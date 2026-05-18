@@ -10,36 +10,33 @@
     </linearGradient>
   </defs>
 
-  <!-- Background -->
-  <rect x="32" y="32" width="448" height="448" rx="96" ry="96" fill="url(#bg)"/>
+  <!-- Full-bleed background — macOS applies its own mask -->
+  <rect x="0" y="0" width="512" height="512" fill="url(#bg)"/>
 
   <!-- Spectrum grid -->
   <g stroke="#ffffff" stroke-opacity="0.12" stroke-width="2">
-    <line x1="170" y1="380" x2="170" y2="200"/>
-    <line x1="215" y1="380" x2="215" y2="170"/>
-    <line x1="260" y1="380" x2="260" y2="220"/>
-    <line x1="305" y1="380" x2="305" y2="150"/>
-    <line x1="350" y1="380" x2="350" y2="190"/>
-    <line x1="155" y1="380" x2="365" y2="380"/>
+    <line x1="170" y1="420" x2="170" y2="240"/>
+    <line x1="215" y1="420" x2="215" y2="210"/>
+    <line x1="260" y1="420" x2="260" y2="260"/>
+    <line x1="305" y1="420" x2="305" y2="190"/>
+    <line x1="350" y1="420" x2="350" y2="230"/>
+    <line x1="155" y1="420" x2="365" y2="420"/>
   </g>
   <g fill="#ffffff" fill-opacity="0.25">
-    <circle cx="170" cy="200" r="4"/>
-    <circle cx="215" cy="170" r="4"/>
-    <circle cx="260" cy="220" r="4"/>
-    <circle cx="305" cy="150" r="4"/>
-    <circle cx="350" cy="190" r="4"/>
+    <circle cx="170" cy="240" r="4"/>
+    <circle cx="215" cy="210" r="4"/>
+    <circle cx="260" cy="260" r="4"/>
+    <circle cx="305" cy="190" r="4"/>
+    <circle cx="350" cy="230" r="4"/>
   </g>
 
-  <!-- Wi-Fi arcs — centered at (256, 310), ~35-45° sweep -->
+  <!-- Wi-Fi arcs — centered at (256, 350) -->
   <g fill="none" stroke="url(#arcGrad)" stroke-width="18" stroke-linecap="round">
-    <!-- Inner: R=55, sweep 35° -->
-    <path d="M 225 265 A 55 55 0 0 1 287 265" />
-    <!-- Middle: R=110, sweep 40° -->
-    <path d="M 186 225 A 110 110 0 0 1 326 225" />
-    <!-- Outer: R=165, sweep 45° -->
-    <path d="M 139 193 A 165 165 0 0 1 373 193" />
+    <path d="M 225 305 A 55 55 0 0 1 287 305" />
+    <path d="M 186 265 A 110 110 0 0 1 326 265" />
+    <path d="M 139 233 A 165 165 0 0 1 373 233" />
   </g>
 
   <!-- Center dot -->
-  <circle cx="256" cy="310" r="16" fill="#ffffff" fill-opacity="0.9"/>
+  <circle cx="256" cy="350" r="16" fill="#ffffff" fill-opacity="0.9"/>
 </svg>
