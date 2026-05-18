@@ -31,6 +31,7 @@
 		EB51C6874A66A7A95F5C1C58 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F66DB715821EBD11B6D1AA /* Color+Extensions.swift */; };
 		EBE67FE6BDA458039D5C9669 /* ChartSeriesData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51C237F247C80EC5176F5C0 /* ChartSeriesData.swift */; };
 		FB0E20882FBAEBCB0064C07A /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = FB0E20872FBAEBCB0064C07A /* Sparkle */; };
+		FB8BB6002FBB04E000FD072E /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = FB8BB5FD2FBB039A00FD072E /* Localizable.xcstrings */; };
 		FBD7B3492FBAED57002C8F5A /* SparkleUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */; };
 		FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */; };
 		FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6203A2551742DF77D61785FE /* WiFiChannel.swift */; };
@@ -73,6 +74,7 @@
 		D69959B95B194A96FA8D337C /* LocationPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermissionManager.swift; sourceTree = "<group>"; };
 		D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewModel.swift; sourceTree = "<group>"; };
 		D9E30854EAD194A9FF4D611B /* ExportMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportMenuView.swift; sourceTree = "<group>"; };
+		FB8BB5FD2FBB039A00FD072E /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdater.swift; sourceTree = "<group>"; };
 		FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -192,6 +194,7 @@
 				1C185A2B983A8BD0ED8EC254 /* Utilities */,
 				E84628E5CD98D61A24833C1B /* ViewModels */,
 				6BE0FDD7651B20648F633DAC /* Views */,
+				FB8BB5FE2FBB039A00FD072E /* Resources */,
 			);
 			path = TinyWiFiAnalyzer;
 			sourceTree = "<group>";
@@ -211,6 +214,14 @@
 				1313F682C3C2D860B5EFFFF0 /* TinyWiFiAnalyzerTests */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		FB8BB5FE2FBB039A00FD072E /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				FB8BB5FD2FBB039A00FD072E /* Localizable.xcstrings */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -240,6 +251,7 @@
 			buildPhases = (
 				5032AD37BED25ED8AB061AD7 /* Sources */,
 				4371D048741550E4775FC8C7 /* Frameworks */,
+				FB8BB5FF2FBB04DB00FD072E /* Resources */,
 			);
 			buildRules = (
 			);
@@ -268,6 +280,7 @@
 			knownRegions = (
 				Base,
 				en,
+				"zh-Hans",
 			);
 			mainGroup = 1D3644357E3565223E7F160A;
 			minimizedProjectReferenceProxies = 1;
@@ -284,6 +297,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FB8BB5FF2FBB04DB00FD072E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB8BB6002FBB04E000FD072E /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		5032AD37BED25ED8AB061AD7 /* Sources */ = {

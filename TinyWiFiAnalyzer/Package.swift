@@ -4,6 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "TinyWiFiAnalyzer",
+    defaultLocalization: "en",
     platforms: [.macOS(.v14)],
     products: [
         .executable(name: "TinyWiFiAnalyzer", targets: ["TinyWiFiAnalyzer"])
@@ -16,7 +17,8 @@ let package = Package(
             name: "TinyWiFiAnalyzer",
             dependencies: [
                 .product(name: "Sparkle", package: "Sparkle"),
-            ]
+            ],
+            resources: [.process("Resources")]
         ),
         .testTarget(
             name: "TinyWiFiAnalyzerTests",
