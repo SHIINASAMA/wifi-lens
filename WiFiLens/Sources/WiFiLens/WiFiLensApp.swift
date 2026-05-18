@@ -72,7 +72,11 @@ struct WiFiLensApp: App {
 
     @MainActor
     private func exportPNG(for vm: BandChartViewModel) {
-        let renderer = ImageRenderer(content: BandChartView(viewModel: vm, scannerViewModel: viewModel))
+        let size = vm.chartSize.width > 0 ? vm.chartSize : CGSize(width: 800, height: 300)
+        let renderer = ImageRenderer(
+            content: BandChartView(viewModel: vm, scannerViewModel: viewModel)
+                .frame(width: size.width, height: size.height)
+        )
         renderer.scale = 2.0
         guard let nsImage = renderer.nsImage,
               let tiff = nsImage.tiffRepresentation,

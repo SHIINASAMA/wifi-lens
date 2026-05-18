@@ -16,6 +16,7 @@ final class BandChartViewModel {
     private(set) var interfaceName: String = ""
     private(set) var currentFilterQuery: String = ""
     private(set) var allSnapshots: [String: [NetworkSnapshot]] = [:]  // bssid → snapshots
+    var chartSize: CGSize = .zero
 
     var hasFilter: Bool { !currentFilterQuery.trimmingCharacters(in: .whitespaces).isEmpty }
     var isEmpty: Bool { allSeriesData.isEmpty }

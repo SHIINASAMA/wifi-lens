@@ -137,6 +137,17 @@ struct ContentView: View {
         case .band(let bandVM):
             BandChartView(viewModel: bandVM, scannerViewModel: viewModel)
                 .frame(height: height)
+                .background {
+                    GeometryReader { geometry in
+                        Color.clear
+                            .onAppear {
+                                bandVM.chartSize = geometry.size
+                            }
+                            .onChange(of: geometry.size) { _, newSize in
+                                bandVM.chartSize = newSize
+                            }
+                    }
+                }
 
         case .networkInfo:
             networkInfoContent
