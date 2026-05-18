@@ -42,15 +42,41 @@ struct IEData {
 
     /// Security summary for table display
     var securitySummary: String {
-        if supportsWPA3 { return "WPA3" }
-        if akmSuites.contains(where: { $0.contains("WPA2") || $0.contains("802.1X") || $0.contains("PSK") || $0.contains("FT/") }) {
-            return "WPA2"
+        if akmSuites.isEmpty { return "" }
+
+        // Collect distinct security levels present
+        var labels: [String] = []
+
+        // WPA3 variants
+        let wpa3Suites = akmSuites.filter { $0.contains("WPA3") }
+        if !wpa3Suites.isEmpty {
+            labels.append(wpa3Suites.joined(separator: "/"))
         }
-        if let first = akmSuites.first {
-            if first.contains("WPA") { return "WPA" }
-            return first.components(separatedBy: " ").first ?? first
+
+        // WPA2 variants (excluding WPA3)
+        let wpa2Suites = akmSuites.filter { !$0.contains("WPA3") && ($0.contains("WPA2") || $0.contains("802.1X") || $0.contains("PSK") || $0.contains("FT/") || $0.contains("SHA256") || $0.contains("SuiteB")) }
+        if !wpa2Suites.isEmpty {
+            labels.append(wpa2Suites.joined(separator: "/"))
         }
-        return ""
+
+        // WPA (legacy)
+        let wpaSuites = akmSuites.filter { $0 == "WPA" }
+        if !wpaSuites.isEmpty {
+            labels.append("WPA")
+        }
+
+        // OWE / other
+        let otherSuites = akmSuites.filter { $0 == "OWE" || $0 == "TDLS" || $0 == "AP PeerKey" }
+        if !otherSuites.isEmpty {
+            labels.append(contentsOf: otherSuites)
+        }
+
+        if labels.isEmpty {
+            // Fallback: show first AKM suite
+            return akmSuites.first?.components(separatedBy: " ").first ?? akmSuites.first ?? ""
+        }
+
+        return labels.joined(separator: "/")
     }
 
     /// MCS summary: e.g. "7" or "9" (VHT)

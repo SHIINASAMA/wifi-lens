@@ -255,7 +255,7 @@ struct IEParserRSNTests {
         let data = singleIE(tag: 48, value: body)
         let result = IEParser.parse(data: data)
         #expect(result.supportsWPA3 == true)
-        #expect(result.securitySummary == "WPA3")
+        #expect(result.securitySummary == "SAE (WPA3)")
         #expect(result.akmSuites == ["SAE (WPA3)"])
     }
 
@@ -537,7 +537,7 @@ struct IEParserCombinedTests {
         #expect(result.supports80211w == true)
         #expect(result.supports80211v == true)
         #expect(result.countryCode == "US ")
-        #expect(result.securitySummary == "WPA3")
+        #expect(result.securitySummary == "SAE (WPA3)/WPA2")
     }
 
     @Test func emptyData() {
