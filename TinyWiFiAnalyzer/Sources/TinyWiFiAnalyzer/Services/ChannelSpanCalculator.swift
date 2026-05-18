@@ -108,9 +108,9 @@ enum ChannelSpanCalculator {
 
             let apex = Double(left + right) / 2.0
 
-            // Guarantee unique IDs even when BSSID is unavailable
+            // Guarantee unique IDs per scan, even when CoreWLAN returns duplicate BSSID/channel entries
             let baseID = "\(nw.bssid)-\(reportedChannel)-\(band.rawValue)"
-            let uniqueID = nw.bssid == "unknown" ? "\(baseID)-\(index)" : baseID
+            let uniqueID = "\(baseID)-\(index)"
 
             series.append(ChartSeriesData(
                 id: uniqueID,

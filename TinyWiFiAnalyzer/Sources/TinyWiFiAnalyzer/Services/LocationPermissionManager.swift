@@ -5,33 +5,45 @@ import AppKit
 @Observable
 final class LocationPermissionManager: NSObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
+    private var waiters: [CheckedContinuation<CLAuthorizationStatus, Never>] = []
 
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var showDeniedAlert = false
 
+    var isAuthorizedForSSID: Bool {
+        switch authorizationStatus {
+        case .authorizedAlways, .authorizedWhenInUse, .authorized:
+            return true
+        default:
+            return false
+        }
+    }
+
     override init() {
         super.init()
         manager.delegate = self
+        authorizationStatus = manager.authorizationStatus
     }
 
-    func requestPermission() {
-        authorizationStatus = manager.authorizationStatus
-        if authorizationStatus != .notDetermined {
-            if authorizationStatus == .denied || authorizationStatus == .restricted {
-                showDeniedAlert = true
-            }
-            return
-        }
+    func refreshStatus() {
+        let status = manager.authorizationStatus
+        authorizationStatus = status
+        showDeniedAlert = status == .denied || status == .restricted
+    }
+
+    func requestPermissionIfNeeded() {
+        refreshStatus()
+        print("[TinyWiFiAnalyzer] requestPermissionIfNeeded(): status=\(authorizationStatus.rawValue)")
+        guard authorizationStatus == .notDetermined else { return }
         manager.requestWhenInUseAuthorization()
     }
 
-    func pollStatus() {
-        let status = manager.authorizationStatus
-        if status != authorizationStatus {
-            authorizationStatus = status
-            if status == .denied || status == .restricted {
-                showDeniedAlert = true
-            }
+    func waitForInitialDecisionIfNeeded() async -> CLAuthorizationStatus {
+        refreshStatus()
+        guard authorizationStatus == .notDetermined else { return authorizationStatus }
+
+        return await withCheckedContinuation { continuation in
+            waiters.append(continuation)
         }
     }
 
@@ -39,8 +51,13 @@ final class LocationPermissionManager: NSObject, CLLocationManagerDelegate {
         let status = manager.authorizationStatus
         Task { @MainActor in
             self.authorizationStatus = status
-            if status == .denied || status == .restricted {
-                self.showDeniedAlert = true
+            self.showDeniedAlert = status == .denied || status == .restricted
+            if status != .notDetermined {
+                let continuations = self.waiters
+                self.waiters.removeAll()
+                for continuation in continuations {
+                    continuation.resume(returning: status)
+                }
             }
         }
     }

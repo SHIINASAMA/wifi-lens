@@ -1,30 +1,39 @@
 import CoreWLAN
 import Foundation
 
+enum WiFiScanEvent: Sendable {
+    case networks([WiFiNetwork])
+    case failure(String)
+}
+
 actor WiFiScanner {
     private let client = CWWiFiClient.shared()
-
     private var shouldStop = false
 
-    /// Emits scan results at the configured interval.
-    func startScanning(interval: Duration = Constants.scanInterval) -> AsyncStream<[WiFiNetwork]> {
-        AsyncStream { continuation in
+    /// Emits scan results or failures at the configured interval.
+    func startScanning(interval: Duration = Constants.scanInterval) -> AsyncStream<WiFiScanEvent> {
+        shouldStop = false
+        print("[TinyWiFiAnalyzer] WiFiScanner.startScanning(): reset stop flag")
+        return AsyncStream { continuation in
             let task = Task {
-                while !shouldStop {
-                    let networks: Set<CWNetwork> = (try? client.interface()?
-                        .scanForNetworks(withSSID: nil)) ?? []
-                    let wrapped = networks.map { WiFiNetwork(from: $0) }
-                    continuation.yield(wrapped)
+                while !shouldStop && !Task.isCancelled {
+                    do {
+                        let networks = try client.interface()?.scanForNetworks(withSSID: nil) ?? []
+                        let wrapped = networks.map { WiFiNetwork(from: $0) }
+                        continuation.yield(.networks(wrapped))
+                    } catch {
+                        continuation.yield(.failure(String(describing: error)))
+                    }
+
                     do {
                         try await Task.sleep(for: interval)
                     } catch {
-                        // Log error but continue scanning
-                        print("Wi-Fi scan failed: \(error)")
+                        break
                     }
-                    try? await Task.sleep(for: interval)
                 }
                 continuation.finish()
             }
+
             continuation.onTermination = { _ in
                 task.cancel()
             }

@@ -3,13 +3,14 @@ import CoreLocation
 
 struct ContentView: View {
     @Bindable var viewModel: ScannerViewModel
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         VStack(spacing: 0) {
             statusBar
             ScrollView {
                 VStack(spacing: 16) {
-                    if viewModel.bandViewModels.isEmpty {
+                    if shouldShowEmptyState {
                         emptyState
                     } else {
                         ForEach(viewModel.bandViewModels, id: \.band.id) { bandVM in
@@ -25,16 +26,18 @@ struct ContentView: View {
         .task {
             await viewModel.start()
         }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                Task { await viewModel.handleSceneDidBecomeActive() }
+            }
+        }
         .onDisappear {
             viewModel.stop()
         }
     }
 
-    // MARK: - Status Bar
-
     private var statusBar: some View {
         HStack(spacing: 16) {
-            // Location auth status
             HStack(spacing: 4) {
                 Circle()
                     .fill(authStatusColor)
@@ -43,6 +46,10 @@ struct ContentView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+
+            Text("State: \(accessStateLabel)")
+                .font(.caption)
+                .foregroundColor(.secondary)
 
             if !viewModel.interfaceName.isEmpty {
                 Text("Interface: \(viewModel.interfaceName)")
@@ -81,44 +88,70 @@ struct ContentView: View {
         case .authorized, .authorizedAlways, .authorizedWhenInUse: "Granted"
         case .denied: "Denied"
         case .restricted: "Restricted"
-        case .notDetermined: "Pending..."
+        case .notDetermined: "Pending"
         @unknown default: "Unknown"
         }
     }
 
-    // MARK: - Empty State
+    private var accessStateLabel: String {
+        switch viewModel.accessState {
+        case .waitingForAuthorization: "Waiting for authorization"
+        case .denied: "Permission denied"
+        case .scanning: "Scanning"
+        case .grantedButSSIDUnavailable: "SSID unavailable"
+        case .scanFailed: "Scan failed"
+        }
+    }
+
+    private var shouldShowEmptyState: Bool {
+        switch viewModel.accessState {
+        case .waitingForAuthorization, .denied, .scanFailed:
+            return true
+        case .scanning, .grantedButSSIDUnavailable:
+            return false
+        }
+    }
 
     private var emptyState: some View {
         VStack(spacing: 16) {
             Spacer()
             ProgressView()
                 .scaleEffect(1.5)
-            Text("Scanning for Wi-Fi networks...")
-                .foregroundColor(.secondary)
 
-            let status = viewModel.locationManager.authorizationStatus
-            if status == .denied || status == .restricted {
-                VStack(spacing: 8) {
-                    Text("Location Services permission is required to read Wi-Fi SSIDs.")
-                        .foregroundColor(.secondary)
-                        .font(.callout)
-                    Button("Open Location Preferences") {
-                        viewModel.locationManager.openLocationPreferences()
-                    }
+            switch viewModel.accessState {
+            case .waitingForAuthorization:
+                Text("Waiting for Location Services permission...")
+                    .foregroundColor(.orange)
+                Button("Open System Settings") {
+                    viewModel.locationManager.openLocationPreferences()
                 }
-            } else if status == .notDetermined {
-                VStack(spacing: 8) {
-                    Text("Location Services permission required")
-                        .foregroundColor(.orange)
-                        .font(.callout)
-                    Text("On macOS, you may need to manually enable Location Services for this app.")
-                        .foregroundColor(.secondary)
-                        .font(.caption)
-                    Button("Open System Settings") {
-                        viewModel.locationManager.openLocationPreferences()
-                    }
+
+            case .denied:
+                Text("Location Services permission is required to read Wi-Fi SSIDs.")
+                    .foregroundColor(.secondary)
+                Button("Open Location Preferences") {
+                    viewModel.locationManager.openLocationPreferences()
                 }
+
+            case .grantedButSSIDUnavailable:
+                Text("Permission is granted, but macOS is still not returning SSIDs.")
+                    .foregroundColor(.secondary)
+                Button("Open Location Preferences") {
+                    viewModel.locationManager.openLocationPreferences()
+                }
+
+            case .scanFailed(let message):
+                Text("Wi-Fi scan failed")
+                    .foregroundColor(.secondary)
+                Text(message)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+            case .scanning:
+                Text("Scanning for Wi-Fi networks...")
+                    .foregroundColor(.secondary)
             }
+
             Spacer()
         }
         .frame(minHeight: 300)
