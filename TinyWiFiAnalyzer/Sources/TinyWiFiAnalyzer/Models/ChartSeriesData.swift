@@ -24,7 +24,7 @@ struct ChartSeriesData: Identifiable {
         let sigma = halfWidth / 3.0  // curve drops to ~0 at edges
         let amplitude = Double(rssi - Constants.rssiNoiseFloor)  // positive value above floor
         let floor = Double(Constants.rssiNoiseFloor)
-        let steps = 40
+        let steps = 80
         var points: [(x: Double, y: Double)] = []
 
         for i in 0...steps {

@@ -7,7 +7,7 @@ struct ContentView: View {
     @Bindable var viewModel: ScannerViewModel
     @Environment(\.scenePhase) private var scenePhase
 
-    @State private var sortOrder: [KeyPathComparator<NetworkTableRow>] = []
+    @State private var sortOrder: [NSSortDescriptor] = [NSSortDescriptor(key: "ssid", ascending: true)]
     @State private var is2GHzCollapsed = false
     @State private var is5GHzCollapsed = false
     @State private var is6GHzCollapsed = false
@@ -174,44 +174,36 @@ struct ContentView: View {
 
     // MARK: - Bottom Table (shared)
 
-    private var bottomTable: some View {
-        Table(viewModel.combinedTableRows, selection: selectionBinding, sortOrder: $sortOrder) {
-            TableColumn("") { row in
-                Circle()
-                    .fill(row.color)
-                    .frame(width: 8, height: 8)
-                    .opacity(rowOpacity(row))
+    private var sortedRows: [NetworkTableRow] {
+        guard !sortOrder.isEmpty else { return viewModel.combinedTableRows }
+        return viewModel.combinedTableRows.sorted { a, b in
+            for desc in sortOrder {
+                let result = compareRow(a, b, key: desc.key ?? "", ascending: desc.ascending)
+                if result != .orderedSame { return result == .orderedAscending }
             }
-            .width(24)
-
-            TableColumn("SSID", value: \.ssid) { row in
-                Text(row.ssid).opacity(rowOpacity(row))
-            }
-            .width(min: 160, ideal: 220)
-
-            TableColumn("Band", value: \.bandLabel) { row in
-                Text(row.bandLabel).opacity(rowOpacity(row))
-            }
-            .width(min: 60, ideal: 80)
-
-            TableColumn("Ch", value: \.channel) { row in
-                Text("\(row.channel)").opacity(rowOpacity(row))
-            }
-            .width(min: 40, ideal: 50)
-
-            TableColumn("RSSI", value: \.rssi) { row in
-                Text("\(row.rssi) dBm").opacity(rowOpacity(row))
-            }
-            .width(min: 60, ideal: 75)
-
-            TableColumn("BSSID", value: \.bssid) { row in
-                Text(row.bssid)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .opacity(rowOpacity(row))
-            }
-            .width(min: 160, ideal: 220)
+            return false
         }
+    }
+
+    private func compareRow(_ a: NetworkTableRow, _ b: NetworkTableRow, key: String, ascending: Bool) -> ComparisonResult {
+        let cmp: ComparisonResult
+        switch key {
+        case "ssid":       cmp = a.ssid.localizedCaseInsensitiveCompare(b.ssid)
+        case "bandLabel":  cmp = a.bandLabel.localizedCaseInsensitiveCompare(b.bandLabel)
+        case "channel":    cmp = a.channel < b.channel ? .orderedAscending : a.channel > b.channel ? .orderedDescending : .orderedSame
+        case "rssi":       cmp = a.rssi > b.rssi ? .orderedAscending : a.rssi < b.rssi ? .orderedDescending : .orderedSame
+        case "bssid":      cmp = a.bssid.localizedCaseInsensitiveCompare(b.bssid)
+        default:           cmp = .orderedSame
+        }
+        return ascending ? cmp : (cmp == .orderedAscending ? .orderedDescending : cmp == .orderedDescending ? .orderedAscending : .orderedSame)
+    }
+
+    private var bottomTable: some View {
+        NativeTableView(
+            rows: sortedRows,
+            selectedID: $viewModel.selectedNetworkID,
+            sortOrder: $sortOrder
+        )
     }
 
     // MARK: - Section Info
@@ -292,23 +284,6 @@ struct ContentView: View {
     }
 
     // MARK: - Helpers
-
-    private func rowOpacity(_ row: NetworkTableRow) -> Double {
-        if let selectedID = viewModel.selectedNetworkID {
-            return row.id == selectedID ? 1.0 : 0.25
-        }
-        return row.isFilteredOut ? Constants.filteredOutOpacity : 1.0
-    }
-
-    private var selectionBinding: Binding<Set<NetworkTableRow.ID>> {
-        Binding(
-            get: {
-                if let selected = viewModel.selectedNetworkID { return [selected] }
-                return []
-            },
-            set: { viewModel.selectedNetworkID = $0.first }
-        )
-    }
 
     private var shouldShowEmptyState: Bool {
         switch viewModel.accessState {

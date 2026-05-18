@@ -4,8 +4,8 @@ struct BandChartView: View {
     @Bindable var viewModel: BandChartViewModel
     @Bindable var scannerViewModel: ScannerViewModel
 
-    private let leftAxisWidth: CGFloat = 36
-    private let bottomAxisHeight: CGFloat = 20
+    private let leftAxisWidth: CGFloat = 38
+    private let bottomAxisHeight: CGFloat = 24
 
     var body: some View {
         VStack(spacing: 0) {

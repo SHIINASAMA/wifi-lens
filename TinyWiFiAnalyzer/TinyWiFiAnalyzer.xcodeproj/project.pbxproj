@@ -17,6 +17,7 @@
 		28DCDBF118C838D48BD26773 /* WiFiNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58854CC5BE8A54269614FAD /* WiFiNetwork.swift */; };
 		318908BC49D244B1EEE68A9A /* ChannelSpanCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */; };
 		33337ED933A513AE77A01209 /* ExportMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E30854EAD194A9FF4D611B /* ExportMenuView.swift */; };
+		3711656F0C3ECD58CA29D407 /* NativeTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3299502DE1A130760C8A7 /* NativeTableView.swift */; };
 		46B405FC484C9C9A5509E8AC /* SpanDirection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310AD5ABC56B4211E30DD1DE /* SpanDirection.swift */; };
 		4BE4E9FA093DB4EB55BA1897 /* SSIDColorHasherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BFE0FBFE5981CF7822D21FD /* SSIDColorHasherTests.swift */; };
 		6680C83EB72E9C488E7F7616 /* BandChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */; };
@@ -45,6 +46,7 @@
 /* Begin PBXFileReference section */
 		1067F6AA96EC6320C6472F59 /* CoreWLAN.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreWLAN.framework; path = System/Library/Frameworks/CoreWLAN.framework; sourceTree = SDKROOT; };
 		1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelSpanCalculator.swift; sourceTree = "<group>"; };
+		28A3299502DE1A130760C8A7 /* NativeTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeTableView.swift; sourceTree = "<group>"; };
 		2A7ED53B7BCC8C0A11662151 /* FilterPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterPopoverView.swift; sourceTree = "<group>"; };
 		310AD5ABC56B4211E30DD1DE /* SpanDirection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanDirection.swift; sourceTree = "<group>"; };
 		3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartView.swift; sourceTree = "<group>"; };
@@ -139,6 +141,7 @@
 				7B31CBEBC05DEA7ADB03FE01 /* ContentView.swift */,
 				D9E30854EAD194A9FF4D611B /* ExportMenuView.swift */,
 				2A7ED53B7BCC8C0A11662151 /* FilterPopoverView.swift */,
+				28A3299502DE1A130760C8A7 /* NativeTableView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -248,7 +251,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2650;
+				LastUpgradeCheck = 1430;
 			};
 			buildConfigurationList = C7B2E8745D5E0030C0227E6E /* Build configuration list for PBXProject "TinyWiFiAnalyzer" */;
 			developmentRegion = en;
@@ -287,6 +290,7 @@
 				33337ED933A513AE77A01209 /* ExportMenuView.swift in Sources */,
 				12AA3A17CCE99E41D313C900 /* FilterPopoverView.swift in Sources */,
 				027A3CECC33E6608D9F53B53 /* LocationPermissionManager.swift in Sources */,
+				3711656F0C3ECD58CA29D407 /* NativeTableView.swift in Sources */,
 				A952EA4DBE85899D61989DF9 /* SSIDColorHasher.swift in Sources */,
 				DA7DEF71C1E8ED4068EB7D66 /* ScannerViewModel.swift in Sources */,
 				46B405FC484C9C9A5509E8AC /* SpanDirection.swift in Sources */,
@@ -322,7 +326,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -340,7 +343,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -360,9 +362,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
-				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "On macOS 14 Sonoma and Later, Location Services permission is required to get Wi-Fi SSIDs. Please enable Location Services in System Preferences > Security & Privacy > Privacy > Location Services.";
@@ -411,11 +411,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -430,7 +428,6 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 6.0;
@@ -471,11 +468,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -497,7 +492,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
@@ -511,9 +505,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
-				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "On macOS 14 Sonoma and Later, Location Services permission is required to get Wi-Fi SSIDs. Please enable Location Services in System Preferences > Security & Privacy > Privacy > Location Services.";
