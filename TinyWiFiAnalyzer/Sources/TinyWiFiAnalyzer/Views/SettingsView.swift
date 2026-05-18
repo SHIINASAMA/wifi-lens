@@ -22,6 +22,8 @@ struct SettingsView: View {
         .frame(width: 400, height: 220)
     }
 
+    @AppStorage("scanIntervalSeconds") private var scanInterval: Int = 3
+
     private var generalTab: some View {
         Form {
             Text("Tiny Wi-Fi Analyzer")
@@ -29,6 +31,16 @@ struct SettingsView: View {
             Text("A simple Wi-Fi channel and signal strength analyzer for macOS.")
                 .font(.caption)
                 .foregroundColor(.secondary)
+
+            Picker("Refresh interval", selection: $scanInterval) {
+                Text("1 second").tag(1)
+                Text("2 seconds").tag(2)
+                Text("3 seconds").tag(3)
+                Text("5 seconds").tag(5)
+                Text("10 seconds").tag(10)
+            }
+            .pickerStyle(.menu)
+            .frame(maxWidth: 280)
         }
         .padding()
     }

@@ -118,7 +118,9 @@ final class ScannerViewModel {
         accessState = .scanning
 
         scanTask = Task {
-            let stream = await scanner.startScanning()
+            let intervalSeconds = UserDefaults.standard.integer(forKey: "scanIntervalSeconds")
+            let interval: Duration = .seconds(max(1, intervalSeconds > 0 ? intervalSeconds : 3))
+            let stream = await scanner.startScanning(interval: interval)
             for await event in stream {
                 guard !Task.isCancelled else { break }
                 locationManager.refreshStatus()
