@@ -23,7 +23,7 @@
 		6680C83EB72E9C488E7F7616 /* BandChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */; };
 		6ACEE4EC462933B7C4320468 /* ChannelBand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4079C5A47F59C655689BCFB8 /* ChannelBand.swift */; };
 		6ECFD8E459A49E4A6FA0FCB0 /* WiFiScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */; };
-		9E2F89530D1114DBFAB705F3 /* TinyWiFiAnalyzerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831E90D5B9D07C478A35DD14 /* TinyWiFiAnalyzerApp.swift */; };
+		9E2F89530D1114DBFAB705F3 /* WiFiLensApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831E90D5B9D07C478A35DD14 /* WiFiLensApp.swift */; };
 		9F1D29EF11E510D9D72BB7D1 /* CWChannel+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5DDCE8EACD706BD2BCEE4B /* CWChannel+Extensions.swift */; };
 		A952EA4DBE85899D61989DF9 /* SSIDColorHasher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */; };
 		B9AB60F3D002A7B9123D2520 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EAF444453E304ABB57AF3AA /* CoreLocation.framework */; };
@@ -34,6 +34,7 @@
 		FB8BB6002FBB04E000FD072E /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = FB8BB5FD2FBB039A00FD072E /* Localizable.xcstrings */; };
 		FB8BB6022FBB07F600FD072E /* NetworkInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8BB6012FBB07F600FD072E /* NetworkInfoService.swift */; };
 		FB8BB6042FBB0BA600FD072E /* IEParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8BB6032FBB0BA600FD072E /* IEParser.swift */; };
+		FB8BB6062FBB134100FD072E /* twa.icns in Resources */ = {isa = PBXBuildFile; fileRef = FB8BB6052FBB134100FD072E /* twa.icns */; };
 		FBD7B3492FBAED57002C8F5A /* SparkleUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */; };
 		FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */; };
 		FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6203A2551742DF77D61785FE /* WiFiChannel.swift */; };
@@ -45,7 +46,7 @@
 			containerPortal = 70C77BA3C6064FF4D1D77E59 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 4815C3B026D255EF85C56198;
-			remoteInfo = TinyWiFiAnalyzer;
+			remoteInfo = WiFiLens;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -65,20 +66,22 @@
 		6BFE0FBFE5981CF7822D21FD /* SSIDColorHasherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSIDColorHasherTests.swift; sourceTree = "<group>"; };
 		7B31CBEBC05DEA7ADB03FE01 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiScanner.swift; sourceTree = "<group>"; };
-		831E90D5B9D07C478A35DD14 /* TinyWiFiAnalyzerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TinyWiFiAnalyzerApp.swift; sourceTree = "<group>"; };
-		8F405489976429A068F15F86 /* TinyWiFiAnalyzerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TinyWiFiAnalyzerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		831E90D5B9D07C478A35DD14 /* WiFiLensApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiLensApp.swift; sourceTree = "<group>"; };
+		8F405489976429A068F15F86 /* WiFiLensTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WiFiLensTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSIDColorHasher.swift; sourceTree = "<group>"; };
 		9C5DDCE8EACD706BD2BCEE4B /* CWChannel+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CWChannel+Extensions.swift"; sourceTree = "<group>"; };
 		A07EE7C5EC36D66A6A9B3D1A /* ChannelSpanCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelSpanCalculatorTests.swift; sourceTree = "<group>"; };
 		B58854CC5BE8A54269614FAD /* WiFiNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiNetwork.swift; sourceTree = "<group>"; };
-		BD784856886985BCC6FC4F02 /* TinyWiFiAnalyzer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TinyWiFiAnalyzer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BD784856886985BCC6FC4F02 /* WiFiLens.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WiFiLens.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C51C237F247C80EC5176F5C0 /* ChartSeriesData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartSeriesData.swift; sourceTree = "<group>"; };
 		D69959B95B194A96FA8D337C /* LocationPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermissionManager.swift; sourceTree = "<group>"; };
 		D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewModel.swift; sourceTree = "<group>"; };
 		D9E30854EAD194A9FF4D611B /* ExportMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportMenuView.swift; sourceTree = "<group>"; };
+		FB0573AB2FBB1F40005F8214 /* WiFiLens-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "WiFiLens-Info.plist"; sourceTree = "<group>"; };
 		FB8BB5FD2FBB039A00FD072E /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		FB8BB6012FBB07F600FD072E /* NetworkInfoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInfoService.swift; sourceTree = "<group>"; };
 		FB8BB6032FBB0BA600FD072E /* IEParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IEParser.swift; sourceTree = "<group>"; };
+		FB8BB6052FBB134100FD072E /* twa.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = twa.icns; path = ../assets/twa.icns; sourceTree = SOURCE_ROOT; };
 		FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdater.swift; sourceTree = "<group>"; };
 		FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -97,13 +100,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1313F682C3C2D860B5EFFFF0 /* TinyWiFiAnalyzerTests */ = {
+		1313F682C3C2D860B5EFFFF0 /* WiFiLensTests */ = {
 			isa = PBXGroup;
 			children = (
 				A07EE7C5EC36D66A6A9B3D1A /* ChannelSpanCalculatorTests.swift */,
 				6BFE0FBFE5981CF7822D21FD /* SSIDColorHasherTests.swift */,
 			);
-			path = TinyWiFiAnalyzerTests;
+			path = WiFiLensTests;
 			sourceTree = "<group>";
 		};
 		1C185A2B983A8BD0ED8EC254 /* Utilities */ = {
@@ -119,6 +122,7 @@
 		1D3644357E3565223E7F160A = {
 			isa = PBXGroup;
 			children = (
+				FB0573AB2FBB1F40005F8214 /* WiFiLens-Info.plist */,
 				2BB8E28CC6CC66A93DA47095 /* Sources */,
 				F35C303A303793F8CD7A167F /* Tests */,
 				6D81AD175FCC46C43BC613A7 /* Frameworks */,
@@ -129,7 +133,7 @@
 		2BB8E28CC6CC66A93DA47095 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				DA6A83BCB3A09FD57BB9E12F /* TinyWiFiAnalyzer */,
+				DA6A83BCB3A09FD57BB9E12F /* WiFiLens */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -171,8 +175,8 @@
 		BD4D8FFAAD7E961D9EE4F5FE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BD784856886985BCC6FC4F02 /* TinyWiFiAnalyzer.app */,
-				8F405489976429A068F15F86 /* TinyWiFiAnalyzerTests.xctest */,
+				BD784856886985BCC6FC4F02 /* WiFiLens.app */,
+				8F405489976429A068F15F86 /* WiFiLensTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -191,10 +195,10 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		DA6A83BCB3A09FD57BB9E12F /* TinyWiFiAnalyzer */ = {
+		DA6A83BCB3A09FD57BB9E12F /* WiFiLens */ = {
 			isa = PBXGroup;
 			children = (
-				831E90D5B9D07C478A35DD14 /* TinyWiFiAnalyzerApp.swift */,
+				831E90D5B9D07C478A35DD14 /* WiFiLensApp.swift */,
 				39648ABC2A100E480054AE21 /* Models */,
 				C469C8F814DF9312C483CAC3 /* Services */,
 				1C185A2B983A8BD0ED8EC254 /* Utilities */,
@@ -202,7 +206,7 @@
 				6BE0FDD7651B20648F633DAC /* Views */,
 				FB8BB5FE2FBB039A00FD072E /* Resources */,
 			);
-			path = TinyWiFiAnalyzer;
+			path = WiFiLens;
 			sourceTree = "<group>";
 		};
 		E84628E5CD98D61A24833C1B /* ViewModels */ = {
@@ -217,7 +221,7 @@
 		F35C303A303793F8CD7A167F /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				1313F682C3C2D860B5EFFFF0 /* TinyWiFiAnalyzerTests */,
+				1313F682C3C2D860B5EFFFF0 /* WiFiLensTests */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -225,6 +229,7 @@
 		FB8BB5FE2FBB039A00FD072E /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				FB8BB6052FBB134100FD072E /* twa.icns */,
 				FB8BB5FD2FBB039A00FD072E /* Localizable.xcstrings */,
 			);
 			path = Resources;
@@ -233,9 +238,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		32B8DFED1C1CBAD8FD8C797C /* TinyWiFiAnalyzerTests */ = {
+		32B8DFED1C1CBAD8FD8C797C /* WiFiLensTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = CA65A170FF00C1566D44BBC0 /* Build configuration list for PBXNativeTarget "TinyWiFiAnalyzerTests" */;
+			buildConfigurationList = CA65A170FF00C1566D44BBC0 /* Build configuration list for PBXNativeTarget "WiFiLensTests" */;
 			buildPhases = (
 				B5CA93E4929E701BE84D66BD /* Sources */,
 			);
@@ -244,16 +249,16 @@
 			dependencies = (
 				3827ECDAF89C6D5C3E9D7051 /* PBXTargetDependency */,
 			);
-			name = TinyWiFiAnalyzerTests;
+			name = WiFiLensTests;
 			packageProductDependencies = (
 			);
-			productName = TinyWiFiAnalyzerTests;
-			productReference = 8F405489976429A068F15F86 /* TinyWiFiAnalyzerTests.xctest */;
+			productName = WiFiLensTests;
+			productReference = 8F405489976429A068F15F86 /* WiFiLensTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		4815C3B026D255EF85C56198 /* TinyWiFiAnalyzer */ = {
+		4815C3B026D255EF85C56198 /* WiFiLens */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C7342F9C7642FE3324E1F9F4 /* Build configuration list for PBXNativeTarget "TinyWiFiAnalyzer" */;
+			buildConfigurationList = C7342F9C7642FE3324E1F9F4 /* Build configuration list for PBXNativeTarget "WiFiLens" */;
 			buildPhases = (
 				5032AD37BED25ED8AB061AD7 /* Sources */,
 				4371D048741550E4775FC8C7 /* Frameworks */,
@@ -263,12 +268,12 @@
 			);
 			dependencies = (
 			);
-			name = TinyWiFiAnalyzer;
+			name = WiFiLens;
 			packageProductDependencies = (
 				FB0E20872FBAEBCB0064C07A /* Sparkle */,
 			);
-			productName = TinyWiFiAnalyzer;
-			productReference = BD784856886985BCC6FC4F02 /* TinyWiFiAnalyzer.app */;
+			productName = WiFiLens;
+			productReference = BD784856886985BCC6FC4F02 /* WiFiLens.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -280,7 +285,7 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 			};
-			buildConfigurationList = C7B2E8745D5E0030C0227E6E /* Build configuration list for PBXProject "TinyWiFiAnalyzer" */;
+			buildConfigurationList = C7B2E8745D5E0030C0227E6E /* Build configuration list for PBXProject "WiFiLens" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -298,8 +303,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4815C3B026D255EF85C56198 /* TinyWiFiAnalyzer */,
-				32B8DFED1C1CBAD8FD8C797C /* TinyWiFiAnalyzerTests */,
+				4815C3B026D255EF85C56198 /* WiFiLens */,
+				32B8DFED1C1CBAD8FD8C797C /* WiFiLensTests */,
 			);
 		};
 /* End PBXProject section */
@@ -310,6 +315,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB8BB6002FBB04E000FD072E /* Localizable.xcstrings in Resources */,
+				FB8BB6062FBB134100FD072E /* twa.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -337,7 +343,7 @@
 				A952EA4DBE85899D61989DF9 /* SSIDColorHasher.swift in Sources */,
 				DA7DEF71C1E8ED4068EB7D66 /* ScannerViewModel.swift in Sources */,
 				46B405FC484C9C9A5509E8AC /* SpanDirection.swift in Sources */,
-				9E2F89530D1114DBFAB705F3 /* TinyWiFiAnalyzerApp.swift in Sources */,
+				9E2F89530D1114DBFAB705F3 /* WiFiLensApp.swift in Sources */,
 				FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */,
 				28DCDBF118C838D48BD26773 /* WiFiNetwork.swift in Sources */,
 				FB8BB6042FBB0BA600FD072E /* IEParser.swift in Sources */,
@@ -361,7 +367,7 @@
 /* Begin PBXTargetDependency section */
 		3827ECDAF89C6D5C3E9D7051 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4815C3B026D255EF85C56198 /* TinyWiFiAnalyzer */;
+			target = 4815C3B026D255EF85C56198 /* WiFiLens */;
 			targetProxy = B3934361D41B2103307CC777 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -378,9 +384,9 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.nolze.TinyWiFiAnalyzerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.nolze.WiFiLensTests;
 				SDKROOT = macosx;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TinyWiFiAnalyzer.app/Contents/MacOS/TinyWiFiAnalyzer";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WiFiLens.app/Contents/MacOS/WiFiLens";
 			};
 			name = Debug;
 		};
@@ -395,9 +401,9 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.nolze.TinyWiFiAnalyzerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.nolze.WiFiLensTests;
 				SDKROOT = macosx;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TinyWiFiAnalyzer.app/Contents/MacOS/TinyWiFiAnalyzer";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WiFiLens.app/Contents/MacOS/WiFiLens";
 			};
 			name = Release;
 		};
@@ -405,10 +411,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
+				INFOPLIST_FILE = "WiFiLens-Info.plist";
+				INFOPLIST_KEY_CFBundleIconFile = twa;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "On macOS 14 Sonoma and Later, Location Services permission is required to get Wi-Fi SSIDs. Please enable Location Services in System Preferences > Security & Privacy > Privacy > Location Services.";
@@ -417,7 +426,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.tiny-wifi-analyzer";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 			};
@@ -548,10 +557,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
+				INFOPLIST_FILE = "WiFiLens-Info.plist";
+				INFOPLIST_KEY_CFBundleIconFile = twa;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "On macOS 14 Sonoma and Later, Location Services permission is required to get Wi-Fi SSIDs. Please enable Location Services in System Preferences > Security & Privacy > Privacy > Location Services.";
@@ -560,7 +572,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.tiny-wifi-analyzer";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 			};
@@ -569,7 +581,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C7342F9C7642FE3324E1F9F4 /* Build configuration list for PBXNativeTarget "TinyWiFiAnalyzer" */ = {
+		C7342F9C7642FE3324E1F9F4 /* Build configuration list for PBXNativeTarget "WiFiLens" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B6525FE3DDC51BB4B44EF6B5 /* Debug */,
@@ -578,7 +590,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		C7B2E8745D5E0030C0227E6E /* Build configuration list for PBXProject "TinyWiFiAnalyzer" */ = {
+		C7B2E8745D5E0030C0227E6E /* Build configuration list for PBXProject "WiFiLens" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BEFF0BAF927CA3CBE7CF5AF2 /* Debug */,
@@ -587,7 +599,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		CA65A170FF00C1566D44BBC0 /* Build configuration list for PBXNativeTarget "TinyWiFiAnalyzerTests" */ = {
+		CA65A170FF00C1566D44BBC0 /* Build configuration list for PBXNativeTarget "WiFiLensTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				27D7C298956651919604E437 /* Debug */,

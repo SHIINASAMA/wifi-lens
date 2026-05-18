@@ -26,7 +26,7 @@ struct SettingsView: View {
 
     private var generalTab: some View {
         Form {
-            Text("Tiny Wi-Fi Analyzer")
+            Text("WiFi Lens")
                 .font(.headline)
             Text("A simple Wi-Fi channel and signal strength analyzer for macOS.")
                 .font(.caption)

@@ -3,14 +3,14 @@ name: Build & Release
 on:
   push:
     paths:
-      - 'TinyWiFiAnalyzer/**'
+      - 'WiFiLens/**'
     branches:
       - master
     tags:
       - 'v*'
   pull_request:
     paths:
-      - 'TinyWiFiAnalyzer/**'
+      - 'WiFiLens/**'
   workflow_dispatch:
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
     runs-on: macos-latest
     defaults:
       run:
-        working-directory: TinyWiFiAnalyzer
+        working-directory: WiFiLens
     steps:
       - uses: actions/checkout@v4
 
@@ -34,14 +34,14 @@ jobs:
     runs-on: macos-latest
     defaults:
       run:
-        working-directory: TinyWiFiAnalyzer
+        working-directory: WiFiLens
     steps:
       - uses: actions/checkout@v4
 
       - name: Build Release
         run: |
-          xcodebuild -project TinyWiFiAnalyzer.xcodeproj \
-            -scheme TinyWiFiAnalyzer \
+          xcodebuild -project WiFiLens.xcodeproj \
+            -scheme WiFiLens \
             -configuration Release \
             -derivedDataPath .build/DerivedData \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
@@ -49,26 +49,26 @@ jobs:
 
       - name: Prepare App Bundle
         run: |
-          APP_SRC=".build/DerivedData/Build/Products/Release/TinyWiFiAnalyzer.app"
-          cp -R "$APP_SRC" TinyWiFiAnalyzer.app
+          APP_SRC=".build/DerivedData/Build/Products/Release/WiFiLens.app"
+          cp -R "$APP_SRC" WiFiLens.app
 
       - name: Create DMG
         run: |
-          hdiutil create -volname "TinyWiFiAnalyzer" \
-            -srcfolder TinyWiFiAnalyzer.app \
-            -ov -format UDZO TinyWiFiAnalyzer.dmg
-          echo "DMG_SIZE=$(stat -f%z TinyWiFiAnalyzer.dmg)" >> $GITHUB_ENV
+          hdiutil create -volname "WiFiLens" \
+            -srcfolder WiFiLens.app \
+            -ov -format UDZO WiFiLens.dmg
+          echo "DMG_SIZE=$(stat -f%z WiFiLens.dmg)" >> $GITHUB_ENV
 
       - name: Get Version
         run: |
           TAG=${GITHUB_REF#refs/tags/v}
           echo "VERSION=$TAG" >> $GITHUB_ENV
-          BUNDLE_VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" TinyWiFiAnalyzer.app/Contents/Info.plist 2>/dev/null || echo "$TAG")
+          BUNDLE_VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" WiFiLens.app/Contents/Info.plist 2>/dev/null || echo "$TAG")
           echo "BUNDLE_VERSION=$BUNDLE_VERSION" >> $GITHUB_ENV
 
       - name: Generate Appcast
         run: |
-          ENCLOSURE_URL="https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/TinyWiFiAnalyzer.dmg"
+          ENCLOSURE_URL="https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/WiFiLens.dmg"
           VER="${{ env.VERSION }}"
           BVER="${{ env.BUNDLE_VERSION }}"
           SIZE="${{ env.DMG_SIZE }}"
@@ -76,7 +76,7 @@ jobs:
           echo '<?xml version="1.0" encoding="utf-8"?>' > appcast.xml
           echo '<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">' >> appcast.xml
           echo '  <channel>' >> appcast.xml
-          echo '    <title>Tiny Wi-Fi Analyzer</title>' >> appcast.xml
+          echo '    <title>WiFi Lens</title>' >> appcast.xml
           echo '    <item>' >> appcast.xml
           echo "      <title>Version ${VER}</title>" >> appcast.xml
           echo "      <sparkle:version>${VER}</sparkle:version>" >> appcast.xml
@@ -96,7 +96,7 @@ jobs:
         with:
           tag_name: v${{ env.VERSION }}
           files: |
-            TinyWiFiAnalyzer/TinyWiFiAnalyzer.dmg
-            TinyWiFiAnalyzer/appcast.xml
+            WiFiLens/WiFiLens.dmg
+            WiFiLens/appcast.xml
           draft: false
           generate_release_notes: true

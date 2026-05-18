@@ -33,7 +33,7 @@ final class LocationPermissionManager: NSObject, CLLocationManagerDelegate {
 
     func requestPermissionIfNeeded() {
         refreshStatus()
-        print("[TinyWiFiAnalyzer] requestPermissionIfNeeded(): status=\(authorizationStatus.rawValue)")
+        print("[WiFiLens] requestPermissionIfNeeded(): status=\(authorizationStatus.rawValue)")
         guard authorizationStatus == .notDetermined else { return }
         manager.requestWhenInUseAuthorization()
     }

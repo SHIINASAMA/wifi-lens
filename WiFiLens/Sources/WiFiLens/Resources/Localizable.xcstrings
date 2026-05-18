@@ -489,9 +489,6 @@
         }
       }
     },
-    "Tiny Wi-Fi Analyzer" : {
-
-    },
     "Toggle Expand" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -556,6 +553,9 @@
           }
         }
       }
+    },
+    "WiFi Lens" : {
+
     }
   },
   "version" : "1.0"

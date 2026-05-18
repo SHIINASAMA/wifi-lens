@@ -1,6 +1,6 @@
-# Tiny Wi-Fi Analyzer
+# WiFi Lens
 
-[![Swift CI](https://github.com/SHIINASAMA/tiny-wifi-analyzer/workflows/Build%20&%20Release/badge.svg)](https://github.com/SHIINASAMA/tiny-wifi-analyzer/actions?query=workflow%3A%22Build+%26+Release%22)
+[![Swift CI](https://github.com/SHIINASAMA/wifi-lens/workflows/Build%20&%20Release/badge.svg)](https://github.com/SHIINASAMA/wifi-lens/actions?query=workflow%3A%22Build+%26+Release%22)
 
 Simple, open-source Wi-Fi channel and signal strength analyzer for macOS.
 Built with SwiftUI, CoreWLAN, and Sparkle.
@@ -33,7 +33,7 @@ Built with SwiftUI, CoreWLAN, and Sparkle.
 
 ## Download
 
-[Visit the latest release](https://github.com/SHIINASAMA/tiny-wifi-analyzer/releases/latest/)
+[Visit the latest release](https://github.com/SHIINASAMA/wifi-lens/releases/latest/)
 
 ### Gatekeeper workaround
 
@@ -42,21 +42,21 @@ Because the application is not signed, macOS Gatekeeper may block it.
 - **Right-click** the app icon → **Open** → confirm in the dialog; or
 - Run in Terminal:
   ```sh
-  xattr -d com.apple.quarantine /Applications/Tiny\ Wi-Fi\ Analyzer.app
+  xattr -d com.apple.quarantine /Applications/WiFi\ Lens.app
   ```
 
 ## Develop
 
 ```sh
-git clone https://github.com/SHIINASAMA/tiny-wifi-analyzer
-cd tiny-wifi-analyzer/TinyWiFiAnalyzer
+git clone https://github.com/SHIINASAMA/wifi-lens
+cd wifi-lens/WiFiLens
 
 # Build & test via SPM
 swift build
 swift test
 
 # Open in Xcode for GUI development (required for app bundle with Location Services)
-xed TinyWiFiAnalyzer.xcodeproj
+xed WiFiLens.xcodeproj
 ```
 
 ## License

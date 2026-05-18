@@ -3,26 +3,26 @@
 import PackageDescription
 
 let package = Package(
-    name: "TinyWiFiAnalyzer",
+    name: "WiFiLens",
     defaultLocalization: "en",
     platforms: [.macOS(.v14)],
     products: [
-        .executable(name: "TinyWiFiAnalyzer", targets: ["TinyWiFiAnalyzer"])
+        .executable(name: "WiFiLens", targets: ["WiFiLens"])
     ],
     dependencies: [
         .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.8.0"),
     ],
     targets: [
         .executableTarget(
-            name: "TinyWiFiAnalyzer",
+            name: "WiFiLens",
             dependencies: [
                 .product(name: "Sparkle", package: "Sparkle"),
             ],
             resources: [.process("Resources")]
         ),
         .testTarget(
-            name: "TinyWiFiAnalyzerTests",
-            dependencies: ["TinyWiFiAnalyzer"]
+            name: "WiFiLensTests",
+            dependencies: ["WiFiLens"]
         ),
     ]
 )

@@ -39,17 +39,17 @@ jobs:
       - name: Package app
         run: |
           mkdir build/volume
-          cp -R 'build/dist/Tiny Wi-Fi Analyzer.app' build/volume
+          cp -R 'build/dist/WiFi Lens.app' build/volume
           hdiutil create \
                   -fs HFS+ \
                   -srcfolder "build/volume" \
-                  -volname "Tiny Wi-Fi Analyzer" "build/Tiny_Wi-Fi_Analyzer.dmg"
+                  -volname "WiFi Lens" "build/WiFi_Lens.dmg"
       - name: Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           draft: true
           name: Release v${{ env.APP_VERSION }}
-          files: build/Tiny_Wi-Fi_Analyzer.dmg
+          files: build/WiFi_Lens.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

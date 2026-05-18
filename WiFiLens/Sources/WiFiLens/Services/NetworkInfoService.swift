@@ -84,7 +84,7 @@ enum NetworkInfoService {
         var subnets: [String] = []
         var router: String?
 
-        let store = SCDynamicStoreCreate(nil, "TinyWiFiAnalyzer" as CFString, nil, nil)
+        let store = SCDynamicStoreCreate(nil, "WiFiLens" as CFString, nil, nil)
         if let store,
            let ipv4Dict = SCDynamicStoreCopyValue(store, "State:/Network/Interface/\(name)/IPv4" as CFString) as? [String: Any] {
             ipv4s = ipv4Dict["Addresses"] as? [String] ?? []

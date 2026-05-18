@@ -1,5 +1,5 @@
 import Testing
-@testable import TinyWiFiAnalyzer
+@testable import WiFiLens
 
 struct ChannelSpanCalculatorTests {
 

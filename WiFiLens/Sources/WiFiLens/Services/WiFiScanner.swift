@@ -13,7 +13,7 @@ actor WiFiScanner {
     /// Emits scan results or failures at the configured interval.
     func startScanning(interval: Duration = Constants.scanInterval) -> AsyncStream<WiFiScanEvent> {
         shouldStop = false
-        print("[TinyWiFiAnalyzer] WiFiScanner.startScanning(): reset stop flag")
+        print("[WiFiLens] WiFiScanner.startScanning(): reset stop flag")
         return AsyncStream { continuation in
             let task = Task {
                 while !shouldStop && !Task.isCancelled {

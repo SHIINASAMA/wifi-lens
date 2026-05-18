@@ -8,7 +8,7 @@ extension Notification.Name {
 }
 
 @main
-struct TinyWiFiAnalyzerApp: App {
+struct WiFiLensApp: App {
     @State private var viewModel = ScannerViewModel()
     @State private var sparkleUpdater = SparkleUpdater()
 

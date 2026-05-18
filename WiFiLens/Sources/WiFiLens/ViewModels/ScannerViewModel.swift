@@ -83,25 +83,25 @@ final class ScannerViewModel {
         guard !isScanning else { return }
         isScanning = true
 
-        print("[TinyWiFiAnalyzer] start(): begin (reserved isScanning=true)")
+        print("[WiFiLens] start(): begin (reserved isScanning=true)")
         locationManager.requestPermissionIfNeeded()
-        print("[TinyWiFiAnalyzer] start(): auth after request = \(locationManager.authorizationStatus.rawValue)")
+        print("[WiFiLens] start(): auth after request = \(locationManager.authorizationStatus.rawValue)")
 
         supportedBands = await scanner.supportedBands()
-        print("[TinyWiFiAnalyzer] start(): supportedBands = \(supportedBands.map { $0.id }.sorted())")
+        print("[WiFiLens] start(): supportedBands = \(supportedBands.map { $0.id }.sorted())")
         updateInterfaceName()
 
         if locationManager.authorizationStatus == .notDetermined {
             accessState = .waitingForAuthorization
-            print("[TinyWiFiAnalyzer] start(): waiting for initial authorization decision")
+            print("[WiFiLens] start(): waiting for initial authorization decision")
             _ = await locationManager.waitForInitialDecisionIfNeeded()
-            print("[TinyWiFiAnalyzer] start(): authorization settled = \(locationManager.authorizationStatus.rawValue)")
+            print("[WiFiLens] start(): authorization settled = \(locationManager.authorizationStatus.rawValue)")
         } else {
             locationManager.refreshStatus()
         }
 
         guard locationManager.isAuthorizedForSSID else {
-            print("[TinyWiFiAnalyzer] start(): authorization denied/restricted")
+            print("[WiFiLens] start(): authorization denied/restricted")
             accessState = .denied
             isScanning = false
             return
@@ -127,7 +127,7 @@ final class ScannerViewModel {
     }
 
     private func startScanLoop() {
-        print("[TinyWiFiAnalyzer] startScanLoop(): starting")
+        print("[WiFiLens] startScanLoop(): starting")
         scanTask?.cancel()
         isScanning = true
         accessState = .scanning
@@ -141,7 +141,7 @@ final class ScannerViewModel {
                 locationManager.refreshStatus()
 
                 if !locationManager.isAuthorizedForSSID {
-                    print("[TinyWiFiAnalyzer] startScanLoop(): lost authorization")
+                    print("[WiFiLens] startScanLoop(): lost authorization")
                     stop()
                     accessState = locationManager.authorizationStatus == .notDetermined
                         ? .waitingForAuthorization
@@ -151,11 +151,11 @@ final class ScannerViewModel {
 
                 switch event {
                 case .failure(let message):
-                    print("[TinyWiFiAnalyzer] scan failure: \(message)")
+                    print("[WiFiLens] scan failure: \(message)")
                     accessState = .scanFailed(message)
 
                 case .networks(let networks):
-                    print("[TinyWiFiAnalyzer] scan success: networks=\(networks.count)")
+                    print("[WiFiLens] scan success: networks=\(networks.count)")
                     applyNetworks(networks)
                     networkInfo = NetworkInfoService.fetch()
                 }

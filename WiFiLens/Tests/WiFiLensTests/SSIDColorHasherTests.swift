@@ -1,6 +1,6 @@
 import Testing
 import SwiftUI
-@testable import TinyWiFiAnalyzer
+@testable import WiFiLens
 
 struct SSIDColorHasherTests {
 
