@@ -23,7 +23,6 @@ struct NetworkTableRow: Identifiable, Hashable {
     let supportsK: Bool
     let supportsR: Bool
     let supportsV: Bool
-    let supportsWPA3: Bool
     let isHiddenSSID: Bool
     let security: String
     let mcs: String
@@ -80,7 +79,6 @@ final class ScannerViewModel {
                     supportsK: series.supportsK,
                     supportsR: series.supportsR,
                     supportsV: series.supportsV,
-                    supportsWPA3: series.supportsWPA3,
                     isHiddenSSID: series.isHiddenSSID,
                     security: series.security,
                     mcs: series.mcs,

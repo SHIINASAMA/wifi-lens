@@ -240,7 +240,7 @@ struct IEParserRSNTests {
         #expect(result.pairwiseCiphers == ["CCMP (AES)"])
         #expect(result.akmSuites == ["WPA2"])
         #expect(result.supportsWPA3 == false)
-        #expect(result.securitySummary == "WPA2")
+        #expect(result.securitySummary == "WPA2 (CCMP)")
     }
 
     @Test func wpa3SAE() {
@@ -255,7 +255,7 @@ struct IEParserRSNTests {
         let data = singleIE(tag: 48, value: body)
         let result = IEParser.parse(data: data)
         #expect(result.supportsWPA3 == true)
-        #expect(result.securitySummary == "SAE (WPA3)")
+        #expect(result.securitySummary == "SAE (WPA3) (CCMP)")
         #expect(result.akmSuites == ["SAE (WPA3)"])
     }
 
@@ -537,7 +537,7 @@ struct IEParserCombinedTests {
         #expect(result.supports80211w == true)
         #expect(result.supports80211v == true)
         #expect(result.countryCode == "US ")
-        #expect(result.securitySummary == "SAE (WPA3)/WPA2")
+        #expect(result.securitySummary == "SAE (WPA3)/WPA2 (CCMP)")
     }
 
     @Test func emptyData() {
@@ -603,7 +603,7 @@ struct IEParserCipherAKMTests {
         let result = IEParser.parse(data: data)
 
         #expect(result.akmSuites == ["WPA"])
-        #expect(result.securitySummary == "WPA")
+        #expect(result.securitySummary == "WPA (TKIP)")
     }
 
     @Test func oweAKM() {

@@ -71,12 +71,16 @@ struct IEData {
             labels.append(contentsOf: otherSuites)
         }
 
-        if labels.isEmpty {
-            // Fallback: show first AKM suite
-            return akmSuites.first?.components(separatedBy: " ").first ?? akmSuites.first ?? ""
-        }
+        let joined = labels.isEmpty
+            ? (akmSuites.first?.components(separatedBy: " ").first ?? akmSuites.first ?? "")
+            : labels.joined(separator: "/")
 
-        return labels.joined(separator: "/")
+        // Append encryption cipher when available
+        let cipher = pairwiseCiphers.first.map { $0.replacingOccurrences(of: " (AES)", with: "") } ?? ""
+        if !cipher.isEmpty && !cipher.contains("Unknown") {
+            return "\(joined) (\(cipher))"
+        }
+        return joined
     }
 
     /// MCS summary: e.g. "7" or "9" (VHT)
@@ -402,46 +406,49 @@ enum IEParser {
         return (mcs: maxMCS, streams: maxStreams)
     }
 
+    /// Returns true if `suite` starts with a known Wi‑Fi Alliance OUI.
+    private static func isWFA(_ suite: [UInt8]) -> Bool {
+        suite.count == 4
+            && suite[0] == 0x00
+            && ((suite[1] == 0x0F && suite[2] == 0xAC)   // WFA OUI (common)
+                || (suite[1] == 0x50 && suite[2] == 0xF2)) // WFA OUI (legacy)
+    }
+
     private static func cipherName(_ suite: [UInt8]) -> String {
-        guard suite.count == 4 else { return "Unknown" }
-        if suite[0] == 0x00 && suite[1] == 0x50 && suite[2] == 0xF2 {
-            switch suite[3] {
-            case 0x02: return "TKIP"
-            case 0x04: return "CCMP (AES)"
-            case 0x05: return "WEP-104"
-            case 0x06: return "BIP-CMAC"
-            case 0x07: return "GCMP-128"
-            case 0x08: return "GCMP-256"
-            case 0x09: return "CCMP-256"
-            case 0x0A: return "BIP-GMAC-128"
-            case 0x0B: return "BIP-GMAC-256"
-            case 0x0C: return "BIP-CMAC-256"
-            default: return "Unknown"
-            }
+        guard isWFA(suite) else { return "Unknown" }
+        switch suite[3] {
+        case 0x02: return "TKIP"
+        case 0x04: return "CCMP (AES)"
+        case 0x05: return "WEP-104"
+        case 0x06: return "BIP-CMAC"
+        case 0x07: return "GCMP-128"
+        case 0x08: return "GCMP-256"
+        case 0x09: return "CCMP-256"
+        case 0x0A: return "BIP-GMAC-128"
+        case 0x0B: return "BIP-GMAC-256"
+        case 0x0C: return "BIP-CMAC-256"
+        default: return "Unknown"
         }
-        return "Unknown"
     }
 
     private static func akmSuiteName(_ suite: [UInt8]) -> String {
-        guard suite.count == 4 else { return "Unknown" }
-        if suite[0] == 0x00 && suite[1] == 0x50 && suite[2] == 0xF2 {
-            switch suite[3] {
-            case 0x01: return "WPA"
-            case 0x02: return "WPA2"
-            case 0x03: return "FT/802.1X"
-            case 0x04: return "FT/PSK"
-            case 0x05: return "WPA2-SHA256"
-            case 0x06: return "PSK-SHA256"
-            case 0x07: return "TDLS"
-            case 0x08: return "SAE (WPA3)"
-            case 0x09: return "FT-SAE (WPA3)"
-            case 0x0A: return "AP PeerKey"
-            case 0x0B: return "WPA2-SuiteB"
-            case 0x0C: return "WPA2-SuiteB"
-            case 0x12: return "OWE"
-            default: return "Unknown"
-            }
+        guard isWFA(suite) else { return "Unknown" }
+        let isLegacy = suite[1] == 0x50 && suite[2] == 0xF2
+        switch suite[3] {
+        case 0x01: return isLegacy ? "WPA" : "802.1X"
+        case 0x02: return isLegacy ? "WPA2" : "PSK"
+        case 0x03: return "FT/802.1X"
+        case 0x04: return "FT/PSK"
+        case 0x05: return isLegacy ? "WPA2-SHA256" : "WPA2"
+        case 0x06: return isLegacy ? "PSK-SHA256" : "PSK-SHA256"
+        case 0x07: return "TDLS"
+        case 0x08: return "SAE (WPA3)"
+        case 0x09: return "FT-SAE (WPA3)"
+        case 0x0A: return "AP PeerKey"
+        case 0x0B: return "WPA2-SuiteB"
+        case 0x0C: return "WPA2-SuiteB"
+        case 0x12: return "OWE"
+        default: return "Unknown"
         }
-        return "Unknown"
     }
 }
