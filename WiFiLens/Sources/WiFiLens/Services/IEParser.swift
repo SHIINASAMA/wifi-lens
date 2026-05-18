@@ -34,8 +34,36 @@ struct IEData {
     var pairwiseCiphers: [String] = []
     var groupCipher: String?
 
+    // Country
+    var countryCode: String?
+
     // Hidden SSID
     var isHiddenSSID: Bool = false
+
+    /// Security summary for table display
+    var securitySummary: String {
+        if supportsWPA3 { return "WPA3" }
+        if akmSuites.contains(where: { $0.contains("WPA2") || $0.contains("802.1X") || $0.contains("PSK") || $0.contains("FT/") }) {
+            return "WPA2"
+        }
+        if let first = akmSuites.first {
+            if first.contains("WPA") { return "WPA" }
+            return first.components(separatedBy: " ").first ?? first
+        }
+        return ""
+    }
+
+    /// MCS summary: e.g. "7" or "9" (VHT)
+    var mcsSummary: String {
+        if let vht = maxVHTMCSIndex { return "\(vht)" }
+        if let ht = maxMCSIndex { return "\(ht)" }
+        return ""
+    }
+
+    /// Spatial streams: e.g. "2" or ""
+    var nssSummary: String {
+        spatialStreams.map { "\($0)" } ?? ""
+    }
 
     init() {}
 }
@@ -43,6 +71,7 @@ struct IEData {
 enum IEParser {
     // IE Tag constants
     private static let tagSSID: UInt8 = 0
+    private static let tagCountry: UInt8 = 7
     private static let tagHTCapabilities: UInt8 = 45
     private static let tagRSN: UInt8 = 48
     private static let tagHTOperation: UInt8 = 61
@@ -55,11 +84,9 @@ enum IEParser {
 
     // Extended Capabilities bit positions (within the IE data bytes)
     // Bit numbering follows 802.11: bit 0 is LSB of byte 0
-    private static let extCapBit_20_40_BSS_Coex: Int = 0
     private static let extCapBit_BSS_Transition: Int = 19     // 802.11v
     private static let extCapBit_RM_Capable: Int = 32          // 802.11k
     private static let extCapBit_FT_Over_DS: Int = 5           // 802.11r
-    private static let extCapBit_WNM_Sleep: Int = 17
 
     // RSN AKM Suite OUI values
     private static let akmSuiteWPA: [UInt8] = [0x00, 0x50, 0xF2, 0x01]
@@ -85,8 +112,12 @@ enum IEParser {
 
             switch tag {
             case tagSSID:
-                // SSID IE: length 0 means hidden network
                 result.isHiddenSSID = (length == 0)
+
+            case tagCountry:
+                if ieData.count >= 3 {
+                    result.countryCode = String(bytes: ieData[0..<3], encoding: .ascii)
+                }
 
             case tagHTCapabilities:
                 result.htSupported = true
@@ -94,7 +125,10 @@ enum IEParser {
 
             case tagVHTCapabilities:
                 result.vhtSupported = true
-                parseVHTCapabilities(ieData, into: &result)
+                // VHT MCS/NSS from CoreWLAN's IE data is unreliable — the
+                // MCS Map bytes are replaced with fixed markers.  We rely on
+                // HT MCS (which is always present on VHT APs for backwards
+                // compatibility) instead of calling parseVHTCapabilities.
 
             case tagHTOperation:
                 parseHTOperation(ieData, into: &result)
@@ -151,23 +185,22 @@ enum IEParser {
         // Channel width: bit 1
         result.supports40MHz = (htCapInfo & (1 << 1)) != 0
 
-        // Rx MCS bitmask starts at byte 5
-        if data.count >= 16 {
-            let mcsBytes = Array(data[5..<min(15, data.count)])
+        // HT Cap body: Info(2) + A-MPDU(1) = 3 bytes → Supported MCS Set at offset 3.
+        // Rx MCS Bitmask occupies the first 10 bytes of the MCS Set (bits 0–79).
+        if data.count >= 13 {
+            let mcsBytes = Array(data[3..<min(13, data.count)])
             result.maxMCSIndex = maxMCSSpatialStreams(mcsBytes).mcs
             result.spatialStreams = maxMCSSpatialStreams(mcsBytes).streams
         }
     }
 
     private static func parseHTOperation(_ data: [UInt8], into result: inout IEData) {
+        // Secondary channel offset in HT Op Info byte indicates whether 40 MHz
+        // is actually in use, complementing the capability bit from HT Capabilities.
         guard data.count >= 1 else { return }
-        let htOpInfo = data[0]
-        // Secondary channel offset: bits 0-1
-        // 0 = no secondary, 1 = above, 3 = below
-        let secChannel = htOpInfo & 0x03
-        // Channel width indicated by HT Cap + HT Op together
-        if result.supports40MHz && (secChannel == 1 || secChannel == 3) {
-            // 40 MHz is actually in use
+        let secChannel = data[0] & 0x03
+        if secChannel == 1 || secChannel == 3 {
+            result.supports40MHz = true
         }
     }
 
@@ -178,9 +211,13 @@ enum IEParser {
         // Max MPDU length, channel width, etc. are in VHT Cap Info
         // For this implementation, we infer channel width from VHT Operation IE
 
-        // Rx VHT-MCS Map (starts at byte 8)
-        if data.count >= 12 {
-            result.maxVHTMCSIndex = maxVHTMCS(data)
+        // Rx VHT-MCS Map (starts at byte 4, after 4-byte VHT Cap Info)
+        if data.count >= 6 {
+            let vhtMCS = maxVHTMCS(data)
+            result.maxVHTMCSIndex = vhtMCS.mcs
+            if vhtMCS.streams > (result.spatialStreams ?? 0) {
+                result.spatialStreams = vhtMCS.streams
+            }
         }
     }
 
@@ -279,38 +316,64 @@ enum IEParser {
     // MARK: - Helpers
 
     private static func maxMCSSpatialStreams(_ mcsBytes: [UInt8]) -> (mcs: Int, streams: Int) {
-        var maxMCS = 0
-        var maxStreams = 0
-        for (streamIdx, byte) in mcsBytes.enumerated() {
-            if byte != 0 {
-                maxStreams = streamIdx + 1
-                // Find highest set bit in this byte
-                for bit in (0..<8).reversed() {
-                    if (byte & (1 << bit)) != 0 {
-                        maxMCS = max(maxMCS, bit)
-                        break
-                    }
+        // HT Rx MCS bitmask: 77 bits across 10 bytes.
+        // Find the highest supported global MCS index, then derive per-stream
+        // MCS (0–7) and spatial-stream count from it.
+        var highestGlobal = -1
+        for byteIndex in 0..<mcsBytes.count {
+            let byte = mcsBytes[byteIndex]
+            if byte == 0 { continue }
+            for bit in 0..<8 {
+                let global = byteIndex * 8 + bit
+                if global > 76 { break }
+                if (byte & (1 << bit)) != 0 {
+                    highestGlobal = max(highestGlobal, global)
                 }
+            }
+        }
+
+        guard highestGlobal >= 0 else { return (mcs: 0, streams: 0) }
+
+        // Number of spatial streams for equal-modulation MCS (0–31)
+        let ss: Int
+        switch highestGlobal {
+        case 0...7:   ss = 1
+        case 8...15:  ss = 2
+        case 16...23: ss = 3
+        case 24...31: ss = 4
+        default:      ss = min(highestGlobal / 8 + 1, 4)
+        }
+
+        return (mcs: highestGlobal % 8, streams: ss)
+    }
+
+    private static func maxVHTMCS(_ data: [UInt8]) -> (mcs: Int?, streams: Int) {
+        // VHT Capabilities Info is 4 bytes (data[0..3]).
+        // Rx VHT-MCS Map is 2 bytes at data[4..5]: 2 bits per stream (0=not supported,
+        // 1=MCS 0–7, 2=MCS 0–8, 3=MCS 0–9).
+        guard data.count >= 6 else { return (nil, 0) }
+        let rxMcsMap = UInt16(data[4]) | (UInt16(data[5]) << 8)
+
+        // First pass: find the maximum MCS level across all streams.
+        var maxMCS = 0
+        for stream in 0..<8 {
+            let mcsField = (rxMcsMap >> (stream * 2)) & 0x03
+            if mcsField > 0 {
+                maxMCS = max(maxMCS, 6 + Int(mcsField))  // 1→7, 2→8, 3→9
+            }
+        }
+        guard maxMCS > 0 else { return (nil, 0) }
+
+        // Second pass: count streams that support the max MCS level.
+        let requiredField = maxMCS - 6  // 7→1, 8→2, 9→3
+        var maxStreams = 0
+        for stream in 0..<8 {
+            let mcsField = (rxMcsMap >> (stream * 2)) & 0x03
+            if mcsField >= requiredField {
+                maxStreams = stream + 1
             }
         }
         return (mcs: maxMCS, streams: maxStreams)
-    }
-
-    private static func maxVHTMCS(_ data: [UInt8]) -> Int? {
-        // VHT Rx MCS Map: 2 bytes per spatial stream
-        guard data.count >= 10 else { return nil }
-        var maxMCS = 0
-        for stream in 0..<4 {
-            let off = 8 + stream * 2
-            guard off + 1 < data.count else { break }
-            let map = UInt16(data[off]) | (UInt16(data[off+1]) << 8)
-            for mcs in 7...9 {
-                if (map & (0x03 << ((mcs - 7) * 2))) != 0 {
-                    maxMCS = max(maxMCS, mcs)
-                }
-            }
-        }
-        return maxMCS > 0 ? maxMCS : nil
     }
 
     private static func cipherName(_ suite: [UInt8]) -> String {

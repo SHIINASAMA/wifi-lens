@@ -45,6 +45,10 @@ struct NativeTableView: NSViewRepresentable {
         addColumn(to: tableView, id: "r", title: "r", width: 28, sortKey: "supportsR", ascending: false)
         addColumn(to: tableView, id: "v", title: "v", width: 28, sortKey: "supportsV", ascending: false)
         addColumn(to: tableView, id: "WPA3", title: "WPA3", width: 50, sortKey: "supportsWPA3", ascending: false)
+        addColumn(to: tableView, id: "Sec", title: "Sec", width: 55, sortKey: "security", ascending: true)
+        addColumn(to: tableView, id: "MCS", title: "MCS", width: 36, sortKey: "mcs", ascending: false)
+        addColumn(to: tableView, id: "NSS", title: "NSS", width: 36, sortKey: "nss", ascending: false)
+        addColumn(to: tableView, id: "CC", title: "CC", width: 36, sortKey: "country", ascending: true)
 
         // Apply stored sort descriptors
         let storedColumns = tableView.tableColumns
@@ -151,6 +155,10 @@ struct NativeTableView: NSViewRepresentable {
             case "r":     textField.stringValue = network.supportsR ? "✓" : ""; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
             case "v":     textField.stringValue = network.supportsV ? "✓" : ""; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
             case "WPA3":  textField.stringValue = network.supportsWPA3 ? "✓" : ""; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
+            case "Sec":   textField.stringValue = network.security; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
+            case "MCS":   textField.stringValue = network.mcs; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
+            case "NSS":   textField.stringValue = network.nss; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
+            case "CC":    textField.stringValue = network.country; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
             default: break
             }
             return textField

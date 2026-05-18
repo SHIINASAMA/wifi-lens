@@ -19,6 +19,10 @@ struct ChartSeriesData: Identifiable {
     var supportsV: Bool = false
     var supportsWPA3: Bool = false
     var isHiddenSSID: Bool = false
+    var security: String = ""
+    var mcs: String = ""
+    var nss: String = ""
+    var country: String = ""
 
     var displaySSID: String { ssid.isEmpty ? "n/a" : ssid }
 

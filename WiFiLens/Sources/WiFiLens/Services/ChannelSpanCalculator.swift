@@ -129,7 +129,11 @@ enum ChannelSpanCalculator {
                 supportsR: ie?.supports80211r ?? false,
                 supportsV: ie?.supports80211v ?? false,
                 supportsWPA3: ie?.supportsWPA3 ?? false,
-                isHiddenSSID: ie?.isHiddenSSID ?? false
+                isHiddenSSID: ie?.isHiddenSSID ?? false,
+                security: ie?.securitySummary ?? "",
+                mcs: ie?.mcsSummary ?? "",
+                nss: ie?.nssSummary ?? "",
+                country: ie?.countryCode ?? ""
             ))
         }
         return series

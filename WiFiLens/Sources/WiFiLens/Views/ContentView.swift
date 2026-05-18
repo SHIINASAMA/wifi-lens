@@ -251,6 +251,10 @@ struct ContentView: View {
         case "supportsV":     cmp = a.supportsV == b.supportsV ? .orderedSame : a.supportsV ? .orderedDescending : .orderedAscending
         case "supportsWPA3":  cmp = a.supportsWPA3 == b.supportsWPA3 ? .orderedSame : a.supportsWPA3 ? .orderedDescending : .orderedAscending
         case "isHiddenSSID":  cmp = a.isHiddenSSID == b.isHiddenSSID ? .orderedSame : a.isHiddenSSID ? .orderedDescending : .orderedAscending
+        case "security":      cmp = a.security.localizedCaseInsensitiveCompare(b.security)
+        case "mcs":           cmp = (Int(a.mcs) ?? 0) < (Int(b.mcs) ?? 0) ? .orderedAscending : (Int(a.mcs) ?? 0) > (Int(b.mcs) ?? 0) ? .orderedDescending : .orderedSame
+        case "nss":           cmp = (Int(a.nss) ?? 0) < (Int(b.nss) ?? 0) ? .orderedAscending : (Int(a.nss) ?? 0) > (Int(b.nss) ?? 0) ? .orderedDescending : .orderedSame
+        case "country":       cmp = a.country.localizedCaseInsensitiveCompare(b.country)
         default:              cmp = .orderedSame
         }
         return ascending ? cmp : (cmp == .orderedAscending ? .orderedDescending : cmp == .orderedDescending ? .orderedAscending : .orderedSame)
