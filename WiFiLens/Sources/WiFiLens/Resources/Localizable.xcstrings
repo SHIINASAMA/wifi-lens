@@ -479,6 +479,9 @@
         }
       }
     },
+    "Show:" : {
+
+    },
     "SSID unavailable" : {
       "localizations" : {
         "zh-Hans" : {
@@ -555,7 +558,14 @@
       }
     },
     "WiFi Lens" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WiFi Lens"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

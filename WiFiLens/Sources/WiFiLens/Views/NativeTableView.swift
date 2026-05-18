@@ -172,7 +172,7 @@ struct NativeTableView: NSViewRepresentable {
             }
         }
 
-        private func hiddenIndicator(_ hidden: Bool, opacity: Double) -> NSView {
+        @MainActor private func hiddenIndicator(_ hidden: Bool, opacity: Double) -> NSView {
             guard hidden else { return NSView() }
             let label = NSTextField(labelWithString: "H")
             label.font = NSFont.systemFont(ofSize: 9, weight: .medium)

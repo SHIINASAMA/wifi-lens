@@ -13,6 +13,9 @@ struct ContentView: View {
     @State private var is6GHzCollapsed = false
     @State private var isTableCollapsed = false
     @State private var isNetworkInfoCollapsed = false
+    @State private var show24InTable = true
+    @State private var show5InTable = true
+    @State private var show6InTable = true
 
     var body: some View {
         VStack(spacing: 0) {
@@ -171,16 +174,60 @@ struct ContentView: View {
             networkInfoContent
                 .frame(height: height)
         case .table:
-            bottomTable
-                .frame(height: height)
+            VStack(spacing: 0) {
+                tableFilterBar
+                bottomTable
+            }
+            .frame(height: height)
         }
+    }
+
+    private var tableFilterBar: some View {
+        HStack(spacing: 12) {
+            Text("Show:")
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
+            bandToggle("2.4 GHz", isOn: $show24InTable)
+            bandToggle("5 GHz", isOn: $show5InTable)
+            if viewModel.supportedBands.contains(.band6GHz) {
+                bandToggle("6 GHz", isOn: $show6InTable)
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 4)
+    }
+
+    private func bandToggle(_ label: String, isOn: Binding<Bool>) -> some View {
+        Button {
+            isOn.wrappedValue.toggle()
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: isOn.wrappedValue ? "checkmark.square.fill" : "square")
+                    .font(.caption)
+                Text(label)
+                    .font(.system(size: 11))
+            }
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Bottom Table (shared)
 
+    private var tableRows: [NetworkTableRow] {
+        viewModel.combinedTableRows.filter { row in
+            switch row.bandLabel {
+            case "2.4 GHz": return show24InTable
+            case "5 GHz":   return show5InTable
+            case "6 GHz":   return show6InTable
+            default: return true
+            }
+        }
+    }
+
     private var sortedRows: [NetworkTableRow] {
-        guard !sortOrder.isEmpty else { return viewModel.combinedTableRows }
-        return viewModel.combinedTableRows.sorted { a, b in
+        guard !sortOrder.isEmpty else { return tableRows }
+        return tableRows.sorted { a, b in
             for desc in sortOrder {
                 let result = compareRow(a, b, key: desc.key ?? "", ascending: desc.ascending)
                 if result != .orderedSame { return result == .orderedAscending }
