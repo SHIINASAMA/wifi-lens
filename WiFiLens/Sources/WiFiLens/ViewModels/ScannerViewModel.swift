@@ -29,6 +29,9 @@ struct NetworkTableRow: Identifiable, Hashable {
     let mcs: String
     let nss: String
     let country: String
+    let trendArrow: String
+    let trendDelta: Int
+    let isVisible: Bool
 }
 
 @MainActor
@@ -37,6 +40,9 @@ final class ScannerViewModel {
     let scanner = WiFiScanner()
     var locationManager = LocationPermissionManager()
     let colorHasher = SSIDColorHasher()
+    let signalHistory = SignalHistoryStore()
+    var hiddenBSSIDs: Set<String> = []
+    private var lastNetworks: [WiFiNetwork] = []  // cached for toggle rebuild
 
     var band24 = BandChartViewModel(band: .band24GHz)
     var band5 = BandChartViewModel(band: .band5GHz)
@@ -79,7 +85,10 @@ final class ScannerViewModel {
                     security: series.security,
                     mcs: series.mcs,
                     nss: series.nss,
-                    country: series.country
+                    country: series.country,
+                    trendArrow: series.trendArrow,
+                    trendDelta: series.trendDelta,
+                    isVisible: series.isVisible
                 )
             }
         }
@@ -187,26 +196,59 @@ final class ScannerViewModel {
     }
 
     private func applyNetworks(_ networks: [WiFiNetwork]) {
+        lastNetworks = networks
         let deduped = deduplicateNetworks(networks)
+
+        // Record RSSI history + snapshots, build trend/history/snapshot lookups
+        let now = Date()
+        for nw in deduped {
+            let ie = nw.ieData.map { IEParser.parse(data: $0) }
+            let snap = NetworkSnapshot(
+                timestamp: now,
+                rssi: nw.rssi,
+                channel: nw.channel.channelNumber,
+                band: nw.channel.band.id,
+                phyMode: ie.map { phyLabel($0) } ?? "",
+                channelWidth: ie.map { chanWidthLabel($0) } ?? "",
+                mcs: ie?.mcsSummary ?? "",
+                nss: ie?.nssSummary ?? "",
+                security: ie?.securitySummary ?? "",
+                country: ie?.countryCode ?? "",
+                supportsK: ie?.supports80211k ?? false,
+                supportsR: ie?.supports80211r ?? false,
+                supportsV: ie?.supports80211v ?? false,
+                supportsWPA3: ie?.supportsWPA3 ?? false
+            )
+            signalHistory.record(bssid: nw.bssid, rssi: nw.rssi, snapshot: snap)
+        }
+        var trends: [String: (direction: TrendDirection, delta: Int)] = [:]
+        for nw in deduped {
+            if let t = signalHistory.trend(for: nw.bssid) { trends[nw.bssid] = t }
+        }
+        var snapshotDict: [String: [NetworkSnapshot]] = [:]
+        for nw in deduped {
+            if let snaps = signalHistory.snapshotHistory(for: nw.bssid) { snapshotDict[nw.bssid] = snaps }
+        }
+
         let sorted24 = deduped
             .filter { $0.channel.band == .band24GHz }
             .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
         if supportedBands.contains(.band24GHz) {
-            band24.updateNetworks(sorted24, colorHasher: colorHasher, filterQuery: globalFilterQuery)
+            band24.updateNetworks(sorted24, colorHasher: colorHasher, filterQuery: globalFilterQuery, trends: trends, snapshots: snapshotDict, hiddenBSSIDs: hiddenBSSIDs)
         }
 
         let sorted5 = deduped
             .filter { $0.channel.band == .band5GHz }
             .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
         if supportedBands.contains(.band5GHz) {
-            band5.updateNetworks(sorted5, colorHasher: colorHasher, filterQuery: globalFilterQuery)
+            band5.updateNetworks(sorted5, colorHasher: colorHasher, filterQuery: globalFilterQuery, trends: trends, snapshots: snapshotDict, hiddenBSSIDs: hiddenBSSIDs)
         }
 
         let sorted6 = deduped
             .filter { $0.channel.band == .band6GHz }
             .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
         if supportedBands.contains(.band6GHz) {
-            band6.updateNetworks(sorted6, colorHasher: colorHasher, filterQuery: globalFilterQuery)
+            band6.updateNetworks(sorted6, colorHasher: colorHasher, filterQuery: globalFilterQuery, trends: trends, snapshots: snapshotDict, hiddenBSSIDs: hiddenBSSIDs)
         }
 
         updateInterfaceName()
@@ -244,10 +286,33 @@ final class ScannerViewModel {
         }
     }
 
+    func toggleVisibility(bssid: String) {
+        if hiddenBSSIDs.contains(bssid) {
+            hiddenBSSIDs.remove(bssid)
+        } else {
+            hiddenBSSIDs.insert(bssid)
+        }
+        applyNetworks(lastNetworks)  // rebuild with updated hiddenBSSIDs
+    }
+
     func stop() {
         scanTask?.cancel()
         scanTask = nil
         isScanning = false
         Task { await scanner.stopScanning() }
+    }
+
+    private func phyLabel(_ ie: IEData) -> String {
+        if ie.heSupported { return "ax" }
+        if ie.vhtSupported { return "ac" }
+        if ie.htSupported { return "n" }
+        return ""
+    }
+
+    private func chanWidthLabel(_ ie: IEData) -> String {
+        if ie.supports160MHz { return "160" }
+        if ie.supports80MHz { return "80" }
+        if ie.supports40MHz { return "40" }
+        return ""
     }
 }

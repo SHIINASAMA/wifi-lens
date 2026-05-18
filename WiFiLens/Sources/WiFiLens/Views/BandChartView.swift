@@ -6,6 +6,9 @@ struct BandChartView: View {
 
     private let leftAxisWidth: CGFloat = 38
     private let bottomAxisHeight: CGFloat = 24
+    private let chartMarginTop: CGFloat = 6
+    private let chartMarginRight: CGFloat = 8
+    private let chartMarginBottom: CGFloat = 4
 
     var body: some View {
         VStack(spacing: 0) {
@@ -37,6 +40,14 @@ struct BandChartView: View {
         .padding(.vertical, 2)
     }
 
+    /// Snapshots for the network currently selected (if it belongs to this band).
+    private var selectedSnapshots: [NetworkSnapshot]? {
+        guard let selID = scannerViewModel.selectedNetworkID,
+              let series = viewModel.displayedSeriesData.first(where: { $0.id == selID })
+        else { return nil }
+        return viewModel.allSnapshots[series.bssid]
+    }
+
     private var chartContent: some View {
         Group {
             if viewModel.isEmpty {
@@ -48,9 +59,19 @@ struct BandChartView: View {
                     Spacer()
                 }
             } else {
-                GeometryReader { geometry in
-                    chartCanvas
-                        .gesture(zoomGesture(in: geometry))
+                VStack(spacing: 0) {
+                    GeometryReader { geometry in
+                        chartCanvas
+                            .gesture(zoomGesture(in: geometry))
+                    }
+
+                    if let snaps = selectedSnapshots, let series = viewModel.displayedSeriesData.first(where: { $0.id == scannerViewModel.selectedNetworkID }) {
+                        Divider()
+                            .padding(.top, 2)
+                        TrendChartView(snapshots: snaps, color: series.color)
+                            .padding(.horizontal, 6)
+                            .padding(.bottom, 6)
+                    }
                 }
             }
         }
@@ -59,9 +80,9 @@ struct BandChartView: View {
     private var chartCanvas: some View {
         Canvas { context, size in
             let chartRect = CGRect(
-                x: leftAxisWidth, y: 0,
-                width: size.width - leftAxisWidth,
-                height: size.height - bottomAxisHeight
+                x: leftAxisWidth, y: chartMarginTop,
+                width: size.width - leftAxisWidth - chartMarginRight,
+                height: size.height - bottomAxisHeight - chartMarginTop - chartMarginBottom
             )
 
             let xMin = viewModel.zoomMin ?? Double(xDataMin)
@@ -130,7 +151,7 @@ struct BandChartView: View {
             let clipPath = Path(chartRect)
             context.clip(to: clipPath)
 
-            for series in viewModel.displayedSeriesData {
+            for series in viewModel.displayedSeriesData where series.isVisible {
                 let isSelected = scannerViewModel.selectedNetworkID == series.id
                 let hasSelection = scannerViewModel.selectedNetworkID != nil
 
@@ -173,6 +194,9 @@ struct BandChartView: View {
                 seriesData: viewModel.displayedSeriesData,
                 leftAxisWidth: leftAxisWidth,
                 bottomAxisHeight: bottomAxisHeight,
+                chartMarginTop: chartMarginTop,
+                chartMarginRight: chartMarginRight,
+                chartMarginBottom: chartMarginBottom,
                 xDataMin: xDataMin,
                 xDataMax: viewModel.band.maxChannel,
                 zoomMin: viewModel.zoomMin,
@@ -191,7 +215,7 @@ struct BandChartView: View {
 
                 let totalWidth = geometry.size.width
                 let chartAreaLeft = leftAxisWidth
-                let chartAreaWidth = totalWidth - chartAreaLeft
+                let chartAreaWidth = totalWidth - chartAreaLeft - chartMarginRight
                 guard chartAreaWidth > 0 else { return }
 
                 let relStart = Swift.max(0.0, startX - chartAreaLeft)
@@ -241,6 +265,9 @@ private struct DataLabelOverlay: View {
     let seriesData: [ChartSeriesData]
     let leftAxisWidth: CGFloat
     let bottomAxisHeight: CGFloat
+    let chartMarginTop: CGFloat
+    let chartMarginRight: CGFloat
+    let chartMarginBottom: CGFloat
     let xDataMin: Int
     let xDataMax: Int
     let zoomMin: Double?
@@ -250,9 +277,9 @@ private struct DataLabelOverlay: View {
     var body: some View {
         GeometryReader { geometry in
             let chartRect = CGRect(
-                x: leftAxisWidth, y: 0,
-                width: geometry.size.width - leftAxisWidth,
-                height: geometry.size.height - bottomAxisHeight
+                x: leftAxisWidth, y: chartMarginTop,
+                width: geometry.size.width - leftAxisWidth - chartMarginRight,
+                height: geometry.size.height - bottomAxisHeight - chartMarginTop - chartMarginBottom
             )
             let xMin = zoomMin ?? Double(xDataMin)
             let xMax = zoomMax ?? Double(xDataMax)
@@ -261,18 +288,69 @@ private struct DataLabelOverlay: View {
             let scaleY = chartRect.height / yRange
             let hasSelection = selectedNetworkID != nil
 
-            ForEach(seriesData) { series in
-                if !series.isFilteredOut || series.id == selectedNetworkID {
-                    let px = chartRect.minX + (Double(series.channel) - xMin) * scaleX
-                    let py = chartRect.maxY - (Double(series.rssi) - Double(Constants.rssiNoiseFloor)) * scaleY - 10
-                    let opacity: Double = hasSelection ? (series.id == selectedNetworkID ? 1.0 : 0.25) : 1.0
-                    Text("\(series.channel) \(series.displaySSID)")
-                        .font(.system(size: 9))
-                        .foregroundColor(series.color)
-                        .opacity(opacity)
-                        .position(x: px, y: py)
-                }
+            let labels = placedLabels(chartRect: chartRect, xMin: xMin, scaleX: scaleX, scaleY: scaleY, hasSelection: hasSelection)
+
+            ForEach(labels, id: \.series.id) { item in
+                let trendStr: String = if !item.series.trendArrow.isEmpty {
+                    " \(item.series.trendArrow)\(item.series.trendDelta != 0 ? " \(item.series.trendDelta > 0 ? "+" : "")\(item.series.trendDelta)" : "")"
+                } else { "" }
+                Text("\(item.series.channel) \(item.series.displaySSID)\(trendStr)")
+                    .font(.system(size: 9))
+                    .foregroundColor(item.series.color)
+                    .opacity(item.opacity)
+                    .position(x: item.x, y: item.y)
             }
         }
+    }
+
+    private struct PlacedLabel {
+        let series: ChartSeriesData
+        let x: CGFloat
+        let y: CGFloat
+        let opacity: Double
+    }
+
+    private func placedLabels(chartRect: CGRect, xMin: Double, scaleX: CGFloat, scaleY: CGFloat, hasSelection: Bool) -> [PlacedLabel] {
+        let labelEstWidth: CGFloat = 100
+        let labelEstHeight: CGFloat = 14
+        let lineHeight: CGFloat = labelEstHeight + 2
+
+        // Sort: selected first, then strongest RSSI
+        let candidates = seriesData
+            .filter { ($0.isVisible && !$0.isFilteredOut) || $0.id == selectedNetworkID }
+            .sorted { a, b in
+                if a.id == selectedNetworkID { return true }
+                if b.id == selectedNetworkID { return false }
+                return a.rssi > b.rssi
+            }
+
+        var placed: [PlacedLabel] = []
+        var occupied: [CGRect] = []
+
+        for series in candidates {
+            let px = chartRect.minX + (series.apex - xMin) * scaleX
+            let naturalY = chartRect.maxY - (Double(series.rssi) - Double(Constants.rssiNoiseFloor)) * scaleY - 8
+            let isSelected = series.id == selectedNetworkID
+            let opacity: Double = hasSelection ? (isSelected ? 1.0 : 0.25) : 1.0
+
+            var labelY = naturalY
+            var fits = false
+            for _ in 0..<6 {
+                let rect = CGRect(x: px - labelEstWidth / 2, y: labelY - labelEstHeight,
+                                  width: labelEstWidth, height: labelEstHeight)
+                if !occupied.contains(where: { $0.intersects(rect) }) {
+                    occupied.append(rect)
+                    fits = true
+                    break
+                }
+                labelY -= lineHeight
+            }
+            // Always show selected label even if it overlaps
+            if !fits && !isSelected { continue }
+            if !fits { labelY = naturalY }  // selected but overlaps: use natural position
+
+            placed.append(PlacedLabel(series: series, x: px, y: labelY, opacity: opacity))
+        }
+        return placed
     }
 }

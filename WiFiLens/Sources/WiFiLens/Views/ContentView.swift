@@ -1,7 +1,6 @@
 import SwiftUI
 
 private let headerHeight: CGFloat = 28
-private let toolbarHeight: CGFloat = 34
 
 struct ContentView: View {
     @Bindable var viewModel: ScannerViewModel
@@ -19,8 +18,6 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            unifiedToolbar
-            Divider()
             dashboardContent
         }
         .frame(minWidth: 700, idealWidth: 1000, minHeight: 600)
@@ -31,35 +28,6 @@ struct ContentView: View {
             }
         }
         .onDisappear { viewModel.stop() }
-    }
-
-    // MARK: - Unified Toolbar
-
-    private var unifiedToolbar: some View {
-        HStack(spacing: 8) {
-            TextField("Filter by SSID or BSSID…", text: $viewModel.globalFilterQuery)
-                .textFieldStyle(.roundedBorder)
-                .frame(maxWidth: 300)
-
-            if !viewModel.globalFilterQuery.isEmpty {
-                Button("Clear") {
-                    viewModel.globalFilterQuery = ""
-                }
-                .buttonStyle(.plain)
-                .font(.caption)
-                .foregroundColor(.secondary)
-            }
-
-            Spacer()
-
-            if viewModel.interfaceName.isEmpty == false {
-                Text(viewModel.interfaceName)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-        }
-        .padding(.horizontal, 12)
-        .frame(height: toolbarHeight)
     }
 
     // MARK: - Dashboard Content
@@ -199,17 +167,10 @@ struct ContentView: View {
     }
 
     private func bandToggle(_ label: String, isOn: Binding<Bool>) -> some View {
-        Button {
-            isOn.wrappedValue.toggle()
-        } label: {
-            HStack(spacing: 4) {
-                Image(systemName: isOn.wrappedValue ? "checkmark.square.fill" : "square")
-                    .font(.caption)
-                Text(label)
-                    .font(.system(size: 11))
-            }
+        Toggle(isOn: isOn) {
+            Text(label).font(.system(size: 11))
         }
-        .buttonStyle(.plain)
+        .toggleStyle(.checkbox)
     }
 
     // MARK: - Bottom Table (shared)
@@ -264,7 +225,8 @@ struct ContentView: View {
         NativeTableView(
             rows: sortedRows,
             selectedID: $viewModel.selectedNetworkID,
-            sortOrder: $sortOrder
+            sortOrder: $sortOrder,
+            onToggleVisibility: { bssid in viewModel.toggleVisibility(bssid: bssid) }
         )
     }
 
@@ -361,13 +323,15 @@ struct ContentView: View {
         guard let info = viewModel.networkInfo else {
             return AnyView(Text("No Wi-Fi connection").foregroundColor(.secondary))
         }
-        let pairs: [(String, String)] = [
+        let leftPairs: [(String, String)] = [
             ("SSID", info.displaySSID),
             ("BSSID", info.displayBSSID),
             ("Channel", info.displayChannel),
             ("RSSI", info.displayRSSI),
             ("Tx Rate", info.displayTxRate),
             ("PHY Mode", info.displayPhyMode),
+        ]
+        let rightPairs: [(String, String)] = [
             ("Security", info.displaySecurity),
             ("IP Address", info.displayIP),
             ("Subnet Mask", info.displaySubnet),
@@ -377,20 +341,26 @@ struct ContentView: View {
         ]
         return AnyView(
             ScrollView {
-                LazyVGrid(columns: [GridItem(.fixed(120), alignment: .trailing), GridItem(.flexible(), alignment: .leading)], spacing: 4) {
-                    ForEach(pairs, id: \.0) { label, value in
-                        Text(label)
-                            .font(.caption)
-                            .fontWeight(.medium)
-                            .foregroundColor(.secondary)
-                        Text(value)
-                            .font(.caption)
-                    }
+                HStack(alignment: .top, spacing: 24) {
+                    kvGrid(leftPairs)
+                    kvGrid(rightPairs)
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 8)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 6)
             }
         )
+    }
+
+    private func kvGrid(_ pairs: [(String, String)]) -> some View {
+        LazyVGrid(columns: [GridItem(.fixed(80), alignment: .trailing), GridItem(.flexible(), alignment: .leading)], spacing: 2) {
+            ForEach(pairs, id: \.0) { label, value in
+                Text(label)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Text(value)
+                    .font(.caption)
+            }
+        }
     }
 
     // MARK: - Helpers

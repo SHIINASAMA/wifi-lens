@@ -23,6 +23,9 @@ struct ChartSeriesData: Identifiable {
     var mcs: String = ""
     var nss: String = ""
     var country: String = ""
+    var isVisible: Bool = true
+    var trendArrow: String = ""   // ▲ / ▼ / ●
+    var trendDelta: Int = 0
 
     var displaySSID: String { ssid.isEmpty ? "n/a" : ssid }
 

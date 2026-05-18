@@ -5,9 +5,10 @@ struct NativeTableView: NSViewRepresentable {
     let rows: [NetworkTableRow]
     @Binding var selectedID: String?
     @Binding var sortOrder: [NSSortDescriptor]
+    var onToggleVisibility: ((String) -> Void)?
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(rows: rows, selectedID: $selectedID, sortOrder: $sortOrder)
+        Coordinator(rows: rows, selectedID: $selectedID, sortOrder: $sortOrder, onToggleVisibility: onToggleVisibility)
     }
 
     func makeNSView(context: Context) -> NSScrollView {
@@ -31,6 +32,15 @@ struct NativeTableView: NSViewRepresentable {
         dotColumn.maxWidth = 24
         dotColumn.isEditable = false
         tableView.addTableColumn(dotColumn)
+
+        // Checkbox column
+        let checkColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("check"))
+        checkColumn.title = ""
+        checkColumn.width = 22
+        checkColumn.minWidth = 22
+        checkColumn.maxWidth = 22
+        checkColumn.isEditable = false
+        tableView.addTableColumn(checkColumn)
 
         // Data columns with sort support
         addColumn(to: tableView, id: "SSID", title: "SSID", width: 160, sortKey: "ssid", ascending: true)
@@ -73,13 +83,14 @@ struct NativeTableView: NSViewRepresentable {
     func updateNSView(_ scrollView: NSScrollView, context: Context) {
         guard let tableView = scrollView.documentView as? NSTableView else { return }
 
-        let idsChanged = context.coordinator.rows.map(\.id) != rows.map(\.id)
+        let rowsChanged = context.coordinator.rows.map(\.id) != rows.map(\.id)
+            || context.coordinator.rows.map(\.isVisible) != rows.map(\.isVisible)
         let orderChanged = context.coordinator.sortOrder.wrappedValue != sortOrder
         context.coordinator.rows = rows
         context.coordinator.selectedID = $selectedID
         context.coordinator.sortOrder = $sortOrder
 
-        if idsChanged || orderChanged {
+        if rowsChanged || orderChanged {
             tableView.reloadData()
         }
 
@@ -108,11 +119,13 @@ struct NativeTableView: NSViewRepresentable {
         var rows: [NetworkTableRow]
         var selectedID: Binding<String?>
         var sortOrder: Binding<[NSSortDescriptor]>
+        var onToggleVisibility: ((String) -> Void)?
 
-        init(rows: [NetworkTableRow], selectedID: Binding<String?>, sortOrder: Binding<[NSSortDescriptor]>) {
+        init(rows: [NetworkTableRow], selectedID: Binding<String?>, sortOrder: Binding<[NSSortDescriptor]>, onToggleVisibility: ((String) -> Void)?) {
             self.rows = rows
             self.selectedID = selectedID
             self.sortOrder = sortOrder
+            self.onToggleVisibility = onToggleVisibility
         }
 
         func numberOfRows(in tableView: NSTableView) -> Int {
@@ -123,6 +136,21 @@ struct NativeTableView: NSViewRepresentable {
             guard row < rows.count, let columnID = tableColumn?.identifier.rawValue else { return nil }
             let network = rows[row]
             let opacity = rowOpacity(network)
+
+            if columnID == "check" {
+                let container = NSView(frame: NSRect(x: 0, y: 0, width: 22, height: 16))
+                let checkbox = NSButton(frame: NSRect(x: 3, y: 1, width: 16, height: 14))
+                checkbox.setButtonType(.switch)
+                checkbox.title = ""
+                checkbox.state = network.isVisible ? .on : .off
+                checkbox.isEnabled = true
+                checkbox.alphaValue = opacity
+                checkbox.tag = row
+                checkbox.target = self
+                checkbox.action = #selector(Coordinator.checkboxToggled(_:))
+                container.addSubview(checkbox)
+                return container
+            }
 
             if columnID == "dot" {
                 let view = NSView(frame: NSRect(x: 0, y: 0, width: 20, height: 16))
@@ -147,7 +175,17 @@ struct NativeTableView: NSViewRepresentable {
             case "SSID":  textField.stringValue = network.ssid
             case "Band":  textField.stringValue = network.bandLabel
             case "Ch":    textField.stringValue = String(network.channel)
-            case "RSSI":  textField.stringValue = "\(network.rssi) dBm"
+            case "RSSI":
+                let deltaStr: String
+                if network.trendDelta != 0 {
+                    let sign = network.trendDelta > 0 ? "+" : ""
+                    deltaStr = " \(network.trendArrow) \(sign)\(network.trendDelta)"
+                } else if !network.trendArrow.isEmpty {
+                    deltaStr = " \(network.trendArrow)"
+                } else {
+                    deltaStr = ""
+                }
+                textField.stringValue = "\(network.rssi) dBm\(deltaStr)"
             case "BSSID": textField.stringValue = network.bssid
             case "PHY":   textField.stringValue = network.phyMode; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
             case "BW":    textField.stringValue = network.channelWidth; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
@@ -187,6 +225,12 @@ struct NativeTableView: NSViewRepresentable {
             label.textColor = NSColor.secondaryLabelColor.withAlphaComponent(opacity)
             label.alignment = .center
             return label
+        }
+
+        @MainActor @objc func checkboxToggled(_ sender: NSButton) {
+            let row = sender.tag
+            guard row < rows.count else { return }
+            onToggleVisibility?(rows[row].bssid)
         }
 
         private func rowOpacity(_ row: NetworkTableRow) -> Double {

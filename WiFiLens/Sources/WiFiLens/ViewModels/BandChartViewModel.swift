@@ -15,6 +15,7 @@ final class BandChartViewModel {
     private(set) var displayedSeriesData: [ChartSeriesData] = []
     private(set) var interfaceName: String = ""
     private(set) var currentFilterQuery: String = ""
+    private(set) var allSnapshots: [String: [NetworkSnapshot]] = [:]  // bssid → snapshots
 
     var hasFilter: Bool { !currentFilterQuery.trimmingCharacters(in: .whitespaces).isEmpty }
     var isEmpty: Bool { allSeriesData.isEmpty }
@@ -23,9 +24,10 @@ final class BandChartViewModel {
         self.band = band
     }
 
-    func updateNetworks(_ networks: [WiFiNetwork], colorHasher: SSIDColorHasher, filterQuery: String) {
-        let dataArray = ChannelSpanCalculator.toSeriesData(networks, colorHasher: colorHasher)
+    func updateNetworks(_ networks: [WiFiNetwork], colorHasher: SSIDColorHasher, filterQuery: String, trends: [String: (direction: TrendDirection, delta: Int)] = [:], snapshots: [String: [NetworkSnapshot]] = [:], hiddenBSSIDs: Set<String> = []) {
+        let dataArray = ChannelSpanCalculator.toSeriesData(networks, colorHasher: colorHasher, trends: trends, hiddenBSSIDs: hiddenBSSIDs)
         allSeriesData = dataArray
+        allSnapshots = snapshots
         currentFilterQuery = filterQuery
         if !isFrozen {
             applyFilter(filterQuery)

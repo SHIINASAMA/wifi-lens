@@ -90,7 +90,9 @@ enum ChannelSpanCalculator {
     /// Malformed entries are silently skipped (defensive, matches Python behavior).
     static func toSeriesData(
         _ networks: [WiFiNetwork],
-        colorHasher: SSIDColorHasher
+        colorHasher: SSIDColorHasher,
+        trends: [String: (direction: TrendDirection, delta: Int)] = [:],
+        hiddenBSSIDs: Set<String> = []
     ) -> [ChartSeriesData] {
         var series: [ChartSeriesData] = []
         for nw in networks {
@@ -113,6 +115,16 @@ enum ChannelSpanCalculator {
 
             let ie = nw.ieData.map { IEParser.parse(data: $0) }
 
+            let trend = trends[nw.bssid]
+            let arrow: String = {
+                switch trend?.direction {
+                case .up:     return "▲"
+                case .down:   return "▼"
+                case .stable: return "●"
+                case .none:   return ""
+                }
+            }()
+
             series.append(ChartSeriesData(
                 id: stableID,
                 ssid: nw.ssid ?? "n/a",
@@ -133,7 +145,10 @@ enum ChannelSpanCalculator {
                 security: ie?.securitySummary ?? "",
                 mcs: ie?.mcsSummary ?? "",
                 nss: ie?.nssSummary ?? "",
-                country: ie?.countryCode ?? ""
+                country: ie?.countryCode ?? "",
+                isVisible: !hiddenBSSIDs.contains(nw.bssid),
+                trendArrow: arrow,
+                trendDelta: trend?.delta ?? 0
             ))
         }
         return series
