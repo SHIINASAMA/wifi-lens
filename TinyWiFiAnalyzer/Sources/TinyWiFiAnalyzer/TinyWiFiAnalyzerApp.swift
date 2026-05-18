@@ -1,4 +1,5 @@
 import SwiftUI
+import Sparkle
 
 extension Notification.Name {
     static let freezeAllBands = Notification.Name("freezeAllBands")
@@ -9,6 +10,7 @@ extension Notification.Name {
 @main
 struct TinyWiFiAnalyzerApp: App {
     @State private var viewModel = ScannerViewModel()
+    @State private var sparkleUpdater = SparkleUpdater()
 
     var body: some Scene {
         WindowGroup {
@@ -55,6 +57,16 @@ struct TinyWiFiAnalyzerApp: App {
                 }
                 .keyboardShortcut(".", modifiers: [.command])
             }
+
+            CommandGroup(after: .appInfo) {
+                Button("Check for Updates…") {
+                    sparkleUpdater.checkForUpdates()
+                }
+            }
+        }
+
+        Settings {
+            SettingsView(updater: sparkleUpdater)
         }
     }
 

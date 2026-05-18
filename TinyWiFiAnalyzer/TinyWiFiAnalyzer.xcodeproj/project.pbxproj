@@ -30,6 +30,9 @@
 		DA7DEF71C1E8ED4068EB7D66 /* ScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */; };
 		EB51C6874A66A7A95F5C1C58 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F66DB715821EBD11B6D1AA /* Color+Extensions.swift */; };
 		EBE67FE6BDA458039D5C9669 /* ChartSeriesData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51C237F247C80EC5176F5C0 /* ChartSeriesData.swift */; };
+		FB0E20882FBAEBCB0064C07A /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = FB0E20872FBAEBCB0064C07A /* Sparkle */; };
+		FBD7B3492FBAED57002C8F5A /* SparkleUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */; };
+		FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */; };
 		FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6203A2551742DF77D61785FE /* WiFiChannel.swift */; };
 /* End PBXBuildFile section */
 
@@ -70,6 +73,8 @@
 		D69959B95B194A96FA8D337C /* LocationPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermissionManager.swift; sourceTree = "<group>"; };
 		D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewModel.swift; sourceTree = "<group>"; };
 		D9E30854EAD194A9FF4D611B /* ExportMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportMenuView.swift; sourceTree = "<group>"; };
+		FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdater.swift; sourceTree = "<group>"; };
+		FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +82,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FB0E20882FBAEBCB0064C07A /* Sparkle in Frameworks */,
 				1E5141F704005BF06DB684A1 /* CoreWLAN.framework in Frameworks */,
 				B9AB60F3D002A7B9123D2520 /* CoreLocation.framework in Frameworks */,
 			);
@@ -142,6 +148,7 @@
 				D9E30854EAD194A9FF4D611B /* ExportMenuView.swift */,
 				2A7ED53B7BCC8C0A11662151 /* FilterPopoverView.swift */,
 				28A3299502DE1A130760C8A7 /* NativeTableView.swift */,
+				FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -168,6 +175,7 @@
 			isa = PBXGroup;
 			children = (
 				1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */,
+				FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */,
 				D69959B95B194A96FA8D337C /* LocationPermissionManager.swift */,
 				8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */,
 				8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */,
@@ -239,6 +247,7 @@
 			);
 			name = TinyWiFiAnalyzer;
 			packageProductDependencies = (
+				FB0E20872FBAEBCB0064C07A /* Sparkle */,
 			);
 			productName = TinyWiFiAnalyzer;
 			productReference = BD784856886985BCC6FC4F02 /* TinyWiFiAnalyzer.app */;
@@ -262,6 +271,9 @@
 			);
 			mainGroup = 1D3644357E3565223E7F160A;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				FB0E20862FBAEB2F0064C07A /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BD4D8FFAAD7E961D9EE4F5FE /* Products */;
 			projectDirPath = "";
@@ -288,6 +300,7 @@
 				0898D535D9CCA525F89735FA /* Constants.swift in Sources */,
 				01ABB72FF2349B86A426CC1D /* ContentView.swift in Sources */,
 				33337ED933A513AE77A01209 /* ExportMenuView.swift in Sources */,
+				FBD7B3492FBAED57002C8F5A /* SparkleUpdater.swift in Sources */,
 				12AA3A17CCE99E41D313C900 /* FilterPopoverView.swift in Sources */,
 				027A3CECC33E6608D9F53B53 /* LocationPermissionManager.swift in Sources */,
 				3711656F0C3ECD58CA29D407 /* NativeTableView.swift in Sources */,
@@ -298,6 +311,7 @@
 				FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */,
 				28DCDBF118C838D48BD26773 /* WiFiNetwork.swift in Sources */,
 				6ECFD8E459A49E4A6FA0FCB0 /* WiFiScanner.swift in Sources */,
+				FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -551,6 +565,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FB0E20862FBAEB2F0064C07A /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FB0E20872FBAEBCB0064C07A /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB0E20862FBAEB2F0064C07A /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 70C77BA3C6064FF4D1D77E59 /* Project object */;
 }

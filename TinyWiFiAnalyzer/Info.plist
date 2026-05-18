@@ -10,5 +10,7 @@
 	<string>Tiny Wi-Fi Analyzer</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>14.0</string>
+	<key>SUFeedURL</key>
+	<string>https://example.com/appcast.xml</string>
 </dict>
 </plist>
