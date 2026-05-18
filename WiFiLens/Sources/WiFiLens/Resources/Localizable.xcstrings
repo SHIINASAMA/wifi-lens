@@ -152,7 +152,14 @@
       }
     },
     "Collecting data…" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在收集数据…"
+          }
+        }
+      }
     },
     "Denied" : {
       "extractionState" : "stale",
@@ -307,7 +314,14 @@
       }
     },
     "No Wi-Fi connection" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无 Wi-Fi 连接"
+          }
+        }
+      }
     },
     "On macOS 14 Sonoma and Later, Location Services permission is required to get Wi-Fi SSIDs.\nPlease enable Location Services in System Preferences > Security & Privacy > Privacy > Location Services." : {
       "localizations" : {
@@ -461,6 +475,17 @@
         }
       }
     },
+    "Scan Interval" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "扫描间隔"
+          }
+        }
+      }
+    },
     "Scanning" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -483,7 +508,14 @@
       }
     },
     "Show:" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示："
+          }
+        }
+      }
     },
     "SSID unavailable" : {
       "localizations" : {
