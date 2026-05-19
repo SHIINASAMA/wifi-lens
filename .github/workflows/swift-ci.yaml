@@ -15,10 +15,7 @@ on:
 
 jobs:
   build-and-test:
-    strategy:
-      matrix:
-        os: [macos-14, macos-15]
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-latest
     defaults:
       run:
         working-directory: WiFiLens
