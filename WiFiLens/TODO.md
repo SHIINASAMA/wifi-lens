@@ -23,8 +23,8 @@
 
 ## Feature Depth
 
-- [ ] Connection quality score (weighted: RSSI + noise floor + channel congestion + roaming protocol support)
-- [ ] Channel occupancy / interference heatmap per band
+- [x] Connection quality score (weighted: RSSI + noise floor + channel congestion + roaming protocol support)
+- [x] Channel occupancy / interference heatmap per band
 - [ ] RSSI threshold alert (notify when a monitored network drops below a configurable threshold)
 
 ## Engineering

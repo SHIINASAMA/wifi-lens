@@ -5,7 +5,7 @@ struct BandChartView: View {
     @Bindable var scannerViewModel: ScannerViewModel
 
     private let leftAxisWidth: CGFloat = 38
-    private let bottomAxisHeight: CGFloat = 24
+    private let bottomAxisHeight: CGFloat = 42
     private let chartMarginTop: CGFloat = 6
     private let chartMarginRight: CGFloat = 8
     private let chartMarginBottom: CGFloat = 4
@@ -134,8 +134,32 @@ struct BandChartView: View {
 
                 context.draw(
                     Text("\(ch)").font(.caption2).foregroundColor(.secondary),
-                    at: CGPoint(x: x, y: chartRect.maxY + 12)
+                    at: CGPoint(x: x, y: chartRect.maxY + 28)
                 )
+            }
+
+            // Channel occupancy heatmap — one bar per signal, below the x-axis
+            let heatHeight: CGFloat = 14
+            let barWidth: CGFloat = 5
+            let barGap: CGFloat = 1
+            let heatY = chartRect.maxY + 3
+            let visible = viewModel.displayedSeriesData.filter(\.isVisible)
+
+            // Group by integer-rounded apex to count occupancy and stack bars
+            var apexSignals: [Int: [Color]] = [:]
+            for s in visible {
+                apexSignals[Int(s.apex.rounded()), default: []].append(s.color)
+            }
+            let maxCnt = CGFloat(max(1, apexSignals.values.map(\.count).max() ?? 1))
+            for (apex, colors) in apexSignals {
+                let x = chartRect.minX + (Double(apex) - xMin) * scaleX
+                let opacity = 0.18 + (CGFloat(colors.count) / maxCnt) * 0.45
+                for (i, color) in colors.enumerated() {
+                    let offset = CGFloat(i) * (barWidth + barGap) - CGFloat(colors.count - 1) * (barWidth + barGap) / 2
+                    var bar = Path()
+                    bar.addRect(CGRect(x: x + offset, y: heatY, width: barWidth, height: heatHeight))
+                    context.fill(bar, with: .color(color.opacity(opacity)))
+                }
             }
 
             var xAxis = Path()

@@ -31,6 +31,7 @@ struct NetworkTableRow: Identifiable, Hashable {
     let trendArrow: String
     let trendDelta: Int
     let isVisible: Bool
+    let qualityScore: Int
 }
 
 @MainActor
@@ -87,7 +88,8 @@ final class ScannerViewModel {
                     country: series.country,
                     trendArrow: series.trendArrow,
                     trendDelta: series.trendDelta,
-                    isVisible: series.isVisible
+                    isVisible: series.isVisible,
+                    qualityScore: series.qualityScore
                 )
             }
         }

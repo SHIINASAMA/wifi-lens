@@ -24,6 +24,7 @@ struct ChartSeriesData: Identifiable {
     var nss: String = ""
     var country: String = ""
     var isVisible: Bool = true
+    var qualityScore: Int = 0  // 0–100 composite score
     var trendArrow: String = ""   // ▲ / ▼ / ●
     var trendDelta: Int = 0
 

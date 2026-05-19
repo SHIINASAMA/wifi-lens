@@ -54,7 +54,8 @@ struct NativeTableView: NSViewRepresentable {
         addColumn(to: tableView, id: "k", title: "k", width: 28, sortKey: "supportsK", ascending: false)
         addColumn(to: tableView, id: "r", title: "r", width: 28, sortKey: "supportsR", ascending: false)
         addColumn(to: tableView, id: "v", title: "v", width: 28, sortKey: "supportsV", ascending: false)
-        addColumn(to: tableView, id: "Sec", title: "Sec", width: 130, sortKey: "security", ascending: true)
+        addColumn(to: tableView, id: "Score", title: "Score", width: 48, sortKey: "qualityScore", ascending: false)
+        addColumn(to: tableView, id: "Sec", title: "Sec", width: 120, sortKey: "security", ascending: true)
         addColumn(to: tableView, id: "MCS", title: "MCS", width: 36, sortKey: "mcs", ascending: false)
         addColumn(to: tableView, id: "NSS", title: "NSS", width: 36, sortKey: "nss", ascending: false)
         addColumn(to: tableView, id: "CC", title: "CC", width: 36, sortKey: "country", ascending: true)
@@ -191,6 +192,11 @@ struct NativeTableView: NSViewRepresentable {
             case "k":     textField.stringValue = network.supportsK ? "✓" : ""; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
             case "r":     textField.stringValue = network.supportsR ? "✓" : ""; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
             case "v":     textField.stringValue = network.supportsV ? "✓" : ""; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
+            case "Score":
+                textField.stringValue = "\(network.qualityScore)"
+                textField.alignment = .center
+                textField.font = NSFont.systemFont(ofSize: 11, weight: .medium)
+                textField.textColor = scoreColor(network.qualityScore)
             case "Sec":   textField.stringValue = network.security; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
             case "MCS":   textField.stringValue = network.mcs; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
             case "NSS":   textField.stringValue = network.nss; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
@@ -229,6 +235,12 @@ struct NativeTableView: NSViewRepresentable {
             let row = sender.tag
             guard row < rows.count else { return }
             onToggleVisibility?(rows[row].bssid)
+        }
+
+        private func scoreColor(_ score: Int) -> NSColor {
+            if score >= 70 { return NSColor.systemGreen }
+            if score >= 40 { return NSColor.systemOrange }
+            return NSColor.systemRed
         }
 
         private func rowOpacity(_ row: NetworkTableRow) -> Double {
