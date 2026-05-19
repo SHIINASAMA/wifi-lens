@@ -1,14 +1,18 @@
 import SwiftUI
 import CoreWLAN
 
+private let headerHeight: CGFloat = 28
+
 enum InterfaceViewMode: String, CaseIterable {
     case simple
     case details
+    case monitor
 
     var displayName: String {
         switch self {
         case .simple:  String(localized: "Simple")
         case .details: String(localized: "Details")
+        case .monitor: String(localized: "Monitor")
         }
     }
 }
@@ -16,6 +20,7 @@ enum InterfaceViewMode: String, CaseIterable {
 struct InterfacesView: View {
     let interfaces: [NetworkInterfaceInfo]
     let scannerViewModel: ScannerViewModel
+    let throughputMonitor: ThroughputMonitor
     @State private var mode: InterfaceViewMode = .simple
 
     private var wifiInterface: NetworkInterfaceInfo? {
@@ -33,7 +38,7 @@ struct InterfacesView: View {
                 }
                 .pickerStyle(.segmented)
                 .controlSize(.small)
-                .frame(width: 160)
+                .frame(width: 240)
             }
             .padding(.horizontal, 16)
             .padding(.top, 16)
@@ -48,6 +53,8 @@ struct InterfacesView: View {
                 Spacer()
             } else if mode == .simple {
                 dashboardView
+            } else if mode == .monitor {
+                monitorView
             } else {
                 detailsView
             }
@@ -229,6 +236,204 @@ struct InterfacesView: View {
         }
     }
 
+    // MARK: - Monitor
+
+    @State private var selectedMonitorInterface: String?
+    @State private var isMonitorChartCollapsed = false
+    @State private var isMonitorTableCollapsed = false
+
+    private var monitorInterfaces: [String] {
+        var seen = Set(throughputMonitor.activeInterfaces)
+        for info in interfaces where !info.interfaceName.isEmpty {
+            seen.insert(info.interfaceName)
+        }
+        return seen.sorted { a, b in
+            let aWifi = a.hasPrefix("en") ? 0 : 1
+            let bWifi = b.hasPrefix("en") ? 0 : 1
+            if aWifi != bWifi { return aWifi < bWifi }
+            return a < b
+        }
+    }
+
+    private var monitorSamples: [ThroughputSample] {
+        guard let name = selectedMonitorInterface else { return [] }
+        return throughputMonitor.samples(for: name)
+    }
+
+    private var selectedMonitorRate: String {
+        guard let name = selectedMonitorInterface,
+              let last = throughputMonitor.samples(for: name).last else { return "" }
+        let down = rateString(last.rateIn)
+        let up = rateString(last.rateOut)
+        return "\(down)  \(up)"
+    }
+
+    private var monitorView: some View {
+        GeometryReader { geometry in
+            let totalH = geometry.size.height
+            let sections = 2
+            let allHeaders = CGFloat(sections) * headerHeight
+            let contentPool = max(0, totalH - allHeaders)
+            let chartExpanded = !isMonitorChartCollapsed
+            let tableExpanded = !isMonitorTableCollapsed
+
+            let chartWeight: CGFloat = 1.0
+            let tableWeight: CGFloat = 1.5
+            let activeWeight = (chartExpanded ? chartWeight : 0) + (tableExpanded ? tableWeight : 0)
+            let totalWeight = max(1, activeWeight)
+
+            let chartContentH: CGFloat = chartExpanded
+                ? max(60, contentPool * chartWeight / totalWeight)
+                : 0
+            let tableContentH: CGFloat = tableExpanded
+                ? max(60, contentPool * tableWeight / totalWeight)
+                : 0
+
+            VStack(spacing: 0) {
+                // Chart section
+                monitorChartHeader
+                if chartExpanded {
+                    monitorChartContent(height: chartContentH)
+                }
+
+                Divider()
+
+                // Interface table section
+                monitorTableHeader
+                if tableExpanded {
+                    monitorTableContent(height: tableContentH)
+                }
+            }
+            .clipped()
+        }
+    }
+
+    private var monitorChartHeader: some View {
+        Button {
+            withAnimation { isMonitorChartCollapsed.toggle() }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: isMonitorChartCollapsed ? "chevron.right" : "chevron.down")
+                    .font(.caption)
+                    .frame(width: 12)
+                Image(systemName: "chart.line.uptrend.xyaxis")
+                    .font(.caption)
+                Text(String(localized: "Throughput"))
+                    .font(.system(size: 12, weight: .semibold))
+                Spacer()
+                Text(selectedMonitorRate)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.horizontal, 10)
+            .frame(height: headerHeight)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var monitorTableHeader: some View {
+        Button {
+            withAnimation { isMonitorTableCollapsed.toggle() }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: isMonitorTableCollapsed ? "chevron.right" : "chevron.down")
+                    .font(.caption)
+                    .frame(width: 12)
+                Image(systemName: "list.bullet.rectangle")
+                    .font(.caption)
+                Text(String(localized: "Interfaces"))
+                    .font(.system(size: 12, weight: .semibold))
+                Spacer()
+                Text("\(monitorInterfaces.count) \(String(localized: "interfaces"))")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.horizontal, 10)
+            .frame(height: headerHeight)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func monitorChartContent(height: CGFloat) -> some View {
+        Group {
+            if monitorSamples.isEmpty {
+                VStack {
+                    Spacer()
+                    Text(String(localized: "Select an interface below to monitor throughput"))
+                        .font(.callout)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
+                .frame(height: height)
+            } else {
+                ThroughputChartView(samples: monitorSamples, interfaceName: selectedMonitorInterface ?? "")
+                    .frame(height: height)
+                    .padding(.horizontal, 8)
+            }
+        }
+    }
+
+    private func monitorTableContent(height: CGFloat) -> some View {
+        ScrollView {
+            LazyVStack(spacing: 0) {
+                ForEach(monitorInterfaces, id: \.self) { name in
+                    let isSelected = selectedMonitorInterface == name
+                    let lastSample = throughputMonitor.samples(for: name).last
+                    Button {
+                        selectedMonitorInterface = name
+                    } label: {
+                        HStack(spacing: 10) {
+                            Image(systemName: name.hasPrefix("en") ? "wifi" : "cable.connector")
+                                .font(.system(size: 12))
+                                .foregroundColor(isSelected ? .accentColor : .secondary)
+                                .frame(width: 20)
+
+                            Text(name)
+                                .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
+                                .foregroundColor(.primary)
+                                .frame(width: 60, alignment: .leading)
+
+                            Spacer()
+
+                            if let s = lastSample {
+                                Text(rateString(s.rateIn))
+                                    .font(.system(size: 12, design: .monospaced))
+                                    .foregroundColor(.green)
+                                    .frame(width: 72, alignment: .trailing)
+                                Text(rateString(s.rateOut))
+                                    .font(.system(size: 12, design: .monospaced))
+                                    .foregroundColor(.blue)
+                                    .frame(width: 72, alignment: .trailing)
+                            } else {
+                                Text("—").font(.system(size: 12)).foregroundColor(.secondary).frame(width: 72)
+                                Text("—").font(.system(size: 12)).foregroundColor(.secondary).frame(width: 72)
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .background(isSelected ? Color.accentColor.opacity(0.08) : .clear)
+
+                    if name != monitorInterfaces.last {
+                        Divider().padding(.leading, 36)
+                    }
+                }
+            }
+            .padding(.vertical, 4)
+        }
+        .frame(height: height)
+    }
+
+    private func rateString(_ bytesPerSec: Double) -> String {
+        if bytesPerSec < 1_024 { return "↓ 0 B/s" }
+        if bytesPerSec < 1_048_576 { return String(format: "↓ %.0f KB/s", bytesPerSec / 1_024) }
+        return String(format: "↓ %.1f MB/s", bytesPerSec / 1_048_576)
+    }
+
     // MARK: - Details (Professional)
 
     private var detailsView: some View {
@@ -401,85 +606,122 @@ struct InterfacesView: View {
 private struct InterfaceCard: View {
     let info: NetworkInterfaceInfo
 
+    /// A compact row that only renders if a value is meaningful.
+    private func compactRow(label: String, value: String) -> some View {
+        let isEmpty = value.isEmpty || value == "—"
+        return HStack(spacing: 4) {
+            Text(label)
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
+                .frame(width: 56, alignment: .trailing)
+            Text(isEmpty ? "—" : value)
+                .font(.system(size: 12, design: isEmpty ? .default : .monospaced))
+                .foregroundColor(isEmpty ? .secondary.opacity(0.6) : .primary)
+                .textSelection(.enabled)
+                .lineLimit(1)
+            Spacer(minLength: 0)
+        }
+    }
+
+    /// Non‑monospaced row for labels like security.
+    private func labelRow(label: String, value: String) -> some View {
+        let isEmpty = value.isEmpty || value == "—"
+        return HStack(spacing: 4) {
+            Text(label)
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
+                .frame(width: 56, alignment: .trailing)
+            Text(isEmpty ? "—" : value)
+                .font(.system(size: 12))
+                .foregroundColor(isEmpty ? .secondary.opacity(0.6) : .primary)
+                .lineLimit(1)
+            Spacer(minLength: 0)
+        }
+    }
+
+    private func typeBadge(_ t: NetworkInterfaceInfo.InterfaceType) -> some View {
+        let (label, color): (String, Color) = switch t {
+        case .wifi:     (String(localized: "Wi‑Fi"), .accentColor)
+        case .ethernet: (String(localized: "Ethernet"), .secondary)
+        case .virtual:  (String(localized: "Virtual"), .secondary.opacity(0.8))
+        }
+        return Text(label)
+            .font(.system(size: 8, weight: .semibold))
+            .foregroundColor(color)
+            .padding(.horizontal, 5)
+            .padding(.vertical, 2)
+            .background(color.opacity(0.12))
+            .clipShape(RoundedRectangle(cornerRadius: 3))
+    }
+
     var body: some View {
+        let t = info.interfaceType
+
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 8) {
-                Image(systemName: info.ssid != nil ? "wifi" : "cable.connector")
-                    .font(.title3)
-                    .foregroundColor(info.ssid != nil ? .accentColor : .secondary)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(info.ssid ?? info.interfaceName)
-                        .font(.headline)
-                    Text(info.interfaceName)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+            // Header
+            HStack(spacing: 6) {
+                typeBadge(t)
+                Text(t == .wifi ? (info.ssid ?? info.interfaceName) : info.interfaceName)
+                    .font(.system(size: 13, weight: .semibold))
+                    .lineLimit(1)
+                if t == .wifi, !info.displayRSSI.isEmpty, info.displayRSSI != "—" {
+                    Text(info.displayRSSI)
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundColor(rssiColor(info.rssi ?? -100))
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 1)
+                        .background(rssiColor(info.rssi ?? -100).opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 3))
                 }
                 Spacer()
-                if info.ssid != nil {
-                    Text(info.displayRSSI)
-                        .font(.callout.monospaced())
+                if t != .virtual {
+                    Text(info.interfaceName)
+                        .font(.system(size: 9))
                         .foregroundColor(.secondary)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-
-            Divider()
-
-            if info.ssid != nil {
-                Grid(horizontalSpacing: 16, verticalSpacing: 4) {
-                    GridRow {
-                        Text(String(localized: "BSSID")).font(.caption).foregroundColor(.secondary).gridColumnAlignment(.trailing)
-                        Text(info.displayBSSID).font(.callout).textSelection(.enabled).gridColumnAlignment(.leading)
-                    }
-                    GridRow {
-                        Text(String(localized: "Channel")).font(.caption).foregroundColor(.secondary).gridColumnAlignment(.trailing)
-                        Text(info.displayChannel).font(.callout).gridColumnAlignment(.leading)
-                    }
-                    GridRow {
-                        Text(String(localized: "Tx Rate")).font(.caption).foregroundColor(.secondary).gridColumnAlignment(.trailing)
-                        Text(info.displayTxRate).font(.callout).gridColumnAlignment(.leading)
-                    }
-                    GridRow {
-                        Text(String(localized: "PHY Mode")).font(.caption).foregroundColor(.secondary).gridColumnAlignment(.trailing)
-                        Text(info.displayPhyMode).font(.callout).gridColumnAlignment(.leading)
-                    }
-                    GridRow {
-                        Text(String(localized: "Security")).font(.caption).foregroundColor(.secondary).gridColumnAlignment(.trailing)
-                        Text(info.displaySecurity).font(.callout).gridColumnAlignment(.leading)
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                Divider()
-            }
-
-            Grid(horizontalSpacing: 16, verticalSpacing: 4) {
-                GridRow {
-                    Text(String(localized: "Hardware MAC")).font(.caption).foregroundColor(.secondary).gridColumnAlignment(.trailing)
-                    Text(info.displayMAC).font(.callout).textSelection(.enabled).gridColumnAlignment(.leading)
-                }
-                GridRow {
-                    Text(String(localized: "IPv4 Address")).font(.caption).foregroundColor(.secondary).gridColumnAlignment(.trailing)
-                    Text(info.displayIP).font(.callout).gridColumnAlignment(.leading)
-                }
-                GridRow {
-                    Text(String(localized: "Subnet Mask")).font(.caption).foregroundColor(.secondary).gridColumnAlignment(.trailing)
-                    Text(info.displaySubnet).font(.callout).gridColumnAlignment(.leading)
-                }
-                GridRow {
-                    Text(String(localized: "Router")).font(.caption).foregroundColor(.secondary).gridColumnAlignment(.trailing)
-                    Text(info.displayRouter).font(.callout).gridColumnAlignment(.leading)
-                }
-                GridRow {
-                    Text(String(localized: "DNS")).font(.caption).foregroundColor(.secondary).gridColumnAlignment(.trailing)
-                    Text(info.displayDNS).font(.callout).gridColumnAlignment(.leading)
-                }
-            }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 12)
             .padding(.vertical, 8)
+
+            Divider().padding(.horizontal, 8)
+
+            // Body — two‑column compact rows
+            VStack(spacing: 2) {
+                if t == .wifi {
+                    compactRow(label: String(localized: "BSSID"), value: info.displayBSSID)
+                    compactRow(label: String(localized: "Channel"), value: info.displayChannel)
+                    compactRow(label: String(localized: "PHY"), value: info.displayPhyMode)
+                    compactRow(label: String(localized: "Tx Rate"), value: info.displayTxRate)
+                    labelRow(label: String(localized: "Security"), value: info.displaySecurity)
+                }
+
+                // Network section — shown for Wi‑Fi and any interface that has network data
+                if info.hasNetworkInfo || t == .wifi {
+                    if t == .wifi {
+                        Divider().padding(.horizontal, 8).padding(.vertical, 2)
+                    }
+                    compactRow(label: String(localized: "IPv4"), value: info.displayIP)
+                    compactRow(label: String(localized: "Subnet"), value: info.displaySubnet)
+                    compactRow(label: String(localized: "Router"), value: info.displayRouter)
+                    compactRow(label: String(localized: "DNS"), value: info.displayDNS)
+                }
+
+                // MAC — only for Wi‑Fi and Ethernet (not virtual)
+                if t != .virtual {
+                    compactRow(label: String(localized: "MAC"), value: info.displayMAC)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
         }
-        .background(.quaternary.opacity(0.3))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .background(.quaternary.opacity(0.25))
+        .clipShape(RoundedRectangle(cornerRadius: 7))
+    }
+
+    private func rssiColor(_ rssi: Int) -> Color {
+        if rssi >= -50 { return .green }
+        if rssi >= -70 { return .yellow }
+        if rssi >= -85 { return .orange }
+        return .red
     }
 }

@@ -42,6 +42,7 @@ final class ScannerViewModel {
     let colorHasher = SSIDColorHasher()
     let signalHistory = SignalHistoryStore()
     let mcpServer = MCPServer()
+    let throughputMonitor = ThroughputMonitor()
     var hiddenBSSIDs: Set<String> = []
     var hiddenBands: Set<String> = []       // band IDs ("24"/"5"/"6") to hide
     var hideHiddenSSIDs: Bool = false       // hide networks with empty SSID
@@ -169,6 +170,7 @@ final class ScannerViewModel {
         scanTask?.cancel()
         isScanning = true
         accessState = .scanning
+        throughputMonitor.start()
 
         scanTask = Task {
             let intervalSeconds = UserDefaults.standard.integer(forKey: "scanIntervalSeconds")
@@ -349,6 +351,7 @@ final class ScannerViewModel {
         scanTask?.cancel()
         scanTask = nil
         isScanning = false
+        throughputMonitor.stop()
         Task { await scanner.stopScanning() }
     }
 

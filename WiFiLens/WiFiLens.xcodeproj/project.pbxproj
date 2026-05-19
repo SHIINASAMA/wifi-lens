@@ -41,6 +41,10 @@
 		FB0573C22FBC47F1005F8214 /* CrashReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C12FBC47F1005F8214 /* CrashReporter.swift */; };
 		FB0573C42FBC7405005F8214 /* ChannelQualityCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */; };
 		FB0573C62FBC741D005F8214 /* ChannelQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */; };
+		FB0573C92FBCD25C005F8214 /* HelpCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C72FBCD25C005F8214 /* HelpCenterView.swift */; };
+		FB0573CA2FBCD25C005F8214 /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C82FBCD25C005F8214 /* OverviewView.swift */; };
+		FB0573CC2FBCD8FA005F8214 /* ThroughputMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */; };
+		FB0573CE2FBCD9B9005F8214 /* ThroughputChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CD2FBCD9B9005F8214 /* ThroughputChartView.swift */; };
 		FB0E20882FBAEBCB0064C07A /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = FB0E20872FBAEBCB0064C07A /* Sparkle */; };
 		FB8BB6002FBB04E000FD072E /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = FB8BB5FD2FBB039A00FD072E /* Localizable.xcstrings */; };
 		FB8BB6022FBB07F600FD072E /* NetworkInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8BB6012FBB07F600FD072E /* NetworkInfoService.swift */; };
@@ -100,6 +104,10 @@
 		FB0573C12FBC47F1005F8214 /* CrashReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReporter.swift; sourceTree = "<group>"; };
 		FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityCalculator.swift; sourceTree = "<group>"; };
 		FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityView.swift; sourceTree = "<group>"; };
+		FB0573C72FBCD25C005F8214 /* HelpCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpCenterView.swift; sourceTree = "<group>"; };
+		FB0573C82FBCD25C005F8214 /* OverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewView.swift; sourceTree = "<group>"; };
+		FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThroughputMonitor.swift; sourceTree = "<group>"; };
+		FB0573CD2FBCD9B9005F8214 /* ThroughputChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThroughputChartView.swift; sourceTree = "<group>"; };
 		FB8BB5FD2FBB039A00FD072E /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		FB8BB6012FBB07F600FD072E /* NetworkInfoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInfoService.swift; sourceTree = "<group>"; };
 		FB8BB6032FBB0BA600FD072E /* IEParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IEParser.swift; sourceTree = "<group>"; };
@@ -180,7 +188,10 @@
 			isa = PBXGroup;
 			children = (
 				FB0573BD2FBC22C2005F8214 /* InterfacesView.swift */,
+				FB0573CD2FBCD9B9005F8214 /* ThroughputChartView.swift */,
 				FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */,
+				FB0573C72FBCD25C005F8214 /* HelpCenterView.swift */,
+				FB0573C82FBCD25C005F8214 /* OverviewView.swift */,
 				3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */,
 				7B31CBEBC05DEA7ADB03FE01 /* ContentView.swift */,
 				FB0573B02FBB5BEE005F8214 /* TrendChartView.swift */,
@@ -220,6 +231,7 @@
 				FB0573C12FBC47F1005F8214 /* CrashReporter.swift */,
 				FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */,
 				D69959B95B194A96FA8D337C /* LocationPermissionManager.swift */,
+				FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */,
 				8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */,
 				8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */,
 				FB8BB6012FBB07F600FD072E /* NetworkInfoService.swift */,
@@ -380,6 +392,7 @@
 				318908BC49D244B1EEE68A9A /* ChannelSpanCalculator.swift in Sources */,
 				FB0573AD2FBB54ED005F8214 /* SignalHistoryStore.swift in Sources */,
 				EBE67FE6BDA458039D5C9669 /* ChartSeriesData.swift in Sources */,
+				FB0573CC2FBCD8FA005F8214 /* ThroughputMonitor.swift in Sources */,
 				EB51C6874A66A7A95F5C1C58 /* Color+Extensions.swift in Sources */,
 				0898D535D9CCA525F89735FA /* Constants.swift in Sources */,
 				FB0573C42FBC7405005F8214 /* ChannelQualityCalculator.swift in Sources */,
@@ -393,6 +406,8 @@
 				FB0573C22FBC47F1005F8214 /* CrashReporter.swift in Sources */,
 				A952EA4DBE85899D61989DF9 /* SSIDColorHasher.swift in Sources */,
 				DA7DEF71C1E8ED4068EB7D66 /* ScannerViewModel.swift in Sources */,
+				FB0573C92FBCD25C005F8214 /* HelpCenterView.swift in Sources */,
+				FB0573CA2FBCD25C005F8214 /* OverviewView.swift in Sources */,
 				46B405FC484C9C9A5509E8AC /* SpanDirection.swift in Sources */,
 				9E2F89530D1114DBFAB705F3 /* WiFiLensApp.swift in Sources */,
 				FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */,
@@ -402,6 +417,7 @@
 				FB0573C02FBC47CC005F8214 /* Logging.swift in Sources */,
 				6ECFD8E459A49E4A6FA0FCB0 /* WiFiScanner.swift in Sources */,
 				FB8BB6022FBB07F600FD072E /* NetworkInfoService.swift in Sources */,
+				FB0573CE2FBCD9B9005F8214 /* ThroughputChartView.swift in Sources */,
 				FB0573BE2FBC22C2005F8214 /* InterfacesView.swift in Sources */,
 				FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */,
 			);

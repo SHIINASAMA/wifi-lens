@@ -18,6 +18,8 @@ private struct AppRootView: View {
         } detail: {
             Group {
                 switch selectedPage {
+                case .overview:
+                    OverviewView()
                 case .spectrum:
                     ContentView(viewModel: viewModel)
                         .alert("Location Services are disabled", isPresented: $viewModel.locationManager.showDeniedAlert) {
@@ -39,7 +41,9 @@ private struct AppRootView: View {
                 case .channels:
                     ChannelQualityView(channels: viewModel.channelQualities)
                 case .interfaces:
-                    InterfacesView(interfaces: viewModel.networkInfo, scannerViewModel: viewModel)
+                    InterfacesView(interfaces: viewModel.networkInfo, scannerViewModel: viewModel, throughputMonitor: viewModel.throughputMonitor)
+                case .helpCenter:
+                    HelpCenterView()
                 }
             }
             .alert(String(localized: "Previous Crash Detected"), isPresented: $showCrashLog) {
@@ -72,7 +76,7 @@ struct WiFiLensApp: App {
     @State private var viewModel = ScannerViewModel()
     @State private var sparkleUpdater = SparkleUpdater()
     @State private var sidebarVisibility = NavigationSplitViewVisibility.automatic
-    @State private var selectedPage: SidebarPage = .spectrum
+    @State private var selectedPage: SidebarPage = .overview
     @State private var showCrashLog: Bool = false
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840

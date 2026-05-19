@@ -3,6 +3,12 @@ import CoreWLAN
 import SystemConfiguration
 
 struct NetworkInterfaceInfo {
+    enum InterfaceType: String {
+        case wifi
+        case ethernet
+        case virtual
+    }
+
     let interfaceName: String
     let hardwareMAC: String?
     let ipv4Addresses: [String]
@@ -19,6 +25,12 @@ struct NetworkInterfaceInfo {
     let phyMode: String?
     let security: String
 
+    var interfaceType: InterfaceType {
+        if ssid != nil { return .wifi }
+        if hardwareMAC != nil { return .ethernet }
+        return .virtual
+    }
+
     var displayMAC: String { hardwareMAC ?? String(localized: "Unknown") }
     var displaySSID: String { ssid ?? "n/a" }
     var displayBSSID: String { bssid ?? String(localized: "Unknown") }
@@ -31,6 +43,9 @@ struct NetworkInterfaceInfo {
     var displaySubnet: String { subnetMasks.first ?? "—" }
     var displayRouter: String { router ?? "—" }
     var displayDNS: String { dnsServers.isEmpty ? "—" : dnsServers.joined(separator: ", ") }
+
+
+    var hasNetworkInfo: Bool { !ipv4Addresses.isEmpty || router != nil || !dnsServers.isEmpty }
 }
 
 enum NetworkInfoService {

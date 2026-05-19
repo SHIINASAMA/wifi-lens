@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "—" : {
+
+    },
     "·" : {
       "localizations" : {
         "zh-Hans" : {
@@ -43,6 +46,16 @@
     },
     "%@" : {
 
+    },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
     },
     "%@ %@%@" : {
       "localizations" : {
@@ -590,6 +603,16 @@
         }
       }
     },
+    "Download" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载"
+          }
+        }
+      }
+    },
     "Dynamic WEP" : {
 "localizations" : {
         "zh-Hans" : {
@@ -616,6 +639,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "企业"
+          }
+        }
+      }
+    },
+    "Ethernet" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以太网"
           }
         }
       }
@@ -760,6 +793,16 @@
         }
       }
     },
+    "Help Center" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "帮助中心"
+          }
+        }
+      }
+    },
     "Hide Hidden" : {
       "localizations" : {
         "zh-Hans" : {
@@ -790,6 +833,16 @@
         }
       }
     },
+    "interfaces" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "个接口"
+          }
+        }
+      }
+    },
     "Interfaces" : {
 "localizations" : {
         "zh-Hans" : {
@@ -806,6 +859,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "干扰"
+          }
+        }
+      }
+    },
+    "IPv4" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IPv4"
           }
         }
       }
@@ -900,6 +963,16 @@
         }
       }
     },
+    "MAC" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MAC"
+          }
+        }
+      }
+    },
     "MCP" : {
 "localizations" : {
         "zh-Hans" : {
@@ -936,6 +1009,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "一般"
+          }
+        }
+      }
+    },
+    "Monitor" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "监听"
           }
         }
       }
@@ -1076,6 +1159,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重叠"
+          }
+        }
+      }
+    },
+    "Overview" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "概览"
           }
         }
       }
@@ -1350,6 +1443,16 @@
         }
       }
     },
+    "Select an interface below to monitor throughput" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择下方接口以监听吞吐量"
+          }
+        }
+      }
+    },
     "Show:" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1410,12 +1513,32 @@
         }
       }
     },
+    "Subnet" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "子网"
+          }
+        }
+      }
+    },
     "Subnet Mask" : {
 "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "子网掩码"
+          }
+        }
+      }
+    },
+    "Throughput" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "吞吐量"
           }
         }
       }
@@ -1460,12 +1583,32 @@
         }
       }
     },
+    "Upload" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上传"
+          }
+        }
+      }
+    },
     "v" : {
 "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "v"
+          }
+        }
+      }
+    },
+    "Virtual" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "虚拟"
           }
         }
       }
@@ -1516,6 +1659,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wi-Fi 扫描失败"
+          }
+        }
+      }
+    },
+    "Wi‑Fi" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wi‑Fi"
           }
         }
       }
