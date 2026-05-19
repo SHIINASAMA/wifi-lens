@@ -2,11 +2,13 @@ import SwiftUI
 
 enum SidebarPage: String, CaseIterable {
     case spectrum
+    case channels
     case interfaces
 
     var label: String {
         switch self {
         case .spectrum:   String(localized: "Spectrum")
+        case .channels:   String(localized: "Channels")
         case .interfaces: String(localized: "Interfaces")
         }
     }
@@ -14,6 +16,7 @@ enum SidebarPage: String, CaseIterable {
     var icon: String {
         switch self {
         case .spectrum:   "antenna.radiowaves.left.and.right"
+        case .channels:   "chart.bar.fill"
         case .interfaces: "cable.connector"
         }
     }

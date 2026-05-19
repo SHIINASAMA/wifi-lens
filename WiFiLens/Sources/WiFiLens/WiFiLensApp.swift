@@ -55,6 +55,8 @@ struct WiFiLensApp: App {
                                 vm.toggleFreeze()
                             }
                         }
+                case .channels:
+                    ChannelQualityView(channels: viewModel.channelQualities)
                 case .interfaces:
                     InterfacesView(interfaces: viewModel.networkInfo)
                 }

@@ -294,8 +294,8 @@ struct ContentView: View {
         }
         sections.append(SectionInfo(
             kind: .table,
-            title: String(localized: "Network Table"),
-            subtitle: String(localized: "\(viewModel.combinedTableRows.count) rows")
+            title: String(localized: "AP"),
+            subtitle: String(localized: "\(viewModel.combinedTableRows.count) APs")
         ))
         return sections
     }

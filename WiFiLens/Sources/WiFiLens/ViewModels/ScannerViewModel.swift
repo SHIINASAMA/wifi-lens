@@ -61,6 +61,7 @@ final class ScannerViewModel {
     }
     var selectedNetworkID: String?
     var networkInfo: [NetworkInterfaceInfo] = []
+    var channelQualities: [ChannelQuality] = []
 
     var bandViewModels: [BandChartViewModel] {
         [band24, band5, band6].filter { supportedBands.contains($0.band) }
@@ -178,6 +179,7 @@ final class ScannerViewModel {
                     Log.scanner.info("scan success — \(networks.count) networks")
                     applyNetworks(networks)
                     networkInfo = NetworkInfoService.fetchAll()
+                    channelQualities = computeChannelQualities()
                 }
             }
         }
@@ -287,6 +289,34 @@ final class ScannerViewModel {
                 }
             }
         }
+    }
+
+    private func computeChannelQualities() -> [ChannelQuality] {
+        let currentChannel: Int? = networkInfo.first(where: { $0.ssid != nil })?.channel
+        let aps = lastNetworks.compactMap { nw -> ChannelQualityCalculator.APInfo? in
+            let ie = nw.ieData.map { IEParser.parse(data: $0) }
+            let width = ie.map { chanWidthLabel($0) } ?? "20"
+            let left = ChannelSpanCalculator.channelBlock(
+                primaryChannel: nw.channel.channelNumber,
+                widthMHz: nw.channel.channelWidthMHz,
+                band: nw.channel.band,
+                spanDirection: nw.channel.spanDirection
+            ).left
+            let right = ChannelSpanCalculator.channelBlock(
+                primaryChannel: nw.channel.channelNumber,
+                widthMHz: nw.channel.channelWidthMHz,
+                band: nw.channel.band,
+                spanDirection: nw.channel.spanDirection
+            ).right
+            return ChannelQualityCalculator.APInfo(
+                channel: nw.channel.channelNumber,
+                rssi: nw.rssi,
+                channelWidth: width,
+                band: nw.channel.band.id,
+                apex: Double(left + right) / 2.0
+            )
+        }
+        return ChannelQualityCalculator.compute(aps: aps, currentChannel: currentChannel)
     }
 
     func toggleVisibility(bssid: String) {
