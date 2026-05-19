@@ -11,10 +11,6 @@ struct ContentView: View {
     @State private var is5GHzCollapsed = false
     @State private var is6GHzCollapsed = false
     @State private var isTableCollapsed = false
-    @State private var show24InTable = true
-    @State private var show5InTable = true
-    @State private var show6InTable = true
-
     var body: some View {
         VStack(spacing: 0) {
             dashboardContent
@@ -29,6 +25,8 @@ struct ContentView: View {
                 Task { await viewModel.handleSceneDidBecomeActive() }
             }
         }
+        .onChange(of: viewModel.hiddenBands) { _, _ in viewModel.applyGlobalFilterToBands() }
+        .onChange(of: viewModel.hideHiddenSSIDs) { _, _ in viewModel.applyGlobalFilterToBands() }
         .onDisappear { viewModel.stop() }
     }
 
@@ -165,19 +163,30 @@ struct ContentView: View {
             Text("Show:")
                 .font(.system(size: 10))
                 .foregroundColor(.secondary)
-            bandToggle("2.4 GHz", isOn: $show24InTable)
-            bandToggle("5 GHz", isOn: $show5InTable)
+            bandToggle("2.4 GHz", bandID: "24")
+            bandToggle("5 GHz", bandID: "5")
             if viewModel.supportedBands.contains(.band6GHz) {
-                bandToggle("6 GHz", isOn: $show6InTable)
+                bandToggle("6 GHz", bandID: "6")
             }
+            Text("·")
+                .foregroundColor(.secondary)
+            Toggle(isOn: $viewModel.hideHiddenSSIDs) {
+                Text("Hide Hidden").font(.system(size: 11))
+            }
+            .toggleStyle(.checkbox)
             Spacer()
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 4)
     }
 
-    private func bandToggle(_ label: String, isOn: Binding<Bool>) -> some View {
-        Toggle(isOn: isOn) {
+    private func bandToggle(_ label: String, bandID: String) -> some View {
+        let isOn = Binding(get: { !viewModel.hiddenBands.contains(bandID) },
+                           set: { show in
+            if show { viewModel.hiddenBands.remove(bandID) }
+            else { viewModel.hiddenBands.insert(bandID) }
+        })
+        return Toggle(isOn: isOn) {
             Text(label).font(.system(size: 11))
         }
         .toggleStyle(.checkbox)
@@ -187,12 +196,12 @@ struct ContentView: View {
 
     private var tableRows: [NetworkTableRow] {
         viewModel.combinedTableRows.filter { row in
-            switch row.bandLabel {
-            case "2.4 GHz": return show24InTable
-            case "5 GHz":   return show5InTable
-            case "6 GHz":   return show6InTable
-            default: return true
-            }
+            let bandID = row.bandLabel == "2.4 GHz" ? "24"
+                : row.bandLabel == "5 GHz" ? "5"
+                : "6"
+            if viewModel.hiddenBands.contains(bandID) { return false }
+            if viewModel.hideHiddenSSIDs && row.isHiddenSSID { return false }
+            return true
         }
     }
 

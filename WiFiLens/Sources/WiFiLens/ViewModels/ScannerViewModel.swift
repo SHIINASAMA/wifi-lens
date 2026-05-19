@@ -43,6 +43,8 @@ final class ScannerViewModel {
     let signalHistory = SignalHistoryStore()
     let mcpServer = MCPServer()
     var hiddenBSSIDs: Set<String> = []
+    var hiddenBands: Set<String> = []       // band IDs ("24"/"5"/"6") to hide
+    var hideHiddenSSIDs: Bool = false       // hide networks with empty SSID
     private(set) var lastNetworks: [WiFiNetwork] = []  // cached for toggle rebuild + MCP
 
     var band24 = BandChartViewModel(band: .band24GHz)
@@ -235,21 +237,21 @@ final class ScannerViewModel {
             .filter { $0.channel.band == .band24GHz }
             .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
         if supportedBands.contains(.band24GHz) {
-            band24.updateNetworks(sorted24, colorHasher: colorHasher, filterQuery: globalFilterQuery, trends: trends, snapshots: snapshotDict, hiddenBSSIDs: hiddenBSSIDs)
+            band24.updateNetworks(sorted24, colorHasher: colorHasher, filterQuery: globalFilterQuery, trends: trends, snapshots: snapshotDict, hiddenBSSIDs: hiddenBSSIDs, hiddenBands: hiddenBands, hideHiddenSSIDs: hideHiddenSSIDs)
         }
 
         let sorted5 = deduped
             .filter { $0.channel.band == .band5GHz }
             .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
         if supportedBands.contains(.band5GHz) {
-            band5.updateNetworks(sorted5, colorHasher: colorHasher, filterQuery: globalFilterQuery, trends: trends, snapshots: snapshotDict, hiddenBSSIDs: hiddenBSSIDs)
+            band5.updateNetworks(sorted5, colorHasher: colorHasher, filterQuery: globalFilterQuery, trends: trends, snapshots: snapshotDict, hiddenBSSIDs: hiddenBSSIDs, hiddenBands: hiddenBands, hideHiddenSSIDs: hideHiddenSSIDs)
         }
 
         let sorted6 = deduped
             .filter { $0.channel.band == .band6GHz }
             .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
         if supportedBands.contains(.band6GHz) {
-            band6.updateNetworks(sorted6, colorHasher: colorHasher, filterQuery: globalFilterQuery, trends: trends, snapshots: snapshotDict, hiddenBSSIDs: hiddenBSSIDs)
+            band6.updateNetworks(sorted6, colorHasher: colorHasher, filterQuery: globalFilterQuery, trends: trends, snapshots: snapshotDict, hiddenBSSIDs: hiddenBSSIDs, hiddenBands: hiddenBands, hideHiddenSSIDs: hideHiddenSSIDs)
         }
 
         updateInterfaceName()
@@ -268,10 +270,10 @@ final class ScannerViewModel {
         accessState = ssidCount > 0 ? .scanning : .grantedButSSIDUnavailable
     }
 
-    private func applyGlobalFilterToBands() {
-        band24.applyFilter(globalFilterQuery)
-        band5.applyFilter(globalFilterQuery)
-        band6.applyFilter(globalFilterQuery)
+    func applyGlobalFilterToBands() {
+        band24.applyFilter(globalFilterQuery, hiddenBands: hiddenBands, hideHiddenSSIDs: hideHiddenSSIDs)
+        band5.applyFilter(globalFilterQuery, hiddenBands: hiddenBands, hideHiddenSSIDs: hideHiddenSSIDs)
+        band6.applyFilter(globalFilterQuery, hiddenBands: hiddenBands, hideHiddenSSIDs: hideHiddenSSIDs)
     }
 
     private func updateInterfaceName() {

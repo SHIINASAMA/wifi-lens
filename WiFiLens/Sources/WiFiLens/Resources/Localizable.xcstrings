@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "·" : {
+
+    },
     "{\"mcpServers\":{\"wifi-lens\":{\"command\":\"WiFiLensMCP\",\"args\":[\"%@\"]}}}" : {
 
     },
@@ -337,6 +340,9 @@
           }
         }
       }
+    },
+    "Hide Hidden" : {
+
     },
     "Ignore" : {
       "extractionState" : "stale",

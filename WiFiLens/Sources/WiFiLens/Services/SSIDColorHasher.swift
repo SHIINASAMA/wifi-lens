@@ -10,11 +10,11 @@ struct SSIDColorHasher {
         self.palette = palette
     }
 
-    func color(for ssid: String?) -> Color {
+    func color(for ssid: String?, bssid: String) -> Color {
         guard let ssid, !ssid.isEmpty, ssid.lowercased() != "n/a" else {
             return Constants.graySSIDColor
         }
-        let data = Data(ssid.utf8)
+        let data = Data(bssid.utf8)
         let hash = Insecure.SHA1.hash(data: data)
         let firstElement = hash.withUnsafeBytes { $0[0] }
         let index = Int(firstElement) % palette.count

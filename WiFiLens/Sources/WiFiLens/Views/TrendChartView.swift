@@ -25,9 +25,12 @@ struct TrendChartView: View {
                     height: size.height - bottomAxisHeight - marginTop - marginBottom
                 )
 
-                let timestamps = snapshots.map(\.rssi)
-                let yMin = Double(Constants.rssiNoiseFloor)
-                let yMax = min(0.0, ceil(Double(timestamps.max() ?? -30) / 10.0) * 10)
+                let values = snapshots.map(\.rssi)
+                let dataMax = Double(values.max() ?? -30)
+                let dataMin = Double(values.min() ?? -90)
+                let headroom: Double = 6
+                let yMax = min(0.0, dataMax + headroom)
+                let yMin = max(Double(Constants.rssiNoiseFloor), dataMin - headroom)
 
                 let scaleX = chartRect.width / CGFloat(max(1, snapshots.count - 1))
                 let scaleY = chartRect.height / (yMax - yMin)

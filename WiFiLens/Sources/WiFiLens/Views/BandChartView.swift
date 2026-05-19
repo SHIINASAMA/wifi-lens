@@ -90,7 +90,9 @@ struct BandChartView: View {
             let yMin = Double(Constants.rssiNoiseFloor)
 
             // Dynamic y-axis: scale to the strongest visible signal, rounded up to nearest 10
-            let strongestRSSI = viewModel.displayedSeriesData.map(\.rssi).max() ?? 0
+            let strongestRSSI = viewModel.displayedSeriesData
+                .filter { $0.isVisible && !$0.isFilteredOut }
+                .map(\.rssi).max() ?? 0
             let yMax = min(0.0, ceil(Double(strongestRSSI) / 10.0) * 10)
 
             let scaleX = chartRect.width / (xMax - xMin)
@@ -143,7 +145,7 @@ struct BandChartView: View {
             let barWidth: CGFloat = 5
             let barGap: CGFloat = 1
             let heatY = chartRect.maxY + 3
-            let visible = viewModel.displayedSeriesData.filter(\.isVisible)
+            let visible = viewModel.displayedSeriesData.filter { $0.isVisible && !$0.isFilteredOut }
 
             // Group by integer-rounded apex to count occupancy and stack bars
             var apexSignals: [Int: [Color]] = [:]
@@ -175,7 +177,7 @@ struct BandChartView: View {
             let clipPath = Path(chartRect)
             context.clip(to: clipPath)
 
-            for series in viewModel.displayedSeriesData where series.isVisible {
+            for series in viewModel.displayedSeriesData where series.isVisible && !series.isFilteredOut {
                 let isSelected = scannerViewModel.selectedNetworkID == series.id
                 let hasSelection = scannerViewModel.selectedNetworkID != nil
 
@@ -188,12 +190,12 @@ struct BandChartView: View {
                     strokeOpacity = 1.0
                     strokeWidth = 2
                 } else if hasSelection {
-                    areaOpacity = series.isFilteredOut ? 0.05 : 0.10
-                    strokeOpacity = series.isFilteredOut ? 0.08 : 0.20
+                    areaOpacity = 0.10
+                    strokeOpacity = 0.20
                     strokeWidth = 1
                 } else {
-                    areaOpacity = series.isFilteredOut ? Constants.filteredOutOpacity : 0.3
-                    strokeOpacity = series.isFilteredOut ? Constants.filteredOutOpacity : 0.6
+                    areaOpacity = 0.3
+                    strokeOpacity = 0.6
                     strokeWidth = 1
                 }
 

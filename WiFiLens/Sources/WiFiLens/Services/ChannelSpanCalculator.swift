@@ -134,7 +134,7 @@ enum ChannelSpanCalculator {
                 apex: apex,
                 right: right,
                 rssi: nw.rssi,
-                color: colorHasher.color(for: nw.ssid),
+                color: colorHasher.color(for: nw.ssid, bssid: nw.bssid),
                 phyMode: ie.map { phyLabel($0) } ?? "",
                 channelWidth: ie.map { widthLabel($0) } ?? "",
                 supportsK: ie?.supports80211k ?? false,
