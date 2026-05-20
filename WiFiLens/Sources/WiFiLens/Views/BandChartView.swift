@@ -216,7 +216,7 @@ struct BandChartView: View {
             for series in visibleSeries {
                 let style = strokeStyle(for: series)
 
-                let curve = series.curvePoints
+                let curve = series.displayCurvePoints
                 guard curve.count >= 2 else { continue }
 
                 var path = Path()
@@ -372,7 +372,7 @@ private struct DataLabelOverlay: View {
 
         for series in candidates {
             let px = chartRect.minX + (series.apex - xMin) * scaleX
-            let naturalY = chartRect.maxY - (Double(series.rssi) - Double(Constants.rssiNoiseFloor)) * scaleY - 8
+            let naturalY = chartRect.maxY - (series.displayRSSI - Double(Constants.rssiNoiseFloor)) * scaleY - 8
             let isSelected = series.id == selectedNetworkID
             let opacity: Double = hasSelection ? (isSelected ? 1.0 : 0.25) : 1.0
 

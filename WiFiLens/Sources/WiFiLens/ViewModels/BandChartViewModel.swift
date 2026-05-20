@@ -27,6 +27,7 @@ final class BandChartViewModel {
     private var currentHiddenBands: Set<String> = []
     private var currentHideHiddenSSIDs: Bool = false
     private var frozenSnapshot: RenderSnapshot?
+    private var animationTimer: Timer?
     var chartSize: CGSize = .zero
 
     var hasFilter: Bool { !currentFilterQuery.trimmingCharacters(in: .whitespaces).isEmpty }
@@ -117,7 +118,40 @@ final class BandChartViewModel {
     }
 
     func strongestRenderedRSSI() -> Int {
-        visibleSeriesData().map(\.rssi).max() ?? 0
+        Int(visibleSeriesData().map(\.displayRSSI).max() ?? 0)
+    }
+
+    // MARK: - RSSI animation
+
+    private func startAnimation() {
+        guard animationTimer == nil else { return }
+        animationTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.tickAnimation()
+            }
+        }
+    }
+
+    private func stopAnimation() {
+        animationTimer?.invalidate()
+        animationTimer = nil
+    }
+
+    private func tickAnimation() {
+        var anyAnimating = false
+        for i in allSeriesData.indices {
+            let target = Double(allSeriesData[i].rssi)
+            let delta = target - allSeriesData[i].displayRSSI
+            if abs(delta) < 0.2 { continue }
+            anyAnimating = true
+            allSeriesData[i].displayRSSI += delta * 0.25
+        }
+        if !isFrozen {
+            refreshRenderedState()
+        }
+        if !anyAnimating {
+            stopAnimation()
+        }
     }
 }
 
@@ -125,6 +159,12 @@ extension BandChartViewModel {
 
     func updateNetworks(_ networks: [WiFiNetwork], colorHasher: SSIDColorHasher, filterQuery: String, trends: [String: (direction: TrendDirection, delta: Int)] = [:], snapshots: [String: [NetworkSnapshot]] = [:], hiddenBSSIDs: Set<String> = [], hiddenBands: Set<String> = [], hideHiddenSSIDs: Bool = false) {
         var dataArray = ChannelSpanCalculator.toSeriesData(networks, colorHasher: colorHasher, trends: trends, hiddenBSSIDs: hiddenBSSIDs)
+
+        // Carry displayRSSI forward so animation continues from the current visual position
+        let prevByID = Dictionary(uniqueKeysWithValues: allSeriesData.map { ($0.id, $0.displayRSSI) })
+        for i in dataArray.indices {
+            dataArray[i].displayRSSI = prevByID[dataArray[i].id] ?? Double(dataArray[i].rssi)
+        }
 
         var occ: [Int: Int] = [:]
         for s in dataArray { occ[s.channel, default: 0] += 1 }
@@ -147,6 +187,7 @@ extension BandChartViewModel {
         if !isFrozen {
             refreshRenderedState()
         }
+        startAnimation()
     }
 
     static func computeScore(rssi: Int, channelCount: Int, supportsK: Bool, supportsR: Bool, supportsV: Bool, channelWidth: String) -> Int {

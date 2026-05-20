@@ -10,6 +10,7 @@ struct ChartSeriesData: Identifiable {
     let apex: Double
     let right: Int
     let rssi: Int
+    var displayRSSI: Double = 0.0
     var color: Color = .gray
     var isFilteredOut: Bool = false
     var phyMode: String = ""
@@ -38,6 +39,26 @@ struct ChartSeriesData: Identifiable {
         let halfWidth = Double(right - left) / 2.0
         let sigma = halfWidth / 3.0  // curve drops to ~0 at edges
         let amplitude = Double(rssi - Constants.rssiNoiseFloor)  // positive value above floor
+        let floor = Double(Constants.rssiNoiseFloor)
+        let steps = 80
+        var points: [(x: Double, y: Double)] = []
+
+        for i in 0...steps {
+            let x = Double(left) + (Double(right - left) * Double(i) / Double(steps))
+            let d = x - center
+            let g = exp(-(d * d) / (2 * sigma * sigma))
+            let y = floor + amplitude * g
+            points.append((x, y))
+        }
+        return points
+    }
+
+    /// Same Gaussian curve but driven by `displayRSSI` for smooth animated transitions.
+    var displayCurvePoints: [(x: Double, y: Double)] {
+        let center = Double(left + right) / 2.0
+        let halfWidth = Double(right - left) / 2.0
+        let sigma = halfWidth / 3.0
+        let amplitude = displayRSSI - Double(Constants.rssiNoiseFloor)
         let floor = Double(Constants.rssiNoiseFloor)
         let steps = 80
         var points: [(x: Double, y: Double)] = []
