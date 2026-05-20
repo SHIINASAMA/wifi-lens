@@ -25,7 +25,8 @@
       }
     },
     "· Adj:" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -94,7 +95,8 @@
       }
     },
     "%lld APs" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -104,7 +106,8 @@
       }
     },
     "%lld networks" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -114,7 +117,8 @@
       }
     },
     "%lld rows" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -124,7 +128,8 @@
       }
     },
     "● Current" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -134,7 +139,8 @@
       }
     },
     "★ Recommended" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -147,7 +153,8 @@
 
     },
     "1 second" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -157,7 +164,8 @@
       }
     },
     "2 seconds" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -167,7 +175,8 @@
       }
     },
     "2.4 GHz" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -177,7 +186,8 @@
       }
     },
     "3 seconds" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -187,7 +197,8 @@
       }
     },
     "5 GHz" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -197,7 +208,8 @@
       }
     },
     "5 seconds" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -207,7 +219,8 @@
       }
     },
     "6 GHz" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -217,7 +230,8 @@
       }
     },
     "10 seconds" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -227,7 +241,8 @@
       }
     },
     "802.11a" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -237,7 +252,8 @@
       }
     },
     "802.11ac" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -247,7 +263,8 @@
       }
     },
     "802.11ax" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -257,7 +274,8 @@
       }
     },
     "802.11b" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -267,7 +285,8 @@
       }
     },
     "802.11be" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -277,7 +296,8 @@
       }
     },
     "802.11g" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -287,7 +307,8 @@
       }
     },
     "802.11n" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -297,7 +318,8 @@
       }
     },
     "A simple Wi-Fi channel and signal strength analyzer for macOS." : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -307,7 +329,8 @@
       }
     },
     "Adj" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -317,7 +340,8 @@
       }
     },
     "AP" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -327,7 +351,8 @@
       }
     },
     "Appearance" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -337,7 +362,8 @@
       }
     },
     "APs" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -347,7 +373,8 @@
       }
     },
     "Automatically check for updates" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -357,7 +384,8 @@
       }
     },
     "Band" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -367,7 +395,8 @@
       }
     },
     "BSSID" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -377,7 +406,8 @@
       }
     },
     "Busy" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -387,7 +417,8 @@
       }
     },
     "BW" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -397,7 +428,8 @@
       }
     },
     "CC" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -407,7 +439,8 @@
       }
     },
     "Ch" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -417,7 +450,8 @@
       }
     },
     "CH" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -427,7 +461,8 @@
       }
     },
     "Channel" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -437,7 +472,8 @@
       }
     },
     "Channel %@" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -447,7 +483,8 @@
       }
     },
     "Channels" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -457,7 +494,8 @@
       }
     },
     "Check for Updates…" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -467,7 +505,8 @@
       }
     },
     "Check Now" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -477,7 +516,8 @@
       }
     },
     "Claude Desktop config" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -487,7 +527,8 @@
       }
     },
     "Clear" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -497,7 +538,8 @@
       }
     },
     "Co-Ch" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -507,7 +549,8 @@
       }
     },
     "Co:" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -517,7 +560,8 @@
       }
     },
     "Collecting data…" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -527,7 +571,8 @@
       }
     },
     "Congested" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -537,7 +582,8 @@
       }
     },
     "Connected" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -547,7 +593,8 @@
       }
     },
     "Connection" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -557,7 +604,8 @@
       }
     },
     "CSV" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -567,7 +615,8 @@
       }
     },
     "Dark" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -577,7 +626,8 @@
       }
     },
     "Denied" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -587,7 +637,8 @@
       }
     },
     "Details" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -597,7 +648,8 @@
       }
     },
     "Disconnected" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -607,7 +659,8 @@
       }
     },
     "Dismiss" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -617,7 +670,8 @@
       }
     },
     "DNS" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -627,7 +681,8 @@
       }
     },
     "Download" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -637,7 +692,8 @@
       }
     },
     "Dynamic WEP" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -647,7 +703,8 @@
       }
     },
     "Enable MCP server" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -657,7 +714,8 @@
       }
     },
     "Enterprise" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -667,7 +725,8 @@
       }
     },
     "Ethernet" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -677,7 +736,8 @@
       }
     },
     "Excellent" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -687,7 +747,8 @@
       }
     },
     "Export" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -697,7 +758,8 @@
       }
     },
     "Export as CSV" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -707,7 +769,8 @@
       }
     },
     "Export as PNG" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -717,7 +780,8 @@
       }
     },
     "Expose current Wi-Fi scan data as a local HTTP API for AI tools (Claude Desktop, etc.) to query via MCP." : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -727,7 +791,8 @@
       }
     },
     "Filter" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -737,7 +802,8 @@
       }
     },
     "Filter by SSID or BSSID…" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -747,7 +813,8 @@
       }
     },
     "Filter by SSID or MAC/BSSID" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -757,7 +824,8 @@
       }
     },
     "Freeze All" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -767,7 +835,8 @@
       }
     },
     "General" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -777,7 +846,8 @@
       }
     },
     "Good" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -787,7 +857,8 @@
       }
     },
     "Granted" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -797,7 +868,8 @@
       }
     },
     "H" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -807,7 +879,8 @@
       }
     },
     "Hardware MAC" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -817,7 +890,8 @@
       }
     },
     "Help" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -837,7 +911,8 @@
       }
     },
     "High" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -847,7 +922,8 @@
       }
     },
     "Ignore" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -857,7 +933,8 @@
       }
     },
     "interfaces" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -867,7 +944,8 @@
       }
     },
     "Interfaces" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -877,7 +955,8 @@
       }
     },
     "Intf" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -887,7 +966,8 @@
       }
     },
     "IPv4" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -897,7 +977,8 @@
       }
     },
     "IPv4 Address" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -907,7 +988,8 @@
       }
     },
     "k" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -917,7 +999,8 @@
       }
     },
     "k / r / v" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -927,7 +1010,8 @@
       }
     },
     "Level" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -937,7 +1021,8 @@
       }
     },
     "Light" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -957,7 +1042,8 @@
       }
     },
     "Location Services are disabled" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -967,7 +1053,8 @@
       }
     },
     "Location Services permission is required to read Wi-Fi SSIDs." : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -987,7 +1074,8 @@
       }
     },
     "Low" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -997,7 +1085,8 @@
       }
     },
     "MAC" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1007,7 +1096,8 @@
       }
     },
     "MCP" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1017,7 +1107,8 @@
       }
     },
     "MCS" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1027,7 +1118,8 @@
       }
     },
     "MCS / NSS" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1037,7 +1129,8 @@
       }
     },
     "Moderate" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1047,7 +1140,8 @@
       }
     },
     "Monitor" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1057,7 +1151,8 @@
       }
     },
     "Network Info" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1067,7 +1162,8 @@
       }
     },
     "Network Table" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1077,7 +1173,8 @@
       }
     },
     "No channel data available" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1087,7 +1184,8 @@
       }
     },
     "No network interfaces found" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1097,7 +1195,8 @@
       }
     },
     "No Wi-Fi connection" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1107,7 +1206,8 @@
       }
     },
     "None" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1117,7 +1217,8 @@
       }
     },
     "now" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1127,7 +1228,8 @@
       }
     },
     "NSS" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1147,7 +1249,8 @@
       }
     },
     "Open Location Preferences" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1157,7 +1260,8 @@
       }
     },
     "Open Preferences" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1167,7 +1271,8 @@
       }
     },
     "Open System Settings" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1177,7 +1282,8 @@
       }
     },
     "Other Interfaces" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1187,7 +1293,8 @@
       }
     },
     "Overlap" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1197,7 +1304,8 @@
       }
     },
     "Overview" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1207,7 +1315,8 @@
       }
     },
     "Pause" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1217,7 +1326,8 @@
       }
     },
     "Pending" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1227,7 +1337,8 @@
       }
     },
     "Permission denied" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1237,7 +1348,8 @@
       }
     },
     "Permission is granted, but macOS is still not returning SSIDs." : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1247,7 +1359,8 @@
       }
     },
     "Personal" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1257,7 +1370,8 @@
       }
     },
     "PHY" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1267,7 +1381,8 @@
       }
     },
     "PHY Mode" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1277,7 +1392,8 @@
       }
     },
     "PNG" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1287,7 +1403,8 @@
       }
     },
     "Port:" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1297,7 +1414,8 @@
       }
     },
     "Previous Crash Detected" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1307,7 +1425,8 @@
       }
     },
     "Professional" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1317,7 +1436,8 @@
       }
     },
     "Quit" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1327,7 +1447,8 @@
       }
     },
     "r" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1337,7 +1458,8 @@
       }
     },
     "Rec" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1347,7 +1469,8 @@
       }
     },
     "Refresh interval" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1357,7 +1480,8 @@
       }
     },
     "Reset Zoom" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1367,7 +1491,8 @@
       }
     },
     "Restricted" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1377,7 +1502,8 @@
       }
     },
     "Resume" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1387,7 +1513,8 @@
       }
     },
     "Router" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1397,7 +1524,8 @@
       }
     },
     "RSSI" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1417,7 +1545,8 @@
       }
     },
     "Scan Interval" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1427,7 +1556,8 @@
       }
     },
     "Scanning" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1447,7 +1577,8 @@
       }
     },
     "Score" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1457,7 +1588,8 @@
       }
     },
     "Sec" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1467,7 +1599,8 @@
       }
     },
     "Security" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1477,7 +1610,8 @@
       }
     },
     "Select an interface below to monitor throughput" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1487,7 +1621,8 @@
       }
     },
     "Settings" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1497,7 +1632,8 @@
       }
     },
     "Settings…" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1517,7 +1653,8 @@
       }
     },
     "Simple" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1527,7 +1664,8 @@
       }
     },
     "Spectrum" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1537,7 +1675,8 @@
       }
     },
     "SSID" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1557,7 +1696,8 @@
       }
     },
     "Stability" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1567,7 +1707,8 @@
       }
     },
     "Subnet" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1577,7 +1718,8 @@
       }
     },
     "Subnet Mask" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1587,7 +1729,8 @@
       }
     },
     "System" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1597,7 +1740,8 @@
       }
     },
     "Theme" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1607,7 +1751,8 @@
       }
     },
     "Throughput" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1617,7 +1762,8 @@
       }
     },
     "Toggle Expand" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1627,7 +1773,8 @@
       }
     },
     "Tx Rate" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1637,7 +1784,8 @@
       }
     },
     "Unknown" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1647,7 +1795,8 @@
       }
     },
     "Updates" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1657,7 +1806,8 @@
       }
     },
     "Upload" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1667,7 +1817,8 @@
       }
     },
     "v" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1677,7 +1828,8 @@
       }
     },
     "Virtual" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1687,7 +1839,8 @@
       }
     },
     "Waiting for authorization" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1707,7 +1860,8 @@
       }
     },
     "Weak" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1717,7 +1871,8 @@
       }
     },
     "WEP" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1727,7 +1882,8 @@
       }
     },
     "Wi-Fi scan failed" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1737,7 +1893,8 @@
       }
     },
     "Wi‑Fi" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1747,7 +1904,8 @@
       }
     },
     "Wi‑Fi 4" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1757,7 +1915,8 @@
       }
     },
     "Wi‑Fi 5" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1767,7 +1926,8 @@
       }
     },
     "Wi‑Fi 6" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1777,7 +1937,8 @@
       }
     },
     "Wi‑Fi 7" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1787,7 +1948,8 @@
       }
     },
     "WiFi Lens" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1797,7 +1959,8 @@
       }
     },
     "WPA Enterprise" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1807,7 +1970,8 @@
       }
     },
     "WPA Personal" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1817,7 +1981,8 @@
       }
     },
     "WPA/WPA2 Enterprise" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1827,7 +1992,8 @@
       }
     },
     "WPA/WPA2 Personal" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1837,7 +2003,8 @@
       }
     },
     "WPA2 Enterprise" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1847,7 +2014,8 @@
       }
     },
     "WPA2 Personal" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1857,7 +2025,8 @@
       }
     },
     "WPA3 Enterprise" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1867,7 +2036,8 @@
       }
     },
     "WPA3 Personal" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1877,7 +2047,8 @@
       }
     },
     "WPA3 Transition" : {
-"localizations" : {
+      "extractionState" : "stale",
+      "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",

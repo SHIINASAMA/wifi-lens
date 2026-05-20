@@ -79,7 +79,8 @@ struct WiFiLensApp: App {
     @State private var viewModel = ScannerViewModel()
     @State private var sparkleUpdater = SparkleUpdater()
     @State private var sidebarVisibility = NavigationSplitViewVisibility.automatic
-    @State private var selectedPage: SidebarPage = .overview
+//    @State private var selectedPage: SidebarPage = .overview
+    @State private var selectedPage: SidebarPage = .spectrum
     @State private var showCrashLog: Bool = false
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
