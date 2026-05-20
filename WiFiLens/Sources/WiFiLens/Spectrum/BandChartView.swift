@@ -194,8 +194,9 @@ struct BandChartView: View {
                 let opacity = 0.18 + (CGFloat(colors.count) / maxCnt) * 0.45
                 for (i, color) in colors.enumerated() {
                     let offset = CGFloat(i) * (barWidth + barGap) - CGFloat(colors.count - 1) * (barWidth + barGap) / 2
+                    let barX = x - barWidth / 2 + offset
                     var bar = Path()
-                    bar.addRect(CGRect(x: x + offset, y: heatY, width: barWidth, height: heatHeight))
+                    bar.addRect(CGRect(x: barX, y: heatY, width: barWidth, height: heatHeight))
                     context.fill(bar, with: .color(color.opacity(opacity)))
                 }
             }

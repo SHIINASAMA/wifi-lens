@@ -335,7 +335,7 @@ final class ScannerViewModel {
                 apex: Double(left + right) / 2.0
             )
         }
-        return ChannelQualityCalculator.compute(aps: aps, currentChannel: currentChannel)
+        return ChannelQualityCalculator.compute(aps: aps, currentChannel: currentChannel, supportedBands: Set(supportedBands.map(\.id)))
     }
 
     func toggleVisibility(bssid: String) {

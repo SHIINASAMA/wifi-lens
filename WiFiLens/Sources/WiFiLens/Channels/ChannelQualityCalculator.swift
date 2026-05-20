@@ -83,10 +83,9 @@ enum ChannelQualityCalculator {
     }
 
     /// Produce a quality rating for every relevant channel in each band.
-    static func compute(aps: [APInfo], currentChannel: Int? = nil) -> [ChannelQuality] {
+    static func compute(aps: [APInfo], currentChannel: Int? = nil, supportedBands: Set<String> = ["24", "5", "6"]) -> [ChannelQuality] {
         var results: [ChannelQuality] = []
 
-        let supportedBands = Set(aps.map(\.band)).union(["24", "5", "6"])  // always assess all three
         for band in supportedBands.sorted() {
             let bandAPs = aps.filter { $0.band == band }
 

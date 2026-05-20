@@ -7,6 +7,9 @@ enum SidebarPage: String, CaseIterable {
     case interfaces
     case help
     case settings
+#if DEBUG
+    case debugChart
+#endif
 
     var label: String {
         switch self {
@@ -16,6 +19,9 @@ enum SidebarPage: String, CaseIterable {
         case .interfaces: String(localized: "Interfaces")
         case .help:       String(localized: "Help")
         case .settings:   String(localized: "Settings")
+#if DEBUG
+        case .debugChart: "Debug Chart"
+#endif
         }
     }
 
@@ -27,6 +33,9 @@ enum SidebarPage: String, CaseIterable {
         case .interfaces: "cable.connector"
         case .help:       "questionmark.circle"
         case .settings:   "gearshape"
+#if DEBUG
+        case .debugChart: "ladybug"
+#endif
         }
     }
 }
@@ -46,6 +55,10 @@ struct SidebarView: View {
                     Label(page.label, systemImage: page.icon)
                         .tag(page)
                 }
+#if DEBUG
+                Label(SidebarPage.debugChart.label, systemImage: SidebarPage.debugChart.icon)
+                    .tag(SidebarPage.debugChart)
+#endif
             }
             Divider()
             Section {

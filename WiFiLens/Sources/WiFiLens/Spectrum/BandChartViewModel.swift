@@ -244,3 +244,34 @@ extension BandChartViewModel {
         zoomMax = clampedMax
     }
 }
+
+#if DEBUG
+extension BandChartViewModel {
+    /// Feed pre-built series data directly (bypasses WiFiNetwork → ChannelSpanCalculator pipeline).
+    func debugInject(series: [ChartSeriesData]) {
+        var dataArray = series
+        let prevByID = Dictionary(uniqueKeysWithValues: allSeriesData.map { ($0.id, $0.displayRSSI) })
+        var occ: [Int: Int] = [:]
+        for i in dataArray.indices {
+            dataArray[i].displayRSSI = prevByID[dataArray[i].id] ?? Double(dataArray[i].rssi)
+            occ[dataArray[i].channel, default: 0] += 1
+        }
+        channelOccupancy = occ
+        for i in dataArray.indices {
+            dataArray[i].qualityScore = Self.computeScore(
+                rssi: dataArray[i].rssi,
+                channelCount: occ[dataArray[i].channel] ?? 1,
+                supportsK: dataArray[i].supportsK,
+                supportsR: dataArray[i].supportsR,
+                supportsV: dataArray[i].supportsV,
+                channelWidth: dataArray[i].channelWidth
+            )
+        }
+        allSeriesData = dataArray
+        if !isFrozen {
+            refreshRenderedState()
+        }
+        startAnimation()
+    }
+}
+#endif

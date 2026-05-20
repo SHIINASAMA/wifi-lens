@@ -47,6 +47,10 @@ private struct AppRootView: View {
                     HelpCenterView()
                 case .settings:
                     SettingsView(updater: sparkleUpdater)
+#if DEBUG
+                case .debugChart:
+                    DebugContainerView()
+#endif
                 }
             }
             .alert(String(localized: "Previous Crash Detected"), isPresented: $showCrashLog) {
