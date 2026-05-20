@@ -326,6 +326,16 @@
         }
       }
     },
+    "Appearance" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外观"
+          }
+        }
+      }
+    },
     "APs" : {
 "localizations" : {
         "zh-Hans" : {
@@ -552,6 +562,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CSV"
+          }
+        }
+      }
+    },
+    "Dark" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "深色"
           }
         }
       }
@@ -912,6 +932,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "等级"
+          }
+        }
+      }
+    },
+    "Light" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "浅色"
           }
         }
       }
@@ -1552,6 +1582,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "子网掩码"
+          }
+        }
+      }
+    },
+    "System" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跟随系统"
+          }
+        }
+      }
+    },
+    "Theme" : {
+"localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主题"
           }
         }
       }

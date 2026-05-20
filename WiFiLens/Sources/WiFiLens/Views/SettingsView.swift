@@ -8,6 +8,7 @@ struct SettingsView: View {
     @AppStorage("scanIntervalSeconds") private var scanInterval: Int = 3
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
+    @AppStorage("appearance") private var appearance: String = "system"
 
     init(updater: SparkleUpdater) {
         self.updater = updater
@@ -28,7 +29,21 @@ struct SettingsView: View {
                     }
                     .padding(.vertical, 4)
                 }
+                
+                // MARK: - Appearance
+                Section {
+                    Picker(String(localized: "Theme"), selection: $appearance) {
+                        Text(String(localized: "System")).tag("system")
+                        Text(String(localized: "Light")).tag("light")
+                        Text(String(localized: "Dark")).tag("dark")
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                } header: {
+                    Text(String(localized: "Appearance"))
+                }
 
+                // MARK: - Scanner
                 Section(String(localized: "Scan Interval")) {
                     Picker(String(localized: "Refresh interval"), selection: $scanInterval) {
                         Text(String(localized: "1 second")).tag(1)

@@ -83,6 +83,7 @@ struct WiFiLensApp: App {
     @State private var showCrashLog: Bool = false
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
+    @AppStorage("appearance") private var appearance: String = "system"
 
     init() {
         Log.bootstrap()
@@ -107,6 +108,7 @@ struct WiFiLensApp: App {
                 sparkleUpdater: sparkleUpdater,
                 updateMCPServer: updateMCPServer
             )
+            .preferredColorScheme(colorScheme)
         }
         .windowResizability(.contentSize)
         .onChange(of: mcpEnabled) { _, enabled in
@@ -157,6 +159,22 @@ struct WiFiLensApp: App {
 
         }
 
+    }
+
+    private var colorScheme: ColorScheme? {
+        switch appearance {
+        case "light": return .light
+        case "dark":  return .dark
+        default:      return systemColorScheme
+        }
+    }
+
+    private var systemColorScheme: ColorScheme {
+        let name = NSApp.effectiveAppearance.name
+        if name == .darkAqua || name == .vibrantDark || name == .accessibilityHighContrastDarkAqua || name == .accessibilityHighContrastVibrantDark {
+            return .dark
+        }
+        return .light
     }
 
     @MainActor
