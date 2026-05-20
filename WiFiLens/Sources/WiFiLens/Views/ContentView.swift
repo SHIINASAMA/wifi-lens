@@ -172,8 +172,20 @@ struct ContentView: View {
     private func bandToggle(_ label: String, bandID: String) -> some View {
         let isOn = Binding(get: { !viewModel.hiddenBands.contains(bandID) },
                            set: { show in
-            if show { viewModel.hiddenBands.remove(bandID) }
-            else { viewModel.hiddenBands.insert(bandID) }
+            if show {
+                viewModel.hiddenBands.remove(bandID)
+            } else {
+                viewModel.hiddenBands.insert(bandID)
+            }
+            // Collapse / expand matching chart section with animation
+            withAnimation {
+                switch bandID {
+                case "24": is2GHzCollapsed = !show
+                case "5":  is5GHzCollapsed = !show
+                case "6":  is6GHzCollapsed = !show
+                default: break
+                }
+            }
         })
         return Toggle(isOn: isOn) {
             Text(label).font(.system(size: 11))

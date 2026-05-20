@@ -37,11 +37,17 @@ struct SidebarView: View {
     var body: some View {
         List(selection: $selectedPage) {
             Section {
-                ForEach([SidebarPage.overview, .spectrum, .channels, .interfaces], id: \.self) { page in
+                Label(SidebarPage.overview.label, systemImage: SidebarPage.overview.icon)
+                    .tag(SidebarPage.overview)
+            }
+            Divider()
+            Section {
+                ForEach([SidebarPage.spectrum, .channels, .interfaces], id: \.self) { page in
                     Label(page.label, systemImage: page.icon)
                         .tag(page)
                 }
             }
+            Divider()
             Section {
                 Label(SidebarPage.help.label, systemImage: SidebarPage.help.icon)
                     .tag(SidebarPage.help)
@@ -49,7 +55,6 @@ struct SidebarView: View {
                     .tag(SidebarPage.settings)
             }
         }
-        .listStyle(.sidebar)
         .frame(minWidth: 160, idealWidth: 180)
         .navigationTitle("WiFi Lens")
     }

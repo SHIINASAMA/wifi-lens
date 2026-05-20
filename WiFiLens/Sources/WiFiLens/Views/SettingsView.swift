@@ -47,11 +47,6 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
-                } header: {
-                    Text(String(localized: "MCP"))
-                }
-
-                Section(String(localized: "Connection")) {
                     HStack {
                         Text(String(localized: "Port:"))
                         TextField("", value: $mcpPort, format: .number)
@@ -70,6 +65,8 @@ struct SettingsView: View {
                             .textSelection(.enabled)
                     }
                     .padding(.top, 4)
+                } header: {
+                    Text(String(localized: "MCP"))
                 }
 
                 // MARK: - Updates
@@ -78,17 +75,14 @@ struct SettingsView: View {
                         .onChange(of: autoCheck) { _, newValue in
                             updater.automaticallyChecksForUpdates = newValue
                         }
-                } header: {
-                    Text(String(localized: "Updates"))
-                }
-
-                Section {
                     HStack {
                         Button(String(localized: "Check Now")) {
                             updater.checkForUpdates()
                         }
                         Spacer()
                     }
+                } header: {
+                    Text(String(localized: "Updates"))
                 }
             }
             .formStyle(.grouped)
