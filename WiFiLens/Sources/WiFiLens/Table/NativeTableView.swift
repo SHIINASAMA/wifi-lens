@@ -114,6 +114,7 @@ struct NativeTableView: NSViewRepresentable {
         let rowsChanged = context.coordinator.rows.map(\.id) != rows.map(\.id)
             || context.coordinator.rows.map(\.isVisible) != rows.map(\.isVisible)
         let orderChanged = context.coordinator.sortOrder.wrappedValue != sortOrder
+        let selectionChanged = context.coordinator.selectedID.wrappedValue != selectedID
         context.coordinator.rows = rows
         context.coordinator.selectedID = $selectedID
         context.coordinator.sortOrder = $sortOrder
@@ -121,6 +122,12 @@ struct NativeTableView: NSViewRepresentable {
         if rowsChanged || orderChanged {
             tableView.reloadData()
             context.coordinator.autoSizeColumns()
+        } else if selectionChanged {
+            // Reload only visible rows to update opacity without a full reload
+            let visibleRange = tableView.rows(in: tableView.visibleRect)
+            let rowIndexes = IndexSet(integersIn: visibleRange.lowerBound..<visibleRange.upperBound)
+            let colIndexes = IndexSet(integersIn: 0..<tableView.tableColumns.count)
+            tableView.reloadData(forRowIndexes: rowIndexes, columnIndexes: colIndexes)
         }
 
         // Restore selection
