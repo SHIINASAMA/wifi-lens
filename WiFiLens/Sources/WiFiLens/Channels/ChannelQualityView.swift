@@ -243,7 +243,7 @@ private struct ChannelCard: View {
             .frame(width: 100)
         }
         .padding(12)
-        .background(.quaternary.opacity(0.4))
+        .background(.regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 

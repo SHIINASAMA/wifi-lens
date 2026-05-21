@@ -3,11 +3,11 @@
 ## Interaction
 
 - [x] Scroll-to-zoom on charts
-- [ ] Hover tooltip showing SSID / RSSI / channel on chart curves
-- [ ] Click curve to select corresponding row in table (reverse of current row→curve highlight)
-- [ ] Show/hide individual table columns via context menu
-- [ ] Auto-adjust column widths to avoid truncation and wasted space
-- [ ] Remember window position and size across launches
+- [x] Hover tooltip showing SSID / RSSI / channel on chart curves
+- [x] Click curve to select corresponding row in table (reverse of current row→curve highlight)
+- [x] Show/hide individual table columns via context menu
+- [x] Auto-adjust column widths to avoid truncation and wasted space
+- [x] Remember window position and size across launches
 
 ## Chart Quality
 

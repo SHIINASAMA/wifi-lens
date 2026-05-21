@@ -10,6 +10,15 @@ struct ContentView: View {
     @State private var is5GHzCollapsed = false
     @State private var is6GHzCollapsed = false
     @State private var isTableCollapsed = false
+    @AppStorage("hiddenTableColumns") private var hiddenColumnsData: String = ""
+
+    private var hiddenColumns: Binding<Set<String>> {
+        Binding(
+            get: { Set(hiddenColumnsData.split(separator: ",").map(String.init).filter { !$0.isEmpty }) },
+            set: { hiddenColumnsData = $0.sorted().joined(separator: ",") }
+        )
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             dashboardContent
@@ -167,6 +176,7 @@ struct ContentView: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 4)
+        .background(.bar)
     }
 
     private func bandToggle(_ label: String, bandID: String) -> some View {
@@ -246,6 +256,7 @@ struct ContentView: View {
             rows: sortedRows,
             selectedID: $viewModel.selectedNetworkID,
             sortOrder: $sortOrder,
+            hiddenColumns: hiddenColumns,
             onToggleVisibility: { bssid in viewModel.toggleVisibility(bssid: bssid) }
         )
     }

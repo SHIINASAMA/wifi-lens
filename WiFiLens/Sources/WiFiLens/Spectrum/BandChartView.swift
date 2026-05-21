@@ -4,6 +4,10 @@ struct BandChartView: View {
     @Bindable var viewModel: BandChartViewModel
     @Bindable var scannerViewModel: ScannerViewModel
 
+    @State private var hoveredSeries: ChartSeriesData?
+    @State private var hoverPoint: CGPoint = .zero
+    @State private var isHovering: Bool = false
+
     private let leftAxisWidth: CGFloat = 38
     private let bottomAxisHeight: CGFloat = 42
     private let chartMarginTop: CGFloat = 6
@@ -87,6 +91,20 @@ struct BandChartView: View {
         return (0.3, 0.6, 1)
     }
 
+    private func chartGeometry(size: CGSize) -> ChartGeometry {
+        let chartRect = CGRect(
+            x: leftAxisWidth, y: chartMarginTop,
+            width: size.width - leftAxisWidth - chartMarginRight,
+            height: size.height - bottomAxisHeight - chartMarginTop - chartMarginBottom
+        )
+        let xMin = viewModel.zoomMin ?? Double(xDataMin)
+        let xMax = viewModel.zoomMax ?? Double(viewModel.band.maxChannel)
+        let yMin = Double(Constants.rssiNoiseFloor)
+        let yMax = min(0.0, ceil(Double(strongestRSSI) / 10.0) * 10)
+
+        return ChartGeometry(chartRect: chartRect, xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax)
+    }
+
     private var chartContent: some View {
         Group {
             if isEmpty {
@@ -99,10 +117,7 @@ struct BandChartView: View {
                 }
             } else {
                 VStack(spacing: 0) {
-                    GeometryReader { geometry in
-                        chartCanvas
-                            .gesture(zoomGesture(in: geometry))
-                    }
+                    chartCanvas
 
                     if let snaps = selectedSnapshots, let series = selectedSeries {
                         Divider()
@@ -117,137 +132,151 @@ struct BandChartView: View {
     }
 
     private var chartCanvas: some View {
-        Canvas { context, size in
-            let chartRect = CGRect(
-                x: leftAxisWidth, y: chartMarginTop,
-                width: size.width - leftAxisWidth - chartMarginRight,
-                height: size.height - bottomAxisHeight - chartMarginTop - chartMarginBottom
-            )
+        GeometryReader { geometry in
+            let geo = chartGeometry(size: geometry.size)
 
-            let xMin = viewModel.zoomMin ?? Double(xDataMin)
-            let xMax = viewModel.zoomMax ?? Double(viewModel.band.maxChannel)
-            let yMin = Double(Constants.rssiNoiseFloor)
+            Canvas { context, size in
+                let gridColor = Color.gray.opacity(0.15)
 
-            // Dynamic y-axis: scale to the strongest visible signal, rounded up to nearest 10
-            let yMax = min(0.0, ceil(Double(strongestRSSI) / 10.0) * 10)
+                for rssiVal in stride(from: Int(geo.yMin), through: Int(geo.yMax), by: 10) {
+                    let rssi = Double(rssiVal)
+                    let y = geo.chartRect.maxY - (rssi - geo.yMin) * geo.scaleY
+                    var line = Path()
+                    line.move(to: CGPoint(x: geo.chartRect.minX, y: y))
+                    line.addLine(to: CGPoint(x: geo.chartRect.maxX, y: y))
+                    context.stroke(line, with: .color(gridColor), lineWidth: 1)
 
-            let scaleX = chartRect.width / (xMax - xMin)
-            let scaleY = chartRect.height / (yMax - yMin)
+                    context.draw(
+                        Text("\(rssiVal)").font(.caption2).foregroundColor(.secondary),
+                        at: CGPoint(x: geo.chartRect.minX - 14, y: y)
+                    )
+                }
 
-            func dataToPoint(channel: Double, rssi: Double) -> CGPoint {
-                CGPoint(
-                    x: chartRect.minX + (channel - xMin) * scaleX,
-                    y: chartRect.maxY - (rssi - yMin) * scaleY
-                )
-            }
+                let desiredTicks = min(viewModel.band.maxChannel - Int(geo.xMin), 15)
+                let rawStep = max(1, Int((geo.xMax - geo.xMin) / Double(desiredTicks)))
+                let step = max(1, rawStep)
+                for ch in stride(from: Int(geo.xMin), through: Int(geo.xMax), by: step) {
+                    if viewModel.band == .band24GHz && ch < 1 { continue }
 
-            let gridColor = Color.gray.opacity(0.15)
+                    let x = geo.chartRect.minX + (Double(ch) - geo.xMin) * geo.scaleX
 
-            for rssiVal in stride(from: Int(yMin), through: Int(yMax), by: 10) {
-                let rssi = Double(rssiVal)
-                let y = chartRect.maxY - (rssi - yMin) * scaleY
-                var line = Path()
-                line.move(to: CGPoint(x: chartRect.minX, y: y))
-                line.addLine(to: CGPoint(x: chartRect.maxX, y: y))
-                context.stroke(line, with: .color(gridColor), lineWidth: 1)
+                    var line = Path()
+                    line.move(to: CGPoint(x: x, y: geo.chartRect.minY))
+                    line.addLine(to: CGPoint(x: x, y: geo.chartRect.maxY))
+                    context.stroke(line, with: .color(gridColor), lineWidth: 1)
 
-                context.draw(
-                    Text("\(rssiVal)").font(.caption2).foregroundColor(.secondary),
-                    at: CGPoint(x: chartRect.minX - 14, y: y)
-                )
-            }
+                    context.draw(
+                        Text("\(ch)").font(.caption2).foregroundColor(.secondary),
+                        at: CGPoint(x: x, y: geo.chartRect.maxY + 28)
+                    )
+                }
 
-            let desiredTicks = min(viewModel.band.maxChannel - Int(xMin), 15)
-            let rawStep = max(1, Int((xMax - xMin) / Double(desiredTicks)))
-            let step = max(1, rawStep)
-            for ch in stride(from: Int(xMin), through: Int(xMax), by: step) {
-                if viewModel.band == .band24GHz && ch < 1 { continue }
+                // Channel occupancy heatmap
+                let heatHeight: CGFloat = 14
+                let barWidth: CGFloat = 5
+                let barGap: CGFloat = 1
+                let heatY = geo.chartRect.maxY + 3
+                let visible = visibleSeries
 
-                let x = chartRect.minX + (Double(ch) - xMin) * scaleX
+                var apexSignals: [Int: [Color]] = [:]
+                for s in visible {
+                    apexSignals[Int(s.apex.rounded()), default: []].append(s.color)
+                }
+                let maxCnt = CGFloat(max(1, apexSignals.values.map(\.count).max() ?? 1))
+                for (apex, colors) in apexSignals {
+                    let x = geo.chartRect.minX + (Double(apex) - geo.xMin) * geo.scaleX
+                    let opacity = 0.18 + (CGFloat(colors.count) / maxCnt) * 0.45
+                    for (i, color) in colors.enumerated() {
+                        let offset = CGFloat(i) * (barWidth + barGap) - CGFloat(colors.count - 1) * (barWidth + barGap) / 2
+                        let barX = x - barWidth / 2 + offset
+                        var bar = Path()
+                        bar.addRect(CGRect(x: barX, y: heatY, width: barWidth, height: heatHeight))
+                        context.fill(bar, with: .color(color.opacity(opacity)))
+                    }
+                }
 
-                var line = Path()
-                line.move(to: CGPoint(x: x, y: chartRect.minY))
-                line.addLine(to: CGPoint(x: x, y: chartRect.maxY))
-                context.stroke(line, with: .color(gridColor), lineWidth: 1)
+                var xAxis = Path()
+                xAxis.move(to: CGPoint(x: geo.chartRect.minX, y: geo.chartRect.maxY))
+                xAxis.addLine(to: CGPoint(x: geo.chartRect.maxX, y: geo.chartRect.maxY))
+                context.stroke(xAxis, with: .color(.secondary), lineWidth: 1)
 
-                context.draw(
-                    Text("\(ch)").font(.caption2).foregroundColor(.secondary),
-                    at: CGPoint(x: x, y: chartRect.maxY + 28)
-                )
-            }
+                var yAxis = Path()
+                yAxis.move(to: CGPoint(x: geo.chartRect.minX, y: geo.chartRect.minY))
+                yAxis.addLine(to: CGPoint(x: geo.chartRect.minX, y: geo.chartRect.maxY))
+                context.stroke(yAxis, with: .color(.secondary), lineWidth: 1)
 
-            // Channel occupancy heatmap — one bar per signal, below the x-axis
-            let heatHeight: CGFloat = 14
-            let barWidth: CGFloat = 5
-            let barGap: CGFloat = 1
-            let heatY = chartRect.maxY + 3
-            let visible = visibleSeries
+                let clipPath = Path(geo.chartRect)
+                context.clip(to: clipPath)
 
-            // Group by integer-rounded apex to count occupancy and stack bars
-            var apexSignals: [Int: [Color]] = [:]
-            for s in visible {
-                apexSignals[Int(s.apex.rounded()), default: []].append(s.color)
-            }
-            let maxCnt = CGFloat(max(1, apexSignals.values.map(\.count).max() ?? 1))
-            for (apex, colors) in apexSignals {
-                let x = chartRect.minX + (Double(apex) - xMin) * scaleX
-                let opacity = 0.18 + (CGFloat(colors.count) / maxCnt) * 0.45
-                for (i, color) in colors.enumerated() {
-                    let offset = CGFloat(i) * (barWidth + barGap) - CGFloat(colors.count - 1) * (barWidth + barGap) / 2
-                    let barX = x - barWidth / 2 + offset
-                    var bar = Path()
-                    bar.addRect(CGRect(x: barX, y: heatY, width: barWidth, height: heatHeight))
-                    context.fill(bar, with: .color(color.opacity(opacity)))
+                for series in visibleSeries {
+                    let style = strokeStyle(for: series)
+                    let curve = series.displayCurvePoints
+                    guard curve.count >= 2 else { continue }
+
+                    var path = Path()
+                    path.move(to: geo.dataToPoint(channel: curve[0].x, rssi: curve[0].y))
+                    for pt in curve.dropFirst() {
+                        path.addLine(to: geo.dataToPoint(channel: pt.x, rssi: pt.y))
+                    }
+                    path.addLine(to: geo.dataToPoint(channel: Double(series.right), rssi: geo.yMin))
+                    path.addLine(to: geo.dataToPoint(channel: Double(series.left), rssi: geo.yMin))
+                    path.closeSubpath()
+
+                    context.fill(path, with: .color(series.color.opacity(style.areaOpacity)))
+                    context.stroke(path, with: .color(series.color.opacity(style.strokeOpacity)), lineWidth: style.strokeWidth)
                 }
             }
-
-            var xAxis = Path()
-            xAxis.move(to: CGPoint(x: chartRect.minX, y: chartRect.maxY))
-            xAxis.addLine(to: CGPoint(x: chartRect.maxX, y: chartRect.maxY))
-            context.stroke(xAxis, with: .color(.secondary), lineWidth: 1)
-
-            var yAxis = Path()
-            yAxis.move(to: CGPoint(x: chartRect.minX, y: chartRect.minY))
-            yAxis.addLine(to: CGPoint(x: chartRect.minX, y: chartRect.maxY))
-            context.stroke(yAxis, with: .color(.secondary), lineWidth: 1)
-
-            let clipPath = Path(chartRect)
-            context.clip(to: clipPath)
-
-            for series in visibleSeries {
-                let style = strokeStyle(for: series)
-
-                let curve = series.displayCurvePoints
-                guard curve.count >= 2 else { continue }
-
-                var path = Path()
-                path.move(to: dataToPoint(channel: curve[0].x, rssi: curve[0].y))
-                for pt in curve.dropFirst() {
-                    path.addLine(to: dataToPoint(channel: pt.x, rssi: pt.y))
-                }
-                path.addLine(to: dataToPoint(channel: Double(series.right), rssi: yMin))
-                path.addLine(to: dataToPoint(channel: Double(series.left), rssi: yMin))
-                path.closeSubpath()
-
-                context.fill(path, with: .color(series.color.opacity(style.areaOpacity)))
-                context.stroke(path, with: .color(series.color.opacity(style.strokeOpacity)), lineWidth: style.strokeWidth)
+            .overlay {
+                DataLabelOverlay(
+                    seriesData: renderedSeriesData,
+                    leftAxisWidth: leftAxisWidth,
+                    bottomAxisHeight: bottomAxisHeight,
+                    chartMarginTop: chartMarginTop,
+                    chartMarginRight: chartMarginRight,
+                    chartMarginBottom: chartMarginBottom,
+                    xDataMin: xDataMin,
+                    xDataMax: viewModel.band.maxChannel,
+                    zoomMin: viewModel.zoomMin,
+                    zoomMax: viewModel.zoomMax,
+                    selectedNetworkID: selectedNetworkID
+                )
             }
+            .overlay {
+                if isHovering, let series = hoveredSeries {
+                    ChartTooltip(ssid: series.displaySSID, rssi: series.rssi,
+                                 channel: series.channel, bssid: series.bssid)
+                        .position(x: clampX(hoverPoint.x, in: geo.chartRect),
+                                  y: max(hoverPoint.y - 22, 4))
+                }
+            }
+            .onContinuousHover(coordinateSpace: .local) { phase in
+                switch phase {
+                case .active(let location):
+                    isHovering = true
+                    if let (series, pt) = geo.nearestSeries(at: location, in: visibleSeries, radius: 14) {
+                        hoveredSeries = series
+                        hoverPoint = pt
+                    } else {
+                        hoveredSeries = nil
+                    }
+                case .ended:
+                    isHovering = false
+                    hoveredSeries = nil
+                }
+            }
+            .onTapGesture {
+                if let series = hoveredSeries {
+                    scannerViewModel.selectedNetworkID = series.id
+                } else {
+                    scannerViewModel.selectedNetworkID = nil
+                }
+            }
+            .gesture(zoomGesture(in: geometry))
         }
-        .overlay {
-            DataLabelOverlay(
-                seriesData: renderedSeriesData,
-                leftAxisWidth: leftAxisWidth,
-                bottomAxisHeight: bottomAxisHeight,
-                chartMarginTop: chartMarginTop,
-                chartMarginRight: chartMarginRight,
-                chartMarginBottom: chartMarginBottom,
-                xDataMin: xDataMin,
-                xDataMax: viewModel.band.maxChannel,
-                zoomMin: viewModel.zoomMin,
-                zoomMax: viewModel.zoomMax,
-                selectedNetworkID: selectedNetworkID
-            )
-        }
+    }
+
+    private func clampX(_ x: CGFloat, in rect: CGRect) -> CGFloat {
+        min(max(x, rect.minX + 60), rect.maxX - 60)
     }
 
     private func zoomGesture(in geometry: GeometryProxy) -> some Gesture {
@@ -396,5 +425,77 @@ private struct DataLabelOverlay: View {
             placed.append(PlacedLabel(series: series, x: px, y: labelY, opacity: opacity))
         }
         return placed
+    }
+}
+
+// MARK: - Chart Geometry (hit-testing + coordinate mapping)
+
+private struct ChartGeometry {
+    let chartRect: CGRect
+    let xMin: Double
+    let xMax: Double
+    let yMin: Double
+    let yMax: Double
+
+    var scaleX: CGFloat { chartRect.width / (xMax - xMin) }
+    var scaleY: CGFloat { chartRect.height / (yMax - yMin) }
+
+    func dataToPoint(channel: Double, rssi: Double) -> CGPoint {
+        CGPoint(
+            x: chartRect.minX + (channel - xMin) * scaleX,
+            y: chartRect.maxY - (rssi - yMin) * scaleY
+        )
+    }
+
+    func nearestSeries(at location: CGPoint, in series: [ChartSeriesData], radius: CGFloat) -> (ChartSeriesData, CGPoint)? {
+        guard chartRect.contains(location) else { return nil }
+        var best: (ChartSeriesData, CGPoint)?
+        var bestDist: CGFloat = radius
+
+        for s in series {
+            // Quick-reject: cursor x far outside curve span
+            let leftX = dataToPoint(channel: Double(s.left), rssi: yMin).x
+            let rightX = dataToPoint(channel: Double(s.right), rssi: yMin).x
+            if location.x < leftX - radius || location.x > rightX + radius { continue }
+
+            for pt in s.displayCurvePoints {
+                let screenPt = dataToPoint(channel: pt.x, rssi: pt.y)
+                let dx = screenPt.x - location.x
+                let dy = screenPt.y - location.y
+                let dist = sqrt(dx * dx + dy * dy)
+                if dist < bestDist {
+                    bestDist = dist
+                    best = (s, screenPt)
+                }
+            }
+        }
+        return best
+    }
+}
+
+// MARK: - Chart Tooltip
+
+private struct ChartTooltip: View {
+    let ssid: String
+    let rssi: Int
+    let channel: Int
+    let bssid: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(ssid)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundColor(.primary)
+            Text("CH \(channel)  \(rssi) dBm")
+                .font(.system(size: 9))
+                .foregroundColor(.secondary)
+            Text(bssid)
+                .font(.system(size: 8))
+                .foregroundColor(.secondary)
+        }
+        .padding(.horizontal, 6)
+        .padding(.vertical, 4)
+        .background(.regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 4))
     }
 }

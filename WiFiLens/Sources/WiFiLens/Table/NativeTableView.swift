@@ -5,10 +5,11 @@ struct NativeTableView: NSViewRepresentable {
     let rows: [NetworkTableRow]
     @Binding var selectedID: String?
     @Binding var sortOrder: [NSSortDescriptor]
+    @Binding var hiddenColumns: Set<String>
     var onToggleVisibility: ((String) -> Void)?
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(rows: rows, selectedID: $selectedID, sortOrder: $sortOrder, onToggleVisibility: onToggleVisibility)
+        Coordinator(rows: rows, selectedID: $selectedID, sortOrder: $sortOrder, hiddenColumns: $hiddenColumns, onToggleVisibility: onToggleVisibility)
     }
 
     func makeNSView(context: Context) -> NSScrollView {
@@ -22,7 +23,7 @@ struct NativeTableView: NSViewRepresentable {
         tableView.allowsEmptySelection = true
         tableView.allowsColumnReordering = false
         tableView.allowsColumnResizing = true
-        tableView.columnAutoresizingStyle = .uniformColumnAutoresizingStyle
+        tableView.columnAutoresizingStyle = .noColumnAutoresizing
 
         // Color dot column
         let dotColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("dot"))
@@ -60,6 +61,33 @@ struct NativeTableView: NSViewRepresentable {
         addColumn(to: tableView, id: "NSS", title: String(localized: "NSS"), width: 36, sortKey: "nss", ascending: false)
         addColumn(to: tableView, id: "CC", title: String(localized: "CC"), width: 36, sortKey: "country", ascending: true)
 
+        // Apply persisted hidden columns
+        for column in tableView.tableColumns {
+            if hiddenColumns.contains(column.identifier.rawValue) {
+                column.isHidden = true
+            }
+        }
+
+        // Custom header view for column context menu
+        let headerView = ColumnMenuHeaderView()
+        headerView.menuProvider = { [weak tableView] in
+            guard let tableView = tableView else { return nil }
+            let menu = NSMenu()
+            for column in tableView.tableColumns {
+                let id = column.identifier.rawValue
+                if id == "dot" || id == "check" { continue }
+                let item = NSMenuItem(title: column.title, action: nil, keyEquivalent: "")
+                item.state = column.isHidden ? .off : .on
+                item.representedObject = id
+                item.target = context.coordinator
+                item.action = #selector(Coordinator.toggleColumnVisibility(_:))
+                menu.addItem(item)
+            }
+            return menu
+        }
+        tableView.headerView = headerView
+        context.coordinator.tableView = tableView
+
         // Apply stored sort descriptors
         let storedColumns = tableView.tableColumns
         for descriptor in sortOrder {
@@ -92,6 +120,7 @@ struct NativeTableView: NSViewRepresentable {
 
         if rowsChanged || orderChanged {
             tableView.reloadData()
+            context.coordinator.autoSizeColumns()
         }
 
         // Restore selection
@@ -119,12 +148,15 @@ struct NativeTableView: NSViewRepresentable {
         var rows: [NetworkTableRow]
         var selectedID: Binding<String?>
         var sortOrder: Binding<[NSSortDescriptor]>
+        var hiddenColumns: Binding<Set<String>>
         var onToggleVisibility: ((String) -> Void)?
+        weak var tableView: NSTableView?
 
-        init(rows: [NetworkTableRow], selectedID: Binding<String?>, sortOrder: Binding<[NSSortDescriptor]>, onToggleVisibility: ((String) -> Void)?) {
+        init(rows: [NetworkTableRow], selectedID: Binding<String?>, sortOrder: Binding<[NSSortDescriptor]>, hiddenColumns: Binding<Set<String>>, onToggleVisibility: ((String) -> Void)?) {
             self.rows = rows
             self.selectedID = selectedID
             self.sortOrder = sortOrder
+            self.hiddenColumns = hiddenColumns
             self.onToggleVisibility = onToggleVisibility
         }
 
@@ -237,6 +269,69 @@ struct NativeTableView: NSViewRepresentable {
             onToggleVisibility?(rows[row].bssid)
         }
 
+        @MainActor @objc func toggleColumnVisibility(_ sender: NSMenuItem) {
+            guard let columnID = sender.representedObject as? String,
+                  let column = tableView?.tableColumns.first(where: { $0.identifier.rawValue == columnID })
+            else { return }
+            column.isHidden.toggle()
+            var hidden = hiddenColumns.wrappedValue
+            if column.isHidden { hidden.insert(columnID) } else { hidden.remove(columnID) }
+            hiddenColumns.wrappedValue = hidden
+        }
+
+        func autoSizeColumns() {
+            guard let tableView = tableView else { return }
+            for column in tableView.tableColumns {
+                let id = column.identifier.rawValue
+                if id == "dot" || id == "check" || column.isHidden { continue }
+
+                let font = columnFont(for: id)
+                let attrs: [NSAttributedString.Key: Any] = [.font: font]
+
+                var maxW: CGFloat = (column.title as NSString).size(withAttributes: attrs).width + 20
+
+                for row in rows {
+                    let text = rowText(row, columnID: id)
+                    let w = (text as NSString).size(withAttributes: attrs).width + 14
+                    if w > maxW { maxW = w }
+                }
+
+                let minW = max(column.minWidth, 28)
+                column.width = min(max(minW, ceil(maxW)), 350)
+            }
+        }
+
+        private func columnFont(for columnID: String) -> NSFont {
+            switch columnID {
+            case "BSSID": return .systemFont(ofSize: 11)
+            case "PHY", "BW", "k", "r", "v", "Score", "Sec", "MCS", "NSS", "CC":
+                return .systemFont(ofSize: 10)
+            default: return .systemFont(ofSize: 12)
+            }
+        }
+
+        private func rowText(_ row: NetworkTableRow, columnID: String) -> String {
+            switch columnID {
+            case "SSID":  return row.ssid
+            case "Hidden": return row.isHiddenSSID ? "H" : ""
+            case "Band":  return row.bandLabel
+            case "Ch":    return String(row.channel)
+            case "RSSI":  return "\(row.rssi) dBm  ▲ +99"
+            case "BSSID": return row.bssid
+            case "PHY":   return row.phyMode
+            case "BW":    return row.channelWidth
+            case "k":     return row.supportsK ? "✓" : ""
+            case "r":     return row.supportsR ? "✓" : ""
+            case "v":     return row.supportsV ? "✓" : ""
+            case "Score": return String(row.qualityScore)
+            case "Sec":   return row.security
+            case "MCS":   return row.mcs
+            case "NSS":   return row.nss
+            case "CC":    return row.country
+            default: return ""
+            }
+        }
+
         private func scoreColor(_ score: Int) -> NSColor {
             if score >= 70 { return NSColor.systemGreen }
             if score >= 40 { return NSColor.systemOrange }
@@ -249,5 +344,13 @@ struct NativeTableView: NSViewRepresentable {
             }
             return row.isFilteredOut ? Constants.filteredOutOpacity : 1.0
         }
+    }
+}
+
+private final class ColumnMenuHeaderView: NSTableHeaderView {
+    var menuProvider: (() -> NSMenu?)?
+
+    override func menu(for event: NSEvent) -> NSMenu? {
+        return menuProvider?()
     }
 }

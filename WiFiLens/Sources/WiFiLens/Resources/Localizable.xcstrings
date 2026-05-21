@@ -460,6 +460,16 @@
         }
       }
     },
+    "CH %@  %@ dBm" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "CH %1$@  %2$@ dBm"
+          }
+        }
+      }
+    },
     "Channel" : {
       "extractionState" : "stale",
       "localizations" : {

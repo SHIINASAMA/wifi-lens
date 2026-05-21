@@ -195,7 +195,7 @@ final class ScannerViewModel {
                     accessState = .scanFailed(message)
 
                 case .networks(let networks):
-                    Log.scanner.info("scan success — \(networks.count) networks")
+//                    Log.scanner.info("scan success — \(networks.count) networks")
                     applyNetworks(networks)
                     networkInfo = NetworkInfoService.fetchAll()
                     channelQualities = computeChannelQualities()

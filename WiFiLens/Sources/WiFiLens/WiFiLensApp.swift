@@ -60,6 +60,9 @@ private struct AppRootView: View {
                     .frame(maxHeight: 200)
             }
         }
+        .background(WindowAccessor { window in
+            window?.setFrameAutosaveName("WiFiLensMainWindow")
+        })
         .task {
             await viewModel.start()
             updateMCPServer()
@@ -70,6 +73,18 @@ private struct AppRootView: View {
             }
         }
     }
+}
+
+private struct WindowAccessor: NSViewRepresentable {
+    let onWindow: (NSWindow?) -> Void
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async { onWindow(view.window) }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
 extension Notification.Name {

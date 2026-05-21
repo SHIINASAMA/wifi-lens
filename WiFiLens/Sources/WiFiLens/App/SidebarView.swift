@@ -68,6 +68,7 @@ struct SidebarView: View {
                     .tag(SidebarPage.settings)
             }
         }
+        .background(.ultraThinMaterial)
         .frame(minWidth: 160, idealWidth: 180)
         .navigationTitle("WiFi Lens")
     }

@@ -120,7 +120,7 @@ struct InterfacesView: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity)
-        .background(.quaternary.opacity(0.4))
+        .background(.regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
@@ -178,7 +178,7 @@ struct InterfacesView: View {
         }
         .frame(height: 100)
         .frame(maxWidth: .infinity)
-        .background(.quaternary.opacity(0.3))
+        .background(.thinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
@@ -203,7 +203,7 @@ struct InterfacesView: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity)
-        .background(.quaternary.opacity(0.4))
+        .background(.regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
@@ -229,7 +229,7 @@ struct InterfacesView: View {
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(.quaternary.opacity(0.2))
+                    .background(.thinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
                 }
             }
@@ -723,7 +723,7 @@ private struct InterfaceCard: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
         }
-        .background(.quaternary.opacity(0.25))
+        .background(.thinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 7))
     }
 
