@@ -31,20 +31,23 @@ struct ChartSeriesData: Identifiable {
 
     var displaySSID: String { ssid.isEmpty ? "n/a" : ssid }
 
-    /// Gaussian bell curve points from `left` to `right`.
-    /// The curve is centered at the primary channel and drops to near the noise floor at the edges.
+    /// Gaussian bell curve points spanning beyond `left`/`right` so the curve
+    /// decays to near zero at the edges, creating a smooth tangent to the noise floor.
     var curvePoints: [(x: Double, y: Double)] {
-        // Center at block midpoint (matching original Python app's apex)
         let center = Double(left + right) / 2.0
         let halfWidth = Double(right - left) / 2.0
-        let sigma = halfWidth / 3.0  // curve drops to ~0 at edges
-        let amplitude = Double(rssi - Constants.rssiNoiseFloor)  // positive value above floor
+        let sigma = halfWidth / 3.0
+        let amplitude = Double(rssi - Constants.rssiNoiseFloor)
         let floor = Double(Constants.rssiNoiseFloor)
         let steps = 80
-        var points: [(x: Double, y: Double)] = []
 
+        // Extend by halfWidth on each side so the curve reaches ~exp(-18) ≈ 0 at the edges
+        let startX = Double(left) - halfWidth
+        let endX = Double(right) + halfWidth
+
+        var points: [(x: Double, y: Double)] = []
         for i in 0...steps {
-            let x = Double(left) + (Double(right - left) * Double(i) / Double(steps))
+            let x = startX + (endX - startX) * Double(i) / Double(steps)
             let d = x - center
             let g = exp(-(d * d) / (2 * sigma * sigma))
             let y = floor + amplitude * g
@@ -61,10 +64,13 @@ struct ChartSeriesData: Identifiable {
         let amplitude = displayRSSI - Double(Constants.rssiNoiseFloor)
         let floor = Double(Constants.rssiNoiseFloor)
         let steps = 80
-        var points: [(x: Double, y: Double)] = []
 
+        let startX = Double(left) - halfWidth
+        let endX = Double(right) + halfWidth
+
+        var points: [(x: Double, y: Double)] = []
         for i in 0...steps {
-            let x = Double(left) + (Double(right - left) * Double(i) / Double(steps))
+            let x = startX + (endX - startX) * Double(i) / Double(steps)
             let d = x - center
             let g = exp(-(d * d) / (2 * sigma * sigma))
             let y = floor + amplitude * g
