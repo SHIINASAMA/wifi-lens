@@ -8,11 +8,11 @@
 
 ## Medium Priority
 
-- [ ] `WiFiLens/Sources/WiFiLens/Views/OverviewView.swift:3-13` — Overview is still a placeholder, yet it is the default landing page in the sidebar. The information architecture is already wired up, but the page contributes no value.
-- [ ] `WiFiLens/Sources/WiFiLens/Views/ContentView.swift:332-357` — The empty-state `switch` includes a `.scanning` branch that is unreachable because `shouldShowEmptyState` never returns `true` while scanning. It is dead code and a maintenance trap.
-- [ ] `WiFiLens/Sources/WiFiLens/Views/BandChartView.swift:252-274` — The current "zoom" is a drag-to-marquee gesture, not scroll-wheel zoom as the TODO describes. The mismatch can cause progress tracking mistakes.
-- [ ] `WiFiLens/Sources/WiFiLens/Services/SignalHistoryStore.swift:14-16` — Signal history is limited to the 20 most recent points in memory. TrendChart already consumes it, but the TODO item "Persistent scan history / session recording" remains unchecked for good reason since there is no persistence layer yet.
-- [ ] `WiFiLens/Sources/WiFiLens/WiFiLensApp.swift:217-223` and `WiFiLens/Sources/WiFiLens/Views/ExportMenuView.swift:44-50` — CSV export still emits only `channel,rssi,ssid,bssid`. The TODO asks for timestamp, band, PHY mode, channel width, capabilities, and hidden-SSID flag; none of those are present.
+- [ ] `OverviewView.swift` — Overview is still a placeholder. The sidebar entry is commented out so it is unreachable. Deferred: blocked on Product Direction "Build a real Overview dashboard".
+- [x] `ContentView.swift` empty-state — The switch included unreachable `.scanning` and `.grantedButSSIDUnavailable` cases. Fixed: replaced with `default: EmptyView()`.
+- [x] `BandChartView.swift` zoom — The TODO item said "scroll-to-zoom" but the implementation is drag-to-marquee. Fixed: renamed TODO item to "Drag-to-zoom on charts".
+- [ ] `SignalHistoryStore.swift` — Signal history limited to 20 points in memory. Deferred: blocked on Product Direction "session model" (persistence layer needed).
+- [x] `WiFiLensApp.swift` CSV export — Added timestamp, band, phy_mode, channel_width, k, r, v, hidden_ssid. Removed dead ExportMenuView.swift.
 
 ## Low Priority
 

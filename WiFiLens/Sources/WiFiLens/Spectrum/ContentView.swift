@@ -390,10 +390,8 @@ struct ContentView: View {
             case .scanFailed(let msg):
                 Text("Scan failed").foregroundColor(.secondary)
                 Text(msg).font(.caption).foregroundColor(.secondary)
-            case .scanning:
-                Text("Scanning for Wi-Fi networks...").foregroundColor(.secondary)
-            case .grantedButSSIDUnavailable:
-                Text("SSID unavailable").foregroundColor(.secondary)
+            default:
+                EmptyView()
             }
             Spacer()
         }

@@ -2,7 +2,7 @@
 
 ## Interaction
 
-- [x] Scroll-to-zoom on charts
+- [x] Drag-to-zoom on charts
 - [x] Hover tooltip showing SSID / RSSI / channel on chart curves
 - [x] Click curve to select corresponding row in table (reverse of current row→curve highlight)
 - [x] Show/hide individual table columns via context menu

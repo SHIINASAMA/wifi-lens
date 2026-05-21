@@ -235,10 +235,14 @@ struct WiFiLensApp: App {
 
     @MainActor
     private func exportCSV(for vm: BandChartViewModel) {
-        var csv = "channel,rssi,ssid,bssid\n"
+        let ts = ISO8601DateFormatter().string(from: Date())
+        var csv = "timestamp,band,channel,rssi,ssid,bssid,phy_mode,channel_width,k,r,v,hidden_ssid\n"
         for s in vm.displayedSeriesData {
             let escaped = s.ssid.replacingOccurrences(of: "\"", with: "\"\"")
-            csv += "\(s.channel),\(s.rssi),\"\(escaped)\",\(s.bssid)\n"
+            csv += "\(ts),\(vm.band.displayName),\(s.channel),\(s.rssi),\"\(escaped)\",\(s.bssid),"
+            csv += "\(s.phyMode),\(s.channelWidth),"
+            csv += "\(s.supportsK),\(s.supportsR),\(s.supportsV),"
+            csv += "\(s.isHiddenSSID)\n"
         }
         guard let data = csv.data(using: .utf8) else { return }
 
