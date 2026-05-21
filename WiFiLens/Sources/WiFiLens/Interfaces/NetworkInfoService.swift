@@ -77,14 +77,14 @@ enum NetworkInfoService {
                 var buffer = [CChar](repeating: 0, count: Int(NI_MAXHOST))
                 if getnameinfo(addr, socklen_t(addr.pointee.sa_len), &buffer, socklen_t(buffer.count),
                                nil, 0, NI_NUMERICHOST) == 0 {
-                    entry.ips.append(String(cString: buffer))
+                    entry.ips.append(String(decoding: buffer.prefix(while: { $0 != 0 }).map(UInt8.init), as: UTF8.self))
                 }
                 // Subnet mask
                 if let netmask = ptr.pointee.ifa_netmask, netmask.pointee.sa_family == sa_family_t(AF_INET) {
                     var maskBuf = [CChar](repeating: 0, count: Int(NI_MAXHOST))
                     if getnameinfo(netmask, socklen_t(netmask.pointee.sa_len), &maskBuf, socklen_t(maskBuf.count),
                                    nil, 0, NI_NUMERICHOST) == 0 {
-                        entry.subnets.append(String(cString: maskBuf))
+                        entry.subnets.append(String(decoding: maskBuf.prefix(while: { $0 != 0 }).map(UInt8.init), as: UTF8.self))
                     }
                 }
             }

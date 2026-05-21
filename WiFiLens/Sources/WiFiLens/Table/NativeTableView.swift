@@ -288,7 +288,7 @@ struct NativeTableView: NSViewRepresentable {
             hiddenColumns.wrappedValue = hidden
         }
 
-        func autoSizeColumns() {
+        @MainActor func autoSizeColumns() {
             guard let tableView = tableView else { return }
             for column in tableView.tableColumns {
                 let id = column.identifier.rawValue

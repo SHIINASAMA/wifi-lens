@@ -39,22 +39,22 @@ final class MCPServer: @unchecked Sendable {
 
     private func handle(_ conn: NWConnection) {
         conn.start(queue: .global(qos: .utility))
-        var buf = Data()
-        func read() {
-            conn.receive(minimumIncompleteLength: 1, maximumLength: 65536) { [weak self] data, _, _, error in
-                guard let self, error == nil, let data else { conn.cancel(); return }
-                buf.append(data)
-                // For GET requests, headers end with \r\n\r\n and there is no body
-                if buf.range(of: Data("\r\n\r\n".utf8)) != nil {
-                    let nets = self.dataProvider?() ?? []
-                    let resp = Self.process(buf, networks: nets)
-                    conn.send(content: resp ?? Data(), completion: .contentProcessed { _ in conn.cancel() })
-                } else if buf.count < 65536 {
-                    read()
-                } else { conn.cancel() }
-            }
+        receiveHeaders(conn, Data())
+    }
+
+    private func receiveHeaders(_ conn: NWConnection, _ buf: Data) {
+        conn.receive(minimumIncompleteLength: 1, maximumLength: 65536) { [weak self] data, _, _, error in
+            guard let self, error == nil, let data else { conn.cancel(); return }
+            var accumulated = buf
+            accumulated.append(data)
+            if accumulated.range(of: Data("\r\n\r\n".utf8)) != nil {
+                let nets = self.dataProvider?() ?? []
+                let resp = Self.process(accumulated, networks: nets)
+                conn.send(content: resp ?? Data(), completion: .contentProcessed { _ in conn.cancel() })
+            } else if accumulated.count < 65536 {
+                self.receiveHeaders(conn, accumulated)
+            } else { conn.cancel() }
         }
-        read()
     }
 
     private static func process(_ raw: Data, networks: [WiFiNetwork]) -> Data? {

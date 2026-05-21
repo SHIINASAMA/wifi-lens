@@ -31,17 +31,15 @@ private struct OSLogHandler: LogHandler {
         set { metadata[key] = newValue }
     }
 
-    func log(level: Logging.Logger.Level, message: Logging.Logger.Message,
-             metadata: Logging.Logger.Metadata?, source: String,
-             file: String, function: String, line: UInt) {
+    func log(event: LogEvent) {
         let oslog = os.Logger(subsystem: "com.wifilens", category: label)
-        switch level {
-        case .trace, .debug: oslog.debug("\(message)")
-        case .info:          oslog.info("\(message)")
-        case .notice:        oslog.notice("\(message)")
-        case .warning:       oslog.warning("\(message)")
-        case .error:         oslog.error("\(message)")
-        case .critical:      oslog.fault("\(message)")
+        switch event.level {
+        case .trace, .debug: oslog.debug("\(event.message)")
+        case .info:          oslog.info("\(event.message)")
+        case .notice:        oslog.notice("\(event.message)")
+        case .warning:       oslog.warning("\(event.message)")
+        case .error:         oslog.error("\(event.message)")
+        case .critical:      oslog.fault("\(event.message)")
         }
     }
 }
