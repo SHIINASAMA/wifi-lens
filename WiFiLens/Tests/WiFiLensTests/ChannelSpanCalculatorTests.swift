@@ -142,4 +142,19 @@ struct ChannelSpanCalculatorTests {
         #expect(left == 50 - half)
         #expect(right == 50 + half)
     }
+
+    @Test func channelBlock6GHz20MHzFallback() {
+        let (left, right) = ChannelSpanCalculator.channelBlock(
+            primaryChannel: 100, widthMHz: 20, band: .band6GHz, spanDirection: nil)
+        #expect(left == 98)
+        #expect(right == 102)
+    }
+
+    @Test func channelBlock6GHz160MHzFallback() {
+        let (left, right) = ChannelSpanCalculator.channelBlock(
+            primaryChannel: 100, widthMHz: 160, band: .band6GHz, spanDirection: nil)
+        let half = ChannelSpanCalculator.channelHalfSpan(for: 160)
+        #expect(left == 100 - half)
+        #expect(right == 100 + half)
+    }
 }
