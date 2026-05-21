@@ -214,10 +214,7 @@ struct ContentView: View {
 
     private var tableRows: [NetworkTableRow] {
         viewModel.combinedTableRows.filter { row in
-            let bandID = row.bandLabel == "2.4 GHz" ? "24"
-                : row.bandLabel == "5 GHz" ? "5"
-                : "6"
-            if viewModel.hiddenBands.contains(bandID) { return false }
+            if viewModel.hiddenBands.contains(row.bandID) { return false }
             if viewModel.hideHiddenSSIDs && row.isHiddenSSID { return false }
             return true
         }

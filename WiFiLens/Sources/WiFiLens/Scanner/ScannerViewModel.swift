@@ -11,6 +11,7 @@ enum ScanAccessState: Equatable {
 
 struct NetworkTableRow: Identifiable, Hashable {
     let id: String
+    let bandID: String           // "24"/"5"/"6" — raw identifier, never localized
     let bandLabel: String
     let channel: Int
     let rssi: Int
@@ -80,6 +81,7 @@ final class ScannerViewModel {
             vm.displayedSeriesData.map { series in
                 NetworkTableRow(
                     id: series.id,
+                    bandID: vm.band.id,
                     bandLabel: vm.band.displayName,
                     channel: series.channel,
                     rssi: series.rssi,

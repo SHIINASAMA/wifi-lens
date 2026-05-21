@@ -16,9 +16,9 @@
 
 ## Low Priority
 
-- [ ] `WiFiLens/Sources/WiFiLens/Views/ContentView.swift:198-206` — The table filter derives a band ID from the localized `bandLabel` string. If the label text changes in the future (e.g., a different locale or wording tweak), this mapping silently breaks. The row model should carry a raw band ID instead.
-- [x] `WiFiLens/Sources/WiFiLens/Views/NativeTableView.swift:25` — `.uniformColumnAutoresizingStyle` distributes column widths evenly, exacerbating the existing column-width complaints. ~~Fixed: changed to `.noColumnAutoresizing` alongside auto-width implementation.~~
-- [ ] `WiFiLens/Sources/WiFiLens/Services/CrashReporter.swift:33` — Crash log writes use `.atomic` and overwrite the single `crash.log` file each time, keeping only the most recent crash. When back-to-back crashes occur during debug, earlier traces are lost and regression investigation becomes harder.
+- [x] `ContentView.swift` band filter — The table filter derived a band ID from the localized `bandLabel` string, which would silently break on locale changes. Fixed: added raw `bandID` field to `NetworkTableRow`.
+- [x] `NativeTableView.swift` — `.uniformColumnAutoresizingStyle` distributes column widths evenly. Fixed: changed to `.noColumnAutoresizing` alongside auto-width implementation.
+- [x] `CrashReporter.swift` — Crash log writes used `.atomic` overwrite on a single `crash.log` file, losing earlier traces in back-to-back crashes. Fixed: each crash now writes to a timestamped file (`crash-2026-05-21T12-34-56Z.log`); `consumeCrashLog()` enumerates all.
 
 ## Notes
 

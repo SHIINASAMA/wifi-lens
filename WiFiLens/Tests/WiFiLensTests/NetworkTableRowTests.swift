@@ -19,6 +19,7 @@ struct NetworkTableRowTests {
     ) -> NetworkTableRow {
         NetworkTableRow(
             id: id,
+            bandID: "5",
             bandLabel: "5 GHz",
             channel: 44,
             rssi: rssi,

@@ -9,13 +9,20 @@ enum CrashReporter {
         return dir
     }()
 
-    static let crashLogURL = logDir.appendingPathComponent("crash.log")
-
     static func consumeCrashLog() -> String? {
-        guard let data = try? Data(contentsOf: crashLogURL),
-              let text = String(data: data, encoding: .utf8), !text.isEmpty else { return nil }
-        try? FileManager.default.removeItem(at: crashLogURL)
-        return text
+        guard let files = try? FileManager.default.contentsOfDirectory(at: logDir, includingPropertiesForKeys: nil) else { return nil }
+        let crashFiles = files.filter { $0.lastPathComponent.hasPrefix("crash-") && $0.pathExtension == "log" }
+        guard !crashFiles.isEmpty else { return nil }
+
+        var all: [String] = []
+        for url in crashFiles {
+            if let data = try? Data(contentsOf: url),
+               let text = String(data: data, encoding: .utf8), !text.isEmpty {
+                all.append(text)
+            }
+            try? FileManager.default.removeItem(at: url)
+        }
+        return all.isEmpty ? nil : all.joined(separator: "\n---\n")
     }
 
     static func register() {
@@ -29,8 +36,10 @@ enum CrashReporter {
 
     fileprivate static func write(_ message: String) {
         let ts = ISO8601DateFormatter().string(from: Date())
+        let safeName = ts.replacingOccurrences(of: ":", with: "-")
         let entry = "[\(ts)] \(message)\n"
-        try? entry.data(using: .utf8)?.write(to: crashLogURL, options: .atomic)
+        let url = logDir.appendingPathComponent("crash-\(safeName).log")
+        try? entry.data(using: .utf8)?.write(to: url, options: .atomic)
     }
 }
 
