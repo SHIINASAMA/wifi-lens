@@ -218,8 +218,8 @@ struct BandChartView: View {
                     for pt in curve.dropFirst() {
                         path.addLine(to: geo.dataToPoint(channel: pt.x, rssi: pt.y))
                     }
-                    path.addLine(to: geo.dataToPoint(channel: curve.last!.x, rssi: geo.yMin))
-                    path.addLine(to: geo.dataToPoint(channel: curve.first!.x, rssi: geo.yMin))
+                    path.addLine(to: geo.dataToPoint(channel: Double(series.right), rssi: geo.yMin))
+                    path.addLine(to: geo.dataToPoint(channel: Double(series.left), rssi: geo.yMin))
                     path.closeSubpath()
 
                     context.fill(path, with: .color(series.color.opacity(style.areaOpacity)))
@@ -453,10 +453,9 @@ private struct ChartGeometry {
         var bestDist: CGFloat = radius
 
         for s in series {
-            // Quick-reject: cursor x far outside curve span (curve extends by halfWidth on each side)
-            let pad = Double(s.right - s.left) / 2.0
-            let leftX = dataToPoint(channel: Double(s.left) - pad, rssi: yMin).x
-            let rightX = dataToPoint(channel: Double(s.right) + pad, rssi: yMin).x
+            // Quick-reject: cursor x far outside curve span
+            let leftX = dataToPoint(channel: Double(s.left), rssi: yMin).x
+            let rightX = dataToPoint(channel: Double(s.right), rssi: yMin).x
             if location.x < leftX - radius || location.x > rightX + radius { continue }
 
             for pt in s.displayCurvePoints {
