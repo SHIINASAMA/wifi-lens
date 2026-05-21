@@ -233,12 +233,17 @@ private struct ChannelCard: View {
                     Image(systemName: "wave.3.right").font(.system(size: 9)).foregroundColor(.secondary)
                     Text("\(channel.strongestNeighborRSSI) dBm").font(.system(size: 11)).foregroundColor(.secondary)
                 }
-                Text(channel.overlapLevel.displayName)
-                    .font(.system(size: 10))
-                    .foregroundColor(overlapColor(channel.overlapLevel))
-                    .padding(.horizontal, 6).padding(.vertical, 2)
-                    .background(overlapColor(channel.overlapLevel).opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                HStack(spacing: 4) {
+                    Text(channel.overlapLevel.displayName)
+                        .font(.system(size: 10))
+                        .foregroundColor(overlapColor(channel.overlapLevel))
+                        .padding(.horizontal, 6).padding(.vertical, 2)
+                        .background(overlapColor(channel.overlapLevel).opacity(0.12))
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                    Text(String(localized: "overlap"))
+                        .font(.system(size: 9))
+                        .foregroundColor(.secondary)
+                }
             }
             .frame(width: 100)
         }

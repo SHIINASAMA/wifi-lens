@@ -18,7 +18,6 @@ enum Log {
     static let location = Logging.Logger(label: "com.wifilens.location")
     static let app       = Logging.Logger(label: "com.wifilens.app")
     static let throughput = Logging.Logger(label: "com.wifilens.throughput")
-    static let table      = Logging.Logger(label: "com.wifilens.table")
 }
 
 /// swif-tlog LogHandler that writes to Apple's unified logging (Console.app).

@@ -2,9 +2,9 @@
 
 ## High Priority
 
-- [ ] `WiFiLens/Sources/WiFiLens/Views/ContentView.swift:293-300` — The AP count in the table section header uses `viewModel.combinedTableRows.count`, which ignores band toggles and the hidden-SSID filter, so the header subtitle drifts out of sync with the rows actually shown.
-- [ ] `WiFiLens/Sources/WiFiLens/Views/NativeTableView.swift:86-95` — The table reloads only when row IDs or `isVisible` changes. When scan data updates SSID, RSSI, security, or quality score without changing the ID set, rows are not refreshed and stale values remain on screen.
-- [ ] `WiFiLens/Sources/WiFiLens/Services/MCPServer.swift:169-175` — The HTTP response header line separator uses bare `\r` instead of `\r\n`, making the server non-conformant. Failures depend on client tolerance and can break MCP bridges or strict HTTP parsers.
+- [x] `WiFiLens/Sources/WiFiLens/Views/ContentView.swift:293-300` — The AP count in the table section header uses `viewModel.combinedTableRows.count`, which ignores band toggles and the hidden-SSID filter, so the header subtitle drifts out of sync with the rows actually shown.
+- [x] `WiFiLens/Sources/WiFiLens/Views/NativeTableView.swift:86-95` — The table reloads only when row IDs or `isVisible` changes. When scan data updates SSID, RSSI, security, or quality score without changing the ID set, rows are not refreshed and stale values remain on screen.
+- [x] `WiFiLens/Sources/WiFiLens/Services/MCPServer.swift:169-175` — The HTTP response header line separator uses bare `\r` instead of `\r\n`, making the server non-conformant. ~~Not a bug: Swift multiline string appends implicit `\n` after each `\r`, producing valid `\r\n`.~~
 
 ## Medium Priority
 
@@ -17,7 +17,7 @@
 ## Low Priority
 
 - [ ] `WiFiLens/Sources/WiFiLens/Views/ContentView.swift:198-206` — The table filter derives a band ID from the localized `bandLabel` string. If the label text changes in the future (e.g., a different locale or wording tweak), this mapping silently breaks. The row model should carry a raw band ID instead.
-- [ ] `WiFiLens/Sources/WiFiLens/Views/NativeTableView.swift:25` — `.uniformColumnAutoresizingStyle` distributes column widths evenly, exacerbating the existing column-width complaints and confirming the TODO item about auto-adjustment is still open.
+- [x] `WiFiLens/Sources/WiFiLens/Views/NativeTableView.swift:25` — `.uniformColumnAutoresizingStyle` distributes column widths evenly, exacerbating the existing column-width complaints. ~~Fixed: changed to `.noColumnAutoresizing` alongside auto-width implementation.~~
 - [ ] `WiFiLens/Sources/WiFiLens/Services/CrashReporter.swift:33` — Crash log writes use `.atomic` and overwrite the single `crash.log` file each time, keeping only the most recent crash. When back-to-back crashes occur during debug, earlier traces are lost and regression investigation becomes harder.
 
 ## Notes

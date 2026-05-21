@@ -100,8 +100,6 @@ struct NativeTableView: NSViewRepresentable {
             tableView.sortDescriptors = sortOrder
         }
 
-        context.coordinator.observeSelectionNotifications(for: tableView)
-
         let scrollView = NSScrollView()
         scrollView.documentView = tableView
         scrollView.hasVerticalScroller = true
@@ -113,11 +111,9 @@ struct NativeTableView: NSViewRepresentable {
     func updateNSView(_ scrollView: NSScrollView, context: Context) {
         guard let tableView = scrollView.documentView as? NSTableView else { return }
 
-        let rowsChanged = context.coordinator.rows.map(\.id) != rows.map(\.id)
-            || context.coordinator.rows.map(\.isVisible) != rows.map(\.isVisible)
+        let rowsChanged = context.coordinator.rows != rows
         let orderChanged = context.coordinator.sortOrder.wrappedValue != sortOrder
         let selectionChanged = context.coordinator.previousSelectedID != selectedID
-        Log.table.info("updateNSView rowsChanged=\(rowsChanged) orderChanged=\(orderChanged) selectionChanged=\(selectionChanged) prevSel=\(context.coordinator.previousSelectedID ?? "nil") curSel=\(selectedID ?? "nil")")
         context.coordinator.rows = rows
         context.coordinator.selectedID = $selectedID
         context.coordinator.sortOrder = $sortOrder
@@ -126,11 +122,9 @@ struct NativeTableView: NSViewRepresentable {
         let needsRestore = rowsChanged || selectionChanged
 
         if rowsChanged || orderChanged {
-            Log.table.info("→ full reloadData()")
             tableView.reloadData()
             context.coordinator.autoSizeColumns()
         } else if selectionChanged {
-            Log.table.info("→ reloadData visible rows only")
             let visibleRange = tableView.rows(in: tableView.visibleRect)
             let rowIndexes = IndexSet(integersIn: visibleRange.lowerBound..<visibleRange.upperBound)
             let colIndexes = IndexSet(integersIn: 0..<tableView.tableColumns.count)
@@ -142,10 +136,8 @@ struct NativeTableView: NSViewRepresentable {
             if let selID = selectedID,
                let idx = rows.firstIndex(where: { $0.id == selID }),
                tableView.selectedRow != idx {
-                Log.table.info("→ selectRowIndexes \(idx) (was \(tableView.selectedRow))")
                 tableView.selectRowIndexes(IndexSet(integer: idx), byExtendingSelection: false)
             } else if selectedID == nil && tableView.selectedRow != -1 {
-                Log.table.info("→ deselectAll (was \(tableView.selectedRow))")
                 tableView.deselectAll(nil)
             }
         }
@@ -179,22 +171,6 @@ struct NativeTableView: NSViewRepresentable {
             self.hiddenColumns = hiddenColumns
             self.onToggleVisibility = onToggleVisibility
             self.previousSelectedID = selectedID.wrappedValue
-        }
-
-        func observeSelectionNotifications(for tableView: NSTableView) {
-            NotificationCenter.default.addObserver(
-                self,
-                selector: #selector(handleSelectionDidChange(_:)),
-                name: NSTableView.selectionDidChangeNotification,
-                object: tableView
-            )
-        }
-
-        @objc private func handleSelectionDidChange(_ notification: Notification) {
-            guard let tableView = notification.object as? NSTableView else { return }
-            let selectedRow = tableView.selectedRow
-            let newID: String? = (selectedRow >= 0 && selectedRow < rows.count) ? rows[selectedRow].id : nil
-            Log.table.info("selectionDidChangeNotification row=\(selectedRow) id=\(newID ?? "nil")")
         }
 
         func numberOfRows(in tableView: NSTableView) -> Int {
@@ -285,11 +261,6 @@ struct NativeTableView: NSViewRepresentable {
             return cellView
         }
 
-        func tableView(_ tableView: NSTableView, shouldSelectRow row: Int) -> Bool {
-            Log.table.info("shouldSelectRow \(row)")
-            return true
-        }
-
         func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
             sortOrder.wrappedValue = tableView.sortDescriptors
         }
@@ -298,7 +269,6 @@ struct NativeTableView: NSViewRepresentable {
             guard let tableView = notification.object as? NSTableView else { return }
             let selectedRow = tableView.selectedRow
             let newID: String? = (selectedRow >= 0 && selectedRow < rows.count) ? rows[selectedRow].id : nil
-            Log.table.info("tableViewSelectionDidChange row=\(selectedRow) id=\(newID ?? "nil")")
             selectedID.wrappedValue = newID
         }
 

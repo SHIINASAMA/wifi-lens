@@ -167,9 +167,7 @@ enum ChannelQualityCalculator {
         for ap in aps {
             let factor = overlapFactor(channel: channel, other: ap, band: band)
             guard factor > 0 else { continue }
-            // RSSI contributes 0..1 (stronger = more penalty)
             let rssiWeight = max(0, min(1, Double(ap.rssi + 100) / 70.0))
-            // Wider channels cause more interference
             let widthMul: Double = switch ap.channelWidth {
             case "160": 2.0
             case "80":  1.5

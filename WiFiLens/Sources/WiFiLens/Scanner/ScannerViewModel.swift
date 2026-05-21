@@ -312,7 +312,12 @@ final class ScannerViewModel {
 
     private func computeChannelQualities() -> [ChannelQuality] {
         let currentChannel: Int? = networkInfo.first(where: { $0.ssid != nil })?.channel
-        let aps = lastNetworks.compactMap { nw -> ChannelQualityCalculator.APInfo? in
+
+        // Deduplicate by BSSID+band: wide channels may report the same AP on
+        // multiple primary channel numbers; keep only the strongest RSSI per band.
+        var seen = [String: ChannelQualityCalculator.APInfo]()
+        for nw in lastNetworks {
+            let key = "\(nw.bssid)-\(nw.channel.band.rawValue)"
             let ie = nw.ieData.map { IEParser.parse(data: $0) }
             let width = ie.map { chanWidthLabel($0) } ?? "20"
             let left = ChannelSpanCalculator.channelBlock(
@@ -327,14 +332,20 @@ final class ScannerViewModel {
                 band: nw.channel.band,
                 spanDirection: nw.channel.spanDirection
             ).right
-            return ChannelQualityCalculator.APInfo(
+            let info = ChannelQualityCalculator.APInfo(
                 channel: nw.channel.channelNumber,
                 rssi: nw.rssi,
                 channelWidth: width,
                 band: nw.channel.band.id,
                 apex: Double(left + right) / 2.0
             )
+            if let existing = seen[key] {
+                if info.rssi > existing.rssi { seen[key] = info }
+            } else {
+                seen[key] = info
+            }
         }
+        let aps = Array(seen.values)
         return ChannelQualityCalculator.compute(aps: aps, currentChannel: currentChannel, supportedBands: Set(supportedBands.map(\.id)))
     }
 
