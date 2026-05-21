@@ -10,6 +10,7 @@ struct ContentView: View {
     @State private var is5GHzCollapsed = false
     @State private var is6GHzCollapsed = false
     @State private var isTableCollapsed = false
+    @State private var isTrendCollapsed = false
     @AppStorage("hiddenTableColumns") private var hiddenColumnsData: String = ""
 
     private var hiddenColumns: Binding<Set<String>> {
@@ -68,6 +69,7 @@ struct ContentView: View {
         // Build weights for each section
         let weights = sections.map { section -> CGFloat in
             if case .table = section.kind { return 1.5 }
+            if case .trend = section.kind { return 0.5 }
             return 1.0
         }
         let totalWeight = sections.enumerated()
@@ -146,6 +148,11 @@ struct ContentView: View {
                             }
                     }
                 }
+
+        case .trend(let snaps, let color):
+            TrendChartView(snapshots: snaps, color: color)
+                .frame(height: height)
+                .padding(.horizontal, 6)
 
         case .table:
             VStack(spacing: 0) {
@@ -264,7 +271,7 @@ struct ContentView: View {
     // MARK: - Section Info
 
     private struct SectionInfo {
-        enum Kind { case band(BandChartViewModel); case table }
+        enum Kind { case band(BandChartViewModel); case trend(snapshots: [NetworkSnapshot], color: Color); case table }
         let kind: Kind
         let title: String
         let subtitle: String
@@ -288,6 +295,9 @@ struct ContentView: View {
                           : vm.band == .band5GHz ? Color.green.opacity(0.6)
                           : Color.purple.opacity(0.6))
                     .frame(width: 8, height: 8)
+            case .trend:
+                Image(systemName: "chart.line.uptrend.xyaxis")
+                    .font(.caption)
             case .table:
                 Image(systemName: "tablecells")
                     .font(.caption)
@@ -304,6 +314,23 @@ struct ContentView: View {
                 subtitle: String(localized: "\(vm.renderedNetworkCount) networks")
             ))
         }
+
+        // Shared trend section — shows signal history for selected network across any band
+        if let selID = viewModel.selectedNetworkID {
+            for vm in viewModel.bandViewModels {
+                if let snaps = vm.renderedSnapshots(for: selID),
+                   let series = vm.renderedSeries(for: selID),
+                   snaps.count >= 2 {
+                    sections.append(SectionInfo(
+                        kind: .trend(snapshots: snaps, color: series.color),
+                        title: "\(series.displaySSID)  ·  \(vm.band.displayName)  ·  \(series.bssid)",
+                        subtitle: String(localized: "\(snaps.count) samples")
+                    ))
+                    break
+                }
+            }
+        }
+
         sections.append(SectionInfo(
             kind: .table,
             title: String(localized: "AP"),
@@ -322,6 +349,7 @@ struct ContentView: View {
             case .band5GHz:  return is5GHzCollapsed
             case .band6GHz:  return is6GHzCollapsed
             }
+        case .trend: return isTrendCollapsed
         case .table: return isTableCollapsed
         }
     }
@@ -334,6 +362,7 @@ struct ContentView: View {
             case .band5GHz:  is5GHzCollapsed.toggle()
             case .band6GHz:  is6GHzCollapsed.toggle()
             }
+        case .trend: isTrendCollapsed.toggle()
         case .table: isTableCollapsed.toggle()
         }
     }

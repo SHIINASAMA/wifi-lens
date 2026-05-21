@@ -44,15 +44,6 @@ struct BandChartView: View {
         .padding(.vertical, 2)
     }
 
-    /// Snapshots for the network currently selected (if it belongs to this band).
-    private var selectedSnapshots: [NetworkSnapshot]? {
-        viewModel.renderedSnapshots(for: scannerViewModel.selectedNetworkID)
-    }
-
-    private var selectedSeries: ChartSeriesData? {
-        viewModel.renderedSeries(for: scannerViewModel.selectedNetworkID)
-    }
-
     private var visibleSeries: [ChartSeriesData] {
         viewModel.visibleSeriesData()
     }
@@ -118,14 +109,6 @@ struct BandChartView: View {
             } else {
                 VStack(spacing: 0) {
                     chartCanvas
-
-                    if let snaps = selectedSnapshots, let series = selectedSeries {
-                        Divider()
-                            .padding(.top, 2)
-                        TrendChartView(snapshots: snaps, color: series.color)
-                            .padding(.horizontal, 6)
-                            .padding(.bottom, 6)
-                    }
                 }
             }
         }
