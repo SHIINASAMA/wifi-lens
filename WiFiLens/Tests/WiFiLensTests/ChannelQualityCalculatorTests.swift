@@ -176,8 +176,8 @@ struct ChannelQualityCalculatorTests {
     @Test func apCountBreakdown() async throws {
         let aps = [
             ap(44, -50, band: .band5GHz),  // co-channel
-            ap(44, -60, "20", "5"),  // co-channel
-            ap(40, -70, "80", "5"),  // adjacent (overlaps ch 44 via 80 MHz)
+            ap(44, -60, band: .band5GHz),  // co-channel
+            ap(40, -70, width: .mhz80, band: .band5GHz),  // adjacent (overlaps ch 44 via 80 MHz)
         ]
         let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
         let ch44 = result.first(where: { $0.channel == 44 })!
@@ -205,9 +205,9 @@ struct ChannelQualityCalculatorTests {
     @Test func recommendsCleanChannelsOverOccupied() async throws {
         // 3 APs on different 5 GHz channels with moderate signal
         let aps = [
-            ap(36, -30, "20", "5"),
-            ap(40, -35, "20", "5"),
-            ap(44, -40, "20", "5"),
+            ap(36, -30, band: .band5GHz),
+            ap(40, -35, band: .band5GHz),
+            ap(44, -40, band: .band5GHz),
         ]
         let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
         let recommended = result.filter { $0.band == "5" && $0.isRecommended }
@@ -230,8 +230,8 @@ struct ChannelQualityCalculatorTests {
 
     @Test func simpleViewShowsCurrentRecommendedAndOccupied() async throws {
         let aps = [
-            ap(36, -50, "20", "5"),
-            ap(40, -50, "20", "5"),
+            ap(36, -50, band: .band5GHz),
+            ap(40, -50, band: .band5GHz),
             ap(44, -50, band: .band5GHz),
         ]
         let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: 48)

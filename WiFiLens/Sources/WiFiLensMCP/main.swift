@@ -77,23 +77,23 @@ await server.withMethodHandler(CallTool.self) { params in
         }
         let body = try? await httpGet(url)
         let text = body ?? "No data. Make sure WiFi Lens is running with MCP enabled."
-        return .init(content: [.text(text)], isError: body == nil)
+        return .init(content: [.text(text: text, annotations: nil, _meta: nil)], isError: body == nil)
 
     case "get_network_detail":
         guard let bssid = params.arguments?["bssid"]?.stringValue else {
-            return .init(content: [.text("Missing required parameter: bssid")], isError: true)
+            return .init(content: [.text(text: "Missing required parameter: bssid", annotations: nil, _meta: nil)], isError: true)
         }
         let body = try? await httpGet("\(baseURL)/networks/\(bssid.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? bssid)")
         let text = body ?? "Network not found or WiFi Lens is not running."
-        return .init(content: [.text(text)], isError: body == nil)
+        return .init(content: [.text(text: text, annotations: nil, _meta: nil)], isError: body == nil)
 
     case "get_channel_occupancy":
         let body = try? await httpGet("\(baseURL)/occupancy")
         let text = body ?? "No data. Make sure WiFi Lens is running with MCP enabled."
-        return .init(content: [.text(text)], isError: body == nil)
+        return .init(content: [.text(text: text, annotations: nil, _meta: nil)], isError: body == nil)
 
     default:
-        return .init(content: [.text("Unknown tool: \(params.name)")], isError: true)
+        return .init(content: [.text(text: "Unknown tool: \(params.name)", annotations: nil, _meta: nil)], isError: true)
     }
 }
 

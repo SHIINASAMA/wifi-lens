@@ -4,129 +4,103 @@ import SwiftUI
 
 struct NetworkTableRowTests {
 
-    private let defaultRow = NetworkTableRow(
-        id: "aa:bb:cc:dd:ee:ff-6-1",
-        bandLabel: "5 GHz",
-        channel: 44,
-        rssi: -50,
-        ssid: "TestWiFi",
-        bssid: "aa:bb:cc:dd:ee:ff",
-        color: .blue,
-        isFilteredOut: false,
-        phyMode: "ax",
-        channelWidth: "80",
-        supportsK: true,
-        supportsR: false,
-        supportsV: true,
-        isHiddenSSID: false,
-        security: "WPA3",
-        mcs: "9",
-        nss: "2",
-        country: "US",
-        trendArrow: "▲",
-        trendDelta: 3,
-        isVisible: true,
-        qualityScore: 80
-    )
-
-    private func row(_ update: (inout NetworkTableRow) -> Void) -> NetworkTableRow {
-        var row = defaultRow
-        update(&row)
-        return row
+    private func makeRow(
+        id: String = "aa:bb:cc:dd:ee:ff-6-1",
+        rssi: Int = -50,
+        ssid: String = "TestWiFi",
+        qualityScore: Int = 80,
+        phyMode: String = "ax",
+        channelWidth: String = "80",
+        isVisible: Bool = true,
+        isFilteredOut: Bool = false,
+        security: String = "WPA3",
+        mcs: String = "9",
+        isHiddenSSID: Bool = false
+    ) -> NetworkTableRow {
+        NetworkTableRow(
+            id: id,
+            bandLabel: "5 GHz",
+            channel: 44,
+            rssi: rssi,
+            ssid: ssid,
+            bssid: "aa:bb:cc:dd:ee:ff",
+            color: .blue,
+            isFilteredOut: isFilteredOut,
+            phyMode: phyMode,
+            channelWidth: channelWidth,
+            supportsK: true,
+            supportsR: false,
+            supportsV: true,
+            isHiddenSSID: isHiddenSSID,
+            security: security,
+            mcs: mcs,
+            nss: "2",
+            country: "US",
+            trendArrow: "▲",
+            trendDelta: 3,
+            isVisible: isVisible,
+            qualityScore: qualityScore
+        )
     }
 
     // MARK: - Equality
 
     @Test func identicalRowsAreEqual() async throws {
-        let a = defaultRow
-        let b = defaultRow
-        #expect(a == b)
-        #expect(a.hashValue == b.hashValue)
+        #expect(makeRow() == makeRow())
+        #expect(makeRow().hashValue == makeRow().hashValue)
     }
 
     @Test func differentRSSINotEqual() async throws {
-        let a = row { $0.rssi = -50 }
-        let b = row { $0.rssi = -60 }
-        #expect(a != b)
+        #expect(makeRow(rssi: -50) != makeRow(rssi: -60))
     }
 
     @Test func differentSSIDNotEqual() async throws {
-        let a = row { $0.ssid = "WiFi-A" }
-        let b = row { $0.ssid = "WiFi-B" }
-        #expect(a != b)
+        #expect(makeRow(ssid: "WiFi-A") != makeRow(ssid: "WiFi-B"))
     }
 
     @Test func differentQualityScoreNotEqual() async throws {
-        let a = row { $0.qualityScore = 80 }
-        let b = row { $0.qualityScore = 60 }
-        #expect(a != b)
+        #expect(makeRow(qualityScore: 80) != makeRow(qualityScore: 60))
     }
 
     @Test func differentPhyModeNotEqual() async throws {
-        let a = row { $0.phyMode = "ax" }
-        let b = row { $0.phyMode = "ac" }
-        #expect(a != b)
+        #expect(makeRow(phyMode: "ax") != makeRow(phyMode: "ac"))
     }
 
     @Test func differentVisibilityNotEqual() async throws {
-        let a = row { $0.isVisible = true }
-        let b = row { $0.isVisible = false }
-        #expect(a != b)
+        #expect(makeRow(isVisible: true) != makeRow(isVisible: false))
     }
 
     @Test func differentFilterNotEqual() async throws {
-        let a = row { $0.isFilteredOut = false }
-        let b = row { $0.isFilteredOut = true }
-        #expect(a != b)
+        #expect(makeRow(isFilteredOut: false) != makeRow(isFilteredOut: true))
     }
 
     @Test func differentChannelWidthNotEqual() async throws {
-        let a = row { $0.channelWidth = "80" }
-        let b = row { $0.channelWidth = "160" }
-        #expect(a != b)
+        #expect(makeRow(channelWidth: "80") != makeRow(channelWidth: "160"))
     }
 
     @Test func differentSecurityNotEqual() async throws {
-        let a = row { $0.security = "WPA3" }
-        let b = row { $0.security = "WPA2" }
-        #expect(a != b)
+        #expect(makeRow(security: "WPA3") != makeRow(security: "WPA2"))
     }
 
     @Test func differentMCSNotEqual() async throws {
-        let a = row { $0.mcs = "9" }
-        let b = row { $0.mcs = "7" }
-        #expect(a != b)
+        #expect(makeRow(mcs: "9") != makeRow(mcs: "7"))
     }
 
     @Test func differentHiddenSSIDNotEqual() async throws {
-        let a = row { $0.isHiddenSSID = false }
-        let b = row { $0.isHiddenSSID = true }
-        #expect(a != b)
+        #expect(makeRow(isHiddenSSID: false) != makeRow(isHiddenSSID: true))
     }
 
     // MARK: - Array comparison (the pattern used in NativeTableView)
 
     @Test func arrayOfRowsDetectsSingleChange() async throws {
-        let rows1 = [row {
-            $0.id = "id1"
-            $0.rssi = -50
-        }, row {
-            $0.id = "id2"
-            $0.rssi = -60
-        }]
-        let rows2 = [row {
-            $0.id = "id1"
-            $0.rssi = -50
-        }, row {
-            $0.id = "id2"
-            $0.rssi = -55
-        }] // rssi changed
+        let rows1 = [makeRow(id: "id1", rssi: -50), makeRow(id: "id2", rssi: -60)]
+        let rows2 = [makeRow(id: "id1", rssi: -50), makeRow(id: "id2", rssi: -55)]
         #expect(rows1 != rows2)
     }
 
     @Test func arrayOfRowsDetectsNoChange() async throws {
-        let rows1 = [defaultRow, defaultRow]
-        let rows2 = [defaultRow, defaultRow]
+        let rows1 = [makeRow(id: "id1"), makeRow(id: "id2")]
+        let rows2 = [makeRow(id: "id1"), makeRow(id: "id2")]
         #expect(rows1 == rows2)
     }
 }

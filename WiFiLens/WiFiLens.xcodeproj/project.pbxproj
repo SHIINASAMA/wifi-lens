@@ -116,6 +116,11 @@
 		FB92F91F2FBE208500BCEC67 /* DebugChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugChartView.swift; sourceTree = "<group>"; };
 		FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugContainerView.swift; sourceTree = "<group>"; };
 		FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugThroughputView.swift; sourceTree = "<group>"; };
+		FBD329432FBF0E2F00D01613 /* ChannelQualityCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityCalculatorTests.swift; sourceTree = "<group>"; };
+		FBD329442FBF0E2F00D01613 /* ChannelSpanCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelSpanCalculatorTests.swift; sourceTree = "<group>"; };
+		FBD329452FBF0E2F00D01613 /* IEParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IEParserTests.swift; sourceTree = "<group>"; };
+		FBD329462FBF0E2F00D01613 /* NetworkTableRowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTableRowTests.swift; sourceTree = "<group>"; };
+		FBD329472FBF0E2F00D01613 /* SSIDColorHasherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSIDColorHasherTests.swift; sourceTree = "<group>"; };
 		FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdater.swift; sourceTree = "<group>"; };
 		FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -139,6 +144,7 @@
 			isa = PBXGroup;
 			children = (
 				FB0573AB2FBB1F40005F8214 /* WiFiLens-Info.plist */,
+				FBD329492FBF0E2F00D01613 /* Tests */,
 				2BB8E28CC6CC66A93DA47095 /* Sources */,
 				6D81AD175FCC46C43BC613A7 /* Frameworks */,
 				BD4D8FFAAD7E961D9EE4F5FE /* Products */,
@@ -309,6 +315,26 @@
 				FB8BB5FD2FBB039A00FD072E /* Localizable.xcstrings */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		FBD329482FBF0E2F00D01613 /* WiFiLensTests */ = {
+			isa = PBXGroup;
+			children = (
+				FBD329432FBF0E2F00D01613 /* ChannelQualityCalculatorTests.swift */,
+				FBD329442FBF0E2F00D01613 /* ChannelSpanCalculatorTests.swift */,
+				FBD329452FBF0E2F00D01613 /* IEParserTests.swift */,
+				FBD329462FBF0E2F00D01613 /* NetworkTableRowTests.swift */,
+				FBD329472FBF0E2F00D01613 /* SSIDColorHasherTests.swift */,
+			);
+			path = WiFiLensTests;
+			sourceTree = "<group>";
+		};
+		FBD329492FBF0E2F00D01613 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				FBD329482FBF0E2F00D01613 /* WiFiLensTests */,
+			);
+			path = Tests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -511,7 +537,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				ENABLE_APP_SANDBOX = YES;
-				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
 				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
@@ -537,6 +563,7 @@
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 			};
 			name = Debug;
 		};
@@ -575,7 +602,10 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_RESOURCE_ACCESS_LOCATION = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -632,6 +662,9 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_RESOURCE_ACCESS_LOCATION = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -671,7 +704,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				ENABLE_APP_SANDBOX = YES;
-				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
 				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
@@ -697,6 +730,7 @@
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 			};
 			name = Release;
 		};
