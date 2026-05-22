@@ -14,6 +14,10 @@ struct SettingsView: View {
     init(updater: SparkleUpdater) {
         self.updater = updater
         _autoCheck = State(initialValue: updater.automaticallyChecksForUpdates)
+        if BuildConfig.current == .pro {
+            updater.automaticallyChecksForUpdates = false
+            Log.app.info("Sparkle auto-update disabled (PRO build)")
+        }
     }
 
     var body: some View {
@@ -89,19 +93,23 @@ struct SettingsView: View {
                 }
 
                 // MARK: - Updates
+                if BuildConfig.current == .oss {
                 Section {
                     Toggle(String(localized: "Automatically check for updates"), isOn: $autoCheck)
                         .onChange(of: autoCheck) { _, newValue in
                             updater.automaticallyChecksForUpdates = newValue
+                            Log.app.info("Sparkle auto-check \(newValue ? "enabled" : "disabled")")
                         }
                     HStack {
                         Button(String(localized: "Check Now")) {
                             updater.checkForUpdates()
+                            Log.app.info("Sparkle manual update check triggered")
                         }
                         Spacer()
                     }
                 } header: {
                     Text(String(localized: "Updates"))
+                }
                 }
             }
             .formStyle(.grouped)
