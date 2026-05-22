@@ -1,7 +1,9 @@
 import SwiftUI
+import SceneKit
 
 struct OverviewView: View {
     @Bindable var viewModel: ScannerViewModel
+    @Environment(\.colorScheme) private var colorScheme
 
     @State private var stableScore = StableScore()
     @State private var displayLevel: ChannelQuality.QualityLevel = .excellent
@@ -25,8 +27,25 @@ struct OverviewView: View {
     }
 
     var body: some View {
-        ScrollView {
+        ZStack {
+            // Subtle gradient behind hero — breaks the "all system materials" feel
+            LinearGradient(
+                colors: colorScheme == .dark
+                    ? [Color(red: 0.10, green: 0.12, blue: 0.20), Color.clear]
+                    : [Color(red: 0.94, green: 0.95, blue: 0.98), Color.clear],
+                startPoint: .top, endPoint: .bottom
+            )
+            .frame(height: 360)
+            .frame(maxHeight: .infinity, alignment: .top)
+            .ignoresSafeArea()
+
+            ScrollView {
             VStack(spacing: 16) {
+                // State icon — rotating 3D Earth
+                let stateColor = wifi != nil ? rssiColor(wifi!.rssi ?? -100) : Color.secondary
+                EarthGlobeView(color: stateColor)
+                    .frame(width: 240, height: 240)
+
                 if let wifi {
                     connectionCard(wifi)
                     signalHealthRow(wifi)
@@ -49,6 +68,7 @@ struct OverviewView: View {
             displayScore = stableScore.update(score: raw)
             displayLevel = .from(score: displayScore)
         }
+        } // ZStack
     }
 
     // MARK: - Connection Hero
@@ -56,10 +76,6 @@ struct OverviewView: View {
     private func connectionCard(_ wifi: NetworkInterfaceInfo) -> some View {
         VStack(spacing: 12) {
             HStack(spacing: 12) {
-                Image(systemName: "wifi")
-                    .font(.system(size: 28))
-                    .foregroundColor(rssiColor(wifi.rssi ?? -100))
-
                 VStack(alignment: .leading, spacing: 4) {
                     Text(wifi.displaySSID)
                         .font(.title3)
@@ -145,7 +161,7 @@ struct OverviewView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
-        .background(.thinMaterial)
+        .background(Color.primary.opacity(0.04))
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
@@ -171,7 +187,7 @@ struct OverviewView: View {
             Spacer()
         }
         .padding(16)
-        .background(.regularMaterial)
+        .background(Color.primary.opacity(0.04))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
@@ -298,10 +314,7 @@ struct OverviewView: View {
     // MARK: - No Connection
 
     private var noConnectionCard: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "wifi.slash")
-                .font(.system(size: 40))
-                .foregroundColor(.secondary)
+        VStack(spacing: 12) {
             Text(String(localized: "Not connected to Wi‑Fi"))
                 .font(.title3)
                 .fontWeight(.semibold)
@@ -312,7 +325,7 @@ struct OverviewView: View {
         }
         .padding(32)
         .frame(maxWidth: .infinity)
-        .background(.regularMaterial)
+        .background(Color.primary.opacity(0.04))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
@@ -334,7 +347,7 @@ struct OverviewView: View {
             Spacer()
         }
         .padding(16)
-        .background(.regularMaterial)
+        .background(Color.primary.opacity(0.04))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
@@ -389,4 +402,177 @@ struct OverviewView: View {
         if sec == "—" || sec == String(localized: "None") { return String(localized: "Open") }
         return sec
     }
+}
+
+// MARK: - 3D Earth Globe
+
+private struct EarthGlobeView: NSViewRepresentable {
+    let color: Color
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    func makeNSView(context: Context) -> SCNView {
+        let scene = SCNScene()
+
+        // Axial tilt container — Earth rotates at 23.5° from orbital plane
+        let tiltNode = SCNNode()
+        tiltNode.eulerAngles = SCNVector3(0.41, 0, 0)
+        tiltNode.name = "tilt"
+        scene.rootNode.addChildNode(tiltNode)
+
+        // Earth sphere with mipmapped texture for anti-aliasing
+        let earth = SCNSphere(radius: 1)
+        earth.segmentCount = 96
+        let material = SCNMaterial()
+        material.diffuse.contents = NSColor(red: 0.08, green: 0.12, blue: 0.35, alpha: 1)
+        if let url = Bundle.main.url(forResource: "earth", withExtension: "jpg"),
+           let image = NSImage(contentsOf: url) {
+            material.diffuse.contents = image
+        }
+        material.diffuse.mipFilter = .linear
+        material.diffuse.maxAnisotropy = 4
+        material.lightingModel = .constant
+        earth.materials = [material]
+        let earthNode = SCNNode(geometry: earth)
+        earthNode.name = "earth"
+        tiltNode.addChildNode(earthNode)
+
+        // Pole caps — cover equirectangular projection artifacts
+        let capGeom = SCNCylinder(radius: 0.04, height: 0.02)
+        capGeom.firstMaterial?.diffuse.contents = NSColor(red: 0.06, green: 0.10, blue: 0.28, alpha: 1)
+        let northCap = SCNNode(geometry: capGeom)
+        northCap.position = SCNVector3(0, 0.99, 0)
+        earthNode.addChildNode(northCap)
+        let southCap = SCNNode(geometry: capGeom)
+        southCap.position = SCNVector3(0, -0.99, 0)
+        earthNode.addChildNode(southCap)
+
+        // Atmosphere glows — on tilt container so they tilt with Earth
+        let innerGlow = SCNSphere(radius: 1.03)
+        innerGlow.segmentCount = 64
+        let innerGlowMat = SCNMaterial()
+        innerGlowMat.diffuse.contents = NSColor.blue.withAlphaComponent(0.04)
+        innerGlowMat.transparency = 0.15
+        innerGlowMat.isDoubleSided = true
+        innerGlow.materials = [innerGlowMat]
+        let innerGlowNode = SCNNode(geometry: innerGlow)
+        innerGlowNode.name = "innerGlow"
+        tiltNode.addChildNode(innerGlowNode)
+
+        let glow = SCNSphere(radius: 1.08)
+        glow.segmentCount = 64
+        let glowMat = SCNMaterial()
+        glowMat.diffuse.contents = NSColor.blue.withAlphaComponent(0.06)
+        glowMat.transparency = 0.2
+        glowMat.isDoubleSided = true
+        glow.materials = [glowMat]
+        let glowNode = SCNNode(geometry: glow)
+        glowNode.name = "glow"
+        tiltNode.addChildNode(glowNode)
+
+        // ---- Data-flow visualization on earthNode (rotates with Earth) ----
+
+        let hubColor = NSColor.systemCyan.withAlphaComponent(0.9)
+        let tubeColor = NSColor.systemCyan.withAlphaComponent(0.10)
+        let arcRadius: CGFloat = 1.028
+        let hubRadius: CGFloat = 1.025
+
+        // lat/lon → unit 3D point
+        func spherePoint(lat: CGFloat, lon: CGFloat) -> SCNVector3 {
+            let latR = lat * .pi / 180; let lonR = lon * .pi / 180
+            return SCNVector3(cos(latR) * cos(lonR), sin(latR), cos(latR) * sin(lonR))
+        }
+
+        // Hub cities
+        let hubs: [(CGFloat, CGFloat)] = [
+            (37.4, -122.1), (40.7, -74.0), (51.5, -0.1), (35.7, 139.8),
+            (1.3, 103.8), (50.1, 8.7), (-33.9, 151.2), (-23.5, -46.6),
+        ]
+        let hubPairs: [(Int, Int)] = [(0,1),(1,2),(2,5),(3,4),(4,7),(5,3),(0,3),(6,4),(7,0),(2,3)]
+
+        // Create hub dots + store unit positions for tubes
+        var hubUnitPos: [SCNVector3] = []
+        for (lat, lon) in hubs {
+            let p = spherePoint(lat: lat, lon: lon)
+            hubUnitPos.append(p)
+
+            let dot = SCNSphere(radius: 0.014)
+            dot.firstMaterial?.diffuse.contents = hubColor
+            dot.firstMaterial?.emission.contents = hubColor
+            let node = SCNNode(geometry: dot)
+            node.position = SCNVector3(p.x * hubRadius, p.y * hubRadius, p.z * hubRadius)
+            earthNode.addChildNode(node)
+
+            let pulse = CABasicAnimation(keyPath: "opacity")
+            pulse.fromValue = 0.3; pulse.toValue = 1.0; pulse.duration = 1.2
+            pulse.autoreverses = true; pulse.repeatCount = .greatestFiniteMagnitude
+            node.addAnimation(pulse, forKey: "pulse")
+        }
+
+        // Connection tubes between hub pairs
+        for (a, b) in hubPairs {
+            let fromU = hubUnitPos[a]; let toU = hubUnitPos[b]
+            let fromP = SCNVector3(fromU.x * arcRadius, fromU.y * arcRadius, fromU.z * arcRadius)
+            let toP   = SCNVector3(toU.x   * arcRadius, toU.y   * arcRadius, toU.z   * arcRadius)
+            let midP  = SCNVector3((fromP.x+toP.x)/2, (fromP.y+toP.y)/2, (fromP.z+toP.z)/2)
+            let dx = toP.x - fromP.x; let dy = toP.y - fromP.y; let dz = toP.z - fromP.z
+            let chordLen = sqrt(dx*dx + dy*dy + dz*dz)
+
+            let tube = SCNCylinder(radius: 0.0012, height: chordLen)
+            tube.firstMaterial?.diffuse.contents = tubeColor
+            let tubeNode = SCNNode(geometry: tube)
+            tubeNode.position = midP
+            tubeNode.look(at: toP, up: SCNVector3(0, 1, 0), localFront: SCNVector3(0, 1, 0))
+            earthNode.addChildNode(tubeNode)
+
+            let fade = CABasicAnimation(keyPath: "opacity")
+            fade.fromValue = 0.15; fade.toValue = 0.45; fade.duration = Double.random(in: 2...4)
+            fade.autoreverses = true; fade.repeatCount = .greatestFiniteMagnitude
+            tubeNode.addAnimation(fade, forKey: "flow")
+        }
+
+        // Camera
+        let camera = SCNCamera()
+        camera.fieldOfView = 40
+        let cameraNode = SCNNode()
+        cameraNode.camera = camera
+        cameraNode.position = SCNVector3(0, 0, 3.5)
+        scene.rootNode.addChildNode(cameraNode)
+
+        // Rotation
+        let rotate = CABasicAnimation(keyPath: "rotation")
+        rotate.fromValue = SCNVector4(0, 1, 0, 0)
+        rotate.toValue = SCNVector4(0, 1, 0, Float.pi * 2)
+        rotate.duration = 60
+        rotate.repeatCount = .greatestFiniteMagnitude
+        earthNode.addAnimation(rotate, forKey: "rotate")
+        innerGlowNode.addAnimation(rotate, forKey: "rotate")
+        glowNode.addAnimation(rotate, forKey: "rotate")
+
+        context.coordinator.scene = scene
+
+        let scnView = SCNView()
+        scnView.backgroundColor = .clear
+        scnView.allowsCameraControl = false
+        scnView.isJitteringEnabled = true
+        scnView.antialiasingMode = .multisampling8X
+        scnView.preferredFramesPerSecond = 0
+
+        scnView.scene = scene
+        scnView.isPlaying = false
+        DispatchQueue.main.async { scnView.isPlaying = true }
+        return scnView
+    }
+
+    func updateNSView(_ nsView: SCNView, context: Context) {
+        guard let tilt = nsView.scene?.rootNode.childNode(withName: "tilt", recursively: false) else { return }
+        if let innerGlow = tilt.childNode(withName: "innerGlow", recursively: false) {
+            innerGlow.geometry?.materials.first?.diffuse.contents = NSColor(color).withAlphaComponent(0.06)
+        }
+        if let glow = tilt.childNode(withName: "glow", recursively: false) {
+            glow.geometry?.materials.first?.diffuse.contents = NSColor(color).withAlphaComponent(0.08)
+        }
+    }
+
+    class Coordinator { var scene: SCNScene? }
 }

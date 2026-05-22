@@ -91,42 +91,42 @@ struct ChannelQuality: Identifiable {
 }
 
 /// Hysteresis wrapper that smooths quality score fluctuations across level boundaries.
-/// Upgrades to a better level immediately; downgrades only when the score drops below
-/// the current level's minimum by the configured margin.
+/// Uses wide margins to prevent flickering, and EMA smoothing within the same level.
 struct StableScore {
-    private var current: Int
+    private var current: Double
     private var level: ChannelQuality.QualityLevel
 
     init(initialScore: Int = 100) {
-        self.current = initialScore
+        self.current = Double(initialScore)
         self.level = .from(score: initialScore)
     }
 
-    /// Feed a new raw score. Returns the stabilized score (may be held at boundary if flickering).
-    mutating func update(score: Int, downgradeMargin: Int = 5, upgradeMargin: Int = 2) -> Int {
+    /// Feed a new raw score. Returns the stabilized score.
+    mutating func update(score: Int, downgradeMargin: Int = 10, upgradeMargin: Int = 6) -> Int {
         let rawLevel = ChannelQuality.QualityLevel.from(score: score)
+        let alpha = 0.25  // EMA smoothing factor — lower = more stable
 
         if rawLevel.order > level.order {
-            // Upgrade only if score is above the current level's maximum by upgrade margin
+            // Upgrade only if score clearly exceeds current level ceiling
             if score >= level.scoreRange.upperBound + upgradeMargin {
-                current = score
+                current = Double(score)
                 level = rawLevel
             }
         } else if rawLevel.order < level.order {
-            // Downgrade only if score is below the current level's minimum by downgrade margin
+            // Downgrade only if score clearly drops below current level floor
             if score <= level.minScore - downgradeMargin {
-                current = score
+                current = Double(score)
                 level = rawLevel
             }
         } else {
-            // Same level: track smoothly
-            current = score
+            // Same level: EMA smooth to dampen jitter
+            current = alpha * Double(score) + (1 - alpha) * current
         }
-        return current
+        return Int(current.rounded())
     }
 
     mutating func reset(score: Int = 100) {
-        current = score
+        current = Double(score)
         level = .from(score: score)
     }
 }
