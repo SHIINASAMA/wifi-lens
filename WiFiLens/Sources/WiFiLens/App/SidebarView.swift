@@ -45,11 +45,11 @@ struct SidebarView: View {
 
     var body: some View {
         List(selection: $selectedPage) {
-//            Section {
-//                Label(SidebarPage.overview.label, systemImage: SidebarPage.overview.icon)
-//                    .tag(SidebarPage.overview)
-//            }
-//            Divider()
+            Section {
+                Label(SidebarPage.overview.label, systemImage: SidebarPage.overview.icon)
+                    .tag(SidebarPage.overview)
+            }
+            Divider()
             Section {
                 ForEach([SidebarPage.spectrum, .channels, .interfaces], id: \.self) { page in
                     Label(page.label, systemImage: page.icon)

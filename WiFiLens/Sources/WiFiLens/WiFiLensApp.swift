@@ -20,7 +20,7 @@ private struct AppRootView: View {
             Group {
                 switch selectedPage {
                 case .overview:
-                    OverviewView()
+                    OverviewView(viewModel: viewModel)
                 case .spectrum:
                     ContentView(viewModel: viewModel)
                         .alert("Location Services are disabled", isPresented: $viewModel.locationManager.showDeniedAlert) {
@@ -98,8 +98,8 @@ struct WiFiLensApp: App {
     @State private var viewModel = ScannerViewModel()
     @State private var sparkleUpdater = SparkleUpdater()
     @State private var sidebarVisibility = NavigationSplitViewVisibility.automatic
-//    @State private var selectedPage: SidebarPage = .overview
-    @State private var selectedPage: SidebarPage = .spectrum
+    @State private var selectedPage: SidebarPage = .overview
+//    @State private var selectedPage: SidebarPage = .spectrum
     @State private var showCrashLog: Bool = false
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
@@ -131,6 +131,7 @@ struct WiFiLensApp: App {
             .preferredColorScheme(colorScheme)
         }
         .windowResizability(.contentSize)
+        .defaultSize(width: 900, height: 550)
         .onChange(of: mcpEnabled) { _, enabled in
             updateMCPServer()
         }
