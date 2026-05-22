@@ -109,10 +109,10 @@
 		FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThroughputMonitor.swift; sourceTree = "<group>"; };
 		FB0573CD2FBCD9B9005F8214 /* ThroughputChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThroughputChartView.swift; sourceTree = "<group>"; };
 		FB231F262FBE2A4C003DED42 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = SOURCE_ROOT; };
-		FB80FA2C2FC0AC1900547708 /* Debug.OSS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.OSS.xcconfig; sourceTree = "<group>"; };
-		FB80FA2D2FC0AC1900547708 /* Debug.PRO.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.PRO.xcconfig; sourceTree = "<group>"; };
-		FB80FA2E2FC0AC1900547708 /* Release.OSS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.OSS.xcconfig; sourceTree = "<group>"; };
-		FB80FA2F2FC0AC1900547708 /* Release.PRO.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.PRO.xcconfig; sourceTree = "<group>"; };
+		FB80FA2C2FC0AC1900547708 /* Debug-OSS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Debug-OSS.xcconfig"; sourceTree = "<group>"; };
+		FB80FA2D2FC0AC1900547708 /* Debug-PRO.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Debug-PRO.xcconfig"; sourceTree = "<group>"; };
+		FB80FA2E2FC0AC1900547708 /* Release-OSS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Release-OSS.xcconfig"; sourceTree = "<group>"; };
+		FB80FA2F2FC0AC1900547708 /* Release-PRO.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Release-PRO.xcconfig"; sourceTree = "<group>"; };
 		FB80FA312FC0AC3800547708 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		FB8BB5FD2FBB039A00FD072E /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		FB8BB6012FBB07F600FD072E /* NetworkInfoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInfoService.swift; sourceTree = "<group>"; };
@@ -316,10 +316,10 @@
 			isa = PBXGroup;
 			children = (
 				FB80FA312FC0AC3800547708 /* Base.xcconfig */,
-				FB80FA2C2FC0AC1900547708 /* Debug.OSS.xcconfig */,
-				FB80FA2D2FC0AC1900547708 /* Debug.PRO.xcconfig */,
-				FB80FA2E2FC0AC1900547708 /* Release.OSS.xcconfig */,
-				FB80FA2F2FC0AC1900547708 /* Release.PRO.xcconfig */,
+				FB80FA2C2FC0AC1900547708 /* Debug-OSS.xcconfig */,
+				FB80FA2D2FC0AC1900547708 /* Debug-PRO.xcconfig */,
+				FB80FA2E2FC0AC1900547708 /* Release-OSS.xcconfig */,
+				FB80FA2F2FC0AC1900547708 /* Release-PRO.xcconfig */,
 			);
 			path = Configs;
 			sourceTree = "<group>";
@@ -513,7 +513,7 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		27D7C298956651919604E437 /* Debug OSS */ = {
+		27D7C298956651919604E437 /* Debug-OSS */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -528,9 +528,9 @@
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WiFi Lens.app/Contents/MacOS/WiFi Lens";
 			};
-			name = "Debug OSS";
+			name = "Debug-OSS";
 		};
-		698FEE00A950E843D4769D08 /* Release OSS */ = {
+		698FEE00A950E843D4769D08 /* Release-OSS */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -545,9 +545,9 @@
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WiFi Lens.app/Contents/MacOS/WiFi Lens";
 			};
-			name = "Release OSS";
+			name = "Release-OSS";
 		};
-		B6525FE3DDC51BB4B44EF6B5 /* Debug OSS */ = {
+		B6525FE3DDC51BB4B44EF6B5 /* Debug-OSS */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -586,11 +586,11 @@
 				SDKROOT = macosx;
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 			};
-			name = "Debug OSS";
+			name = "Debug-OSS";
 		};
-		BD607A70E6F07E317F2987AB /* Release OSS */ = {
+		BD607A70E6F07E317F2987AB /* Release-OSS */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FB80FA2E2FC0AC1900547708 /* Release.OSS.xcconfig */;
+			baseConfigurationReference = FB80FA2E2FC0AC1900547708 /* Release-OSS.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -647,11 +647,11 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 6.0;
 			};
-			name = "Release OSS";
+			name = "Release-OSS";
 		};
-		BEFF0BAF927CA3CBE7CF5AF2 /* Debug OSS */ = {
+		BEFF0BAF927CA3CBE7CF5AF2 /* Debug-OSS */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FB80FA2C2FC0AC1900547708 /* Debug.OSS.xcconfig */;
+			baseConfigurationReference = FB80FA2C2FC0AC1900547708 /* Debug-OSS.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -715,9 +715,9 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
 			};
-			name = "Debug OSS";
+			name = "Debug-OSS";
 		};
-		C628309BD8108FD3AB3919F4 /* Release OSS */ = {
+		C628309BD8108FD3AB3919F4 /* Release-OSS */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -756,11 +756,11 @@
 				SDKROOT = macosx;
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 			};
-			name = "Release OSS";
+			name = "Release-OSS";
 		};
-		FB80FA322FC0ACA600547708 /* Debug PRO */ = {
+		FB80FA322FC0ACA600547708 /* Debug-PRO */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FB80FA2D2FC0AC1900547708 /* Debug.PRO.xcconfig */;
+			baseConfigurationReference = FB80FA2D2FC0AC1900547708 /* Debug-PRO.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -824,9 +824,9 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
 			};
-			name = "Debug PRO";
+			name = "Debug-PRO";
 		};
-		FB80FA332FC0ACA600547708 /* Debug PRO */ = {
+		FB80FA332FC0ACA600547708 /* Debug-PRO */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -865,9 +865,9 @@
 				SDKROOT = macosx;
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 			};
-			name = "Debug PRO";
+			name = "Debug-PRO";
 		};
-		FB80FA342FC0ACA600547708 /* Debug PRO */ = {
+		FB80FA342FC0ACA600547708 /* Debug-PRO */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -882,11 +882,11 @@
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WiFi Lens.app/Contents/MacOS/WiFi Lens";
 			};
-			name = "Debug PRO";
+			name = "Debug-PRO";
 		};
-		FB80FA352FC0ACB100547708 /* Release PRO */ = {
+		FB80FA352FC0ACB100547708 /* Release-PRO */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FB80FA2F2FC0AC1900547708 /* Release.PRO.xcconfig */;
+			baseConfigurationReference = FB80FA2F2FC0AC1900547708 /* Release-PRO.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -943,9 +943,9 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 6.0;
 			};
-			name = "Release PRO";
+			name = "Release-PRO";
 		};
-		FB80FA362FC0ACB100547708 /* Release PRO */ = {
+		FB80FA362FC0ACB100547708 /* Release-PRO */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -984,9 +984,9 @@
 				SDKROOT = macosx;
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 			};
-			name = "Release PRO";
+			name = "Release-PRO";
 		};
-		FB80FA372FC0ACB100547708 /* Release PRO */ = {
+		FB80FA372FC0ACB100547708 /* Release-PRO */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -1001,7 +1001,7 @@
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WiFi Lens.app/Contents/MacOS/WiFi Lens";
 			};
-			name = "Release PRO";
+			name = "Release-PRO";
 		};
 /* End XCBuildConfiguration section */
 
@@ -1009,35 +1009,35 @@
 		C7342F9C7642FE3324E1F9F4 /* Build configuration list for PBXNativeTarget "WiFiLens" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				B6525FE3DDC51BB4B44EF6B5 /* Debug OSS */,
-				FB80FA332FC0ACA600547708 /* Debug PRO */,
-				C628309BD8108FD3AB3919F4 /* Release OSS */,
-				FB80FA362FC0ACB100547708 /* Release PRO */,
+				B6525FE3DDC51BB4B44EF6B5 /* Debug-OSS */,
+				FB80FA332FC0ACA600547708 /* Debug-PRO */,
+				C628309BD8108FD3AB3919F4 /* Release-OSS */,
+				FB80FA362FC0ACB100547708 /* Release-PRO */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Debug OSS";
+			defaultConfigurationName = "Debug-OSS";
 		};
 		C7B2E8745D5E0030C0227E6E /* Build configuration list for PBXProject "WiFiLens" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BEFF0BAF927CA3CBE7CF5AF2 /* Debug OSS */,
-				FB80FA322FC0ACA600547708 /* Debug PRO */,
-				BD607A70E6F07E317F2987AB /* Release OSS */,
-				FB80FA352FC0ACB100547708 /* Release PRO */,
+				BEFF0BAF927CA3CBE7CF5AF2 /* Debug-OSS */,
+				FB80FA322FC0ACA600547708 /* Debug-PRO */,
+				BD607A70E6F07E317F2987AB /* Release-OSS */,
+				FB80FA352FC0ACB100547708 /* Release-PRO */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Debug OSS";
+			defaultConfigurationName = "Debug-OSS";
 		};
 		CA65A170FF00C1566D44BBC0 /* Build configuration list for PBXNativeTarget "WiFiLensTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				27D7C298956651919604E437 /* Debug OSS */,
-				FB80FA342FC0ACA600547708 /* Debug PRO */,
-				698FEE00A950E843D4769D08 /* Release OSS */,
-				FB80FA372FC0ACB100547708 /* Release PRO */,
+				27D7C298956651919604E437 /* Debug-OSS */,
+				FB80FA342FC0ACA600547708 /* Debug-PRO */,
+				698FEE00A950E843D4769D08 /* Release-OSS */,
+				FB80FA372FC0ACB100547708 /* Release-PRO */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Debug OSS";
+			defaultConfigurationName = "Debug-OSS";
 		};
 /* End XCConfigurationList section */
 
