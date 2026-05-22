@@ -1,8 +1,10 @@
 //
-//  Release.OSS.xcconfig
+//  OSS.xcconfig
 //  WiFiLens
 //
 //  Created by Kaoru on 2026/5/22.
 //
 
 #include "Base.xcconfig"
+
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) OSS

@@ -90,26 +90,27 @@ private struct AppRootView: View {
         }
         .overlay(alignment: .topLeading) {
             // --- position parameters ---
-            let trafficLightsX: CGFloat = 148   // clear space for window buttons
+            let trafficLightsX: CGFloat = 149   // clear space for window buttons
             let sidebarGap: CGFloat = 12        // gap between sidebar edge and label
-            let titleBarY: CGFloat = 14         // vertical center in title bar
+            let titleBarY: CGFloat = 9          // vertical center in title bar
             let x = sidebarCollapsed ? trafficLightsX : sidebarWidth + sidebarGap
             // ---
             let glassLabel = Button {
                 // no action yet
             } label: {
-                Text("WiFi Lens")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.primary.opacity(0.7))
+                #if OSS
+                Text("WiFi Lens·OSS")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(Color(red: 130/255, green: 89/255, blue: 221/255))
+                    .frame(height: 34)
                     .padding(.horizontal, 14)
-                    .padding(.vertical, 5)
+                #endif
             }
             .buttonStyle(.plain)
-            .background(.regularMaterial, in: Capsule())
+            .background(Color(red: 130/255, green: 89/255, blue: 221/255).opacity(0.12), in: Capsule())
             .overlay {
-                Capsule().stroke(.white.opacity(0.1), lineWidth: 0.5)
+                Capsule().stroke(Color(red: 130/255, green: 89/255, blue: 221/255), lineWidth: 1)
             }
-            .fixedSize()
             glassLabel
                 .padding(.leading, x)
                 .padding(.top, titleBarY)

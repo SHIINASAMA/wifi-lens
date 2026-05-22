@@ -425,10 +425,10 @@ private struct EarthGlobeView: NSViewRepresentable {
         earth.segmentCount = 96
         let material = SCNMaterial()
         material.diffuse.contents = NSColor(red: 0.08, green: 0.12, blue: 0.35, alpha: 1)
-        if let url = Bundle.main.url(forResource: "earth", withExtension: "jpg"),
-           let image = NSImage(contentsOf: url) {
-            material.diffuse.contents = image
-        }
+        
+        let image = NSImage(named: "Earth")
+        material.diffuse.contents = image
+        
         material.diffuse.mipFilter = .linear
         material.diffuse.maxAnisotropy = 4
         material.lightingModel = .constant

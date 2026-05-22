@@ -2269,6 +2269,7 @@
       }
     },
     "WiFi Lens" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2277,6 +2278,9 @@
           }
         }
       }
+    },
+    "WiFi Lens·OSS" : {
+
     },
     "WPA Enterprise" : {
       "extractionState" : "stale",

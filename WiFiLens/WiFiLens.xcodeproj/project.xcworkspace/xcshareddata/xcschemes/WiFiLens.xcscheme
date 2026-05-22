@@ -17,7 +17,7 @@
                BlueprintIdentifier = "4815C3B026D255EF85C56198"
                BuildableName = "WiFi Lens.app"
                BlueprintName = "WiFiLens"
-               ReferencedContainer = "container:WiFiLens.xcodeproj">
+               ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -35,7 +35,7 @@
                BlueprintIdentifier = "32B8DFED1C1CBAD8FD8C797C"
                BuildableName = "WiFiLensTests.xctest"
                BlueprintName = "WiFiLensTests"
-               ReferencedContainer = "container:WiFiLens.xcodeproj">
+               ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -57,12 +57,12 @@
             BlueprintIdentifier = "4815C3B026D255EF85C56198"
             BuildableName = "WiFi Lens.app"
             BlueprintName = "WiFiLens"
-            ReferencedContainer = "container:WiFiLens.xcodeproj">
+            ReferencedContainer = "container:">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
-      buildConfiguration = "Release-OSS"
+      buildConfiguration = "Debug-OSS"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
@@ -74,7 +74,7 @@
             BlueprintIdentifier = "4815C3B026D255EF85C56198"
             BuildableName = "WiFi Lens.app"
             BlueprintName = "WiFiLens"
-            ReferencedContainer = "container:WiFiLens.xcodeproj">
+            ReferencedContainer = "container:">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
