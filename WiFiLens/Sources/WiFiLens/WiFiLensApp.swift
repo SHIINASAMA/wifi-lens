@@ -80,7 +80,10 @@ private struct WindowAccessor: NSViewRepresentable {
 
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
-        DispatchQueue.main.async { onWindow(view.window) }
+        DispatchQueue.main.async {
+            onWindow(view.window)
+            view.window?.titlebarAppearsTransparent = true
+        }
         return view
     }
 
