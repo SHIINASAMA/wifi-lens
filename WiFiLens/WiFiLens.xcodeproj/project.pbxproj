@@ -42,6 +42,7 @@
 		FB0573CA2FBCD25C005F8214 /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C82FBCD25C005F8214 /* OverviewView.swift */; };
 		FB0573CC2FBCD8FA005F8214 /* ThroughputMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */; };
 		FB0573CE2FBCD9B9005F8214 /* ThroughputChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CD2FBCD9B9005F8214 /* ThroughputChartView.swift */; };
+		FB0573C422FBBEAE4005F8214 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = FB0573C412FBBEAE4005F8214 /* Logging */; };
 		FB0E20882FBAEBCB0064C07A /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = FB0E20872FBAEBCB0064C07A /* Sparkle */; };
 		FB231F272FBE2A4C003DED42 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = FB231F262FBE2A4C003DED42 /* LICENSE */; };
 		FB8BB6002FBB04E000FD072E /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = FB8BB5FD2FBB039A00FD072E /* Localizable.xcstrings */; };
@@ -138,6 +139,7 @@
 				1E5141F704005BF06DB684A1 /* CoreWLAN.framework in Frameworks */,
 				B9AB60F3D002A7B9123D2520 /* CoreLocation.framework in Frameworks */,
 				FB0573B42FBBEAE4005F8214 /* MCP in Frameworks */,
+				FB0573C422FBBEAE4005F8214 /* Logging in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -390,6 +392,7 @@
 			packageProductDependencies = (
 				FB0E20872FBAEBCB0064C07A /* Sparkle */,
 				FB0573B32FBBEAE4005F8214 /* MCP */,
+				FB0573C412FBBEAE4005F8214 /* Logging */,
 			);
 			productName = WiFiLens;
 			productReference = BD784856886985BCC6FC4F02 /* WiFi Lens.app */;
@@ -417,6 +420,7 @@
 			packageReferences = (
 				FB0E20862FBAEB2F0064C07A /* XCRemoteSwiftPackageReference "Sparkle" */,
 				FB0573B22FBBEAE4005F8214 /* XCRemoteSwiftPackageReference "swift-sdk" */,
+				FB0573C402FBBEAE4005F8214 /* XCRemoteSwiftPackageReference "swift-log" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BD4D8FFAAD7E961D9EE4F5FE /* Products */;
@@ -1054,6 +1058,14 @@
 				minimumVersion = 2.9.2;
 			};
 		};
+		FB0573C402FBBEAE4005F8214 /* XCRemoteSwiftPackageReference "swift-log" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-log";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.12.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1066,6 +1078,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = FB0E20862FBAEB2F0064C07A /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
+		};
+		FB0573C412FBBEAE4005F8214 /* Logging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB0573C402FBBEAE4005F8214 /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = Logging;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
