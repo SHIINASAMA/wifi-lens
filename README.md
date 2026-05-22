@@ -51,13 +51,17 @@ Because the application is not signed, macOS Gatekeeper may block it.
 git clone https://github.com/SHIINASAMA/wifi-lens
 cd wifi-lens/WiFiLens
 
-# Build & test via SPM
-swift build
-swift test
+# Build
+xcodebuild -project WiFiLens.xcodeproj -scheme WiFiLens -configuration Debug -destination 'platform=macOS' build
 
-# Open in Xcode for GUI development (required for app bundle with Location Services)
+# Run tests
+xcodebuild -project WiFiLens.xcodeproj -scheme WiFiLens -configuration Debug -destination 'platform=macOS' test
+
+# Open in Xcode
 xed WiFiLens.xcodeproj
 ```
+
+For documentation on architecture, roadmap, and known issues, see the [docs/](docs/) directory.
 
 ## License
 
