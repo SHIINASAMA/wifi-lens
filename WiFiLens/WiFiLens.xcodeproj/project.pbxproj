@@ -92,7 +92,6 @@
 		C51C237F247C80EC5176F5C0 /* ChartSeriesData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartSeriesData.swift; sourceTree = "<group>"; };
 		D69959B95B194A96FA8D337C /* LocationPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermissionManager.swift; sourceTree = "<group>"; };
 		D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewModel.swift; sourceTree = "<group>"; };
-		FB0573AB2FBB1F40005F8214 /* WiFiLens-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "WiFiLens-Info.plist"; sourceTree = "<group>"; };
 		FB0573AC2FBB54ED005F8214 /* SignalHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalHistoryStore.swift; sourceTree = "<group>"; };
 		FB0573AE2FBB5BD6005F8214 /* NetworkSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSnapshot.swift; sourceTree = "<group>"; };
 		FB0573B02FBB5BEE005F8214 /* TrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendChartView.swift; sourceTree = "<group>"; };
@@ -143,7 +142,6 @@
 		1D3644357E3565223E7F160A = {
 			isa = PBXGroup;
 			children = (
-				FB0573AB2FBB1F40005F8214 /* WiFiLens-Info.plist */,
 				FBD329492FBF0E2F00D01613 /* Tests */,
 				2BB8E28CC6CC66A93DA47095 /* Sources */,
 				6D81AD175FCC46C43BC613A7 /* Frameworks */,
@@ -549,7 +547,6 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
-				INFOPLIST_FILE = "WiFiLens-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "WiFi Lens";
 				INFOPLIST_KEY_CFBundleIconFile = twa;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
@@ -718,7 +715,6 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
-				INFOPLIST_FILE = "WiFiLens-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "WiFi Lens";
 				INFOPLIST_KEY_CFBundleIconFile = twa;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
