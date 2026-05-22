@@ -13,6 +13,7 @@ private struct AppRootView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var sidebarWidth: CGFloat = 180
     @State private var sidebarCollapsed = false
+    @AppStorage("hideTitleBadge") private var hideTitleBadge = false
 
     var body: some View {
         NavigationSplitView(columnVisibility: $sidebarVisibility) {
@@ -90,32 +91,19 @@ private struct AppRootView: View {
         }
         .overlay(alignment: .topLeading) {
             // --- position parameters ---
-            let trafficLightsX: CGFloat = 149   // clear space for window buttons
-            let sidebarGap: CGFloat = 12        // gap between sidebar edge and label
-            let titleBarY: CGFloat = 9          // vertical center in title bar
+            let trafficLightsX: CGFloat = 149
+            let sidebarGap: CGFloat = 12
+            let titleBarY: CGFloat = 9
             let x = sidebarCollapsed ? trafficLightsX : sidebarWidth + sidebarGap
             // ---
-            let glassLabel = Button {
-                // no action yet
-            } label: {
-                #if OSS
-                Text("WiFi Lens·OSS")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(Color(red: 130/255, green: 89/255, blue: 221/255))
-                    .frame(height: 34)
-                    .padding(.horizontal, 14)
-                #endif
+            if selectedPage == .overview, !(BuildConfig.current == .pro && hideTitleBadge) {
+                TitleBadge(config: .current)
+                    .padding(.leading, x)
+                    .padding(.top, titleBarY)
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+                    .animation(.easeInOut(duration: 0.25), value: x)
             }
-            .buttonStyle(.plain)
-            .background(Color(red: 130/255, green: 89/255, blue: 221/255).opacity(0.12), in: Capsule())
-            .overlay {
-                Capsule().stroke(Color(red: 130/255, green: 89/255, blue: 221/255), lineWidth: 1)
-            }
-            glassLabel
-                .padding(.leading, x)
-                .padding(.top, titleBarY)
-                .ignoresSafeArea()
-                .allowsHitTesting(false)
         }
     }
 }

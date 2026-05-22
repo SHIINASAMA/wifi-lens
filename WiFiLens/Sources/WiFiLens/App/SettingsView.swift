@@ -9,6 +9,7 @@ struct SettingsView: View {
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
     @AppStorage("appearance") private var appearance: String = "system"
+    @AppStorage("hideTitleBadge") private var hideTitleBadge = false
 
     init(updater: SparkleUpdater) {
         self.updater = updater
@@ -39,6 +40,9 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.segmented)
                     .labelsHidden()
+                    if BuildConfig.current == .pro {
+                        Toggle(String(localized: "Hide title badge"), isOn: $hideTitleBadge)
+                    }
                 } header: {
                     Text(String(localized: "Appearance"))
                 }

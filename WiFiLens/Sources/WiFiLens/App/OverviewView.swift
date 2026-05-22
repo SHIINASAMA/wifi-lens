@@ -40,30 +40,34 @@ struct OverviewView: View {
             .ignoresSafeArea()
 
             ScrollView {
-            VStack(spacing: 16) {
-                // State icon — rotating 3D Earth
-                let stateColor = wifi != nil ? rssiColor(wifi!.rssi ?? -100) : Color.secondary
-                EarthGlobeView(color: stateColor)
-                    .frame(width: 240, height: 240)
+                HStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    VStack(spacing: 16) {
+                        // State icon — rotating 3D Earth
+                        let stateColor = wifi != nil ? rssiColor(wifi!.rssi ?? -100) : Color.secondary
+                        EarthGlobeView(color: stateColor)
+                            .frame(width: 240, height: 240)
 
-                if let wifi {
-                    connectionCard(wifi)
-                    signalHealthRow(wifi)
-                    diagnosticCard(wifi)
-                    if let current = currentChannelQuality, displayScore < 70 {
-                        channelAdviceCard(current)
+                        if let wifi {
+                            connectionCard(wifi)
+                            signalHealthRow(wifi)
+                            diagnosticCard(wifi)
+                            if let current = currentChannelQuality, displayScore < 70 {
+                                channelAdviceCard(current)
+                            }
+                        } else {
+                            noConnectionCard
+                        }
+                        environmentCard
+                        Spacer(minLength: 0)
                     }
-                } else {
-                    noConnectionCard
+                    .padding(16)
+                    .frame(maxWidth: 640)
+                    Spacer(minLength: 0)
                 }
-                environmentCard
-                Spacer(minLength: 0)
+                .frame(maxWidth: .infinity)
             }
-            .padding(16)
-            .frame(maxWidth: 640)
-        }
-        .frame(maxWidth: .infinity)
-        .onChange(of: currentChannelQuality?.qualityScore) { _, newRaw in
+            .onChange(of: currentChannelQuality?.qualityScore) { _, newRaw in
             let raw = newRaw ?? 100
             displayScore = stableScore.update(score: raw)
             displayLevel = .from(score: displayScore)

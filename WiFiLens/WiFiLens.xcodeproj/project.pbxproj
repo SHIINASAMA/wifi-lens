@@ -51,6 +51,8 @@
 		FB92F9232FBE208500BCEC67 /* DebugContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */; };
 		FB92F9252FBE208500BCEC67 /* DebugThroughputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */; };
 		FBB2CA8A2FC0CB7500FC2D2C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */; };
+		FBB2CA8D2FC0E14000FC2D2C /* TitleBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB2CA8C2FC0E14000FC2D2C /* TitleBadge.swift */; };
+		FBB2CA8E2FC0E14000FC2D2C /* BuildConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB2CA8B2FC0E14000FC2D2C /* BuildConfig.swift */; };
 		FBD7B3492FBAED57002C8F5A /* SparkleUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */; };
 		FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */; };
 		FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6203A2551742DF77D61785FE /* WiFiChannel.swift */; };
@@ -115,6 +117,8 @@
 		FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugContainerView.swift; sourceTree = "<group>"; };
 		FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugThroughputView.swift; sourceTree = "<group>"; };
 		FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = SOURCE_ROOT; };
+		FBB2CA8B2FC0E14000FC2D2C /* BuildConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildConfig.swift; sourceTree = "<group>"; };
+		FBB2CA8C2FC0E14000FC2D2C /* TitleBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleBadge.swift; sourceTree = "<group>"; };
 		FBD329432FBF0E2F00D01613 /* ChannelQualityCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityCalculatorTests.swift; sourceTree = "<group>"; };
 		FBD329442FBF0E2F00D01613 /* ChannelSpanCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelSpanCalculatorTests.swift; sourceTree = "<group>"; };
 		FBD329452FBF0E2F00D01613 /* IEParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IEParserTests.swift; sourceTree = "<group>"; };
@@ -235,6 +239,8 @@
 			isa = PBXGroup;
 			children = (
 				FB0573B92FBBFC31005F8214 /* SidebarView.swift */,
+				FBB2CA8B2FC0E14000FC2D2C /* BuildConfig.swift */,
+				FBB2CA8C2FC0E14000FC2D2C /* TitleBadge.swift */,
 				FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */,
 				FB0573C82FBCD25C005F8214 /* OverviewView.swift */,
 				FB0573C72FBCD25C005F8214 /* HelpCenterView.swift */,
@@ -472,6 +478,8 @@
 				9E2F89530D1114DBFAB705F3 /* WiFiLensApp.swift in Sources */,
 				FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */,
 				28DCDBF118C838D48BD26773 /* WiFiNetwork.swift in Sources */,
+				FBB2CA8D2FC0E14000FC2D2C /* TitleBadge.swift in Sources */,
+				FBB2CA8E2FC0E14000FC2D2C /* BuildConfig.swift in Sources */,
 				FB8BB6042FBB0BA600FD072E /* IEParser.swift in Sources */,
 				FB0573BA2FBBFC31005F8214 /* SidebarView.swift in Sources */,
 				FB0573C02FBC47CC005F8214 /* Logging.swift in Sources */,
