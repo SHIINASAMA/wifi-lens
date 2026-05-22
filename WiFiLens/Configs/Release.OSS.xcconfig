@@ -1,0 +1,8 @@
+//
+//  Release.OSS.xcconfig
+//  WiFiLens
+//
+//  Created by Kaoru on 2026/5/22.
+//
+
+#include "Base.xcconfig"

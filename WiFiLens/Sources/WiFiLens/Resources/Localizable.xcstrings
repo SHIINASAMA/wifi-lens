@@ -114,6 +114,23 @@
         }
       }
     },
+    "%1$lld/100 · %2$lld nearby" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld/100 · %2$lld nearby"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld/100 · %2$lld 个附近网络"
+          }
+        }
+      }
+    },
     "%lld APs" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -132,6 +149,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld 个网络"
+          }
+        }
+      }
+    },
+    "%lld networks detected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%lld networks detected"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "检测到 %lld 个网络"
           }
         }
       }
@@ -414,6 +448,23 @@
         }
       }
     },
+    "Better Channels" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Better Channels"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更优信道"
+          }
+        }
+      }
+    },
     "BSSID" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -508,6 +559,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "信道 %@"
+          }
+        }
+      }
+    },
+    "Channel %1$lld has %2$lld nearby networks. Try switching to %3$@." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Channel %1$lld has %2$lld nearby networks. Try switching to %3$@."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信道 %1$lld 附近有 %2$lld 个网络。建议切换到 %3$@。"
+          }
+        }
+      }
+    },
+    "Channel could be better" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Channel could be better"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信道可以更好"
+          }
+        }
+      }
+    },
+    "Channel is congested" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Channel is congested"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信道拥挤"
           }
         }
       }
@@ -611,6 +713,23 @@
         }
       }
     },
+    "Connect to a Wi‑Fi network to see diagnostics and recommendations." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Connect to a Wi‑Fi network to see diagnostics and recommendations."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连接到 Wi‑Fi 网络即可查看诊断与建议。"
+          }
+        }
+      }
+    },
     "Connected" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -629,6 +748,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "连接"
+          }
+        }
+      }
+    },
+    "Connection is OK" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Connection is OK"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连接状态一般"
           }
         }
       }
@@ -1246,6 +1382,23 @@
         }
       }
     },
+    "Not connected to Wi‑Fi" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Not connected to Wi‑Fi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未连接 Wi‑Fi"
+          }
+        }
+      }
+    },
     "now" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1268,12 +1421,46 @@
         }
       }
     },
+    "Older Wi‑Fi standard" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Older Wi‑Fi standard"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "较旧的 Wi‑Fi 标准"
+          }
+        }
+      }
+    },
     "On macOS 14 Sonoma and Later, Location Services permission is required to get Wi-Fi SSIDs.\nPlease enable Location Services in System Preferences > Security & Privacy > Privacy > Location Services." : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "在 macOS 14 Sonoma 及更新版本中，需要使用定位服务权限才能获取 Wi-Fi SSID。\n请在「系统设置」>「隐私与安全性」>「定位服务」中启用。"
+          }
+        }
+      }
+    },
+    "Open" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开放"
           }
         }
       }
@@ -1640,6 +1827,23 @@
         }
       }
     },
+    "Security could be stronger" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Security could be stronger"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安全性可以更强"
+          }
+        }
+      }
+    },
     "Select an interface below to monitor throughput" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1679,6 +1883,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "显示："
+          }
+        }
+      }
+    },
+    "Signal" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Signal"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信号"
           }
         }
       }
@@ -1734,6 +1955,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "稳定性"
+          }
+        }
+      }
+    },
+    "Strong" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Strong"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "强"
+          }
+        }
+      }
+    },
+    "Strong signal, clean channel, and WPA3 security. You're getting the best experience." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Strong signal, clean channel, and WPA3 security. You're getting the best experience."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信号强、信道干净、WPA3 加密。你正在享受最佳网络体验。"
           }
         }
       }
@@ -1848,6 +2103,23 @@
         }
       }
     },
+    "Using %@. WPA3 is the latest standard. Check if your router supports it." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Using %@. WPA3 is the latest standard. Check if your router supports it."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在使用 %@。WPA3 是最新的加密标准。检查你的路由器是否支持。"
+          }
+        }
+      }
+    },
     "v" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1898,6 +2170,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "弱"
+          }
+        }
+      }
+    },
+    "Weak signal" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Weak signal"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信号弱"
           }
         }
       }
@@ -1980,7 +2269,6 @@
       }
     },
     "WiFi Lens" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2089,104 +2377,19 @@
         }
       }
     },
-    "Signal" : {
+    "You could improve by moving closer to the router or switching channels." : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Signal"
+            "value" : "You could improve by moving closer to the router or switching channels."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "信号"
-          }
-        }
-      }
-    },
-    "Strong" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Strong"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "强"
-          }
-        }
-      }
-    },
-    "Open" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Open"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "开放"
-          }
-        }
-      }
-    },
-    "Your connection looks great" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Your connection looks great"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "你的连接状态极佳"
-          }
-        }
-      }
-    },
-    "Strong signal, clean channel, and WPA3 security. You're getting the best experience." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Strong signal, clean channel, and WPA3 security. You're getting the best experience."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "信号强、信道干净、WPA3 加密。你正在享受最佳网络体验。"
-          }
-        }
-      }
-    },
-    "Weak signal" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Weak signal"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "信号弱"
+            "value" : "靠近路由器或切换信道可以改善网络体验。"
           }
         }
       }
@@ -2208,53 +2411,19 @@
         }
       }
     },
-    "Channel is congested" : {
+    "You're on Wi‑Fi %@. Wi‑Fi 6 or 7 would give you faster speeds." : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Channel is congested"
+            "value" : "You're on Wi‑Fi %@. Wi‑Fi 6 or 7 would give you faster speeds."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "信道拥挤"
-          }
-        }
-      }
-    },
-    "Channel %1$lld has %2$lld nearby networks. Try switching to %3$@." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Channel %1$lld has %2$lld nearby networks. Try switching to %3$@."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "信道 %1$lld 附近有 %2$lld 个网络。建议切换到 %3$@。"
-          }
-        }
-      }
-    },
-    "Channel could be better" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Channel could be better"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "信道可以更好"
+            "value" : "你正在使用 Wi‑Fi %@。Wi‑Fi 6 或 7 能给你更快的速度。"
           }
         }
       }
@@ -2276,189 +2445,19 @@
         }
       }
     },
-    "Security could be stronger" : {
+    "Your connection looks great" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Security could be stronger"
+            "value" : "Your connection looks great"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "安全性可以更强"
-          }
-        }
-      }
-    },
-    "Using %@. WPA3 is the latest standard. Check if your router supports it." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Using %@. WPA3 is the latest standard. Check if your router supports it."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在使用 %@。WPA3 是最新的加密标准。检查你的路由器是否支持。"
-          }
-        }
-      }
-    },
-    "Older Wi‑Fi standard" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Older Wi‑Fi standard"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "较旧的 Wi‑Fi 标准"
-          }
-        }
-      }
-    },
-    "You're on Wi‑Fi %@. Wi‑Fi 6 or 7 would give you faster speeds." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "You're on Wi‑Fi %@. Wi‑Fi 6 or 7 would give you faster speeds."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "你正在使用 Wi‑Fi %@。Wi‑Fi 6 或 7 能给你更快的速度。"
-          }
-        }
-      }
-    },
-    "Connection is OK" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Connection is OK"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "连接状态一般"
-          }
-        }
-      }
-    },
-    "You could improve by moving closer to the router or switching channels." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "You could improve by moving closer to the router or switching channels."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "靠近路由器或切换信道可以改善网络体验。"
-          }
-        }
-      }
-    },
-    "Better Channels" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Better Channels"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "更优信道"
-          }
-        }
-      }
-    },
-    "%1$lld/100 · %2$lld nearby" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld/100 · %2$lld nearby"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld/100 · %2$lld 个附近网络"
-          }
-        }
-      }
-    },
-    "Not connected to Wi‑Fi" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Not connected to Wi‑Fi"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未连接 Wi‑Fi"
-          }
-        }
-      }
-    },
-    "Connect to a Wi‑Fi network to see diagnostics and recommendations." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Connect to a Wi‑Fi network to see diagnostics and recommendations."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "连接到 Wi‑Fi 网络即可查看诊断与建议。"
-          }
-        }
-      }
-    },
-    "%lld networks detected" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%lld networks detected"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "检测到 %lld 个网络"
+            "value" : "你的连接状态极佳"
           }
         }
       }

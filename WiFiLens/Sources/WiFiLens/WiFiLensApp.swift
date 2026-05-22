@@ -11,11 +11,23 @@ private struct AppRootView: View {
     let updateMCPServer: @MainActor () -> Void
 
     @Environment(\.scenePhase) private var scenePhase
+    @State private var sidebarWidth: CGFloat = 180
+    @State private var sidebarCollapsed = false
 
     var body: some View {
         NavigationSplitView(columnVisibility: $sidebarVisibility) {
             SidebarView(selectedPage: $selectedPage)
                 .navigationSplitViewColumnWidth(min: 160, ideal: 180)
+                .background(
+                    GeometryReader { geo in
+                        Color.clear.onAppear {
+                            sidebarWidth = geo.size.width
+                        }
+                        .onChange(of: geo.size.width) { _, w in
+                            sidebarWidth = w
+                        }
+                    }
+                )
         } detail: {
             Group {
                 switch selectedPage {
@@ -59,6 +71,7 @@ private struct AppRootView: View {
                 ScrollView { Text(crashLogText).font(.caption.monospaced()).textSelection(.enabled) }
                     .frame(maxHeight: 200)
             }
+            .navigationTitle("")
         }
         .background(WindowAccessor { window in
             window?.setFrameAutosaveName("WiFiLensMainWindow")
@@ -72,6 +85,37 @@ private struct AppRootView: View {
                 Task { await viewModel.handleSceneDidBecomeActive() }
             }
         }
+        .onChange(of: sidebarVisibility) { _, vis in
+            sidebarCollapsed = vis == .detailOnly
+        }
+        .overlay(alignment: .topLeading) {
+            // --- position parameters ---
+            let trafficLightsX: CGFloat = 148   // clear space for window buttons
+            let sidebarGap: CGFloat = 12        // gap between sidebar edge and label
+            let titleBarY: CGFloat = 14         // vertical center in title bar
+            let x = sidebarCollapsed ? trafficLightsX : sidebarWidth + sidebarGap
+            // ---
+            let glassLabel = Button {
+                // no action yet
+            } label: {
+                Text("WiFi Lens")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.primary.opacity(0.7))
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 5)
+            }
+            .buttonStyle(.plain)
+            .background(.regularMaterial, in: Capsule())
+            .overlay {
+                Capsule().stroke(.white.opacity(0.1), lineWidth: 0.5)
+            }
+            .fixedSize()
+            glassLabel
+                .padding(.leading, x)
+                .padding(.top, titleBarY)
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+        }
     }
 }
 
@@ -83,6 +127,11 @@ private struct WindowAccessor: NSViewRepresentable {
         DispatchQueue.main.async {
             onWindow(view.window)
             view.window?.titlebarAppearsTransparent = true
+            view.window?.titleVisibility = .hidden
+            // Nuke title text after SwiftUI layout settles
+            DispatchQueue.main.async {
+                view.window?.title = ""
+            }
         }
         return view
     }
