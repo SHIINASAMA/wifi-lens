@@ -132,12 +132,29 @@ enum NetworkInfoService {
                 return fetchWiFiDetails(iface)
             }()
 
-            // Router lookup from SystemConfiguration
+            // Router lookup from SystemConfiguration (Interface path)
             var router: String? = nil
             if let store,
                let ipv4Dict = SCDynamicStoreCopyValue(store, "State:/Network/Interface/\(name)/IPv4" as CFString) as? [String: Any] {
                 if let r = ipv4Dict["Router"] as? String { router = r }
                 else if let arr = ipv4Dict["Router"] as? [String], let first = arr.first { router = first }
+            }
+
+            // Fallback: try Service-based path for router
+            if router == nil, let store {
+                if let serviceKeys = SCDynamicStoreCopyKeyList(store, "State:/Network/Service/.*/IPv4" as CFString) as? [String] {
+                    for key in serviceKeys {
+                        if let svcDict = SCDynamicStoreCopyValue(store, key as CFString) as? [String: Any],
+                           let svcInterface = svcDict["InterfaceName"] as? String, svcInterface == name {
+                            if let r = svcDict["Router"] as? String {
+                                router = r
+                            } else if let arr = svcDict["Router"] as? [String], let first = arr.first {
+                                router = first
+                            }
+                            if router != nil { break }
+                        }
+                    }
+                }
             }
 
             result.append(NetworkInterfaceInfo(
