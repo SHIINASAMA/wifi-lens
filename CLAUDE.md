@@ -16,9 +16,9 @@ All detailed documentation lives under `docs/`. When adding or updating document
 
 ```sh
 # Always use xcodebuild — do NOT use swift build / swift test
-# Build configurations: Debug OSS / Debug PRO / Release OSS / Release PRO
-xcodebuild -project WiFiLens.xcodeproj -scheme WiFiLens -configuration "Debug OSS" -destination 'platform=macOS' build
-xcodebuild -project WiFiLens.xcodeproj -scheme WiFiLens -configuration "Debug OSS" -destination 'platform=macOS' test
+# Build configurations: Debug-OSS / Debug-PRO / Release-OSS / Release-PRO
+xcodebuild -project WiFiLens.xcodeproj -scheme WiFiLens -configuration "Debug-OSS" -destination 'platform=macOS' build
+xcodebuild -project WiFiLens.xcodeproj -scheme WiFiLens -configuration "Debug-OSS" -destination 'platform=macOS' test
 xed WiFiLens.xcodeproj                   # open in Xcode GUI
 ```
 
