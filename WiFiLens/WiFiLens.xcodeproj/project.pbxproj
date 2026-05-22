@@ -36,13 +36,13 @@
 		FB0573BE2FBC22C2005F8214 /* InterfacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573BD2FBC22C2005F8214 /* InterfacesView.swift */; };
 		FB0573C02FBC47CC005F8214 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573BF2FBC47CC005F8214 /* Logging.swift */; };
 		FB0573C22FBC47F1005F8214 /* CrashReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C12FBC47F1005F8214 /* CrashReporter.swift */; };
+		FB0573C422FBBEAE4005F8214 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = FB0573C412FBBEAE4005F8214 /* Logging */; };
 		FB0573C42FBC7405005F8214 /* ChannelQualityCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */; };
 		FB0573C62FBC741D005F8214 /* ChannelQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */; };
 		FB0573C92FBCD25C005F8214 /* HelpCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C72FBCD25C005F8214 /* HelpCenterView.swift */; };
 		FB0573CA2FBCD25C005F8214 /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C82FBCD25C005F8214 /* OverviewView.swift */; };
 		FB0573CC2FBCD8FA005F8214 /* ThroughputMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */; };
 		FB0573CE2FBCD9B9005F8214 /* ThroughputChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CD2FBCD9B9005F8214 /* ThroughputChartView.swift */; };
-		FB0573C422FBBEAE4005F8214 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = FB0573C412FBBEAE4005F8214 /* Logging */; };
 		FB0E20882FBAEBCB0064C07A /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = FB0E20872FBAEBCB0064C07A /* Sparkle */; };
 		FB231F272FBE2A4C003DED42 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = FB231F262FBE2A4C003DED42 /* LICENSE */; };
 		FB8BB6002FBB04E000FD072E /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = FB8BB5FD2FBB039A00FD072E /* Localizable.xcstrings */; };
@@ -1050,20 +1050,20 @@
 				minimumVersion = 0.12.1;
 			};
 		};
-		FB0E20862FBAEB2F0064C07A /* XCRemoteSwiftPackageReference "Sparkle" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sparkle-project/Sparkle";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.9.2;
-			};
-		};
 		FB0573C402FBBEAE4005F8214 /* XCRemoteSwiftPackageReference "swift-log" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-log";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.12.0;
+			};
+		};
+		FB0E20862FBAEB2F0064C07A /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -1074,15 +1074,15 @@
 			package = FB0573B22FBBEAE4005F8214 /* XCRemoteSwiftPackageReference "swift-sdk" */;
 			productName = MCP;
 		};
-		FB0E20872FBAEBCB0064C07A /* Sparkle */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = FB0E20862FBAEB2F0064C07A /* XCRemoteSwiftPackageReference "Sparkle" */;
-			productName = Sparkle;
-		};
 		FB0573C412FBBEAE4005F8214 /* Logging */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = FB0573C402FBBEAE4005F8214 /* XCRemoteSwiftPackageReference "swift-log" */;
 			productName = Logging;
+		};
+		FB0E20872FBAEBCB0064C07A /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB0E20862FBAEB2F0064C07A /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
