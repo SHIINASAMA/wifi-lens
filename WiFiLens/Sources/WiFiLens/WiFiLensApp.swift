@@ -72,7 +72,7 @@ private struct AppRootView: View {
                 ScrollView { Text(crashLogText).font(.caption.monospaced()).textSelection(.enabled) }
                     .frame(maxHeight: 200)
             }
-            .navigationTitle("")
+            .navigationTitle(selectedPage == .overview ? "" : selectedPage.label)
         }
         .background(WindowAccessor { window in
             window?.setFrameAutosaveName("WiFiLensMainWindow")
@@ -116,11 +116,7 @@ private struct WindowAccessor: NSViewRepresentable {
         DispatchQueue.main.async {
             onWindow(view.window)
             view.window?.titlebarAppearsTransparent = true
-            view.window?.titleVisibility = .hidden
-            // Nuke title text after SwiftUI layout settles
-            DispatchQueue.main.async {
-                view.window?.title = ""
-            }
+            view.window?.titleVisibility = .visible
         }
         return view
     }
