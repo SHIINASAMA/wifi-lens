@@ -56,6 +56,10 @@
 		FBD7B3492FBAED57002C8F5A /* SparkleUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */; };
 		FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */; };
 		FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6203A2551742DF77D61785FE /* WiFiChannel.swift */; };
+		39B4C850463F4305990A6943 /* SignalSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6180984B78D4363B6840C79 /* SignalSmoothing.swift */; };
+		85C7DEE09D3045078A2ADFF5 /* ExponentialMovingAverage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E1D69278614400AA3B660C /* ExponentialMovingAverage.swift */; };
+		C477C7396F754B85A69816B6 /* KalmanFilter1D.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9F90F78BD04526AE0566CC /* KalmanFilter1D.swift */; };
+		DCAC1361D1814E4895FD4B4F /* HysteresisEMA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01A62377C8474773A0ACA7CD /* HysteresisEMA.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -126,6 +130,10 @@
 		FBD329472FBF0E2F00D01613 /* SSIDColorHasherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSIDColorHasherTests.swift; sourceTree = "<group>"; };
 		FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdater.swift; sourceTree = "<group>"; };
 		FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		D6180984B78D4363B6840C79 /* SignalSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalSmoothing.swift; sourceTree = "<group>"; };
+		36E1D69278614400AA3B660C /* ExponentialMovingAverage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExponentialMovingAverage.swift; sourceTree = "<group>"; };
+		CA9F90F78BD04526AE0566CC /* KalmanFilter1D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KalmanFilter1D.swift; sourceTree = "<group>"; };
+		01A62377C8474773A0ACA7CD /* HysteresisEMA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HysteresisEMA.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -290,6 +298,7 @@
 				B1279BAD6D501300C4F2A85F /* Table */,
 				786696F9D6046171197C0641 /* MCP */,
 				DD6657406F0FB50F2D9B7FB4 /* Utilities */,
+				14F4ABDD1A4A4FAD821DF0CB /* SignalProcessing */,
 				49FEC4F42675BFAD1316DDEC /* Debug */,
 				FB8BB5FE2FBB039A00FD072E /* Resources */,
 			);
@@ -349,6 +358,17 @@
 				FBD329482FBF0E2F00D01613 /* WiFiLensTests */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		14F4ABDD1A4A4FAD821DF0CB /* SignalProcessing */ = {
+			isa = PBXGroup;
+			children = (
+				D6180984B78D4363B6840C79 /* SignalSmoothing.swift */,
+				36E1D69278614400AA3B660C /* ExponentialMovingAverage.swift */,
+				CA9F90F78BD04526AE0566CC /* KalmanFilter1D.swift */,
+				01A62377C8474773A0ACA7CD /* HysteresisEMA.swift */,
+			);
+			path = SignalProcessing;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -488,6 +508,10 @@
 				FB0573CE2FBCD9B9005F8214 /* ThroughputChartView.swift in Sources */,
 				FB0573BE2FBC22C2005F8214 /* InterfacesView.swift in Sources */,
 				FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */,
+				39B4C850463F4305990A6943 /* SignalSmoothing.swift in Sources */,
+				85C7DEE09D3045078A2ADFF5 /* ExponentialMovingAverage.swift in Sources */,
+				C477C7396F754B85A69816B6 /* KalmanFilter1D.swift in Sources */,
+				DCAC1361D1814E4895FD4B4F /* HysteresisEMA.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
