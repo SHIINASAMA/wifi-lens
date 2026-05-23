@@ -1,0 +1,223 @@
+import SwiftUI
+import CoreWLAN
+
+enum TestState {
+    case idle
+    case ready
+    case running
+    case stopped
+}
+
+@MainActor
+@Observable
+final class RoamingTestViewModel {
+
+    // MARK: - Device
+
+    let isPortable = DeviceCapabilities.isPortable
+
+    // MARK: - State
+
+    var state: TestState = .idle
+    var errorMessage: String?
+
+    // MARK: - Current connection
+
+    var currentSSID: String?
+    var currentBSSID: String?
+    var currentRSSI: Int = 0
+    var currentChannel: Int = 0
+    var currentTxRate: Double = 0
+    var currentPhyMode: String?
+    var routerIP: String?
+    var gatewayLatency: Double?
+
+    // MARK: - Test data
+
+    var segments: [RoamingSegment] = []
+    var transitions: [APTransitionEvent] = []
+    var elapsedTime: TimeInterval = 0
+    var totalSamples: Int { segments.reduce(0) { $0 + $1.samples.count } }
+
+    // MARK: - Private
+
+    private var timer: Timer?
+    private var startDate: Date?
+    private var lastBSSID: String?
+    private var lastRSSI: Int?
+    private var lastChannel: Int?
+    private var currentSegmentIndex: Int = -1
+    private let pinger = GatewayPinger()
+
+    // MARK: - Computed
+
+    var canStart: Bool {
+        state == .ready || state == .stopped
+    }
+
+    var isRunning: Bool {
+        state == .running
+    }
+
+    // MARK: - Actions
+
+    func checkReadiness() {
+        state = .idle
+        errorMessage = nil
+
+        guard let iface = CWWiFiClient.shared().interface(),
+              let ssid = iface.ssid() else {
+            errorMessage = String(localized: "Not connected to any Wi-Fi network. Connect to a network before starting the roaming test.")
+            state = .idle
+            return
+        }
+
+        currentSSID = ssid
+        currentBSSID = iface.bssid()
+        currentRSSI = iface.rssiValue()
+        currentChannel = iface.wlanChannel()?.channelNumber ?? 0
+        currentTxRate = iface.transmitRate()
+        currentPhyMode = phyModeLabel(iface)
+        state = .ready
+    }
+
+    func startTest() {
+        guard canStart else { return }
+        guard let iface = CWWiFiClient.shared().interface(),
+              let bssid = iface.bssid() else { return }
+
+        segments = []
+        transitions = []
+        lastBSSID = bssid
+        lastRSSI = iface.rssiValue()
+        lastChannel = iface.wlanChannel()?.channelNumber ?? 0
+        startDate = Date()
+        elapsedTime = 0
+        errorMessage = nil
+
+        // Create first segment
+        let segment = RoamingSegment(bssid: bssid, startTime: Date())
+        segments = [segment]
+        currentSegmentIndex = 0
+
+        refreshConnectionInfo()
+        appendSample()
+
+        state = .running
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.tick()
+            }
+        }
+    }
+
+    func stopTest() {
+        timer?.invalidate()
+        timer = nil
+
+        // Close current segment
+        if currentSegmentIndex >= 0, currentSegmentIndex < segments.count {
+            segments[currentSegmentIndex].endTime = Date()
+        }
+
+        refreshConnectionInfo()
+        state = .stopped
+    }
+
+    // MARK: - Tick
+
+    private func tick() {
+        guard state == .running else { return }
+        guard let iface = CWWiFiClient.shared().interface() else { return }
+
+        let newBSSID = iface.bssid()
+        let newRSSI = iface.rssiValue()
+        let newChannel = iface.wlanChannel()?.channelNumber ?? 0
+
+        // Ping gateway asynchronously
+        if let router = routerIP {
+            Task {
+                let latency = await pinger.ping(host: router)
+                await MainActor.run {
+                    gatewayLatency = latency
+                }
+            }
+        }
+
+        // Detect AP transition
+        if let newBSSID, let lastBSSID, newBSSID != lastBSSID {
+            // Close current segment
+            if currentSegmentIndex >= 0, currentSegmentIndex < segments.count {
+                segments[currentSegmentIndex].endTime = Date()
+            }
+
+            // Record transition
+            let event = APTransitionEvent(
+                timestamp: Date(),
+                fromBSSID: lastBSSID,
+                toBSSID: newBSSID,
+                rssiBefore: lastRSSI ?? 0,
+                rssiAfter: newRSSI,
+                channelBefore: lastChannel ?? 0,
+                channelAfter: newChannel
+            )
+            transitions.append(event)
+
+            // Start new segment
+            let segment = RoamingSegment(bssid: newBSSID, startTime: Date())
+            segments.append(segment)
+            currentSegmentIndex = segments.count - 1
+        }
+
+        self.lastBSSID = newBSSID
+        self.lastRSSI = newRSSI
+        self.lastChannel = newChannel
+
+        refreshConnectionInfo()
+        appendSample()
+    }
+
+    // MARK: - Helpers
+
+    private func refreshConnectionInfo() {
+        guard let iface = CWWiFiClient.shared().interface() else { return }
+        currentSSID = iface.ssid()
+        currentBSSID = iface.bssid()
+        currentRSSI = iface.rssiValue()
+        currentChannel = iface.wlanChannel()?.channelNumber ?? 0
+        currentTxRate = iface.transmitRate()
+        currentPhyMode = phyModeLabel(iface)
+        if routerIP == nil {
+            routerIP = NetworkInfoService.fetch()?.router
+        }
+    }
+
+    private func appendSample() {
+        guard currentSegmentIndex >= 0, currentSegmentIndex < segments.count else { return }
+        let sample = RoamingSample(
+            timestamp: Date(),
+            rssi: currentRSSI,
+            channel: currentChannel,
+            txRate: currentTxRate,
+            gatewayLatency: gatewayLatency
+        )
+        segments[currentSegmentIndex].samples.append(sample)
+
+        if let start = startDate {
+            elapsedTime = Date().timeIntervalSince(start)
+        }
+    }
+
+    private func phyModeLabel(_ iface: CWInterface) -> String? {
+        switch iface.activePHYMode() {
+        case .mode11be: "802.11be"
+        case .mode11ax: "802.11ax"
+        case .mode11ac: "802.11ac"
+        case .mode11n:  "802.11n"
+        case .mode11a:  "802.11a"
+        case .mode11b:  "802.11b"
+        case .mode11g:  "802.11g"
+        default:        nil
+        }
+    }
+}

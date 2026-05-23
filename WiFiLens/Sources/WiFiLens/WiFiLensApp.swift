@@ -3,6 +3,7 @@ import Sparkle
 
 private struct AppRootView: View {
     @Bindable var viewModel: ScannerViewModel
+    @Bindable var roamingViewModel: RoamingTestViewModel
     @Binding var sidebarVisibility: NavigationSplitViewVisibility
     @Binding var selectedPage: SidebarPage
     @Binding var showCrashLog: Bool
@@ -56,6 +57,8 @@ private struct AppRootView: View {
                     ChannelQualityView(channels: viewModel.channelQualities)
                 case .interfaces:
                     InterfacesView(interfaces: viewModel.networkInfo, scannerViewModel: viewModel, throughputMonitor: viewModel.throughputMonitor)
+                case .roaming:
+                    RoamingTestView(viewModel: roamingViewModel)
                 case .help:
                     HelpCenterView()
                 case .settings:
@@ -133,6 +136,7 @@ extension Notification.Name {
 @main
 struct WiFiLensApp: App {
     @State private var viewModel = ScannerViewModel()
+    @State private var roamingViewModel = RoamingTestViewModel()
     @State private var sparkleUpdater = SparkleUpdater()
     @State private var sidebarVisibility = NavigationSplitViewVisibility.automatic
     @State private var selectedPage: SidebarPage = .overview
@@ -158,6 +162,7 @@ struct WiFiLensApp: App {
         WindowGroup {
             AppRootView(
                 viewModel: viewModel,
+                roamingViewModel: roamingViewModel,
                 sidebarVisibility: $sidebarVisibility,
                 selectedPage: $selectedPage,
                 showCrashLog: $showCrashLog,

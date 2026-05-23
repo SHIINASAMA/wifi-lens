@@ -531,6 +531,9 @@
         }
       }
     },
+    "Ch %@" : {
+
+    },
     "CH %@  %@ dBm" : {
       "localizations" : {
         "en" : {
@@ -541,9 +544,49 @@
         }
       }
     },
-    "Channel" : {
-      "extractionState" : "stale",
+    "Ch After" : {
+      "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Ch After"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信道后"
+          }
+        }
+      }
+    },
+    "Ch Before" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Ch Before"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信道前"
+          }
+        }
+      }
+    },
+    "Channel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Channel"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -625,6 +668,23 @@
         }
       }
     },
+    "Check Again" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Check Again"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新检查"
+          }
+        }
+      }
+    },
     "Check for Updates…" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -643,6 +703,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "立即检查"
+          }
+        }
+      }
+    },
+    "Checking connection..." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Checking connection..."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在检查连接…"
           }
         }
       }
@@ -1000,6 +1077,23 @@
         }
       }
     },
+    "From BSSID" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "From BSSID"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从 BSSID"
+          }
+        }
+      }
+    },
     "General" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1175,6 +1269,23 @@
         }
       }
     },
+    "Latency" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Latency"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "延迟"
+          }
+        }
+      }
+    },
     "Level" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1338,6 +1449,23 @@
         }
       }
     },
+    "No AP transitions detected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No AP transitions detected"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未检测到 AP 切换"
+          }
+        }
+      }
+    },
     "No channel data available" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1378,6 +1506,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "无"
+          }
+        }
+      }
+    },
+    "Not connected to any Wi-Fi network. Connect to a network before starting the roaming test." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Not connected to any Wi-Fi network. Connect to a network before starting the roaming test."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未连接到任何 Wi-Fi 网络。请在开始漫游测试前连接网络。"
           }
         }
       }
@@ -1729,6 +1874,23 @@
         }
       }
     },
+    "Roaming Test" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Roaming Test"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "漫游测试"
+          }
+        }
+      }
+    },
     "Router" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1741,12 +1903,72 @@
       }
     },
     "RSSI" : {
-      "extractionState" : "stale",
+      "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "RSSI"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "RSSI"
+          }
+        }
+      }
+    },
+    "RSSI %@ dBm" : {
+
+    },
+    "RSSI After" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "RSSI After"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RSSI 后"
+          }
+        }
+      }
+    },
+    "RSSI Before" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "RSSI Before"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RSSI 前"
+          }
+        }
+      }
+    },
+    "samples" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "samples"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "个样本"
           }
         }
       }
@@ -1959,6 +2181,40 @@
         }
       }
     },
+    "Start" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Start"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始"
+          }
+        }
+      }
+    },
+    "Stop" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Stop"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "停止"
+          }
+        }
+      }
+    },
     "Strong" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2037,6 +2293,23 @@
         }
       }
     },
+    "This feature is designed for battery-equipped Mac laptops. Desktop Macs cannot simulate mobile roaming scenarios." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This feature is designed for battery-equipped Mac laptops. Desktop Macs cannot simulate mobile roaming scenarios."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此功能适用于配备电池的 Mac 笔记本电脑，桌面 Mac 无法模拟移动漫游场景。"
+          }
+        }
+      }
+    },
     "Throughput" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2044,6 +2317,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "吞吐量"
+          }
+        }
+      }
+    },
+    "Time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Time"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "时间"
+          }
+        }
+      }
+    },
+    "To BSSID" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "To BSSID"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "到 BSSID"
           }
         }
       }
@@ -2059,9 +2366,32 @@
         }
       }
     },
-    "Tx Rate" : {
-      "extractionState" : "stale",
+    "transitions" : {
+      "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "transitions"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次切换"
+          }
+        }
+      }
+    },
+    "Tx Rate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Tx Rate"
+          }
+        },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2138,6 +2468,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "虚拟"
+          }
+        }
+      }
+    },
+    "Waiting for AP transitions..." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Waiting for AP transitions..."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等待 AP 切换…"
           }
         }
       }

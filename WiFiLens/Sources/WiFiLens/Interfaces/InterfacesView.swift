@@ -22,6 +22,7 @@ struct InterfacesView: View {
     let scannerViewModel: ScannerViewModel
     let throughputMonitor: ThroughputMonitor
     @State private var mode: InterfaceViewMode = .simple
+    @State private var gatewayLatency: Double?
 
     private var wifiInterface: NetworkInterfaceInfo? {
         interfaces.first(where: { $0.ssid != nil })
@@ -115,6 +116,11 @@ struct InterfacesView: View {
                     Text(channelLabel(wifi))
                         .font(.caption)
                         .foregroundColor(.secondary)
+                    if let latency = gatewayLatency {
+                        Text(String(format: "%.1f ms", latency))
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundColor(latencyColor(latency))
+                    }
                 }
             }
         }
@@ -122,6 +128,16 @@ struct InterfacesView: View {
         .frame(maxWidth: .infinity)
         .background(.regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .task(id: wifi.router) {
+            guard let router = wifi.router else { return }
+            let pinger = GatewayPinger()
+            while !Task.isCancelled {
+                if let lat = await pinger.ping(host: router) {
+                    gatewayLatency = lat
+                }
+                try? await Task.sleep(for: .seconds(2))
+            }
+        }
     }
 
     // MARK: - Health Indicators
@@ -733,4 +749,11 @@ private struct InterfaceCard: View {
         if rssi >= -85 { return .orange }
         return .red
     }
+
+}
+
+private func latencyColor(_ ms: Double) -> Color {
+    if ms < 5 { return .green }
+    if ms < 20 { return .yellow }
+    return .red
 }

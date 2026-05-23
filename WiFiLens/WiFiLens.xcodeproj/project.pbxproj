@@ -60,6 +60,11 @@
 		85C7DEE09D3045078A2ADFF5 /* ExponentialMovingAverage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E1D69278614400AA3B660C /* ExponentialMovingAverage.swift */; };
 		C477C7396F754B85A69816B6 /* KalmanFilter1D.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9F90F78BD04526AE0566CC /* KalmanFilter1D.swift */; };
 		DCAC1361D1814E4895FD4B4F /* HysteresisEMA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01A62377C8474773A0ACA7CD /* HysteresisEMA.swift */; };
+		56818EA68B0747B083E0FDF8 /* DeviceCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0470288A92AF41C793DAE70B /* DeviceCapabilities.swift */; };
+		2FA3CB9C5DD2446AAA549779 /* GatewayPinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF472346A62545B9866DA8ED /* GatewayPinger.swift */; };
+		847B77DBC638404081A7BFC2 /* RoamingRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8367630A1EDF4515917A144A /* RoamingRecord.swift */; };
+		7E778683F723499D93511520 /* RoamingTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F790DC6E08D43C5BD058D96 /* RoamingTestViewModel.swift */; };
+		530D1F7F7F44460CABA342AB /* RoamingTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B13DBF938D654926B205302C /* RoamingTestView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -134,6 +139,11 @@
 		36E1D69278614400AA3B660C /* ExponentialMovingAverage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExponentialMovingAverage.swift; sourceTree = "<group>"; };
 		CA9F90F78BD04526AE0566CC /* KalmanFilter1D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KalmanFilter1D.swift; sourceTree = "<group>"; };
 		01A62377C8474773A0ACA7CD /* HysteresisEMA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HysteresisEMA.swift; sourceTree = "<group>"; };
+		0470288A92AF41C793DAE70B /* DeviceCapabilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCapabilities.swift; sourceTree = "<group>"; };
+		BF472346A62545B9866DA8ED /* GatewayPinger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayPinger.swift; sourceTree = "<group>"; };
+		8367630A1EDF4515917A144A /* RoamingRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingRecord.swift; sourceTree = "<group>"; };
+		9F790DC6E08D43C5BD058D96 /* RoamingTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingTestViewModel.swift; sourceTree = "<group>"; };
+		B13DBF938D654926B205302C /* RoamingTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingTestView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -294,6 +304,7 @@
 				93CBE45991F4573779019CBC /* Scanner */,
 				76E1D8231AF6132E0568C813 /* Spectrum */,
 				8FFEB5302BE8674E56110FAE /* Interfaces */,
+				9F327AEB42954B939E2CC19F /* Roaming */,
 				D3E6587CCEDEC199C00591B2 /* Channels */,
 				B1279BAD6D501300C4F2A85F /* Table */,
 				786696F9D6046171197C0641 /* MCP */,
@@ -309,6 +320,8 @@
 			isa = PBXGroup;
 			children = (
 				69F66DB715821EBD11B6D1AA /* Color+Extensions.swift */,
+				0470288A92AF41C793DAE70B /* DeviceCapabilities.swift */,
+				BF472346A62545B9866DA8ED /* GatewayPinger.swift */,
 				51DDD97F3B94514DE0790B51 /* Constants.swift */,
 			);
 			path = Utilities;
@@ -369,6 +382,16 @@
 				01A62377C8474773A0ACA7CD /* HysteresisEMA.swift */,
 			);
 			path = SignalProcessing;
+			sourceTree = "<group>";
+		};
+		9F327AEB42954B939E2CC19F /* Roaming */ = {
+			isa = PBXGroup;
+			children = (
+				8367630A1EDF4515917A144A /* RoamingRecord.swift */,
+				9F790DC6E08D43C5BD058D96 /* RoamingTestViewModel.swift */,
+				B13DBF938D654926B205302C /* RoamingTestView.swift */,
+			);
+			path = Roaming;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -508,6 +531,12 @@
 				FB0573CE2FBCD9B9005F8214 /* ThroughputChartView.swift in Sources */,
 				FB0573BE2FBC22C2005F8214 /* InterfacesView.swift in Sources */,
 				FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */,
+				56818EA68B0747B083E0FDF8 /* DeviceCapabilities.swift in Sources */,
+				2FA3CB9C5DD2446AAA549779 /* GatewayPinger.swift in Sources */,
+				847B77DBC638404081A7BFC2 /* RoamingRecord.swift in Sources */,
+				7E778683F723499D93511520 /* RoamingTestViewModel.swift in Sources */,
+				530D1F7F7F44460CABA342AB /* RoamingTestView.swift in Sources */,
+
 				39B4C850463F4305990A6943 /* SignalSmoothing.swift in Sources */,
 				85C7DEE09D3045078A2ADFF5 /* ExponentialMovingAverage.swift in Sources */,
 				C477C7396F754B85A69816B6 /* KalmanFilter1D.swift in Sources */,

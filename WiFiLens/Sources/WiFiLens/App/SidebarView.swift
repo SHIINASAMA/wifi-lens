@@ -5,6 +5,7 @@ enum SidebarPage: String, CaseIterable {
     case spectrum
     case channels
     case interfaces
+    case roaming
     case help
     case settings
 #if DEBUG
@@ -17,6 +18,7 @@ enum SidebarPage: String, CaseIterable {
         case .spectrum:   String(localized: "Spectrum")
         case .channels:   String(localized: "Channels")
         case .interfaces: String(localized: "Interfaces")
+        case .roaming:   String(localized: "Roaming Test")
         case .help:       String(localized: "Help")
         case .settings:   String(localized: "Settings")
 #if DEBUG
@@ -31,6 +33,7 @@ enum SidebarPage: String, CaseIterable {
         case .spectrum:   "antenna.radiowaves.left.and.right"
         case .channels:   "chart.bar.fill"
         case .interfaces: "cable.connector"
+        case .roaming:   "arrow.triangle.swap"
         case .help:       "questionmark.circle"
         case .settings:   "gearshape"
 #if DEBUG
@@ -51,7 +54,7 @@ struct SidebarView: View {
             }
             Divider()
             Section {
-                ForEach([SidebarPage.spectrum, .channels, .interfaces], id: \.self) { page in
+                ForEach([SidebarPage.spectrum, .channels, .interfaces, .roaming], id: \.self) { page in
                     Label(page.label, systemImage: page.icon)
                         .tag(page)
                 }
