@@ -85,8 +85,8 @@ final class ThroughputMonitor {
 
             let prev = lastCounters[name]
             let elapsed = prev.map { now.timeIntervalSince($0.ts) } ?? 1.0
-            let deltaIn = prev.map { Double(bytesIn - $0.in) / max(0.1, elapsed) } ?? 0
-            let deltaOut = prev.map { Double(bytesOut - $0.out) / max(0.1, elapsed) } ?? 0
+            let deltaIn  = prev.map { max(0, Double(Int64(bytesIn) - Int64($0.in)))   / max(0.1, elapsed) } ?? 0
+            let deltaOut = prev.map { max(0, Double(Int64(bytesOut) - Int64($0.out))) / max(0.1, elapsed) } ?? 0
 
             lastCounters[name] = (in: bytesIn, out: bytesOut, ts: now)
 
