@@ -132,6 +132,7 @@
 		FB0573C82FBCD25C005F8214 /* OverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewView.swift; sourceTree = "<group>"; };
 		FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThroughputMonitor.swift; sourceTree = "<group>"; };
 		FB0573CD2FBCD9B9005F8214 /* ThroughputChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThroughputChartView.swift; sourceTree = "<group>"; };
+		FB5A212C2FC31C6100828D9F /* WiFiLens-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "WiFiLens-Info.plist"; sourceTree = "<group>"; };
 		FB80FA2C2FC0AC1900547708 /* OSS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = OSS.xcconfig; sourceTree = "<group>"; };
 		FB80FA2F2FC0AC1900547708 /* PRO.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = PRO.xcconfig; sourceTree = "<group>"; };
 		FB80FA312FC0AC3800547708 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
@@ -188,6 +189,7 @@
 		1D3644357E3565223E7F160A = {
 			isa = PBXGroup;
 			children = (
+				FB5A212C2FC31C6100828D9F /* WiFiLens-Info.plist */,
 				FB80FA302FC0AC1900547708 /* Configs */,
 				FBD329492FBF0E2F00D01613 /* Tests */,
 				2BB8E28CC6CC66A93DA47095 /* Sources */,
@@ -638,6 +640,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 121;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
@@ -651,6 +654,7 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
+				INFOPLIST_FILE = "WiFiLens-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "WiFi Lens";
 				INFOPLIST_KEY_CFBundleIconFile = twa;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
@@ -661,7 +665,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -808,6 +812,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 121;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
@@ -821,6 +826,7 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
+				INFOPLIST_FILE = "WiFiLens-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "WiFi Lens";
 				INFOPLIST_KEY_CFBundleIconFile = twa;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
@@ -831,7 +837,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -918,6 +924,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 121;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
@@ -931,6 +938,7 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
+				INFOPLIST_FILE = "WiFiLens-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "WiFi Lens";
 				INFOPLIST_KEY_CFBundleIconFile = twa;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
@@ -941,7 +949,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1038,6 +1046,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 121;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
@@ -1051,6 +1060,7 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
+				INFOPLIST_FILE = "WiFiLens-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "WiFi Lens";
 				INFOPLIST_KEY_CFBundleIconFile = twa;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
@@ -1061,7 +1071,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";

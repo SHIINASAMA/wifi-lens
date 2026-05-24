@@ -37,10 +37,11 @@ final class SparkleUpdater: ObservableObject {
             do {
                 try updater.start()
             } catch {
-                AppLogger.app.error("Sparkle start failed: \(error.localizedDescription)")
+                AppLogger.sparkle.error("start failed: \(error.localizedDescription)")
                 return
             }
         }
+        AppLogger.sparkle.info("manual check triggered")
         controller.checkForUpdates(nil)
     }
 }

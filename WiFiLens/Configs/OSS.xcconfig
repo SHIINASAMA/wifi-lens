@@ -8,4 +8,3 @@
 #include "Base.xcconfig"
 
 SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) OSS
-INFOPLIST_KEY_SUFeedURL = "https://github.com/SHIINASAMA/wifi-lens/releases/latest/download/appcast.xml"
