@@ -8,11 +8,17 @@ const BASE = import.meta.env.BASE_URL
 document.getElementById('app')!.innerHTML = /* html */ `
 <div class="page">
 
+  ${renderToC()}
+  <button id="back-to-top" class="fixed bottom-8 right-8 z-50 w-10 h-10 rounded-full bg-gray-800/90 border border-gray-700/50 text-gray-400 hover:text-white hover:bg-gray-700/90 transition-all duration-300 flex items-center justify-center opacity-0 pointer-events-none backdrop-blur-md shadow-lg" aria-label="Back to top">
+    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
   ${renderNav()}
   ${renderHero()}
   ${renderFeatures()}
   ${renderDemo()}
   ${renderSpecs()}
+  ${renderMCP()}
   ${renderDownload()}
   ${renderFooter()}
 
@@ -35,6 +41,35 @@ const observer = new IntersectionObserver(
 
 document.querySelectorAll('.reveal').forEach((el) => observer.observe(el))
 
+// ── Sidebar ToC ──────────────────────────────────────────────
+
+const tocLinks = document.querySelectorAll<HTMLAnchorElement>('.toc-link')
+const tocObserver = new IntersectionObserver(
+  (entries) => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        tocLinks.forEach((l) => l.classList.remove('toc-active'))
+        const id = entry.target.id
+        const link = document.querySelector<HTMLAnchorElement>(`.toc-link[href="#${id}"]`)
+        link?.classList.add('toc-active')
+      }
+    }
+  },
+  { rootMargin: '-20% 0px -75% 0px', threshold: 0 }
+)
+
+document.querySelectorAll<HTMLElement>('[data-toc]').forEach((el) => tocObserver.observe(el))
+
+// ── Back to top ──────────────────────────────────────────────
+
+const topBtn = document.getElementById('back-to-top')!
+window.addEventListener('scroll', () => {
+  topBtn.classList.toggle('opacity-0', window.scrollY < 500)
+  topBtn.classList.toggle('pointer-events-none', window.scrollY < 500)
+})
+
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }))
+
 // ── Nav scroll effect ─────────────────────────────────────────
 
 const navEl = document.getElementById('nav')!
@@ -45,6 +80,31 @@ window.addEventListener('scroll', () => {
   navEl.classList.toggle('nav-hidden', y > lastY && y > 400)
   lastY = y
 })
+
+// ═══════════════════════════════════════════════════════════════
+// Sidebar ToC
+// ═══════════════════════════════════════════════════════════════
+
+function renderToC() {
+  const items = [
+    { id: 'features', label: 'Features' },
+    ...(t.demo.items as readonly { title: string }[]).map(s => ({
+      id: s.title.toLowerCase().replace(/\s+/g, '-'),
+      label: s.title,
+    })),
+    { id: 'mcp', label: 'MCP' },
+    { id: 'download', label: 'Download' },
+  ]
+
+  return /* html */ `
+  <aside class="toc-sidebar hidden xl:block fixed right-6 top-1/2 -translate-y-1/2 z-40 w-36">
+    <nav class="flex flex-col gap-0.5 border-l border-gray-800/50 pl-4 py-3 bg-gray-950/70 backdrop-blur-sm rounded-r-lg">
+      ${items.map(it => /* html */ `
+      <a href="#${it.id}" class="toc-link text-[11px] text-gray-500 hover:text-gray-200 transition-colors duration-200 py-0.5 block leading-snug">${it.label}</a>
+      `).join('')}
+    </nav>
+  </aside>`
+}
 
 // ═══════════════════════════════════════════════════════════════
 // Nav
@@ -224,7 +284,7 @@ function renderFeatures() {
   ]
 
   return /* html */ `
-  <section id="features" class="relative py-32">
+  <section id="features" class="relative py-32" data-toc>
     <div class="mx-auto max-w-6xl px-6">
       <div class="reveal text-center mb-20">
         <h2 class="section-title">${t.features.title}</h2>
@@ -270,6 +330,7 @@ function renderDemo() {
 }
 
 function screenshotRow(item: { title: string; desc: string; bullets: readonly string[]; image: string }, index: number) {
+  const slug = item.title.toLowerCase().replace(/\s+/g, '-')
   const isEven = index % 2 === 0
   const imgCol = /* html */ `
   <div class="reveal ${isEven ? 'lg:order-1' : 'lg:order-2'}">
@@ -313,10 +374,10 @@ function screenshotRow(item: { title: string; desc: string; bullets: readonly st
   </div>`
 
   return /* html */ `
-  <div class="grid lg:grid-cols-2 gap-10 items-center">
+  <section id="${slug}" class="grid lg:grid-cols-2 gap-10 items-center" data-toc>
     ${imgCol}
     ${textCol}
-  </div>`
+  </section>`
 }
 
 // ── Specs ─────────────────────────────────────────────────────
@@ -343,11 +404,87 @@ function renderSpecs() {
   </section>`
 }
 
+// ── MCP ──────────────────────────────────────────────────────
+
+function renderMCP() {
+  const mcp = t.mcp
+
+  return /* html */ `
+  <section class="relative py-28" data-toc id="mcp">
+    <div class="absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-950/80 to-gray-950"></div>
+    <!-- subtle terminal green accent -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(34,197,94,0.03),transparent)]"></div>
+
+    <div class="relative mx-auto max-w-4xl px-6">
+      <div class="reveal text-center mb-16">
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-[11px] text-green-400 font-mono uppercase tracking-wider mb-6">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+          Model Context Protocol
+        </span>
+        <h2 class="section-title">${mcp.title}</h2>
+        <p class="section-subtitle mx-auto max-w-2xl">${mcp.subtitle}</p>
+      </div>
+
+      <!-- Endpoints -->
+      <div class="reveal grid sm:grid-cols-3 gap-4 mb-12">
+        ${[
+          { method: 'GET', path: '/networks', desc: mcp.endpoints.networks },
+          { method: 'GET', path: '/networks/:bssid', desc: mcp.endpoints.detail },
+          { method: 'GET', path: '/occupancy', desc: mcp.endpoints.occupancy },
+        ].map(ep => /* html */ `
+        <div class="glass-card p-5 group hover:border-green-500/20 transition-colors duration-300">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-[10px] font-mono font-bold text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded">${ep.method}</span>
+            <span class="text-xs font-mono text-gray-400 group-hover:text-gray-200 transition-colors truncate">${ep.path}</span>
+          </div>
+          <p class="text-xs text-gray-500 leading-relaxed">${ep.desc}</p>
+        </div>
+        `).join('')}
+      </div>
+
+      <!-- Config snippet -->
+      <div class="reveal">
+        <p class="text-sm text-gray-400 text-center mb-4">${mcp.config.desc}</p>
+        <div class="max-w-lg mx-auto glass-card overflow-hidden border-gray-700/50">
+          <div class="flex items-center justify-between px-4 py-2 bg-gray-900/80 border-b border-gray-800/40">
+            <span class="text-[10px] text-gray-500 font-mono uppercase tracking-wider">claude_desktop_config.json</span>
+            <span class="flex gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-red-500/60"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/60"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500/60"></span>
+            </span>
+          </div>
+          <pre class="p-5 text-xs font-mono text-gray-300 bg-gray-950/80 overflow-x-auto leading-relaxed"><span class="text-gray-500">{</span>
+  <span class="text-green-400">"mcpServers"</span>: <span class="text-gray-500">{</span>
+    <span class="text-green-400">"wifi-lens"</span>: <span class="text-gray-500">{</span>
+      <span class="text-green-400">"command"</span>: <span class="text-amber-300">"WiFiLensMCP"</span>,
+      <span class="text-green-400">"args"</span>: <span class="text-gray-500">[</span><span class="text-amber-300">"19840"</span><span class="text-gray-500">]</span>
+    <span class="text-gray-500">}</span>
+  <span class="text-gray-500">}</span>
+<span class="text-gray-500">}</span></pre>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div class="reveal flex justify-center gap-4 mt-8">
+        <a href="https://github.com/SHIINASAMA/wifi-lens/blob/master/docs/ARCHITECTURE.md" class="text-xs text-gray-500 hover:text-gray-300 transition-colors font-mono flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          ${mcp.cta.docs}
+        </a>
+        <a href="https://github.com/SHIINASAMA/wifi-lens" class="text-xs text-gray-500 hover:text-gray-300 transition-colors font-mono flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          ${mcp.cta.github}
+        </a>
+      </div>
+    </div>
+  </section>`
+}
+
 // ── Download ──────────────────────────────────────────────────
 
 function renderDownload() {
   return /* html */ `
-  <section id="download" class="relative py-32">
+  <section id="download" class="relative py-32" data-toc>
     <div class="absolute inset-0 bg-gradient-to-b from-transparent via-brand-950/5 to-transparent"></div>
     <div class="relative mx-auto max-w-4xl px-6">
       <div class="reveal text-center mb-16">

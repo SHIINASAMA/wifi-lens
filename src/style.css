@@ -14,6 +14,13 @@
   ::selection {
     @apply bg-brand-500/30;
   }
+
+  @media (min-width: 1280px) {
+    .page section .mx-auto.max-w-6xl,
+    .page section .mx-auto.max-w-4xl {
+      margin-right: 12rem;
+    }
+  }
 }
 
 @layer components {
@@ -66,5 +73,25 @@
 
   #nav.nav-hidden {
     transform: translateY(-100%);
+  }
+
+  .toc-link {
+    border-left: 2px solid transparent;
+    margin-left: -18px;
+    padding-left: 16px !important;
+    transition: border-color 0.3s, color 0.3s;
+  }
+
+  .toc-link.toc-active {
+    color: #93c5fd;
+    border-left-color: #3b82f6;
+  }
+
+  #back-to-top {
+    transition: opacity 0.3s, transform 0.3s, background-color 0.3s;
+  }
+
+  #back-to-top:hover {
+    transform: translateY(-2px);
   }
 }

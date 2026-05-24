@@ -95,6 +95,24 @@ export const en = {
       { label: 'Session format', value: '.wifi-roam JSON · versioned schema' },
     ],
   },
+  mcp: {
+    title: 'MCP Server — Let AI See Your Wi-Fi',
+    subtitle: 'WiFi Lens doubles as a Model Context Protocol server, exposing live scan data to AI tools like Claude Desktop. A local HTTP server on 127.0.0.1 — no cloud, no data leaving your machine.',
+    endpoints: {
+      title: 'Three JSON endpoints',
+      networks: 'All visible networks with SSID, BSSID, RSSI, channel, band, PHY mode, channel width, security, MCS, NSS, and country code. Optional ?band= filter.',
+      detail: 'Per-BSSID detail with the raw channel width in MHz.',
+      occupancy: 'Per-band per-channel AP counts for occupancy analysis.',
+    },
+    config: {
+      title: 'One config to connect',
+      desc: 'Enable the MCP server in Settings, then add this to your Claude Desktop config:',
+    },
+    cta: {
+      docs: 'Read the docs',
+      github: 'View on GitHub',
+    },
+  },
   download: {
     title: 'Get WiFi Lens',
     oss: {
