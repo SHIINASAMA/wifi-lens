@@ -534,6 +534,22 @@ private struct SelectorDragState {
     let startWindowDuration: TimeInterval
 }
 
+private struct InvertedRoundedSelectionShape: Shape {
+    let selectionRect: CGRect
+    let selectionCornerRadius: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.addRect(rect)
+        path.addPath(
+            RoundedRectangle(cornerRadius: selectionCornerRadius)
+                .path(in: selectionRect),
+            transform: .identity
+        )
+        return path
+    }
+}
+
 private struct RoamingTimelineChart: View {
     let segments: [RoamingSegment]
     let transitions: [APTransitionEvent]
@@ -817,10 +833,10 @@ private struct RoamingTimelineChart: View {
             let selLeft = min(w, max(0, rangeStart * w))
             let selRight = min(w, max(0, rangeEnd * w))
             let selWidth = max(0, selRight - selLeft)
-            let bodyHovered = hoveredTarget == .body
             let leftHovered = hoveredTarget == .leftHandle
             let rightHovered = hoveredTarget == .rightHandle
             let dragging = dragState != nil
+            let selectionRect = CGRect(x: selLeft, y: 0, width: selWidth, height: overviewHeight)
 
             ZStack(alignment: .leading) {
                 OverviewCanvas(
@@ -833,27 +849,17 @@ private struct RoamingTimelineChart: View {
                 .frame(width: w, height: overviewHeight)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
 
-                HStack(spacing: 0) {
-                    Rectangle()
-                        .fill(.thinMaterial)
-                        .frame(width: max(0, selLeft), height: overviewHeight)
-                    if selLeft + selWidth < w {
-                        Rectangle()
-                            .fill(.thinMaterial)
-                            .frame(width: max(0, w - selLeft - max(selWidth, 0)), height: overviewHeight)
-                    }
-                }
+                Color.black.opacity(0.38)
+                    .frame(width: w, height: overviewHeight)
+                    .mask(
+                        InvertedRoundedSelectionShape(selectionRect: selectionRect, selectionCornerRadius: 6)
+                            .fill(style: FillStyle(eoFill: true))
+                    )
 
                 RoundedRectangle(cornerRadius: 6)
-                    .fill(Color.primary.opacity(bodyHovered || dragging ? 0.12 : 0.06))
+                    .strokeBorder(Color.primary.opacity(dragging ? 0.5 : 0.25), lineWidth: dragging ? 1.5 : 1)
                     .frame(width: max(selWidth, 0), height: overviewHeight)
                     .offset(x: selLeft)
-                    .overlay(alignment: .topLeading) {
-                        RoundedRectangle(cornerRadius: 6)
-                            .strokeBorder(Color.primary.opacity(dragging ? 0.5 : 0.25), lineWidth: dragging ? 1.5 : 1)
-                            .frame(width: max(selWidth, 0), height: overviewHeight)
-                            .offset(x: selLeft)
-                    }
 
                 selectorHandle(isActive: leftHovered || dragState?.mode == .panWindow)
                     .frame(width: selectorHandleHitWidth * 2, height: overviewHeight)

@@ -1033,6 +1033,40 @@
         }
       }
     },
+    "Failed to load session" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Failed to load session"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "加载会话失败"
+          }
+        }
+      }
+    },
+    "Failed to save session" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Failed to save session"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "保存会话失败"
+          }
+        }
+      }
+    },
     "Filter" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1304,6 +1338,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "浅色"
+          }
+        }
+      }
+    },
+    "Load" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Load"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "加载"
+          }
+        }
+      }
+    },
+    "Load Roaming Session" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Load Roaming Session"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "加载漫游会话"
           }
         }
       }
@@ -1969,74 +2037,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "个样本"
-          }
-        }
-      }
-    },
-    "Failed to load session" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to load session"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "加载会话失败"
-          }
-        }
-      }
-    },
-    "Failed to save session" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Failed to save session"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "保存会话失败"
-          }
-        }
-      }
-    },
-    "Load" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Load"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "加载"
-          }
-        }
-      }
-    },
-    "Load Roaming Session" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Load Roaming Session"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "加载漫游会话"
           }
         }
       }
