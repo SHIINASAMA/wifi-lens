@@ -29,7 +29,7 @@
 
 ## Product Directions
 
-- [ ] Build a real Overview dashboard as the app landing page: current connection health, top channel recommendations, recent scan summary, and quick actions
+- [x] Build a real Overview dashboard as the app landing page: current connection health, top channel recommendations, recent scan summary, and quick actions
 - [ ] Unify export into a single reporting flow: multi-band export, richer CSV schema, and session snapshots suitable for sharing/debugging
 - [ ] Replace custom chart hit-testing/zoom/labels with a charting approach that supports hover, selection, and accessibility more naturally
 - [ ] Turn signal history into a first-class session model: persisted timelines, monitored SSIDs, threshold alerts, and historical comparisons

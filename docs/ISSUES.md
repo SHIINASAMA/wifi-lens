@@ -8,7 +8,7 @@
 
 ## Medium Priority
 
-- [ ] `OverviewView.swift` — Overview is still a placeholder. The sidebar entry is commented out so it is unreachable. Deferred: blocked on Product Direction "Build a real Overview dashboard".
+- [x] `OverviewView.swift` — Overview is still a placeholder. The sidebar entry is commented out so it is unreachable. Fixed: Overview is now the default landing page with a full dashboard (connection card, diagnostics, channel advice, environment summary).
 - [x] `ContentView.swift` empty-state — The switch included unreachable `.scanning` and `.grantedButSSIDUnavailable` cases. Fixed: replaced with `default: EmptyView()`.
 - [x] `BandChartView.swift` zoom — The TODO item said "scroll-to-zoom" but the implementation is drag-to-marquee. Fixed: renamed TODO item to "Drag-to-zoom on charts".
 - [ ] `SignalHistoryStore.swift` — Signal history limited to 20 points in memory. Deferred: blocked on Product Direction "session model" (persistence layer needed).

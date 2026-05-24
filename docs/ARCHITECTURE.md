@@ -27,7 +27,8 @@ CoreWLAN scan → WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gau
 | `Roaming/` | RoamingTestView, RoamingTestViewModel, AP transition tracking, timeline chart with range selector |
 | `SignalProcessing/` | RSSI signal smoothing (EMA, Kalman, Hysteresis EMA) |
 | `Table/` | NativeTableView (NSViewRepresentable wrapping NSTableView) |
-| `App/` | OverviewView, SidebarView, SettingsView, Logging, CrashReporter, TitleBadge |
+| `App/` | OverviewView, SidebarView, SettingsView, Logging, CrashReporter, SparkleUpdater, TitleBadge |
+| `Debug/` | DebugChartView (DEV builds only) |
 | `MCP/` | HTTP server exposing scan data to MCP clients |
 | `Utilities/` | Constants, Color extensions, BuildConfig |
 | `Resources/` | Localizable.xcstrings (String Catalog) |
@@ -39,9 +40,8 @@ CoreWLAN scan → WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gau
 - `NativeTableView` uses `Coordinator` as `NSTableViewDelegate` + `NSTableViewDataSource`
 - Chart curves are Gaussian bell shapes computed in `ChartSeriesData.curvePoints`/`displayCurvePoints`; `displayRSSI` animates toward `rssi` for smooth transitions
 - All Canvas charts share utilities from `Charts/`: `ChartGeometry` for coordinate mapping, `ChartRendering` for grid/axis/area-fill, `SplineInterpolation` for Catmull-Rom and clamped cubic curves, `RangeSelectorView` for timeline window selection
-- Signal history (`SignalHistoryStore`) keeps 20 snapshots per BSSID in memory
-- RSSI signal smoothing uses `SignalProcessing/` with EMA, Kalman, and Hysteresis EMA implementations
 - AP roaming transitions share a single timestamp between old and new segments, eliminating gaps on the timeline
+- Signal history (`SignalHistoryStore`) keeps 20 snapshots per BSSID in memory
 - `StableScore` provides hysteresis for quality level boundaries (upgrade margin 2, downgrade margin 5)
 
 ## Localization

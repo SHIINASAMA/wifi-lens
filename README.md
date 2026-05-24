@@ -11,7 +11,7 @@ Built with SwiftUI, CoreWLAN, and Sparkle.
 
 - Real-time Wi-Fi scanning across 2.4 GHz, 5 GHz, and 6 GHz bands
 - Gaussian bell-curve charts per band with dynamic y-axis scaling
-- Per-band freeze, drag-to-zoom, and full-window expand
+- Per-band freeze and drag-to-zoom
 - Deterministic SSID-based color assignment
 - Combined network table with native column sort, row selection, and chart highlighting
 - Filter networks by SSID or BSSID across all bands
@@ -21,12 +21,11 @@ Built with SwiftUI, CoreWLAN, and Sparkle.
 - Signal history trend charts per network
 - Roaming test: AP transition monitoring with timeline chart, range selector, and session save/load
 - Channel occupancy heatmap per band
-- RSSI signal smoothing (EMA, Kalman, Hysteresis EMA)
 - Configurable scan interval (1–10 seconds)
 - Export per-band charts as PNG or CSV
 - MCP (Model Context Protocol) HTTP server for external tool integration
 - Built-in Sparkle auto-update support
-- Crash reporting and structured logging (swift-log → OSLog)
+- Crash reporting and structured logging
 - English and Simplified Chinese localization
 
 ## Requirements
@@ -69,6 +68,10 @@ xed WiFiLens.xcodeproj
 ```
 
 For documentation on architecture, roadmap, and known issues, see the [docs/](docs/) directory.
+
+## Acknowledgments
+
+This project began as a fork of [tiny-wifi-analyzer](https://github.com/nolze/tiny-wifi-analyzer) by [nolze](https://github.com/nolze), who built the original Python-based Wi-Fi scanner. Since then the app has been fully rewritten in Swift with SwiftUI and CoreWLAN, evolving into a native macOS application under a new name.
 
 ## License
 
