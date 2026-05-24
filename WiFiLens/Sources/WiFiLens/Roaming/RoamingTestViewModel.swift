@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreWLAN
+import AppKit
 
 enum TestState {
     case idle
@@ -219,5 +220,76 @@ final class RoamingTestViewModel {
         case .mode11g:  "802.11g"
         default:        nil
         }
+    }
+
+    // MARK: - Persistence
+
+    func saveSession() {
+        guard !segments.isEmpty else { return }
+
+        let record = RoamingSessionRecord(
+            version: RoamingSessionRecord.currentVersion,
+            savedAt: Date(),
+            ssid: currentSSID ?? String(localized: "Unknown"),
+            bssid: currentBSSID,
+            phyMode: currentPhyMode,
+            channel: currentChannel,
+            duration: elapsedTime,
+            segments: segments,
+            transitions: transitions
+        )
+
+        let panel = NSSavePanel()
+        panel.title = String(localized: "Save Roaming Session")
+        panel.allowedContentTypes = [.json]
+        panel.nameFieldStringValue = defaultFileName
+
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+
+        do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            let data = try encoder.encode(record)
+            try data.write(to: url)
+        } catch {
+            errorMessage = String(localized: "Failed to save session")
+        }
+    }
+
+    func loadSession() {
+        let panel = NSOpenPanel()
+        panel.title = String(localized: "Load Roaming Session")
+        panel.allowedContentTypes = [.json]
+        panel.allowsMultipleSelection = false
+
+        guard panel.runModal() == .OK, let url = panel.urls.first else { return }
+
+        do {
+            let data = try Data(contentsOf: url)
+            let decoder = JSONDecoder()
+            let record = try decoder.decode(RoamingSessionRecord.self, from: data)
+
+            segments = record.segments
+            transitions = record.transitions
+            elapsedTime = record.duration
+            currentSSID = record.ssid
+            currentBSSID = record.bssid
+            currentPhyMode = record.phyMode
+            currentChannel = record.channel
+            currentRSSI = record.segments.last?.samples.last?.rssi ?? 0
+            currentTxRate = record.segments.last?.samples.last?.txRate ?? 0
+            state = .stopped
+            errorMessage = nil
+        } catch {
+            errorMessage = String(localized: "Failed to load session")
+        }
+    }
+
+    private var defaultFileName: String {
+        let ssid = currentSSID ?? "WiFi"
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd_HHmmss"
+        let ts = f.string(from: Date())
+        return "\(ssid)_\(ts).wifi-roam"
     }
 }

@@ -65,6 +65,7 @@
 		847B77DBC638404081A7BFC2 /* RoamingRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8367630A1EDF4515917A144A /* RoamingRecord.swift */; };
 		7E778683F723499D93511520 /* RoamingTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F790DC6E08D43C5BD058D96 /* RoamingTestViewModel.swift */; };
 		530D1F7F7F44460CABA342AB /* RoamingTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B13DBF938D654926B205302C /* RoamingTestView.swift */; };
+			A1B2C3D4E5F64789ABCDEF01 /* RoamingSessionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E2D3C4B5A64987FEDCBA01 /* RoamingSessionRecord.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -144,6 +145,7 @@
 		8367630A1EDF4515917A144A /* RoamingRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingRecord.swift; sourceTree = "<group>"; };
 		9F790DC6E08D43C5BD058D96 /* RoamingTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingTestViewModel.swift; sourceTree = "<group>"; };
 		B13DBF938D654926B205302C /* RoamingTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingTestView.swift; sourceTree = "<group>"; };
+		F1E2D3C4B5A64987FEDCBA01 /* RoamingSessionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingSessionRecord.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -390,6 +392,7 @@
 				8367630A1EDF4515917A144A /* RoamingRecord.swift */,
 				9F790DC6E08D43C5BD058D96 /* RoamingTestViewModel.swift */,
 				B13DBF938D654926B205302C /* RoamingTestView.swift */,
+				F1E2D3C4B5A64987FEDCBA01 /* RoamingSessionRecord.swift */,
 			);
 			path = Roaming;
 			sourceTree = "<group>";
@@ -536,6 +539,7 @@
 				847B77DBC638404081A7BFC2 /* RoamingRecord.swift in Sources */,
 				7E778683F723499D93511520 /* RoamingTestViewModel.swift in Sources */,
 				530D1F7F7F44460CABA342AB /* RoamingTestView.swift in Sources */,
+					A1B2C3D4E5F64789ABCDEF01 /* RoamingSessionRecord.swift in Sources */,
 
 				39B4C850463F4305990A6943 /* SignalSmoothing.swift in Sources */,
 				85C7DEE09D3045078A2ADFF5 /* ExponentialMovingAverage.swift in Sources */,

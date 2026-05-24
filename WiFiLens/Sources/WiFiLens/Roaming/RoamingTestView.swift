@@ -209,6 +209,26 @@ struct RoamingTestView: View {
 
             Spacer()
 
+            if viewModel.state == .stopped, viewModel.totalSamples > 0 {
+                Button {
+                    viewModel.saveSession()
+                } label: {
+                    Label(String(localized: "Save"), systemImage: "square.and.arrow.down")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+            }
+
+            if viewModel.state != .running {
+                Button {
+                    viewModel.loadSession()
+                } label: {
+                    Label(String(localized: "Load"), systemImage: "square.and.arrow.up")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+            }
+
             if viewModel.isRunning {
                 Button(String(localized: "Stop")) {
                     viewModel.stopTest()
