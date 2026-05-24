@@ -109,14 +109,14 @@ struct ThroughputChartView: View {
 
                     // X axis time labels — index-based, evenly spaced
                     let now = samples.last?.timestamp ?? Date()
-                    let tickIndices = evenlySpacedIndices(count: samples.count, targetCount: min(6, max(3, samples.count / 15)))
+                    let tickIndices = evenlySpacedTickIndices(count: samples.count, targetCount: min(6, max(3, samples.count / 15)))
                     var lastLabelX: CGFloat = -100
                     for idx in tickIndices {
                         let x = chartRect.minX + CGFloat(idx) * scaleX
                         if x - lastLabelX > 40 {
                             lastLabelX = x
                             let secs = now.timeIntervalSince(samples[idx].timestamp)
-                            let label = timeLabel(secs)
+                            let label = chartDurationLabel(secs)
 
                             var tick = Path()
                             tick.move(to: CGPoint(x: x, y: centerY - 3))
@@ -177,29 +177,8 @@ struct ThroughputChartView: View {
     ) {
         guard points.count >= 2 else { return }
 
-        // Build smooth curve with Y-clamped control points to prevent overshoot
-        var curve = Path()
-        curve.move(to: points[0])
-        for i in 1..<points.count {
-            let p0 = points[max(0, i - 2)]
-            let p1 = points[i - 1]
-            let p2 = points[i]
-            let p3 = points[min(points.count - 1, i + 1)]
+        let curve = clampedCubicSpline(points: points)
 
-            let yMin = min(p1.y, p2.y)
-            let yMax = max(p1.y, p2.y)
-
-            let rawCP1y = p1.y + (p2.y - p0.y) / 6
-            let rawCP2y = p2.y - (p3.y - p1.y) / 6
-
-            let cp1 = CGPoint(x: p1.x + (p2.x - p0.x) / 6,
-                              y: min(max(rawCP1y, yMin), yMax))
-            let cp2 = CGPoint(x: p2.x - (p3.x - p1.x) / 6,
-                              y: min(max(rawCP2y, yMin), yMax))
-            curve.addCurve(to: p2, control1: cp1, control2: cp2)
-        }
-
-        // Fill area — curve → baseline → back
         var fill = Path()
         fill.addPath(curve)
         fill.addLine(to: CGPoint(x: points.last!.x, y: baseline))
@@ -210,36 +189,10 @@ struct ThroughputChartView: View {
         context.stroke(curve, with: .color(color.opacity(0.7)), lineWidth: 1.5)
     }
 
-    // MARK: - Helpers
-
-    /// Evenly spaced indices covering the full range, avoiding overlap.
-    private func evenlySpacedIndices(count: Int, targetCount: Int) -> [Int] {
-        guard count > 0, targetCount > 0 else { return [] }
-        let step = max(1, (count - 1) / max(1, targetCount - 1))
-        var result: [Int] = []
-        for i in stride(from: 0, to: count, by: step) {
-            result.append(i)
-        }
-        // Ensure last point is included
-        if let last = result.last, last != count - 1 {
-            result.append(count - 1)
-        }
-        return result
-    }
-
     private func rateLabel(_ bytesPerSec: Double) -> String {
         if bytesPerSec < 1_024 { return String(format: "%.0f", bytesPerSec) }
         if bytesPerSec < 1_048_576 { return String(format: "%.0fK", bytesPerSec / 1_024) }
         if bytesPerSec < 1_073_741_824 { return String(format: "%.1fM", bytesPerSec / 1_048_576) }
         return String(format: "%.1fG", bytesPerSec / 1_073_741_824)
-    }
-
-    private func timeLabel(_ seconds: TimeInterval) -> String {
-        if seconds < 0 { return "0s" }
-        if seconds < 60 { return "\(Int(seconds))s" }
-        let m = Int(seconds) / 60
-        let s = Int(seconds) % 60
-        if s == 0 { return "\(m)m" }
-        return "\(m):\(String(format: "%02d", s))"
     }
 }

@@ -451,15 +451,12 @@ private struct ChartCanvas: View {
                 var areaPath = Path()
                 areaPath.move(to: CGPoint(x: points[0].x, y: plotBottom))
                 areaPath.addLine(to: points[0])
-                addSpline(to: &areaPath, points: points)
+                addCatmullRomSpline(to: &areaPath, points: points)
                 areaPath.addLine(to: CGPoint(x: points[points.count - 1].x, y: plotBottom))
                 areaPath.closeSubpath()
                 context.fill(areaPath, with: .color(color.opacity(0.12)))
 
-                // Line
-                var linePath = Path()
-                linePath.move(to: points[0])
-                addSpline(to: &linePath, points: points)
+                let linePath = catmullRomSpline(points: points)
                 context.stroke(linePath, with: .color(color), lineWidth: 2)
             }
 
@@ -491,64 +488,10 @@ private struct ChartCanvas: View {
     }
 }
 
-private func addSpline(to path: inout Path, points: [CGPoint]) {
-    guard points.count >= 2 else { return }
-    for i in 0..<(points.count - 1) {
-        let p0 = i > 0 ? points[i - 1] : points[0]
-        let p1 = points[i]
-        let p2 = points[i + 1]
-        let p3 = i + 2 < points.count ? points[i + 2] : points[points.count - 1]
-
-        let cp1 = CGPoint(x: p1.x + (p2.x - p0.x) / 6, y: p1.y + (p2.y - p0.y) / 6)
-        let cp2 = CGPoint(x: p2.x - (p3.x - p1.x) / 6, y: p2.y - (p3.y - p1.y) / 6)
-        path.addCurve(to: p2, control1: cp1, control2: cp2)
-    }
-}
-
 // MARK: - Timeline Chart with Range Selector
 
 private let overviewHeight: CGFloat = 48
 private let detailChartHeight: CGFloat = 160
-private let defaultWindowDuration: TimeInterval = 30
-private let minWindowDuration: TimeInterval = 5
-private let selectorHandleHitWidth: CGFloat = 14
-private let followTailSnapTolerance: CGFloat = 8
-
-private enum SelectorDragMode {
-    case idle
-    case resizeLeft
-    case panWindow
-    case resizeRight
-}
-
-private enum SelectorHoverTarget: Equatable {
-    case leftHandle
-    case body
-    case rightHandle
-}
-
-private struct SelectorDragState {
-    let mode: SelectorDragMode
-    let startRangeStart: CGFloat
-    let startRangeEnd: CGFloat
-    let startWindowDuration: TimeInterval
-}
-
-private struct InvertedRoundedSelectionShape: Shape {
-    let selectionRect: CGRect
-    let selectionCornerRadius: CGFloat
-
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.addRect(rect)
-        path.addPath(
-            RoundedRectangle(cornerRadius: selectionCornerRadius)
-                .path(in: selectionRect),
-            transform: .identity
-        )
-        return path
-    }
-}
 
 private struct RoamingTimelineChart: View {
     let segments: [RoamingSegment]
@@ -557,176 +500,56 @@ private struct RoamingTimelineChart: View {
     let bssidColors: [String: Color]
     let elapsedTime: TimeInterval
 
-    @State private var rangeStart: CGFloat = 0
-    @State private var rangeEnd: CGFloat = 1
-    @State private var windowDuration: TimeInterval = defaultWindowDuration
-    @State private var pinnedWindowStart: TimeInterval = 0
-    @State private var dragState: SelectorDragState?
-    @State private var isFollowingTail = true
-    @State private var hoveredTarget: SelectorHoverTarget?
+    @State private var visibleStart: TimeInterval = 0
+    @State private var visibleEnd: TimeInterval = 30
     @State private var hoveredDetailTime: TimeInterval?
-    @State private var hoveredOverviewX: CGFloat?
+    @State private var overviewHoverTime: TimeInterval?
+    @State private var overviewPlotWidth: CGFloat = 1
 
-    private var clampedWindowDuration: TimeInterval { min(windowDuration, max(1, elapsedTime)) }
-    private var windowFraction: CGFloat {
-        guard elapsedTime > 0 else { return 1 }
-        return min(1, max(CGFloat(clampedWindowDuration / elapsedTime), 0.0001))
-    }
-    private var visibleStart: TimeInterval { isFollowingTail ? TimeInterval(rangeStart) * elapsedTime : pinnedWindowStart }
-    private var visibleEnd: TimeInterval { min(elapsedTime, visibleStart + clampedWindowDuration) }
-    private var activeHoverTime: TimeInterval? { hoveredDetailTime ?? hoveredOverviewX.map { TimeInterval($0 / max(overviewPlotWidth, 1)) * elapsedTime } }
+    private var activeHoverTime: TimeInterval? { hoveredDetailTime ?? overviewHoverTime }
     private var highlightedSample: RoamingSample? {
         guard let hoverTime = activeHoverTime, let sessionStart = allSamples.first?.timestamp else { return nil }
         return allSamples.min { lhs, rhs in
             abs(lhs.timestamp.timeIntervalSince(sessionStart) - hoverTime) < abs(rhs.timestamp.timeIntervalSince(sessionStart) - hoverTime)
         }
     }
-    @State private var overviewPlotWidth: CGFloat = 1
 
     var body: some View {
         VStack(spacing: 0) {
             detailChart
-            overviewChart
+            GeometryReader { geo in
+                TimelineRangeSelector(
+                    totalDuration: elapsedTime,
+                    minWindow: 5,
+                    defaultWindow: 30,
+                    overviewHeight: overviewHeight,
+                    overview: {
+                        OverviewCanvas(
+                            segments: segments,
+                            transitions: transitions,
+                            bssidColors: bssidColors,
+                            elapsedTime: elapsedTime,
+                            highlightedTime: activeHoverTime
+                        )
+                    },
+                    timeFormatter: { timeFormatter.string(from: $0) ?? "0:00" },
+                    onRangeChange: { range in
+                        visibleStart = range.start
+                        visibleEnd = range.end
+                    },
+                    onHoverTime: { time in
+                        overviewHoverTime = time
+                    }
+                )
+                .onAppear { overviewPlotWidth = geo.size.width }
+                .onChange(of: geo.size.width) { _, w in overviewPlotWidth = w }
+            }
+            .frame(height: overviewHeight)
+            .padding(.horizontal, 8)
+            .padding(.bottom, 6)
             overviewTimeAxis
         }
         .background(Color.primary.opacity(0.02))
-        .onChange(of: elapsedTime) { _, newTotal in
-            guard newTotal > 0 else {
-                rangeStart = 0
-                rangeEnd = 1
-                pinnedWindowStart = 0
-                return
-            }
-
-            windowDuration = min(max(windowDuration, minWindowDuration), max(minWindowDuration, newTotal))
-
-            if isFollowingTail {
-                snapToTail(totalTime: newTotal)
-            } else {
-                pinnedWindowStart = min(max(0, pinnedWindowStart), max(0, newTotal - clampedWindowDuration))
-                rangeStart = min(1, max(0, CGFloat(pinnedWindowStart / newTotal)))
-                rangeEnd = min(1, rangeStart + windowFraction)
-            }
-        }
-        .onAppear {
-            if elapsedTime > 0 {
-                windowDuration = min(defaultWindowDuration, elapsedTime)
-                snapToTail(totalTime: elapsedTime)
-            }
-        }
-    }
-
-    private func snapToTail(totalTime: TimeInterval) {
-        guard totalTime > 0 else {
-            rangeStart = 0
-            rangeEnd = 1
-            pinnedWindowStart = 0
-            return
-        }
-        pinnedWindowStart = max(0, totalTime - clampedWindowDuration)
-        rangeStart = max(0, CGFloat(pinnedWindowStart / totalTime))
-        rangeEnd = min(1, rangeStart + windowFraction)
-    }
-
-    private func time(at locationX: CGFloat, width: CGFloat) -> TimeInterval {
-        guard width > 0 else { return 0 }
-        let fraction = min(1, max(0, locationX / width))
-        return TimeInterval(fraction) * elapsedTime
-    }
-
-    private func isSnappedToTail(width: CGFloat) -> Bool {
-        guard width > 0 else { return true }
-        return (1 - rangeEnd) * width <= followTailSnapTolerance
-    }
-
-    private func hoverTarget(at x: CGFloat, width: CGFloat) -> SelectorHoverTarget? {
-        let selLeft = min(width, max(0, rangeStart * width))
-        let selRight = min(width, max(0, rangeEnd * width))
-        let leftHitMin = max(0, selLeft - selectorHandleHitWidth)
-        let leftHitMax = min(width, selLeft + selectorHandleHitWidth)
-        if x >= leftHitMin, x <= leftHitMax {
-            return .leftHandle
-        }
-
-        let rightHitMin = max(0, selRight - selectorHandleHitWidth)
-        let rightHitMax = min(width, selRight + selectorHandleHitWidth)
-        if x >= rightHitMin, x <= rightHitMax {
-            return .rightHandle
-        }
-
-        if x >= selLeft, x <= selRight {
-            return .body
-        }
-
-        return nil
-    }
-
-    private func beginDrag(at x: CGFloat, width: CGFloat) {
-        guard let target = hoverTarget(at: x, width: width) else { return }
-        hoveredTarget = target
-        let mode: SelectorDragMode = switch target {
-        case .leftHandle: .resizeLeft
-        case .body: .panWindow
-        case .rightHandle: .resizeRight
-        }
-        dragState = SelectorDragState(
-            mode: mode,
-            startRangeStart: rangeStart,
-            startRangeEnd: rangeEnd,
-            startWindowDuration: clampedWindowDuration
-        )
-        isFollowingTail = false
-        hoveredOverviewX = nil
-    }
-
-    private func updateDrag(translationX: CGFloat, width: CGFloat) {
-        guard let dragState, width > 0, elapsedTime > 0 else { return }
-        let delta = translationX / width
-
-        switch dragState.mode {
-        case .panWindow:
-            let span = dragState.startRangeEnd - dragState.startRangeStart
-            let maxStart = max(0, 1 - span)
-            let newStart = max(0, min(maxStart, dragState.startRangeStart + delta))
-            rangeStart = newStart
-            rangeEnd = min(1, newStart + span)
-            pinnedWindowStart = TimeInterval(rangeStart) * elapsedTime
-            isFollowingTail = isSnappedToTail(width: width)
-
-        case .resizeLeft:
-            let anchorEnd = dragState.startRangeEnd
-            let proposedStart = max(0, min(anchorEnd - CGFloat(minWindowDuration / elapsedTime), dragState.startRangeStart + delta))
-            let proposedFraction = max(CGFloat(minWindowDuration / elapsedTime), anchorEnd - proposedStart)
-            let proposedDuration = TimeInterval(proposedFraction) * elapsedTime
-            windowDuration = min(elapsedTime, max(minWindowDuration, proposedDuration))
-            rangeStart = max(0, anchorEnd - windowFraction)
-            rangeEnd = min(1, rangeStart + windowFraction)
-            pinnedWindowStart = TimeInterval(rangeStart) * elapsedTime
-            isFollowingTail = isSnappedToTail(width: width)
-
-        case .resizeRight:
-            let anchorStart = dragState.startRangeStart
-            let maxEnd = 1.0
-            let proposedEnd = min(maxEnd, max(anchorStart + CGFloat(minWindowDuration / elapsedTime), dragState.startRangeEnd + delta))
-            let proposedFraction = max(CGFloat(minWindowDuration / elapsedTime), proposedEnd - anchorStart)
-            let proposedDuration = TimeInterval(proposedFraction) * elapsedTime
-            windowDuration = min(elapsedTime, max(minWindowDuration, proposedDuration))
-            rangeStart = anchorStart
-            rangeEnd = min(1, rangeStart + windowFraction)
-            pinnedWindowStart = TimeInterval(rangeStart) * elapsedTime
-            isFollowingTail = isSnappedToTail(width: width)
-
-        case .idle:
-            break
-        }
-    }
-
-    private func endDrag(width: CGFloat) {
-        if isSnappedToTail(width: width) {
-            isFollowingTail = true
-            snapToTail(totalTime: elapsedTime)
-        }
-        dragState = nil
     }
 
     // MARK: Detail chart
@@ -823,143 +646,6 @@ private struct RoamingTimelineChart: View {
         .background(.regularMaterial, in: Capsule())
         .padding(.leading, 12)
         .padding(.top, 6)
-    }
-
-    // MARK: Overview chart
-
-    private var overviewChart: some View {
-        GeometryReader { geo in
-            let w = max(1, geo.size.width)
-            let selLeft = min(w, max(0, rangeStart * w))
-            let selRight = min(w, max(0, rangeEnd * w))
-            let selWidth = max(0, selRight - selLeft)
-            let leftHovered = hoveredTarget == .leftHandle
-            let rightHovered = hoveredTarget == .rightHandle
-            let dragging = dragState != nil
-            let selectionRect = CGRect(x: selLeft, y: 0, width: selWidth, height: overviewHeight)
-
-            ZStack(alignment: .leading) {
-                OverviewCanvas(
-                    segments: segments,
-                    transitions: transitions,
-                    bssidColors: bssidColors,
-                    elapsedTime: elapsedTime,
-                    highlightedTime: activeHoverTime
-                )
-                .frame(width: w, height: overviewHeight)
-                .clipShape(RoundedRectangle(cornerRadius: 4))
-
-                Color.black.opacity(0.38)
-                    .frame(width: w, height: overviewHeight)
-                    .mask(
-                        InvertedRoundedSelectionShape(selectionRect: selectionRect, selectionCornerRadius: 6)
-                            .fill(style: FillStyle(eoFill: true))
-                    )
-
-                RoundedRectangle(cornerRadius: 6)
-                    .strokeBorder(Color.primary.opacity(dragging ? 0.5 : 0.25), lineWidth: dragging ? 1.5 : 1)
-                    .frame(width: max(selWidth, 0), height: overviewHeight)
-                    .offset(x: selLeft)
-
-                selectorHandle(isActive: leftHovered || dragState?.mode == .panWindow)
-                    .frame(width: selectorHandleHitWidth * 2, height: overviewHeight)
-                    .offset(x: selLeft - selectorHandleHitWidth)
-                    .onHover { inside in
-                        if inside { NSCursor.resizeLeftRight.push() }
-                        else { NSCursor.resizeLeftRight.pop() }
-                    }
-
-                selectorHandle(isActive: rightHovered || dragState?.mode == .panWindow)
-                    .frame(width: selectorHandleHitWidth * 2, height: overviewHeight)
-                    .offset(x: selRight - selectorHandleHitWidth)
-                    .onHover { inside in
-                        if inside { NSCursor.resizeLeftRight.push() }
-                        else { NSCursor.resizeLeftRight.pop() }
-                    }
-
-                if selWidth > 0 {
-                    edgeTimeBadge(time: visibleStart)
-                        .offset(x: selLeft - 20, y: -overviewHeight / 2 - 8)
-                    edgeTimeBadge(time: visibleEnd)
-                        .offset(x: selRight - 20, y: -overviewHeight / 2 - 8)
-                }
-
-                if let hoveredOverviewX {
-                    let markerTime = highlightedSample?.timestamp.timeIntervalSince(allSamples.first?.timestamp ?? Date()) ?? TimeInterval(hoveredOverviewX / max(w, 1)) * elapsedTime
-                    let x = min(w, max(0, CGFloat(markerTime / max(elapsedTime, 0.1)) * w))
-                    Rectangle()
-                        .fill(Color.primary.opacity(0.4))
-                        .frame(width: 1, height: overviewHeight)
-                        .offset(x: x)
-                }
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 4))
-            .overlay(
-                RoundedRectangle(cornerRadius: 4)
-                    .strokeBorder(Color.primary.opacity(0.1), lineWidth: 0.5)
-            )
-            .contentShape(Rectangle())
-            .onAppear {
-                overviewPlotWidth = w
-            }
-            .onChange(of: w) { _, newWidth in
-                overviewPlotWidth = newWidth
-            }
-            .onContinuousHover { phase in
-                switch phase {
-                case .active(let location):
-                    let x = location.x
-                    if x >= selLeft, x <= selRight {
-                        hoveredTarget = hoverTarget(at: x, width: w)
-                        hoveredOverviewX = x
-                    } else {
-                        hoveredTarget = nil
-                        hoveredOverviewX = nil
-                    }
-                case .ended:
-                    hoveredTarget = nil
-                    hoveredOverviewX = nil
-                }
-            }
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { value in
-                        if dragState == nil {
-                            beginDrag(at: value.startLocation.x, width: w)
-                        }
-                        updateDrag(translationX: value.translation.width, width: w)
-                    }
-                    .onEnded { _ in
-                        endDrag(width: w)
-                    }
-            )
-        }
-        .frame(height: overviewHeight)
-        .padding(.horizontal, 8)
-        .padding(.bottom, 6)
-    }
-
-    private func edgeTimeBadge(time: TimeInterval) -> some View {
-        Text(timeFormatter.string(from: time) ?? "0:00")
-            .font(.system(size: 9, design: .monospaced))
-            .foregroundColor(.primary)
-            .padding(.horizontal, 4)
-            .padding(.vertical, 2)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 3))
-    }
-
-    private func selectorHandle(isActive: Bool) -> some View {
-        let color = Color.accentColor.opacity(isActive ? 0.9 : 0.4)
-        return ZStack {
-            RoundedRectangle(cornerRadius: 5)
-                .fill(.regularMaterial)
-                .frame(width: 10, height: 28)
-            VStack(spacing: 3.5) {
-                Circle().fill(color).frame(width: 3, height: 3)
-                Circle().fill(color).frame(width: 3, height: 3)
-                Circle().fill(color).frame(width: 3, height: 3)
-            }
-        }
     }
 }
 

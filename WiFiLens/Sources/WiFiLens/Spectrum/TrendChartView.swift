@@ -35,31 +35,18 @@ struct TrendChartView: View {
                 let scaleX = chartRect.width / CGFloat(max(1, snapshots.count - 1))
                 let scaleY = chartRect.height / (yMax - yMin)
 
-                let gridColor = Color.gray.opacity(0.15)
-
                 // Y axis grid + labels
-                for rssiVal in stride(from: Int(yMin), through: Int(yMax), by: 10) {
-                    let y = chartRect.maxY - (Double(rssiVal) - yMin) * scaleY
-                    var line = Path()
-                    line.move(to: CGPoint(x: chartRect.minX, y: y))
-                    line.addLine(to: CGPoint(x: chartRect.maxX, y: y))
-                    context.stroke(line, with: .color(gridColor), lineWidth: 1)
-                    context.draw(
-                        Text("\(rssiVal)").font(.caption2).foregroundColor(.secondary),
-                        at: CGPoint(x: chartRect.minX - 14, y: y)
-                    )
-                }
+                drawYAxisGrid(context: &context, chartRect: chartRect, yMin: yMin, yMax: yMax, scaleY: scaleY)
 
                 // X axis time labels — show 4-5 evenly spaced ticks
                 let now = snapshots.last?.timestamp ?? Date()
                 let tickCount = min(5, max(2, snapshots.count))
-                var drawnLabels: [CGFloat] = [] // avoid overlapping labels
+                var drawnLabels: [CGFloat] = []
                 for t in 0..<tickCount {
                     let idx = t * (snapshots.count - 1) / max(1, tickCount - 1)
                     let x = chartRect.minX + CGFloat(idx) * scaleX
                     let secs = now.timeIntervalSince(snapshots[idx].timestamp)
-                    let label = formatDuration(secs)
-                    // simple overlap avoidance
+                    let label = chartDurationLabel(secs, zeroText: String(localized: "now"))
                     let overlaps = drawnLabels.contains(where: { abs($0 - x) < 32 })
                     if !overlaps {
                         drawnLabels.append(x)
@@ -71,15 +58,7 @@ struct TrendChartView: View {
                 }
 
                 // Axes
-                var xAxis = Path()
-                xAxis.move(to: CGPoint(x: chartRect.minX, y: chartRect.maxY))
-                xAxis.addLine(to: CGPoint(x: chartRect.maxX, y: chartRect.maxY))
-                context.stroke(xAxis, with: .color(.secondary), lineWidth: 1)
-
-                var yAxis = Path()
-                yAxis.move(to: CGPoint(x: chartRect.minX, y: chartRect.minY))
-                yAxis.addLine(to: CGPoint(x: chartRect.minX, y: chartRect.maxY))
-                context.stroke(yAxis, with: .color(.secondary), lineWidth: 1)
+                drawAxes(context: &context, chartRect: chartRect)
 
                 // Build polyline + fill path
                 var line = Path()
@@ -117,13 +96,5 @@ struct TrendChartView: View {
             }
             .frame(height: 100)
         }
-    }
-
-    private func formatDuration(_ secs: TimeInterval) -> String {
-        if secs < 1 { return String(localized: "now") }
-        if secs < 60 { return "\(Int(secs))s" }
-        let m = Int(secs) / 60
-        let s = Int(secs) % 60
-        return "\(m):\(String(format: "%02d", s))"
     }
 }

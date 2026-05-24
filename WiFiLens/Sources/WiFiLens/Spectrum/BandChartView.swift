@@ -197,12 +197,12 @@ struct BandChartView: View {
                     guard curve.count >= 2 else { continue }
 
                     var path = Path()
-                    path.move(to: geo.dataToPoint(channel: curve[0].x, rssi: curve[0].y))
+                    path.move(to: geo.dataToPoint(x: curve[0].x, y: curve[0].y))
                     for pt in curve.dropFirst() {
-                        path.addLine(to: geo.dataToPoint(channel: pt.x, rssi: pt.y))
+                        path.addLine(to: geo.dataToPoint(x: pt.x, y: pt.y))
                     }
-                    path.addLine(to: geo.dataToPoint(channel: Double(series.right), rssi: geo.yMin))
-                    path.addLine(to: geo.dataToPoint(channel: Double(series.left), rssi: geo.yMin))
+                    path.addLine(to: geo.dataToPoint(x: Double(series.right), y: geo.yMin))
+                    path.addLine(to: geo.dataToPoint(x: Double(series.left), y: geo.yMin))
                     path.closeSubpath()
 
                     context.fill(path, with: .color(series.color.opacity(style.areaOpacity)))
@@ -413,36 +413,19 @@ private struct DataLabelOverlay: View {
 
 // MARK: - Chart Geometry (hit-testing + coordinate mapping)
 
-private struct ChartGeometry {
-    let chartRect: CGRect
-    let xMin: Double
-    let xMax: Double
-    let yMin: Double
-    let yMax: Double
-
-    var scaleX: CGFloat { chartRect.width / (xMax - xMin) }
-    var scaleY: CGFloat { chartRect.height / (yMax - yMin) }
-
-    func dataToPoint(channel: Double, rssi: Double) -> CGPoint {
-        CGPoint(
-            x: chartRect.minX + (channel - xMin) * scaleX,
-            y: chartRect.maxY - (rssi - yMin) * scaleY
-        )
-    }
-
+private extension ChartGeometry {
     func nearestSeries(at location: CGPoint, in series: [ChartSeriesData], radius: CGFloat) -> (ChartSeriesData, CGPoint)? {
         guard chartRect.contains(location) else { return nil }
         var best: (ChartSeriesData, CGPoint)?
         var bestDist: CGFloat = radius
 
         for s in series {
-            // Quick-reject: cursor x far outside curve span
-            let leftX = dataToPoint(channel: Double(s.left), rssi: yMin).x
-            let rightX = dataToPoint(channel: Double(s.right), rssi: yMin).x
+            let leftX = dataToPoint(x: Double(s.left), y: yMin).x
+            let rightX = dataToPoint(x: Double(s.right), y: yMin).x
             if location.x < leftX - radius || location.x > rightX + radius { continue }
 
             for pt in s.displayCurvePoints {
-                let screenPt = dataToPoint(channel: pt.x, rssi: pt.y)
+                let screenPt = dataToPoint(x: pt.x, y: pt.y)
                 let dx = screenPt.x - location.x
                 let dy = screenPt.y - location.y
                 let dist = sqrt(dx * dx + dy * dy)

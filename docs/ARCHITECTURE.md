@@ -21,6 +21,7 @@ CoreWLAN scan → WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gau
 | `Scanner/` | CoreWLAN scan loop, ViewModel, network/channel models |
 | `Spectrum/` | BandChartView (Canvas), TrendChartView, ContentView (dashboard), SignalHistoryStore |
 | `Channels/` | ChannelQualityCalculator, ChannelQualityView |
+| `Charts/` | Shared Canvas utilities (ChartGeometry, splines, rendering, time formatting, range selector) |
 | `Interfaces/` | InterfacesView, ThroughputMonitor, NetworkInfoService |
 | `Table/` | NativeTableView (NSViewRepresentable wrapping NSTableView) |
 | `App/` | OverviewView, SidebarView, SettingsView, Logging, CrashReporter |
