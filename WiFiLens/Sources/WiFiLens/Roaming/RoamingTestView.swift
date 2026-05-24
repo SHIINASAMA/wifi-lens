@@ -356,6 +356,7 @@ private struct ChartCanvas: View {
     let elapsedTime: TimeInterval
     let bssidColors: [String: Color]
     var timeOffset: TimeInterval = 0
+    var sessionStartDate: Date = Date()
     var highlightedTime: TimeInterval?
     var highlightedSample: RoamingSample?
 
@@ -376,10 +377,8 @@ private struct ChartCanvas: View {
             let totalSecs = max(1, elapsedTime)
             let scaleX = plotWidth / CGFloat(totalSecs)
 
-            let startDate = allSamples.first?.timestamp ?? Date()
-
             func xPos(_ ts: Date) -> CGFloat {
-                plotLeft + CGFloat(ts.timeIntervalSince(startDate)) * scaleX
+                plotLeft + CGFloat(ts.timeIntervalSince(sessionStartDate) - timeOffset) * scaleX
             }
 
             func yPos(_ rssi: Int) -> CGFloat {
@@ -419,7 +418,7 @@ private struct ChartCanvas: View {
 
             for (_, segment) in segments.enumerated() {
                 let visibleSamples = segment.samples.filter { sample in
-                    let t = sample.timestamp.timeIntervalSince(startDate)
+                    let t = sample.timestamp.timeIntervalSince(sessionStartDate) - timeOffset
                     return t >= 0 && t <= elapsedTime
                 }
                 guard visibleSamples.count >= 2 else { continue }
@@ -439,37 +438,33 @@ private struct ChartCanvas: View {
 
             for (_, segment) in segments.enumerated() {
                 let samples = segment.samples.filter { sample in
-                    let t = sample.timestamp.timeIntervalSince(startDate)
+                    let t = sample.timestamp.timeIntervalSince(sessionStartDate) - timeOffset
                     return t >= 0 && t <= elapsedTime
                 }
                 guard samples.count >= 2 else { continue }
                 let color = bssidColors[segment.bssid] ?? .blue
 
+                let points = samples.map { CGPoint(x: xPos($0.timestamp), y: yPos($0.rssi)) }
+
+                // Filled area
                 var areaPath = Path()
-                let firstX = xPos(samples[0].timestamp)
-                let firstY = yPos(samples[0].rssi)
-                areaPath.move(to: CGPoint(x: firstX, y: plotBottom))
-                areaPath.addLine(to: CGPoint(x: firstX, y: firstY))
-
-                for i in 1..<samples.count {
-                    areaPath.addLine(to: CGPoint(x: xPos(samples[i].timestamp), y: yPos(samples[i].rssi)))
-                }
-
-                let lastX = xPos(samples[samples.count - 1].timestamp)
-                areaPath.addLine(to: CGPoint(x: lastX, y: plotBottom))
+                areaPath.move(to: CGPoint(x: points[0].x, y: plotBottom))
+                areaPath.addLine(to: points[0])
+                addSpline(to: &areaPath, points: points)
+                areaPath.addLine(to: CGPoint(x: points[points.count - 1].x, y: plotBottom))
                 areaPath.closeSubpath()
                 context.fill(areaPath, with: .color(color.opacity(0.12)))
 
+                // Line
                 var linePath = Path()
-                linePath.move(to: CGPoint(x: firstX, y: firstY))
-                for i in 1..<samples.count {
-                    linePath.addLine(to: CGPoint(x: xPos(samples[i].timestamp), y: yPos(samples[i].rssi)))
-                }
-                context.stroke(linePath, with: .color(color), lineWidth: 1.5)
+                linePath.move(to: points[0])
+                addSpline(to: &linePath, points: points)
+                context.stroke(linePath, with: .color(color), lineWidth: 2)
             }
 
             for transition in transitions {
                 let x = xPos(transition.timestamp)
+                guard x >= plotLeft, x <= plotLeft + plotWidth else { continue }
                 var dash = Path()
                 dash.move(to: CGPoint(x: x, y: plotTop))
                 dash.addLine(to: CGPoint(x: x, y: plotBottom))
@@ -477,8 +472,7 @@ private struct ChartCanvas: View {
             }
 
             if let highlightedTime {
-                let clampedTime = max(timeOffset, min(timeOffset + totalSecs, highlightedTime))
-                let x = plotLeft + CGFloat(clampedTime - timeOffset) * scaleX
+                let x = plotLeft + CGFloat(max(0, min(totalSecs, highlightedTime - timeOffset))) * scaleX
                 var hoverLine = Path()
                 hoverLine.move(to: CGPoint(x: x, y: plotTop))
                 hoverLine.addLine(to: CGPoint(x: x, y: plotBottom))
@@ -486,15 +480,27 @@ private struct ChartCanvas: View {
             }
 
             if let highlightedSample {
-                let sampleTime = highlightedSample.timestamp.timeIntervalSince(startDate)
-                let clampedSampleTime = max(0, min(totalSecs, sampleTime))
-                let x = plotLeft + CGFloat(clampedSampleTime) * scaleX
+                let x = xPos(highlightedSample.timestamp)
                 let y = yPos(highlightedSample.rssi)
                 let pointRect = CGRect(x: x - 4, y: y - 4, width: 8, height: 8)
                 context.fill(Path(ellipseIn: pointRect), with: .color(.white))
                 context.stroke(Path(ellipseIn: pointRect), with: .color(.accentColor), lineWidth: 2)
             }
         }
+    }
+}
+
+private func addSpline(to path: inout Path, points: [CGPoint]) {
+    guard points.count >= 2 else { return }
+    for i in 0..<(points.count - 1) {
+        let p0 = i > 0 ? points[i - 1] : points[0]
+        let p1 = points[i]
+        let p2 = points[i + 1]
+        let p3 = i + 2 < points.count ? points[i + 2] : points[points.count - 1]
+
+        let cp1 = CGPoint(x: p1.x + (p2.x - p0.x) / 6, y: p1.y + (p2.y - p0.y) / 6)
+        let cp2 = CGPoint(x: p2.x - (p3.x - p1.x) / 6, y: p2.y - (p3.y - p1.y) / 6)
+        path.addCurve(to: p2, control1: cp1, control2: cp2)
     }
 }
 
@@ -541,8 +547,8 @@ private struct RoamingTimelineChart: View {
     @State private var dragState: SelectorDragState?
     @State private var isFollowingTail = true
     @State private var hoveredTarget: SelectorHoverTarget?
+    @State private var hoveredDetailTime: TimeInterval?
     @State private var hoveredOverviewX: CGFloat?
-    @State private var hoveredDetailPlotX: CGFloat?
 
     private var clampedWindowDuration: TimeInterval { min(windowDuration, max(1, elapsedTime)) }
     private var windowFraction: CGFloat {
@@ -551,22 +557,13 @@ private struct RoamingTimelineChart: View {
     }
     private var visibleStart: TimeInterval { isFollowingTail ? TimeInterval(rangeStart) * elapsedTime : pinnedWindowStart }
     private var visibleEnd: TimeInterval { min(elapsedTime, visibleStart + clampedWindowDuration) }
-    private var activeHoverTime: TimeInterval? {
-        if let hoveredDetailPlotX {
-            return visibleStart + TimeInterval(hoveredDetailPlotX / max(detailPlotWidth, 1)) * max(0, visibleEnd - visibleStart)
-        }
-        if let hoveredOverviewX {
-            return TimeInterval(hoveredOverviewX / max(overviewPlotWidth, 1)) * elapsedTime
-        }
-        return nil
-    }
+    private var activeHoverTime: TimeInterval? { hoveredDetailTime ?? hoveredOverviewX.map { TimeInterval($0 / max(overviewPlotWidth, 1)) * elapsedTime } }
     private var highlightedSample: RoamingSample? {
         guard let hoverTime = activeHoverTime, let sessionStart = allSamples.first?.timestamp else { return nil }
         return allSamples.min { lhs, rhs in
             abs(lhs.timestamp.timeIntervalSince(sessionStart) - hoverTime) < abs(rhs.timestamp.timeIntervalSince(sessionStart) - hoverTime)
         }
     }
-    @State private var detailPlotWidth: CGFloat = 1
     @State private var overviewPlotWidth: CGFloat = 1
 
     var body: some View {
@@ -721,9 +718,15 @@ private struct RoamingTimelineChart: View {
             let t = $0.timestamp.timeIntervalSince(sessionStart)
             return t >= visibleStart && t <= visibleEnd
         }
-        let rangeSecs = max(0.1, visibleEnd - visibleStart)
 
-        return GeometryReader { geo in
+        guard let firstSample = visibleSamples.first, let lastSample = visibleSamples.last else {
+            return AnyView(Spacer().frame(height: detailChartHeight + topMargin + bottomAxisHeight))
+        }
+        let dataStart = firstSample.timestamp.timeIntervalSince(sessionStart)
+        let dataEnd = lastSample.timestamp.timeIntervalSince(sessionStart)
+        let rangeSecs = max(0.1, dataEnd - dataStart)
+
+        return AnyView(GeometryReader { geo in
             let plotWidth = max(1, geo.size.width - leftAxisWidth - 8)
             ZStack(alignment: .topLeading) {
                 ChartCanvas(
@@ -733,7 +736,8 @@ private struct RoamingTimelineChart: View {
                     chartWidth: nil,
                     elapsedTime: rangeSecs,
                     bssidColors: bssidColors,
-                    timeOffset: visibleStart,
+                    timeOffset: dataStart,
+                    sessionStartDate: sessionStart,
                     highlightedTime: activeHoverTime,
                     highlightedSample: highlightedSample
                 )
@@ -743,25 +747,20 @@ private struct RoamingTimelineChart: View {
                 }
             }
             .contentShape(Rectangle())
-            .onAppear {
-                detailPlotWidth = plotWidth
-            }
-            .onChange(of: plotWidth) { _, newWidth in
-                detailPlotWidth = newWidth
-            }
             .onContinuousHover { phase in
                 switch phase {
                 case .active(let location):
-                    hoveredDetailPlotX = max(0, min(plotWidth, location.x - leftAxisWidth))
+                    let plotX = max(0, min(plotWidth, location.x - leftAxisWidth))
+                    hoveredDetailTime = dataStart + TimeInterval(plotX / plotWidth) * rangeSecs
                 case .ended:
-                    hoveredDetailPlotX = nil
+                    hoveredDetailTime = nil
                 }
             }
         }
         .frame(height: detailChartHeight + topMargin + bottomAxisHeight)
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .clipped()
+        .clipped())
     }
 
     private func detailValueBadge(sample: RoamingSample, time: TimeInterval, plotWidth: CGFloat) -> some View {
