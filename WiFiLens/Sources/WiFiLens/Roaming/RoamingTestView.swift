@@ -833,9 +833,16 @@ private struct RoamingTimelineChart: View {
                 .frame(width: w, height: overviewHeight)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
 
-                Rectangle()
-                    .fill(.thinMaterial)
-                    .frame(width: w, height: overviewHeight)
+                HStack(spacing: 0) {
+                    Rectangle()
+                        .fill(.thinMaterial)
+                        .frame(width: max(0, selLeft), height: overviewHeight)
+                    if selLeft + selWidth < w {
+                        Rectangle()
+                            .fill(.thinMaterial)
+                            .frame(width: max(0, w - selLeft - max(selWidth, 0)), height: overviewHeight)
+                    }
+                }
 
                 RoundedRectangle(cornerRadius: 6)
                     .fill(Color.primary.opacity(bodyHovered || dragging ? 0.12 : 0.06))
