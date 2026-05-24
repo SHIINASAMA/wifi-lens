@@ -476,14 +476,14 @@ private struct ChartCanvas: View {
                 var hoverLine = Path()
                 hoverLine.move(to: CGPoint(x: x, y: plotTop))
                 hoverLine.addLine(to: CGPoint(x: x, y: plotBottom))
-                context.stroke(hoverLine, with: .color(.white.opacity(0.75)), style: .init(dash: [3, 3], dashPhase: 0))
+                context.stroke(hoverLine, with: .color(.primary.opacity(0.5)), style: .init(dash: [3, 3], dashPhase: 0))
             }
 
             if let highlightedSample {
                 let x = xPos(highlightedSample.timestamp)
                 let y = yPos(highlightedSample.rssi)
                 let pointRect = CGRect(x: x - 4, y: y - 4, width: 8, height: 8)
-                context.fill(Path(ellipseIn: pointRect), with: .color(.white))
+                context.fill(Path(ellipseIn: pointRect), with: .color(.primary))
                 context.stroke(Path(ellipseIn: pointRect), with: .color(.accentColor), lineWidth: 2)
             }
         }
