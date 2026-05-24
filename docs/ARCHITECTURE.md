@@ -11,7 +11,8 @@ CoreWLAN scan → WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gau
                               ├── combinedTableRows → NativeTableView (AppKit NSTableView)
                               ├── channelQualities → ChannelQualityCalculator → ChannelQualityView
                               ├── bandViewModels → BandChartView (SwiftUI Canvas)
-                              └── networkInfo → InterfacesView
+                              ├── networkInfo → InterfacesView
+                              └── roamingSamples → RoamingTestViewModel → RoamingTestView (Timeline Chart)
 ```
 
 ## Source Layout
@@ -21,11 +22,14 @@ CoreWLAN scan → WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gau
 | `Scanner/` | CoreWLAN scan loop, ViewModel, network/channel models |
 | `Spectrum/` | BandChartView (Canvas), TrendChartView, ContentView (dashboard), SignalHistoryStore |
 | `Channels/` | ChannelQualityCalculator, ChannelQualityView |
-| `Charts/` | Shared Canvas utilities (ChartGeometry, splines, rendering, time formatting, range selector) |
+| `Charts/` | Shared Canvas utilities: ChartGeometry, splines, grid/axis rendering, time formatting, range selector |
 | `Interfaces/` | InterfacesView, ThroughputMonitor, NetworkInfoService |
+| `Roaming/` | RoamingTestView, RoamingTestViewModel, AP transition tracking, timeline chart with range selector |
+| `SignalProcessing/` | RSSI signal smoothing (EMA, Kalman, Hysteresis EMA) |
 | `Table/` | NativeTableView (NSViewRepresentable wrapping NSTableView) |
-| `App/` | OverviewView, SidebarView, SettingsView, Logging, CrashReporter |
+| `App/` | OverviewView, SidebarView, SettingsView, Logging, CrashReporter, TitleBadge |
 | `MCP/` | HTTP server exposing scan data to MCP clients |
+| `Utilities/` | Constants, Color extensions, BuildConfig |
 | `Resources/` | Localizable.xcstrings (String Catalog) |
 
 ## Key Patterns
@@ -34,7 +38,10 @@ CoreWLAN scan → WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gau
 - Selection flows bidirectionally: table row → `selectedNetworkID` → chart highlight; chart curve click → `selectedNetworkID` → table row highlight
 - `NativeTableView` uses `Coordinator` as `NSTableViewDelegate` + `NSTableViewDataSource`
 - Chart curves are Gaussian bell shapes computed in `ChartSeriesData.curvePoints`/`displayCurvePoints`; `displayRSSI` animates toward `rssi` for smooth transitions
+- All Canvas charts share utilities from `Charts/`: `ChartGeometry` for coordinate mapping, `ChartRendering` for grid/axis/area-fill, `SplineInterpolation` for Catmull-Rom and clamped cubic curves, `RangeSelectorView` for timeline window selection
 - Signal history (`SignalHistoryStore`) keeps 20 snapshots per BSSID in memory
+- RSSI signal smoothing uses `SignalProcessing/` with EMA, Kalman, and Hysteresis EMA implementations
+- AP roaming transitions share a single timestamp between old and new segments, eliminating gaps on the timeline
 - `StableScore` provides hysteresis for quality level boundaries (upgrade margin 2, downgrade margin 5)
 
 ## Localization

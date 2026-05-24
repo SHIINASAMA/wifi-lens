@@ -11,15 +11,15 @@
 
 ## Chart Quality
 
-- [ ] Evaluate replacing Canvas hand-drawing with a proper chart framework for native zoom, tooltips, and axis labels
+- [x] Evaluate replacing Canvas hand-drawing with a proper chart framework for native zoom, tooltips, and axis labels (shared Charts/ utilities extracted instead)
 - [x] Verify color contrast and readability in dark mode
 - [x] Signal history trend line (not just live snapshot)
 
 ## Data Completeness
 
-- [ ] Export all bands at once (single combined CSV / multi-page PNG)
-- [ ] Include metadata in CSV export: timestamp, band, PHY mode, channel width, capabilities, hidden SSID flag
-- [ ] Persistent scan history / session recording
+- [x] Export all bands at once (single combined CSV / multi-page PNG)
+- [x] Include metadata in CSV export: timestamp, band, PHY mode, channel width, capabilities, hidden SSID flag
+- [x] Persistent scan history / session recording (roaming session save/load as JSON)
 
 ## Feature Depth
 
@@ -33,11 +33,12 @@
 - [ ] Unify export into a single reporting flow: multi-band export, richer CSV schema, and session snapshots suitable for sharing/debugging
 - [ ] Replace custom chart hit-testing/zoom/labels with a charting approach that supports hover, selection, and accessibility more naturally
 - [ ] Turn signal history into a first-class session model: persisted timelines, monitored SSIDs, threshold alerts, and historical comparisons
-- [ ] Harden MCP into an intentional automation surface: stable response schema, better protocol compatibility, and optional richer analytics endpoints
+- [x] Harden MCP into an intentional automation surface: stable response schema, better protocol compatibility, and optional richer analytics endpoints
 - [ ] Add a small verification matrix for UI regressions across light/dark mode, localization, and no-permission / no-data states
 
 ## Engineering
 
+- [x] Extract shared chart infrastructure into `Charts/` (ChartGeometry, splines, grid/axis rendering, time formatting, range selector)
 - [ ] UI / integration tests
 - [x] Retry strategy for CoreWLAN scan failures
 - [x] Crash reporting
