@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 // MARK: - Chart Layout
 
@@ -845,22 +846,22 @@ private struct RoamingTimelineChart: View {
                             .frame(width: max(selWidth, 0), height: overviewHeight)
                             .offset(x: selLeft)
                     }
-                    .overlay(alignment: .topLeading) {
-                        if selWidth > 0 {
-                            Rectangle()
-                                .fill(Color.primary.opacity(0.3))
-                                .frame(width: max(1, selWidth), height: 1)
-                                .offset(x: selLeft, y: 0)
-                        }
-                    }
 
                 selectorHandle(isActive: leftHovered || dragState?.mode == .panWindow)
                     .frame(width: selectorHandleHitWidth * 2, height: overviewHeight)
                     .offset(x: selLeft - selectorHandleHitWidth)
+                    .onHover { inside in
+                        if inside { NSCursor.resizeLeftRight.push() }
+                        else { NSCursor.resizeLeftRight.pop() }
+                    }
 
                 selectorHandle(isActive: rightHovered || dragState?.mode == .panWindow)
                     .frame(width: selectorHandleHitWidth * 2, height: overviewHeight)
                     .offset(x: selRight - selectorHandleHitWidth)
+                    .onHover { inside in
+                        if inside { NSCursor.resizeLeftRight.push() }
+                        else { NSCursor.resizeLeftRight.pop() }
+                    }
 
                 if selWidth > 0 {
                     edgeTimeBadge(time: visibleStart)
@@ -893,8 +894,14 @@ private struct RoamingTimelineChart: View {
             .onContinuousHover { phase in
                 switch phase {
                 case .active(let location):
-                    hoveredTarget = hoverTarget(at: location.x, width: w)
-                    hoveredOverviewX = max(0, min(w, location.x))
+                    let x = location.x
+                    if x >= selLeft, x <= selRight {
+                        hoveredTarget = hoverTarget(at: x, width: w)
+                        hoveredOverviewX = x
+                    } else {
+                        hoveredTarget = nil
+                        hoveredOverviewX = nil
+                    }
                 case .ended:
                     hoveredTarget = nil
                     hoveredOverviewX = nil
@@ -931,13 +938,13 @@ private struct RoamingTimelineChart: View {
     private func selectorHandle(isActive: Bool) -> some View {
         let color = Color.accentColor.opacity(isActive ? 0.9 : 0.4)
         return ZStack {
-            RoundedRectangle(cornerRadius: 4)
+            RoundedRectangle(cornerRadius: 5)
                 .fill(.regularMaterial)
-                .frame(width: 8, height: 22)
-            VStack(spacing: 3) {
-                Circle().fill(color).frame(width: 2.5, height: 2.5)
-                Circle().fill(color).frame(width: 2.5, height: 2.5)
-                Circle().fill(color).frame(width: 2.5, height: 2.5)
+                .frame(width: 10, height: 28)
+            VStack(spacing: 3.5) {
+                Circle().fill(color).frame(width: 3, height: 3)
+                Circle().fill(color).frame(width: 3, height: 3)
+                Circle().fill(color).frame(width: 3, height: 3)
             }
         }
     }
