@@ -34,6 +34,7 @@ jobs:
             -scheme WiFiLens \
             -configuration "$DEBUG_CONFIG" \
             -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
             build
 
       - name: Test
@@ -42,6 +43,7 @@ jobs:
             -scheme WiFiLens \
             -configuration "$DEBUG_CONFIG" \
             -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
             test
 
   release:
