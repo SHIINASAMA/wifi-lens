@@ -581,7 +581,19 @@ private struct RoamingTimelineChart: View {
         }
 
         guard let firstSample = visibleSamples.first, let lastSample = visibleSamples.last else {
-            return AnyView(Spacer().frame(height: detailChartHeight + topMargin + bottomAxisHeight))
+            return AnyView(
+                VStack(spacing: 8) {
+                    Spacer()
+                    Image(systemName: "chart.xyaxis.line")
+                        .font(.title2)
+                        .foregroundColor(.secondary.opacity(0.5))
+                    Text(String(localized: "No chart data yet"))
+                        .font(.callout)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
+                .frame(height: detailChartHeight + topMargin + bottomAxisHeight)
+            )
         }
         let dataStart = firstSample.timestamp.timeIntervalSince(sessionStart)
         let dataEnd = lastSample.timestamp.timeIntervalSince(sessionStart)

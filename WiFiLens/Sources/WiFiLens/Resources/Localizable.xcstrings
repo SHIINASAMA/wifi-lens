@@ -1636,6 +1636,23 @@
         }
       }
     },
+    "No chart data yet" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No chart data yet"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无图表数据"
+          }
+        }
+      }
+    },
     "No channel data available" : {
       "extractionState" : "stale",
       "localizations" : {
