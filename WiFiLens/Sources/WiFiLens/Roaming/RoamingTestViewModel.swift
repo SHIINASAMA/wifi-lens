@@ -226,6 +226,7 @@ final class RoamingTestViewModel {
 
     private func phyModeLabel(_ iface: CWInterface) -> String? {
         switch iface.activePHYMode() {
+        case .mode11be: "802.11be"
         case .mode11ax: "802.11ax"
         case .mode11ac: "802.11ac"
         case .mode11n:  "802.11n"
