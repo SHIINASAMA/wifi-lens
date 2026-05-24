@@ -6,7 +6,7 @@ private let pointSpacing: CGFloat = 4
 private let chartHeight: CGFloat = 180
 private let leftAxisWidth: CGFloat = 40
 private let bottomAxisHeight: CGFloat = 24
-private let topMargin: CGFloat = 22
+private let topMargin: CGFloat = 36
 
 private let segmentColors: [Color] = [
     .blue, .green, .orange, .purple, .teal, .pink, .mint, .indigo
@@ -569,8 +569,8 @@ private struct RoamingTimelineChart: View {
     var body: some View {
         VStack(spacing: 0) {
             detailChart
-            rangeLabel
             overviewChart
+            overviewTimeAxis
         }
         .background(Color.primary.opacity(0.02))
         .onChange(of: elapsedTime) { _, newTotal in
@@ -713,24 +713,33 @@ private struct RoamingTimelineChart: View {
 
     // MARK: Detail chart
 
-    private var rangeLabel: some View {
-        let startText = timeFormatter.string(from: visibleStart) ?? "0:00"
-        let endText = timeFormatter.string(from: visibleEnd) ?? "0:00"
-        return HStack {
-            Text(startText)
-                .font(.system(size: 10, design: .monospaced))
-                .foregroundColor(.secondary)
-            Spacer()
-            Text("\u{2013}") // en-dash
-                .font(.system(size: 10))
-                .foregroundColor(.secondary.opacity(0.5))
-            Spacer()
-            Text(endText)
-                .font(.system(size: 10, design: .monospaced))
-                .foregroundColor(.secondary)
+    private var overviewTimeAxis: some View {
+        let tickCount = max(2, min(6, Int(overviewPlotWidth / 80)))
+        let tickInterval = max(1, elapsedTime / TimeInterval(max(1, tickCount - 1)))
+        var ticks: [TimeInterval] = []
+        if elapsedTime > 0 {
+            var t: TimeInterval = 0
+            while t <= elapsedTime + 0.001 {
+                ticks.append(t)
+                t += tickInterval
+            }
+        }
+        return HStack(spacing: 0) {
+            if let first = ticks.first {
+                Text(timeFormatter.string(from: first) ?? "0")
+                    .font(.system(size: 9, design: .monospaced))
+                    .foregroundColor(.secondary.opacity(0.5))
+                Spacer(minLength: 0)
+            }
+            ForEach(Array(ticks.dropFirst().enumerated()), id: \.offset) { _, tick in
+                Text(timeFormatter.string(from: tick) ?? "0")
+                    .font(.system(size: 9, design: .monospaced))
+                    .foregroundColor(.secondary.opacity(0.5))
+                Spacer(minLength: 0)
+            }
         }
         .padding(.horizontal, 16)
-        .padding(.top, 4)
+        .padding(.bottom, 4)
     }
 
     private var detailChart: some View {
@@ -859,6 +868,13 @@ private struct RoamingTimelineChart: View {
                     .frame(width: selectorHandleHitWidth * 2, height: overviewHeight)
                     .offset(x: selRight - selectorHandleHitWidth)
 
+                if selWidth > 0 {
+                    edgeTimeBadge(time: visibleStart)
+                        .offset(x: selLeft - 20, y: -overviewHeight / 2 - 8)
+                    edgeTimeBadge(time: visibleEnd)
+                        .offset(x: selRight - 20, y: -overviewHeight / 2 - 8)
+                }
+
                 if let hoveredOverviewX {
                     let markerTime = highlightedSample?.timestamp.timeIntervalSince(allSamples.first?.timestamp ?? Date()) ?? TimeInterval(hoveredOverviewX / max(w, 1)) * elapsedTime
                     let x = min(w, max(0, CGFloat(markerTime / max(elapsedTime, 0.1)) * w))
@@ -909,6 +925,15 @@ private struct RoamingTimelineChart: View {
         .padding(.bottom, 6)
     }
 
+    private func edgeTimeBadge(time: TimeInterval) -> some View {
+        Text(timeFormatter.string(from: time) ?? "0:00")
+            .font(.system(size: 9, design: .monospaced))
+            .foregroundColor(.white.opacity(0.7))
+            .padding(.horizontal, 4)
+            .padding(.vertical, 2)
+            .background(Color.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 3))
+    }
+
     private func selectorHandle(isActive: Bool, pointingLeft: Bool) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: 4)
@@ -937,15 +962,9 @@ private struct OverviewCanvas: View {
     let elapsedTime: TimeInterval
     let highlightedTime: TimeInterval?
 
-    private let tickHeight: CGFloat = 12
-    private let labelHeight: CGFloat = 14
-
     var body: some View {
         Canvas { context, size in
             guard !segments.isEmpty, elapsedTime > 0 else { return }
-
-            let chartBottom = max(1, size.height - labelHeight)
-            let tickTop = chartBottom
 
             var rssiVals: [Int] = []
             for seg in segments { rssiVals.append(contentsOf: seg.samples.map(\.rssi)) }
@@ -959,7 +978,7 @@ private struct OverviewCanvas: View {
                 CGFloat(ts.timeIntervalSince(startDate) / elapsedTime) * size.width
             }
             func yPos(_ rssi: Int) -> CGFloat {
-                chartBottom - CGFloat(Double(rssi) - rssiMin) / CGFloat(rssiRange) * chartBottom
+                size.height - CGFloat(Double(rssi) - rssiMin) / CGFloat(rssiRange) * size.height
             }
 
             for segment in segments {
@@ -979,7 +998,7 @@ private struct OverviewCanvas: View {
                 let x = xPos(t.timestamp)
                 var line = Path()
                 line.move(to: CGPoint(x: x, y: 0))
-                line.addLine(to: CGPoint(x: x, y: chartBottom))
+                line.addLine(to: CGPoint(x: x, y: size.height))
                 context.stroke(line, with: .color(.white.opacity(0.4)), lineWidth: 0.5)
             }
 
@@ -987,28 +1006,8 @@ private struct OverviewCanvas: View {
                 let x = CGFloat(highlightedTime / elapsedTime) * size.width
                 var hoverLine = Path()
                 hoverLine.move(to: CGPoint(x: x, y: 0))
-                hoverLine.addLine(to: CGPoint(x: x, y: chartBottom))
+                hoverLine.addLine(to: CGPoint(x: x, y: size.height))
                 context.stroke(hoverLine, with: .color(.white.opacity(0.75)), style: .init(dash: [3, 3], dashPhase: 0))
-            }
-
-            // Time axis ticks and labels
-            let tickCount = min(8, max(2, Int(size.width / 60)))
-            let tickInterval = max(1, elapsedTime / TimeInterval(tickCount))
-            var tickTime: TimeInterval = 0
-            while tickTime <= elapsedTime {
-                let x = CGFloat(tickTime / elapsedTime) * size.width
-                var tick = Path()
-                tick.move(to: CGPoint(x: x, y: tickTop))
-                tick.addLine(to: CGPoint(x: x, y: tickTop + tickHeight))
-                context.stroke(tick, with: .color(.white.opacity(0.25)), lineWidth: 0.5)
-
-                let label = Text(timeFormatter.string(from: tickTime) ?? "0")
-                    .font(.system(size: 8))
-                    .foregroundColor(.secondary)
-                let resolved = context.resolve(label)
-                let labelW = resolved.measure(in: CGSize(width: 60, height: 12)).width
-                context.draw(resolved, at: CGPoint(x: min(x, size.width - labelW / 2 - 2), y: tickTop + tickHeight + 1))
-                tickTime += tickInterval
             }
         }
     }
