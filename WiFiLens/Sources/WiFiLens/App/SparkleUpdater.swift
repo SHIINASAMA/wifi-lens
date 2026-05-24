@@ -13,15 +13,12 @@ final class SparkleUpdater: ObservableObject {
         }
 
         controller = SPUStandardUpdaterController(
-            startingUpdater: false,
+            startingUpdater: true,
             updaterDelegate: nil,
             userDriverDelegate: nil
         )
         updater = controller.updater
-
-        if UserDefaults.standard.bool(forKey: autoCheckKey) {
-            try? updater.start()
-        }
+        updater.automaticallyChecksForUpdates = UserDefaults.standard.bool(forKey: autoCheckKey)
     }
 
     var automaticallyChecksForUpdates: Bool {
