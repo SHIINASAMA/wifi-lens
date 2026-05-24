@@ -6,7 +6,7 @@ private let pointSpacing: CGFloat = 4
 private let chartHeight: CGFloat = 180
 private let leftAxisWidth: CGFloat = 40
 private let bottomAxisHeight: CGFloat = 24
-private let topMargin: CGFloat = 36
+private let topMargin: CGFloat = 40
 
 private let segmentColors: [Color] = [
     .blue, .green, .orange, .purple, .teal, .pink, .mint, .indigo
@@ -714,28 +714,22 @@ private struct RoamingTimelineChart: View {
     // MARK: Detail chart
 
     private var overviewTimeAxis: some View {
-        let tickCount = max(2, min(6, Int(overviewPlotWidth / 80)))
-        let tickInterval = max(1, elapsedTime / TimeInterval(max(1, tickCount - 1)))
-        var ticks: [TimeInterval] = []
-        if elapsedTime > 0 {
-            var t: TimeInterval = 0
-            while t <= elapsedTime + 0.001 {
-                ticks.append(t)
-                t += tickInterval
+        let midTickCount = max(0, min(4, Int(overviewPlotWidth / 100)))
+        var allTicks: [TimeInterval] = [0]
+        if elapsedTime > 0, midTickCount > 0 {
+            let step = elapsedTime / TimeInterval(midTickCount + 1)
+            for i in 1...midTickCount {
+                allTicks.append(step * TimeInterval(i))
             }
         }
+        allTicks.append(max(0, elapsedTime))
+
         return HStack(spacing: 0) {
-            if let first = ticks.first {
-                Text(timeFormatter.string(from: first) ?? "0")
-                    .font(.system(size: 9, design: .monospaced))
-                    .foregroundColor(.secondary.opacity(0.5))
-                Spacer(minLength: 0)
-            }
-            ForEach(Array(ticks.dropFirst().enumerated()), id: \.offset) { _, tick in
+            ForEach(Array(allTicks.enumerated()), id: \.offset) { i, tick in
+                if i > 0 { Spacer(minLength: 0) }
                 Text(timeFormatter.string(from: tick) ?? "0")
                     .font(.system(size: 9, design: .monospaced))
-                    .foregroundColor(.secondary.opacity(0.5))
-                Spacer(minLength: 0)
+                    .foregroundColor(.secondary)
             }
         }
         .padding(.horizontal, 16)
@@ -838,23 +832,23 @@ private struct RoamingTimelineChart: View {
                 .clipShape(RoundedRectangle(cornerRadius: 4))
 
                 Rectangle()
-                    .fill(.black.opacity(0.42))
+                    .fill(.thinMaterial)
                     .frame(width: w, height: overviewHeight)
 
                 RoundedRectangle(cornerRadius: 6)
-                    .fill(Color.white.opacity(bodyHovered || dragging ? 0.08 : 0.05))
+                    .fill(Color.primary.opacity(bodyHovered || dragging ? 0.12 : 0.06))
                     .frame(width: max(selWidth, 0), height: overviewHeight)
                     .offset(x: selLeft)
                     .overlay(alignment: .topLeading) {
                         RoundedRectangle(cornerRadius: 6)
-                            .strokeBorder(Color.white.opacity(dragging ? 0.85 : 0.55), lineWidth: dragging ? 1.5 : 1)
+                            .strokeBorder(Color.primary.opacity(dragging ? 0.5 : 0.25), lineWidth: dragging ? 1.5 : 1)
                             .frame(width: max(selWidth, 0), height: overviewHeight)
                             .offset(x: selLeft)
                     }
                     .overlay(alignment: .topLeading) {
                         if selWidth > 0 {
                             Rectangle()
-                                .fill(Color.white.opacity(0.85))
+                                .fill(Color.primary.opacity(0.3))
                                 .frame(width: max(1, selWidth), height: 1)
                                 .offset(x: selLeft, y: 0)
                         }
@@ -879,7 +873,7 @@ private struct RoamingTimelineChart: View {
                     let markerTime = highlightedSample?.timestamp.timeIntervalSince(allSamples.first?.timestamp ?? Date()) ?? TimeInterval(hoveredOverviewX / max(w, 1)) * elapsedTime
                     let x = min(w, max(0, CGFloat(markerTime / max(elapsedTime, 0.1)) * w))
                     Rectangle()
-                        .fill(Color.white.opacity(0.65))
+                        .fill(Color.primary.opacity(0.4))
                         .frame(width: 1, height: overviewHeight)
                         .offset(x: x)
                 }
@@ -928,26 +922,26 @@ private struct RoamingTimelineChart: View {
     private func edgeTimeBadge(time: TimeInterval) -> some View {
         Text(timeFormatter.string(from: time) ?? "0:00")
             .font(.system(size: 9, design: .monospaced))
-            .foregroundColor(.white.opacity(0.7))
+            .foregroundColor(.primary)
             .padding(.horizontal, 4)
             .padding(.vertical, 2)
-            .background(Color.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 3))
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 3))
     }
 
     private func selectorHandle(isActive: Bool, pointingLeft: Bool) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: 4)
-                .fill(Color.black.opacity(isActive ? 0.5 : 0.34))
+                .fill(.regularMaterial)
             Capsule()
-                .fill(Color.white.opacity(isActive ? 0.95 : 0.8))
+                .fill(Color.primary.opacity(isActive ? 0.7 : 0.4))
                 .frame(width: 2, height: overviewHeight - 10)
             Image(systemName: pointingLeft ? "chevron.left" : "chevron.right")
                 .font(.system(size: 7, weight: .bold))
-                .foregroundColor(.white.opacity(isActive ? 0.95 : 0.75))
+                .foregroundColor(.primary.opacity(isActive ? 0.8 : 0.5))
                 .offset(x: pointingLeft ? -5 : 5)
             Image(systemName: pointingLeft ? "chevron.right" : "chevron.left")
                 .font(.system(size: 7, weight: .bold))
-                .foregroundColor(.white.opacity(isActive ? 0.95 : 0.75))
+                .foregroundColor(.primary.opacity(isActive ? 0.8 : 0.5))
                 .offset(x: pointingLeft ? 5 : -5)
         }
     }
@@ -999,7 +993,7 @@ private struct OverviewCanvas: View {
                 var line = Path()
                 line.move(to: CGPoint(x: x, y: 0))
                 line.addLine(to: CGPoint(x: x, y: size.height))
-                context.stroke(line, with: .color(.white.opacity(0.4)), lineWidth: 0.5)
+                context.stroke(line, with: .color(.primary.opacity(0.15)), lineWidth: 0.5)
             }
 
             if let highlightedTime {
@@ -1007,7 +1001,7 @@ private struct OverviewCanvas: View {
                 var hoverLine = Path()
                 hoverLine.move(to: CGPoint(x: x, y: 0))
                 hoverLine.addLine(to: CGPoint(x: x, y: size.height))
-                context.stroke(hoverLine, with: .color(.white.opacity(0.75)), style: .init(dash: [3, 3], dashPhase: 0))
+                context.stroke(hoverLine, with: .color(.primary.opacity(0.5)), style: .init(dash: [3, 3], dashPhase: 0))
             }
         }
     }
