@@ -724,7 +724,7 @@ private struct RoamingTimelineChart: View {
         let rangeSecs = max(0.1, visibleEnd - visibleStart)
 
         return GeometryReader { geo in
-            let plotWidth = max(1, geo.size.width - 16 - leftAxisWidth - 8)
+            let plotWidth = max(1, geo.size.width - leftAxisWidth - 8)
             ZStack(alignment: .topLeading) {
                 ChartCanvas(
                     segments: segments,
