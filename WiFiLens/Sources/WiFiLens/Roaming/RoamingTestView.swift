@@ -164,7 +164,6 @@ struct RoamingTestView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(.regularMaterial)
     }
 
     private func metricLabel(_ title: String, _ value: String, _ color: Color) -> some View {
@@ -248,7 +247,6 @@ struct RoamingTestView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
-        .background(.bar)
     }
 
     // MARK: - Trend chart
@@ -297,7 +295,6 @@ struct RoamingTestView: View {
                             tableHeader(String(localized: "Ch Before"))
                             tableHeader(String(localized: "Ch After"))
                         }
-                        .background(.bar)
                     }
 
                     ScrollView {
@@ -549,7 +546,6 @@ private struct RoamingTimelineChart: View {
             .padding(.bottom, 6)
             overviewTimeAxis
         }
-        .background(Color.primary.opacity(0.02))
     }
 
     // MARK: Detail chart

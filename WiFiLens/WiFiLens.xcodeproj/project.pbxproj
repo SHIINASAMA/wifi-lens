@@ -145,9 +145,9 @@
 		FB9B7F372FC2D9650057B038 /* ChartRendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartRendering.swift; sourceTree = "<group>"; };
 		FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartTimeFormatting.swift; sourceTree = "<group>"; };
 		FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplineInterpolation.swift; sourceTree = "<group>"; };
+		FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSelectorView.swift; sourceTree = "<group>"; };
 		FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = SOURCE_ROOT; };
 		FBB2CA8B2FC0E14000FC2D2C /* BuildConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildConfig.swift; sourceTree = "<group>"; };
-		FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSelectorView.swift; sourceTree = "<group>"; };
 		FBB2CA8C2FC0E14000FC2D2C /* TitleBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleBadge.swift; sourceTree = "<group>"; };
 		FBD329432FBF0E2F00D01613 /* ChannelQualityCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityCalculatorTests.swift; sourceTree = "<group>"; };
 		FBD329442FBF0E2F00D01613 /* ChannelSpanCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelSpanCalculatorTests.swift; sourceTree = "<group>"; };
@@ -661,7 +661,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -831,7 +831,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -941,7 +941,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1061,7 +1061,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
