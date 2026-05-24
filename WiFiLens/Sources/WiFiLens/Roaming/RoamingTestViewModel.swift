@@ -147,14 +147,24 @@ final class RoamingTestViewModel {
 
         // Detect AP transition
         if let newBSSID, let lastBSSID, newBSSID != lastBSSID {
-            // Close current segment
+            let transitionTime = Date()
+
+            // Append final sample to old segment at the exact transition time
             if currentSegmentIndex >= 0, currentSegmentIndex < segments.count {
-                segments[currentSegmentIndex].endTime = Date()
+                let finalSample = RoamingSample(
+                    timestamp: transitionTime,
+                    rssi: lastRSSI ?? 0,
+                    channel: lastChannel ?? 0,
+                    txRate: currentTxRate,
+                    gatewayLatency: gatewayLatency
+                )
+                segments[currentSegmentIndex].samples.append(finalSample)
+                segments[currentSegmentIndex].endTime = transitionTime
             }
 
             // Record transition
             let event = APTransitionEvent(
-                timestamp: Date(),
+                timestamp: transitionTime,
                 fromBSSID: lastBSSID,
                 toBSSID: newBSSID,
                 rssiBefore: lastRSSI ?? 0,
@@ -164,8 +174,8 @@ final class RoamingTestViewModel {
             )
             transitions.append(event)
 
-            // Start new segment
-            let segment = RoamingSegment(bssid: newBSSID, startTime: Date())
+            // Start new segment at the same timestamp
+            let segment = RoamingSegment(bssid: newBSSID, startTime: transitionTime)
             segments.append(segment)
             currentSegmentIndex = segments.count - 1
         }
@@ -195,8 +205,13 @@ final class RoamingTestViewModel {
 
     private func appendSample() {
         guard currentSegmentIndex >= 0, currentSegmentIndex < segments.count else { return }
+        let segment = segments[currentSegmentIndex]
+        // First sample of a segment uses the segment's startTime,
+        // so consecutive segments share the transition timestamp and
+        // there is no visual gap on the time axis.
+        let timestamp = segment.samples.isEmpty ? segment.startTime : Date()
         let sample = RoamingSample(
-            timestamp: Date(),
+            timestamp: timestamp,
             rssi: currentRSSI,
             channel: currentChannel,
             txRate: currentTxRate,
