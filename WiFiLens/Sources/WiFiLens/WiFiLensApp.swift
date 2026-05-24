@@ -16,9 +16,53 @@ private struct AppRootView: View {
     @State private var sidebarCollapsed = false
     @AppStorage("hideTitleBadge") private var hideTitleBadge = false
 
+    private var hasLocationAuthorization: Bool {
+        viewModel.locationManager.isAuthorizedForSSID
+    }
+
+    private var showsLocationPermissionRequiredView: Bool {
+        selectedPage.requiresLocationAuthorization && !hasLocationAuthorization
+    }
+
+    @ViewBuilder
+    private var detailContent: some View {
+        if showsLocationPermissionRequiredView {
+            LocationPermissionRequiredView(
+                accessState: viewModel.accessState,
+                openLocationPreferences: viewModel.locationManager.openLocationPreferences
+            )
+        } else {
+            switch selectedPage {
+            case .overview:
+                OverviewView(viewModel: viewModel)
+            case .spectrum:
+                ContentView(viewModel: viewModel)
+                    .onReceive(NotificationCenter.default.publisher(for: .freezeAllBands)) { _ in
+                        for vm in viewModel.bandViewModels {
+                            vm.toggleFreeze()
+                        }
+                    }
+            case .channels:
+                ChannelQualityView(channels: viewModel.channelQualities)
+            case .interfaces:
+                InterfacesView(interfaces: viewModel.networkInfo, scannerViewModel: viewModel, throughputMonitor: viewModel.throughputMonitor)
+            case .roaming:
+                RoamingTestView(viewModel: roamingViewModel)
+            case .help:
+                HelpCenterView()
+            case .settings:
+                SettingsView(updater: sparkleUpdater)
+#if DEBUG
+            case .debugChart:
+                DebugContainerView()
+#endif
+            }
+        }
+    }
+
     var body: some View {
         NavigationSplitView(columnVisibility: $sidebarVisibility) {
-            SidebarView(selectedPage: $selectedPage)
+            SidebarView(selectedPage: $selectedPage, locationManager: viewModel.locationManager)
                 .navigationSplitViewColumnWidth(min: 160, ideal: 180)
                 .background(
                     GeometryReader { geo in
@@ -32,42 +76,7 @@ private struct AppRootView: View {
                 )
         } detail: {
             Group {
-                switch selectedPage {
-                case .overview:
-                    OverviewView(viewModel: viewModel)
-                case .spectrum:
-                    ContentView(viewModel: viewModel)
-                        .alert("Location Services are disabled", isPresented: $viewModel.locationManager.showDeniedAlert) {
-                            Button("Open Preferences") {
-                                viewModel.locationManager.openLocationPreferences()
-                            }
-                            Button("Ignore", role: .cancel) {}
-                            Button("Quit", role: .destructive) {
-                                viewModel.locationManager.terminateApp()
-                            }
-                        } message: {
-                            Text("On macOS 14 Sonoma and Later, Location Services permission is required to get Wi-Fi SSIDs.\nPlease enable Location Services in System Preferences > Security & Privacy > Privacy > Location Services.")
-                        }
-                        .onReceive(NotificationCenter.default.publisher(for: .freezeAllBands)) { _ in
-                            for vm in viewModel.bandViewModels {
-                                vm.toggleFreeze()
-                            }
-                        }
-                case .channels:
-                    ChannelQualityView(channels: viewModel.channelQualities)
-                case .interfaces:
-                    InterfacesView(interfaces: viewModel.networkInfo, scannerViewModel: viewModel, throughputMonitor: viewModel.throughputMonitor)
-                case .roaming:
-                    RoamingTestView(viewModel: roamingViewModel)
-                case .help:
-                    HelpCenterView()
-                case .settings:
-                    SettingsView(updater: sparkleUpdater)
-#if DEBUG
-                case .debugChart:
-                    DebugContainerView()
-#endif
-                }
+                detailContent
             }
             .alert(String(localized: "Previous Crash Detected"), isPresented: $showCrashLog) {
                 Button(String(localized: "Dismiss"), role: .cancel) {}
@@ -76,6 +85,14 @@ private struct AppRootView: View {
                     .frame(maxHeight: 200)
             }
             .navigationTitle(selectedPage == .overview ? "" : selectedPage.label)
+            .alert(String(localized: "Location Services Required"), isPresented: $viewModel.locationManager.showDeniedAlert) {
+                Button(String(localized: "Open System Settings")) {
+                    viewModel.locationManager.openLocationPreferences()
+                }
+                Button(String(localized: "Cancel"), role: .cancel) {}
+            } message: {
+                Text(String(localized: "Location Services permission is required to read Wi-Fi network names. Please enable it in System Settings."))
+            }
         }
         .background(WindowAccessor { window in
             window?.setFrameAutosaveName("WiFiLensMainWindow")

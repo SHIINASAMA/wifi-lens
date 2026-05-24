@@ -48,6 +48,10 @@ struct OverviewView: View {
                         EarthGlobeView(color: stateColor)
                             .frame(width: 240, height: 240)
 
+                        if !viewModel.locationManager.isAuthorizedForSSID {
+                            authorizationCard
+                        }
+
                         if let wifi {
                             connectionCard(wifi)
                             signalHealthRow(wifi)
@@ -58,7 +62,9 @@ struct OverviewView: View {
                         } else {
                             noConnectionCard
                         }
-                        environmentCard
+                        if viewModel.locationManager.isAuthorizedForSSID {
+                            environmentCard
+                        }
                         Spacer(minLength: 0)
                     }
                     .padding(16)
@@ -331,6 +337,33 @@ struct OverviewView: View {
         .frame(maxWidth: .infinity)
         .background(Color.primary.opacity(0.04))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    // MARK: - Authorization Card
+
+    private var authorizationCard: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "location.circle")
+                .font(.title2)
+                .foregroundColor(.orange)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(String(localized: "Location Services Required"))
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                Text(String(localized: "macOS requires Location Services permission to read Wi-Fi network names. Your location is never tracked or stored."))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer()
+            Button(String(localized: "Authorize…")) {
+                viewModel.requestAuthorization()
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.small)
+        }
+        .padding(12)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
     }
 
     // MARK: - Environment Summary

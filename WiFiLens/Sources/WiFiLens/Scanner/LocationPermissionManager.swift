@@ -5,10 +5,10 @@ import AppKit
 @Observable
 final class LocationPermissionManager: NSObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
-    private var waiters: [CheckedContinuation<CLAuthorizationStatus, Never>] = []
 
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var showDeniedAlert = false
+    var onAuthorizationGranted: (() -> Void)?
 
     var isAuthorizedForSSID: Bool {
         switch authorizationStatus {
@@ -38,26 +38,13 @@ final class LocationPermissionManager: NSObject, CLLocationManagerDelegate {
         manager.requestWhenInUseAuthorization()
     }
 
-    func waitForInitialDecisionIfNeeded() async -> CLAuthorizationStatus {
-        refreshStatus()
-        guard authorizationStatus == .notDetermined else { return authorizationStatus }
-
-        return await withCheckedContinuation { continuation in
-            waiters.append(continuation)
-        }
-    }
-
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         let status = manager.authorizationStatus
         Task { @MainActor in
             self.authorizationStatus = status
             self.showDeniedAlert = status == .denied || status == .restricted
-            if status != .notDetermined {
-                let continuations = self.waiters
-                self.waiters.removeAll()
-                for continuation in continuations {
-                    continuation.resume(returning: status)
-                }
+            if status != .notDetermined, self.isAuthorizedForSSID {
+                self.onAuthorizationGranted?()
             }
         }
     }

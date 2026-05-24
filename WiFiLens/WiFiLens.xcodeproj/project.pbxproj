@@ -71,6 +71,7 @@
 		FBD7B3492FBAED57002C8F5A /* SparkleUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */; };
 		FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */; };
 		FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6203A2551742DF77D61785FE /* WiFiChannel.swift */; };
+			FBAD00012FC400000057B038 /* LocationPermissionRequiredView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -157,6 +158,7 @@
 		FBD329472FBF0E2F00D01613 /* SSIDColorHasherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSIDColorHasherTests.swift; sourceTree = "<group>"; };
 		FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdater.swift; sourceTree = "<group>"; };
 		FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+			FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermissionRequiredView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -301,6 +303,7 @@
 				FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */,
 				FB0573C12FBC47F1005F8214 /* CrashReporter.swift */,
 				FB0573BF2FBC47CC005F8214 /* Logging.swift */,
+					FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -533,6 +536,7 @@
 				FB0573C42FBC7405005F8214 /* ChannelQualityCalculator.swift in Sources */,
 				01ABB72FF2349B86A426CC1D /* ContentView.swift in Sources */,
 				FBD7B3492FBAED57002C8F5A /* SparkleUpdater.swift in Sources */,
+				FBAD00012FC400000057B038 /* LocationPermissionRequiredView.swift in Sources */,
 				12AA3A17CCE99E41D313C900 /* FilterPopoverView.swift in Sources */,
 				027A3CECC33E6608D9F53B53 /* LocationPermissionManager.swift in Sources */,
 				3711656F0C3ECD58CA29D407 /* NativeTableView.swift in Sources */,

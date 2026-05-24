@@ -65,6 +65,18 @@ final class ScannerViewModel {
         mcpServer.dataProvider = { [weak self] in self?.lastNetworks ?? [] }
     }
 
+    /// Trigger the Location Services authorization flow:
+    /// - `.notDetermined` → system dialog
+    /// - `.denied` → alert offering to open System Settings
+    func requestAuthorization() {
+        locationManager.refreshStatus()
+        if locationManager.authorizationStatus == .notDetermined {
+            locationManager.requestPermissionIfNeeded()
+        } else {
+            locationManager.showDeniedAlert = true
+        }
+    }
+
     var globalFilterQuery: String = "" {
         didSet { applyGlobalFilterToBands() }
     }
@@ -119,36 +131,42 @@ final class ScannerViewModel {
 
         let task = Task { @MainActor in
             AppLogger.scanner.info("start() — begin")
-            locationManager.requestPermissionIfNeeded()
 
-            startScanLoop()
-
-            supportedBands = await scanner.supportedBands()
-            AppLogger.scanner.info("start() — supported bands = \(supportedBands.map { $0.id }.sorted())")
-            updateInterfaceName()
-
-            if locationManager.authorizationStatus == .notDetermined {
-                accessState = .waitingForAuthorization
-                AppLogger.scanner.info("start() — waiting for initial authorization")
-                _ = await locationManager.waitForInitialDecisionIfNeeded()
-                AppLogger.scanner.info("start() — authorization settled = \(locationManager.authorizationStatus.rawValue)")
-            } else {
-                locationManager.refreshStatus()
+            locationManager.onAuthorizationGranted = { [weak self] in
+                guard let self else { return }
+                Task { @MainActor in
+                    await self.startScanningAfterAuth()
+                }
             }
 
-            if !locationManager.isAuthorizedForSSID {
+            locationManager.requestPermissionIfNeeded()
+            locationManager.refreshStatus()
+
+            if locationManager.isAuthorizedForSSID {
+                await startScanningAfterAuth()
+            } else if locationManager.authorizationStatus == .notDetermined {
+                accessState = .waitingForAuthorization
+                AppLogger.scanner.info("start() — waiting for authorization callback")
+            } else {
                 AppLogger.scanner.warning("start() — authorization denied/restricted")
                 accessState = .denied
                 stop()
                 return
             }
-
-            hasStarted = true
         }
 
         startupTask = task
         await task.value
         startupTask = nil
+    }
+
+    private func startScanningAfterAuth() async {
+        guard !isScanning else { return }
+        supportedBands = await scanner.supportedBands()
+        AppLogger.scanner.info("start() — supported bands = \(supportedBands.map { $0.id }.sorted())")
+        updateInterfaceName()
+        startScanLoop()
+        hasStarted = true
     }
 
     func handleSceneDidBecomeActive() async {
@@ -157,7 +175,7 @@ final class ScannerViewModel {
 
         if locationManager.isAuthorizedForSSID {
             if !isScanning {
-                startScanLoop()
+                await startScanningAfterAuth()
             }
         } else {
             stop()

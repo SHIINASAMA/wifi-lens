@@ -12,6 +12,19 @@ enum SidebarPage: String, CaseIterable {
     case debugChart
 #endif
 
+    var requiresLocationAuthorization: Bool {
+        switch self {
+        case .overview, .help, .settings:
+            false
+        case .spectrum, .channels, .interfaces, .roaming:
+            true
+#if DEBUG
+        case .debugChart:
+            true
+#endif
+        }
+    }
+
     var label: String {
         switch self {
         case .overview:   String(localized: "Overview")
@@ -45,6 +58,7 @@ enum SidebarPage: String, CaseIterable {
 
 struct SidebarView: View {
     @Binding var selectedPage: SidebarPage
+    var locationManager: LocationPermissionManager
 
     var body: some View {
         List(selection: $selectedPage) {
