@@ -147,13 +147,13 @@ struct WiFiLensApp: App {
     @AppStorage("appearance") private var appearance: String = "system"
 
     init() {
-        Log.bootstrap()
+        AppLogger.bootstrap()
         CrashReporter.register()
         if let log = CrashReporter.consumeCrashLog() {
             _crashLogText = State(initialValue: log)
             _showCrashLog = State(initialValue: true)
         }
-        Log.app.info("WiFi Lens launched")
+        AppLogger.app.info("WiFi Lens launched")
     }
 
     @State private var crashLogText: String = ""
@@ -248,7 +248,7 @@ struct WiFiLensApp: App {
         do {
             try viewModel.mcpServer.start()
         } catch {
-            Log.mcp.error("MCP server failed to start: \(error)")
+            AppLogger.mcp.error("MCP server failed to start: \(error)")
         }
     }
 

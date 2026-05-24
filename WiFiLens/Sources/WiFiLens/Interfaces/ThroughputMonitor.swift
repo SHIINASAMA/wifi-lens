@@ -36,7 +36,7 @@ final class ThroughputMonitor {
                 try? await Task.sleep(for: .seconds(1))
             }
         }
-        Log.throughput.info("started")
+        AppLogger.throughput.info("started")
     }
 
     func stop() {
@@ -45,7 +45,7 @@ final class ThroughputMonitor {
         pollTask = nil
         lastCounters.removeAll()
         perInterface.removeAll()
-        Log.throughput.info("stopped")
+        AppLogger.throughput.info("stopped")
     }
 
     func samples(for name: String) -> [ThroughputSample] {

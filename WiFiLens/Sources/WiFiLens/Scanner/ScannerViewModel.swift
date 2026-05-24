@@ -118,26 +118,26 @@ final class ScannerViewModel {
         guard !hasStarted else { return }
 
         let task = Task { @MainActor in
-            Log.scanner.info("start() — begin")
+            AppLogger.scanner.info("start() — begin")
             locationManager.requestPermissionIfNeeded()
 
             startScanLoop()
 
             supportedBands = await scanner.supportedBands()
-            Log.scanner.info("start() — supported bands = \(supportedBands.map { $0.id }.sorted())")
+            AppLogger.scanner.info("start() — supported bands = \(supportedBands.map { $0.id }.sorted())")
             updateInterfaceName()
 
             if locationManager.authorizationStatus == .notDetermined {
                 accessState = .waitingForAuthorization
-                Log.scanner.info("start() — waiting for initial authorization")
+                AppLogger.scanner.info("start() — waiting for initial authorization")
                 _ = await locationManager.waitForInitialDecisionIfNeeded()
-                Log.scanner.info("start() — authorization settled = \(locationManager.authorizationStatus.rawValue)")
+                AppLogger.scanner.info("start() — authorization settled = \(locationManager.authorizationStatus.rawValue)")
             } else {
                 locationManager.refreshStatus()
             }
 
             if !locationManager.isAuthorizedForSSID {
-                Log.scanner.warning("start() — authorization denied/restricted")
+                AppLogger.scanner.warning("start() — authorization denied/restricted")
                 accessState = .denied
                 stop()
                 return
@@ -168,7 +168,7 @@ final class ScannerViewModel {
     }
 
     private func startScanLoop() {
-        Log.scanner.info("startScanLoop() — starting")
+        AppLogger.scanner.info("startScanLoop() — starting")
         scanTask?.cancel()
         isScanning = true
         accessState = .scanning
@@ -183,7 +183,7 @@ final class ScannerViewModel {
                 locationManager.refreshStatus()
 
                 if !locationManager.isAuthorizedForSSID {
-                    Log.scanner.warning("startScanLoop() — lost authorization")
+                    AppLogger.scanner.warning("startScanLoop() — lost authorization")
                     stop()
                     accessState = locationManager.authorizationStatus == .notDetermined
                         ? .waitingForAuthorization
@@ -193,11 +193,11 @@ final class ScannerViewModel {
 
                 switch event {
                 case .failure(let message):
-                    Log.scanner.error("scan failure: \(message)")
+                    AppLogger.scanner.error("scan failure: \(message)")
                     accessState = .scanFailed(message)
 
                 case .networks(let networks):
-//                    Log.scanner.info("scan success — \(networks.count) networks")
+//                    AppLogger.scanner.info("scan success — \(networks.count) networks")
                     applyNetworks(networks)
                     networkInfo = NetworkInfoService.fetchAll()
                     channelQualities = computeChannelQualities()

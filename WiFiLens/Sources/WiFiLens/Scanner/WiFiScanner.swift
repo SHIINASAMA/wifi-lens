@@ -14,7 +14,7 @@ actor WiFiScanner {
     /// On scan failure, retries up to 3 times with exponential backoff (1s → 2s → 4s).
     func startScanning(interval: Duration = Constants.scanInterval) -> AsyncStream<WiFiScanEvent> {
         shouldStop = false
-        Log.scanner.debug("startScanning() — reset stop flag")
+        AppLogger.scanner.debug("startScanning() — reset stop flag")
         return AsyncStream { continuation in
             let task = Task {
                 while !shouldStop && !Task.isCancelled {
@@ -24,7 +24,7 @@ actor WiFiScanner {
                         continuation.yield(.networks(networks))
                     case .failure(let error):
                         let msg = String(describing: error)
-                        Log.scanner.error("scan exhausted retries: \(msg)")
+                        AppLogger.scanner.error("scan exhausted retries: \(msg)")
                         continuation.yield(.failure(msg))
                     }
 
@@ -55,7 +55,7 @@ actor WiFiScanner {
                 let msg = String(describing: error)
                 if attempt < 3 {
                     let backoff = Duration.seconds(1 << (attempt - 1))
-                    Log.scanner.warning("scan attempt \(attempt) failed, retrying in \(backoff): \(msg)")
+                    AppLogger.scanner.warning("scan attempt \(attempt) failed, retrying in \(backoff): \(msg)")
                     do { try await Task.sleep(for: backoff) }
                     catch { return .failure(.exhausted("cancelled during retry")) }
                 } else {

@@ -16,7 +16,7 @@ struct SettingsView: View {
         _autoCheck = State(initialValue: updater.automaticallyChecksForUpdates)
         if BuildConfig.current == .pro {
             updater.automaticallyChecksForUpdates = false
-            Log.app.info("Sparkle auto-update disabled (PRO build)")
+            AppLogger.app.info("Sparkle auto-update disabled (PRO build)")
         }
     }
 
@@ -98,18 +98,31 @@ struct SettingsView: View {
                     Toggle(String(localized: "Automatically check for updates"), isOn: $autoCheck)
                         .onChange(of: autoCheck) { _, newValue in
                             updater.automaticallyChecksForUpdates = newValue
-                            Log.app.info("Sparkle auto-check \(newValue ? "enabled" : "disabled")")
+                            AppLogger.app.info("Sparkle auto-check \(newValue ? "enabled" : "disabled")")
                         }
                     HStack {
                         Button(String(localized: "Check Now")) {
                             updater.checkForUpdates()
-                            Log.app.info("Sparkle manual update check triggered")
+                            AppLogger.app.info("Sparkle manual update check triggered")
                         }
                         Spacer()
                     }
                 } header: {
                     Text(String(localized: "Updates"))
                 }
+                }
+
+                // MARK: - Diagnostics
+
+                Section {
+                    HStack {
+                        Button(String(localized: "Reveal Logs in Finder")) {
+                            AppLogger.revealInFinder()
+                        }
+                        Spacer()
+                    }
+                } header: {
+                    Text(String(localized: "Diagnostics"))
                 }
             }
             .formStyle(.grouped)

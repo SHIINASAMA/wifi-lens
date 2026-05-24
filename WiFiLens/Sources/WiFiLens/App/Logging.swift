@@ -1,27 +1,118 @@
 import Foundation
 import Logging
 import OSLog
+import AppKit
 
-/// Shared swift-log logger instances.
-/// Call `Log.bootstrap()` once at launch.
-enum Log {
+// MARK: - AppLogger
+
+/// Unified logging facade. Call `AppLogger.bootstrap()` once at launch.
+enum AppLogger {
+
+    // MARK: Bootstrap
+
     static func bootstrap() {
         LoggingSystem.bootstrap { label in
-            var handler = OSLogHandler(label: label)
-            handler.logLevel = .info
-            return handler
+            var handlers: [LogHandler] = []
+
+            #if DEBUG
+            var console = ConsoleLogHandler(label: label)
+            console.logLevel = .trace
+            handlers.append(console)
+            #endif
+
+            var os = OSLogHandler(label: label)
+            os.logLevel = .info
+            handlers.append(os)
+
+            let file = FileLogHandler(label: label)
+            handlers.append(file)
+
+            return MultiplexLogHandler(handlers)
         }
     }
 
-    static let scanner  = Logging.Logger(label: "com.wifilens.scanner")
-    static let mcp      = Logging.Logger(label: "com.wifilens.mcp")
-    static let location = Logging.Logger(label: "com.wifilens.location")
-    static let app       = Logging.Logger(label: "com.wifilens.app")
-    static let throughput = Logging.Logger(label: "com.wifilens.throughput")
+    // MARK: Categories
+
+    static let general    = Logging.Logger(label: "general")
+    static let scanner    = Logging.Logger(label: "scanner")
+    static let network    = Logging.Logger(label: "network")
+    static let ui         = Logging.Logger(label: "ui")
+    static let sparkle    = Logging.Logger(label: "sparkle")
+    static let mcp        = Logging.Logger(label: "mcp")
+    static let throughput = Logging.Logger(label: "throughput")
+    static let location   = Logging.Logger(label: "location")
+
+    /// Backward-compatible alias for `AppLogger.app` call sites.
+    static let app = general
+
+    // MARK: Log directory
+
+    static var logDirectory: URL {
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+            .appendingPathComponent("WiFi Lens")
+            .appendingPathComponent("Logs")
+    }
+
+    /// Opens the log directory in Finder.
+    static func revealInFinder() {
+        let dir = logDirectory
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        NSWorkspace.shared.open(dir)
+    }
 }
 
-/// swif-tlog LogHandler that writes to Apple's unified logging (Console.app).
+// MARK: - ConsoleLogHandler
+
+/// Writes to stdout with timestamps. Debug builds only.
+private struct ConsoleLogHandler: LogHandler {
+    let label: String
+    var logLevel: Logging.Logger.Level = .trace
+    var metadata = Logging.Logger.Metadata()
+
+    subscript(metadataKey key: String) -> Logging.Logger.Metadata.Value? {
+        get { metadata[key] }
+        set { metadata[key] = newValue }
+    }
+
+    func log(event: LogEvent) {
+        let ts = _timestampFormatter.string(from: Date())
+        print("\(ts) [\(event.level.short)] [\(label)] \(event.message)")
+    }
+}
+
+// MARK: - OSLogHandler
+
+/// Writes to Apple Unified Logging (Console.app).
 private struct OSLogHandler: LogHandler {
+    let label: String
+    var logLevel: Logging.Logger.Level = .info
+    var metadata = Logging.Logger.Metadata()
+
+    private static let subsystem = Bundle.main.bundleIdentifier ?? "io.github.kaoru.wifi-lens"
+
+    subscript(metadataKey key: String) -> Logging.Logger.Metadata.Value? {
+        get { metadata[key] }
+        set { metadata[key] = newValue }
+    }
+
+    func log(event: LogEvent) {
+        let logger = os.Logger(subsystem: Self.subsystem, category: label)
+        switch event.level {
+        case .trace:    logger.trace("\(event.message)")
+        case .debug:    logger.debug("\(event.message)")
+        case .info:     logger.info("\(event.message)")
+        case .notice:   logger.notice("\(event.message)")
+        case .warning:  logger.warning("\(event.message)")
+        case .error:    logger.error("\(event.message)")
+        case .critical: logger.fault("\(event.message)")
+        }
+    }
+}
+
+// MARK: - FileLogHandler
+
+/// Writes to rotating log files via a serial background queue.
+private struct FileLogHandler: LogHandler {
     let label: String
     var logLevel: Logging.Logger.Level = .info
     var metadata = Logging.Logger.Metadata()
@@ -32,14 +123,110 @@ private struct OSLogHandler: LogHandler {
     }
 
     func log(event: LogEvent) {
-        let oslog = os.Logger(subsystem: "com.wifilens", category: label)
-        switch event.level {
-        case .trace, .debug: oslog.debug("\(event.message)")
-        case .info:          oslog.info("\(event.message)")
-        case .notice:        oslog.notice("\(event.message)")
-        case .warning:       oslog.warning("\(event.message)")
-        case .error:         oslog.error("\(event.message)")
-        case .critical:      oslog.fault("\(event.message)")
+        let line = _fileLineFormatter.string(from: Date())
+            .appending(" [\(event.level.short)] [\(label)] \(event.message)\n")
+        LogFileWriter.shared.enqueue(line)
+    }
+}
+
+// MARK: - File Writer
+
+private final class LogFileWriter: @unchecked Sendable {
+    static let shared: LogFileWriter = {
+        let w = LogFileWriter()
+        w.open()
+        return w
+    }()
+
+    private let queue = DispatchQueue(label: "com.wifilens.logwriter", qos: .utility)
+    private let maxSize: Int64 = 5 * 1024 * 1024
+    private let maxFiles = 7
+
+    private var handle: FileHandle?
+    private var currentSize: Int64 = 0
+
+    private init() {}
+
+    func enqueue(_ line: String) {
+        queue.async { [weak self] in
+            self?.write(line)
+        }
+    }
+
+    private func open() {
+        let dir = AppLogger.logDirectory
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let path = dir.appendingPathComponent("wifi-lens.log").path
+        if !FileManager.default.fileExists(atPath: path) {
+            FileManager.default.createFile(atPath: path, contents: nil)
+        }
+        currentSize = (try? FileManager.default.attributesOfItem(atPath: path)[.size] as? Int64) ?? 0
+        handle = FileHandle(forUpdatingAtPath: path)
+        handle?.seekToEndOfFile()
+    }
+
+    private func write(_ line: String) {
+        guard let data = line.data(using: .utf8) else { return }
+        if handle == nil { open() }
+        if currentSize + Int64(data.count) > maxSize { rotate() }
+        do {
+            try handle?.write(contentsOf: data)
+            currentSize += Int64(data.count)
+        } catch {
+            open()
+            try? handle?.write(contentsOf: data)
+            currentSize = Int64(data.count)
+        }
+    }
+
+    private func rotate() {
+        handle?.closeFile()
+        let dir = AppLogger.logDirectory
+        let base = dir.appendingPathComponent("wifi-lens")
+
+        for i in stride(from: maxFiles - 1, through: 1, by: -1) {
+            let old = base.appendingPathExtension("\(i).log")
+            let next = base.appendingPathExtension("\(i + 1).log")
+            try? FileManager.default.removeItem(at: next)
+            try? FileManager.default.moveItem(at: old, to: next)
+        }
+        try? FileManager.default.moveItem(at: base.appendingPathExtension("log"),
+                                           to: base.appendingPathExtension("1.log"))
+        try? FileManager.default.removeItem(at: base.appendingPathExtension("\(maxFiles + 1).log"))
+
+        let current = base.appendingPathExtension("log")
+        FileManager.default.createFile(atPath: current.path, contents: nil)
+        handle = try? FileHandle(forWritingTo: current)
+        currentSize = 0
+    }
+}
+
+// MARK: - Formatters
+
+private let _timestampFormatter: DateFormatter = {
+    let f = DateFormatter()
+    f.dateFormat = "HH:mm:ss.SSS"
+    return f
+}()
+
+private let _fileLineFormatter: DateFormatter = {
+    let f = DateFormatter()
+    f.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+    return f
+}()
+
+// MARK: - Level Short Descriptions
+
+private extension Logging.Logger.Level {
+    var short: String {
+        switch self {
+        case .trace:    "TRC"
+        case .debug:    "DBG"
+        case .info:     "INF"
+        case .notice:   "NTC"
+        case .warning:  "WRN"
+        case .error:    "ERR"
+        case .critical: "CRT"
         }
     }
 }
