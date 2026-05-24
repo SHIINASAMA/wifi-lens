@@ -646,7 +646,7 @@ private struct RoamingTimelineChart: View {
     }
 
     private func beginDrag(at x: CGFloat, width: CGFloat) {
-        let target = hoverTarget(at: x, width: width) ?? .body
+        guard let target = hoverTarget(at: x, width: width) else { return }
         hoveredTarget = target
         let mode: SelectorDragMode = switch target {
         case .leftHandle: .resizeLeft
@@ -660,6 +660,7 @@ private struct RoamingTimelineChart: View {
             startWindowDuration: clampedWindowDuration
         )
         isFollowingTail = false
+        hoveredOverviewX = nil
     }
 
     private func updateDrag(translationX: CGFloat, width: CGFloat) {
@@ -914,7 +915,6 @@ private struct RoamingTimelineChart: View {
                             beginDrag(at: value.startLocation.x, width: w)
                         }
                         updateDrag(translationX: value.translation.width, width: w)
-                        hoveredOverviewX = max(0, min(w, value.location.x))
                     }
                     .onEnded { _ in
                         endDrag(width: w)
