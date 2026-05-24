@@ -854,11 +854,11 @@ private struct RoamingTimelineChart: View {
                         }
                     }
 
-                selectorHandle(isActive: leftHovered || dragState?.mode == .panWindow, pointingLeft: true)
+                selectorHandle(isActive: leftHovered || dragState?.mode == .panWindow)
                     .frame(width: selectorHandleHitWidth * 2, height: overviewHeight)
                     .offset(x: selLeft - selectorHandleHitWidth)
 
-                selectorHandle(isActive: rightHovered || dragState?.mode == .panWindow, pointingLeft: false)
+                selectorHandle(isActive: rightHovered || dragState?.mode == .panWindow)
                     .frame(width: selectorHandleHitWidth * 2, height: overviewHeight)
                     .offset(x: selRight - selectorHandleHitWidth)
 
@@ -928,21 +928,17 @@ private struct RoamingTimelineChart: View {
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 3))
     }
 
-    private func selectorHandle(isActive: Bool, pointingLeft: Bool) -> some View {
-        ZStack {
+    private func selectorHandle(isActive: Bool) -> some View {
+        let color = Color.accentColor.opacity(isActive ? 0.9 : 0.4)
+        return ZStack {
             RoundedRectangle(cornerRadius: 4)
                 .fill(.regularMaterial)
-            Capsule()
-                .fill(Color.primary.opacity(isActive ? 0.7 : 0.4))
-                .frame(width: 2, height: overviewHeight - 10)
-            Image(systemName: pointingLeft ? "chevron.left" : "chevron.right")
-                .font(.system(size: 7, weight: .bold))
-                .foregroundColor(.primary.opacity(isActive ? 0.8 : 0.5))
-                .offset(x: pointingLeft ? -5 : 5)
-            Image(systemName: pointingLeft ? "chevron.right" : "chevron.left")
-                .font(.system(size: 7, weight: .bold))
-                .foregroundColor(.primary.opacity(isActive ? 0.8 : 0.5))
-                .offset(x: pointingLeft ? 5 : -5)
+                .frame(width: 8, height: 22)
+            VStack(spacing: 3) {
+                Circle().fill(color).frame(width: 2.5, height: 2.5)
+                Circle().fill(color).frame(width: 2.5, height: 2.5)
+                Circle().fill(color).frame(width: 2.5, height: 2.5)
+            }
         }
     }
 }
