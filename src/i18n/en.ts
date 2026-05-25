@@ -64,9 +64,9 @@ export const en = {
       },
       {
         title: 'Channel Quality Analyzer',
-        alt: 'Channel quality analyzer showing per-channel scores and recommendations across Wi-Fi bands',
-        desc: 'Compare channel scores before changing your network setup. WiFi Lens surfaces cleaner options with overlap context and quick recommendations.',
-        bullets: ['Per-channel quality scores', 'Compare channels before switching', 'Cleaner-channel recommendations'],
+        alt: 'Channel quality analyzer with region-aware scoring, DFS detection, and device compatibility filtering',
+        desc: 'Compare channel scores before changing your network setup. WiFi Lens surfaces cleaner options with region-aware filtering, overlap context, and device compatibility checks.',
+        bullets: ['Per-channel quality scores', 'Region-aware recommendations', 'Cleaner-channel suggestions'],
         image: '/screenshots/channels.png',
       },
       {

@@ -14,13 +14,6 @@
   ::selection {
     @apply bg-brand-500/30;
   }
-
-  @media (min-width: 1280px) {
-    .page section .mx-auto.max-w-6xl,
-    .page section .mx-auto.max-w-4xl {
-      margin-right: 12rem;
-    }
-  }
 }
 
 @layer components {
@@ -88,25 +81,9 @@
     transform: translateY(-100%);
   }
 
-  .toc-link {
-    border-left: 2px solid transparent;
-    margin-left: -18px;
-    padding-left: 16px !important;
-    transition: border-color 0.3s, color 0.3s;
-  }
-
   .toc-link.toc-active {
     color: #93c5fd;
-    border-left-color: #3b82f6;
-  }
-
-  .toc-privacy {
-    color: #86efac !important;
-  }
-
-  .toc-privacy.toc-active {
-    color: #86efac !important;
-    border-left-color: #22c55e !important;
+    background: rgba(59, 130, 246, 0.08);
   }
 
   #back-to-top {
