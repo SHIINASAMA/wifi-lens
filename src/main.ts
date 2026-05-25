@@ -334,27 +334,17 @@ function screenshotRow(item: { title: string; desc: string; bullets: readonly st
   const isEven = index % 2 === 0
   const imgCol = /* html */ `
   <div class="reveal ${isEven ? 'lg:order-1' : 'lg:order-2'}">
-    <div class="glass-card overflow-hidden shadow-xl shadow-brand-950/10 group">
-      <!-- macOS title bar -->
-      <div class="flex items-center gap-2 px-3 h-8 bg-gray-900/80 border-b border-gray-800/50">
-        <span class="w-2.5 h-2.5 rounded-full bg-red-500/60"></span>
-        <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/60"></span>
-        <span class="w-2.5 h-2.5 rounded-full bg-green-500/60"></span>
-        <span class="flex-1 text-center text-[10px] text-gray-600 font-medium tracking-wide mr-8">WiFi Lens — ${item.title}</span>
-      </div>
-      <!-- Image placeholder -->
-      <div class="relative aspect-[16/10] bg-gray-950/80 flex items-center justify-center">
-        <img
-          src="${BASE}${item.image}"
-          alt="${item.title}"
-          class="absolute inset-0 w-full h-full object-cover"
-          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
-        />
-        <div class="hidden flex-col items-center gap-3 text-gray-600 pointer-events-none">
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <span class="text-xs font-mono">${item.image}</span>
-          <span class="text-[10px] uppercase tracking-wider opacity-50">Placeholder — replace with screenshot</span>
-        </div>
+    <div class="glass-card overflow-hidden shadow-xl shadow-brand-950/10 group aspect-[16/10] bg-gray-950/80 flex items-center justify-center">
+      <img
+        src="${BASE}${item.image}"
+        alt="${item.title}"
+        class="absolute inset-0 w-full h-full object-cover"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+      />
+      <div class="hidden flex-col items-center gap-3 text-gray-600 pointer-events-none">
+        <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span class="text-xs font-mono">${item.image}</span>
+        <span class="text-[10px] uppercase tracking-wider opacity-50">Placeholder — replace with screenshot</span>
       </div>
     </div>
   </div>`
