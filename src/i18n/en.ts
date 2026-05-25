@@ -3,6 +3,7 @@ export const en = {
     features: 'Features',
     mcp: 'MCP',
     download: 'Download',
+    privacy: 'Privacy',
     docs: 'Docs',
   },
   hero: {
@@ -149,8 +150,21 @@ export const en = {
       cta: 'Planned',
     },
   },
+  privacy: {
+    title: 'Your data stays on your Mac',
+    subtitle: 'WiFi Lens is built to be local-first from the ground up. No accounts, no cloud, no surprises.',
+    bullets: [
+      'WiFi Lens does not collect, store, or transmit any personal information, usage analytics, or telemetry. There are no third-party analytics, ad networks, or tracking SDKs in the app.',
+      'Location Services: macOS requires this permission for CoreWLAN to expose Wi‑Fi SSID names. WiFi Lens never accesses your coordinates and never logs your location.',
+      'All Wi‑Fi scan results, crash reports, and diagnostic logs remain in files on your own disk. Nothing is uploaded or shared automatically — you control whether to share them.',
+    ],
+    mcp: 'MCP server is bound to 127.0.0.1. No scan data leaves your machine through MCP unless you explicitly route it elsewhere.',
+    oss: 'Source code is open (Apache 2.0). Every data-handling claim above is independently verifiable.',
+  },
   footer: {
     copyright: 'WiFi Lens. Built with SwiftUI, CoreWLAN, and Sparkle.',
+    privacy: 'Privacy',
+    support: 'Support',
     oss: 'GitHub',
     license: 'Apache 2.0',
   },

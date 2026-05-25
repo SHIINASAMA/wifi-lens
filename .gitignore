@@ -1,6 +1,7 @@
 # macOS
 .DS_Store
 
+.vite/
 .build/
 _site/
 
