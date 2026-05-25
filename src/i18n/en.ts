@@ -163,6 +163,8 @@ export const en = {
   },
   footer: {
     copyright: 'WiFi Lens. Built with SwiftUI, CoreWLAN, and Sparkle.',
+    x: '@WiFiLens',
+    email: 'wifi-lens@outlook.com',
     privacy: 'Privacy',
     support: 'Support',
     oss: 'GitHub',

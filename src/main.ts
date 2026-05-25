@@ -564,7 +564,16 @@ function renderFooter() {
   <footer class="relative border-t border-gray-800/50 py-10">
     <div class="mx-auto max-w-6xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
       <p class="text-xs text-gray-500">${t.footer.copyright}</p>
-      <div class="flex items-center gap-6 text-xs text-gray-600">
+      <div class="flex items-center gap-5 text-xs text-gray-600">
+        <a href="https://x.com/WiFiLens" class="hover:text-gray-300 transition-colors flex items-center gap-1.5" aria-label="X (Twitter)">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          ${t.footer.x}
+        </a>
+        <a href="mailto:${t.footer.email}" class="hover:text-gray-300 transition-colors flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13 2 4"/></svg>
+          ${t.footer.email}
+        </a>
+        <span class="text-gray-800">|</span>
         <a href="#privacy" class="hover:text-gray-400 transition-colors">${t.footer.privacy}</a>
         <a href="https://github.com/SHIINASAMA/wifi-lens/issues" class="hover:text-gray-400 transition-colors">${t.footer.support}</a>
         <a href="https://github.com/SHIINASAMA/wifi-lens" class="hover:text-gray-400 transition-colors">${t.footer.oss}</a>

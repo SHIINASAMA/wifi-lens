@@ -1,6 +1,8 @@
 # WiFi Lens
 
 [![Swift CI](https://github.com/SHIINASAMA/wifi-lens/workflows/Build%20&%20Release/badge.svg)](https://github.com/SHIINASAMA/wifi-lens/actions?query=workflow%3A%22Build+%26+Release%22)
+[![X](https://img.shields.io/badge/X-@WiFiLens-1d9bf0)](https://x.com/WiFiLens)
+[![Email](https://img.shields.io/badge/email-wifi--lens@outlook.com-0078d4)](mailto:wifi-lens@outlook.com)
 
 Simple, open-source Wi-Fi channel and signal strength analyzer for macOS.
 Built with SwiftUI, CoreWLAN, and Sparkle.
