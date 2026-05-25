@@ -120,6 +120,7 @@ function renderNav() {
       </a>
       <div class="hidden sm:flex items-center gap-8 text-sm">
         <a href="#features" class="text-gray-400 hover:text-white transition-colors duration-200">${t.nav.features}</a>
+        <a href="#mcp" class="text-gray-400 hover:text-white transition-colors duration-200">${t.nav.mcp}</a>
         <a href="#download" class="text-gray-400 hover:text-white transition-colors duration-200">${t.nav.download}</a>
         <a href="https://github.com/SHIINASAMA/wifi-lens/tree/master/docs" class="text-gray-400 hover:text-white transition-colors duration-200">${t.nav.docs}</a>
         <a href="https://github.com/SHIINASAMA/wifi-lens" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="GitHub">
@@ -163,10 +164,9 @@ function renderHero() {
               <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               ${t.hero.cta.oss}
             </a>
-            <a href="#download" class="btn-pro text-center relative">
-              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 9l5 4 5-4"/><line x1="12" y1="9" x2="12" y2="17"/></svg>
-              ${t.hero.cta.pro}
-              <span class="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-brand-600 text-[10px] font-semibold text-white shadow-lg">${t.hero.cta.proSoon}</span>
+            <a href="#mcp" class="btn-pro text-center hero-secondary-cta">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+              ${t.hero.cta.secondary}
             </a>
           </div>
 
@@ -309,6 +309,7 @@ function renderFeatures() {
 function renderDemo() {
   const items: readonly {
     title: string
+    alt: string
     desc: string
     bullets: readonly string[]
     image: string
@@ -329,22 +330,22 @@ function renderDemo() {
   </section>`
 }
 
-function screenshotRow(item: { title: string; desc: string; bullets: readonly string[]; image: string }, index: number) {
+function screenshotRow(item: { title: string; alt: string; desc: string; bullets: readonly string[]; image: string }, index: number) {
   const slug = item.title.toLowerCase().replace(/\s+/g, '-')
   const isEven = index % 2 === 0
   const imgCol = /* html */ `
   <div class="reveal ${isEven ? 'lg:order-1' : 'lg:order-2'}">
-    <div class="glass-card overflow-hidden shadow-xl shadow-brand-950/10 group aspect-[16/10] bg-gray-950/80 flex items-center justify-center">
+    <div class="overflow-hidden rounded-2xl shadow-xl shadow-brand-950/10 group bg-gray-950/80 relative min-h-[240px]">
       <img
         src="${BASE}${item.image}"
-        alt="${item.title}"
-        class="absolute inset-0 w-full h-full object-cover"
-        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+        alt="${item.alt}"
+        class="w-full block"
+        onerror="this.style.display='none';this.nextElementSibling.classList.remove('hidden');this.nextElementSibling.classList.add('flex')"
       />
-      <div class="hidden flex-col items-center gap-3 text-gray-600 pointer-events-none">
+      <div class="hidden absolute inset-0 flex-col items-center justify-center gap-3 text-gray-600 pointer-events-none">
         <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
         <span class="text-xs font-mono">${item.image}</span>
-        <span class="text-[10px] uppercase tracking-wider opacity-50">Placeholder — replace with screenshot</span>
+        <span class="text-[10px] uppercase tracking-wider opacity-50">Screenshot unavailable</span>
       </div>
     </div>
   </div>`
@@ -480,10 +481,11 @@ function renderDownload() {
       <div class="reveal text-center mb-16">
         <h2 class="section-title">${t.download.title}</h2>
       </div>
-      <div class="grid md:grid-cols-2 gap-6">
+      <div class="grid md:grid-cols-2 gap-6 items-stretch download-grid">
         ${downloadCard('oss')}
         ${downloadCard('pro')}
       </div>
+      <p class="reveal text-center text-xs text-gray-500 font-mono mt-6">${t.hero.cta.proSoon}</p>
     </div>
   </section>`
 }
@@ -493,8 +495,8 @@ function downloadCard(variant: 'oss' | 'pro') {
   const isPro = variant === 'pro'
 
   return /* html */ `
-  <div class="reveal glass-card p-8 flex flex-col ${isPro ? 'ring-1 ring-brand-500/20 relative' : ''}">
-    ${isPro ? `<span class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-brand-600 text-[11px] font-semibold text-white shadow-lg">Soon</span>` : ''}
+  <div class="reveal download-card ${isPro ? 'download-card-pro relative' : 'download-card-oss'}">
+    ${isPro ? `<span class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-brand-600 text-[11px] font-semibold text-white shadow-lg">Planned</span>` : ''}
     <div class="flex items-center gap-3 mb-3">
       <h3 class="text-xl font-bold text-white">${d.title}</h3>
       <span class="px-2.5 py-0.5 rounded-full text-[10px] font-medium ${isPro ? 'bg-brand-500/15 text-brand-300' : 'bg-emerald-500/15 text-emerald-300'}">${d.badge}</span>

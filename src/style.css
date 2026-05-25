@@ -36,9 +36,22 @@
     @apply bg-gray-900/60 border border-gray-800/80 backdrop-blur-xl rounded-2xl;
   }
 
-  .section-title {
-    @apply text-3xl sm:text-4xl font-bold tracking-tight text-white;
+  .download-grid {
+    @apply gap-5;
   }
+
+  .download-card {
+    @apply flex flex-col rounded-3xl p-8 bg-gradient-to-b from-gray-900/80 to-gray-950/80 backdrop-blur-xl border border-white/5 shadow-[0_20px_60px_rgba(0,0,0,0.25)];
+  }
+
+  .download-card-oss {
+    @apply ring-1 ring-brand-500/15 shadow-brand-950/20;
+  }
+
+  .download-card-pro {
+    @apply bg-gray-950/55 border-gray-800/60 shadow-none;
+  }
+
 
   .section-subtitle {
     @apply mt-3 text-lg text-gray-400 max-w-2xl;
