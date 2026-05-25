@@ -13,15 +13,15 @@ enum ChannelViewMode: String, CaseIterable {
 }
 
 struct ChannelQualityView: View {
-    let channels: [ChannelQuality]
+    let channels: [ChannelRecommendation]
     @State private var mode: ChannelViewMode = .simple
-    @State private var sortKey: SortKey = .qualityScore
+    @State private var sortKey: SortKey = .rfScore
     @State private var sortAscending: Bool = false
     @State private var selectedID: String?
 
-    enum SortKey: String { case channel, bandDisplay, qualityScore, qualityLevel, apCount, coChannelCount, adjacentCount, overlapLevel, strongestNeighborRSSI, interferenceScore }
+    enum SortKey: String { case channel, bandDisplay, rfScore, rfLevel, apCount, coChannelCount, adjacentCount, overlapLevel, strongestNeighborRSSI, interferenceScore, classification }
 
-    private var displayed: [ChannelQuality] {
+    private var displayed: [ChannelRecommendation] {
         if mode == .simple {
             return channels.filter(\.showInSimpleView)
         }
@@ -30,14 +30,15 @@ struct ChannelQualityView: View {
             let cmp: Bool = switch sortKey {
             case .channel:              a.channel < b.channel
             case .bandDisplay:          a.bandDisplay < b.bandDisplay
-            case .qualityScore:         a.qualityScore < b.qualityScore
-            case .qualityLevel:         a.qualityScore < b.qualityScore
+            case .rfScore:             a.rfScore < b.rfScore
+            case .rfLevel:             a.rfScore < b.rfScore
             case .apCount:              a.apCount < b.apCount
             case .coChannelCount:       a.coChannelCount < b.coChannelCount
             case .adjacentCount:        a.adjacentCount < b.adjacentCount
             case .overlapLevel:         a.overlapLevel.rawValue < b.overlapLevel.rawValue
             case .strongestNeighborRSSI: a.strongestNeighborRSSI < b.strongestNeighborRSSI
             case .interferenceScore:    a.interferenceScore < b.interferenceScore
+            case .classification:       a.classification.order < b.classification.order
             }
             return sortAscending ? cmp : !cmp
         }
@@ -59,6 +60,8 @@ struct ChannelQualityView: View {
             .padding(.horizontal, 16)
             .padding(.top, 16)
 
+            regulatoryInfoBanner
+
             if channels.isEmpty {
                 Spacer()
                 Image(systemName: "antenna.radiowaves.left.and.right.slash")
@@ -71,6 +74,35 @@ struct ChannelQualityView: View {
                 simpleList
             } else {
                 tableView
+            }
+        }
+    }
+
+    // MARK: - Regulatory Info
+
+    private var hasRegulatoryChannels: Bool {
+        channels.contains(where: { $0.classification != .recommended })
+    }
+
+    private var regulatoryInfoBanner: some View {
+        Group {
+            if hasRegulatoryChannels {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "info.circle.fill")
+                            .font(.system(size: 10))
+                            .foregroundColor(.accentColor)
+                        Text(String(localized: "Channel recommendations now include regional regulations, DFS requirements, and device compatibility."))
+                            .font(.system(size: 10))
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .padding(.horizontal, 16)
+                .padding(.top, 10)
             }
         }
     }
@@ -96,15 +128,15 @@ struct ChannelQualityView: View {
                 GridRow {
                     sortHeader(String(localized: "CH"), .channel)
                     sortHeader(String(localized: "Band"), .bandDisplay)
-                    sortHeader(String(localized: "Score"), .qualityScore)
-                    sortHeader(String(localized: "Level"), .qualityLevel)
+                    sortHeader(String(localized: "Score"), .rfScore)
+                    sortHeader(String(localized: "Level"), .rfLevel)
                     sortHeader(String(localized: "APs"), .apCount)
                     sortHeader(String(localized: "Co-Ch"), .coChannelCount)
                     sortHeader(String(localized: "Adj"), .adjacentCount)
                     sortHeader(String(localized: "Overlap"), .overlapLevel)
                     sortHeader(String(localized: "RSSI"), .strongestNeighborRSSI)
                     sortHeader(String(localized: "Intf"), .interferenceScore)
-                    tableHeader(String(localized: "Rec"))
+                    sortHeader(String(localized: "Class"), .classification)
                 }
                 .background(.bar)
 
@@ -113,15 +145,15 @@ struct ChannelQualityView: View {
                     GridRow {
                         cell("\(ch.channel)", bold: ch.isCurrentChannel, color: ch.isCurrentChannel ? .accentColor : .primary)
                         cell(ch.bandDisplay)
-                        cell("\(ch.qualityScore)", color: Color(hex: ch.qualityLevel.color))
-                        cell(ch.qualityLevel.displayName, color: Color(hex: ch.qualityLevel.color))
+                        cell("\(ch.rfScore)", color: Color(hex: ch.rfLevel.color))
+                        cell(ch.rfLevel.displayName, color: Color(hex: ch.rfLevel.color))
                         cell("\(ch.apCount)")
                         cell("\(ch.coChannelCount)")
                         cell("\(ch.adjacentCount)")
                         cell(ch.overlapLevel.displayName)
                         cell("\(ch.strongestNeighborRSSI)")
                         cell("\(ch.interferenceScore)")
-                        cell(ch.isRecommended ? "★" : ch.isCurrentChannel ? "●" : "")
+                        cell(ch.classification != .recommended ? ch.classification.displayName : ch.isRecommended ? "★" : "")
                     }
                     .background(rowBG(ch.id, idx: idx))
                     .contentShape(Rectangle())
@@ -152,11 +184,6 @@ struct ChannelQualityView: View {
         .padding(.vertical, 5)
     }
 
-    private func tableHeader(_ text: String) -> some View {
-        Text(text).font(.system(size: 10, weight: .medium)).foregroundColor(.secondary)
-            .frame(maxWidth: .infinity, alignment: .center).padding(.vertical, 5)
-    }
-
     private func rowBG(_ id: String, idx: Int) -> Color {
         if selectedID == id { return .accentColor.opacity(0.25) }
         return idx.isMultiple(of: 2) ? .clear : .primary.opacity(0.04)
@@ -166,31 +193,23 @@ struct ChannelQualityView: View {
         Text(text).font(.system(size: 11, weight: bold ? .semibold : .regular))
             .foregroundColor(color).frame(maxWidth: .infinity, alignment: .center).padding(.vertical, 5)
     }
-
-    private func tableCell(_ text: String, bold: Bool = false, color: Color = .primary) -> some View {
-        Text(text)
-            .font(.system(size: 10, weight: bold ? .semibold : .regular))
-            .foregroundColor(color)
-            .frame(maxWidth: .infinity, alignment: .center)
-            .padding(.vertical, 6)
-    }
 }
 
 // MARK: - Card
 
 private struct ChannelCard: View {
-    let channel: ChannelQuality
+    let channel: ChannelRecommendation
 
     var body: some View {
         HStack(spacing: 14) {
             VStack(spacing: 2) {
                 ZStack {
                     Circle()
-                        .fill(Color(hex: channel.qualityLevel.color).opacity(0.15))
+                        .fill(Color(hex: channel.rfLevel.color).opacity(0.15))
                         .frame(width: 44, height: 44)
                     Text("\(channel.channel)")
                         .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundColor(Color(hex: channel.qualityLevel.color))
+                        .foregroundColor(Color(hex: channel.rfLevel.color))
                 }
                 Text(channel.bandDisplay)
                     .font(.system(size: 9))
@@ -200,22 +219,27 @@ private struct ChannelCard: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
-                    Text(channel.qualityLevel.displayName)
+                    Text(channel.rfLevel.displayName)
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(Color(hex: channel.qualityLevel.color))
-                    if channel.isRecommended { badge(String(localized: "★ Recommended"), color: "#FF9F0A") }
+                        .foregroundColor(Color(hex: channel.rfLevel.color))
+                    if channel.rfIsRecommended { badge(String(localized: "★ Recommended"), color: "#FF9F0A") }
                     if channel.isCurrentChannel { badge(String(localized: "● Current"), color: "#007AFF") }
+                    if channel.classification == .advanced {
+                        badge(String(localized: "DFS/Advanced"), color: "#FF9F0A")
+                    } else if channel.classification == .restricted {
+                        badge(String(localized: "Restricted"), color: "#FF3B30")
+                    }
                 }
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
                         RoundedRectangle(cornerRadius: 3).fill(.quaternary).frame(height: 6)
                         RoundedRectangle(cornerRadius: 3)
-                            .fill(LinearGradient(colors: [Color(hex: channel.qualityLevel.color).opacity(0.6), Color(hex: channel.qualityLevel.color)], startPoint: .leading, endPoint: .trailing))
-                            .frame(width: geo.size.width * CGFloat(channel.qualityScore) / 100, height: 6)
+                            .fill(LinearGradient(colors: [Color(hex: channel.rfLevel.color).opacity(0.6), Color(hex: channel.rfLevel.color)], startPoint: .leading, endPoint: .trailing))
+                            .frame(width: geo.size.width * CGFloat(channel.rfScore) / 100, height: 6)
                     }
                 }
                 .frame(height: 6)
-                Text("\(channel.qualityScore)/100")
+                Text("\(channel.rfScore)/100")
                     .font(.system(size: 11, design: .monospaced))
                     .foregroundColor(.secondary)
             }

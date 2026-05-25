@@ -84,6 +84,18 @@ final class ScannerViewModel {
     var networkInfo: [NetworkInterfaceInfo] = []
     var channelQualities: [ChannelQuality] = []
 
+    // Regulatory-aware recommendations (Phase 2: computed alongside channelQualities)
+    var channelRecommendations: [ChannelRecommendation] = []
+    var inferredRegion: RegionInferenceResult?
+    private var deviceSupportedChannels = Set<String>()
+    private var deviceCachedCapabilities: DevicePHYCapabilities = .default
+    private var cachedSupportedChannelsRaw: [(Int, Int)] = []
+    var userRegionOverride: RegulatoryDomain? {
+        didSet {
+            // Recompute on next scan — force uses the new override
+        }
+    }
+
     var bandViewModels: [BandChartViewModel] {
         [band24, band5, band6].filter { supportedBands.contains($0.band) }
     }
@@ -164,6 +176,12 @@ final class ScannerViewModel {
         guard !isScanning else { return }
         supportedBands = await scanner.supportedBands()
         AppLogger.scanner.info("start() — supported bands = \(supportedBands.map { $0.id }.sorted())")
+        // Fetch device capabilities once for the regulatory pipeline
+        let rawChannels = await scanner.supportedChannels()
+        deviceSupportedChannels = Set(rawChannels.map { "\($0.0.rawValue)-\($0.1)" })
+        deviceCachedCapabilities = await scanner.devicePHYCapabilities()
+        cachedSupportedChannelsRaw = await scanner.supportedWLANChannelsRaw()
+        AppLogger.scanner.debug("device — supported \(rawChannels.count) channels, PHY=\(deviceCachedCapabilities.phySummary), DFS=\(deviceCachedCapabilities.supportsDFS), 6GHz=\(deviceCachedCapabilities.supports6GHz)")
         updateInterfaceName()
         startScanLoop()
         hasStarted = true
@@ -219,6 +237,7 @@ final class ScannerViewModel {
                     applyNetworks(networks)
                     networkInfo = NetworkInfoService.fetchAll()
                     channelQualities = computeChannelQualities()
+                    channelRecommendations = computeChannelRecommendations()
                 }
             }
         }
@@ -367,6 +386,41 @@ final class ScannerViewModel {
         }
         let aps = Array(seen.values)
         return ChannelQualityCalculator.compute(aps: aps, currentChannel: currentChannel, supportedBands: Set(supportedBands.map(\.id)))
+    }
+
+    /// Run the regulatory-aware filtering pipeline on top of RF results.
+    private func computeChannelRecommendations() -> [ChannelRecommendation] {
+        let rfResults = channelQualities
+
+        // Read region override from settings (stored as String in UserDefaults)
+        let override: RegulatoryDomain? = {
+            let raw = UserDefaults.standard.string(forKey: "regulatoryRegionOverride") ?? "auto"
+            return raw == "auto" ? nil : RegulatoryDomain(rawValue: raw)
+        }()
+
+        // Region inference
+        let apCountryCodes: [String] = lastNetworks.compactMap { nw in
+            guard let ie = nw.ieData else { return nil }
+            return IEParser.parse(data: ie).countryCode
+        }
+
+        let region = RegionInferenceEngine.infer(
+            systemLocale: .current,
+            supportedChannels: cachedSupportedChannelsRaw,
+            apCountryCodes: apCountryCodes,
+            userOverride: userRegionOverride ?? override
+        )
+        inferredRegion = region
+        AppLogger.scanner.debug("region: \(region.domain.rawValue) (\(region.confidence.label))")
+
+        let input = RegulatoryFilter.FilterInput(
+            rfResults: rfResults,
+            inferredRegion: region,
+            deviceSupportedChannels: deviceSupportedChannels,
+            deviceCapabilities: deviceCachedCapabilities,
+            userClassificationOverrides: nil
+        )
+        return RegulatoryFilter.apply(to: input)
     }
 
     func toggleVisibility(bssid: String) {

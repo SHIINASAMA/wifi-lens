@@ -43,7 +43,7 @@ private struct AppRootView: View {
                         }
                     }
             case .channels:
-                ChannelQualityView(channels: viewModel.channelQualities)
+                ChannelQualityView(channels: viewModel.channelRecommendations)
             case .interfaces:
                 InterfacesView(interfaces: viewModel.networkInfo, scannerViewModel: viewModel, throughputMonitor: viewModel.throughputMonitor)
             case .roaming:

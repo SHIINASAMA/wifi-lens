@@ -86,4 +86,48 @@ actor WiFiScanner {
         }
         return bands
     }
+
+    /// Returns the full set of (band, channel) tuples the hardware can use.
+    /// This reflects the OS regulatory database + driver capabilities.
+    func supportedChannels() -> [(ChannelBand, Int)] {
+        guard let channels = client.interface()?.supportedWLANChannels() else {
+            return []
+        }
+        return channels.compactMap { cw in
+            guard let band = ChannelBand(rawValue: cw.channelBand.rawValue) else { return nil }
+            return (band, cw.channelNumber)
+        }
+    }
+
+    /// Returns raw (band raw value, channel number) pairs for region fingerprinting.
+    /// These are Sendable, unlike CWChannel.
+    func supportedWLANChannelsRaw() -> [(Int, Int)] {
+        guard let channels = client.interface()?.supportedWLANChannels() else { return [] }
+        return channels.map { (Int($0.channelBand.rawValue), $0.channelNumber) }
+    }
+
+    /// Derives device PHY capabilities from the active interface.
+    func devicePHYCapabilities() -> DevicePHYCapabilities {
+        guard let iface = client.interface() else {
+            return .default
+        }
+        let phy = iface.activePHYMode()
+        let allChannels = supportedChannels()
+        let is6Ghz = allChannels.contains(where: { $0.0 == .band6GHz })
+        let channelNumbers = Set(allChannels.map(\.1))
+        let dfsChannelSet: Set<Int> = [
+            52, 56, 60, 64, 100, 104, 108, 112, 116,
+            120, 124, 128, 132, 136, 140, 144,
+        ]
+        let supportsDFS = !channelNumbers.intersection(dfsChannelSet).isEmpty
+        return DevicePHYCapabilities(
+            supportsAX: phy.rawValue >= 5,
+            supportsAC: phy.rawValue >= 4,
+            supportsN: phy.rawValue >= 3,
+            supportsBE: phy.rawValue >= 6,
+            supports6GHz: is6Ghz,
+            supportsDFS: supportsDFS,
+            supports160MHz: false
+        )
+    }
 }

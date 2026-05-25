@@ -156,6 +156,7 @@ export const en = {
     bullets: [
       'WiFi Lens does not collect, store, or transmit any personal information, usage analytics, or telemetry. There are no third-party analytics, ad networks, or tracking SDKs in the app.',
       'Location Services: macOS requires this permission for CoreWLAN to expose Wi‑Fi SSID names. WiFi Lens never accesses your coordinates and never logs your location.',
+      'Region detection: channel recommendations use your system locale, hardware-reported channel list, and nearby AP country codes to infer your regulatory domain. This inference runs entirely on-device — no region data is collected or transmitted.',
       'All Wi‑Fi scan results, crash reports, and diagnostic logs remain in files on your own disk. Nothing is uploaded or shared automatically — you control whether to share them.',
     ],
     mcp: 'MCP server is bound to 127.0.0.1. No scan data leaves your machine through MCP unless you explicitly route it elsewhere.',

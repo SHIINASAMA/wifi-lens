@@ -39,6 +39,14 @@ Built with SwiftUI, CoreWLAN, and Sparkle.
 > Open **System Settings → Privacy & Security → Location Services** and enable
 > the app when prompted.
 
+## Privacy
+
+WiFi Lens does not collect, store, or transmit any personal information, usage analytics, or telemetry. All data stays on your Mac.
+
+- **Location Services** — Required by macOS to expose Wi-Fi SSID names. WiFi Lens never accesses your GPS coordinates.
+- **Region detection** — Channel recommendations use your system locale, hardware-reported channel list, and nearby AP country codes to infer your regulatory domain. This inference runs entirely on-device.
+- **MCP server** — Bound to `127.0.0.1`. No scan data leaves your machine unless you explicitly route it elsewhere.
+
 ## Download
 
 [Visit the latest release](https://github.com/SHIINASAMA/wifi-lens/releases/latest/)

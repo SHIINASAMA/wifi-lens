@@ -6,6 +6,7 @@ struct SettingsView: View {
 
     @State private var autoCheck: Bool
     @AppStorage("scanIntervalSeconds") private var scanInterval: Int = 3
+    @AppStorage("regulatoryRegionOverride") private var regionOverride: String = "auto"
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
     @AppStorage("appearance") private var appearance: String = "system"
@@ -61,6 +62,20 @@ struct SettingsView: View {
                         Text(String(localized: "10 seconds")).tag(10)
                     }
                     .pickerStyle(.menu)
+
+                    Picker(String(localized: "Regulatory Region"), selection: $regionOverride) {
+                        Text(String(localized: "Auto-detect")).tag("auto")
+                        Text(String(localized: "United States (FCC)")).tag("US")
+                        Text(String(localized: "Japan (MIC)")).tag("JP")
+                        Text(String(localized: "China (SRRC)")).tag("CN")
+                        Text(String(localized: "European Union (ETSI)")).tag("EU")
+                    }
+                    .pickerStyle(.menu)
+
+                    Text(String(localized: "Channel recommendations are filtered by regional regulations. Auto-detect uses system locale, hardware capabilities, and nearby AP information."))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
 
                 // MARK: - MCP

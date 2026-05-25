@@ -13,13 +13,13 @@ struct OverviewView: View {
         viewModel.networkInfo.first(where: { $0.ssid != nil })
     }
 
-    private var currentChannelQuality: ChannelQuality? {
+    private var currentChannelQuality: ChannelRecommendation? {
         guard wifi?.channel != nil else { return nil }
-        return viewModel.channelQualities.first(where: { $0.isCurrentChannel })
+        return viewModel.channelRecommendations.first(where: { $0.isCurrentChannel })
     }
 
-    private var recommendedChannels: [ChannelQuality] {
-        viewModel.channelQualities.filter(\.isRecommended)
+    private var recommendedChannels: [ChannelRecommendation] {
+        viewModel.channelRecommendations.filter(\.isRecommended)
     }
 
     private var totalNetworks: Int {
@@ -73,7 +73,7 @@ struct OverviewView: View {
                 }
                 .frame(maxWidth: .infinity)
             }
-            .onChange(of: currentChannelQuality?.qualityScore) { _, newRaw in
+            .onChange(of: currentChannelQuality?.rfScore) { _, newRaw in
             let raw = newRaw ?? 100
             displayScore = stableScore.update(score: raw)
             displayLevel = .from(score: displayScore)
@@ -282,7 +282,7 @@ struct OverviewView: View {
 
     // MARK: - Channel Advice
 
-    private func channelAdviceCard(_ current: ChannelQuality) -> some View {
+    private func channelAdviceCard(_ current: ChannelRecommendation) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 6) {
                 Image(systemName: "lightbulb.fill")
@@ -295,17 +295,17 @@ struct OverviewView: View {
                 HStack(spacing: 10) {
                     ZStack {
                         Circle()
-                            .fill(Color(hex: ch.qualityLevel.color).opacity(0.15))
+                            .fill(Color(hex: ch.rfLevel.color).opacity(0.15))
                             .frame(width: 32, height: 32)
                         Text("\(ch.channel)")
                             .font(.system(size: 14, weight: .bold, design: .rounded))
-                            .foregroundColor(Color(hex: ch.qualityLevel.color))
+                            .foregroundColor(Color(hex: ch.rfLevel.color))
                     }
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("\(ch.bandDisplay) — \(ch.qualityLevel.displayName)")
+                        Text("\(ch.bandDisplay) — \(ch.rfLevel.displayName)")
                             .font(.system(size: 12, weight: .medium))
-                        Text(String(localized: "\(ch.qualityScore)/100 · \(ch.apCount) nearby"))
+                        Text(String(localized: "\(ch.rfScore)/100 · \(ch.apCount) nearby"))
                             .font(.system(size: 10))
                             .foregroundColor(.secondary)
                     }
