@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-gray-950 text-gray-100 antialiased;
+  }
+
+  ::selection {
+    @apply bg-brand-500/30;
+  }
+
+  @media (min-width: 1280px) {
+    .page section .mx-auto.max-w-6xl,
+    .page section .mx-auto.max-w-4xl {
+      margin-right: 12rem;
+    }
+  }
+}
+
+@layer components {
+  .btn-oss {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm transition-all duration-200 shadow-lg shadow-brand-600/20 hover:shadow-brand-500/30 active:scale-[0.98];
+  }
+
+  .btn-pro {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-100 font-semibold text-sm border border-gray-700 hover:border-gray-600 transition-all duration-200 active:scale-[0.98];
+  }
+
+  .glass-card {
+    @apply bg-gray-900/60 border border-gray-800/80 backdrop-blur-xl rounded-2xl;
+  }
+
+  .download-grid {
+    @apply gap-5;
+  }
+
+  .download-card {
+    @apply flex flex-col rounded-3xl p-8 bg-gradient-to-b from-gray-900/80 to-gray-950/80 backdrop-blur-xl border border-white/5 shadow-[0_20px_60px_rgba(0,0,0,0.25)];
+  }
+
+  .download-card-oss {
+    @apply ring-1 ring-brand-500/15 shadow-brand-950/20;
+  }
+
+  .download-card-pro {
+    @apply bg-gray-950/55 border-gray-800/60 shadow-none;
+  }
+
+
+  .section-subtitle {
+    @apply mt-3 text-lg text-gray-400 max-w-2xl;
+  }
+
+  .feature-icon {
+    @apply w-10 h-10 rounded-xl flex items-center justify-center text-lg mb-4;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #nav {
+    background: transparent;
+    transition: background 0.3s, box-shadow 0.3s, transform 0.4s;
+  }
+
+  #nav.nav-scrolled {
+    background: rgba(3, 7, 18, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  #nav.nav-hidden {
+    transform: translateY(-100%);
+  }
+
+  .toc-link {
+    border-left: 2px solid transparent;
+    margin-left: -18px;
+    padding-left: 16px !important;
+    transition: border-color 0.3s, color 0.3s;
+  }
+
+  .toc-link.toc-active {
+    color: #93c5fd;
+    border-left-color: #3b82f6;
+  }
+
+  .toc-privacy {
+    color: #86efac !important;
+  }
+
+  .toc-privacy.toc-active {
+    color: #86efac !important;
+    border-left-color: #22c55e !important;
+  }
+
+  #back-to-top {
+    transition: opacity 0.3s, transform 0.3s, background-color 0.3s;
+  }
+
+  #back-to-top:hover {
+    transform: translateY(-2px);
+  }
+}

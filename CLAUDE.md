@@ -15,14 +15,21 @@ All detailed documentation lives under `docs/`. When adding or updating document
 ## Build & Test
 
 ```sh
-# Always use xcodebuild — do NOT use swift build / swift test
+# App — always use xcodebuild, never swift build / swift test
 # Build configurations: Debug-OSS / Debug-PRO / Release-OSS / Release-PRO
 xcodebuild -project WiFiLens.xcodeproj -scheme WiFiLens -configuration "Debug-OSS" -destination 'platform=macOS' build
 xcodebuild -project WiFiLens.xcodeproj -scheme WiFiLens -configuration "Debug-OSS" -destination 'platform=macOS' test
 xed WiFiLens.xcodeproj                   # open in Xcode GUI
+
+# Website — Vite + Tailwind CSS, outputs to _site/
+npm ci && npm run dev                    # dev server at localhost:5173/wifi-lens/
+npm run build                            # production build
+npm run preview                          # preview production build
 ```
 
 The product name is `WiFi Lens.app` (with space). If Xcode regenerates the project and `TEST_HOST` breaks, fix it to: `$(BUILT_PRODUCTS_DIR)/WiFi Lens.app/Contents/MacOS/WiFi Lens`.
+
+The website deploys to GitHub Pages via `.github/workflows/pages.yml`, triggered on push when any site source file changes.
 
 ## Key Facts
 
