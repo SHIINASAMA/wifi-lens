@@ -300,11 +300,15 @@ final class RoamingTestViewModel {
         }
     }
 
-    private var defaultFileName: String {
-        let ssid = currentSSID ?? "WiFi"
+    private static let fileNameFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "yyyy-MM-dd_HHmmss"
-        let ts = f.string(from: Date())
+        return f
+    }()
+
+    private var defaultFileName: String {
+        let ssid = currentSSID ?? "WiFi"
+        let ts = Self.fileNameFormatter.string(from: Date())
         return "\(ssid)_\(ts).wifi-roam"
     }
 }

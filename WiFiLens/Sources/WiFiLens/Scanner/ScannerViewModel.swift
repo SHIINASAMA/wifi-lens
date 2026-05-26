@@ -85,20 +85,19 @@ final class ScannerViewModel {
     var channelQualities: [ChannelQuality] = []
 
     // Regulatory-aware recommendations (Phase 2: computed alongside channelQualities)
+    let regulatoryPipeline = RegulatoryPipeline()
     var channelRecommendations: [ChannelRecommendation] = []
-    var inferredRegion: RegionInferenceResult?
-    private var deviceSupportedChannels = Set<String>()
-    private var deviceCachedCapabilities: DevicePHYCapabilities = .default
-    private var cachedSupportedChannelsRaw: [(Int, Int)] = []
+    var inferredRegion: RegionInferenceResult? { regulatoryPipeline.inferredRegion }
     var userRegionOverride: RegulatoryDomain? {
-        didSet {
-            // Recompute on next scan — force uses the new override
-        }
+        get { regulatoryPipeline.userRegionOverride }
+        set { regulatoryPipeline.userRegionOverride = newValue }
     }
 
     var bandViewModels: [BandChartViewModel] {
         [band24, band5, band6].filter { supportedBands.contains($0.band) }
     }
+
+    var allBandViewModels: [BandChartViewModel] { [band24, band5, band6] }
 
     var combinedTableRows: [NetworkTableRow] {
         bandViewModels.flatMap { vm in

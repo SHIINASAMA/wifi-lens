@@ -123,8 +123,18 @@ final class BandChartViewModel {
 
     // MARK: - RSSI animation
 
+    var isViewVisible = true {
+        didSet {
+            if isViewVisible {
+                if !allSeriesData.isEmpty { startAnimation() }
+            } else {
+                stopAnimation()
+            }
+        }
+    }
+
     private func startAnimation() {
-        guard animationTimer == nil else { return }
+        guard animationTimer == nil, isViewVisible else { return }
         animationTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
             Task { @MainActor [weak self] in
                 self?.tickAnimation()

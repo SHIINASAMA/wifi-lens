@@ -257,10 +257,14 @@ struct DebugRoamingChartView: View {
             .lineLimit(1)
     }
 
-    private func tsLabel(_ date: Date) -> String {
+    private static let tsFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "HH:mm:ss"
-        return f.string(from: date)
+        return f
+    }()
+
+    private func tsLabel(_ date: Date) -> String {
+        Self.tsFormatter.string(from: date)
     }
 }
 

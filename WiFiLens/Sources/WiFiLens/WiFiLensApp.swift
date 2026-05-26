@@ -121,6 +121,10 @@ private struct AppRootView: View {
             }
             .onChange(of: selectedPage) { _, newPage in
                 visitedPages.insert(newPage)
+                let spectrumVisible = newPage == .spectrum
+                for vm in viewModel.allBandViewModels {
+                    vm.isViewVisible = spectrumVisible
+                }
             }
             .alert(String(localized: "Previous Crash Detected"), isPresented: $showCrashLog) {
                 Button(String(localized: "Dismiss"), role: .cancel) {}
