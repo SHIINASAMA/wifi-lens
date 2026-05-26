@@ -411,7 +411,6 @@ final class ScannerViewModel {
             userOverride: userRegionOverride ?? override
         )
         inferredRegion = region
-        AppLogger.scanner.debug("region: \(region.domain.rawValue) (\(region.confidence.label))")
 
         let input = RegulatoryFilter.FilterInput(
             rfResults: rfResults,

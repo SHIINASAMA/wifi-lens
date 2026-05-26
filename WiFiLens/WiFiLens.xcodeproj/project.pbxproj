@@ -66,6 +66,7 @@
 		FB92F9212FBE208500BCEC67 /* DebugChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F91F2FBE208500BCEC67 /* DebugChartView.swift */; };
 		FB92F9232FBE208500BCEC67 /* DebugContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */; };
 		FB92F9252FBE208500BCEC67 /* DebugThroughputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */; };
+		FB92F9282FBE208500BCEC67 /* DebugRoamingChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */; };
 		FB9B7F3B2FC2D9650057B038 /* ChartTimeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */; };
 		FB9B7F3C2FC2D9650057B038 /* ChartGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F362FC2D9650057B038 /* ChartGeometry.swift */; };
 		FB9B7F3D2FC2D9650057B038 /* SplineInterpolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */; };
@@ -155,6 +156,7 @@
 		FB92F91F2FBE208500BCEC67 /* DebugChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugChartView.swift; sourceTree = "<group>"; };
 		FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugContainerView.swift; sourceTree = "<group>"; };
 		FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugThroughputView.swift; sourceTree = "<group>"; };
+		FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugRoamingChartView.swift; sourceTree = "<group>"; };
 		FB9B7F362FC2D9650057B038 /* ChartGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartGeometry.swift; sourceTree = "<group>"; };
 		FB9B7F372FC2D9650057B038 /* ChartRendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartRendering.swift; sourceTree = "<group>"; };
 		FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartTimeFormatting.swift; sourceTree = "<group>"; };
@@ -227,6 +229,7 @@
 				FB92F91F2FBE208500BCEC67 /* DebugChartView.swift */,
 				FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */,
 				FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */,
+				FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */,
 			);
 			path = Debug;
 			sourceTree = "<group>";
@@ -349,22 +352,22 @@
 		DA6A83BCB3A09FD57BB9E12F /* WiFiLens */ = {
 			isa = PBXGroup;
 			children = (
-				FB6F41CB2FC4889B0009F29B /* Regulatory */,
-				FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */,
-				831E90D5B9D07C478A35DD14 /* WiFiLensApp.swift */,
-				FB9B7F3A2FC2D9650057B038 /* Charts */,
 				AD735352E4FE8FE0803C143C /* App */,
-				93CBE45991F4573779019CBC /* Scanner */,
-				76E1D8231AF6132E0568C813 /* Spectrum */,
-				8FFEB5302BE8674E56110FAE /* Interfaces */,
-				9F327AEB42954B939E2CC19F /* Roaming */,
+				FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */,
 				D3E6587CCEDEC199C00591B2 /* Channels */,
-				B1279BAD6D501300C4F2A85F /* Table */,
-				786696F9D6046171197C0641 /* MCP */,
-				DD6657406F0FB50F2D9B7FB4 /* Utilities */,
-				14F4ABDD1A4A4FAD821DF0CB /* SignalProcessing */,
+				FB9B7F3A2FC2D9650057B038 /* Charts */,
 				49FEC4F42675BFAD1316DDEC /* Debug */,
+				8FFEB5302BE8674E56110FAE /* Interfaces */,
+				786696F9D6046171197C0641 /* MCP */,
+				FB6F41CB2FC4889B0009F29B /* Regulatory */,
 				FB8BB5FE2FBB039A00FD072E /* Resources */,
+				9F327AEB42954B939E2CC19F /* Roaming */,
+				93CBE45991F4573779019CBC /* Scanner */,
+				14F4ABDD1A4A4FAD821DF0CB /* SignalProcessing */,
+				76E1D8231AF6132E0568C813 /* Spectrum */,
+				B1279BAD6D501300C4F2A85F /* Table */,
+				DD6657406F0FB50F2D9B7FB4 /* Utilities */,
+				831E90D5B9D07C478A35DD14 /* WiFiLensApp.swift */,
 			);
 			path = WiFiLens;
 			sourceTree = "<group>";
@@ -571,6 +574,7 @@
 				FB92F9212FBE208500BCEC67 /* DebugChartView.swift in Sources */,
 				FB92F9232FBE208500BCEC67 /* DebugContainerView.swift in Sources */,
 				FB92F9252FBE208500BCEC67 /* DebugThroughputView.swift in Sources */,
+				FB92F9282FBE208500BCEC67 /* DebugRoamingChartView.swift in Sources */,
 				A952EA4DBE85899D61989DF9 /* SSIDColorHasher.swift in Sources */,
 				DA7DEF71C1E8ED4068EB7D66 /* ScannerViewModel.swift in Sources */,
 				FB0573C92FBCD25C005F8214 /* HelpCenterView.swift in Sources */,

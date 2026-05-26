@@ -5,11 +5,13 @@ import SwiftUI
 enum DebugPage: String, CaseIterable {
     case spectrum
     case throughput
+    case roaming
 
     var label: String {
         switch self {
         case .spectrum:   "Spectrum"
         case .throughput: "Throughput"
+        case .roaming:    "Roaming"
         }
     }
 }
@@ -36,6 +38,8 @@ struct DebugContainerView: View {
                 DebugChartView()
             case .throughput:
                 DebugThroughputView()
+            case .roaming:
+                DebugRoamingChartView()
             }
         }
     }
