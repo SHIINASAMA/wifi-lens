@@ -549,6 +549,9 @@
     "Bluetooth is turned off" : {
 
     },
+    "Bluetooth Permission Denied" : {
+
+    },
     "Bluetooth Permission Required" : {
 
     },
@@ -1360,6 +1363,12 @@
           }
         }
       }
+    },
+    "Grant Bluetooth permission in Settings → Permissions to scan for nearby BLE devices." : {
+
+    },
+    "Grant Bluetooth permission in Settings to scan for BLE devices." : {
+
     },
     "Granted" : {
       "extractionState" : "stale",

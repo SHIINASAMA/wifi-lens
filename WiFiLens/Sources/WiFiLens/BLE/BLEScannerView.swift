@@ -11,8 +11,12 @@ struct BLEScannerView: View {
 
             if viewModel.bluetoothState == .poweredOff {
                 bluetoothOffView
-            } else if viewModel.bluetoothState == .unauthorized {
+            } else if viewModel.bluetoothState == .unauthorized
+                        || viewModel.bluetoothPermission.authorizationStatus == .denied
+                        || viewModel.bluetoothPermission.authorizationStatus == .restricted {
                 unauthorizedView
+            } else if viewModel.bluetoothPermission.authorizationStatus == .notDetermined {
+                permissionRequiredView
             } else if let error = viewModel.errorMessage {
                 errorView(error)
             } else if viewModel.devices.isEmpty, viewModel.isScanning {
@@ -265,15 +269,32 @@ struct BLEScannerView: View {
             Image(systemName: "hand.raised.slash")
                 .font(.system(size: 32))
                 .foregroundColor(.secondary.opacity(0.5))
+            Text("Bluetooth Permission Denied")
+                .font(.body)
+                .foregroundColor(.secondary)
+            Text("Grant Bluetooth permission in Settings to scan for BLE devices.")
+                .font(.caption)
+                .foregroundColor(.secondary.opacity(0.5))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+            Spacer()
+        }
+    }
+
+    private var permissionRequiredView: some View {
+        VStack(spacing: 12) {
+            Spacer()
+            Image(systemName: "antenna.radiowaves.left.and.right")
+                .font(.system(size: 32))
+                .foregroundColor(.secondary.opacity(0.5))
             Text("Bluetooth Permission Required")
                 .font(.body)
                 .foregroundColor(.secondary)
-            Button("Open System Settings") {
-                if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Bluetooth") {
-                    NSWorkspace.shared.open(url)
-                }
-            }
-            .buttonStyle(.bordered)
+            Text("Grant Bluetooth permission in Settings → Permissions to scan for nearby BLE devices.")
+                .font(.caption)
+                .foregroundColor(.secondary.opacity(0.5))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
             Spacer()
         }
     }

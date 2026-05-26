@@ -3,6 +3,8 @@ import Sparkle
 
 struct SettingsView: View {
     let updater: SparkleUpdater
+    let locationPermission: LocationPermissionManager
+    let bluetoothPermission: BluetoothPermissionManager?
 
     @State private var autoCheck: Bool
     @AppStorage("scanIntervalSeconds") private var scanInterval: Int = 3
@@ -12,8 +14,10 @@ struct SettingsView: View {
     @AppStorage("appearance") private var appearance: String = "system"
     @AppStorage("hideTitleBadge") private var hideTitleBadge = false
 
-    init(updater: SparkleUpdater) {
+    init(updater: SparkleUpdater, locationPermission: LocationPermissionManager, bluetoothPermission: BluetoothPermissionManager?) {
         self.updater = updater
+        self.locationPermission = locationPermission
+        self.bluetoothPermission = bluetoothPermission
         _autoCheck = State(initialValue: updater.automaticallyChecksForUpdates)
         if BuildConfig.current == .pro {
             updater.automaticallyChecksForUpdates = false
@@ -23,7 +27,9 @@ struct SettingsView: View {
 
     var body: some View {
         ScrollView {
-            Form {
+            HStack(spacing: 0) {
+                Spacer(minLength: 0)
+                Form {
                 // MARK: - General
                 Section {
                     VStack(alignment: .leading, spacing: 4) {
@@ -127,6 +133,60 @@ struct SettingsView: View {
                 }
                 }
 
+                // MARK: - Permissions
+
+                Section {
+                    // Location
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Image(systemName: "location.fill")
+                                .foregroundColor(.blue)
+                                .frame(width: 20)
+                            Text(String(localized: "Location Services"))
+                                .font(.body)
+                            Spacer()
+                            PermissionStatusBadge(isAuthorized: locationPermission.isAuthorizedForSSID)
+                        }
+                        Text(String(localized: "Required to read Wi-Fi network names (SSID). Without it, network names show as \"n/a\" but signal data is still available."))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Button(String(localized: "Open Location Settings")) {
+                            locationPermission.openLocationPreferences()
+                        }
+                        .buttonStyle(.borderless)
+                        .font(.caption)
+                    }
+                    .padding(.vertical, 4)
+
+                    // Bluetooth
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Image(systemName: "antenna.radiowaves.left.and.right")
+                                .foregroundColor(.blue)
+                                .frame(width: 20)
+                            Text(String(localized: "Bluetooth"))
+                                .font(.body)
+                            Spacer()
+                            if let bp = bluetoothPermission {
+                                PermissionStatusBadge(isAuthorized: bp.isAuthorized)
+                            }
+                        }
+                        Text(String(localized: "Required to scan for nearby BLE devices and measure signal strength for network analysis."))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Button(String(localized: "Open Bluetooth Settings")) {
+                            bluetoothPermission?.openBluetoothPreferences()
+                        }
+                        .buttonStyle(.borderless)
+                        .font(.caption)
+                    }
+                    .padding(.vertical, 4)
+                } header: {
+                    Text(String(localized: "Permissions"))
+                }
+
                 // MARK: - Diagnostics
 
                 Section {
@@ -143,7 +203,24 @@ struct SettingsView: View {
             .formStyle(.grouped)
             .frame(maxWidth: 520)
             .padding(.vertical, 16)
+                Spacer(minLength: 0)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+private struct PermissionStatusBadge: View {
+    let isAuthorized: Bool
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(isAuthorized ? Color.green : Color.orange)
+                .frame(width: 6, height: 6)
+            Text(isAuthorized ? String(localized: "Granted") : String(localized: "Required"))
+                .font(.caption2)
+                .foregroundColor(.secondary)
+        }
     }
 }

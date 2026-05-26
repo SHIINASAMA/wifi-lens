@@ -5,6 +5,7 @@ import SwiftUI
 final class BLEViewModel {
     let scanner = BLEScanner()
     let deviceTracker = BLEDeviceTracker()
+    let bluetoothPermission = BluetoothPermissionManager()
 
     var isScanning = false
     var bluetoothState: BLEBluetoothState = .unknown
@@ -31,8 +32,24 @@ final class BLEViewModel {
 
     // MARK: - Actions
 
+    func requestPermission() {
+        bluetoothPermission.requestPermissionIfNeeded()
+    }
+
     func startScanning() async {
         guard !isScanning else { return }
+
+        bluetoothPermission.refreshStatus()
+        guard bluetoothPermission.isAuthorized else {
+            if bluetoothPermission.authorizationStatus == .notDetermined {
+                bluetoothPermission.requestPermissionIfNeeded()
+            }
+            errorMessage = bluetoothPermission.authorizationStatus == .denied
+                ? String(localized: "Bluetooth permission was denied. Enable it in System Settings.")
+                : String(localized: "Bluetooth permission is required to scan for BLE devices.")
+            return
+        }
+
         isScanning = true
         errorMessage = nil
 
@@ -45,6 +62,7 @@ final class BLEViewModel {
 
                 case .bluetoothStateChanged(let state):
                     bluetoothState = state
+                    bluetoothPermission.refreshStatus()
                     if state == .poweredOff || state == .unauthorized {
                         stopScanning()
                     }

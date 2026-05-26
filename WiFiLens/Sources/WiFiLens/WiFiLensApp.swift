@@ -91,7 +91,7 @@ private struct AppRootView: View {
                 }
 
                 if visitedPages.contains(.settings) {
-                    SettingsView(updater: sparkleUpdater)
+                    SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel.bluetoothPermission)
                         .opacity(selectedPage == .settings ? 1 : 0)
                         .allowsHitTesting(selectedPage == .settings)
                         .disabled(selectedPage != .settings)
