@@ -49,13 +49,42 @@ enum SidebarPage: String, CaseIterable {
         case .channels:   "chart.bar.fill"
         case .interfaces: "cable.connector"
         case .roaming:   "arrow.triangle.swap"
-        case .bleScanner: "wave.3.right"
+        case .bleScanner: "personalhotspot"
         case .help:       "questionmark.circle"
         case .settings:   "gearshape"
 #if DEBUG
         case .debugChart: "ladybug"
 #endif
         }
+    }
+}
+
+private struct BluetoothIconShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        let w = rect.width
+        let h = rect.height
+        var path = Path()
+
+        // Main vertical spine: M128 36V220
+        path.move(to: CGPoint(x: w * 0.5, y: h * 36.0 / 256.0))
+        path.addLine(to: CGPoint(x: w * 0.5, y: h * 220.0 / 256.0))
+
+        // Upper right diamond: M128 128L190 74L128 36
+        path.move(to: CGPoint(x: w * 0.5, y: h * 128.0 / 256.0))
+        path.addLine(to: CGPoint(x: w * 190.0 / 256.0, y: h * 74.0 / 256.0))
+        path.addLine(to: CGPoint(x: w * 0.5, y: h * 36.0 / 256.0))
+
+        // Lower right diamond: M128 128L190 182L128 220
+        path.move(to: CGPoint(x: w * 0.5, y: h * 128.0 / 256.0))
+        path.addLine(to: CGPoint(x: w * 190.0 / 256.0, y: h * 182.0 / 256.0))
+        path.addLine(to: CGPoint(x: w * 0.5, y: h * 220.0 / 256.0))
+
+        // Left crossing arms: M66 74L128 128L66 182
+        path.move(to: CGPoint(x: w * 66.0 / 256.0, y: h * 74.0 / 256.0))
+        path.addLine(to: CGPoint(x: w * 0.5, y: h * 128.0 / 256.0))
+        path.addLine(to: CGPoint(x: w * 66.0 / 256.0, y: h * 182.0 / 256.0))
+
+        return path
     }
 }
 
@@ -72,8 +101,17 @@ struct SidebarView: View {
             Divider()
             Section {
                 ForEach([SidebarPage.spectrum, .channels, .interfaces, .roaming, .bleScanner], id: \.self) { page in
-                    Label(page.label, systemImage: page.icon)
-                        .tag(page)
+                    if page == .bleScanner {
+                        Label(title: { Text(page.label) }, icon: {
+                            BluetoothIconShape()
+                                .stroke(.foreground, style: .init(lineWidth: 1.1, lineCap: .round, lineJoin: .round))
+                                .frame(width: 16, height: 16)
+                        })
+                            .tag(page)
+                    } else {
+                        Label(page.label, systemImage: page.icon)
+                            .tag(page)
+                    }
                 }
 #if DEBUG
                 Label(SidebarPage.debugChart.label, systemImage: SidebarPage.debugChart.icon)

@@ -43,7 +43,8 @@ struct BLEScannerView: View {
                 Image(systemName: viewModel.isScanning ? "stop.fill" : "play.fill")
                     .frame(width: 16, height: 16)
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.plain)
+            .help(viewModel.isScanning ? "Stop scanning" : "Start scanning")
             .disabled(viewModel.bluetoothState != .poweredOn)
 
             Circle()
@@ -57,7 +58,7 @@ struct BLEScannerView: View {
             Spacer()
 
             if !viewModel.devices.isEmpty {
-                Text("\(viewModel.devices.count) device\(viewModel.devices.count == 1 ? "" : "s")")
+                Text(String(localized: "\(viewModel.devices.count) devices"))
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .padding(.trailing, 8)
@@ -117,19 +118,6 @@ struct BLEScannerView: View {
                     .foregroundColor(.secondary)
             }
             .width(min: 70, ideal: 80)
-
-            TableColumn("TX") { device in
-                if let tx = device.txPower {
-                    Text("\(tx) dBm")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                } else {
-                    Text("—")
-                        .font(.caption)
-                        .foregroundColor(.secondary.opacity(0.5))
-                }
-            }
-            .width(min: 50, ideal: 60)
 
             TableColumn("Ads") { device in
                 Text("\(device.advertisementCount)")
@@ -332,9 +320,7 @@ struct BLEScannerView: View {
     }
 
     private var stateLabel: String {
-        viewModel.isScanning
-            ? "Scanning (\(viewModel.devices.count) device\(viewModel.devices.count == 1 ? "" : "s"))"
-            : viewModel.bluetoothState.label
+        viewModel.isScanning ? String(localized: "Scanning") : viewModel.bluetoothState.label
     }
 
     private func rssiColor(_ rssi: Double) -> Color {
@@ -348,10 +334,9 @@ struct BLEScannerView: View {
     private func formatTimeAgo(_ date: Date) -> String {
         let delta = Date().timeIntervalSince(date)
         switch delta {
-        case ..<1:   return "now"
-        case ..<5:   return "\(Int(delta))s ago"
-        case ..<60:  return "\(Int(delta))s ago"
-        case ..<3600: return "\(Int(delta / 60))m ago"
+        case ..<1:   return String(localized: "now")
+        case ..<60:  return String(localized: "\(Int(delta))s ago")
+        case ..<3600: return String(localized: "\(Int(delta / 60))m ago")
         default:     return "—"
         }
     }

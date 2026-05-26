@@ -7,6 +7,14 @@ final class BLEDeviceTracker {
     private var deviceHistories: [UUID: [BLERSSISample]] = [:]
     private var emaFilters: [UUID: ExponentialMovingAverage] = [:]
     private var firstSeenTimestamps: [UUID: Date] = [:]
+    private var lastMetadata: [UUID: DeviceMetadata] = [:]
+
+    private struct DeviceMetadata {
+        var localName: String?
+        var txPower: Int?
+        var isConnectable: Bool = false
+        var manufacturerData: Data?
+    }
 
     let maxHistoryCount: Int
     let emaAlpha: Double
@@ -19,23 +27,26 @@ final class BLEDeviceTracker {
     }
 
     /// Process a batch of raw advertisement events, returning updated snapshots
-    /// with RSSI history attached. Updates internal ring buffers and EMA filters.
-    /// Purges devices not seen within staleTimeout.
+    /// for ALL known devices (including those not in the current batch).
     func processBatch(
         _ eventsByDevice: [UUID: [BLEAdvertisementEvent]]
     ) -> [BLEDeviceSnapshot] {
-        purgeStale()
-
-        var snapshots: [BLEDeviceSnapshot] = []
-
+        // Update history and metadata for devices in the current batch
         for (identifier, events) in eventsByDevice {
             guard let latest = events.max(by: { $0.timestamp < $1.timestamp }),
                   !events.isEmpty else { continue }
 
-            let now = Date()
             if firstSeenTimestamps[identifier] == nil {
                 firstSeenTimestamps[identifier] = latest.timestamp
             }
+
+            // Retain best-known metadata — only overwrite fields when we get new data
+            var meta = lastMetadata[identifier] ?? DeviceMetadata()
+            if let name = latest.localName { meta.localName = name }
+            if let tx = latest.txPower { meta.txPower = tx }
+            meta.isConnectable = latest.isConnectable
+            if let mfr = latest.manufacturerData { meta.manufacturerData = mfr }
+            lastMetadata[identifier] = meta
 
             // RSSI aggregation: use best (strongest) RSSI from this batch
             let bestRSSI = events.map(\.rssi).max() ?? latest.rssi
@@ -48,7 +59,7 @@ final class BLEDeviceTracker {
 
             // Build sample and append to ring buffer
             let sample = BLERSSISample(
-                timestamp: now,
+                timestamp: latest.timestamp,
                 rawRSSI: bestRSSI,
                 smoothedRSSI: smoothed
             )
@@ -59,19 +70,30 @@ final class BLEDeviceTracker {
                 history.removeFirst(history.count - maxHistoryCount)
             }
             deviceHistories[identifier] = history
+        }
+
+        purgeStale()
+
+        // Build snapshots for ALL known devices, not just the current batch.
+        // Devices that didn't appear in this batch are carried over with their
+        // last-known RSSI and metadata until they go stale.
+        var snapshots: [BLEDeviceSnapshot] = []
+        for (identifier, history) in deviceHistories {
+            guard let lastSample = history.last,
+                  let meta = lastMetadata[identifier] else { continue }
 
             snapshots.append(BLEDeviceSnapshot(
                 peripheralIdentifier: identifier,
-                localName: latest.localName,
-                rssi: bestRSSI,
-                smoothedRSSI: smoothed,
-                txPower: latest.txPower,
-                isConnectable: latest.isConnectable,
-                firstSeen: firstSeenTimestamps[identifier] ?? latest.timestamp,
-                lastSeen: latest.timestamp,
-                advertisementCount: events.count,
+                localName: meta.localName,
+                rssi: lastSample.rawRSSI,
+                smoothedRSSI: lastSample.smoothedRSSI,
+                txPower: meta.txPower,
+                isConnectable: meta.isConnectable,
+                firstSeen: firstSeenTimestamps[identifier] ?? lastSample.timestamp,
+                lastSeen: lastSample.timestamp,
+                advertisementCount: history.count,
                 rssiHistory: history,
-                manufacturerData: latest.manufacturerData
+                manufacturerData: meta.manufacturerData
             ))
         }
 
@@ -97,6 +119,7 @@ final class BLEDeviceTracker {
             deviceHistories.removeValue(forKey: id)
             emaFilters.removeValue(forKey: id)
             firstSeenTimestamps.removeValue(forKey: id)
+            lastMetadata.removeValue(forKey: id)
         }
     }
 }

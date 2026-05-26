@@ -92,41 +92,38 @@ struct ContentView: View {
     // MARK: - Section Header
 
     private func sectionHeader(_ section: SectionInfo) -> some View {
-        Button {
-            withAnimation { toggleCollapse(section) }
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: isCollapsed(section) ? "chevron.right" : "chevron.down")
-                    .font(.caption)
-                    .frame(width: 12)
+        HStack(spacing: 6) {
+            Image(systemName: isCollapsed(section) ? "chevron.right" : "chevron.down")
+                .font(.caption)
+                .frame(width: 12)
 
-                section.icon
+            section.icon
 
-                Text(section.title)
-                    .font(.system(size: 12, weight: .semibold))
+            Text(section.title)
+                .font(.system(size: 12, weight: .semibold))
 
-                if section.isChart, let bandVM = section.bandVM {
-                    Button {
-                        bandVM.toggleFreeze()
-                    } label: {
-                        Image(systemName: bandVM.isFrozen ? "play.fill" : "pause.fill")
-                            .font(.caption2)
-                    }
-                    .buttonStyle(.plain)
-                    .help(bandVM.isFrozen ? "Resume" : "Pause")
+            if section.isChart, let bandVM = section.bandVM {
+                Button {
+                    bandVM.toggleFreeze()
+                } label: {
+                    Image(systemName: bandVM.isFrozen ? "play.fill" : "pause.fill")
                 }
-
-                Spacer()
-
-                Text(section.subtitle)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                .buttonStyle(.plain)
+                .help(bandVM.isFrozen ? "Resume" : "Pause")
             }
-            .padding(.horizontal, 10)
-            .frame(height: headerHeight)
-            .contentShape(Rectangle())
+
+            Spacer()
+
+            Text(section.subtitle)
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
-        .buttonStyle(.plain)
+        .padding(.horizontal, 10)
+        .frame(height: headerHeight)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            withAnimation { toggleCollapse(section) }
+        }
     }
 
     // MARK: - Section Content

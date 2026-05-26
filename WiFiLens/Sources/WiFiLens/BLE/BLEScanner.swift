@@ -8,12 +8,12 @@ enum BLEBluetoothState: Sendable {
 
     var label: String {
         switch self {
-        case .unknown:      "Unknown"
-        case .resetting:    "Resetting"
-        case .unsupported:  "Unsupported"
-        case .poweredOff:   "Bluetooth Off"
-        case .poweredOn:    "Ready"
-        case .unauthorized: "Permission Denied"
+        case .unknown:      String(localized: "Unknown")
+        case .resetting:    String(localized: "Resetting")
+        case .unsupported:  String(localized: "Unsupported")
+        case .poweredOff:   String(localized: "Bluetooth Off")
+        case .poweredOn:    String(localized: "Ready")
+        case .unauthorized: String(localized: "Permission Denied")
         }
     }
 }

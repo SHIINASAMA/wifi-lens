@@ -1,0 +1,29 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    SF Symbols inspired Bluetooth icon
+    Design goals:
+    - Rounded terminals
+    - Optical balance similar to SF Symbols
+    - Consistent stroke width
+    - Slightly softened geometry for macOS feel
+  -->
+
+  <g stroke="currentColor"
+     stroke-width="18"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+
+    <!-- Main vertical spine -->
+    <path d="M128 36V220"/>
+
+    <!-- Upper diamond / rune -->
+    <path d="M128 128L190 74L128 36"/>
+
+    <!-- Lower diamond / rune -->
+    <path d="M128 128L190 182L128 220"/>
+
+    <!-- Left crossing arms -->
+    <path d="M66 74L128 128L66 182"/>
+
+  </g>
+</svg>

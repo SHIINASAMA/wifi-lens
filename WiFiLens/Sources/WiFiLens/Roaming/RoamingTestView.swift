@@ -232,19 +232,25 @@ struct RoamingTestView: View {
             }
 
             if viewModel.isRunning {
-                Button(String(localized: "Stop")) {
+                Button {
                     viewModel.stopTest()
+                } label: {
+                    Label(String(localized: "Stop"), systemImage: "stop.fill")
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.red)
                 .controlSize(.small)
+                .help(String(localized: "Stop roaming test"))
             } else {
-                Button(String(localized: "Start")) {
+                Button {
                     viewModel.startTest()
+                } label: {
+                    Label(String(localized: "Start"), systemImage: "play.fill")
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
                 .disabled(!viewModel.canStart)
+                .help(String(localized: "Start roaming test"))
             }
         }
         .padding(.horizontal, 16)

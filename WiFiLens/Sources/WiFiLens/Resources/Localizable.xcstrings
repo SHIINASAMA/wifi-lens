@@ -69,7 +69,14 @@
       }
     },
     "%@ — RSSI history" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ — RSSI 历史"
+          }
+        }
+      }
     },
     "%@ %@" : {
       "localizations" : {
@@ -108,11 +115,18 @@
       }
     },
     "%@ device%@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ device%2$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 个设备"
           }
         }
       }
@@ -155,6 +169,17 @@
         }
       }
     },
+    "%lld devices" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 个设备"
+          }
+        }
+      }
+    },
     "%lld networks" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -190,6 +215,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld 行"
+          }
+        }
+      }
+    },
+    "%lldm ago" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 分钟前"
+          }
+        }
+      }
+    },
+    "%llds ago" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 秒前"
           }
         }
       }
@@ -406,6 +453,17 @@
         }
       }
     },
+    "Ads" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "广播"
+          }
+        }
+      }
+    },
     "Advanced" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -546,14 +604,90 @@
         }
       }
     },
+    "BLE Scanner" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "蓝牙扫描器"
+          }
+        }
+      }
+    },
     "Bluetooth is turned off" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "蓝牙已关闭"
+          }
+        }
+      }
+    },
+    "Bluetooth Off" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "蓝牙已关闭"
+          }
+        }
+      }
     },
     "Bluetooth Permission Denied" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "蓝牙权限被拒绝"
+          }
+        }
+      }
+    },
+    "Bluetooth permission is required to scan for BLE devices." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "扫描 BLE 设备需要蓝牙权限。"
+          }
+        }
+      }
+    },
+    "Bluetooth permission is required. Enable it in System Settings." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要蓝牙权限。请在系统设置中启用。"
+          }
+        }
+      }
     },
     "Bluetooth Permission Required" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要蓝牙权限"
+          }
+        }
+      }
+    },
+    "Bluetooth permission was denied. Enable it in System Settings." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "蓝牙权限被拒绝。请在系统设置中启用。"
+          }
+        }
+      }
     },
     "BSSID" : {
       "extractionState" : "stale",
@@ -1043,7 +1177,14 @@
       }
     },
     "dBm" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "dBm"
+          }
+        }
+      }
     },
     "Denied" : {
       "extractionState" : "stale",
@@ -1139,8 +1280,26 @@
         }
       }
     },
+    "EMA" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EMA"
+          }
+        }
+      }
+    },
     "Enable Bluetooth in System Settings to scan for BLE devices." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请在系统设置中启用蓝牙以扫描 BLE 设备。"
+          }
+        }
+      }
     },
     "Enable MCP server" : {
       "extractionState" : "stale",
@@ -1314,6 +1473,17 @@
         }
       }
     },
+    "First" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "首次"
+          }
+        }
+      }
+    },
     "Freeze All" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1365,10 +1535,24 @@
       }
     },
     "Grant Bluetooth permission in Settings → Permissions to scan for nearby BLE devices." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请在设置 → 权限中授予蓝牙权限以扫描附近的 BLE 设备。"
+          }
+        }
+      }
     },
     "Grant Bluetooth permission in Settings to scan for BLE devices." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请在设置中授予蓝牙权限以扫描 BLE 设备。"
+          }
+        }
+      }
     },
     "Granted" : {
       "extractionState" : "stale",
@@ -1448,6 +1632,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "高置信度"
+          }
+        }
+      }
+    },
+    "Identifier" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "标识符"
           }
         }
       }
@@ -1557,6 +1752,17 @@
         }
       }
     },
+    "Last Seen" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最后发现"
+          }
+        }
+      }
+    },
     "Latency" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1570,6 +1776,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "延迟"
+          }
+        }
+      }
+    },
+    "Latest" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近"
           }
         }
       }
@@ -1830,6 +2047,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "监听"
+          }
+        }
+      }
+    },
+    "Name" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名称"
           }
         }
       }
@@ -2134,6 +2362,17 @@
         }
       }
     },
+    "Permission Denied" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "权限被拒绝"
+          }
+        }
+      }
+    },
     "Permission is granted, but macOS is still not returning SSIDs." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2245,7 +2484,25 @@
       }
     },
     "Raw" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原始"
+          }
+        }
+      }
+    },
+    "Ready" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "就绪"
+          }
+        }
+      }
     },
     "Rec" : {
       "extractionState" : "stale",
@@ -2310,6 +2567,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重置缩放"
+          }
+        }
+      }
+    },
+    "Resetting" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在重置"
           }
         }
       }
@@ -2435,6 +2703,17 @@
         }
       }
     },
+    "Samples" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "采样数"
+          }
+        }
+      }
+    },
     "Save" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2501,8 +2780,26 @@
         }
       }
     },
+    "Scanning (%lld devices)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在扫描 (%lld 个设备)"
+          }
+        }
+      }
+    },
     "Scanning for BLE devices…" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在扫描 BLE 设备…"
+          }
+        }
+      }
     },
     "Scanning for Wi-Fi networks..." : {
       "extractionState" : "stale",
@@ -2637,7 +2934,25 @@
       }
     },
     "Smooth" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平滑"
+          }
+        }
+      }
+    },
+    "Smoothed" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "平滑值"
+          }
+        }
+      }
     },
     "Spectrum" : {
       "extractionState" : "stale",
@@ -2700,6 +3015,40 @@
         }
       }
     },
+    "Start roaming test" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Start roaming test"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始漫游测试"
+          }
+        }
+      }
+    },
+    "Start scanning" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Start scanning"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始扫描"
+          }
+        }
+      }
+    },
     "Stop" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2713,6 +3062,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "停止"
+          }
+        }
+      }
+    },
+    "Stop roaming test" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Stop roaming test"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "停止漫游测试"
+          }
+        }
+      }
+    },
+    "Stop scanning" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Stop scanning"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "停止扫描"
           }
         }
       }
@@ -2785,7 +3168,14 @@
       }
     },
     "Tap play to start scanning for BLE devices" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "轻点播放按钮开始扫描 BLE 设备"
+          }
+        }
+      }
     },
     "Theme" : {
       "extractionState" : "stale",
@@ -2929,6 +3319,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未知"
+          }
+        }
+      }
+    },
+    "Unsupported" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不支持"
           }
         }
       }

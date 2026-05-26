@@ -34,11 +34,12 @@ struct DebugThroughputView: View {
 
     private var controls: some View {
         HStack(spacing: 16) {
-            Toggle(isOn: $isRunning) {
+            Button {
+                isRunning.toggle()
+            } label: {
                 Image(systemName: isRunning ? "pause.fill" : "play.fill")
             }
-            .toggleStyle(.button)
-            .controlSize(.small)
+            .buttonStyle(.plain)
             .help(isRunning ? "Pause" : "Resume")
 
             paramSlider(label: "Base", value: $baseRate, range: 0...2_000_000, format: "%.0f K", scale: 1_000)

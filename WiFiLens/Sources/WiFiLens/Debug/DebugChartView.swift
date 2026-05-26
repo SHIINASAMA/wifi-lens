@@ -58,11 +58,12 @@ struct DebugChartView: View {
     private var controls: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 16) {
-                Toggle(isOn: $isRunning) {
+                Button {
+                    isRunning.toggle()
+                } label: {
                     Image(systemName: isRunning ? "pause.fill" : "play.fill")
                 }
-                .toggleStyle(.button)
-                .controlSize(.small)
+                .buttonStyle(.plain)
                 .help(isRunning ? "Pause" : "Resume")
 
                 Picker("Band", selection: $selectedBand) {
