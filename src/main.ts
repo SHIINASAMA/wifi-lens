@@ -20,6 +20,32 @@ const iconMap: Record<string, typeof Star> = {
   terminal: Terminal, lock: Lock, download: Download, zap: Zap, store: Store,
 }
 
+// ── Safety ───────────────────────────────────────────────────────
+// All page content is rendered via innerHTML with template literal
+// strings. Current data sources are static i18n strings — no external
+// or user-supplied content is interpolated, so there is no XSS vector.
+//
+// If dynamic data (release notes, user input, remote content, etc.)
+// is ever added, all untrusted values MUST pass through esc() before
+// interpolation. The esc() function below escapes HTML-sensitive
+// characters to prevent injection.
+//
+// Better yet: for any feature that needs dynamic data, switch that
+// section to DOM API (document.createElement / createElement from
+// lucide) instead of string concatenation.
+//
+// This comment serves as a guardrail — do not remove it without
+// ensuring the new code path handles XSS properly.
+
+function esc(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 // ── Render ────────────────────────────────────────────────────
 
 document.getElementById('app')!.innerHTML = /* html */ `
@@ -192,12 +218,12 @@ function renderHero() {
           </div>
 
           <h1 class="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05]">
-            <span class="text-white">${t.hero.title.split(' ')[0]}</span>
-            <span class="bg-gradient-to-r from-brand-400 via-brand-500 to-cyan-400 bg-clip-text text-transparent"> ${t.hero.title.split(' ')[1]}</span>
+            <span class="text-white">${esc(t.hero.title.split(' ')[0])}</span>
+            <span class="bg-gradient-to-r from-brand-400 via-brand-500 to-cyan-400 bg-clip-text text-transparent"> ${esc(t.hero.title.split(' ')[1])}</span>
           </h1>
 
           <p class="text-lg sm:text-xl text-gray-400 leading-relaxed max-w-lg">
-            ${t.hero.subtitle}
+            ${esc(t.hero.subtitle)}
           </p>
 
           <div class="flex flex-col sm:flex-row gap-3">
