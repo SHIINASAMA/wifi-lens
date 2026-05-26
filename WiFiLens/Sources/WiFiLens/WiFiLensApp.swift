@@ -4,6 +4,7 @@ import Sparkle
 private struct AppRootView: View {
     @Bindable var viewModel: ScannerViewModel
     @Bindable var roamingViewModel: RoamingTestViewModel
+    @Bindable var bleViewModel: BLEViewModel
     @Binding var sidebarVisibility: NavigationSplitViewVisibility
     @Binding var selectedPage: SidebarPage
     @Binding var showCrashLog: Bool
@@ -75,6 +76,13 @@ private struct AppRootView: View {
                         .disabled(selectedPage != .roaming)
                 }
 
+                if visitedPages.contains(.bleScanner) {
+                    BLEScannerView(viewModel: bleViewModel)
+                        .opacity(selectedPage == .bleScanner ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .bleScanner)
+                        .disabled(selectedPage != .bleScanner)
+                }
+
                 if visitedPages.contains(.help) {
                     HelpCenterView()
                         .opacity(selectedPage == .help ? 1 : 0)
@@ -124,6 +132,11 @@ private struct AppRootView: View {
                 let spectrumVisible = newPage == .spectrum
                 for vm in viewModel.allBandViewModels {
                     vm.isViewVisible = spectrumVisible
+                }
+                if newPage == .bleScanner, !bleViewModel.isScanning {
+                    Task { await bleViewModel.startScanning() }
+                } else if newPage != .bleScanner, bleViewModel.isScanning {
+                    bleViewModel.stopScanning()
                 }
             }
             .alert(String(localized: "Previous Crash Detected"), isPresented: $showCrashLog) {
@@ -202,6 +215,7 @@ extension Notification.Name {
 struct WiFiLensApp: App {
     @State private var viewModel = ScannerViewModel()
     @State private var roamingViewModel = RoamingTestViewModel()
+    @State private var bleViewModel = BLEViewModel()
     @State private var sparkleUpdater = SparkleUpdater()
     @State private var sidebarVisibility = NavigationSplitViewVisibility.automatic
     @State private var selectedPage: SidebarPage = .overview
@@ -229,6 +243,7 @@ struct WiFiLensApp: App {
             AppRootView(
                 viewModel: viewModel,
                 roamingViewModel: roamingViewModel,
+                bleViewModel: bleViewModel,
                 sidebarVisibility: $sidebarVisibility,
                 selectedPage: $selectedPage,
                 showCrashLog: $showCrashLog,

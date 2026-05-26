@@ -46,7 +46,6 @@
 		FB0573BE2FBC22C2005F8214 /* InterfacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573BD2FBC22C2005F8214 /* InterfacesView.swift */; };
 		FB0573C02FBC47CC005F8214 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573BF2FBC47CC005F8214 /* Logging.swift */; };
 		FB0573C22FBC47F1005F8214 /* CrashReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C12FBC47F1005F8214 /* CrashReporter.swift */; };
-		FBD329502FC500000057B038 /* MetricKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD329512FC500000057B038 /* MetricKitManager.swift */; };
 		FB0573C422FBBEAE4005F8214 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = FB0573C412FBBEAE4005F8214 /* Logging */; };
 		FB0573C42FBC7405005F8214 /* ChannelQualityCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */; };
 		FB0573C62FBC741D005F8214 /* ChannelQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */; };
@@ -55,6 +54,7 @@
 		FB0573CC2FBCD8FA005F8214 /* ThroughputMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */; };
 		FB0573CE2FBCD9B9005F8214 /* ThroughputChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CD2FBCD9B9005F8214 /* ThroughputChartView.swift */; };
 		FB0E20882FBAEBCB0064C07A /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = FB0E20872FBAEBCB0064C07A /* Sparkle */; };
+		FB2E3B2E2FC5ACDA00D2610E /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB2E3B2D2FC5ACDA00D2610E /* CoreBluetooth.framework */; };
 		FB6F41CC2FC4889B0009F29B /* RegulatoryDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C92FC4889B0009F29B /* RegulatoryDomain.swift */; };
 		FB6F41CD2FC4889B0009F29B /* RegulatoryDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C82FC4889B0009F29B /* RegulatoryDatabase.swift */; };
 		FB6F41CE2FC4889B0009F29B /* ChannelRecommendation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C52FC4889B0009F29B /* ChannelRecommendation.swift */; };
@@ -78,9 +78,19 @@
 		FBB2CA8A2FC0CB7500FC2D2C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */; };
 		FBB2CA8D2FC0E14000FC2D2C /* TitleBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB2CA8C2FC0E14000FC2D2C /* TitleBadge.swift */; };
 		FBB2CA8E2FC0E14000FC2D2C /* BuildConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB2CA8B2FC0E14000FC2D2C /* BuildConfig.swift */; };
+		FBD329502FC500000057B038 /* MetricKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD329512FC500000057B038 /* MetricKitManager.swift */; };
 		FBD7B3492FBAED57002C8F5A /* SparkleUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */; };
 		FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */; };
 		FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6203A2551742DF77D61785FE /* WiFiChannel.swift */; };
+		5A390BC860BEB1F0D50DAC76 /* BLEChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E1C6C7FE18D0034F66CD3E /* BLEChannel.swift */; };
+		DE564B93CC7C550958EDF3D5 /* BLEAdvertisementEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE1ECDC700E5809F5B7FF4 /* BLEAdvertisementEvent.swift */; };
+		6EE067F9A1CC14BACCA0F3DB /* BLERSSISample.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCF8EF1A4D0D355ED657A6 /* BLERSSISample.swift */; };
+		BAF20FFD625D5AFC7DDA93CC /* BLEDeviceSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF4EDF838BA0ABB1DAFDBBB /* BLEDeviceSnapshot.swift */; };
+		D661CA0D0AE39DCBD4B91D38 /* BLEScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55DE3CF5A0CF1AE0ADFECAE1 /* BLEScanner.swift */; };
+		FCCEB24ABEECEAE7B03195AD /* BLEDeviceTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D296EB5CEF7484BA599C2F9 /* BLEDeviceTracker.swift */; };
+		ECCBBEBFAF59A2E2035CE1FF /* BLEViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7BA76DD3B1E6198BDAEEA7 /* BLEViewModel.swift */; };
+		8C78C6A4ACEDAD6EA5CCD90E /* BLETrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */; };
+		AE2E0FE2DE426DF20D3CDBC1 /* BLEScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D7CF00F0FEAA84B6E2F64C9 /* BLEScannerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -136,13 +146,13 @@
 		FB0573BD2FBC22C2005F8214 /* InterfacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterfacesView.swift; sourceTree = "<group>"; };
 		FB0573BF2FBC47CC005F8214 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		FB0573C12FBC47F1005F8214 /* CrashReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReporter.swift; sourceTree = "<group>"; };
-		FBD329512FC500000057B038 /* MetricKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricKitManager.swift; sourceTree = "<group>"; };
 		FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityCalculator.swift; sourceTree = "<group>"; };
 		FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityView.swift; sourceTree = "<group>"; };
 		FB0573C72FBCD25C005F8214 /* HelpCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpCenterView.swift; sourceTree = "<group>"; };
 		FB0573C82FBCD25C005F8214 /* OverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewView.swift; sourceTree = "<group>"; };
 		FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThroughputMonitor.swift; sourceTree = "<group>"; };
 		FB0573CD2FBCD9B9005F8214 /* ThroughputChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThroughputChartView.swift; sourceTree = "<group>"; };
+		FB2E3B2D2FC5ACDA00D2610E /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		FB5A212C2FC31C6100828D9F /* WiFiLens-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "WiFiLens-Info.plist"; sourceTree = "<group>"; };
 		FB6F41C52FC4889B0009F29B /* ChannelRecommendation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelRecommendation.swift; sourceTree = "<group>"; };
 		FB6F41C62FC4889B0009F29B /* DeviceCompatibilityFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCompatibilityFilter.swift; sourceTree = "<group>"; };
@@ -178,8 +188,18 @@
 		FBD3294A2FBF0E2F00D01613 /* MCPServerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPServerTests.swift; sourceTree = "<group>"; };
 		FBD3294B2FBF0E2F00D01613 /* BandChartViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartViewModelTests.swift; sourceTree = "<group>"; };
 		FBD3294C2FBF0E2F00D01613 /* RoamingTestViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingTestViewModelTests.swift; sourceTree = "<group>"; };
+		FBD329512FC500000057B038 /* MetricKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricKitManager.swift; sourceTree = "<group>"; };
 		FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdater.swift; sourceTree = "<group>"; };
 		FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B1E1C6C7FE18D0034F66CD3E /* BLEChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEChannel.swift; sourceTree = "<group>"; };
+		FABE1ECDC700E5809F5B7FF4 /* BLEAdvertisementEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEAdvertisementEvent.swift; sourceTree = "<group>"; };
+		CEDCF8EF1A4D0D355ED657A6 /* BLERSSISample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLERSSISample.swift; sourceTree = "<group>"; };
+		EDF4EDF838BA0ABB1DAFDBBB /* BLEDeviceSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDeviceSnapshot.swift; sourceTree = "<group>"; };
+		55DE3CF5A0CF1AE0ADFECAE1 /* BLEScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEScanner.swift; sourceTree = "<group>"; };
+		2D296EB5CEF7484BA599C2F9 /* BLEDeviceTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDeviceTracker.swift; sourceTree = "<group>"; };
+		BB7BA76DD3B1E6198BDAEEA7 /* BLEViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEViewModel.swift; sourceTree = "<group>"; };
+		38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLETrendChartView.swift; sourceTree = "<group>"; };
+		1D7CF00F0FEAA84B6E2F64C9 /* BLEScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEScannerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,6 +211,7 @@
 				1E5141F704005BF06DB684A1 /* CoreWLAN.framework in Frameworks */,
 				B9AB60F3D002A7B9123D2520 /* CoreLocation.framework in Frameworks */,
 				FB0573B42FBBEAE4005F8214 /* MCP in Frameworks */,
+				FB2E3B2E2FC5ACDA00D2610E /* CoreBluetooth.framework in Frameworks */,
 				FB0573C422FBBEAE4005F8214 /* Logging in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -244,6 +265,7 @@
 		6D81AD175FCC46C43BC613A7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FB2E3B2D2FC5ACDA00D2610E /* CoreBluetooth.framework */,
 				3EAF444453E304ABB57AF3AA /* CoreLocation.framework */,
 				1067F6AA96EC6320C6472F59 /* CoreWLAN.framework */,
 			);
@@ -376,6 +398,7 @@
 				B1279BAD6D501300C4F2A85F /* Table */,
 				DD6657406F0FB50F2D9B7FB4 /* Utilities */,
 				831E90D5B9D07C478A35DD14 /* WiFiLensApp.swift */,
+				D214ECC1EF82C7552FF49DE8 /* BLE */,
 			);
 			path = WiFiLens;
 			sourceTree = "<group>";
@@ -464,6 +487,22 @@
 				FBD329482FBF0E2F00D01613 /* WiFiLensTests */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		D214ECC1EF82C7552FF49DE8 /* BLE */ = {
+			isa = PBXGroup;
+			children = (
+				B1E1C6C7FE18D0034F66CD3E /* BLEChannel.swift */,
+				FABE1ECDC700E5809F5B7FF4 /* BLEAdvertisementEvent.swift */,
+				CEDCF8EF1A4D0D355ED657A6 /* BLERSSISample.swift */,
+				EDF4EDF838BA0ABB1DAFDBBB /* BLEDeviceSnapshot.swift */,
+				55DE3CF5A0CF1AE0ADFECAE1 /* BLEScanner.swift */,
+				2D296EB5CEF7484BA599C2F9 /* BLEDeviceTracker.swift */,
+				BB7BA76DD3B1E6198BDAEEA7 /* BLEViewModel.swift */,
+				38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */,
+				1D7CF00F0FEAA84B6E2F64C9 /* BLEScannerView.swift */,
+			);
+			path = BLE;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -561,6 +600,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A390BC860BEB1F0D50DAC76 /* BLEChannel.swift in Sources */,
+				DE564B93CC7C550958EDF3D5 /* BLEAdvertisementEvent.swift in Sources */,
+				6EE067F9A1CC14BACCA0F3DB /* BLERSSISample.swift in Sources */,
+				BAF20FFD625D5AFC7DDA93CC /* BLEDeviceSnapshot.swift in Sources */,
+				D661CA0D0AE39DCBD4B91D38 /* BLEScanner.swift in Sources */,
+				FCCEB24ABEECEAE7B03195AD /* BLEDeviceTracker.swift in Sources */,
+				ECCBBEBFAF59A2E2035CE1FF /* BLEViewModel.swift in Sources */,
+				8C78C6A4ACEDAD6EA5CCD90E /* BLETrendChartView.swift in Sources */,
+				AE2E0FE2DE426DF20D3CDBC1 /* BLEScannerView.swift in Sources */,
 				6680C83EB72E9C488E7F7616 /* BandChartView.swift in Sources */,
 				23F1AB88A28C6E035AA916AA /* BandChartViewModel.swift in Sources */,
 				FB0573C62FBC741D005F8214 /* ChannelQualityView.swift in Sources */,

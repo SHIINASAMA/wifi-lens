@@ -41,6 +41,7 @@ enum AppLogger {
     static let mcp        = Logging.Logger(label: "mcp")
     static let throughput = Logging.Logger(label: "throughput")
     static let location   = Logging.Logger(label: "location")
+    static let ble        = Logging.Logger(label: "ble")
 
     /// Backward-compatible alias for `AppLogger.app` call sites.
     static let app = general
