@@ -60,6 +60,7 @@
 		FB6F41CF2FC4889B0009F29B /* DeviceCompatibilityFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C62FC4889B0009F29B /* DeviceCompatibilityFilter.swift */; };
 		FB6F41D02FC4889B0009F29B /* RegulatoryFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41CA2FC4889B0009F29B /* RegulatoryFilter.swift */; };
 		FB6F41D12FC4889B0009F29B /* RegionInferenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C72FC4889B0009F29B /* RegionInferenceEngine.swift */; };
+		FB6F41D32FC4889B0009F29B /* RegulatoryPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41D22FC4889B0009F29B /* RegulatoryPipeline.swift */; };
 		FB8BB6002FBB04E000FD072E /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = FB8BB5FD2FBB039A00FD072E /* Localizable.xcstrings */; };
 		FB8BB6022FBB07F600FD072E /* NetworkInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8BB6012FBB07F600FD072E /* NetworkInfoService.swift */; };
 		FB8BB6042FBB0BA600FD072E /* IEParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8BB6032FBB0BA600FD072E /* IEParser.swift */; };
@@ -147,6 +148,7 @@
 		FB6F41C82FC4889B0009F29B /* RegulatoryDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegulatoryDatabase.swift; sourceTree = "<group>"; };
 		FB6F41C92FC4889B0009F29B /* RegulatoryDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegulatoryDomain.swift; sourceTree = "<group>"; };
 		FB6F41CA2FC4889B0009F29B /* RegulatoryFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegulatoryFilter.swift; sourceTree = "<group>"; };
+		FB6F41D22FC4889B0009F29B /* RegulatoryPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegulatoryPipeline.swift; sourceTree = "<group>"; };
 		FB80FA2C2FC0AC1900547708 /* OSS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = OSS.xcconfig; sourceTree = "<group>"; };
 		FB80FA2F2FC0AC1900547708 /* PRO.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = PRO.xcconfig; sourceTree = "<group>"; };
 		FB80FA312FC0AC3800547708 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
@@ -400,6 +402,7 @@
 				FB6F41C82FC4889B0009F29B /* RegulatoryDatabase.swift */,
 				FB6F41C92FC4889B0009F29B /* RegulatoryDomain.swift */,
 				FB6F41CA2FC4889B0009F29B /* RegulatoryFilter.swift */,
+				FB6F41D22FC4889B0009F29B /* RegulatoryPipeline.swift */,
 			);
 			path = Regulatory;
 			sourceTree = "<group>";
@@ -599,6 +602,7 @@
 				FB6F41CF2FC4889B0009F29B /* DeviceCompatibilityFilter.swift in Sources */,
 				FB6F41D02FC4889B0009F29B /* RegulatoryFilter.swift in Sources */,
 				FB6F41D12FC4889B0009F29B /* RegionInferenceEngine.swift in Sources */,
+				FB6F41D32FC4889B0009F29B /* RegulatoryPipeline.swift in Sources */,
 				6ECFD8E459A49E4A6FA0FCB0 /* WiFiScanner.swift in Sources */,
 				FB8BB6022FBB07F600FD072E /* NetworkInfoService.swift in Sources */,
 				FB0573CE2FBCD9B9005F8214 /* ThroughputChartView.swift in Sources */,
