@@ -170,7 +170,6 @@ final class MCPServer: @unchecked Sendable {
         HTTP/1.1 \(status) \(reason)\r
         Content-Type: application/json\r
         Content-Length: \(bodyData.count)\r
-        Access-Control-Allow-Origin: *\r
         \r\n
         """
         return (header.data(using: .ascii) ?? Data()) + bodyData
