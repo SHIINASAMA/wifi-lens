@@ -214,6 +214,7 @@ struct WiFiLensApp: App {
     init() {
         AppLogger.bootstrap()
         CrashReporter.register()
+        MetricKitManager.start()
         if let log = CrashReporter.consumeCrashLog() {
             _crashLogText = State(initialValue: log)
             _showCrashLog = State(initialValue: true)

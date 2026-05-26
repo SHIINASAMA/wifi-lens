@@ -46,6 +46,7 @@
 		FB0573BE2FBC22C2005F8214 /* InterfacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573BD2FBC22C2005F8214 /* InterfacesView.swift */; };
 		FB0573C02FBC47CC005F8214 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573BF2FBC47CC005F8214 /* Logging.swift */; };
 		FB0573C22FBC47F1005F8214 /* CrashReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C12FBC47F1005F8214 /* CrashReporter.swift */; };
+		FBD329502FC500000057B038 /* MetricKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD329512FC500000057B038 /* MetricKitManager.swift */; };
 		FB0573C422FBBEAE4005F8214 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = FB0573C412FBBEAE4005F8214 /* Logging */; };
 		FB0573C42FBC7405005F8214 /* ChannelQualityCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */; };
 		FB0573C62FBC741D005F8214 /* ChannelQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */; };
@@ -135,6 +136,7 @@
 		FB0573BD2FBC22C2005F8214 /* InterfacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterfacesView.swift; sourceTree = "<group>"; };
 		FB0573BF2FBC47CC005F8214 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		FB0573C12FBC47F1005F8214 /* CrashReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReporter.swift; sourceTree = "<group>"; };
+		FBD329512FC500000057B038 /* MetricKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricKitManager.swift; sourceTree = "<group>"; };
 		FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityCalculator.swift; sourceTree = "<group>"; };
 		FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityView.swift; sourceTree = "<group>"; };
 		FB0573C72FBCD25C005F8214 /* HelpCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpCenterView.swift; sourceTree = "<group>"; };
@@ -323,6 +325,7 @@
 				FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */,
 				FB0573C12FBC47F1005F8214 /* CrashReporter.swift */,
 				FB0573BF2FBC47CC005F8214 /* Logging.swift */,
+				FBD329512FC500000057B038 /* MetricKitManager.swift */,
 				FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */,
 			);
 			path = App;
@@ -580,6 +583,7 @@
 				3711656F0C3ECD58CA29D407 /* NativeTableView.swift in Sources */,
 				FB0573B62FBBEBB9005F8214 /* MCPServer.swift in Sources */,
 				FB0573C22FBC47F1005F8214 /* CrashReporter.swift in Sources */,
+				FBD329502FC500000057B038 /* MetricKitManager.swift in Sources */,
 				FB92F9212FBE208500BCEC67 /* DebugChartView.swift in Sources */,
 				FB92F9232FBE208500BCEC67 /* DebugContainerView.swift in Sources */,
 				FB92F9252FBE208500BCEC67 /* DebugThroughputView.swift in Sources */,
