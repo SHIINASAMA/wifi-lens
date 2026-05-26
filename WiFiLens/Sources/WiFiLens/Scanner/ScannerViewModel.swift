@@ -177,10 +177,10 @@ final class ScannerViewModel {
         AppLogger.scanner.info("start() — supported bands = \(supportedBands.map { $0.id }.sorted())")
         // Fetch device capabilities once for the regulatory pipeline
         let rawChannels = await scanner.supportedChannels()
-        deviceSupportedChannels = Set(rawChannels.map { "\($0.0.rawValue)-\($0.1)" })
-        deviceCachedCapabilities = await scanner.devicePHYCapabilities()
-        cachedSupportedChannelsRaw = await scanner.supportedWLANChannelsRaw()
-        AppLogger.scanner.debug("device — supported \(rawChannels.count) channels, PHY=\(deviceCachedCapabilities.phySummary), DFS=\(deviceCachedCapabilities.supportsDFS), 6GHz=\(deviceCachedCapabilities.supports6GHz)")
+        regulatoryPipeline.deviceSupportedChannels = Set(rawChannels.map { "\($0.0.rawValue)-\($0.1)" })
+        regulatoryPipeline.deviceCachedCapabilities = await scanner.devicePHYCapabilities()
+        regulatoryPipeline.cachedSupportedChannelsRaw = await scanner.supportedWLANChannelsRaw()
+        AppLogger.scanner.debug("device — supported \(rawChannels.count) channels, PHY=\(regulatoryPipeline.deviceCachedCapabilities.phySummary), DFS=\(regulatoryPipeline.deviceCachedCapabilities.supportsDFS), 6GHz=\(regulatoryPipeline.deviceCachedCapabilities.supports6GHz)")
         updateInterfaceName()
         startScanLoop()
         hasStarted = true
@@ -389,36 +389,15 @@ final class ScannerViewModel {
 
     /// Run the regulatory-aware filtering pipeline on top of RF results.
     private func computeChannelRecommendations() -> [ChannelRecommendation] {
-        let rfResults = channelQualities
-
-        // Read region override from settings (stored as String in UserDefaults)
         let override: RegulatoryDomain? = {
             let raw = UserDefaults.standard.string(forKey: "regulatoryRegionOverride") ?? "auto"
             return raw == "auto" ? nil : RegulatoryDomain(rawValue: raw)
         }()
-
-        // Region inference
-        let apCountryCodes: [String] = lastNetworks.compactMap { nw in
-            guard let ie = nw.ieData else { return nil }
-            return IEParser.parse(data: ie).countryCode
-        }
-
-        let region = RegionInferenceEngine.infer(
-            systemLocale: .current,
-            supportedChannels: cachedSupportedChannelsRaw,
-            apCountryCodes: apCountryCodes,
-            userOverride: userRegionOverride ?? override
+        return regulatoryPipeline.computeRecommendations(
+            from: channelQualities,
+            networks: lastNetworks,
+            userDefaultsOverride: override
         )
-        inferredRegion = region
-
-        let input = RegulatoryFilter.FilterInput(
-            rfResults: rfResults,
-            inferredRegion: region,
-            deviceSupportedChannels: deviceSupportedChannels,
-            deviceCapabilities: deviceCachedCapabilities,
-            userClassificationOverrides: nil
-        )
-        return RegulatoryFilter.apply(to: input)
     }
 
     func toggleVisibility(bssid: String) {
