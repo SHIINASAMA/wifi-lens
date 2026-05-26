@@ -57,7 +57,7 @@ final class MCPServer: @unchecked Sendable {
         }
     }
 
-    private static func process(_ raw: Data, networks: [WiFiNetwork]) -> Data? {
+    static func process(_ raw: Data, networks: [WiFiNetwork]) -> Data? {
         guard let req = String(data: raw, encoding: .utf8) else { return nil }
         let lines = req.components(separatedBy: "\r\n")
         guard lines.count >= 1 else { return nil }
