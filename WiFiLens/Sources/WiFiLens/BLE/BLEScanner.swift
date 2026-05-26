@@ -135,11 +135,19 @@ private final class BLEScannerDelegate: NSObject, CBCentralManagerDelegate, @unc
 
     func startScan() {
         guard !started else { return }
+        guard centralManager?.state == .poweredOn else { return }
         started = true
         let options: [String: Any] = [
             CBCentralManagerScanOptionAllowDuplicatesKey: true
         ]
-        centralManager?.scanForPeripherals(withServices: nil, options: options)
+        // Defer to next main-queue iteration — CBCentralManager may report
+        // .poweredOn in its delegate callback before its internal state is
+        // fully ready. Calling scanForPeripherals synchronously triggers:
+        // "API MISUSE: can only accept this command while in the powered on state"
+        DispatchQueue.main.async { [weak self] in
+            guard self?.started == true else { return }
+            self?.centralManager?.scanForPeripherals(withServices: nil, options: options)
+        }
     }
 
     func stopScan() {

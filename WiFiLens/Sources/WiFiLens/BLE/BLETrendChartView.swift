@@ -6,7 +6,7 @@ struct BLETrendChartView: View {
     let samples: [BLERSSISample]
     let color: Color
 
-    private let chartHeight: CGFloat = 100
+    private let chartHeight: CGFloat = 200
     private let leftAxisWidth: CGFloat = 36
     private let bottomAxisHeight: CGFloat = 20
     private let marginTop: CGFloat = 8

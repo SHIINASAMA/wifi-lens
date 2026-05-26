@@ -21,22 +21,30 @@
 		46B405FC484C9C9A5509E8AC /* SpanDirection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310AD5ABC56B4211E30DD1DE /* SpanDirection.swift */; };
 		530D1F7F7F44460CABA342AB /* RoamingTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B13DBF938D654926B205302C /* RoamingTestView.swift */; };
 		56818EA68B0747B083E0FDF8 /* DeviceCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0470288A92AF41C793DAE70B /* DeviceCapabilities.swift */; };
+		5A390BC860BEB1F0D50DAC76 /* BLEChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E1C6C7FE18D0034F66CD3E /* BLEChannel.swift */; };
 		6680C83EB72E9C488E7F7616 /* BandChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */; };
 		6ACEE4EC462933B7C4320468 /* ChannelBand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4079C5A47F59C655689BCFB8 /* ChannelBand.swift */; };
 		6ECFD8E459A49E4A6FA0FCB0 /* WiFiScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */; };
+		6EE067F9A1CC14BACCA0F3DB /* BLERSSISample.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCF8EF1A4D0D355ED657A6 /* BLERSSISample.swift */; };
 		7E778683F723499D93511520 /* RoamingTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F790DC6E08D43C5BD058D96 /* RoamingTestViewModel.swift */; };
 		847B77DBC638404081A7BFC2 /* RoamingRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8367630A1EDF4515917A144A /* RoamingRecord.swift */; };
 		85C7DEE09D3045078A2ADFF5 /* ExponentialMovingAverage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E1D69278614400AA3B660C /* ExponentialMovingAverage.swift */; };
+		8C78C6A4ACEDAD6EA5CCD90E /* BLETrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */; };
 		9E2F89530D1114DBFAB705F3 /* WiFiLensApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831E90D5B9D07C478A35DD14 /* WiFiLensApp.swift */; };
 		9F1D29EF11E510D9D72BB7D1 /* CWChannel+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5DDCE8EACD706BD2BCEE4B /* CWChannel+Extensions.swift */; };
 		A1B2C3D4E5F64789ABCDEF01 /* RoamingSessionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E2D3C4B5A64987FEDCBA01 /* RoamingSessionRecord.swift */; };
 		A952EA4DBE85899D61989DF9 /* SSIDColorHasher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */; };
+		AE2E0FE2DE426DF20D3CDBC1 /* BLEScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D7CF00F0FEAA84B6E2F64C9 /* BLEScannerView.swift */; };
 		B9AB60F3D002A7B9123D2520 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EAF444453E304ABB57AF3AA /* CoreLocation.framework */; };
+		BAF20FFD625D5AFC7DDA93CC /* BLEDeviceSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF4EDF838BA0ABB1DAFDBBB /* BLEDeviceSnapshot.swift */; };
 		C477C7396F754B85A69816B6 /* KalmanFilter1D.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9F90F78BD04526AE0566CC /* KalmanFilter1D.swift */; };
+		D661CA0D0AE39DCBD4B91D38 /* BLEScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55DE3CF5A0CF1AE0ADFECAE1 /* BLEScanner.swift */; };
 		DA7DEF71C1E8ED4068EB7D66 /* ScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */; };
 		DCAC1361D1814E4895FD4B4F /* HysteresisEMA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01A62377C8474773A0ACA7CD /* HysteresisEMA.swift */; };
+		DE564B93CC7C550958EDF3D5 /* BLEAdvertisementEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE1ECDC700E5809F5B7FF4 /* BLEAdvertisementEvent.swift */; };
 		EB51C6874A66A7A95F5C1C58 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F66DB715821EBD11B6D1AA /* Color+Extensions.swift */; };
 		EBE67FE6BDA458039D5C9669 /* ChartSeriesData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51C237F247C80EC5176F5C0 /* ChartSeriesData.swift */; };
+		ECCBBEBFAF59A2E2035CE1FF /* BLEViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7BA76DD3B1E6198BDAEEA7 /* BLEViewModel.swift */; };
 		FB0573AD2FBB54ED005F8214 /* SignalHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573AC2FBB54ED005F8214 /* SignalHistoryStore.swift */; };
 		FB0573AF2FBB5BD6005F8214 /* NetworkSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573AE2FBB5BD6005F8214 /* NetworkSnapshot.swift */; };
 		FB0573B12FBB5BEE005F8214 /* TrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573B02FBB5BEE005F8214 /* TrendChartView.swift */; };
@@ -81,16 +89,8 @@
 		FBD329502FC500000057B038 /* MetricKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD329512FC500000057B038 /* MetricKitManager.swift */; };
 		FBD7B3492FBAED57002C8F5A /* SparkleUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */; };
 		FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */; };
-		FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6203A2551742DF77D61785FE /* WiFiChannel.swift */; };
-		5A390BC860BEB1F0D50DAC76 /* BLEChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E1C6C7FE18D0034F66CD3E /* BLEChannel.swift */; };
-		DE564B93CC7C550958EDF3D5 /* BLEAdvertisementEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE1ECDC700E5809F5B7FF4 /* BLEAdvertisementEvent.swift */; };
-		6EE067F9A1CC14BACCA0F3DB /* BLERSSISample.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCF8EF1A4D0D355ED657A6 /* BLERSSISample.swift */; };
-		BAF20FFD625D5AFC7DDA93CC /* BLEDeviceSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF4EDF838BA0ABB1DAFDBBB /* BLEDeviceSnapshot.swift */; };
-		D661CA0D0AE39DCBD4B91D38 /* BLEScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55DE3CF5A0CF1AE0ADFECAE1 /* BLEScanner.swift */; };
 		FCCEB24ABEECEAE7B03195AD /* BLEDeviceTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D296EB5CEF7484BA599C2F9 /* BLEDeviceTracker.swift */; };
-		ECCBBEBFAF59A2E2035CE1FF /* BLEViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7BA76DD3B1E6198BDAEEA7 /* BLEViewModel.swift */; };
-		8C78C6A4ACEDAD6EA5CCD90E /* BLETrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */; };
-		AE2E0FE2DE426DF20D3CDBC1 /* BLEScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D7CF00F0FEAA84B6E2F64C9 /* BLEScannerView.swift */; };
+		FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6203A2551742DF77D61785FE /* WiFiChannel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -108,14 +108,18 @@
 		0470288A92AF41C793DAE70B /* DeviceCapabilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCapabilities.swift; sourceTree = "<group>"; };
 		1067F6AA96EC6320C6472F59 /* CoreWLAN.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreWLAN.framework; path = System/Library/Frameworks/CoreWLAN.framework; sourceTree = SDKROOT; };
 		1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelSpanCalculator.swift; sourceTree = "<group>"; };
+		1D7CF00F0FEAA84B6E2F64C9 /* BLEScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEScannerView.swift; sourceTree = "<group>"; };
 		28A3299502DE1A130760C8A7 /* NativeTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeTableView.swift; sourceTree = "<group>"; };
 		2A7ED53B7BCC8C0A11662151 /* FilterPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterPopoverView.swift; sourceTree = "<group>"; };
+		2D296EB5CEF7484BA599C2F9 /* BLEDeviceTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDeviceTracker.swift; sourceTree = "<group>"; };
 		310AD5ABC56B4211E30DD1DE /* SpanDirection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanDirection.swift; sourceTree = "<group>"; };
 		36E1D69278614400AA3B660C /* ExponentialMovingAverage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExponentialMovingAverage.swift; sourceTree = "<group>"; };
+		38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLETrendChartView.swift; sourceTree = "<group>"; };
 		3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartView.swift; sourceTree = "<group>"; };
 		3EAF444453E304ABB57AF3AA /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		4079C5A47F59C655689BCFB8 /* ChannelBand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelBand.swift; sourceTree = "<group>"; };
 		51DDD97F3B94514DE0790B51 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		55DE3CF5A0CF1AE0ADFECAE1 /* BLEScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEScanner.swift; sourceTree = "<group>"; };
 		58FF378E09090DEBAAFA77F6 /* BandChartViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartViewModel.swift; sourceTree = "<group>"; };
 		6203A2551742DF77D61785FE /* WiFiChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiChannel.swift; sourceTree = "<group>"; };
 		69F66DB715821EBD11B6D1AA /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
@@ -128,15 +132,20 @@
 		9C5DDCE8EACD706BD2BCEE4B /* CWChannel+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CWChannel+Extensions.swift"; sourceTree = "<group>"; };
 		9F790DC6E08D43C5BD058D96 /* RoamingTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingTestViewModel.swift; sourceTree = "<group>"; };
 		B13DBF938D654926B205302C /* RoamingTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingTestView.swift; sourceTree = "<group>"; };
+		B1E1C6C7FE18D0034F66CD3E /* BLEChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEChannel.swift; sourceTree = "<group>"; };
 		B58854CC5BE8A54269614FAD /* WiFiNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiNetwork.swift; sourceTree = "<group>"; };
+		BB7BA76DD3B1E6198BDAEEA7 /* BLEViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEViewModel.swift; sourceTree = "<group>"; };
 		BD784856886985BCC6FC4F02 /* WiFi Lens.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "WiFi Lens.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF472346A62545B9866DA8ED /* GatewayPinger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayPinger.swift; sourceTree = "<group>"; };
 		C51C237F247C80EC5176F5C0 /* ChartSeriesData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartSeriesData.swift; sourceTree = "<group>"; };
 		CA9F90F78BD04526AE0566CC /* KalmanFilter1D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KalmanFilter1D.swift; sourceTree = "<group>"; };
+		CEDCF8EF1A4D0D355ED657A6 /* BLERSSISample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLERSSISample.swift; sourceTree = "<group>"; };
 		D6180984B78D4363B6840C79 /* SignalSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalSmoothing.swift; sourceTree = "<group>"; };
 		D69959B95B194A96FA8D337C /* LocationPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermissionManager.swift; sourceTree = "<group>"; };
 		D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewModel.swift; sourceTree = "<group>"; };
+		EDF4EDF838BA0ABB1DAFDBBB /* BLEDeviceSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDeviceSnapshot.swift; sourceTree = "<group>"; };
 		F1E2D3C4B5A64987FEDCBA01 /* RoamingSessionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingSessionRecord.swift; sourceTree = "<group>"; };
+		FABE1ECDC700E5809F5B7FF4 /* BLEAdvertisementEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEAdvertisementEvent.swift; sourceTree = "<group>"; };
 		FB0573AC2FBB54ED005F8214 /* SignalHistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalHistoryStore.swift; sourceTree = "<group>"; };
 		FB0573AE2FBB5BD6005F8214 /* NetworkSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSnapshot.swift; sourceTree = "<group>"; };
 		FB0573B02FBB5BEE005F8214 /* TrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendChartView.swift; sourceTree = "<group>"; };
@@ -191,15 +200,6 @@
 		FBD329512FC500000057B038 /* MetricKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricKitManager.swift; sourceTree = "<group>"; };
 		FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdater.swift; sourceTree = "<group>"; };
 		FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		B1E1C6C7FE18D0034F66CD3E /* BLEChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEChannel.swift; sourceTree = "<group>"; };
-		FABE1ECDC700E5809F5B7FF4 /* BLEAdvertisementEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEAdvertisementEvent.swift; sourceTree = "<group>"; };
-		CEDCF8EF1A4D0D355ED657A6 /* BLERSSISample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLERSSISample.swift; sourceTree = "<group>"; };
-		EDF4EDF838BA0ABB1DAFDBBB /* BLEDeviceSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDeviceSnapshot.swift; sourceTree = "<group>"; };
-		55DE3CF5A0CF1AE0ADFECAE1 /* BLEScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEScanner.swift; sourceTree = "<group>"; };
-		2D296EB5CEF7484BA599C2F9 /* BLEDeviceTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDeviceTracker.swift; sourceTree = "<group>"; };
-		BB7BA76DD3B1E6198BDAEEA7 /* BLEViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEViewModel.swift; sourceTree = "<group>"; };
-		38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLETrendChartView.swift; sourceTree = "<group>"; };
-		1D7CF00F0FEAA84B6E2F64C9 /* BLEScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEScannerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -370,6 +370,22 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		D214ECC1EF82C7552FF49DE8 /* BLE */ = {
+			isa = PBXGroup;
+			children = (
+				B1E1C6C7FE18D0034F66CD3E /* BLEChannel.swift */,
+				FABE1ECDC700E5809F5B7FF4 /* BLEAdvertisementEvent.swift */,
+				CEDCF8EF1A4D0D355ED657A6 /* BLERSSISample.swift */,
+				EDF4EDF838BA0ABB1DAFDBBB /* BLEDeviceSnapshot.swift */,
+				55DE3CF5A0CF1AE0ADFECAE1 /* BLEScanner.swift */,
+				2D296EB5CEF7484BA599C2F9 /* BLEDeviceTracker.swift */,
+				BB7BA76DD3B1E6198BDAEEA7 /* BLEViewModel.swift */,
+				38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */,
+				1D7CF00F0FEAA84B6E2F64C9 /* BLEScannerView.swift */,
+			);
+			path = BLE;
+			sourceTree = "<group>";
+		};
 		D3E6587CCEDEC199C00591B2 /* Channels */ = {
 			isa = PBXGroup;
 			children = (
@@ -382,8 +398,10 @@
 		DA6A83BCB3A09FD57BB9E12F /* WiFiLens */ = {
 			isa = PBXGroup;
 			children = (
-				AD735352E4FE8FE0803C143C /* App */,
+				831E90D5B9D07C478A35DD14 /* WiFiLensApp.swift */,
 				FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */,
+				AD735352E4FE8FE0803C143C /* App */,
+				D214ECC1EF82C7552FF49DE8 /* BLE */,
 				D3E6587CCEDEC199C00591B2 /* Channels */,
 				FB9B7F3A2FC2D9650057B038 /* Charts */,
 				49FEC4F42675BFAD1316DDEC /* Debug */,
@@ -397,8 +415,6 @@
 				76E1D8231AF6132E0568C813 /* Spectrum */,
 				B1279BAD6D501300C4F2A85F /* Table */,
 				DD6657406F0FB50F2D9B7FB4 /* Utilities */,
-				831E90D5B9D07C478A35DD14 /* WiFiLensApp.swift */,
-				D214ECC1EF82C7552FF49DE8 /* BLE */,
 			);
 			path = WiFiLens;
 			sourceTree = "<group>";
@@ -487,22 +503,6 @@
 				FBD329482FBF0E2F00D01613 /* WiFiLensTests */,
 			);
 			path = Tests;
-			sourceTree = "<group>";
-		};
-		D214ECC1EF82C7552FF49DE8 /* BLE */ = {
-			isa = PBXGroup;
-			children = (
-				B1E1C6C7FE18D0034F66CD3E /* BLEChannel.swift */,
-				FABE1ECDC700E5809F5B7FF4 /* BLEAdvertisementEvent.swift */,
-				CEDCF8EF1A4D0D355ED657A6 /* BLERSSISample.swift */,
-				EDF4EDF838BA0ABB1DAFDBBB /* BLEDeviceSnapshot.swift */,
-				55DE3CF5A0CF1AE0ADFECAE1 /* BLEScanner.swift */,
-				2D296EB5CEF7484BA599C2F9 /* BLEDeviceTracker.swift */,
-				BB7BA76DD3B1E6198BDAEEA7 /* BLEViewModel.swift */,
-				38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */,
-				1D7CF00F0FEAA84B6E2F64C9 /* BLEScannerView.swift */,
-			);
-			path = BLE;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -752,7 +752,7 @@
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
-				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = YES;
 				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
 				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
 				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
@@ -924,7 +924,7 @@
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
-				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = YES;
 				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
 				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
 				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
@@ -1036,7 +1036,7 @@
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
-				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = YES;
 				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
 				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
 				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
@@ -1160,7 +1160,7 @@
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
-				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = YES;
 				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
 				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
 				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;

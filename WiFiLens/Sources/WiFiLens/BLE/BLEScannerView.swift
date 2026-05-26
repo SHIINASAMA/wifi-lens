@@ -145,11 +145,12 @@ struct BLEScannerView: View {
     }
 
     private func trendChartSection(_ history: [BLERSSISample]) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        let chartColor = rssiColor(viewModel.selectedDevice?.smoothedRSSI ?? -50)
+        return VStack(alignment: .leading, spacing: 4) {
             HStack {
                 if let device = viewModel.selectedDevice {
                     Circle()
-                        .fill(rssiColor(device.smoothedRSSI))
+                        .fill(chartColor)
                         .frame(width: 8, height: 8)
                     Text("\(device.displayName) — RSSI history")
                         .font(.caption)
@@ -160,11 +161,11 @@ struct BLEScannerView: View {
                 // Legend
                 HStack(spacing: 12) {
                     HStack(spacing: 4) {
-                        Circle().fill(rssiColor(-40).opacity(0.3)).frame(width: 6, height: 6)
+                        Circle().fill(chartColor.opacity(0.3)).frame(width: 6, height: 6)
                         Text("Raw").font(.caption2).foregroundColor(.secondary)
                     }
                     HStack(spacing: 4) {
-                        Circle().fill(rssiColor(-40)).frame(width: 6, height: 6)
+                        Circle().fill(chartColor).frame(width: 6, height: 6)
                         Text("Smooth").font(.caption2).foregroundColor(.secondary)
                     }
                 }
@@ -173,8 +174,9 @@ struct BLEScannerView: View {
 
             BLETrendChartView(
                 samples: history,
-                color: rssiColor(viewModel.selectedDevice?.smoothedRSSI ?? -50)
+                color: chartColor
             )
+            .id(viewModel.selectedDeviceID ?? "")
             .padding(.horizontal, 16)
 
             HStack(spacing: 16) {
