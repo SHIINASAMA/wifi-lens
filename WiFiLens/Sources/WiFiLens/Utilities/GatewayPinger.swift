@@ -2,9 +2,12 @@ import Foundation
 
 actor GatewayPinger {
     private var lastTask: Task<Double?, Never>?
+    private var currentProcess: Process?
 
     func ping(host: String) async -> Double? {
         lastTask?.cancel()
+        currentProcess?.terminate()
+
         let task = Task<Double?, Never> { [host] in
             let process = Process()
             process.executableURL = URL(fileURLWithPath: "/sbin/ping")
@@ -13,16 +16,17 @@ actor GatewayPinger {
             let pipe = Pipe()
             process.standardOutput = pipe
 
+            self.currentProcess = process
+
             do {
                 try process.run()
                 process.waitUntilExit()
 
-                guard process.terminationStatus == 0 else { return nil }
+                guard !Task.isCancelled, process.terminationStatus == 0 else { return nil }
 
                 let data = pipe.fileHandleForReading.readDataToEndOfFile()
                 guard let output = String(data: data, encoding: .utf8) else { return nil }
 
-                // Parse "time=XX.XXX ms" from ping output
                 for line in output.components(separatedBy: "\n") {
                     if line.contains("time=") {
                         if let range = line.range(of: "time=") {
