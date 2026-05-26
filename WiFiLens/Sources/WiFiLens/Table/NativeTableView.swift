@@ -112,7 +112,6 @@ struct NativeTableView: NSViewRepresentable {
         guard let tableView = scrollView.documentView as? NSTableView else { return }
 
         let rowsChanged = context.coordinator.rows != rows
-        let orderChanged = context.coordinator.sortOrder.wrappedValue != sortOrder
         let selectionChanged = context.coordinator.previousSelectedID != selectedID
         context.coordinator.rows = rows
         context.coordinator.selectedID = $selectedID
@@ -121,7 +120,7 @@ struct NativeTableView: NSViewRepresentable {
 
         let needsRestore = rowsChanged || selectionChanged
 
-        if rowsChanged || orderChanged {
+        if rowsChanged {
             tableView.reloadData()
             context.coordinator.autoSizeColumns()
         } else if selectionChanged {
@@ -262,14 +261,19 @@ struct NativeTableView: NSViewRepresentable {
         }
 
         func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
-            sortOrder.wrappedValue = tableView.sortDescriptors
+            let newValue = tableView.sortDescriptors
+            if newValue != sortOrder.wrappedValue {
+                sortOrder.wrappedValue = newValue
+            }
         }
 
         func tableViewSelectionDidChange(_ notification: Notification) {
             guard let tableView = notification.object as? NSTableView else { return }
             let selectedRow = tableView.selectedRow
             let newID: String? = (selectedRow >= 0 && selectedRow < rows.count) ? rows[selectedRow].id : nil
-            selectedID.wrappedValue = newID
+            if newID != selectedID.wrappedValue {
+                selectedID.wrappedValue = newID
+            }
         }
 
         @MainActor @objc func checkboxToggled(_ sender: NSButton) {
