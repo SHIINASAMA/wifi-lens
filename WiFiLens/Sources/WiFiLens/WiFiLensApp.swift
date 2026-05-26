@@ -15,6 +15,7 @@ private struct AppRootView: View {
     @State private var sidebarWidth: CGFloat = 180
     @State private var sidebarCollapsed = false
     @AppStorage("hideTitleBadge") private var hideTitleBadge = false
+    @State private var visitedPages: Set<SidebarPage> = [.overview]
 
     private var hasLocationAuthorization: Bool {
         viewModel.locationManager.isAuthorizedForSSID
@@ -32,29 +33,69 @@ private struct AppRootView: View {
                 openLocationPreferences: viewModel.locationManager.openLocationPreferences
             )
         } else {
-            switch selectedPage {
-            case .overview:
-                OverviewView(viewModel: viewModel)
-            case .spectrum:
-                ContentView(viewModel: viewModel)
-                    .onReceive(NotificationCenter.default.publisher(for: .freezeAllBands)) { _ in
-                        for vm in viewModel.bandViewModels {
-                            vm.toggleFreeze()
+            ZStack {
+                if visitedPages.contains(.overview) {
+                    OverviewView(viewModel: viewModel)
+                        .opacity(selectedPage == .overview ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .overview)
+                        .disabled(selectedPage != .overview)
+                }
+
+                if visitedPages.contains(.spectrum) {
+                    ContentView(viewModel: viewModel)
+                        .opacity(selectedPage == .spectrum ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .spectrum)
+                        .disabled(selectedPage != .spectrum)
+                        .onReceive(NotificationCenter.default.publisher(for: .freezeAllBands)) { _ in
+                            guard selectedPage == .spectrum else { return }
+                            for vm in viewModel.bandViewModels {
+                                vm.toggleFreeze()
+                            }
                         }
-                    }
-            case .channels:
-                ChannelQualityView(channels: viewModel.channelRecommendations)
-            case .interfaces:
-                InterfacesView(interfaces: viewModel.networkInfo, scannerViewModel: viewModel, throughputMonitor: viewModel.throughputMonitor)
-            case .roaming:
-                RoamingTestView(viewModel: roamingViewModel)
-            case .help:
-                HelpCenterView()
-            case .settings:
-                SettingsView(updater: sparkleUpdater)
+                }
+
+                if visitedPages.contains(.channels) {
+                    ChannelQualityView(channels: viewModel.channelRecommendations)
+                        .opacity(selectedPage == .channels ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .channels)
+                        .disabled(selectedPage != .channels)
+                }
+
+                if visitedPages.contains(.interfaces) {
+                    InterfacesView(interfaces: viewModel.networkInfo, scannerViewModel: viewModel, throughputMonitor: viewModel.throughputMonitor)
+                        .opacity(selectedPage == .interfaces ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .interfaces)
+                        .disabled(selectedPage != .interfaces)
+                }
+
+                if visitedPages.contains(.roaming) {
+                    RoamingTestView(viewModel: roamingViewModel)
+                        .opacity(selectedPage == .roaming ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .roaming)
+                        .disabled(selectedPage != .roaming)
+                }
+
+                if visitedPages.contains(.help) {
+                    HelpCenterView()
+                        .opacity(selectedPage == .help ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .help)
+                        .disabled(selectedPage != .help)
+                }
+
+                if visitedPages.contains(.settings) {
+                    SettingsView(updater: sparkleUpdater)
+                        .opacity(selectedPage == .settings ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .settings)
+                        .disabled(selectedPage != .settings)
+                }
+
 #if DEBUG
-            case .debugChart:
-                DebugContainerView()
+                if visitedPages.contains(.debugChart) {
+                    DebugContainerView()
+                        .opacity(selectedPage == .debugChart ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .debugChart)
+                        .disabled(selectedPage != .debugChart)
+                }
 #endif
             }
         }
@@ -77,6 +118,9 @@ private struct AppRootView: View {
         } detail: {
             Group {
                 detailContent
+            }
+            .onChange(of: selectedPage) { _, newPage in
+                visitedPages.insert(newPage)
             }
             .alert(String(localized: "Previous Crash Detected"), isPresented: $showCrashLog) {
                 Button(String(localized: "Dismiss"), role: .cancel) {}

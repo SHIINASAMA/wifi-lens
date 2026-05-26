@@ -18,6 +18,7 @@ enum DebugPage: String, CaseIterable {
 
 struct DebugContainerView: View {
     @State private var selectedPage: DebugPage = .spectrum
+    @State private var visitedTabs: Set<DebugPage> = [.spectrum]
 
     var body: some View {
         VStack(spacing: 0) {
@@ -30,16 +31,33 @@ struct DebugContainerView: View {
             .controlSize(.small)
             .frame(width: 180)
             .padding(.vertical, 6)
+            .onChange(of: selectedPage) { _, newTab in
+                visitedTabs.insert(newTab)
+            }
 
             Divider()
 
-            switch selectedPage {
-            case .spectrum:
-                DebugChartView()
-            case .throughput:
-                DebugThroughputView()
-            case .roaming:
-                DebugRoamingChartView()
+            ZStack {
+                if visitedTabs.contains(.spectrum) {
+                    DebugChartView()
+                        .opacity(selectedPage == .spectrum ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .spectrum)
+                        .disabled(selectedPage != .spectrum)
+                }
+
+                if visitedTabs.contains(.throughput) {
+                    DebugThroughputView()
+                        .opacity(selectedPage == .throughput ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .throughput)
+                        .disabled(selectedPage != .throughput)
+                }
+
+                if visitedTabs.contains(.roaming) {
+                    DebugRoamingChartView()
+                        .opacity(selectedPage == .roaming ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .roaming)
+                        .disabled(selectedPage != .roaming)
+                }
             }
         }
     }

@@ -63,7 +63,9 @@ struct RoamingTestView: View {
             }
         }
         .task {
-            viewModel.checkReadiness()
+            if viewModel.state == .idle {
+                viewModel.checkReadiness()
+            }
         }
     }
 
