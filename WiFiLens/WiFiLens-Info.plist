@@ -4,7 +4,5 @@
 <dict>
 	<key>SUFeedURL</key>
 	<string>https://github.com/SHIINASAMA/wifi-lens/releases/latest/download/appcast.xml</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>WiFi Lens uses Bluetooth to scan for nearby BLE devices and measure signal strength for network analysis.</string>
 </dict>
 </plist>
