@@ -19,11 +19,13 @@ final class BLEDeviceTracker {
     let maxHistoryCount: Int
     let emaAlpha: Double
     let staleTimeout: TimeInterval
+    let maxTrackedDevices: Int
 
-    init(maxHistoryCount: Int = 30, emaAlpha: Double = 0.25, staleTimeout: TimeInterval = 60) {
+    init(maxHistoryCount: Int = 30, emaAlpha: Double = 0.25, staleTimeout: TimeInterval = 30, maxTrackedDevices: Int = 100) {
         self.maxHistoryCount = maxHistoryCount
         self.emaAlpha = emaAlpha
         self.staleTimeout = staleTimeout
+        self.maxTrackedDevices = maxTrackedDevices
     }
 
     /// Process a batch of raw advertisement events, returning updated snapshots
@@ -73,6 +75,7 @@ final class BLEDeviceTracker {
         }
 
         purgeStale()
+        evictOverflow()
 
         // Build snapshots for ALL known devices, not just the current batch.
         // Devices that didn't appear in this batch are carried over with their
@@ -116,6 +119,27 @@ final class BLEDeviceTracker {
             return last.timestamp < cutoff
         }
         for (id, _) in stale {
+            deviceHistories.removeValue(forKey: id)
+            emaFilters.removeValue(forKey: id)
+            firstSeenTimestamps.removeValue(forKey: id)
+            lastMetadata.removeValue(forKey: id)
+        }
+    }
+
+    /// Evict weakest/oldest devices when the tracked count exceeds the limit.
+    private func evictOverflow() {
+        guard deviceHistories.count > maxTrackedDevices else { return }
+
+        let sorted = deviceHistories.compactMap { (id, samples) -> (UUID, Int, Date)? in
+            guard let last = samples.last else { return nil }
+            return (id, last.rawRSSI, last.timestamp)
+        }.sorted { a, b in
+            if a.1 != b.1 { return a.1 < b.1 }
+            return a.2 < b.2
+        }
+
+        let toEvict = sorted.prefix(deviceHistories.count - maxTrackedDevices)
+        for (id, _, _) in toEvict {
             deviceHistories.removeValue(forKey: id)
             emaFilters.removeValue(forKey: id)
             firstSeenTimestamps.removeValue(forKey: id)

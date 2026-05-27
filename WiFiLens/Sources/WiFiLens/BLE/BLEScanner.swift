@@ -178,7 +178,11 @@ private final class BLEScannerDelegate: NSObject, CBCentralManagerDelegate, @unc
 
     func accumulate(_ event: BLEAdvertisementEvent) {
         accumulatorLock.lock()
-        accumulator[event.peripheralIdentifier, default: []].append(event)
+        var events = accumulator[event.peripheralIdentifier] ?? []
+        if events.count < 50 {
+            events.append(event)
+            accumulator[event.peripheralIdentifier] = events
+        }
         accumulatorLock.unlock()
     }
 
