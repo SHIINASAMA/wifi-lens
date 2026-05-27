@@ -1,5 +1,7 @@
 import SwiftUI
+#if OSS
 import Sparkle
+#endif
 
 private struct AppRootView: View {
     @Bindable var viewModel: ScannerViewModel
@@ -295,11 +297,13 @@ struct WiFiLensApp: App {
                 .keyboardShortcut(",", modifiers: .command)
             }
 
+#if OSS
             CommandGroup(after: .appInfo) {
                 Button(String(localized: "common.action.check_for_updates", comment: "Check for updates menu item")) {
                     sparkleUpdater.checkForUpdates()
                 }
             }
+#endif
 
         }
 

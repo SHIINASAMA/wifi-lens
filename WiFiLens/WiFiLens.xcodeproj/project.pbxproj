@@ -62,7 +62,91 @@
 		FB0573CA2FBCD25C005F8214 /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C82FBCD25C005F8214 /* OverviewView.swift */; };
 		FB0573CC2FBCD8FA005F8214 /* ThroughputMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */; };
 		FB0573CE2FBCD9B9005F8214 /* ThroughputChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CD2FBCD9B9005F8214 /* ThroughputChartView.swift */; };
-		FB0E20882FBAEBCB0064C07A /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = FB0E20872FBAEBCB0064C07A /* Sparkle */; };
+		FB1E32482FC7316C009D1BDC /* BluetoothPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6CDF2DB455AB04A0A7C8BBF /* BluetoothPermissionManager.swift */; };
+		FB1E32492FC7316C009D1BDC /* BLEChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E1C6C7FE18D0034F66CD3E /* BLEChannel.swift */; };
+		FB1E324A2FC7316C009D1BDC /* BLEAdvertisementEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE1ECDC700E5809F5B7FF4 /* BLEAdvertisementEvent.swift */; };
+		FB1E324B2FC7316C009D1BDC /* BLERSSISample.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCF8EF1A4D0D355ED657A6 /* BLERSSISample.swift */; };
+		FB1E324C2FC7316C009D1BDC /* BLEDeviceSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF4EDF838BA0ABB1DAFDBBB /* BLEDeviceSnapshot.swift */; };
+		FB1E324D2FC7316C009D1BDC /* BLEScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55DE3CF5A0CF1AE0ADFECAE1 /* BLEScanner.swift */; };
+		FB1E324E2FC7316C009D1BDC /* BLEDeviceTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D296EB5CEF7484BA599C2F9 /* BLEDeviceTracker.swift */; };
+		FB1E324F2FC7316C009D1BDC /* BLEViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7BA76DD3B1E6198BDAEEA7 /* BLEViewModel.swift */; };
+		FB1E32502FC7316C009D1BDC /* BLETrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */; };
+		FB1E32512FC7316C009D1BDC /* BLEScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D7CF00F0FEAA84B6E2F64C9 /* BLEScannerView.swift */; };
+		FB1E32522FC7316C009D1BDC /* BandChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */; };
+		FB1E32532FC7316C009D1BDC /* BandChartViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58FF378E09090DEBAAFA77F6 /* BandChartViewModel.swift */; };
+		FB1E32542FC7316C009D1BDC /* ChannelQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */; };
+		FB1E32552FC7316C009D1BDC /* CWChannel+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5DDCE8EACD706BD2BCEE4B /* CWChannel+Extensions.swift */; };
+		FB1E32562FC7316C009D1BDC /* ChannelBand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4079C5A47F59C655689BCFB8 /* ChannelBand.swift */; };
+		FB1E32572FC7316C009D1BDC /* NetworkSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573AE2FBB5BD6005F8214 /* NetworkSnapshot.swift */; };
+		FB1E32582FC7316C009D1BDC /* TrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573B02FBB5BEE005F8214 /* TrendChartView.swift */; };
+		FB1E32592FC7316C009D1BDC /* ChannelSpanCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */; };
+		FB1E325A2FC7316C009D1BDC /* SignalHistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573AC2FBB54ED005F8214 /* SignalHistoryStore.swift */; };
+		FB1E325B2FC7316C009D1BDC /* ChartSeriesData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51C237F247C80EC5176F5C0 /* ChartSeriesData.swift */; };
+		FB1E325C2FC7316C009D1BDC /* ThroughputMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */; };
+		FB1E325D2FC7316C009D1BDC /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69F66DB715821EBD11B6D1AA /* Color+Extensions.swift */; };
+		FB1E325E2FC7316C009D1BDC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51DDD97F3B94514DE0790B51 /* Constants.swift */; };
+		FB1E325F2FC7316C009D1BDC /* ChannelQualityCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */; };
+		FB1E32602FC7316C009D1BDC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B31CBEBC05DEA7ADB03FE01 /* ContentView.swift */; };
+		FB1E32612FC7316C009D1BDC /* SparkleUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */; };
+		FB1E32622FC7316C009D1BDC /* LocationPermissionRequiredView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */; };
+		FB1E32632FC7316C009D1BDC /* FilterPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A7ED53B7BCC8C0A11662151 /* FilterPopoverView.swift */; };
+		FB1E32642FC7316C009D1BDC /* LocationPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69959B95B194A96FA8D337C /* LocationPermissionManager.swift */; };
+		FB1E32652FC7316C009D1BDC /* NativeTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3299502DE1A130760C8A7 /* NativeTableView.swift */; };
+		FB1E32662FC7316C009D1BDC /* MCPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573B52FBBEBB9005F8214 /* MCPServer.swift */; };
+		FB1E32672FC7316C009D1BDC /* CrashReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C12FBC47F1005F8214 /* CrashReporter.swift */; };
+		FB1E32682FC7316C009D1BDC /* MetricKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD329512FC500000057B038 /* MetricKitManager.swift */; };
+		FB1E32692FC7316C009D1BDC /* DebugChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F91F2FBE208500BCEC67 /* DebugChartView.swift */; };
+		FB1E326A2FC7316C009D1BDC /* DebugContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */; };
+		FB1E326B2FC7316C009D1BDC /* DebugThroughputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */; };
+		FB1E326C2FC7316C009D1BDC /* DebugRoamingChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */; };
+		FB1E326D2FC7316C009D1BDC /* SSIDColorHasher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */; };
+		FB1E326E2FC7316C009D1BDC /* ScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */; };
+		FB1E326F2FC7316C009D1BDC /* HelpCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C72FBCD25C005F8214 /* HelpCenterView.swift */; };
+		FB1E32702FC7316C009D1BDC /* ChartTimeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */; };
+		FB1E32712FC7316C009D1BDC /* ChartGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F362FC2D9650057B038 /* ChartGeometry.swift */; };
+		FB1E32722FC7316C009D1BDC /* SplineInterpolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */; };
+		FB1E32732FC7316C009D1BDC /* RangeSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */; };
+		FB1E32742FC7316C009D1BDC /* ChartRendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F372FC2D9650057B038 /* ChartRendering.swift */; };
+		FB1E32752FC7316C009D1BDC /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C82FBCD25C005F8214 /* OverviewView.swift */; };
+		FB1E32762FC7316C009D1BDC /* SpanDirection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310AD5ABC56B4211E30DD1DE /* SpanDirection.swift */; };
+		FB1E32772FC7316C009D1BDC /* WiFiLensApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831E90D5B9D07C478A35DD14 /* WiFiLensApp.swift */; };
+		FB1E32782FC7316C009D1BDC /* WiFiChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6203A2551742DF77D61785FE /* WiFiChannel.swift */; };
+		FB1E32792FC7316C009D1BDC /* WiFiNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58854CC5BE8A54269614FAD /* WiFiNetwork.swift */; };
+		FB1E327A2FC7316C009D1BDC /* TitleBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB2CA8C2FC0E14000FC2D2C /* TitleBadge.swift */; };
+		FB1E327B2FC7316C009D1BDC /* BuildConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB2CA8B2FC0E14000FC2D2C /* BuildConfig.swift */; };
+		FB1E327C2FC7316C009D1BDC /* IEParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8BB6032FBB0BA600FD072E /* IEParser.swift */; };
+		FB1E327D2FC7316C009D1BDC /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573B92FBBFC31005F8214 /* SidebarView.swift */; };
+		FB1E327E2FC7316C009D1BDC /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573BF2FBC47CC005F8214 /* Logging.swift */; };
+		FB1E327F2FC7316C009D1BDC /* RegulatoryDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C92FC4889B0009F29B /* RegulatoryDomain.swift */; };
+		FB1E32802FC7316C009D1BDC /* RegulatoryDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C82FC4889B0009F29B /* RegulatoryDatabase.swift */; };
+		FB1E32812FC7316C009D1BDC /* ChannelRecommendation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C52FC4889B0009F29B /* ChannelRecommendation.swift */; };
+		FB1E32822FC7316C009D1BDC /* DeviceCompatibilityFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C62FC4889B0009F29B /* DeviceCompatibilityFilter.swift */; };
+		FB1E32832FC7316C009D1BDC /* RegulatoryFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41CA2FC4889B0009F29B /* RegulatoryFilter.swift */; };
+		FB1E32842FC7316C009D1BDC /* RegionInferenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C72FC4889B0009F29B /* RegionInferenceEngine.swift */; };
+		FB1E32852FC7316C009D1BDC /* RegulatoryPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41D22FC4889B0009F29B /* RegulatoryPipeline.swift */; };
+		FB1E32862FC7316C009D1BDC /* WiFiScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */; };
+		FB1E32872FC7316C009D1BDC /* NetworkInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8BB6012FBB07F600FD072E /* NetworkInfoService.swift */; };
+		FB1E32882FC7316C009D1BDC /* ThroughputChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CD2FBCD9B9005F8214 /* ThroughputChartView.swift */; };
+		FB1E32892FC7316C009D1BDC /* InterfacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573BD2FBC22C2005F8214 /* InterfacesView.swift */; };
+		FB1E328A2FC7316C009D1BDC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */; };
+		FB1E328B2FC7316C009D1BDC /* DeviceCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0470288A92AF41C793DAE70B /* DeviceCapabilities.swift */; };
+		FB1E328C2FC7316C009D1BDC /* GatewayPinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF472346A62545B9866DA8ED /* GatewayPinger.swift */; };
+		FB1E328D2FC7316C009D1BDC /* RoamingRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8367630A1EDF4515917A144A /* RoamingRecord.swift */; };
+		FB1E328E2FC7316C009D1BDC /* RoamingTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F790DC6E08D43C5BD058D96 /* RoamingTestViewModel.swift */; };
+		FB1E328F2FC7316C009D1BDC /* RoamingTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B13DBF938D654926B205302C /* RoamingTestView.swift */; };
+		FB1E32902FC7316C009D1BDC /* RoamingSessionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E2D3C4B5A64987FEDCBA01 /* RoamingSessionRecord.swift */; };
+		FB1E32912FC7316C009D1BDC /* SignalSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6180984B78D4363B6840C79 /* SignalSmoothing.swift */; };
+		FB1E32922FC7316C009D1BDC /* ExponentialMovingAverage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E1D69278614400AA3B660C /* ExponentialMovingAverage.swift */; };
+		FB1E32932FC7316C009D1BDC /* KalmanFilter1D.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9F90F78BD04526AE0566CC /* KalmanFilter1D.swift */; };
+		FB1E32942FC7316C009D1BDC /* HysteresisEMA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01A62377C8474773A0ACA7CD /* HysteresisEMA.swift */; };
+		FB1E32972FC7316C009D1BDC /* CoreWLAN.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1067F6AA96EC6320C6472F59 /* CoreWLAN.framework */; };
+		FB1E32982FC7316C009D1BDC /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EAF444453E304ABB57AF3AA /* CoreLocation.framework */; };
+		FB1E32992FC7316C009D1BDC /* MCP in Frameworks */ = {isa = PBXBuildFile; productRef = FB1E32432FC7316C009D1BDC /* MCP */; };
+		FB1E329A2FC7316C009D1BDC /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB2E3B2D2FC5ACDA00D2610E /* CoreBluetooth.framework */; };
+		FB1E329B2FC7316C009D1BDC /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = FB1E32452FC7316C009D1BDC /* Logging */; };
+		FB1E329D2FC7316C009D1BDC /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = FBB1F0AB2FC61E3D00E9D2C6 /* Localizable.xcstrings */; };
+		FB1E329E2FC7316C009D1BDC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */; };
+		FB1E32A82FC731CA009D1BDC /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = FB1E32A72FC731CA009D1BDC /* Sparkle */; };
 		FB2E3B2E2FC5ACDA00D2610E /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB2E3B2D2FC5ACDA00D2610E /* CoreBluetooth.framework */; };
 		FB6F41CC2FC4889B0009F29B /* RegulatoryDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C92FC4889B0009F29B /* RegulatoryDomain.swift */; };
 		FB6F41CD2FC4889B0009F29B /* RegulatoryDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C82FC4889B0009F29B /* RegulatoryDatabase.swift */; };
@@ -163,6 +247,7 @@
 		FB0573C82FBCD25C005F8214 /* OverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewView.swift; sourceTree = "<group>"; };
 		FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThroughputMonitor.swift; sourceTree = "<group>"; };
 		FB0573CD2FBCD9B9005F8214 /* ThroughputChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThroughputChartView.swift; sourceTree = "<group>"; };
+		FB1E32A42FC7316C009D1BDC /* WiFi Lens Pro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "WiFi Lens Pro.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB2E3B2D2FC5ACDA00D2610E /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		FB5A212C2FC31C6100828D9F /* WiFiLens-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "WiFiLens-Info.plist"; sourceTree = "<group>"; };
 		FB6F41C52FC4889B0009F29B /* ChannelRecommendation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelRecommendation.swift; sourceTree = "<group>"; };
@@ -210,12 +295,24 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FB0E20882FBAEBCB0064C07A /* Sparkle in Frameworks */,
 				1E5141F704005BF06DB684A1 /* CoreWLAN.framework in Frameworks */,
 				B9AB60F3D002A7B9123D2520 /* CoreLocation.framework in Frameworks */,
 				FB0573B42FBBEAE4005F8214 /* MCP in Frameworks */,
+				FB1E32A82FC731CA009D1BDC /* Sparkle in Frameworks */,
 				FB2E3B2E2FC5ACDA00D2610E /* CoreBluetooth.framework in Frameworks */,
 				FB0573C422FBBEAE4005F8214 /* Logging in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB1E32952FC7316C009D1BDC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB1E32972FC7316C009D1BDC /* CoreWLAN.framework in Frameworks */,
+				FB1E32982FC7316C009D1BDC /* CoreLocation.framework in Frameworks */,
+				FB1E32992FC7316C009D1BDC /* MCP in Frameworks */,
+				FB1E329A2FC7316C009D1BDC /* CoreBluetooth.framework in Frameworks */,
+				FB1E329B2FC7316C009D1BDC /* Logging in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -369,6 +466,7 @@
 			children = (
 				BD784856886985BCC6FC4F02 /* WiFi Lens.app */,
 				8F405489976429A068F15F86 /* WiFiLensTests.xctest */,
+				FB1E32A42FC7316C009D1BDC /* WiFi Lens Pro.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -553,12 +651,33 @@
 			);
 			name = WiFiLens;
 			packageProductDependencies = (
-				FB0E20872FBAEBCB0064C07A /* Sparkle */,
 				FB0573B32FBBEAE4005F8214 /* MCP */,
 				FB0573C412FBBEAE4005F8214 /* Logging */,
+				FB1E32A72FC731CA009D1BDC /* Sparkle */,
 			);
 			productName = WiFiLens;
 			productReference = BD784856886985BCC6FC4F02 /* WiFi Lens.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FB1E32402FC7316C009D1BDC /* WiFiLensPro */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FB1E329F2FC7316C009D1BDC /* Build configuration list for PBXNativeTarget "WiFiLensPro" */;
+			buildPhases = (
+				FB1E32472FC7316C009D1BDC /* Sources */,
+				FB1E32952FC7316C009D1BDC /* Frameworks */,
+				FB1E329C2FC7316C009D1BDC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WiFiLensPro;
+			packageProductDependencies = (
+				FB1E32432FC7316C009D1BDC /* MCP */,
+				FB1E32452FC7316C009D1BDC /* Logging */,
+			);
+			productName = WiFiLens;
+			productReference = FB1E32A42FC7316C009D1BDC /* WiFi Lens Pro.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -577,13 +696,14 @@
 				Base,
 				en,
 				"zh-Hans",
+				ja,
 			);
 			mainGroup = 1D3644357E3565223E7F160A;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				FB0E20862FBAEB2F0064C07A /* XCRemoteSwiftPackageReference "Sparkle" */,
 				FB0573B22FBBEAE4005F8214 /* XCRemoteSwiftPackageReference "swift-sdk" */,
 				FB0573C402FBBEAE4005F8214 /* XCRemoteSwiftPackageReference "swift-log" */,
+				FB1E32A62FC731CA009D1BDC /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BD4D8FFAAD7E961D9EE4F5FE /* Products */;
@@ -591,12 +711,22 @@
 			projectRoot = "";
 			targets = (
 				4815C3B026D255EF85C56198 /* WiFiLens */,
+				FB1E32402FC7316C009D1BDC /* WiFiLensPro */,
 				32B8DFED1C1CBAD8FD8C797C /* WiFiLensTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		FB1E329C2FC7316C009D1BDC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB1E329D2FC7316C009D1BDC /* Localizable.xcstrings in Resources */,
+				FB1E329E2FC7316C009D1BDC /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FB8BB5FF2FBB04DB00FD072E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -700,6 +830,90 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FB1E32472FC7316C009D1BDC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB1E32482FC7316C009D1BDC /* BluetoothPermissionManager.swift in Sources */,
+				FB1E32492FC7316C009D1BDC /* BLEChannel.swift in Sources */,
+				FB1E324A2FC7316C009D1BDC /* BLEAdvertisementEvent.swift in Sources */,
+				FB1E324B2FC7316C009D1BDC /* BLERSSISample.swift in Sources */,
+				FB1E324C2FC7316C009D1BDC /* BLEDeviceSnapshot.swift in Sources */,
+				FB1E324D2FC7316C009D1BDC /* BLEScanner.swift in Sources */,
+				FB1E324E2FC7316C009D1BDC /* BLEDeviceTracker.swift in Sources */,
+				FB1E324F2FC7316C009D1BDC /* BLEViewModel.swift in Sources */,
+				FB1E32502FC7316C009D1BDC /* BLETrendChartView.swift in Sources */,
+				FB1E32512FC7316C009D1BDC /* BLEScannerView.swift in Sources */,
+				FB1E32522FC7316C009D1BDC /* BandChartView.swift in Sources */,
+				FB1E32532FC7316C009D1BDC /* BandChartViewModel.swift in Sources */,
+				FB1E32542FC7316C009D1BDC /* ChannelQualityView.swift in Sources */,
+				FB1E32552FC7316C009D1BDC /* CWChannel+Extensions.swift in Sources */,
+				FB1E32562FC7316C009D1BDC /* ChannelBand.swift in Sources */,
+				FB1E32572FC7316C009D1BDC /* NetworkSnapshot.swift in Sources */,
+				FB1E32582FC7316C009D1BDC /* TrendChartView.swift in Sources */,
+				FB1E32592FC7316C009D1BDC /* ChannelSpanCalculator.swift in Sources */,
+				FB1E325A2FC7316C009D1BDC /* SignalHistoryStore.swift in Sources */,
+				FB1E325B2FC7316C009D1BDC /* ChartSeriesData.swift in Sources */,
+				FB1E325C2FC7316C009D1BDC /* ThroughputMonitor.swift in Sources */,
+				FB1E325D2FC7316C009D1BDC /* Color+Extensions.swift in Sources */,
+				FB1E325E2FC7316C009D1BDC /* Constants.swift in Sources */,
+				FB1E325F2FC7316C009D1BDC /* ChannelQualityCalculator.swift in Sources */,
+				FB1E32602FC7316C009D1BDC /* ContentView.swift in Sources */,
+				FB1E32612FC7316C009D1BDC /* SparkleUpdater.swift in Sources */,
+				FB1E32622FC7316C009D1BDC /* LocationPermissionRequiredView.swift in Sources */,
+				FB1E32632FC7316C009D1BDC /* FilterPopoverView.swift in Sources */,
+				FB1E32642FC7316C009D1BDC /* LocationPermissionManager.swift in Sources */,
+				FB1E32652FC7316C009D1BDC /* NativeTableView.swift in Sources */,
+				FB1E32662FC7316C009D1BDC /* MCPServer.swift in Sources */,
+				FB1E32672FC7316C009D1BDC /* CrashReporter.swift in Sources */,
+				FB1E32682FC7316C009D1BDC /* MetricKitManager.swift in Sources */,
+				FB1E32692FC7316C009D1BDC /* DebugChartView.swift in Sources */,
+				FB1E326A2FC7316C009D1BDC /* DebugContainerView.swift in Sources */,
+				FB1E326B2FC7316C009D1BDC /* DebugThroughputView.swift in Sources */,
+				FB1E326C2FC7316C009D1BDC /* DebugRoamingChartView.swift in Sources */,
+				FB1E326D2FC7316C009D1BDC /* SSIDColorHasher.swift in Sources */,
+				FB1E326E2FC7316C009D1BDC /* ScannerViewModel.swift in Sources */,
+				FB1E326F2FC7316C009D1BDC /* HelpCenterView.swift in Sources */,
+				FB1E32702FC7316C009D1BDC /* ChartTimeFormatting.swift in Sources */,
+				FB1E32712FC7316C009D1BDC /* ChartGeometry.swift in Sources */,
+				FB1E32722FC7316C009D1BDC /* SplineInterpolation.swift in Sources */,
+				FB1E32732FC7316C009D1BDC /* RangeSelectorView.swift in Sources */,
+				FB1E32742FC7316C009D1BDC /* ChartRendering.swift in Sources */,
+				FB1E32752FC7316C009D1BDC /* OverviewView.swift in Sources */,
+				FB1E32762FC7316C009D1BDC /* SpanDirection.swift in Sources */,
+				FB1E32772FC7316C009D1BDC /* WiFiLensApp.swift in Sources */,
+				FB1E32782FC7316C009D1BDC /* WiFiChannel.swift in Sources */,
+				FB1E32792FC7316C009D1BDC /* WiFiNetwork.swift in Sources */,
+				FB1E327A2FC7316C009D1BDC /* TitleBadge.swift in Sources */,
+				FB1E327B2FC7316C009D1BDC /* BuildConfig.swift in Sources */,
+				FB1E327C2FC7316C009D1BDC /* IEParser.swift in Sources */,
+				FB1E327D2FC7316C009D1BDC /* SidebarView.swift in Sources */,
+				FB1E327E2FC7316C009D1BDC /* Logging.swift in Sources */,
+				FB1E327F2FC7316C009D1BDC /* RegulatoryDomain.swift in Sources */,
+				FB1E32802FC7316C009D1BDC /* RegulatoryDatabase.swift in Sources */,
+				FB1E32812FC7316C009D1BDC /* ChannelRecommendation.swift in Sources */,
+				FB1E32822FC7316C009D1BDC /* DeviceCompatibilityFilter.swift in Sources */,
+				FB1E32832FC7316C009D1BDC /* RegulatoryFilter.swift in Sources */,
+				FB1E32842FC7316C009D1BDC /* RegionInferenceEngine.swift in Sources */,
+				FB1E32852FC7316C009D1BDC /* RegulatoryPipeline.swift in Sources */,
+				FB1E32862FC7316C009D1BDC /* WiFiScanner.swift in Sources */,
+				FB1E32872FC7316C009D1BDC /* NetworkInfoService.swift in Sources */,
+				FB1E32882FC7316C009D1BDC /* ThroughputChartView.swift in Sources */,
+				FB1E32892FC7316C009D1BDC /* InterfacesView.swift in Sources */,
+				FB1E328A2FC7316C009D1BDC /* SettingsView.swift in Sources */,
+				FB1E328B2FC7316C009D1BDC /* DeviceCapabilities.swift in Sources */,
+				FB1E328C2FC7316C009D1BDC /* GatewayPinger.swift in Sources */,
+				FB1E328D2FC7316C009D1BDC /* RoamingRecord.swift in Sources */,
+				FB1E328E2FC7316C009D1BDC /* RoamingTestViewModel.swift in Sources */,
+				FB1E328F2FC7316C009D1BDC /* RoamingTestView.swift in Sources */,
+				FB1E32902FC7316C009D1BDC /* RoamingSessionRecord.swift in Sources */,
+				FB1E32912FC7316C009D1BDC /* SignalSmoothing.swift in Sources */,
+				FB1E32922FC7316C009D1BDC /* ExponentialMovingAverage.swift in Sources */,
+				FB1E32932FC7316C009D1BDC /* KalmanFilter1D.swift in Sources */,
+				FB1E32942FC7316C009D1BDC /* HysteresisEMA.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -711,7 +925,7 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		27D7C298956651919604E437 /* Debug-OSS */ = {
+		27D7C298956651919604E437 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -728,9 +942,9 @@
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WiFi Lens.app/Contents/MacOS/WiFi Lens";
 			};
-			name = "Debug-OSS";
+			name = Debug;
 		};
-		698FEE00A950E843D4769D08 /* Release-OSS */ = {
+		698FEE00A950E843D4769D08 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -747,9 +961,9 @@
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WiFi Lens.app/Contents/MacOS/WiFi Lens";
 			};
-			name = "Release-OSS";
+			name = Release;
 		};
-		B6525FE3DDC51BB4B44EF6B5 /* Debug-OSS */ = {
+		B6525FE3DDC51BB4B44EF6B5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FB80FA2C2FC0AC1900547708 /* OSS.xcconfig */;
 			buildSettings = {
@@ -760,7 +974,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 130;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
@@ -786,16 +999,15 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 			};
-			name = "Debug-OSS";
+			name = Debug;
 		};
-		BD607A70E6F07E317F2987AB /* Release-OSS */ = {
+		BD607A70E6F07E317F2987AB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -853,9 +1065,9 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 6.0;
 			};
-			name = "Release-OSS";
+			name = Release;
 		};
-		BEFF0BAF927CA3CBE7CF5AF2 /* Debug-OSS */ = {
+		BEFF0BAF927CA3CBE7CF5AF2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -920,9 +1132,9 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
 			};
-			name = "Debug-OSS";
+			name = Debug;
 		};
-		C628309BD8108FD3AB3919F4 /* Release-OSS */ = {
+		C628309BD8108FD3AB3919F4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FB80FA2C2FC0AC1900547708 /* OSS.xcconfig */;
 			buildSettings = {
@@ -933,7 +1145,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 130;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
@@ -959,83 +1170,15 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 			};
-			name = "Release-OSS";
+			name = Release;
 		};
-		FB80FA322FC0ACA600547708 /* Debug-PRO */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
-				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
-				ENABLE_RESOURCE_ACCESS_LOCATION = YES;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"DEBUG=1",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 6.0;
-			};
-			name = "Debug-PRO";
-		};
-		FB80FA332FC0ACA600547708 /* Debug-PRO */ = {
+		FB1E32A02FC7316C009D1BDC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FB80FA2F2FC0AC1900547708 /* PRO.xcconfig */;
 			buildSettings = {
@@ -1046,7 +1189,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 130;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
@@ -1060,8 +1202,8 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
-				INFOPLIST_FILE = "WiFiLens-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "WiFi Lens";
+				INFOPLIST_FILE = "";
+				INFOPLIST_KEY_CFBundleDisplayName = "WiFi Lens Pro";
 				INFOPLIST_KEY_CFBundleIconFile = twa;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
@@ -1072,95 +1214,15 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 1.3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
-				PRODUCT_NAME = "WiFi Lens";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens-pro";
+				PRODUCT_NAME = "WiFi Lens Pro";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 			};
-			name = "Debug-PRO";
+			name = Debug;
 		};
-		FB80FA342FC0ACA600547708 /* Debug-PRO */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.nolze.WiFiLensTests;
-				SDKROOT = macosx;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WiFi Lens.app/Contents/MacOS/WiFi Lens";
-			};
-			name = "Debug-PRO";
-		};
-		FB80FA352FC0ACB100547708 /* Release-PRO */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
-				ENABLE_RESOURCE_ACCESS_LOCATION = YES;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 6.0;
-			};
-			name = "Release-PRO";
-		};
-		FB80FA362FC0ACB100547708 /* Release-PRO */ = {
+		FB1E32A22FC7316C009D1BDC /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FB80FA2F2FC0AC1900547708 /* PRO.xcconfig */;
 			buildSettings = {
@@ -1171,7 +1233,6 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 130;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
@@ -1185,8 +1246,8 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
-				INFOPLIST_FILE = "WiFiLens-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "WiFi Lens";
+				INFOPLIST_FILE = "";
+				INFOPLIST_KEY_CFBundleDisplayName = "WiFi Lens Pro";
 				INFOPLIST_KEY_CFBundleIconFile = twa;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
@@ -1197,33 +1258,13 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 1.3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
-				PRODUCT_NAME = "WiFi Lens";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens-pro";
+				PRODUCT_NAME = "WiFI Lens Pro";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 			};
-			name = "Release-PRO";
-		};
-		FB80FA372FC0ACB100547708 /* Release-PRO */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.nolze.WiFiLensTests;
-				SDKROOT = macosx;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WiFi Lens.app/Contents/MacOS/WiFi Lens";
-			};
-			name = "Release-PRO";
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -1231,35 +1272,38 @@
 		C7342F9C7642FE3324E1F9F4 /* Build configuration list for PBXNativeTarget "WiFiLens" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				B6525FE3DDC51BB4B44EF6B5 /* Debug-OSS */,
-				FB80FA332FC0ACA600547708 /* Debug-PRO */,
-				C628309BD8108FD3AB3919F4 /* Release-OSS */,
-				FB80FA362FC0ACB100547708 /* Release-PRO */,
+				B6525FE3DDC51BB4B44EF6B5 /* Debug */,
+				C628309BD8108FD3AB3919F4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Debug-OSS";
+			defaultConfigurationName = Debug;
 		};
 		C7B2E8745D5E0030C0227E6E /* Build configuration list for PBXProject "WiFiLens" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BEFF0BAF927CA3CBE7CF5AF2 /* Debug-OSS */,
-				FB80FA322FC0ACA600547708 /* Debug-PRO */,
-				BD607A70E6F07E317F2987AB /* Release-OSS */,
-				FB80FA352FC0ACB100547708 /* Release-PRO */,
+				BEFF0BAF927CA3CBE7CF5AF2 /* Debug */,
+				BD607A70E6F07E317F2987AB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Debug-OSS";
+			defaultConfigurationName = Debug;
 		};
 		CA65A170FF00C1566D44BBC0 /* Build configuration list for PBXNativeTarget "WiFiLensTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				27D7C298956651919604E437 /* Debug-OSS */,
-				FB80FA342FC0ACA600547708 /* Debug-PRO */,
-				698FEE00A950E843D4769D08 /* Release-OSS */,
-				FB80FA372FC0ACB100547708 /* Release-PRO */,
+				27D7C298956651919604E437 /* Debug */,
+				698FEE00A950E843D4769D08 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Debug-OSS";
+			defaultConfigurationName = Debug;
+		};
+		FB1E329F2FC7316C009D1BDC /* Build configuration list for PBXNativeTarget "WiFiLensPro" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FB1E32A02FC7316C009D1BDC /* Debug */,
+				FB1E32A22FC7316C009D1BDC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 
@@ -1280,7 +1324,23 @@
 				minimumVersion = 1.12.0;
 			};
 		};
-		FB0E20862FBAEB2F0064C07A /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+		FB1E32442FC7316C009D1BDC /* XCRemoteSwiftPackageReference "swift-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/modelcontextprotocol/swift-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.12.1;
+			};
+		};
+		FB1E32462FC7316C009D1BDC /* XCRemoteSwiftPackageReference "swift-log" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-log";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.12.0;
+			};
+		};
+		FB1E32A62FC731CA009D1BDC /* XCRemoteSwiftPackageReference "Sparkle" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sparkle-project/Sparkle";
 			requirement = {
@@ -1301,9 +1361,19 @@
 			package = FB0573C402FBBEAE4005F8214 /* XCRemoteSwiftPackageReference "swift-log" */;
 			productName = Logging;
 		};
-		FB0E20872FBAEBCB0064C07A /* Sparkle */ = {
+		FB1E32432FC7316C009D1BDC /* MCP */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = FB0E20862FBAEB2F0064C07A /* XCRemoteSwiftPackageReference "Sparkle" */;
+			package = FB1E32442FC7316C009D1BDC /* XCRemoteSwiftPackageReference "swift-sdk" */;
+			productName = MCP;
+		};
+		FB1E32452FC7316C009D1BDC /* Logging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB1E32462FC7316C009D1BDC /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = Logging;
+		};
+		FB1E32A72FC731CA009D1BDC /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FB1E32A62FC731CA009D1BDC /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
 		};
 /* End XCSwiftPackageProductDependency section */

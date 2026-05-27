@@ -5877,6 +5877,54 @@
         }
       }
     },
+    "settings.privacy.header" : {
+      "comment" : "Privacy settings section header",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プライバシー"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隐私"
+          }
+        }
+      }
+    },
+    "settings.privacy.view_policy" : {
+      "comment" : "Button to view privacy policy",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Privacy Policy…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プライバシーポリシーを表示…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看隐私政策…"
+          }
+        }
+      }
+    },
     "settings.region.auto_detect" : {
       "comment" : "Auto-detect regulatory region option",
       "extractionState" : "manual",
@@ -6233,54 +6281,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自动检查更新"
-          }
-        }
-      }
-    },
-    "settings.privacy.header" : {
-      "comment" : "Privacy settings section header",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Privacy"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プライバシー"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "隐私"
-          }
-        }
-      }
-    },
-    "settings.privacy.view_policy" : {
-      "comment" : "Button to view privacy policy",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View Privacy Policy…"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プライバシーポリシーを表示…"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "查看隐私政策…"
           }
         }
       }

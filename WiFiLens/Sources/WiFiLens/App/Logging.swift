@@ -37,7 +37,9 @@ enum AppLogger {
     static let scanner    = Logging.Logger(label: "scanner")
     static let network    = Logging.Logger(label: "network")
     static let ui         = Logging.Logger(label: "ui")
+#if OSS
     static let sparkle    = Logging.Logger(label: "sparkle")
+#endif
     static let mcp        = Logging.Logger(label: "mcp")
     static let throughput = Logging.Logger(label: "throughput")
     static let location   = Logging.Logger(label: "location")

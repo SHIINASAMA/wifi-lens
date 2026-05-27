@@ -15,16 +15,16 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4815C3B026D255EF85C56198"
-               BuildableName = "WiFi Lens.app"
-               BlueprintName = "WiFiLens"
+               BlueprintIdentifier = "FB1E32402FC7316C009D1BDC"
+               BuildableName = "WiFi Lens Pro.app"
+               BlueprintName = "WiFiLensPro"
                ReferencedContainer = "container:WiFiLens.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Debug-OSS"
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
@@ -36,10 +36,9 @@
       </TestPlans>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug-OSS"
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      language = "ja"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
@@ -51,9 +50,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4815C3B026D255EF85C56198"
-            BuildableName = "WiFi Lens.app"
-            BlueprintName = "WiFiLens"
+            BlueprintIdentifier = "FB1E32402FC7316C009D1BDC"
+            BuildableName = "WiFi Lens Pro.app"
+            BlueprintName = "WiFiLensPro"
             ReferencedContainer = "container:WiFiLens.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -63,27 +62,26 @@
       </LocationScenarioReference>
    </LaunchAction>
    <ProfileAction
-      buildConfiguration = "Release-OSS"
+      buildConfiguration = "Release"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4815C3B026D255EF85C56198"
-            BuildableName = "WiFi Lens.app"
-            BlueprintName = "WiFiLens"
+            BlueprintIdentifier = "FB1E32402FC7316C009D1BDC"
+            BuildableName = "WiFi Lens Pro.app"
+            BlueprintName = "WiFiLensPro"
             ReferencedContainer = "container:WiFiLens.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
-      buildConfiguration = "Release-OSS">
+      buildConfiguration = "Release">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Release-OSS"
+      buildConfiguration = "Release"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

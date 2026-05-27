@@ -1,3 +1,4 @@
+#if OSS
 import Sparkle
 
 private let autoCheckKey = "SUEnableAutomaticChecks"
@@ -45,3 +46,14 @@ final class SparkleUpdater: ObservableObject {
         controller.checkForUpdates(nil)
     }
 }
+#else
+@MainActor
+final class SparkleUpdater {
+    init() {}
+    var automaticallyChecksForUpdates: Bool {
+        get { false }
+        set { }
+    }
+    func checkForUpdates() {}
+}
+#endif

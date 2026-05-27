@@ -1,5 +1,7 @@
 import SwiftUI
+#if OSS
 import Sparkle
+#endif
 import AppKit
 
 private let privacyPolicyURL = "https://shiinasama.github.io/wifi-lens/#privacy"
@@ -22,10 +24,6 @@ struct SettingsView: View {
         self.locationPermission = locationPermission
         self.bluetoothPermission = bluetoothPermission
         _autoCheck = State(initialValue: updater.automaticallyChecksForUpdates)
-        if BuildConfig.current == .pro {
-            updater.automaticallyChecksForUpdates = false
-            AppLogger.app.info("Sparkle auto-update disabled (PRO build)")
-        }
     }
 
     var body: some View {
