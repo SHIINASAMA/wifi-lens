@@ -5,7 +5,7 @@
 [![Email](https://img.shields.io/badge/email-wifi--lens@outlook.com-0078d4)](mailto:wifi-lens@outlook.com)
 
 Simple, open-source Wi-Fi channel and signal strength analyzer for macOS.
-Built with SwiftUI, CoreWLAN, and Sparkle.
+Built with SwiftUI, CoreWLAN, CoreBluetooth, and Sparkle.
 
 ![screenshot](assets/screenshot-swiftui.png)
 
@@ -14,6 +14,7 @@ Built with SwiftUI, CoreWLAN, and Sparkle.
 ## Features
 
 - Real-time Wi-Fi scanning across 2.4 GHz, 5 GHz, and 6 GHz bands
+- BLE device scanner with RSSI analysis, trend charts, and device tracking
 - Gaussian bell-curve charts per band with dynamic y-axis scaling
 - Per-band freeze and drag-to-zoom
 - Deterministic SSID-based color assignment
@@ -22,6 +23,7 @@ Built with SwiftUI, CoreWLAN, and Sparkle.
 - 802.11 capability details: PHY generation, channel width, 802.11k/r/v roaming, WPA3, hidden SSID
 - Connected network status: IP, gateway, DNS, MAC, channel, Tx rate, security
 - Connection quality score with channel congestion analysis
+- Regulatory-aware channel recommendations based on region inference
 - Signal history trend charts per network
 - Roaming test: AP transition monitoring with timeline chart, range selector, and session save/load
 - Channel occupancy heatmap per band
@@ -30,6 +32,7 @@ Built with SwiftUI, CoreWLAN, and Sparkle.
 - MCP (Model Context Protocol) HTTP server for external tool integration
 - Built-in Sparkle auto-update support
 - Crash reporting and structured logging
+- Localized in English, Japanese, and Simplified Chinese
 
 ## Requirements
 
@@ -69,13 +72,27 @@ git clone https://github.com/SHIINASAMA/wifi-lens
 cd wifi-lens/WiFiLens
 
 # Build
-xcodebuild -project WiFiLens.xcodeproj -scheme WiFiLens -configuration "Debug-OSS" -destination 'platform=macOS' build
+xcodebuild -project WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' build
 
 # Run tests
-xcodebuild -project WiFiLens.xcodeproj -scheme WiFiLens -configuration "Debug-OSS" -destination 'platform=macOS' test
+xcodebuild -project WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' test
 
 # Open in Xcode
 xed WiFiLens.xcodeproj
+```
+
+The product name is `WiFi Lens.app` (with space).
+
+### Website
+
+The landing page is built with Vite and Tailwind CSS, outputting to `_site/`.
+
+```sh
+cd wifi-lens          # repo root
+npm ci
+npm run dev           # dev server at localhost:5173/wifi-lens/
+npm run build         # production build
+npm run preview       # preview production build
 ```
 
 For documentation on architecture, roadmap, and known issues, see the [docs/](docs/) directory.

@@ -16,10 +16,10 @@ All detailed documentation lives under `docs/`. When adding or updating document
 
 ```sh
 # App — always use xcodebuild, never swift build / swift test
-# Build configurations: Debug-OSS / Debug-PRO / Release-OSS / Release-PRO
-xcodebuild -project WiFiLens.xcodeproj -scheme WiFiLens -configuration "Debug-OSS" -destination 'platform=macOS' build
-xcodebuild -project WiFiLens.xcodeproj -scheme WiFiLens -configuration "Debug-OSS" -destination 'platform=macOS' test
-xed WiFiLens.xcodeproj                   # open in Xcode GUI
+# Build configurations: Debug / Release
+xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' build
+xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' test
+xed WiFiLens/WiFiLens.xcodeproj                   # open in Xcode GUI
 
 # Website — Vite + Tailwind CSS, outputs to _site/
 npm ci && npm run dev                    # dev server at localhost:5173/wifi-lens/
@@ -33,7 +33,7 @@ The website deploys to GitHub Pages via `.github/workflows/pages.yml`, triggered
 
 ## Key Facts
 
-- macOS 14+, Swift 6.0, SwiftUI + AppKit interop with CoreWLAN
+- macOS 14+, Swift 6.0, SwiftUI + AppKit interop with CoreWLAN and CoreBluetooth
 - `ScannerViewModel` is `@Observable`, passed via `@Bindable`
 - Tests use Swift Testing (`@Test`, `#expect()`) with `@testable import WiFiLens`
 - Localization: `String(localized: "domain.component.element", comment: "Context for translators")` → `Resources/Localizable.xcstrings` (`en`, `ja`, `zh-Hans`)
