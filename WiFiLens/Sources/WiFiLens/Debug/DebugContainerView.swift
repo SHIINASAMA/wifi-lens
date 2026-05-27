@@ -28,7 +28,7 @@ struct DebugContainerView: View {
                 }
             }
             .pickerStyle(.segmented)
-            .controlSize(.small)
+            .controlSize(.regular)
             .frame(width: 180)
             .padding(.vertical, 6)
             .onChange(of: selectedPage) { _, newTab in

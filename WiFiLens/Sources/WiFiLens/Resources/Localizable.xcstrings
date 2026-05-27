@@ -3865,19 +3865,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "BLE Scanner"
+            "value" : "Bluetooth"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "BLE スキャナ"
+            "value" : "Bluetooth"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "蓝牙扫描器"
+            "value" : "蓝牙"
           }
         }
       }

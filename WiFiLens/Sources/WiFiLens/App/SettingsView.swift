@@ -50,7 +50,6 @@ struct SettingsView: View {
                         Text(String(localized: "common.label.dark", comment: "Dark appearance theme option")).tag("dark")
                     }
                     .pickerStyle(.segmented)
-                    .labelsHidden()
                     if BuildConfig.current == .pro {
                         Toggle(String(localized: "settings.appearance.hide_badge", comment: "Toggle to hide the title badge"), isOn: $hideTitleBadge)
                     }

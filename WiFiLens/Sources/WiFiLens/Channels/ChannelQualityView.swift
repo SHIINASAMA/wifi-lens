@@ -48,13 +48,13 @@ struct ChannelQualityView: View {
         VStack(spacing: 0) {
             // Mode toggle
             HStack {
-                Picker("", selection: $mode) {
+                Picker("", selection: $mode.animation(.bouncy)) {
                     ForEach(ChannelViewMode.allCases, id: \.self) { m in
                         Text(m.displayName).tag(m)
                     }
                 }
                 .pickerStyle(.segmented)
-                .controlSize(.small)
+                .controlSize(.regular)
                 .frame(width: 160)
             }
             .padding(.horizontal, 16)
