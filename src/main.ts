@@ -642,6 +642,8 @@ function renderMCP() {
 function renderPrivacy() {
   const p = t.privacy
 
+  const sections = [p.noCollection, p.permissions, p.localOnly, p.distribution, p.openSource]
+
   return /* html */ `
   <section class="relative py-28" data-toc id="privacy">
     <div class="absolute inset-0 bg-gradient-to-b from-gray-950/50 via-transparent to-transparent"></div>
@@ -650,18 +652,19 @@ function renderPrivacy() {
         <h2 class="section-title">${p.title}</h2>
         <p class="section-subtitle mx-auto">${p.subtitle}</p>
       </div>
-      <div class="reveal max-w-2xl mx-auto space-y-4">
-        ${p.bullets.map((b: string) => /* html */ `
-        <div class="flex items-start gap-3 text-sm text-gray-400">
-          <svg class="w-5 h-5 mt-0.5 shrink-0 text-brand-400/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          <span>${b}</span>
+      <div class="reveal max-w-2xl mx-auto space-y-10">
+        ${sections.map((s: { heading: string; body: string }) => /* html */ `
+        <div>
+          <h3 class="text-sm font-semibold text-gray-200 mb-3 tracking-wide">${s.heading}</h3>
+          ${s.body.split('\n\n').map((para: string, i: number) => /* html */ `
+          <p class="text-sm text-gray-400 leading-relaxed${i > 0 ? ' mt-3' : ''}">${para.trim()}</p>
+          `).join('')}
         </div>
         `).join('')}
-        <div class="flex items-start gap-3 text-sm text-gray-500 pt-2">
-          <svg class="w-5 h-5 mt-0.5 shrink-0 text-green-500/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          <span>${p.mcp}</span>
+        <div class="pt-6 border-t border-gray-800/50 text-xs text-gray-500 space-y-2">
+          <p>${p.lastUpdated}</p>
+          <p>${p.contact}</p>
         </div>
-        <p class="text-xs text-gray-600 text-center pt-6">${p.oss}</p>
       </div>
     </div>
   </section>`

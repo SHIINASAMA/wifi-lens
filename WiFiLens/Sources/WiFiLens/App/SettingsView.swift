@@ -1,5 +1,8 @@
 import SwiftUI
 import Sparkle
+import AppKit
+
+private let privacyPolicyURL = "https://shiinasama.github.io/wifi-lens/#privacy"
 
 struct SettingsView: View {
     let updater: SparkleUpdater
@@ -41,7 +44,7 @@ struct SettingsView: View {
                     }
                     .padding(.vertical, 4)
                 }
-                
+
                 // MARK: - Appearance
                 Section {
                     Picker(String(localized: "settings.appearance.theme_label", comment: "Theme picker label"), selection: $appearance) {
@@ -81,55 +84,6 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
-                }
-
-                // MARK: - MCP
-                Section {
-                    Toggle(String(localized: "settings.mcp.enable_toggle", comment: "Toggle to enable the MCP HTTP server"), isOn: $mcpEnabled)
-                    Text(String(localized: "settings.mcp.description", comment: "Description of the MCP server feature"))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                    HStack {
-                        Text(String(localized: "settings.mcp.port_label", comment: "MCP server port field label"))
-                        TextField("", value: $mcpPort, format: .number)
-                            .frame(width: 80)
-                        Stepper("", value: $mcpPort, in: 1024...65535)
-                            .labelsHidden()
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(String(localized: "settings.mcp.claude_config_label", comment: "Label for Claude Desktop config snippet"))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text(#"{"mcpServers":{"wifi-lens":{"command":"WiFiLensMCP","args":["\#(mcpPort)"]}}}"#)
-                            .font(.system(size: 10, design: .monospaced))
-                            .foregroundColor(.secondary)
-                            .textSelection(.enabled)
-                    }
-                    .padding(.top, 4)
-                } header: {
-                    Text(String(localized: "settings.mcp.header", comment: "MCP settings section header"))
-                }
-
-                // MARK: - Updates
-                if BuildConfig.current == .oss {
-                Section {
-                    Toggle(String(localized: "settings.updates.auto_check", comment: "Toggle for automatic update checking"), isOn: $autoCheck)
-                        .onChange(of: autoCheck) { _, newValue in
-                            updater.automaticallyChecksForUpdates = newValue
-                            AppLogger.app.info("Sparkle auto-check \(newValue ? "enabled" : "disabled")")
-                        }
-                    HStack {
-                        Button(String(localized: "common.action.check_now", comment: "Check now button for updates")) {
-                            updater.checkForUpdates()
-                            AppLogger.app.info("Sparkle manual update check triggered")
-                        }
-                        Spacer()
-                    }
-                } header: {
-                    Text(String(localized: "settings.updates.header", comment: "Updates settings section header"))
-                }
                 }
 
                 // MARK: - Permissions
@@ -186,6 +140,55 @@ struct SettingsView: View {
                     Text(String(localized: "settings.permissions.header", comment: "Permissions settings section header"))
                 }
 
+                // MARK: - MCP
+                Section {
+                    Toggle(String(localized: "settings.mcp.enable_toggle", comment: "Toggle to enable the MCP HTTP server"), isOn: $mcpEnabled)
+                    Text(String(localized: "settings.mcp.description", comment: "Description of the MCP server feature"))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    HStack {
+                        Text(String(localized: "settings.mcp.port_label", comment: "MCP server port field label"))
+                        TextField("", value: $mcpPort, format: .number)
+                            .frame(width: 80)
+                        Stepper("", value: $mcpPort, in: 1024...65535)
+                            .labelsHidden()
+                    }
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(String(localized: "settings.mcp.claude_config_label", comment: "Label for Claude Desktop config snippet"))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Text(#"{"mcpServers":{"wifi-lens":{"command":"WiFiLensMCP","args":["\#(mcpPort)"]}}}"#)
+                            .font(.system(size: 10, design: .monospaced))
+                            .foregroundColor(.secondary)
+                            .textSelection(.enabled)
+                    }
+                    .padding(.top, 4)
+                } header: {
+                    Text(String(localized: "settings.mcp.header", comment: "MCP settings section header"))
+                }
+
+                // MARK: - Updates
+                if BuildConfig.current == .oss {
+                Section {
+                    Toggle(String(localized: "settings.updates.auto_check", comment: "Toggle for automatic update checking"), isOn: $autoCheck)
+                        .onChange(of: autoCheck) { _, newValue in
+                            updater.automaticallyChecksForUpdates = newValue
+                            AppLogger.app.info("Sparkle auto-check \(newValue ? "enabled" : "disabled")")
+                        }
+                    HStack {
+                        Button(String(localized: "common.action.check_now", comment: "Check now button for updates")) {
+                            updater.checkForUpdates()
+                            AppLogger.app.info("Sparkle manual update check triggered")
+                        }
+                        Spacer()
+                    }
+                } header: {
+                    Text(String(localized: "settings.updates.header", comment: "Updates settings section header"))
+                }
+                }
+
                 // MARK: - Diagnostics
 
                 Section {
@@ -197,6 +200,21 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text(String(localized: "settings.diagnostics.header", comment: "Diagnostics settings section header"))
+                }
+
+                // MARK: - Privacy
+
+                Section {
+                    HStack {
+                        Button(String(localized: "settings.privacy.view_policy", comment: "Button to view privacy policy")) {
+                            if let url = URL(string: privacyPolicyURL) {
+                                NSWorkspace.shared.open(url)
+                            }
+                        }
+                        Spacer()
+                    }
+                } header: {
+                    Text(String(localized: "settings.privacy.header", comment: "Privacy settings section header"))
                 }
             }
             .formStyle(.grouped)

@@ -151,16 +151,30 @@ export const en = {
     },
   },
   privacy: {
-    title: 'Your data stays on your Mac',
-    subtitle: 'WiFi Lens is built to be local-first from the ground up. No accounts, no cloud, no surprises.',
-    bullets: [
-      'WiFi Lens does not collect, store, or transmit any personal information, usage analytics, or telemetry. There are no third-party analytics, ad networks, or tracking code in the app.',
-      'Location Services: macOS requires this permission to show Wi‑Fi network names. WiFi Lens never accesses your coordinates and never logs your location.',
-      'Region detection: channel recommendations use your system locale, hardware-reported channel list, and nearby AP country codes to infer your regulatory domain. This inference runs entirely on-device — no region data is collected or transmitted.',
-      'All Wi‑Fi scan results, crash reports, and diagnostic logs remain in files on your own disk. Nothing is uploaded or shared automatically — you control whether to share them.',
-    ],
-    mcp: 'MCP server is bound to 127.0.0.1. No scan data leaves your machine through MCP unless you explicitly route it elsewhere.',
-    oss: 'Source code is open (Apache 2.0). Every data-handling claim above is independently verifiable.',
+    title: 'Your data stays on your Mac. Always.',
+    subtitle: 'WiFi Lens processes everything locally. No accounts, no cloud, no tracking.',
+    noCollection: {
+      heading: 'No Personal Data Collection',
+      body: 'WiFi Lens does not collect, store, or transmit any personally identifiable information. The app contains no user accounts, no analytics SDKs, no ad networks, and no telemetry frameworks. We operate no backend servers to receive your data — because we have no interest in having it.',
+    },
+    permissions: {
+      heading: 'Why We Request Permissions',
+      body: 'Wi‑Fi — Core functionality: scanning and analyzing nearby wireless networks.\n\nBluetooth — Used to discover nearby Bluetooth devices for coexistence analysis. All discovery runs locally on your machine.\n\nLocation Services — macOS requires this permission for any app that reads Wi‑Fi network names (SSIDs). WiFi Lens never accesses your GPS coordinates and never logs your location.',
+    },
+    localOnly: {
+      heading: 'Everything Stays on Your Machine',
+      body: 'All Wi‑Fi scan results, Bluetooth discovery data, channel recommendations, and regulatory region detection run entirely on-device. No scan data is ever uploaded to a remote server.\n\nCrash reports and diagnostic logs are written to files on your own disk. Nothing is transmitted unless you explicitly choose to share it.\n\nThe MCP server binds to 127.0.0.1 (localhost only). No scan data leaves your machine through MCP unless you deliberately route it elsewhere.',
+    },
+    distribution: {
+      heading: 'Distribution Differences',
+      body: 'WiFi Lens is available through two channels. They differ only in how updates are checked:\n\nMac App Store — Uses Apple\'s built-in update mechanism. The app never contacts any third-party server for version checks or updates.\n\nGitHub / Direct Download — Uses the Sparkle framework to check for new versions. Sparkle fetches a single appcast file (a version descriptor) from our release server. This request transmits no personal data, no usage analytics, and no diagnostic information — it is purely a version comparison.',
+    },
+    openSource: {
+      heading: 'Open Source & Verifiable',
+      body: 'The complete source code is available under the Apache 2.0 license. Every claim on this page can be independently verified by anyone who reads the code.',
+    },
+    lastUpdated: 'Last updated: May 27, 2026',
+    contact: 'Questions? Open a GitHub Issue or reach us at wifi-lens@outlook.com',
   },
   footer: {
     copyright: '© 2025 WiFi Lens. Understand your Wi‑Fi.',
