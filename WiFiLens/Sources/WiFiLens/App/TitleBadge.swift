@@ -21,7 +21,7 @@ struct TitleBadge: View {
         Button {
             // no action yet
         } label: {
-            Text(String(localized: "WiFi Lens OSS"))
+            Text(String(localized: "settings.app.title_badge_oss", comment: "OSS edition title badge text"))
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(Color(red: 130/255, green: 89/255, blue: 221/255))
                 .frame(height: 34)
@@ -43,7 +43,7 @@ struct TitleBadge: View {
             // no action yet
         } label: {
             Label {
-                Text(String(localized: "WiFi Lens Pro"))
+                Text(String(localized: "settings.app.title_badge_pro", comment: "PRO edition title badge text"))
                     .font(.system(size: 13, weight: .semibold))
             } icon: {
                 Image(systemName: "star.fill")

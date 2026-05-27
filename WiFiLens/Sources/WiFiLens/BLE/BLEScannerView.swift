@@ -44,7 +44,7 @@ struct BLEScannerView: View {
                     .frame(width: 16, height: 16)
             }
             .buttonStyle(.plain)
-            .help(viewModel.isScanning ? String(localized: "Stop scanning") : String(localized: "Start scanning"))
+            .help(viewModel.isScanning ? String(localized: "ble.control.stop_scanning", comment: "Button to stop BLE scanning") : String(localized: "ble.control.start_scanning", comment: "Button to start BLE scanning"))
             .disabled(viewModel.bluetoothState != .poweredOn)
 
             Circle()
@@ -58,7 +58,7 @@ struct BLEScannerView: View {
             Spacer()
 
             if !viewModel.devices.isEmpty {
-                Text(String(localized: "\(viewModel.devices.count) devices"))
+                Text(String(format: String(localized: "ble.device_count_fmt", comment: "Device count with number"), viewModel.devices.count))
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .padding(.trailing, 8)
@@ -82,7 +82,7 @@ struct BLEScannerView: View {
 
     private var deviceTable: some View {
         Table(viewModel.displayedDevices, selection: $viewModel.selectedDeviceID) {
-            TableColumn(String(localized: "Name")) { device in
+            TableColumn(String(localized: "common.label.name", comment: "Name column header")) { device in
                 HStack(spacing: 4) {
                     Circle()
                         .fill(rssiColor(device.smoothedRSSI))
@@ -94,39 +94,39 @@ struct BLEScannerView: View {
             }
             .width(min: 120, ideal: 160)
 
-            TableColumn(String(localized: "Identifier")) { device in
+            TableColumn(String(localized: "ble.table.col.identifier", comment: "Device identifier column header")) { device in
                 Text(device.shortIdentifier)
                     .font(.caption.monospaced())
                     .foregroundColor(.secondary)
             }
             .width(min: 80, ideal: 100)
 
-            TableColumn(String(localized: "RSSI")) { device in
+            TableColumn(String(localized: "channels.table.col.rssi", comment: "RSSI column header")) { device in
                 HStack(spacing: 4) {
                     Text("\(device.rssi)")
                         .font(.body.monospaced().bold())
-                    Text(String(localized: "dBm"))
+                    Text(String(localized: "ble.table.unit.dbm", comment: "dBm unit label"))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
             }
             .width(min: 60, ideal: 70)
 
-            TableColumn(String(localized: "Smoothed")) { device in
+            TableColumn(String(localized: "ble.table.col.smoothed", comment: "Smoothed RSSI column header")) { device in
                 Text(String(format: "%.0f dBm", device.smoothedRSSI))
                     .font(.caption.monospaced())
                     .foregroundColor(.secondary)
             }
             .width(min: 70, ideal: 80)
 
-            TableColumn(String(localized: "Ads")) { device in
+            TableColumn(String(localized: "ble.table.col.ads", comment: "Advertisement count column header")) { device in
                 Text("\(device.advertisementCount)")
                     .font(.caption.monospaced())
                     .foregroundColor(.secondary)
             }
             .width(min: 30, ideal: 40)
 
-            TableColumn(String(localized: "Last Seen")) { device in
+            TableColumn(String(localized: "ble.table.col.last_seen", comment: "Last seen time column header")) { device in
                 Text(formatTimeAgo(device.lastSeen))
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -144,7 +144,7 @@ struct BLEScannerView: View {
                     Circle()
                         .fill(chartColor)
                         .frame(width: 8, height: 8)
-                    Text(String(localized: "\(device.displayName) — RSSI history"))
+                    Text(String(format: String(localized: "ble.rssi_history_fmt", comment: "RSSI history chart title with device name"), device.displayName))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -154,11 +154,11 @@ struct BLEScannerView: View {
                 HStack(spacing: 12) {
                     HStack(spacing: 4) {
                         Circle().fill(chartColor.opacity(0.3)).frame(width: 6, height: 6)
-                        Text(String(localized: "Raw")).font(.caption2).foregroundColor(.secondary)
+                        Text(String(localized: "ble.trend.raw", comment: "Raw RSSI chart label")).font(.caption2).foregroundColor(.secondary)
                     }
                     HStack(spacing: 4) {
                         Circle().fill(chartColor).frame(width: 6, height: 6)
-                        Text(String(localized: "Smooth")).font(.caption2).foregroundColor(.secondary)
+                        Text(String(localized: "ble.trend.smooth", comment: "Smoothed RSSI chart label")).font(.caption2).foregroundColor(.secondary)
                     }
                 }
             }
@@ -173,7 +173,7 @@ struct BLEScannerView: View {
 
             HStack(spacing: 16) {
                 if let first = history.first {
-                    LabeledContent(String(localized: "First")) {
+                    LabeledContent(String(localized: "common.label.first", comment: "First data point label")) {
                         Text("\(first.rawRSSI) dBm")
                             .font(.caption.monospaced())
                     }
@@ -181,7 +181,7 @@ struct BLEScannerView: View {
                     .foregroundColor(.secondary)
                 }
                 if let last = history.last {
-                    LabeledContent(String(localized: "Latest")) {
+                    LabeledContent(String(localized: "common.label.latest", comment: "Latest/most recent data point label")) {
                         Text("\(last.rawRSSI) dBm")
                             .font(.caption.monospaced())
                     }
@@ -189,13 +189,13 @@ struct BLEScannerView: View {
                     .foregroundColor(.secondary)
                 }
                 if let device = viewModel.selectedDevice {
-                    LabeledContent(String(localized: "Samples")) {
+                    LabeledContent(String(localized: "common.label.samples_title", comment: "Sample count column header or title")) {
                         Text("\(history.count)")
                             .font(.caption.monospaced())
                     }
                     .font(.caption2)
                     .foregroundColor(.secondary)
-                    LabeledContent(String(localized: "EMA")) {
+                    LabeledContent(String(localized: "ble.trend.ema", comment: "EMA (Exponential Moving Average) abbreviation")) {
                         Text(String(format: "%.0f dBm", device.smoothedRSSI))
                             .font(.caption.monospaced().bold())
                     }
@@ -217,7 +217,7 @@ struct BLEScannerView: View {
             Image(systemName: "antenna.radiowaves.left.and.right")
                 .font(.system(size: 32))
                 .foregroundColor(.secondary.opacity(0.5))
-            Text(String(localized: "Tap play to start scanning for BLE devices"))
+            Text(String(localized: "ble.empty.idle", comment: "Empty state prompting user to start scanning"))
                 .font(.body)
                 .foregroundColor(.secondary)
             Spacer()
@@ -228,7 +228,7 @@ struct BLEScannerView: View {
         VStack(spacing: 12) {
             Spacer()
             ProgressView()
-            Text(String(localized: "Scanning for BLE devices…"))
+            Text(String(localized: "ble.empty.scanning", comment: "Status while scanning for BLE devices"))
                 .font(.body)
                 .foregroundColor(.secondary)
             Spacer()
@@ -241,10 +241,10 @@ struct BLEScannerView: View {
             Image(systemName: "antenna.radiowaves.left.and.right.slash")
                 .font(.system(size: 32))
                 .foregroundColor(.secondary.opacity(0.5))
-            Text(String(localized: "Bluetooth is turned off"))
+            Text(String(localized: "ble.state.bluetooth_off_title", comment: "Title when Bluetooth is disabled"))
                 .font(.body)
                 .foregroundColor(.secondary)
-            Text(String(localized: "Enable Bluetooth in System Settings to scan for BLE devices."))
+            Text(String(localized: "ble.state.bluetooth_off_desc", comment: "Instructions to enable Bluetooth"))
                 .font(.caption)
                 .foregroundColor(.secondary.opacity(0.5))
             Spacer()
@@ -257,10 +257,10 @@ struct BLEScannerView: View {
             Image(systemName: "hand.raised.slash")
                 .font(.system(size: 32))
                 .foregroundColor(.secondary.opacity(0.5))
-            Text(String(localized: "Bluetooth Permission Denied"))
+            Text(String(localized: "ble.state.bluetooth_perm_denied_title", comment: "Title when Bluetooth permission is denied"))
                 .font(.body)
                 .foregroundColor(.secondary)
-            Text(String(localized: "Grant Bluetooth permission in Settings to scan for BLE devices."))
+            Text(String(localized: "ble.state.bluetooth_perm_denied_desc", comment: "Instructions to grant Bluetooth permission"))
                 .font(.caption)
                 .foregroundColor(.secondary.opacity(0.5))
                 .multilineTextAlignment(.center)
@@ -275,10 +275,10 @@ struct BLEScannerView: View {
             Image(systemName: "antenna.radiowaves.left.and.right")
                 .font(.system(size: 32))
                 .foregroundColor(.secondary.opacity(0.5))
-            Text(String(localized: "Bluetooth Permission Required"))
+            Text(String(localized: "ble.state.bluetooth_perm_required_title", comment: "Title when Bluetooth permission is needed"))
                 .font(.body)
                 .foregroundColor(.secondary)
-            Text(String(localized: "Grant Bluetooth permission in Settings → Permissions to scan for nearby BLE devices."))
+            Text(String(localized: "ble.state.bluetooth_perm_required_desc", comment: "Detailed instructions to grant Bluetooth permission"))
                 .font(.caption)
                 .foregroundColor(.secondary.opacity(0.5))
                 .multilineTextAlignment(.center)
@@ -320,7 +320,7 @@ struct BLEScannerView: View {
     }
 
     private var stateLabel: String {
-        viewModel.isScanning ? String(localized: "Scanning") : viewModel.bluetoothState.label
+        viewModel.isScanning ? String(localized: "common.label.scanning", comment: "Scanning in progress status") : viewModel.bluetoothState.label
     }
 
     private func rssiColor(_ rssi: Double) -> Color {
@@ -334,10 +334,10 @@ struct BLEScannerView: View {
     private func formatTimeAgo(_ date: Date) -> String {
         let delta = Date().timeIntervalSince(date)
         switch delta {
-        case ..<1:   return String(localized: "now")
-        case ..<60:  return String(localized: "\(Int(delta))s ago")
-        case ..<3600: return String(localized: "\(Int(delta / 60))m ago")
-        default:     return String(localized: "—")
+        case ..<1:   return String(localized: "common.label.now", comment: "Just now timestamp indicator")
+        case ..<60:  return String(format: String(localized: "format.seconds_ago", comment: "Relative time: N seconds ago"), Int(delta))
+        case ..<3600: return String(format: String(localized: "format.minutes_ago", comment: "Relative time: N minutes ago"), Int(delta / 60))
+        default:     return String(localized: "symbol.em_dash", comment: "Em dash symbol used as placeholder")
         }
     }
 }

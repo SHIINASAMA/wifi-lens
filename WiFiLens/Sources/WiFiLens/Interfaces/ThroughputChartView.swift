@@ -15,13 +15,13 @@ struct ThroughputChartView: View {
             HStack(spacing: 12) {
                 HStack(spacing: 4) {
                     Circle().fill(.green).frame(width: 6, height: 6)
-                    Text(String(localized: "Download"))
+                    Text(String(localized: "common.label.download", comment: "Download/throughput receive label"))
                         .font(.system(size: 10))
                         .foregroundColor(.secondary)
                 }
                 HStack(spacing: 4) {
                     Circle().fill(.blue).frame(width: 6, height: 6)
-                    Text(String(localized: "Upload"))
+                    Text(String(localized: "common.label.upload", comment: "Upload/throughput send label"))
                         .font(.system(size: 10))
                         .foregroundColor(.secondary)
                 }
@@ -35,7 +35,7 @@ struct ThroughputChartView: View {
 
             if samples.count < 2 {
                 Spacer()
-                Text(String(localized: "Collecting data…"))
+                Text(String(localized: "common.label.collecting_data", comment: "Status shown while collecting sensor data"))
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)

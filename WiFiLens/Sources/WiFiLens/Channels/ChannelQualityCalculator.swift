@@ -28,11 +28,11 @@ struct ChannelQuality: Identifiable {
 
         var displayName: String {
             switch self {
-            case .excellent: String(localized: "Excellent")
-            case .good:      String(localized: "Good")
-            case .moderate:  String(localized: "Moderate")
-            case .busy:      String(localized: "Busy")
-            case .congested: String(localized: "Congested")
+            case .excellent: String(localized: "channels.quality.excellent", comment: "Excellent channel quality tier")
+            case .good:      String(localized: "overview.signal.good", comment: "Good signal level label")
+            case .moderate:  String(localized: "channels.quality.moderate", comment: "Moderate channel quality tier")
+            case .busy:      String(localized: "channels.quality.busy", comment: "Busy channel quality tier")
+            case .congested: String(localized: "channels.quality.congested", comment: "Congested channel quality tier")
             }
         }
 
@@ -82,9 +82,9 @@ struct ChannelQuality: Identifiable {
 
         var displayName: String {
             switch self {
-            case .low:      String(localized: "Low")
-            case .moderate: String(localized: "Moderate")
-            case .high:     String(localized: "High")
+            case .low:      String(localized: "channels.overlap.low", comment: "Low overlap level")
+            case .moderate: String(localized: "channels.quality.moderate", comment: "Moderate channel quality tier")
+            case .high:     String(localized: "channels.overlap.high", comment: "High overlap level")
             }
         }
     }
@@ -152,7 +152,7 @@ enum ChannelQualityCalculator {
                 ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
                 : stride(from: band == "5" ? 36 : 1, through: band == "5" ? 165 : 233, by: 4).map { $0 }
 
-            let bandDisplay = band == "24" ? String(localized: "2.4 GHz") : band == "5" ? String(localized: "5 GHz") : String(localized: "6 GHz")
+            let bandDisplay = band == "24" ? String(localized: "wifi.band.24ghz", comment: "2.4 GHz Wi-Fi band name") : band == "5" ? String(localized: "wifi.band.5ghz", comment: "5 GHz Wi-Fi band name") : String(localized: "wifi.band.6ghz", comment: "6 GHz Wi-Fi band name")
 
             // Score each channel
             let scored = channels.map { ch -> ChannelQuality in

@@ -109,7 +109,7 @@ struct ContentView: View {
                     Image(systemName: bandVM.isFrozen ? "play.fill" : "pause.fill")
                 }
                 .buttonStyle(.plain)
-                .help(bandVM.isFrozen ? String(localized: "Resume") : String(localized: "Pause"))
+                .help(bandVM.isFrozen ? String(localized: "common.action.resume", comment: "Resume action button") : String(localized: "common.action.pause", comment: "Pause action button"))
             }
 
             Spacer()
@@ -162,18 +162,18 @@ struct ContentView: View {
 
     private var tableFilterBar: some View {
         HStack(spacing: 12) {
-            Text(String(localized: "Show:"))
+            Text(String(localized: "spectrum.filter.show_label", comment: "Label for band filter checkboxes"))
                 .font(.system(size: 10))
                 .foregroundColor(.secondary)
-            bandToggle(String(localized: "2.4 GHz"), bandID: "24")
-            bandToggle(String(localized: "5 GHz"), bandID: "5")
+            bandToggle(String(localized: "wifi.band.24ghz", comment: "2.4 GHz Wi-Fi band name"), bandID: "24")
+            bandToggle(String(localized: "wifi.band.5ghz", comment: "5 GHz Wi-Fi band name"), bandID: "5")
             if viewModel.supportedBands.contains(.band6GHz) {
-                bandToggle(String(localized: "6 GHz"), bandID: "6")
+                bandToggle(String(localized: "wifi.band.6ghz", comment: "6 GHz Wi-Fi band name"), bandID: "6")
             }
             Text("·")
                 .foregroundColor(.secondary)
             Toggle(isOn: $viewModel.hideHiddenSSIDs) {
-                Text(String(localized: "Hide Hidden")).font(.system(size: 11))
+                Text(String(localized: "spectrum.filter.hide_hidden", comment: "Toggle to hide networks with hidden SSIDs")).font(.system(size: 11))
             }
             .toggleStyle(.checkbox)
             Spacer()
@@ -305,7 +305,7 @@ struct ContentView: View {
             sections.append(SectionInfo(
                 kind: .band(vm),
                 title: vm.band.displayName,
-                subtitle: String(localized: "\(vm.renderedNetworkCount) networks")
+                subtitle: String(format: String(localized: "spectrum.trend.network_count_fmt", comment: "Network count for trend chart"), vm.renderedNetworkCount)
             ))
         }
 
@@ -318,7 +318,7 @@ struct ContentView: View {
                     sections.append(SectionInfo(
                         kind: .trend(snapshots: snaps, color: series.color),
                         title: "\(series.displaySSID)  ·  \(vm.band.displayName)  ·  \(series.bssid)",
-                        subtitle: String(localized: "\(snaps.count) samples")
+                        subtitle: String(format: String(localized: "format.sample_count", comment: "Sample count with number"), snaps.count)
                     ))
                     break
                 }
@@ -327,8 +327,8 @@ struct ContentView: View {
 
         sections.append(SectionInfo(
             kind: .table,
-            title: String(localized: "AP"),
-            subtitle: String(localized: "\(tableRows.count) APs")
+            title: String(localized: "spectrum.table.ap_label", comment: "Access Point abbreviation (singular)"),
+            subtitle: String(format: String(localized: "spectrum.table.ap_count_fmt", comment: "Access Point count with number"), tableRows.count)
         ))
         return sections
     }
@@ -376,13 +376,13 @@ struct ContentView: View {
             ProgressView().scaleEffect(1.5)
             switch viewModel.accessState {
             case .waitingForAuthorization:
-                Text(String(localized: "Waiting for Location Services permission...")).foregroundColor(.orange)
-                Button(String(localized: "Open System Settings")) { viewModel.locationManager.openLocationPreferences() }
+                Text(String(localized: "permission.location.waiting", comment: "Status while waiting for Location Services authorization")).foregroundColor(.orange)
+                Button(String(localized: "common.action.open_system_settings", comment: "Button to open macOS System Settings")) { viewModel.locationManager.openLocationPreferences() }
             case .denied:
-                Text(String(localized: "Location Services required.")).foregroundColor(.secondary)
-                Button(String(localized: "Open Location Preferences")) { viewModel.locationManager.openLocationPreferences() }
+                Text(String(localized: "permission.location.required_short", comment: "Short label: Location Services required")).foregroundColor(.secondary)
+                Button(String(localized: "common.action.open_location_preferences", comment: "Button to open Location Services preferences")) { viewModel.locationManager.openLocationPreferences() }
             case .scanFailed(let msg):
-                Text(String(localized: "Scan failed")).foregroundColor(.secondary)
+                Text(String(localized: "common.error.scan_failed", comment: "Generic scan failure message")).foregroundColor(.secondary)
                 Text(msg).font(.caption).foregroundColor(.secondary)
             default:
                 EmptyView()

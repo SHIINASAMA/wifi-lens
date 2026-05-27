@@ -8,12 +8,12 @@ enum BLEBluetoothState: Sendable {
 
     var label: String {
         switch self {
-        case .unknown:      String(localized: "Unknown")
-        case .resetting:    String(localized: "Resetting")
-        case .unsupported:  String(localized: "Unsupported")
-        case .poweredOff:   String(localized: "Bluetooth Off")
-        case .poweredOn:    String(localized: "Ready")
-        case .unauthorized: String(localized: "Permission Denied")
+        case .unknown:      String(localized: "common.label.unknown", comment: "Generic unknown value label")
+        case .resetting:    String(localized: "ble.state.resetting", comment: "BLE state: adapter is resetting")
+        case .unsupported:  String(localized: "ble.state.unsupported", comment: "BLE state: hardware does not support BLE")
+        case .poweredOff:   String(localized: "ble.state.bluetooth_off", comment: "BLE state: Bluetooth is off")
+        case .poweredOn:    String(localized: "common.label.ready", comment: "Ready state indicator")
+        case .unauthorized: String(localized: "ble.state.permission_denied", comment: "BLE state: permission was denied")
         }
     }
 }
@@ -158,7 +158,7 @@ private final class BLEScannerDelegate: NSObject, CBCentralManagerDelegate, @unc
     func beginActivity() {
         activityToken = ProcessInfo.processInfo.beginActivity(
             options: [.userInitiated, .idleSystemSleepDisabled],
-            reason: String(localized: "BLE device scanning")
+            reason: String(localized: "ble.scan.description", comment: "Description of BLE scanning feature")
         )
     }
 

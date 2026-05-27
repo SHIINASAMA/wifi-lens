@@ -36,8 +36,10 @@ The website deploys to GitHub Pages via `.github/workflows/pages.yml`, triggered
 - macOS 14+, Swift 6.0, SwiftUI + AppKit interop with CoreWLAN
 - `ScannerViewModel` is `@Observable`, passed via `@Bindable`
 - Tests use Swift Testing (`@Test`, `#expect()`) with `@testable import WiFiLens`
-- Localization: `String(localized:)` → `Resources/Localizable.xcstrings` (`en` + `zh-Hans`)
-- New i18n strings must be manually added to `.xcstrings` — auto-extraction is off
+- Localization: `String(localized: "domain.component.element", comment: "Context for translators")` → `Resources/Localizable.xcstrings` (`en`, `ja`, `zh-Hans`)
+- Keys use hierarchical dot-notation (e.g., `settings.scan.interval_1s`, `overview.diagnosis.great.title`) — see `docs/ARCHITECTURE.md` for full convention
+- New strings must be manually added to `.xcstrings` with `"extractionState": "manual"` and explicit `en` localization — auto-extraction is off
+- Use `String(format: String(localized: "format.key"), args...)` for parameterized strings, not string interpolation in keys
 
 ## Rules
 

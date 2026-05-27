@@ -6,8 +6,8 @@ enum ChannelViewMode: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .simple: String(localized: "Simple")
-        case .table:  String(localized: "Professional")
+        case .simple: String(localized: "channels.mode.simple", comment: "Simple view mode for channel quality")
+        case .table:  String(localized: "channels.mode.professional", comment: "Professional view mode for channel quality")
         }
     }
 }
@@ -67,7 +67,7 @@ struct ChannelQualityView: View {
                 Image(systemName: "antenna.radiowaves.left.and.right.slash")
                     .font(.largeTitle)
                     .foregroundColor(.secondary)
-                Text(String(localized: "No channel data available"))
+                Text(String(localized: "spectrum.empty.no_channel_data", comment: "Empty state when no channel data exists"))
                     .foregroundColor(.secondary)
                 Spacer()
             } else if mode == .simple {
@@ -92,7 +92,7 @@ struct ChannelQualityView: View {
                         Image(systemName: "info.circle.fill")
                             .font(.system(size: 10))
                             .foregroundColor(.accentColor)
-                        Text(String(localized: "Channel recommendations now include regional regulations, DFS requirements, and device compatibility."))
+                        Text(String(localized: "channels.banner.regulatory", comment: "Info banner about regulatory-aware recommendations"))
                             .font(.system(size: 10))
                             .foregroundColor(.secondary)
                     }
@@ -126,17 +126,17 @@ struct ChannelQualityView: View {
         ScrollView {
             Grid(horizontalSpacing: 0, verticalSpacing: 0) {
                 GridRow {
-                    sortHeader(String(localized: "CH"), .channel)
-                    sortHeader(String(localized: "Band"), .bandDisplay)
-                    sortHeader(String(localized: "Score"), .rfScore)
-                    sortHeader(String(localized: "Level"), .rfLevel)
-                    sortHeader(String(localized: "APs"), .apCount)
-                    sortHeader(String(localized: "Co-Ch"), .coChannelCount)
-                    sortHeader(String(localized: "Adj"), .adjacentCount)
-                    sortHeader(String(localized: "Overlap"), .overlapLevel)
-                    sortHeader(String(localized: "RSSI"), .strongestNeighborRSSI)
-                    sortHeader(String(localized: "Intf"), .interferenceScore)
-                    sortHeader(String(localized: "Class"), .classification)
+                    sortHeader(String(localized: "channels.table.col.ch", comment: "Channel column header (abbreviated)"), .channel)
+                    sortHeader(String(localized: "channels.table.col.band", comment: "Band column header"), .bandDisplay)
+                    sortHeader(String(localized: "channels.table.col.score", comment: "Quality score column header"), .rfScore)
+                    sortHeader(String(localized: "channels.table.col.level", comment: "Quality level column header"), .rfLevel)
+                    sortHeader(String(localized: "channels.table.col.aps", comment: "Access Point count column header"), .apCount)
+                    sortHeader(String(localized: "channels.table.col.co_ch", comment: "Co-channel count column header"), .coChannelCount)
+                    sortHeader(String(localized: "channels.table.col.adjacent", comment: "Adjacent channel count column header"), .adjacentCount)
+                    sortHeader(String(localized: "channels.table.col.overlap", comment: "Overlap column header"), .overlapLevel)
+                    sortHeader(String(localized: "channels.table.col.rssi", comment: "RSSI column header"), .strongestNeighborRSSI)
+                    sortHeader(String(localized: "channels.table.col.interference", comment: "Interference column header"), .interferenceScore)
+                    sortHeader(String(localized: "channels.table.col.class", comment: "Regulatory class column header"), .classification)
                 }
                 .background(.bar)
 
@@ -222,12 +222,12 @@ private struct ChannelCard: View {
                     Text(channel.rfLevel.displayName)
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(Color(hex: channel.rfLevel.color))
-                    if channel.rfIsRecommended { badge(String(localized: "★ Recommended"), color: "#FF9F0A") }
-                    if channel.isCurrentChannel { badge(String(localized: "● Current"), color: "#007AFF") }
+                    if channel.rfIsRecommended { badge(String(localized: "channels.badge.recommended", comment: "Star badge marking recommended channel"), color: "#FF9F0A") }
+                    if channel.isCurrentChannel { badge(String(localized: "channels.badge.current", comment: "Dot badge marking current channel"), color: "#007AFF") }
                     if channel.classification == .advanced {
-                        badge(String(localized: "DFS/Advanced"), color: "#FF9F0A")
+                        badge(String(localized: "channels.badge.dfs", comment: "Badge for DFS/advanced classification"), color: "#FF9F0A")
                     } else if channel.classification == .restricted {
-                        badge(String(localized: "Restricted"), color: "#FF3B30")
+                        badge(String(localized: "channels.classification.restricted", comment: "Restricted channel classification"), color: "#FF3B30")
                     }
                 }
                 GeometryReader { geo in
@@ -248,9 +248,9 @@ private struct ChannelCard: View {
 
             VStack(alignment: .trailing, spacing: 4) {
                 HStack(spacing: 4) {
-                    Text(String(localized: "Co:")).font(.system(size: 9)).foregroundColor(.secondary)
+                    Text(String(localized: "channels.card.co_label", comment: "Co-channel label on detail card")).font(.system(size: 9)).foregroundColor(.secondary)
                     Text("\(channel.coChannelCount)").font(.system(size: 12, weight: .medium))
-                    Text(String(localized: "· Adj:")).font(.system(size: 9)).foregroundColor(.secondary)
+                    Text(String(localized: "channels.card.adj_label", comment: "Adjacent channel label on detail card")).font(.system(size: 9)).foregroundColor(.secondary)
                     Text("\(channel.adjacentCount)").font(.system(size: 12, weight: .medium))
                 }
                 HStack(spacing: 4) {
@@ -264,7 +264,7 @@ private struct ChannelCard: View {
                         .padding(.horizontal, 6).padding(.vertical, 2)
                         .background(overlapColor(channel.overlapLevel).opacity(0.12))
                         .clipShape(RoundedRectangle(cornerRadius: 4))
-                    Text(String(localized: "overlap"))
+                    Text(String(localized: "channels.card.overlap_label", comment: "Overlap label on detail card"))
                         .font(.system(size: 9))
                         .foregroundColor(.secondary)
                 }

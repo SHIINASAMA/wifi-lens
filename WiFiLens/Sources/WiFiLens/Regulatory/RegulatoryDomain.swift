@@ -15,7 +15,7 @@ enum RegulatoryDomain: String, CaseIterable, Codable, Sendable {
         case .JP: "Japan (MIC)"
         case .CN: "China (SRRC)"
         case .EU: "European Union (ETSI)"
-        case .unknown: String(localized: "Unknown")
+        case .unknown: String(localized: "common.label.unknown", comment: "Generic unknown value label")
         }
     }
 
@@ -44,9 +44,9 @@ enum InferenceConfidence: Comparable, Sendable {
 
     var label: String {
         switch self {
-        case .high: String(localized: "High confidence")
-        case .medium: String(localized: "Medium confidence")
-        case .low: String(localized: "Low confidence")
+        case .high: String(localized: "wifi.inference.high_confidence", comment: "High confidence regulatory domain inference")
+        case .medium: String(localized: "wifi.inference.medium_confidence", comment: "Medium confidence regulatory domain inference")
+        case .low: String(localized: "wifi.inference.low_confidence", comment: "Low confidence regulatory domain inference")
         }
     }
 }

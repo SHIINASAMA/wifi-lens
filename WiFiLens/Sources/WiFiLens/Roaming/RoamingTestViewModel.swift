@@ -68,7 +68,7 @@ final class RoamingTestViewModel {
 
         guard let iface = CWWiFiClient.shared().interface(),
               let ssid = iface.ssid() else {
-            errorMessage = String(localized: "Not connected to any Wi-Fi network. Connect to a network before starting the roaming test.")
+            errorMessage = String(localized: "roaming.error.no_connection", comment: "Error when trying to start roaming test without Wi-Fi")
             state = .idle
             return
         }
@@ -245,7 +245,7 @@ final class RoamingTestViewModel {
         let record = RoamingSessionRecord(
             version: RoamingSessionRecord.currentVersion,
             savedAt: Date(),
-            ssid: currentSSID ?? String(localized: "Unknown"),
+            ssid: currentSSID ?? String(localized: "common.label.unknown", comment: "Generic unknown value label"),
             bssid: currentBSSID,
             phyMode: currentPhyMode,
             channel: currentChannel,
@@ -255,7 +255,7 @@ final class RoamingTestViewModel {
         )
 
         let panel = NSSavePanel()
-        panel.title = String(localized: "Save Roaming Session")
+        panel.title = String(localized: "roaming.session.save_title", comment: "Save roaming session dialog title")
         panel.allowedContentTypes = [.json]
         panel.nameFieldStringValue = defaultFileName
 
@@ -267,13 +267,13 @@ final class RoamingTestViewModel {
             let data = try encoder.encode(record)
             try data.write(to: url)
         } catch {
-            errorMessage = String(localized: "Failed to save session")
+            errorMessage = String(localized: "roaming.error.save_failed", comment: "Error message when session save fails")
         }
     }
 
     func loadSession() {
         let panel = NSOpenPanel()
-        panel.title = String(localized: "Load Roaming Session")
+        panel.title = String(localized: "roaming.session.load_title", comment: "Load roaming session dialog title")
         panel.allowedContentTypes = [.json]
         panel.allowsMultipleSelection = false
 
@@ -296,7 +296,7 @@ final class RoamingTestViewModel {
             state = .stopped
             errorMessage = nil
         } catch {
-            errorMessage = String(localized: "Failed to load session")
+            errorMessage = String(localized: "roaming.error.load_failed", comment: "Error message when session load fails")
         }
     }
 

@@ -31,9 +31,9 @@ struct NetworkInterfaceInfo {
         return .virtual
     }
 
-    var displayMAC: String { hardwareMAC ?? String(localized: "Unknown") }
+    var displayMAC: String { hardwareMAC ?? String(localized: "common.label.unknown", comment: "Generic unknown value label") }
     var displaySSID: String { ssid ?? "n/a" }
-    var displayBSSID: String { bssid ?? String(localized: "Unknown") }
+    var displayBSSID: String { bssid ?? String(localized: "common.label.unknown", comment: "Generic unknown value label") }
     var displayChannel: String { channel.map { "\($0)" } ?? "—" }
     var displayRSSI: String { rssi.map { "\($0) dBm" } ?? "—" }
     var displayTxRate: String { txRate.map { "\(Int($0)) Mbps" } ?? "—" }
@@ -281,33 +281,33 @@ enum NetworkInfoService {
 
     private static func securityLabel(_ iface: CWInterface) -> String {
         switch iface.security().rawValue {
-        case 0: return String(localized: "None")
-        case 1: return String(localized: "WEP")
-        case 2: return String(localized: "WPA Personal")
-        case 3: return String(localized: "WPA/WPA2 Personal")
-        case 4: return String(localized: "WPA2 Personal")
-        case 5: return String(localized: "Personal")
-        case 6: return String(localized: "Dynamic WEP")
-        case 7: return String(localized: "WPA Enterprise")
-        case 8: return String(localized: "WPA/WPA2 Enterprise")
-        case 9: return String(localized: "WPA2 Enterprise")
-        case 10: return String(localized: "Enterprise")
-        case 13: return String(localized: "WPA3 Personal")
-        case 14: return String(localized: "WPA3 Enterprise")
-        case 15: return String(localized: "WPA3 Transition")
+        case 0: return String(localized: "common.label.none", comment: "Generic none/empty value label")
+        case 1: return String(localized: "wifi.security.wep", comment: "WEP security type")
+        case 2: return String(localized: "wifi.security.wpa_personal", comment: "WPA Personal security type")
+        case 3: return String(localized: "wifi.security.wpa_wpa2_personal", comment: "WPA/WPA2 Personal mixed mode")
+        case 4: return String(localized: "wifi.security.wpa2_personal", comment: "WPA2 Personal security type")
+        case 5: return String(localized: "wifi.security.personal", comment: "Generic Personal security type label")
+        case 6: return String(localized: "wifi.security.dynamic_wep", comment: "Dynamic WEP security type")
+        case 7: return String(localized: "wifi.security.wpa_enterprise", comment: "WPA Enterprise security type")
+        case 8: return String(localized: "wifi.security.wpa_wpa2_enterprise", comment: "WPA/WPA2 Enterprise mixed mode")
+        case 9: return String(localized: "wifi.security.wpa2_enterprise", comment: "WPA2 Enterprise security type")
+        case 10: return String(localized: "wifi.security.enterprise", comment: "Generic Enterprise security type label")
+        case 13: return String(localized: "wifi.security.wpa3_personal", comment: "WPA3 Personal security type")
+        case 14: return String(localized: "wifi.security.wpa3_enterprise", comment: "WPA3 Enterprise security type")
+        case 15: return String(localized: "wifi.security.wpa3_transition", comment: "WPA3 Transition mode security type")
         default: return "—"
         }
     }
 
     private static func phyModeLabel(_ iface: CWInterface) -> String? {
         switch iface.activePHYMode().rawValue {
-        case 0: return String(localized: "802.11a")
-        case 1: return String(localized: "802.11b")
-        case 2: return String(localized: "802.11g")
-        case 3: return String(localized: "802.11n")
-        case 4: return String(localized: "802.11ac")
-        case 5: return String(localized: "802.11ax")
-        case 6: return String(localized: "802.11be")
+        case 0: return String(localized: "wifi.phy_mode.802_11a", comment: "802.11a PHY mode label")
+        case 1: return String(localized: "wifi.phy_mode.802_11b", comment: "802.11b PHY mode label")
+        case 2: return String(localized: "wifi.phy_mode.802_11g", comment: "802.11g PHY mode label")
+        case 3: return String(localized: "wifi.phy_mode.802_11n", comment: "802.11n PHY mode label")
+        case 4: return String(localized: "wifi.phy_mode.802_11ac", comment: "802.11ac PHY mode label")
+        case 5: return String(localized: "wifi.phy_mode.802_11ax", comment: "802.11ax PHY mode label")
+        case 6: return String(localized: "wifi.phy_mode.802_11be", comment: "802.11be PHY mode label")
         default: return nil
         }
     }

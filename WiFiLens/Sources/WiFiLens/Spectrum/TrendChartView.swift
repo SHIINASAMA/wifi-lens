@@ -12,7 +12,7 @@ struct TrendChartView: View {
 
     var body: some View {
         if snapshots.count < 2 {
-            Text(String(localized: "Collecting data…"))
+            Text(String(localized: "common.label.collecting_data", comment: "Status shown while collecting sensor data"))
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity, alignment: .center)
@@ -46,7 +46,7 @@ struct TrendChartView: View {
                     let idx = t * (snapshots.count - 1) / max(1, tickCount - 1)
                     let x = chartRect.minX + CGFloat(idx) * scaleX
                     let secs = now.timeIntervalSince(snapshots[idx].timestamp)
-                    let label = chartDurationLabel(secs, zeroText: String(localized: "now"))
+                    let label = chartDurationLabel(secs, zeroText: String(localized: "common.label.now", comment: "Just now timestamp indicator"))
                     let overlaps = drawnLabels.contains(where: { abs($0 - x) < 32 })
                     if !overlaps {
                         drawnLabels.append(x)

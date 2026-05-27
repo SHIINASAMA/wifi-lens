@@ -13,7 +13,7 @@ struct BLETrendChartView: View {
 
     var body: some View {
         if samples.count < 2 {
-            Text("Collecting data…")
+            Text(String(localized: "common.label.collecting_data", comment: "Status shown while collecting sensor data"))
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .frame(height: chartHeight)

@@ -45,8 +45,8 @@ final class BLEViewModel {
                 bluetoothPermission.requestPermissionIfNeeded()
             }
             errorMessage = bluetoothPermission.authorizationStatus == .denied
-                ? String(localized: "Bluetooth permission was denied. Enable it in System Settings.")
-                : String(localized: "Bluetooth permission is required to scan for BLE devices.")
+                ? String(localized: "ble.permission.denied_message", comment: "Bluetooth permission denied error message")
+                : String(localized: "ble.permission.required_message", comment: "Bluetooth permission required explanation")
             return
         }
 
@@ -67,8 +67,7 @@ final class BLEViewModel {
                         stopScanning()
                     }
                     if state == .unauthorized {
-                        errorMessage = String(localized:
-                            "Bluetooth permission is required. Enable it in System Settings.")
+                        errorMessage = String(localized: "ble.permission.required_with_action", comment: "Bluetooth permission required with action instruction")
                     }
 
                 case .failure(let message):

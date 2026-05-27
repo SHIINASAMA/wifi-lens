@@ -28,16 +28,16 @@ enum SidebarPage: String, CaseIterable {
 
     var label: String {
         switch self {
-        case .overview:   String(localized: "Overview")
-        case .spectrum:   String(localized: "Spectrum")
-        case .channels:   String(localized: "Channels")
-        case .interfaces: String(localized: "Interfaces")
-        case .roaming:   String(localized: "Roaming Test")
-        case .bleScanner: String(localized: "BLE Scanner")
-        case .help:       String(localized: "Help")
-        case .settings:   String(localized: "Settings")
+        case .overview:   String(localized: "nav.overview", comment: "Overview sidebar navigation item")
+        case .spectrum:   String(localized: "nav.spectrum", comment: "Spectrum sidebar navigation item")
+        case .channels:   String(localized: "nav.channels", comment: "Channels sidebar navigation item")
+        case .interfaces: String(localized: "nav.interfaces", comment: "Interfaces sidebar navigation item")
+        case .roaming:   String(localized: "nav.roaming_test", comment: "Roaming Test sidebar navigation item")
+        case .bleScanner: String(localized: "nav.ble_scanner", comment: "BLE Scanner sidebar navigation item")
+        case .help:       String(localized: "nav.help", comment: "Help sidebar navigation item")
+        case .settings:   String(localized: "common.action.settings", comment: "Settings button or menu item")
 #if DEBUG
-        case .debugChart: String(localized: "Debug Chart")
+        case .debugChart: String(localized: "nav.debug_chart", comment: "Debug Chart sidebar navigation item (dev only)")
 #endif
         }
     }

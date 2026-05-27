@@ -10,9 +10,9 @@ enum InterfaceViewMode: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .simple:  String(localized: "Simple")
-        case .details: String(localized: "Details")
-        case .monitor: String(localized: "Monitor")
+        case .simple:  String(localized: "channels.mode.simple", comment: "Simple view mode for channel quality")
+        case .details: String(localized: "common.label.details", comment: "Details view mode label")
+        case .monitor: String(localized: "interfaces.mode.monitor", comment: "Throughput monitor view mode")
         }
     }
 }
@@ -49,7 +49,7 @@ struct InterfacesView: View {
                 Image(systemName: "wifi.slash")
                     .font(.largeTitle)
                     .foregroundColor(.secondary)
-                Text(String(localized: "No network interfaces found"))
+                Text(String(localized: "interfaces.empty.no_interfaces", comment: "Empty state when no network interfaces exist"))
                     .foregroundColor(.secondary)
                 Spacer()
             } else if mode == .simple {
@@ -100,7 +100,7 @@ struct InterfacesView: View {
                         .fontWeight(.semibold)
                     HStack(spacing: 6) {
                         Circle().fill(.green).frame(width: 6, height: 6)
-                        Text(String(localized: "Connected"))
+                        Text(String(localized: "common.label.connected", comment: "Connected state indicator"))
                             .font(.caption)
                             .foregroundColor(.secondary)
                         Text("· \(wifi.interfaceName)")
@@ -146,7 +146,7 @@ struct InterfacesView: View {
         HStack(spacing: 12) {
             // RSSI
             indicatorPill(
-                title: String(localized: "RSSI"),
+                title: String(localized: "channels.table.col.rssi", comment: "RSSI column header"),
                 value: wifi.displayRSSI,
                 subtitle: nil,
                 color: rssiColor(wifi.rssi ?? -100),
@@ -155,7 +155,7 @@ struct InterfacesView: View {
 
             // PHY Mode
             indicatorPill(
-                title: String(localized: "PHY Mode"),
+                title: String(localized: "interfaces.field.phy_mode", comment: "PHY mode field label"),
                 value: wifi.displayPhyMode,
                 subtitle: wifiModelabel(wifi),
                 color: .accentColor,
@@ -165,7 +165,7 @@ struct InterfacesView: View {
             // Stability
             let stab = stability(wifi)
             indicatorPill(
-                title: String(localized: "Stability"),
+                title: String(localized: "interfaces.field.stability", comment: "Connection stability field label"),
                 value: stab.label,
                 subtitle: "\(stab.score)/100",
                 color: stab.color,
@@ -203,18 +203,18 @@ struct InterfacesView: View {
     private func linkDetails(_ wifi: NetworkInterfaceInfo) -> some View {
         HStack(alignment: .top, spacing: 24) {
             kvTable([
-                (String(localized: "BSSID"), wifi.displayBSSID),
-                (String(localized: "Security"), wifi.displaySecurity),
-                (String(localized: "MCS / NSS"), mcsNssLabel(wifi)),
-                (String(localized: "Tx Rate"), wifi.displayTxRate),
-                (String(localized: "k / r / v"), kvrLabel(wifi)),
+                (String(localized: "interfaces.field.bssid", comment: "BSSID field label"), wifi.displayBSSID),
+                (String(localized: "overview.health.security_label", comment: "Security health indicator label"), wifi.displaySecurity),
+                (String(localized: "interfaces.field.mcs_nss", comment: "MCS/NSS field label"), mcsNssLabel(wifi)),
+                (String(localized: "interfaces.field.tx_rate", comment: "Transmit rate field label"), wifi.displayTxRate),
+                (String(localized: "interfaces.field.krv", comment: "802.11 k/r/v roaming support field label"), kvrLabel(wifi)),
             ])
             kvTable([
-                (String(localized: "IPv4 Address"), wifi.displayIP),
-                (String(localized: "Subnet Mask"), wifi.displaySubnet),
-                (String(localized: "Router"), wifi.displayRouter),
-                (String(localized: "DNS"), wifi.displayDNS),
-                (String(localized: "Hardware MAC"), wifi.displayMAC),
+                (String(localized: "interfaces.field.ipv4_address", comment: "IPv4 address field label"), wifi.displayIP),
+                (String(localized: "interfaces.field.subnet_mask", comment: "Subnet mask field label (full)"), wifi.displaySubnet),
+                (String(localized: "interfaces.field.router", comment: "Router/gateway address field label"), wifi.displayRouter),
+                (String(localized: "interfaces.field.dns", comment: "DNS server field label"), wifi.displayDNS),
+                (String(localized: "interfaces.field.hardware_mac", comment: "Hardware MAC address field label"), wifi.displayMAC),
             ])
         }
         .padding(16)
@@ -227,7 +227,7 @@ struct InterfacesView: View {
 
     private func otherInterfaces(_ others: [NetworkInterfaceInfo]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(String(localized: "Other Interfaces"))
+            Text(String(localized: "interfaces.label.other", comment: "Other interfaces section header"))
                 .font(.headline)
                 .foregroundColor(.secondary)
             VStack(spacing: 4) {
@@ -334,7 +334,7 @@ struct InterfacesView: View {
                     .frame(width: 12)
                 Image(systemName: "chart.line.uptrend.xyaxis")
                     .font(.caption)
-                Text(String(localized: "Throughput"))
+                Text(String(localized: "interfaces.field.throughput", comment: "Throughput section header"))
                     .font(.system(size: 12, weight: .semibold))
                 Spacer()
                 Text(selectedMonitorRate)
@@ -358,10 +358,10 @@ struct InterfacesView: View {
                     .frame(width: 12)
                 Image(systemName: "list.bullet.rectangle")
                     .font(.caption)
-                Text(String(localized: "Interfaces"))
+                Text(String(localized: "nav.interfaces", comment: "Interfaces sidebar navigation item"))
                     .font(.system(size: 12, weight: .semibold))
                 Spacer()
-                Text("\(monitorInterfaces.count) \(String(localized: "interfaces"))")
+                Text("\(monitorInterfaces.count) \(String(localized: "interfaces.label.interfaces", comment: "Interfaces plural unit"))")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -377,7 +377,7 @@ struct InterfacesView: View {
             if monitorSamples.isEmpty {
                 VStack {
                     Spacer()
-                    Text(String(localized: "Select an interface below to monitor throughput"))
+                    Text(String(localized: "interfaces.empty.select_to_monitor", comment: "Prompt to select interface for throughput monitoring"))
                         .font(.callout)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -493,14 +493,14 @@ struct InterfacesView: View {
 
     private func bandLabel(_ wifi: NetworkInterfaceInfo) -> String {
         guard let ch = wifi.channel else { return "—" }
-        if ch <= 14 { return String(localized: "2.4 GHz") }
-        if ch <= 170 { return String(localized: "5 GHz") }
-        return String(localized: "6 GHz")
+        if ch <= 14 { return String(localized: "wifi.band.24ghz", comment: "2.4 GHz Wi-Fi band name") }
+        if ch <= 170 { return String(localized: "wifi.band.5ghz", comment: "5 GHz Wi-Fi band name") }
+        return String(localized: "wifi.band.6ghz", comment: "6 GHz Wi-Fi band name")
     }
 
     private func channelLabel(_ wifi: NetworkInterfaceInfo) -> String {
         guard let ch = wifi.channel else { return "—" }
-        return String(localized: "Channel \(ch)")
+        return String(format: String(localized: "interfaces.field.channel_fmt", comment: "Formatted channel label with number"), String(ch))
     }
 
     private func rssiColor(_ rssi: Int) -> Color {
@@ -577,10 +577,10 @@ struct InterfacesView: View {
 
         score = min(100, score)
         let label: String = switch score {
-        case 85...:  String(localized: "Excellent")
-        case 70...:  String(localized: "Good")
-        case 50...:  String(localized: "Moderate")
-        default:     String(localized: "Weak")
+        case 85...:  String(localized: "channels.quality.excellent", comment: "Excellent channel quality tier")
+        case 70...:  String(localized: "overview.signal.good", comment: "Good signal level label")
+        case 50...:  String(localized: "channels.quality.moderate", comment: "Moderate channel quality tier")
+        default:     String(localized: "overview.signal.weak", comment: "Weak signal level label")
         }
         let color: Color = switch score {
         case 85...: .green
@@ -593,10 +593,10 @@ struct InterfacesView: View {
 
     private func wifiModelabel(_ wifi: NetworkInterfaceInfo) -> String {
         switch wifi.displayPhyMode {
-        case "802.11be": return String(localized: "Wi‑Fi 7")
-        case "802.11ax": return String(localized: "Wi‑Fi 6")
-        case "802.11ac": return String(localized: "Wi‑Fi 5")
-        case "802.11n":  return String(localized: "Wi‑Fi 4")
+        case "802.11be": return String(localized: "wifi.generation.wifi_7", comment: "Wi-Fi 7 (802.11be) generation name")
+        case "802.11ax": return String(localized: "wifi.generation.wifi_6", comment: "Wi-Fi 6 (802.11ax) generation name")
+        case "802.11ac": return String(localized: "wifi.generation.wifi_5", comment: "Wi-Fi 5 (802.11ac) generation name")
+        case "802.11n":  return String(localized: "wifi.generation.wifi_4", comment: "Wi-Fi 4 (802.11n) generation name")
         default: return wifi.displayPhyMode
         }
     }
@@ -608,8 +608,8 @@ struct InterfacesView: View {
             .flatMap { $0.ieData.map { IEParser.parse(data: $0) } }
         let mcs = ie?.mcsSummary ?? ""
         let nss = ie?.nssSummary ?? ""
-        if mcs.isEmpty && nss.isEmpty { return String(localized: "—") }
-        return String(format: String(localized: "MCS %@ / NSS %@"), mcs, nss)
+        if mcs.isEmpty && nss.isEmpty { return String(localized: "symbol.em_dash", comment: "Em dash symbol used as placeholder") }
+        return String(format: String(localized: "interfaces.field.mcs_nss_fmt", comment: "MCS/NSS formatted value"), mcs, nss)
     }
 
     private func kvrLabel(_ wifi: NetworkInterfaceInfo) -> String {
@@ -666,9 +666,9 @@ private struct InterfaceCard: View {
 
     private func typeBadge(_ t: NetworkInterfaceInfo.InterfaceType) -> some View {
         let (label, color): (String, Color) = switch t {
-        case .wifi:     (String(localized: "Wi‑Fi"), .accentColor)
-        case .ethernet: (String(localized: "Ethernet"), .secondary)
-        case .virtual:  (String(localized: "Virtual"), .secondary.opacity(0.8))
+        case .wifi:     (String(localized: "interfaces.label.wifi", comment: "Wi-Fi interface type label"), .accentColor)
+        case .ethernet: (String(localized: "interfaces.label.ethernet", comment: "Ethernet interface type label"), .secondary)
+        case .virtual:  (String(localized: "interfaces.label.virtual", comment: "Virtual interface type label"), .secondary.opacity(0.8))
         }
         return Text(label)
             .font(.system(size: 8, weight: .semibold))
@@ -713,11 +713,11 @@ private struct InterfaceCard: View {
             // Body — two‑column compact rows
             VStack(spacing: 2) {
                 if t == .wifi {
-                    compactRow(label: String(localized: "BSSID"), value: info.displayBSSID)
-                    compactRow(label: String(localized: "Channel"), value: info.displayChannel)
-                    compactRow(label: String(localized: "PHY"), value: info.displayPhyMode)
-                    compactRow(label: String(localized: "Tx Rate"), value: info.displayTxRate)
-                    labelRow(label: String(localized: "Security"), value: info.displaySecurity)
+                    compactRow(label: String(localized: "interfaces.field.bssid", comment: "BSSID field label"), value: info.displayBSSID)
+                    compactRow(label: String(localized: "overview.health.channel_label", comment: "Channel quality health indicator label"), value: info.displayChannel)
+                    compactRow(label: String(localized: "interfaces.field.phy", comment: "PHY mode field label (short)"), value: info.displayPhyMode)
+                    compactRow(label: String(localized: "interfaces.field.tx_rate", comment: "Transmit rate field label"), value: info.displayTxRate)
+                    labelRow(label: String(localized: "overview.health.security_label", comment: "Security health indicator label"), value: info.displaySecurity)
                 }
 
                 // Network section — shown for Wi‑Fi and any interface that has network data
@@ -725,15 +725,15 @@ private struct InterfaceCard: View {
                     if t == .wifi {
                         Divider().padding(.horizontal, 8).padding(.vertical, 2)
                     }
-                    compactRow(label: String(localized: "IPv4"), value: info.displayIP)
-                    compactRow(label: String(localized: "Subnet"), value: info.displaySubnet)
-                    compactRow(label: String(localized: "Router"), value: info.displayRouter)
-                    compactRow(label: String(localized: "DNS"), value: info.displayDNS)
+                    compactRow(label: String(localized: "interfaces.field.ipv4", comment: "IPv4 section header"), value: info.displayIP)
+                    compactRow(label: String(localized: "interfaces.field.subnet", comment: "Subnet mask field label (short)"), value: info.displaySubnet)
+                    compactRow(label: String(localized: "interfaces.field.router", comment: "Router/gateway address field label"), value: info.displayRouter)
+                    compactRow(label: String(localized: "interfaces.field.dns", comment: "DNS server field label"), value: info.displayDNS)
                 }
 
                 // MAC — only for Wi‑Fi and Ethernet (not virtual)
                 if t != .virtual {
-                    compactRow(label: String(localized: "MAC"), value: info.displayMAC)
+                    compactRow(label: String(localized: "interfaces.field.mac", comment: "MAC address field label (short)"), value: info.displayMAC)
                 }
             }
             .padding(.horizontal, 12)

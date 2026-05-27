@@ -35,7 +35,7 @@ struct BandChartView: View {
                     Image(systemName: "arrow.counterclockwise")
                         .frame(width: 24, height: 24)
                 }
-                .help("Reset Zoom")
+                .help(String(localized: "common.action.reset_zoom", comment: "Reset chart zoom to default"))
             }
 
             Spacer()
@@ -101,7 +101,7 @@ struct BandChartView: View {
             if isEmpty {
                 VStack {
                     Spacer()
-                    Text("Loading...")
+                    Text(String(localized: "common.label.loading", comment: "Loading indicator text"))
                         .foregroundColor(Color(hex: "#888888"))
                         .font(.system(size: 16))
                     Spacer()

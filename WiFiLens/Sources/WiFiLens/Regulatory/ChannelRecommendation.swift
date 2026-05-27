@@ -36,9 +36,9 @@ struct ChannelRecommendation: Identifiable, Sendable {
 
         var displayName: String {
             switch self {
-            case .recommended: String(localized: "Recommended")
-            case .advanced:    String(localized: "Advanced")
-            case .restricted:  String(localized: "Restricted")
+            case .recommended: String(localized: "channels.classification.recommended", comment: "Recommended channel classification")
+            case .advanced:    String(localized: "channels.classification.advanced", comment: "Advanced channel classification")
+            case .restricted:  String(localized: "channels.classification.restricted", comment: "Restricted channel classification")
             }
         }
 

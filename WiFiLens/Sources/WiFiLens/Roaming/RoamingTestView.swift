@@ -75,7 +75,7 @@ struct RoamingTestView: View {
         HStack(spacing: 8) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundColor(.orange)
-            Text(String(localized: "This feature is designed for battery-equipped Mac laptops. Desktop Macs cannot simulate mobile roaming scenarios."))
+            Text(String(localized: "roaming.warning.not_portable", comment: "Warning that roaming test needs a laptop, not desktop Mac"))
                 .font(.system(size: 11))
             Spacer()
         }
@@ -98,13 +98,13 @@ struct RoamingTestView: View {
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
-                Button(String(localized: "Check Again")) {
+                Button(String(localized: "common.action.check_again", comment: "Check again button")) {
                     viewModel.checkReadiness()
                 }
                 .padding(.top, 8)
             } else {
                 ProgressView()
-                Text(String(localized: "Checking connection..."))
+                Text(String(localized: "overview.status.checking", comment: "Status while checking Wi-Fi connection"))
                     .font(.callout)
                     .foregroundColor(.secondary)
             }
@@ -156,11 +156,11 @@ struct RoamingTestView: View {
 
             // Right: metrics
             HStack(spacing: 20) {
-                metricLabel(String(localized: "RSSI"), "\(viewModel.currentRSSI) dBm", rssiColor(viewModel.currentRSSI))
-                metricLabel(String(localized: "Channel"), "\(viewModel.currentChannel)", .primary)
-                metricLabel(String(localized: "Tx Rate"), String(format: "%.0f Mbps", viewModel.currentTxRate), .primary)
+                metricLabel(String(localized: "channels.table.col.rssi", comment: "RSSI column header"), "\(viewModel.currentRSSI) dBm", rssiColor(viewModel.currentRSSI))
+                metricLabel(String(localized: "overview.health.channel_label", comment: "Channel quality health indicator label"), "\(viewModel.currentChannel)", .primary)
+                metricLabel(String(localized: "interfaces.field.tx_rate", comment: "Transmit rate field label"), String(format: "%.0f Mbps", viewModel.currentTxRate), .primary)
                 if let latency = viewModel.gatewayLatency {
-                    metricLabel(String(localized: "Latency"), String(format: "%.1f ms", latency), latencyColor(latency))
+                    metricLabel(String(localized: "roaming.field.latency", comment: "Latency field label in roaming view"), String(format: "%.1f ms", latency), latencyColor(latency))
                 }
             }
         }
@@ -195,7 +195,7 @@ struct RoamingTestView: View {
                 Image(systemName: "chart.xyaxis.line")
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
-                Text("\(viewModel.totalSamples) \(String(localized: "samples"))")
+                Text("\(viewModel.totalSamples) \(String(localized: "common.label.samples", comment: "Sample count unit label"))")
                     .font(.system(size: 12))
                     .foregroundColor(.secondary)
             }
@@ -204,7 +204,7 @@ struct RoamingTestView: View {
                 Image(systemName: "arrow.triangle.swap")
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
-                Text("\(viewModel.transitions.count) \(String(localized: "transitions"))")
+                Text("\(viewModel.transitions.count) \(String(localized: "common.label.transitions", comment: "AP transition count unit label"))")
                     .font(.system(size: 12))
                     .foregroundColor(.secondary)
             }
@@ -215,7 +215,7 @@ struct RoamingTestView: View {
                 Button {
                     viewModel.saveSession()
                 } label: {
-                    Label(String(localized: "Save"), systemImage: "square.and.arrow.down")
+                    Label(String(localized: "common.action.save", comment: "Save button label"), systemImage: "square.and.arrow.down")
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
@@ -225,7 +225,7 @@ struct RoamingTestView: View {
                 Button {
                     viewModel.loadSession()
                 } label: {
-                    Label(String(localized: "Load"), systemImage: "square.and.arrow.up")
+                    Label(String(localized: "common.action.load", comment: "Load button label"), systemImage: "square.and.arrow.up")
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
@@ -235,22 +235,22 @@ struct RoamingTestView: View {
                 Button {
                     viewModel.stopTest()
                 } label: {
-                    Label(String(localized: "Stop"), systemImage: "stop.fill")
+                    Label(String(localized: "common.action.stop", comment: "Stop action button"), systemImage: "stop.fill")
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.red)
                 .controlSize(.small)
-                .help(String(localized: "Stop roaming test"))
+                .help(String(localized: "roaming.control.stop_tooltip", comment: "Tooltip for stop roaming test button"))
             } else {
                 Button {
                     viewModel.startTest()
                 } label: {
-                    Label(String(localized: "Start"), systemImage: "play.fill")
+                    Label(String(localized: "common.action.start", comment: "Start action button"), systemImage: "play.fill")
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.small)
                 .disabled(!viewModel.canStart)
-                .help(String(localized: "Start roaming test"))
+                .help(String(localized: "roaming.control.start_tooltip", comment: "Tooltip for start roaming test button"))
             }
         }
         .padding(.horizontal, 16)
@@ -295,13 +295,13 @@ struct RoamingTestView: View {
                     // Header
                     Grid(horizontalSpacing: 0, verticalSpacing: 0) {
                         GridRow {
-                            tableHeader(String(localized: "Time"))
-                            tableHeader(String(localized: "From BSSID"))
-                            tableHeader(String(localized: "To BSSID"))
-                            tableHeader(String(localized: "RSSI Before"))
-                            tableHeader(String(localized: "RSSI After"))
-                            tableHeader(String(localized: "Ch Before"))
-                            tableHeader(String(localized: "Ch After"))
+                            tableHeader(String(localized: "roaming.table.col.time", comment: "Time column header in transition table"))
+                            tableHeader(String(localized: "roaming.table.col.from_bssid", comment: "Source BSSID column header"))
+                            tableHeader(String(localized: "roaming.table.col.to_bssid", comment: "Destination BSSID column header"))
+                            tableHeader(String(localized: "roaming.table.col.rssi_before", comment: "RSSI before transition column header"))
+                            tableHeader(String(localized: "roaming.table.col.rssi_after", comment: "RSSI after transition column header"))
+                            tableHeader(String(localized: "roaming.table.col.ch_before", comment: "Channel before transition column header"))
+                            tableHeader(String(localized: "roaming.table.col.ch_after", comment: "Channel after transition column header"))
                         }
                     }
 
@@ -599,7 +599,7 @@ private struct RoamingTimelineChart: View {
                     Image(systemName: "chart.xyaxis.line")
                         .font(.title2)
                         .foregroundColor(.secondary.opacity(0.5))
-                    Text(String(localized: "No chart data yet"))
+                    Text(String(localized: "common.empty.no_chart_data", comment: "Empty state when no chart data is available"))
                         .font(.callout)
                         .foregroundColor(.secondary)
                     Spacer()

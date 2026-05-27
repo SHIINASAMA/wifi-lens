@@ -46,9 +46,13 @@ CoreWLAN scan → WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gau
 
 ## Localization
 
-- All user-facing strings use `String(localized:)` in source
-- Translations in `Resources/Localizable.xcstrings` (Xcode String Catalog, `en` + `zh-Hans`)
-- New strings must be manually added to `.xcstrings` with `"extractionState" : "manual"`
+- All user-facing strings use `String(localized: "domain.component.element", comment: "Context for translators")` in source
+- Keys use hierarchical dot-notation: `<domain>.<component>.<element>` with lowercase and underscores
+- Domains: `common` (shared UI), `nav` (sidebar), `settings`, `overview`, `spectrum`, `channels`, `interfaces`, `roaming`, `ble`, `permission`, `wifi` (terminology), `format` (parameterized)
+- Example: `"overview.diagnosis.congested.title"` for "Channel is congested" diagnosis heading
+- Parameterized strings use `String(format: String(localized: "format.key"), args...)` — never interpolate values into the key string
+- Translations in `Resources/Localizable.xcstrings` (Xcode String Catalog, `en`, `ja`, `zh-Hans`)
+- New strings must be manually added to `.xcstrings` with `"extractionState": "manual"` and an explicit `en` localization with `"state": "translated"`
 - Xcode auto-extraction is disabled (`SWIFT_EMIT_LOC_STRINGS = NO`)
 
 ## Testing

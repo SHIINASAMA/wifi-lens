@@ -5,9 +5,9 @@ enum ChannelBand: Int, Sendable, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .band24GHz: String(localized: "2.4 GHz")
-        case .band5GHz: String(localized: "5 GHz")
-        case .band6GHz: String(localized: "6 GHz")
+        case .band24GHz: String(localized: "wifi.band.24ghz", comment: "2.4 GHz Wi-Fi band name")
+        case .band5GHz: String(localized: "wifi.band.5ghz", comment: "5 GHz Wi-Fi band name")
+        case .band6GHz: String(localized: "wifi.band.6ghz", comment: "6 GHz Wi-Fi band name")
         }
     }
 

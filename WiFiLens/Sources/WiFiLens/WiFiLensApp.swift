@@ -139,20 +139,20 @@ private struct AppRootView: View {
                     bleViewModel.stopScanning()
                 }
             }
-            .alert(String(localized: "Previous Crash Detected"), isPresented: $showCrashLog) {
-                Button(String(localized: "Dismiss"), role: .cancel) {}
+            .alert(String(localized: "permission.crash_detected_title", comment: "Alert title when previous crash is detected on launch"), isPresented: $showCrashLog) {
+                Button(String(localized: "common.action.dismiss", comment: "Dismiss/close alert button"), role: .cancel) {}
             } message: {
                 ScrollView { Text(crashLogText).font(.caption.monospaced()).textSelection(.enabled) }
                     .frame(maxHeight: 200)
             }
             .navigationTitle(selectedPage == .overview ? "" : selectedPage.label)
-            .alert(String(localized: "Location Services Required"), isPresented: $viewModel.locationManager.showDeniedAlert) {
-                Button(String(localized: "Open System Settings")) {
+            .alert(String(localized: "permission.location.services_required_title", comment: "Alert title: Location Services permission needed"), isPresented: $viewModel.locationManager.showDeniedAlert) {
+                Button(String(localized: "common.action.open_system_settings", comment: "Button to open macOS System Settings")) {
                     viewModel.locationManager.openLocationPreferences()
                 }
-                Button(String(localized: "Cancel"), role: .cancel) {}
+                Button(String(localized: "common.action.cancel", comment: "Cancel button label"), role: .cancel) {}
             } message: {
-                Text(String(localized: "Location Services permission is required to read Wi-Fi network names. Please enable it in System Settings."))
+                Text(String(localized: "permission.location.services_required_message", comment: "Alert message explaining why Location Services is required"))
             }
         }
         .background(WindowAccessor { window in
@@ -263,13 +263,13 @@ struct WiFiLensApp: App {
         }
         .commands {
             CommandGroup(after: .toolbar) {
-                Menu(String(localized: "Export")) {
+                Menu(String(localized: "common.action.export", comment: "Export menu item or button")) {
                     ForEach(viewModel.bandViewModels, id: \.band.id) { vm in
                         Menu(vm.band.displayName) {
-                            Button(String(localized: "PNG")) {
+                            Button(String(localized: "spectrum.export.png_short", comment: "PNG export format short label")) {
                                 exportPNG(for: vm)
                             }
-                            Button(String(localized: "CSV")) {
+                            Button(String(localized: "spectrum.export.csv_short", comment: "CSV export format short label")) {
                                 exportCSV(for: vm)
                             }
                         }
@@ -280,7 +280,7 @@ struct WiFiLensApp: App {
 
                 Divider()
 
-                Button(String(localized: "Freeze All")) {
+                Button(String(localized: "common.action.freeze_all", comment: "Freeze all spectrum charts button")) {
                     NotificationCenter.default.post(name: .freezeAllBands, object: nil)
                 }
                 .keyboardShortcut(".", modifiers: [.command])
@@ -290,13 +290,13 @@ struct WiFiLensApp: App {
                 Button {
                     selectedPage = .settings
                 } label: {
-                    Label(String(localized: "Settings"), systemImage: "gearshape")
+                    Label(String(localized: "common.action.settings", comment: "Settings button or menu item"), systemImage: "gearshape")
                 }
                 .keyboardShortcut(",", modifiers: .command)
             }
 
             CommandGroup(after: .appInfo) {
-                Button(String(localized: "Check for Updates…")) {
+                Button(String(localized: "common.action.check_for_updates", comment: "Check for updates menu item")) {
                     sparkleUpdater.checkForUpdates()
                 }
             }

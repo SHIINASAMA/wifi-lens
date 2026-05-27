@@ -92,7 +92,7 @@ struct OverviewView: View {
                         .fontWeight(.semibold)
                     HStack(spacing: 6) {
                         Circle().fill(Color.green).frame(width: 6, height: 6)
-                        Text(String(localized: "Connected"))
+                        Text(String(localized: "common.label.connected", comment: "Connected state indicator"))
                             .font(.caption)
                             .foregroundColor(.secondary)
                         if let ch = wifi.channel {
@@ -133,7 +133,7 @@ struct OverviewView: View {
         HStack(spacing: 10) {
             healthPill(
                 icon: "wave.3.right",
-                label: String(localized: "Signal"),
+                label: String(localized: "overview.health.signal_label", comment: "Signal strength health indicator label"),
                 value: signalLabel(wifi.rssi ?? -100),
                 color: rssiColor(wifi.rssi ?? -100)
             )
@@ -141,7 +141,7 @@ struct OverviewView: View {
             if currentChannelQuality != nil {
                 healthPill(
                     icon: "chart.bar.fill",
-                    label: String(localized: "Channel"),
+                    label: String(localized: "overview.health.channel_label", comment: "Channel quality health indicator label"),
                     value: displayLevel.displayName,
                     color: Color(hex: displayLevel.color)
                 )
@@ -149,7 +149,7 @@ struct OverviewView: View {
 
             healthPill(
                 icon: "lock.shield.fill",
-                label: String(localized: "Security"),
+                label: String(localized: "overview.health.security_label", comment: "Security health indicator label"),
                 value: securityShort(wifi.security),
                 color: wifi.security.contains("WPA3") ? .green : .orange
             )
@@ -218,8 +218,8 @@ struct OverviewView: View {
         if rssi >= -55 && chScore >= 70 && sec.contains("WPA3") {
             return Diagnosis(
                 icon: "star.fill",
-                title: String(localized: "Your connection looks great"),
-                message: String(localized: "Strong signal, clean channel, and WPA3 security. You're getting the best experience."),
+                title: String(localized: "overview.diagnosis.great.title", comment: "Diagnosis title: excellent connection"),
+                message: String(localized: "overview.diagnosis.great.message", comment: "Diagnosis message: excellent connection"),
                 color: .green
             )
         }
@@ -227,8 +227,8 @@ struct OverviewView: View {
         if rssi < -75 {
             return Diagnosis(
                 icon: "wifi.slash",
-                title: String(localized: "Weak signal"),
-                message: String(localized: "You're far from the router. Moving closer or adding a mesh node would help."),
+                title: String(localized: "overview.diagnosis.weak_signal.title", comment: "Diagnosis title: weak signal"),
+                message: String(localized: "overview.diagnosis.weak_signal.message", comment: "Diagnosis message: weak signal advice"),
                 color: .red
             )
         }
@@ -238,8 +238,8 @@ struct OverviewView: View {
             let recList = recommendedChannels.prefix(2).map { "\($0.channel)" }.joined(separator: " / ")
             return Diagnosis(
                 icon: "antenna.radiowaves.left.and.right",
-                title: String(localized: "Channel is congested"),
-                message: String(localized: "Channel \(channelNum) has \(apCount) nearby networks. Try switching to \(recList)."),
+                title: String(localized: "overview.diagnosis.congested.title", comment: "Diagnosis title: congested channel"),
+                message: String(format: String(localized: "overview.diagnosis.congested.message_fmt", comment: "Congested channel diagnosis with channel number, AP count, and recommended channels"), channelNum, apCount, recList),
                 color: .orange
             )
         }
@@ -247,17 +247,17 @@ struct OverviewView: View {
         if chScore < 70 {
             return Diagnosis(
                 icon: "antenna.radiowaves.left.and.right",
-                title: String(localized: "Channel could be better"),
-                message: String(localized: "Your channel has some congestion. Switching could improve performance."),
+                title: String(localized: "overview.diagnosis.medium_channel.title", comment: "Diagnosis title: mediocre channel"),
+                message: String(localized: "overview.diagnosis.medium_channel.message", comment: "Diagnosis message: channel improvement advice"),
                 color: .orange
             )
         }
 
-        if !sec.contains("WPA3") && sec != "—" && sec != String(localized: "None") {
+        if !sec.contains("WPA3") && sec != "—" && sec != String(localized: "common.label.none", comment: "Generic none/empty value label") {
             return Diagnosis(
                 icon: "lock.open.fill",
-                title: String(localized: "Security could be stronger"),
-                message: String(localized: "Using \(sec). WPA3 is the latest standard. Check if your router supports it."),
+                title: String(localized: "overview.diagnosis.security.title", comment: "Diagnosis title: weak security"),
+                message: String(format: String(localized: "overview.diagnosis.security.message_fmt", comment: "Diagnosis message: security upgrade advice with current security type"), sec),
                 color: .orange
             )
         }
@@ -266,16 +266,16 @@ struct OverviewView: View {
             let version = phy == "n" ? "4" : "5"
             return Diagnosis(
                 icon: "speedometer",
-                title: String(localized: "Older Wi‑Fi standard"),
-                message: String(localized: "You're on Wi‑Fi \(version). Wi‑Fi 6 or 7 would give you faster speeds."),
+                title: String(localized: "overview.diagnosis.old_phy.title", comment: "Diagnosis title: older Wi-Fi generation"),
+                message: String(format: String(localized: "overview.diagnosis.old_phy.message_fmt", comment: "Diagnosis message: Wi-Fi generation upgrade advice"), version),
                 color: .orange
             )
         }
 
         return Diagnosis(
             icon: "checkmark.circle.fill",
-            title: String(localized: "Connection is OK"),
-            message: String(localized: "You could improve by moving closer to the router or switching channels."),
+            title: String(localized: "overview.diagnosis.ok.title", comment: "Diagnosis title: acceptable connection"),
+            message: String(localized: "overview.diagnosis.ok.message", comment: "Diagnosis message: general improvement advice"),
             color: .mint
         )
     }
@@ -287,7 +287,7 @@ struct OverviewView: View {
             HStack(spacing: 6) {
                 Image(systemName: "lightbulb.fill")
                     .foregroundColor(.yellow)
-                Text(String(localized: "Better Channels"))
+                Text(String(localized: "overview.channel_advice.header", comment: "Header for recommended channels card"))
                     .font(.system(size: 12, weight: .semibold))
             }
 
@@ -305,7 +305,7 @@ struct OverviewView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("\(ch.bandDisplay) — \(ch.rfLevel.displayName)")
                             .font(.system(size: 12, weight: .medium))
-                        Text(String(localized: "\(ch.rfScore)/100 · \(ch.apCount) nearby"))
+                        Text(String(format: String(localized: "format.network_score_with_ap_count", comment: "Network score display with nearby AP count"), ch.rfScore, ch.apCount))
                             .font(.system(size: 10))
                             .foregroundColor(.secondary)
                     }
@@ -325,10 +325,10 @@ struct OverviewView: View {
 
     private var noConnectionCard: some View {
         VStack(spacing: 12) {
-            Text(String(localized: "Not connected to Wi‑Fi"))
+            Text(String(localized: "overview.status.not_connected", comment: "Empty state when not connected to any Wi-Fi network"))
                 .font(.title3)
                 .fontWeight(.semibold)
-            Text(String(localized: "Connect to a Wi‑Fi network to see diagnostics and recommendations."))
+            Text(String(localized: "overview.status.connect_prompt", comment: "Prompt to connect to Wi-Fi for diagnostics"))
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -347,16 +347,16 @@ struct OverviewView: View {
                 .font(.title2)
                 .foregroundColor(.orange)
             VStack(alignment: .leading, spacing: 4) {
-                Text(String(localized: "Location Services Required"))
+                Text(String(localized: "permission.location.services_required_title", comment: "Alert title: Location Services permission needed"))
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                Text(String(localized: "macOS requires Location Services permission to read Wi-Fi network names. Your location is never tracked or stored."))
+                Text(String(localized: "permission.location.macos_requires", comment: "Explanation of macOS LS requirement with privacy reassurance"))
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer()
-            Button(String(localized: "Authorize…")) {
+            Button(String(localized: "common.action.authorize", comment: "Authorize/request permission button")) {
                 viewModel.requestAuthorization()
             }
             .buttonStyle(.borderedProminent)
@@ -375,7 +375,7 @@ struct OverviewView: View {
                 .foregroundColor(.accentColor)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(String(localized: "\(totalNetworks) networks detected"))
+                Text(String(format: String(localized: "overview.environment.summary_fmt", comment: "Banner showing count of detected networks"), totalNetworks))
                     .font(.system(size: 13, weight: .semibold))
                 Text(bandSummary)
                     .font(.system(size: 11))
@@ -409,10 +409,10 @@ struct OverviewView: View {
     }
 
     private func signalLabel(_ rssi: Int) -> String {
-        if rssi >= -55 { return String(localized: "Strong") }
-        if rssi >= -70 { return String(localized: "Good") }
-        if rssi >= -85 { return String(localized: "Moderate") }
-        return String(localized: "Weak")
+        if rssi >= -55 { return String(localized: "overview.signal.strong", comment: "Strong signal level label") }
+        if rssi >= -70 { return String(localized: "overview.signal.good", comment: "Good signal level label") }
+        if rssi >= -85 { return String(localized: "channels.quality.moderate", comment: "Moderate channel quality tier") }
+        return String(localized: "overview.signal.weak", comment: "Weak signal level label")
     }
 
     private func signalBars(_ rssi: Int) -> some View {
@@ -427,16 +427,16 @@ struct OverviewView: View {
     }
 
     private func bandName(_ ch: Int) -> String {
-        if ch <= 14 { return String(localized: "2.4 GHz") }
-        if ch <= 170 { return String(localized: "5 GHz") }
-        return String(localized: "6 GHz")
+        if ch <= 14 { return String(localized: "wifi.band.24ghz", comment: "2.4 GHz Wi-Fi band name") }
+        if ch <= 170 { return String(localized: "wifi.band.5ghz", comment: "5 GHz Wi-Fi band name") }
+        return String(localized: "wifi.band.6ghz", comment: "6 GHz Wi-Fi band name")
     }
 
     private func securityShort(_ sec: String) -> String {
         if sec.contains("WPA3") { return "WPA3" }
         if sec.contains("WPA2") { return "WPA2" }
         if sec.contains("WPA") { return "WPA" }
-        if sec == "—" || sec == String(localized: "None") { return String(localized: "Open") }
+        if sec == "—" || sec == String(localized: "common.label.none", comment: "Generic none/empty value label") { return String(localized: "wifi.security.open", comment: "Open/no password security type") }
         return sec
     }
 }
