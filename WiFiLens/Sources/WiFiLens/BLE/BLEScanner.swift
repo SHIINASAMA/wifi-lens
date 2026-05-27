@@ -158,7 +158,7 @@ private final class BLEScannerDelegate: NSObject, CBCentralManagerDelegate, @unc
     func beginActivity() {
         activityToken = ProcessInfo.processInfo.beginActivity(
             options: [.userInitiated, .idleSystemSleepDisabled],
-            reason: "BLE device scanning"
+            reason: String(localized: "BLE device scanning")
         )
     }
 

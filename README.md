@@ -9,6 +9,8 @@ Built with SwiftUI, CoreWLAN, and Sparkle.
 
 ![screenshot](assets/screenshot-swiftui.png)
 
+🇺🇸 [English](README.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
+
 ## Features
 
 - Real-time Wi-Fi scanning across 2.4 GHz, 5 GHz, and 6 GHz bands
@@ -28,7 +30,6 @@ Built with SwiftUI, CoreWLAN, and Sparkle.
 - MCP (Model Context Protocol) HTTP server for external tool integration
 - Built-in Sparkle auto-update support
 - Crash reporting and structured logging
-- English and Simplified Chinese localization
 
 ## Requirements
 

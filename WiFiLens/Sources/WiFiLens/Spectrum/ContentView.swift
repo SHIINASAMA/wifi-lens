@@ -109,7 +109,7 @@ struct ContentView: View {
                     Image(systemName: bandVM.isFrozen ? "play.fill" : "pause.fill")
                 }
                 .buttonStyle(.plain)
-                .help(bandVM.isFrozen ? "Resume" : "Pause")
+                .help(bandVM.isFrozen ? String(localized: "Resume") : String(localized: "Pause"))
             }
 
             Spacer()
@@ -162,18 +162,18 @@ struct ContentView: View {
 
     private var tableFilterBar: some View {
         HStack(spacing: 12) {
-            Text("Show:")
+            Text(String(localized: "Show:"))
                 .font(.system(size: 10))
                 .foregroundColor(.secondary)
-            bandToggle("2.4 GHz", bandID: "24")
-            bandToggle("5 GHz", bandID: "5")
+            bandToggle(String(localized: "2.4 GHz"), bandID: "24")
+            bandToggle(String(localized: "5 GHz"), bandID: "5")
             if viewModel.supportedBands.contains(.band6GHz) {
-                bandToggle("6 GHz", bandID: "6")
+                bandToggle(String(localized: "6 GHz"), bandID: "6")
             }
             Text("·")
                 .foregroundColor(.secondary)
             Toggle(isOn: $viewModel.hideHiddenSSIDs) {
-                Text("Hide Hidden").font(.system(size: 11))
+                Text(String(localized: "Hide Hidden")).font(.system(size: 11))
             }
             .toggleStyle(.checkbox)
             Spacer()
@@ -376,13 +376,13 @@ struct ContentView: View {
             ProgressView().scaleEffect(1.5)
             switch viewModel.accessState {
             case .waitingForAuthorization:
-                Text("Waiting for Location Services permission...").foregroundColor(.orange)
-                Button("Open System Settings") { viewModel.locationManager.openLocationPreferences() }
+                Text(String(localized: "Waiting for Location Services permission...")).foregroundColor(.orange)
+                Button(String(localized: "Open System Settings")) { viewModel.locationManager.openLocationPreferences() }
             case .denied:
-                Text("Location Services required.").foregroundColor(.secondary)
-                Button("Open Location Preferences") { viewModel.locationManager.openLocationPreferences() }
+                Text(String(localized: "Location Services required.")).foregroundColor(.secondary)
+                Button(String(localized: "Open Location Preferences")) { viewModel.locationManager.openLocationPreferences() }
             case .scanFailed(let msg):
-                Text("Scan failed").foregroundColor(.secondary)
+                Text(String(localized: "Scan failed")).foregroundColor(.secondary)
                 Text(msg).font(.caption).foregroundColor(.secondary)
             default:
                 EmptyView()

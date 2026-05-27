@@ -608,8 +608,8 @@ struct InterfacesView: View {
             .flatMap { $0.ieData.map { IEParser.parse(data: $0) } }
         let mcs = ie?.mcsSummary ?? ""
         let nss = ie?.nssSummary ?? ""
-        if mcs.isEmpty && nss.isEmpty { return "—" }
-        return "MCS \(mcs) / NSS \(nss)"
+        if mcs.isEmpty && nss.isEmpty { return String(localized: "—") }
+        return String(format: String(localized: "MCS %@ / NSS %@"), mcs, nss)
     }
 
     private func kvrLabel(_ wifi: NetworkInterfaceInfo) -> String {

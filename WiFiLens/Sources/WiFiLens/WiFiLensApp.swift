@@ -263,7 +263,7 @@ struct WiFiLensApp: App {
         }
         .commands {
             CommandGroup(after: .toolbar) {
-                Menu("Export") {
+                Menu(String(localized: "Export")) {
                     ForEach(viewModel.bandViewModels, id: \.band.id) { vm in
                         Menu(vm.band.displayName) {
                             Button(String(localized: "PNG")) {
@@ -280,7 +280,7 @@ struct WiFiLensApp: App {
 
                 Divider()
 
-                Button("Freeze All") {
+                Button(String(localized: "Freeze All")) {
                     NotificationCenter.default.post(name: .freezeAllBands, object: nil)
                 }
                 .keyboardShortcut(".", modifiers: [.command])
@@ -296,7 +296,7 @@ struct WiFiLensApp: App {
             }
 
             CommandGroup(after: .appInfo) {
-                Button("Check for Updates…") {
+                Button(String(localized: "Check for Updates…")) {
                     sparkleUpdater.checkForUpdates()
                 }
             }

@@ -191,6 +191,7 @@
 		FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = SOURCE_ROOT; };
 		FBB2CA8B2FC0E14000FC2D2C /* BuildConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildConfig.swift; sourceTree = "<group>"; };
 		FBB2CA8C2FC0E14000FC2D2C /* TitleBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleBadge.swift; sourceTree = "<group>"; };
+		FBB77CDD2FC6BF9800CED0FB /* Default.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Default.xctestplan; sourceTree = "<group>"; };
 		FBD329432FBF0E2F00D01613 /* ChannelQualityCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityCalculatorTests.swift; sourceTree = "<group>"; };
 		FBD329442FBF0E2F00D01613 /* ChannelSpanCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelSpanCalculatorTests.swift; sourceTree = "<group>"; };
 		FBD329452FBF0E2F00D01613 /* IEParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IEParserTests.swift; sourceTree = "<group>"; };
@@ -203,14 +204,6 @@
 		FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdater.swift; sourceTree = "<group>"; };
 		FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		FBB77CDB2FC6B44000CED0FB /* TestPlans */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = TestPlans;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		4371D048741550E4775FC8C7 /* Frameworks */ = {
@@ -493,6 +486,14 @@
 			path = Charts;
 			sourceTree = "<group>";
 		};
+		FBB77CDE2FC6BF9800CED0FB /* TestPlans */ = {
+			isa = PBXGroup;
+			children = (
+				FBB77CDD2FC6BF9800CED0FB /* Default.xctestplan */,
+			);
+			path = TestPlans;
+			sourceTree = "<group>";
+		};
 		FBD329482FBF0E2F00D01613 /* WiFiLensTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -511,7 +512,7 @@
 		FBD329492FBF0E2F00D01613 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				FBB77CDB2FC6B44000CED0FB /* TestPlans */,
+				FBB77CDE2FC6BF9800CED0FB /* TestPlans */,
 				FBD329482FBF0E2F00D01613 /* WiFiLensTests */,
 			);
 			path = Tests;
@@ -759,7 +760,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 122;
+				CURRENT_PROJECT_VERSION = 130;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
@@ -784,7 +785,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -931,7 +932,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 122;
+				CURRENT_PROJECT_VERSION = 130;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
@@ -956,7 +957,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1043,7 +1044,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 122;
+				CURRENT_PROJECT_VERSION = 130;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
@@ -1068,7 +1069,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1167,7 +1168,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 122;
+				CURRENT_PROJECT_VERSION = 130;
 				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
@@ -1192,7 +1193,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens";
 				PRODUCT_NAME = "WiFi Lens";
 				PROVISIONING_PROFILE_SPECIFIER = "";

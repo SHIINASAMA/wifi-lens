@@ -10,21 +10,21 @@ struct LocationPermissionRequiredView: View {
             ProgressView().scaleEffect(1.5)
             switch accessState {
             case .waitingForAuthorization:
-                Text("Waiting for Location Services permission...")
+                Text(String(localized: "Waiting for Location Services permission..."))
                     .foregroundColor(.orange)
-                Button("Open System Settings") {
+                Button(String(localized: "Open System Settings")) {
                     openLocationPreferences()
                 }
             case .denied:
-                Text("Location Services required.")
+                Text(String(localized: "Location Services required."))
                     .foregroundColor(.secondary)
-                Button("Open Location Preferences") {
+                Button(String(localized: "Open Location Preferences")) {
                     openLocationPreferences()
                 }
             default:
-                Text("Location Services required.")
+                Text(String(localized: "Location Services required."))
                     .foregroundColor(.secondary)
-                Button("Open Location Preferences") {
+                Button(String(localized: "Open Location Preferences")) {
                     openLocationPreferences()
                 }
             }

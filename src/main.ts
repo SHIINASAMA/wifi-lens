@@ -1,18 +1,13 @@
 import './style.css'
-import { en as t } from './i18n'
+import i18next, { ready, changeLanguage } from './i18n'
+import type { SupportedLocale } from './i18n'
+import { en } from './i18n/en'
 import { createElement, Star, ChartColumn, CheckCircle, Table, Activity, Layers, Terminal, Lock, Download, Zap, LayoutDashboard, Store } from 'lucide'
 
-const BASE = import.meta.env.BASE_URL
+let lng: SupportedLocale = 'en'
+let t: typeof en = en
 
-// Map demo item title → lucide icon
-const lucideIcons: Record<string, string> = {
-  'overview-dashboard':       'layout-dashboard',
-  'spectrum-scanner':         'chart-column',
-  'channel-quality-analyzer': 'check-circle',
-  '18-column-network-table':  'table',
-  'roaming-test':             'activity',
-  'network-interfaces':       'layers',
-}
+const BASE = import.meta.env.BASE_URL
 
 const iconMap: Record<string, typeof Star> = {
   star: Star, 'layout-dashboard': LayoutDashboard, 'chart-column': ChartColumn,
@@ -48,7 +43,20 @@ function esc(s: string): string {
 
 // ── Render ────────────────────────────────────────────────────
 
-document.getElementById('app')!.innerHTML = /* html */ `
+function resolveLanguage(): SupportedLocale {
+  const lang = i18next.language
+  if (lang?.startsWith('zh')) return 'zh-Hans'
+  if (lang?.startsWith('ja')) return 'ja'
+  return 'en'
+}
+
+function loadTranslation(lang: SupportedLocale) {
+  const data = i18next.getDataByLanguage(lang) as { translation?: typeof en } | undefined
+  t = data?.translation ?? en
+}
+
+function renderAll() {
+  document.getElementById('app')!.innerHTML = /* html */ `
 <div class="page">
 
   ${renderToC()}
@@ -68,102 +76,179 @@ document.getElementById('app')!.innerHTML = /* html */ `
 
 </div>
 `
+}
 
-// Replace <i data-lucide> placeholders with SVG icons
-document.querySelectorAll('[data-lucide]').forEach(el => {
-  try {
-    const name = el.getAttribute('data-lucide')!
-    const icon = iconMap[name]
-    if (!icon) return
-    const svg = createElement(icon)
-    const size = el.classList.contains('w-5') ? '1.25rem' : '0.875rem'
-    svg.setAttribute('width', size)
-    svg.setAttribute('height', size)
-    svg.setAttribute('stroke', 'currentColor')
-    svg.classList.add('shrink-0')
-    el.replaceWith(svg)
-  } catch (_) { /* icon not found, leave placeholder */ }
-})
+function hydrateUI() {
+  // Replace <i data-lucide> placeholders with SVG icons
+  document.querySelectorAll('[data-lucide]').forEach(el => {
+    try {
+      const name = el.getAttribute('data-lucide')!
+      const icon = iconMap[name]
+      if (!icon) return
+      const svg = createElement(icon)
+      const size = el.classList.contains('w-5') ? '1.25rem' : '0.875rem'
+      svg.setAttribute('width', size)
+      svg.setAttribute('height', size)
+      svg.setAttribute('stroke', 'currentColor')
+      svg.classList.add('shrink-0')
+      el.replaceWith(svg)
+    } catch (_) { /* icon not found, leave placeholder */ }
+  })
 
-// ── Scroll reveal ─────────────────────────────────────────────
+  // ── Scroll reveal ─────────────────────────────────────────────
 
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((e) => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible')
-        observer.unobserve(e.target)
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible')
+          observer.unobserve(e.target)
+        }
+      })
+    },
+    { threshold: 0.12 }
+  )
+
+  document.querySelectorAll('.reveal').forEach((el) => observer.observe(el))
+
+  // ── Sidebar ToC ──────────────────────────────────────────────
+
+  const tocLinks = document.querySelectorAll<HTMLAnchorElement>('.toc-link')
+  const tocObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          tocLinks.forEach((l) => l.classList.remove('toc-active'))
+          const id = entry.target.id
+          const link = document.querySelector<HTMLAnchorElement>(`.toc-link[href="#${id}"]`)
+          link?.classList.add('toc-active')
+        }
       }
+    },
+    { rootMargin: '-20% 0px -75% 0px', threshold: 0 }
+  )
+
+  document.querySelectorAll<HTMLElement>('[data-toc]').forEach((el) => tocObserver.observe(el))
+
+  // ── Back to top click ─────────────────────────────────────────
+
+  document.getElementById('back-to-top')!.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  })
+
+  // ── Language switcher ─────────────────────────────────────────
+
+  document.querySelectorAll<HTMLButtonElement>('.lang-option').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const target = btn.dataset.lang as SupportedLocale
+      if (target === lng) return
+      await switchTo(target)
     })
-  },
-  { threshold: 0.12 }
-)
+  })
 
-document.querySelectorAll('.reveal').forEach((el) => observer.observe(el))
+  updateLangIndicator()
+}
 
-// ── Sidebar ToC ──────────────────────────────────────────────
+async function switchTo(target: SupportedLocale) {
+  const scrollY = window.scrollY
+  await changeLanguage(target)
+  lng = target
+  loadTranslation(lng)
+  document.getElementById('html-root')!.setAttribute('lang', lng)
 
-const tocLinks = document.querySelectorAll<HTMLAnchorElement>('.toc-link')
-const tocObserver = new IntersectionObserver(
-  (entries) => {
-    for (const entry of entries) {
-      if (entry.isIntersecting) {
-        tocLinks.forEach((l) => l.classList.remove('toc-active'))
-        const id = entry.target.id
-        const link = document.querySelector<HTMLAnchorElement>(`.toc-link[href="#${id}"]`)
-        link?.classList.add('toc-active')
-      }
+  const app = document.getElementById('app')!
+  app.style.opacity = '0'
+  app.style.transition = 'opacity 100ms ease'
+
+  await new Promise(r => setTimeout(r, 100))
+  renderAll()
+  hydrateUI()
+  window.scrollTo({ top: scrollY, behavior: 'instant' as ScrollBehavior })
+
+  requestAnimationFrame(() => {
+    app.style.opacity = '1'
+  })
+}
+
+function updateLangIndicator() {
+  document.querySelectorAll('.lang-switch').forEach(container => {
+    const active = container.querySelector<HTMLButtonElement>(`.lang-option[data-lang="${lng}"]`)
+    if (!active) return
+    const indicator = container.querySelector<HTMLElement>('.lang-indicator')
+    if (!indicator) return
+    const cr = container.getBoundingClientRect()
+    const ar = active.getBoundingClientRect()
+    indicator.style.left = `${ar.left - cr.left}px`
+    indicator.style.width = `${ar.width}px`
+  })
+}
+
+async function init() {
+  await ready
+  lng = resolveLanguage()
+  loadTranslation(lng)
+  document.getElementById('html-root')!.setAttribute('lang', lng)
+
+  renderAll()
+  hydrateUI()
+
+  // ── Window-level scroll effects ────────────────────────────────
+
+  let lastY = 0
+  window.addEventListener('scroll', () => {
+    const navEl = document.getElementById('nav')
+    if (navEl) {
+      const y = window.scrollY
+      navEl.classList.toggle('nav-scrolled', y > 20)
+      navEl.classList.toggle('nav-hidden', y > lastY && y > 400)
+      lastY = y
     }
-  },
-  { rootMargin: '-20% 0px -75% 0px', threshold: 0 }
-)
 
-document.querySelectorAll<HTMLElement>('[data-toc]').forEach((el) => tocObserver.observe(el))
+    const topBtn = document.getElementById('back-to-top')
+    if (topBtn) {
+      topBtn.classList.toggle('opacity-0', window.scrollY < 500)
+      topBtn.classList.toggle('pointer-events-none', window.scrollY < 500)
+    }
+  }, { passive: true })
 
-// ── Back to top ──────────────────────────────────────────────
+  window.addEventListener('resize', updateLangIndicator, { passive: true })
 
-const topBtn = document.getElementById('back-to-top')!
-window.addEventListener('scroll', () => {
-  topBtn.classList.toggle('opacity-0', window.scrollY < 500)
-  topBtn.classList.toggle('pointer-events-none', window.scrollY < 500)
-})
+  document.fonts.ready.then(updateLangIndicator)
 
-topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }))
+}
 
-// ── Nav scroll effect ─────────────────────────────────────────
-
-const navEl = document.getElementById('nav')!
-let lastY = 0
-window.addEventListener('scroll', () => {
-  const y = window.scrollY
-  navEl.classList.toggle('nav-scrolled', y > 20)
-  navEl.classList.toggle('nav-hidden', y > lastY && y > 400)
-  lastY = y
-})
+init()
 
 // ═══════════════════════════════════════════════════════════════
 // Sidebar ToC
 // ═══════════════════════════════════════════════════════════════
 
 function renderToC() {
-  const short: Record<string, string> = {
-    'overview-dashboard': 'Overview', 'spectrum-scanner': 'Spectrum',
-    'channel-quality-analyzer': 'Channels', '18-column-network-table': 'Table',
-    'roaming-test': 'Roaming', 'network-interfaces': 'Interfaces',
-  }
+  const demoShortLabels = [
+    t.demo.items[0]?.title.replace(/ .*/, '') ?? 'Overview',
+    t.demo.items[1]?.title.replace(/ .*/, '') ?? 'Spectrum',
+    t.demo.items[2]?.title.replace(/ .*/, '') ?? 'Channels',
+    t.demo.items[3]?.title.replace(/ .*/, '') ?? 'Table',
+    t.demo.items[4]?.title.replace(/ .*/, '') ?? 'Roaming',
+    t.demo.items[5]?.title.replace(/ .*/, '') ?? 'Interfaces',
+  ]
+  const demoIcons = [
+    'layout-dashboard', 'chart-column', 'check-circle',
+    'table', 'activity', 'layers',
+  ]
   const items = [
-    { id: 'features', label: 'Features', icon: 'zap' },
-    ...(t.demo.items as readonly { title: string }[]).map(s => {
+    { id: 'features', label: t.nav.features, icon: 'zap' },
+    ...(t.demo.items as readonly { title: string }[]).map((s, i) => {
       const slug = s.title.toLowerCase().replace(/\s+/g, '-')
-      return { id: slug, label: short[slug] ?? s.title, icon: lucideIcons[slug] ?? '' }
+      return { id: slug, label: demoShortLabels[i] ?? s.title, icon: demoIcons[i] ?? '' }
     }),
-    { id: 'mcp', label: 'MCP', icon: 'terminal' },
-    { id: 'privacy', label: 'Privacy', icon: 'lock' },
-    { id: 'download', label: 'Download', icon: 'download' },
+    { id: 'mcp', label: t.nav.mcp, icon: 'terminal' },
+    { id: 'privacy', label: t.nav.privacy, icon: 'lock' },
+    { id: 'download', label: t.nav.download, icon: 'download' },
   ]
 
   return /* html */ `
-  <aside class="toc-sidebar hidden xl:block fixed right-6 top-1/2 -translate-y-1/2 z-40 w-28">
+  <aside class="toc-sidebar hidden xl:block fixed right-6 top-1/2 -translate-y-1/2 z-40 ${lng === 'en' ? 'w-28' : 'w-40'}">
     <nav class="flex flex-col gap-0.5">
       ${items.map(it => /* html */ `
       <a href="#${it.id}" class="toc-link flex items-center gap-2 text-xs text-gray-500 hover:text-gray-200 transition-colors duration-200 py-1 px-3 rounded-lg">${it.icon ? `<i data-lucide="${it.icon}"></i>` : ''}<span>${it.label}</span></a>
@@ -193,6 +278,20 @@ function renderNav() {
         <a href="https://github.com/SHIINASAMA/wifi-lens" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="GitHub">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
         </a>
+        <div class="lang-switch" role="radiogroup" aria-label="Select language">
+          <span class="lang-indicator" aria-hidden="true"></span>
+          <button class="lang-option" role="radio" data-lang="en" aria-checked="${lng === 'en' ? 'true' : 'false'}">EN</button>
+          <button class="lang-option" role="radio" data-lang="zh-Hans" aria-checked="${lng === 'zh-Hans' ? 'true' : 'false'}">中文</button>
+          <button class="lang-option" role="radio" data-lang="ja" aria-checked="${lng === 'ja' ? 'true' : 'false'}">日本語</button>
+        </div>
+      </div>
+      <div class="sm:hidden">
+        <div class="lang-switch" role="radiogroup" aria-label="Select language">
+          <span class="lang-indicator" aria-hidden="true"></span>
+          <button class="lang-option" role="radio" data-lang="en" aria-checked="${lng === 'en' ? 'true' : 'false'}">EN</button>
+          <button class="lang-option" role="radio" data-lang="zh-Hans" aria-checked="${lng === 'zh-Hans' ? 'true' : 'false'}">中文</button>
+          <button class="lang-option" role="radio" data-lang="ja" aria-checked="${lng === 'ja' ? 'true' : 'false'}">日本語</button>
+        </div>
       </div>
     </div>
   </nav>`

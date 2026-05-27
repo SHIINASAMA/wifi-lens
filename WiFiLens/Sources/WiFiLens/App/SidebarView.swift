@@ -37,7 +37,7 @@ enum SidebarPage: String, CaseIterable {
         case .help:       String(localized: "Help")
         case .settings:   String(localized: "Settings")
 #if DEBUG
-        case .debugChart: "Debug Chart"
+        case .debugChart: String(localized: "Debug Chart")
 #endif
         }
     }

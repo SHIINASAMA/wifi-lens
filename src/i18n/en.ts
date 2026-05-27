@@ -7,7 +7,7 @@ export const en = {
     docs: 'Docs',
   },
   hero: {
-    badge: 'macOS 14+  ·  SwiftUI + CoreWLAN',
+    badge: 'macOS 14+  ·  Native  ·  Local-first',
     title: 'WiFi Lens',
     subtitle: 'A native Wi‑Fi analyzer for macOS that helps you spot congestion, diagnose connection quality, and verify roaming behavior in real time.',
     cta: {
@@ -24,8 +24,8 @@ export const en = {
       desc: 'See nearby 2.4 GHz, 5 GHz, and 6 GHz networks update in real time. Zoom, freeze, and compare channel overlap without losing the big picture.',
     },
     table: {
-      title: '18-Column Network Table',
-      desc: 'Inspect every visible network in a dense, sortable table. Filter quickly and jump between table rows and spectrum curves to investigate issues faster.',
+      title: 'Comprehensive Network Table',
+      desc: 'Inspect RSSI, channel, band, security, vendor, and capabilities for every visible network. Sort, filter, and cross-reference rows with the spectrum view while investigating.',
     },
     roaming: {
       title: 'Roaming Test with Timeline',
@@ -70,10 +70,10 @@ export const en = {
         image: '/screenshots/channels.png',
       },
       {
-        title: '18-Column Network Table',
-        alt: 'Sortable network table with Wi-Fi details including RSSI, channel, security, and capabilities',
-        desc: 'Drill into the full list of visible networks with a dense, native table. Sort, filter, and cross-reference rows with the spectrum view while investigating.',
-        bullets: ['18 sortable network columns', 'Match table rows to spectrum curves', 'Filter fast by SSID or BSSID'],
+        title: 'Comprehensive Network Table',
+        alt: 'Sortable network table with Wi-Fi details including RSSI, channel, security, vendor, and capabilities',
+        desc: 'Drill into the full list of visible networks with a dense, native table. Every row exposes signal strength, channel, band, security type, vendor OUI, and 802.11 capabilities.',
+        bullets: ['RSSI, channel, band, and security type', 'Vendor OUI and capability flags', 'Filter fast by SSID or BSSID'],
         image: '/screenshots/table.png',
       },
       {
@@ -93,14 +93,14 @@ export const en = {
     ],
   },
   specs: {
-    title: 'Technical highlights',
+    title: 'What makes it useful',
     items: [
-      { label: 'Scan engine', value: 'CoreWLAN · 1–10 s interval · tri-band' },
-      { label: 'Charts', value: 'SwiftUI Canvas · Gaussian curves · Catmull-Rom splines' },
-      { label: 'Export', value: 'PNG (2x ImageRenderer) · CSV (12 columns)' },
-      { label: 'MCP server', value: 'HTTP on localhost · 3 endpoints · configurable port' },
-      { label: 'Quality model', value: 'Overlap factor × RSSI × width × band · hysteresis' },
-      { label: 'Session format', value: '.wifi-roam JSON · versioned schema' },
+      { label: 'Live scanning', value: 'Real-time updates across 2.4, 5, and 6 GHz — pick any interval from 1 to 10 seconds' },
+      { label: 'Spectrum charts', value: 'Smooth, responsive visualizations that make channel overlap and congestion easy to spot' },
+      { label: 'Export', value: 'Save spectrum screenshots as high-resolution PNGs or export network data as CSV spreadsheets' },
+      { label: 'AI integration', value: 'Let compatible AI tools inspect your local Wi‑Fi environment without sending data to the cloud' },
+      { label: 'Channel scoring', value: 'Smart recommendations that weigh signal strength, overlap, and band width together' },
+      { label: 'Session saving', value: 'Save roaming tests and reopen them later to compare before-and-after results' },
     ],
   },
   mcp: {
@@ -126,7 +126,7 @@ export const en = {
     oss: {
       title: 'WiFi Lens OSS',
       badge: 'Free & Open Source',
-      desc: 'Download the open source build from GitHub Releases, or build it yourself with one xcodebuild command.',
+      desc: 'Download the latest version from GitHub Releases, ready to run on macOS 14 or later.',
       features: [
         'Live tri-band spectrum scanning',
         'Detailed network table and filtering',
@@ -154,8 +154,8 @@ export const en = {
     title: 'Your data stays on your Mac',
     subtitle: 'WiFi Lens is built to be local-first from the ground up. No accounts, no cloud, no surprises.',
     bullets: [
-      'WiFi Lens does not collect, store, or transmit any personal information, usage analytics, or telemetry. There are no third-party analytics, ad networks, or tracking SDKs in the app.',
-      'Location Services: macOS requires this permission for CoreWLAN to expose Wi‑Fi SSID names. WiFi Lens never accesses your coordinates and never logs your location.',
+      'WiFi Lens does not collect, store, or transmit any personal information, usage analytics, or telemetry. There are no third-party analytics, ad networks, or tracking code in the app.',
+      'Location Services: macOS requires this permission to show Wi‑Fi network names. WiFi Lens never accesses your coordinates and never logs your location.',
       'Region detection: channel recommendations use your system locale, hardware-reported channel list, and nearby AP country codes to infer your regulatory domain. This inference runs entirely on-device — no region data is collected or transmitted.',
       'All Wi‑Fi scan results, crash reports, and diagnostic logs remain in files on your own disk. Nothing is uploaded or shared automatically — you control whether to share them.',
     ],
@@ -163,7 +163,7 @@ export const en = {
     oss: 'Source code is open (Apache 2.0). Every data-handling claim above is independently verifiable.',
   },
   footer: {
-    copyright: 'WiFi Lens. Built with SwiftUI, CoreWLAN, and Sparkle.',
+    copyright: '© 2025 WiFi Lens. Understand your Wi‑Fi.',
     x: '@WiFiLens',
     email: 'wifi-lens@outlook.com',
     privacy: 'Privacy',
