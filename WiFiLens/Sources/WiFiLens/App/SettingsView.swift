@@ -17,7 +17,7 @@ struct SettingsView: View {
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
     @AppStorage("appearance") private var appearance: String = "system"
-    @AppStorage("hideTitleBadge") private var hideTitleBadge = false
+    @AppStorage("hideTitleBadge") private var hideTitleBadge = true
 
     init(updater: SparkleUpdater, locationPermission: LocationPermissionManager, bluetoothPermission: BluetoothPermissionManager?) {
         self.updater = updater
@@ -99,14 +99,14 @@ struct SettingsView: View {
                             PermissionStatusBadge(isAuthorized: locationPermission.isAuthorizedForSSID)
                         }
                         Text(String(localized: "settings.permissions.location_desc", comment: "Description of why Location Services is needed"))
-                            .font(.caption)
+                            .font(.callout)
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                         Button(String(localized: "common.action.open_location_settings", comment: "Button to open Location Services settings")) {
                             locationPermission.openLocationPreferences()
                         }
                         .buttonStyle(.borderless)
-                        .font(.caption)
+                        .font(.callout)
                     }
                     .padding(.vertical, 4)
 
@@ -124,14 +124,14 @@ struct SettingsView: View {
                             }
                         }
                         Text(String(localized: "settings.permissions.bluetooth_desc", comment: "Description of why Bluetooth is needed"))
-                            .font(.caption)
+                            .font(.callout)
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                         Button(String(localized: "common.action.open_bluetooth_settings", comment: "Button to open Bluetooth settings")) {
                             bluetoothPermission?.openBluetoothPreferences()
                         }
                         .buttonStyle(.borderless)
-                        .font(.caption)
+                        .font(.callout)
                     }
                     .padding(.vertical, 4)
                 } header: {
@@ -232,9 +232,9 @@ private struct PermissionStatusBadge: View {
         HStack(spacing: 4) {
             Circle()
                 .fill(isAuthorized ? Color.green : Color.orange)
-                .frame(width: 6, height: 6)
+                .frame(width: 8, height: 8)
             Text(isAuthorized ? String(localized: "common.label.granted", comment: "Permission granted status") : String(localized: "common.label.required", comment: "Required status label"))
-                .font(.caption2)
+                .font(.caption)
                 .foregroundColor(.secondary)
         }
     }

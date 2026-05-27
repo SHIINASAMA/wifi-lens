@@ -14,8 +14,8 @@ on:
   workflow_dispatch:
 
 env:
-  DEBUG_CONFIG: Debug-OSS
-  RELEASE_CONFIG: Release-OSS
+  DEBUG_CONFIG: Debug
+  RELEASE_CONFIG: Release
 
 jobs:
   build-and-test:
@@ -31,7 +31,7 @@ jobs:
       - name: Build
         run: |
           xcodebuild -project WiFiLens.xcodeproj \
-            -scheme WiFiLens \
+            -scheme "WiFi Lens" \
             -configuration "$DEBUG_CONFIG" \
             -destination 'platform=macOS' \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
@@ -40,7 +40,7 @@ jobs:
       - name: Test
         run: |
           xcodebuild -project WiFiLens.xcodeproj \
-            -scheme WiFiLens \
+            -scheme "WiFi Lens" \
             -configuration "$DEBUG_CONFIG" \
             -destination 'platform=macOS' \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
@@ -61,7 +61,7 @@ jobs:
       - name: Build Release
         run: |
           xcodebuild -project WiFiLens.xcodeproj \
-            -scheme WiFiLens \
+            -scheme "WiFi Lens" \
             -configuration "$RELEASE_CONFIG" \
             -derivedDataPath .build/DerivedData \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \

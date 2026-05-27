@@ -5764,19 +5764,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Required to scan for nearby BLE devices and measure signal strength for network analysis."
+            "value" : "Bluetooth access allows WiFi Lens to discover nearby BLE devices and analyze their signal strength, helping you identify sources of wireless interference."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "近隣のBLEデバイスをスキャンし、ネットワーク分析のための信号強度を測定するために必要です。"
+            "value" : "Bluetoothアクセスにより、近隣のBLEデバイスを検出して信号強度を分析し、無線干渉の原因特定に役立てることができます。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "扫描附近 BLE 设备并测量信号强度以进行网络分析时需要此权限。"
+            "value" : "蓝牙权限用于发现附近的 BLE 设备并分析其信号强度，帮助您识别无线干扰源。"
           }
         }
       }
@@ -5836,19 +5836,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Required to read Wi-Fi network names (SSID). Without it, network names show as \"n/a\" but signal data is still available."
+            "value" : "WiFi Lens uses Location Services to read Wi-Fi network names (SSIDs). When denied, network names appear as \"n/a\", but signal strength and channel data remain fully available."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wi-Fiネットワーク名（SSID）を取得するために必要です。許可しない場合、ネットワーク名は「n/a」と表示されますが、信号データは引き続き利用できます。"
+            "value" : "WiFi LensはWi-Fiネットワーク名（SSID）の取得に位置情報サービスを使用します。許可しない場合、ネットワーク名は「n/a」と表示されますが、電波強度やチャンネルデータは引き続き利用可能です。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "需要此权限以读取 Wi-Fi 网络名称（SSID）。如果未授予权限，网络名称将显示为“n/a”，但信号数据仍然可用。"
+            "value" : "WiFi Lens 使用位置服务来读取 Wi-Fi 网络名称（SSID）。如果被拒绝，网络名称将显示为 \"n/a\"，但信号强度和信道数据仍然完全可用。"
           }
         }
       }

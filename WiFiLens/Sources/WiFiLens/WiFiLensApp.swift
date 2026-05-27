@@ -17,7 +17,7 @@ private struct AppRootView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var sidebarWidth: CGFloat = 180
     @State private var sidebarCollapsed = false
-    @AppStorage("hideTitleBadge") private var hideTitleBadge = false
+    @AppStorage("hideTitleBadge") private var hideTitleBadge = true
     @State private var visitedPages: Set<SidebarPage> = [.overview]
 
     private var hasLocationAuthorization: Bool {
@@ -179,7 +179,7 @@ private struct AppRootView: View {
             let titleBarY: CGFloat = 9
             let x = sidebarCollapsed ? trafficLightsX : sidebarWidth + sidebarGap
             // ---
-            if selectedPage == .overview, !(BuildConfig.current == .pro && hideTitleBadge) {
+            if selectedPage == .overview, (BuildConfig.current == .oss || !hideTitleBadge) {
                 TitleBadge(config: .current)
                     .padding(.leading, x)
                     .padding(.top, titleBarY)
