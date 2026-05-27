@@ -1,48 +1,22 @@
 # TODO
 
-## Interaction
-
-- [x] Drag-to-zoom on charts
-- [x] Hover tooltip showing SSID / RSSI / channel on chart curves
-- [x] Click curve to select corresponding row in table (reverse of current row→curve highlight)
-- [x] Show/hide individual table columns via context menu
-- [x] Auto-adjust column widths to avoid truncation and wasted space
-- [x] Remember window position and size across launches
-
-## Chart Quality
-
-- [x] Evaluate replacing Canvas hand-drawing with a proper chart framework for native zoom, tooltips, and axis labels (shared Charts/ utilities extracted instead)
-- [x] Verify color contrast and readability in dark mode
-- [x] Signal history trend line (not just live snapshot)
-
-## Data Completeness
-
-- [x] Export all bands at once (single combined CSV / multi-page PNG)
-- [x] Include metadata in CSV export: timestamp, band, PHY mode, channel width, capabilities, hidden SSID flag
-- [x] Persistent scan history / session recording (roaming session save/load as JSON)
-
 ## Feature Depth
 
-- [x] Connection quality score (weighted: RSSI + noise floor + channel congestion + roaming protocol support)
-- [x] Channel occupancy / interference heatmap per band
 - [ ] RSSI threshold alert (notify when a monitored network drops below a configurable threshold)
+- [x] Fix BLEScanner delegate retain cycles — `onDiscover`/`onReady` closures strongly capture `del`, and `stopScanning()` never clears `delegate` or closure properties, leaking the delegate and `AsyncStream.Continuation` on each 30s scan restart
+- [x] Implement JP channel 14 bonus weighting in `RegionInferenceEngine.channelFingerprint()` — the `if domain == .JP && hardwareChannels.contains("1-14")` body is empty (`/* weighted */`), making JP inference fragile (relies on array iteration order instead of signal strength)
 
 ## Product Directions
 
-- [x] Build a real Overview dashboard as the app landing page: current connection health, top channel recommendations, recent scan summary, and quick actions
 - [ ] Unify export into a single reporting flow: multi-band export, richer CSV schema, and session snapshots suitable for sharing/debugging
 - [ ] Replace custom chart hit-testing/zoom/labels with a charting approach that supports hover, selection, and accessibility more naturally
 - [ ] Turn signal history into a first-class session model: persisted timelines, monitored SSIDs, threshold alerts, and historical comparisons
-- [x] Harden MCP into an intentional automation surface: stable response schema, better protocol compatibility, and optional richer analytics endpoints
 - [ ] Add a small verification matrix for UI regressions across light/dark mode, localization, and no-permission / no-data states
 
 ## Engineering
 
-- [x] Extract shared chart infrastructure into `Charts/` (ChartGeometry, splines, grid/axis rendering, time formatting, range selector)
 - [ ] UI / integration tests
-- [x] Retry strategy for CoreWLAN scan failures
-- [x] Crash reporting
-- [x] Structured logging (swift-log → OSLog)
+- [x] Update `docs/ARCHITECTURE.md` Source Layout table with `BLE/` and `Regulatory/` directories
 
 ## Out of Scope (for now)
 

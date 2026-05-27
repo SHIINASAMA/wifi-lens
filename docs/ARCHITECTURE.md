@@ -28,8 +28,10 @@ CoreWLAN scan → WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gau
 | `SignalProcessing/` | RSSI signal smoothing (EMA, Kalman, Hysteresis EMA) |
 | `Table/` | NativeTableView (NSViewRepresentable wrapping NSTableView) |
 | `App/` | OverviewView, SidebarView, SettingsView, Logging, CrashReporter, SparkleUpdater, TitleBadge |
-| `Debug/` | DebugChartView (DEV builds only) |
+| `BLE/` | BLEScanner, BLEDeviceTracker, BLEViewModel, BLEScannerView, BLETrendChartView, BLEAdvertisementEvent |
+| `Debug/` | DebugChartView, DebugRoamingChartView (DEV builds only) |
 | `MCP/` | HTTP server exposing scan data to MCP clients |
+| `Regulatory/` | RegulatoryPipeline, RegulatoryDatabase, RegulatoryFilter, RegionInferenceEngine, ChannelRecommendation |
 | `Utilities/` | Constants, Color extensions, BuildConfig |
 | `Resources/` | Localizable.xcstrings (String Catalog) |
 

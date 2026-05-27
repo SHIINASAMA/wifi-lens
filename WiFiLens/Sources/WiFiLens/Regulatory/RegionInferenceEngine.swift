@@ -169,7 +169,10 @@ enum RegionInferenceEngine {
 
             // Bonus for uniquely-identifying channels
             // JP: channel 14 in 2.4 GHz
-            if domain == .JP && hardwareChannels.contains("1-14") { /* weighted */ }
+            if domain == .JP && hardwareChannels.contains("1-14") {
+                bestScore = score + 0.15
+                bestDomain = domain
+            }
 
             if score > bestScore {
                 bestScore = score

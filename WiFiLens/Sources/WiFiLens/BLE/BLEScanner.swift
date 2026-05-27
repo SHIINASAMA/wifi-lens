@@ -47,13 +47,13 @@ actor BLEScanner {
                 }
             }
 
-            del.onDiscover = { event in
-                del.accumulate(event)
+            del.onDiscover = { [weak del] event in
+                del?.accumulate(event)
             }
 
-            del.onReady = {
-                del.startScan()
-                del.beginActivity()
+            del.onReady = { [weak del] in
+                del?.startScan()
+                del?.beginActivity()
             }
 
             // Start the central manager (triggers onReady when powered on)
@@ -85,6 +85,9 @@ actor BLEScanner {
 
             continuation.onTermination = { _ in
                 streamTask.cancel()
+                del.onStateChange = nil
+                del.onDiscover = nil
+                del.onReady = nil
                 del.stopScan()
                 del.endActivity()
                 del.stop()
@@ -96,6 +99,7 @@ actor BLEScanner {
         shouldStop = true
         delegate?.stopScan()
         delegate?.endActivity()
+        delegate = nil
     }
 
     // MARK: - Private
