@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "BA60A811-D3EA-49B2-8F09-677AA638F4B2",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:WiFiLens.xcodeproj",
+        "identifier" : "32B8DFED1C1CBAD8FD8C797C",
+        "name" : "WiFiLensTests"
+      }
+    }
+  ],
+  "version" : 1
+}

@@ -204,6 +204,14 @@
 		FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		FBB77CDB2FC6B44000CED0FB /* TestPlans */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TestPlans;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		4371D048741550E4775FC8C7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -503,6 +511,7 @@
 		FBD329492FBF0E2F00D01613 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				FBB77CDB2FC6B44000CED0FB /* TestPlans */,
 				FBD329482FBF0E2F00D01613 /* WiFiLensTests */,
 			);
 			path = Tests;
