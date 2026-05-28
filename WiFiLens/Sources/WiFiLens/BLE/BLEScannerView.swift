@@ -1,6 +1,40 @@
 import SwiftUI
 
 struct BLEScannerView: View {
+    let viewModel: BLEViewModel?
+    let bleEnabled: Bool
+
+    var body: some View {
+        if let viewModel {
+            BLEScannerContentView(viewModel: viewModel)
+        } else {
+            BLEDisabledView()
+        }
+    }
+}
+
+private struct BLEDisabledView: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            Spacer()
+            Image(systemName: "antenna.radiowaves.left.and.right.slash")
+                .font(.system(size: 48))
+                .foregroundColor(.secondary)
+            Text(String(localized: "ble.disabled.title", comment: "Title when BLE feature is disabled in settings"))
+                .font(.title3)
+                .multilineTextAlignment(.center)
+            Text(String(localized: "ble.disabled.description", comment: "Description prompting user to enable BLE in settings"))
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal, 24)
+    }
+}
+
+private struct BLEScannerContentView: View {
     @Bindable var viewModel: BLEViewModel
 
     var body: some View {

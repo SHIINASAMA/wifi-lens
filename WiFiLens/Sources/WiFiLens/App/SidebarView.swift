@@ -105,6 +105,7 @@ struct SidebarView: View {
     @Binding var selectedPage: SidebarPage
     var locationManager: LocationPermissionManager
     var isWiFiAvailable: Bool
+    var bleEnabled: Bool
 
     var body: some View {
         List(selection: $selectedPage) {

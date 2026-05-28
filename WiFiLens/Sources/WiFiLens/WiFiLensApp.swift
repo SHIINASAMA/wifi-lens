@@ -6,7 +6,7 @@ import Sparkle
 private struct AppRootView: View {
     @Bindable var viewModel: ScannerViewModel
     @Bindable var roamingViewModel: RoamingTestViewModel
-    @Bindable var bleViewModel: BLEViewModel
+    var bleViewModel: BLEViewModel?
     @Binding var sidebarVisibility: NavigationSplitViewVisibility
     @Binding var selectedPage: SidebarPage
     @Binding var showCrashLog: Bool
@@ -18,6 +18,7 @@ private struct AppRootView: View {
     @State private var sidebarWidth: CGFloat = 180
     @State private var sidebarCollapsed = false
     @AppStorage("hideTitleBadge") private var hideTitleBadge = true
+    @AppStorage("bleEnabled") private var bleEnabled: Bool = false
     @State private var visitedPages: Set<SidebarPage> = [.overview]
 
     private var hasLocationAuthorization: Bool {
@@ -81,7 +82,7 @@ private struct AppRootView: View {
                 }
 
                 if visitedPages.contains(.bleScanner) {
-                    BLEScannerView(viewModel: bleViewModel)
+                    BLEScannerView(viewModel: bleViewModel, bleEnabled: bleEnabled)
                         .opacity(selectedPage == .bleScanner ? 1 : 0)
                         .allowsHitTesting(selectedPage == .bleScanner)
                         .disabled(selectedPage != .bleScanner)
@@ -95,7 +96,7 @@ private struct AppRootView: View {
                 }
 
                 if visitedPages.contains(.settings) {
-                    SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel.bluetoothPermission)
+                    SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel?.bluetoothPermission, bleEnabled: $bleEnabled)
                         .opacity(selectedPage == .settings ? 1 : 0)
                         .allowsHitTesting(selectedPage == .settings)
                         .disabled(selectedPage != .settings)
@@ -115,7 +116,7 @@ private struct AppRootView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: $sidebarVisibility) {
-            SidebarView(selectedPage: $selectedPage, locationManager: viewModel.locationManager, isWiFiAvailable: viewModel.isWiFiAvailable)
+            SidebarView(selectedPage: $selectedPage, locationManager: viewModel.locationManager, isWiFiAvailable: viewModel.isWiFiAvailable, bleEnabled: bleEnabled)
                 .navigationSplitViewColumnWidth(min: 160, ideal: 180)
                 .background(
                     GeometryReader { geo in
@@ -137,10 +138,10 @@ private struct AppRootView: View {
                 for vm in viewModel.allBandViewModels {
                     vm.isViewVisible = spectrumVisible
                 }
-                if newPage == .bleScanner, !bleViewModel.isScanning {
-                    Task { await bleViewModel.startScanning() }
-                } else if newPage != .bleScanner, bleViewModel.isScanning {
-                    bleViewModel.stopScanning()
+                if newPage == .bleScanner, let vm = bleViewModel, !vm.isScanning {
+                    Task { await vm.startScanning() }
+                } else if newPage != .bleScanner, let vm = bleViewModel, vm.isScanning {
+                    vm.stopScanning()
                 }
             }
             .onChange(of: viewModel.wifiPowerState) { _, newState in
@@ -226,15 +227,15 @@ extension Notification.Name {
 struct WiFiLensApp: App {
     @State private var viewModel = ScannerViewModel()
     @State private var roamingViewModel = RoamingTestViewModel()
-    @State private var bleViewModel = BLEViewModel()
+    @State private var bleViewModel: BLEViewModel?
     @State private var sparkleUpdater = SparkleUpdater()
     @State private var sidebarVisibility = NavigationSplitViewVisibility.automatic
     @State private var selectedPage: SidebarPage = .overview
-//    @State private var selectedPage: SidebarPage = .spectrum
     @State private var showCrashLog: Bool = false
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
     @AppStorage("appearance") private var appearance: String = "system"
+    @AppStorage("bleEnabled") private var bleEnabled: Bool = false
 
     init() {
         AppLogger.bootstrap()
@@ -244,6 +245,8 @@ struct WiFiLensApp: App {
             _crashLogText = State(initialValue: log)
             _showCrashLog = State(initialValue: true)
         }
+        let bleOn = UserDefaults.standard.bool(forKey: "bleEnabled")
+        _bleViewModel = State(initialValue: bleOn ? BLEViewModel() : nil)
         AppLogger.app.info("WiFi Lens launched")
     }
 
@@ -266,6 +269,14 @@ struct WiFiLensApp: App {
         }
         .windowResizability(.contentSize)
         .defaultSize(width: 900, height: 550)
+        .onChange(of: bleEnabled) { _, enabled in
+            if enabled {
+                bleViewModel = BLEViewModel()
+            } else {
+                bleViewModel?.stopScanning()
+                bleViewModel = nil
+            }
+        }
         .onChange(of: mcpEnabled) { _, enabled in
             updateMCPServer()
         }

@@ -10,6 +10,8 @@ struct SettingsView: View {
     let updater: SparkleUpdater
     let locationPermission: LocationPermissionManager
     let bluetoothPermission: BluetoothPermissionManager?
+    @Binding var bleEnabled: Bool
+    @Environment(\.scenePhase) private var scenePhase
 
     @State private var autoCheck: Bool
     @AppStorage("scanIntervalSeconds") private var scanInterval: Int = 3
@@ -19,10 +21,11 @@ struct SettingsView: View {
     @AppStorage("appearance") private var appearance: String = "system"
     @AppStorage("hideTitleBadge") private var hideTitleBadge = true
 
-    init(updater: SparkleUpdater, locationPermission: LocationPermissionManager, bluetoothPermission: BluetoothPermissionManager?) {
+    init(updater: SparkleUpdater, locationPermission: LocationPermissionManager, bluetoothPermission: BluetoothPermissionManager?, bleEnabled: Binding<Bool>) {
         self.updater = updater
         self.locationPermission = locationPermission
         self.bluetoothPermission = bluetoothPermission
+        _bleEnabled = bleEnabled
         _autoCheck = State(initialValue: updater.automaticallyChecksForUpdates)
     }
 
@@ -84,10 +87,39 @@ struct SettingsView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
+                // MARK: - Features
+                Section {
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Image(systemName: "antenna.radiowaves.left.and.right")
+                                .foregroundColor(.blue)
+                                .frame(width: 20)
+                            Text(String(localized: "settings.features.ble_label", comment: "Bluetooth analysis feature toggle label"))
+                                .font(.body)
+                            Spacer()
+                            Toggle("", isOn: Binding(
+                                get: { bleEnabled },
+                                set: { newValue in
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        bleEnabled = newValue
+                                    }
+                                }
+                            ))
+                                .labelsHidden()
+                        }
+                        Text(String(localized: "settings.features.ble_description", comment: "Description of Bluetooth analysis feature"))
+                            .font(.callout)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.vertical, 4)
+                } header: {
+                    Text(String(localized: "settings.section.features", comment: "Features subsection header in settings"))
+                }
+
                 // MARK: - Permissions
 
                 Section {
-                    // Location
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
                             Image(systemName: "location.fill")
@@ -98,10 +130,7 @@ struct SettingsView: View {
                             Spacer()
                             PermissionStatusBadge(isAuthorized: locationPermission.isAuthorizedForSSID)
                         }
-                        Text(String(localized: "settings.permissions.location_desc", comment: "Description of why Location Services is needed"))
-                            .font(.callout)
-                            .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
+                        PermissionDescriptionText(String(localized: "settings.permissions.location_desc", comment: "Description of why Location Services is needed"))
                         Button(String(localized: "common.action.open_location_settings", comment: "Button to open Location Services settings")) {
                             locationPermission.openLocationPreferences()
                         }
@@ -110,7 +139,6 @@ struct SettingsView: View {
                     }
                     .padding(.vertical, 4)
 
-                    // Bluetooth
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
                             Image(systemName: "antenna.radiowaves.left.and.right")
@@ -119,24 +147,25 @@ struct SettingsView: View {
                             Text(String(localized: "settings.permissions.bluetooth_label", comment: "Bluetooth permission row label"))
                                 .font(.body)
                             Spacer()
-                            if let bp = bluetoothPermission {
-                                PermissionStatusBadge(isAuthorized: bp.isAuthorized)
-                            }
+                            PermissionStatusBadge(isAuthorized: bluetoothPermission?.isAuthorized ?? false)
+                                .opacity(bluetoothPermission != nil ? 1.0 : 0.5)
                         }
-                        Text(String(localized: "settings.permissions.bluetooth_desc", comment: "Description of why Bluetooth is needed"))
-                            .font(.callout)
-                            .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
+                        PermissionDescriptionText(
+                            String(localized: "settings.permissions.bluetooth_desc", comment: "Description of why Bluetooth is needed")
+                        )
                         Button(String(localized: "common.action.open_bluetooth_settings", comment: "Button to open Bluetooth settings")) {
                             bluetoothPermission?.openBluetoothPreferences()
                         }
                         .buttonStyle(.borderless)
                         .font(.callout)
+                        .disabled(bluetoothPermission == nil)
+                        .opacity(bluetoothPermission == nil ? 0.5 : 1.0)
                     }
                     .padding(.vertical, 4)
                 } header: {
-                    Text(String(localized: "settings.permissions.header", comment: "Permissions settings section header"))
+                    Text(String(localized: "settings.section.permissions", comment: "System permissions subsection header in settings"))
                 }
+                .animation(.easeInOut(duration: 0.3), value: bleEnabled)
 
                 // MARK: - MCP
                 Section {
@@ -224,20 +253,68 @@ struct SettingsView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            refreshPermissionStatuses()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                refreshPermissionStatuses()
+            }
+        }
+    }
+
+    private func refreshPermissionStatuses() {
+        locationPermission.refreshStatus()
+        bluetoothPermission?.refreshStatus()
     }
 }
 
 private struct PermissionStatusBadge: View {
     let isAuthorized: Bool
 
+    private var statusText: String {
+        isAuthorized
+            ? String(localized: "common.label.granted", comment: "Permission granted status")
+            : String(localized: "common.label.required", comment: "Required status label")
+    }
+
     var body: some View {
         HStack(spacing: 4) {
             Circle()
                 .fill(isAuthorized ? Color.green : Color.orange)
                 .frame(width: 8, height: 8)
-            Text(isAuthorized ? String(localized: "common.label.granted", comment: "Permission granted status") : String(localized: "common.label.required", comment: "Required status label"))
+                .animation(.easeInOut(duration: 0.22), value: isAuthorized)
+            ZStack {
+                Text(String(localized: "common.label.granted", comment: "Permission granted status"))
+                    .opacity(isAuthorized ? 1 : 0)
+                Text(String(localized: "common.label.required", comment: "Required status label"))
+                    .opacity(isAuthorized ? 0 : 1)
+            }
                 .font(.caption)
                 .foregroundColor(.secondary)
+                .contentTransition(.opacity)
+                .animation(.easeInOut(duration: 0.22), value: isAuthorized)
         }
+        .accessibilityLabel(statusText)
+    }
+}
+
+private struct PermissionDescriptionText: View {
+    let text: String
+
+    init(_ text: String) {
+        self.text = text
+    }
+
+    var body: some View {
+        ZStack(alignment: .leading) {
+            Text(text)
+                .font(.callout)
+                .foregroundColor(.secondary)
+                .lineLimit(2)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(height: 36, alignment: .topLeading)
     }
 }

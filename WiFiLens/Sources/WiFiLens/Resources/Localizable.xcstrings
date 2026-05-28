@@ -137,6 +137,54 @@
         }
       }
     },
+    "ble.disabled.description" : {
+      "comment" : "Description prompting user to enable BLE in settings",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable Bluetooth Analysis in Settings to scan for nearby devices and monitor signal strength."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定で「Bluetooth分析」を有効にすると、近くのデバイスをスキャンし信号強度を監視できます。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在设置中开启蓝牙分析后，可扫描附近设备并监测信号强度。"
+          }
+        }
+      }
+    },
+    "ble.disabled.title" : {
+      "comment" : "Title when BLE feature is disabled in settings",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth Analysis Disabled"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth分析は無効です"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "蓝牙分析已关闭"
+          }
+        }
+      }
+    },
     "ble.empty.idle" : {
       "comment" : "Empty state prompting user to start scanning",
       "extractionState" : "manual",
@@ -5661,6 +5709,54 @@
         }
       }
     },
+    "settings.features.ble_description" : {
+      "comment" : "Description of Bluetooth analysis feature",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan for nearby Bluetooth devices and analyze signal strength and activity patterns."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "近くのBluetoothデバイスをスキャンし、信号強度とアクティビティパターンを分析します。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "扫描附近的蓝牙设备，分析信号强度和活动模式。"
+          }
+        }
+      }
+    },
+    "settings.features.ble_label" : {
+      "comment" : "Bluetooth analysis feature toggle label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth Analysis"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth分析"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "蓝牙分析"
+          }
+        }
+      }
+    },
     "settings.mcp.claude_config_label" : {
       "comment" : "Label for Claude Desktop config snippet",
       "extractionState" : "manual",
@@ -5801,6 +5897,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "蓝牙权限用于发现附近的 BLE 设备并分析其信号强度，帮助您识别无线干扰源。"
+          }
+        }
+      }
+    },
+    "settings.permissions.bluetooth_disabled_desc" : {
+      "comment" : "Description when Bluetooth permission is unavailable because BLE is disabled",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable Bluetooth Analysis to manage this permission."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この権限を管理するには、Bluetooth分析を有効にしてください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开启蓝牙分析功能后可管理此权限。"
           }
         }
       }
@@ -6281,6 +6401,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "刷新间隔"
+          }
+        }
+      }
+    },
+    "settings.section.features" : {
+      "comment" : "Features subsection header in settings",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Features"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "機能"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "功能"
+          }
+        }
+      }
+    },
+    "settings.section.features_permissions" : {
+      "comment" : "Settings section header for features and permissions",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Features & Permissions"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "機能と権限"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "功能与权限"
+          }
+        }
+      }
+    },
+    "settings.section.permissions" : {
+      "comment" : "System permissions subsection header in settings",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System Permissions"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システム権限"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统权限"
           }
         }
       }
