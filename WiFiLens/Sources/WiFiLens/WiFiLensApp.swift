@@ -160,6 +160,9 @@ private struct AppRootView: View {
         .background(WindowAccessor { window in
             window?.setFrameAutosaveName("WiFiLensMainWindow")
         })
+        .onAppear {
+            visitedPages.insert(selectedPage)
+        }
         .task {
             await viewModel.start()
             updateMCPServer()
