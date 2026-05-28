@@ -26,6 +26,7 @@
 		6680C83EB72E9C488E7F7616 /* BandChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */; };
 		6ACEE4EC462933B7C4320468 /* ChannelBand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4079C5A47F59C655689BCFB8 /* ChannelBand.swift */; };
 		6ECFD8E459A49E4A6FA0FCB0 /* WiFiScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */; };
+		C1D2E3F4A5B6123456780001 /* WiFiPowerMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A1B3C8D4F6123456780001 /* WiFiPowerMonitor.swift */; };
 		6EE067F9A1CC14BACCA0F3DB /* BLERSSISample.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCF8EF1A4D0D355ED657A6 /* BLERSSISample.swift */; };
 		7E778683F723499D93511520 /* RoamingTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F790DC6E08D43C5BD058D96 /* RoamingTestViewModel.swift */; };
 		847B77DBC638404081A7BFC2 /* RoamingRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8367630A1EDF4515917A144A /* RoamingRecord.swift */; };
@@ -89,6 +90,7 @@
 		FB1E32602FC7316C009D1BDC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B31CBEBC05DEA7ADB03FE01 /* ContentView.swift */; };
 		FB1E32612FC7316C009D1BDC /* SparkleUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */; };
 		FB1E32622FC7316C009D1BDC /* LocationPermissionRequiredView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */; };
+		FBD000022FC4000000ABC001 /* WiFiOffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD000002FC4000000ABC001 /* WiFiOffView.swift */; };
 		FB1E32632FC7316C009D1BDC /* FilterPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A7ED53B7BCC8C0A11662151 /* FilterPopoverView.swift */; };
 		FB1E32642FC7316C009D1BDC /* LocationPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69959B95B194A96FA8D337C /* LocationPermissionManager.swift */; };
 		FB1E32652FC7316C009D1BDC /* NativeTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3299502DE1A130760C8A7 /* NativeTableView.swift */; };
@@ -125,6 +127,7 @@
 		FB1E32842FC7316C009D1BDC /* RegionInferenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C72FC4889B0009F29B /* RegionInferenceEngine.swift */; };
 		FB1E32852FC7316C009D1BDC /* RegulatoryPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41D22FC4889B0009F29B /* RegulatoryPipeline.swift */; };
 		FB1E32862FC7316C009D1BDC /* WiFiScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */; };
+		A1B2C3D4E5F6789012340001 /* WiFiPowerMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A1B3C8D4F6123456780001 /* WiFiPowerMonitor.swift */; };
 		FB1E32872FC7316C009D1BDC /* NetworkInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8BB6012FBB07F600FD072E /* NetworkInfoService.swift */; };
 		FB1E32882FC7316C009D1BDC /* ThroughputChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CD2FBCD9B9005F8214 /* ThroughputChartView.swift */; };
 		FB1E32892FC7316C009D1BDC /* InterfacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573BD2FBC22C2005F8214 /* InterfacesView.swift */; };
@@ -167,6 +170,7 @@
 		FB9B7F3E2FC2D9650057B038 /* ChartRendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F372FC2D9650057B038 /* ChartRendering.swift */; };
 		FB9B7F412FC2D9650057B038 /* RangeSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */; };
 		FBAD00012FC400000057B038 /* LocationPermissionRequiredView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */; };
+		FBD000012FC4000000ABC001 /* WiFiOffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD000002FC4000000ABC001 /* WiFiOffView.swift */; };
 		FBB1F0AC2FC61E3D00E9D2C6 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = FBB1F0AB2FC61E3D00E9D2C6 /* Localizable.xcstrings */; };
 		FBB2CA8A2FC0CB7500FC2D2C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */; };
 		FBB2CA8D2FC0E14000FC2D2C /* TitleBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB2CA8C2FC0E14000FC2D2C /* TitleBadge.swift */; };
@@ -210,6 +214,7 @@
 		69F66DB715821EBD11B6D1AA /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 		7B31CBEBC05DEA7ADB03FE01 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiScanner.swift; sourceTree = "<group>"; };
+		E5A1B3C8D4F6123456780001 /* WiFiPowerMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiPowerMonitor.swift; sourceTree = "<group>"; };
 		831E90D5B9D07C478A35DD14 /* WiFiLensApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiLensApp.swift; sourceTree = "<group>"; };
 		8367630A1EDF4515917A144A /* RoamingRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingRecord.swift; sourceTree = "<group>"; };
 		8F405489976429A068F15F86 /* WiFiLensTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WiFiLensTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -272,6 +277,7 @@
 		FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplineInterpolation.swift; sourceTree = "<group>"; };
 		FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSelectorView.swift; sourceTree = "<group>"; };
 		FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermissionRequiredView.swift; sourceTree = "<group>"; };
+		FBD000002FC4000000ABC001 /* WiFiOffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiOffView.swift; sourceTree = "<group>"; };
 		FBB1F0AB2FC61E3D00E9D2C6 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = SOURCE_ROOT; };
 		FBB2CA8B2FC0E14000FC2D2C /* BuildConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildConfig.swift; sourceTree = "<group>"; };
@@ -412,6 +418,7 @@
 			isa = PBXGroup;
 			children = (
 				8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */,
+				E5A1B3C8D4F6123456780001 /* WiFiPowerMonitor.swift */,
 				D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */,
 				B58854CC5BE8A54269614FAD /* WiFiNetwork.swift */,
 				6203A2551742DF77D61785FE /* WiFiChannel.swift */,
@@ -449,6 +456,7 @@
 				FB0573BF2FBC47CC005F8214 /* Logging.swift */,
 				FBD329512FC500000057B038 /* MetricKitManager.swift */,
 				FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */,
+				FBD000002FC4000000ABC001 /* WiFiOffView.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -770,6 +778,7 @@
 				01ABB72FF2349B86A426CC1D /* ContentView.swift in Sources */,
 				FBD7B3492FBAED57002C8F5A /* SparkleUpdater.swift in Sources */,
 				FBAD00012FC400000057B038 /* LocationPermissionRequiredView.swift in Sources */,
+				FBD000012FC4000000ABC001 /* WiFiOffView.swift in Sources */,
 				12AA3A17CCE99E41D313C900 /* FilterPopoverView.swift in Sources */,
 				027A3CECC33E6608D9F53B53 /* LocationPermissionManager.swift in Sources */,
 				3711656F0C3ECD58CA29D407 /* NativeTableView.swift in Sources */,
@@ -782,6 +791,7 @@
 				FB92F9282FBE208500BCEC67 /* DebugRoamingChartView.swift in Sources */,
 				A952EA4DBE85899D61989DF9 /* SSIDColorHasher.swift in Sources */,
 				DA7DEF71C1E8ED4068EB7D66 /* ScannerViewModel.swift in Sources */,
+				C1D2E3F4A5B6123456780001 /* WiFiPowerMonitor.swift in Sources */,
 				FB0573C92FBCD25C005F8214 /* HelpCenterView.swift in Sources */,
 				FB9B7F3B2FC2D9650057B038 /* ChartTimeFormatting.swift in Sources */,
 				FB9B7F3C2FC2D9650057B038 /* ChartGeometry.swift in Sources */,
@@ -861,6 +871,7 @@
 				FB1E32602FC7316C009D1BDC /* ContentView.swift in Sources */,
 				FB1E32612FC7316C009D1BDC /* SparkleUpdater.swift in Sources */,
 				FB1E32622FC7316C009D1BDC /* LocationPermissionRequiredView.swift in Sources */,
+				FBD000022FC4000000ABC001 /* WiFiOffView.swift in Sources */,
 				FB1E32632FC7316C009D1BDC /* FilterPopoverView.swift in Sources */,
 				FB1E32642FC7316C009D1BDC /* LocationPermissionManager.swift in Sources */,
 				FB1E32652FC7316C009D1BDC /* NativeTableView.swift in Sources */,
@@ -873,6 +884,7 @@
 				FB1E326C2FC7316C009D1BDC /* DebugRoamingChartView.swift in Sources */,
 				FB1E326D2FC7316C009D1BDC /* SSIDColorHasher.swift in Sources */,
 				FB1E326E2FC7316C009D1BDC /* ScannerViewModel.swift in Sources */,
+				A1B2C3D4E5F6789012340001 /* WiFiPowerMonitor.swift in Sources */,
 				FB1E326F2FC7316C009D1BDC /* HelpCenterView.swift in Sources */,
 				FB1E32702FC7316C009D1BDC /* ChartTimeFormatting.swift in Sources */,
 				FB1E32712FC7316C009D1BDC /* ChartGeometry.swift in Sources */,

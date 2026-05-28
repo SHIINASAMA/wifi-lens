@@ -7245,6 +7245,54 @@
         }
       }
     },
+    "wifi.off.description" : {
+      "comment" : "Description prompting user to turn on Wi-Fi in System Settings",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn on Wi-Fi in System Settings to start scanning."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システム設定でWi-Fiをオンにしてスキャンを開始してください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请在系统设置中打开 Wi-Fi 以开始扫描。"
+          }
+        }
+      }
+    },
+    "wifi.off.title" : {
+      "comment" : "Title shown when Wi-Fi is turned off",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wi-Fi is turned off"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wi-Fi がオフです"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wi-Fi 已关闭"
+          }
+        }
+      }
+    },
     "wifi.phy_mode.802_11a" : {
       "comment" : "802.11a PHY mode label",
       "extractionState" : "manual",

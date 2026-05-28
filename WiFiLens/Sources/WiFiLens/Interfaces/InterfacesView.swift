@@ -30,34 +30,38 @@ struct InterfacesView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Mode toggle
-            HStack {
-                Picker("", selection: $mode.animation(.bouncy)) {
-                    ForEach(InterfaceViewMode.allCases, id: \.self) { m in
-                        Text(m.displayName).tag(m)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .controlSize(.regular)
-                .frame(width: 240)
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
-
-            if interfaces.isEmpty {
-                Spacer()
-                Image(systemName: "wifi.slash")
-                    .font(.largeTitle)
-                    .foregroundColor(.secondary)
-                Text(String(localized: "interfaces.empty.no_interfaces", comment: "Empty state when no network interfaces exist"))
-                    .foregroundColor(.secondary)
-                Spacer()
-            } else if mode == .simple {
-                dashboardView
-            } else if mode == .monitor {
-                monitorView
+            if !scannerViewModel.isWiFiAvailable {
+                WiFiOffView()
             } else {
-                detailsView
+                // Mode toggle
+                HStack {
+                    Picker("", selection: $mode.animation(.bouncy)) {
+                        ForEach(InterfaceViewMode.allCases, id: \.self) { m in
+                            Text(m.displayName).tag(m)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .controlSize(.regular)
+                    .frame(width: 240)
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+
+                if interfaces.isEmpty {
+                    Spacer()
+                    Image(systemName: "wifi.slash")
+                        .font(.largeTitle)
+                        .foregroundColor(.secondary)
+                    Text(String(localized: "interfaces.empty.no_interfaces", comment: "Empty state when no network interfaces exist"))
+                        .foregroundColor(.secondary)
+                    Spacer()
+                } else if mode == .simple {
+                    dashboardView
+                } else if mode == .monitor {
+                    monitorView
+                } else {
+                    detailsView
+                }
             }
         }
     }

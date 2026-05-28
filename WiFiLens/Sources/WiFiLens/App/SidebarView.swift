@@ -26,6 +26,19 @@ enum SidebarPage: String, CaseIterable {
         }
     }
 
+    var requiresWiFi: Bool {
+        switch self {
+        case .overview, .help, .settings, .bleScanner:
+            false
+        case .spectrum, .channels, .interfaces, .roaming:
+            true
+#if DEBUG
+        case .debugChart:
+            true
+#endif
+        }
+    }
+
     var label: String {
         switch self {
         case .overview:   String(localized: "nav.overview", comment: "Overview sidebar navigation item")

@@ -23,7 +23,8 @@ struct OverviewView: View {
     }
 
     private var totalNetworks: Int {
-        viewModel.bandViewModels.reduce(0) { $0 + $1.renderedAllSeriesData.count }
+        guard viewModel.isWiFiAvailable else { return 0 }
+        return viewModel.bandViewModels.reduce(0) { $0 + $1.renderedAllSeriesData.count }
     }
 
     var body: some View {
@@ -52,7 +53,9 @@ struct OverviewView: View {
                             authorizationCard
                         }
 
-                        if let wifi {
+                        if !viewModel.isWiFiAvailable {
+                            wifiOffCard
+                        } else if let wifi {
                             connectionCard(wifi)
                             signalHealthRow(wifi)
                             diagnosticCard(wifi)
@@ -62,7 +65,7 @@ struct OverviewView: View {
                         } else {
                             noConnectionCard
                         }
-                        if viewModel.locationManager.isAuthorizedForSSID {
+                        if viewModel.locationManager.isAuthorizedForSSID && viewModel.isWiFiAvailable {
                             environmentCard
                         }
                         Spacer(minLength: 0)
@@ -337,6 +340,11 @@ struct OverviewView: View {
         .frame(maxWidth: .infinity)
         .background(Color.primary.opacity(0.04))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var wifiOffCard: some View {
+        WiFiOffView()
+            .padding(.horizontal, 0)
     }
 
     // MARK: - Authorization Card

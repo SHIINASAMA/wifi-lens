@@ -82,6 +82,20 @@ final class RoamingTestViewModel {
         state = .ready
     }
 
+    func handleWiFiPowerStateChange(_ powerState: WiFiPowerState) {
+        switch powerState {
+        case .poweredOn:
+            if !isRunning {
+                checkReadiness()
+            }
+
+        case .poweredOff, .interfaceUnavailable:
+            stopTest()
+            self.state = .idle
+            errorMessage = nil
+        }
+    }
+
     func startTest() {
         guard canStart else { return }
         guard let iface = CWWiFiClient.shared().interface(),

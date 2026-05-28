@@ -14,6 +14,7 @@ enum ChannelViewMode: String, CaseIterable {
 
 struct ChannelQualityView: View {
     let channels: [ChannelRecommendation]
+    let isWiFiAvailable: Bool
     @State private var mode: ChannelViewMode = .simple
     @State private var sortKey: SortKey = .rfScore
     @State private var sortAscending: Bool = false
@@ -46,34 +47,38 @@ struct ChannelQualityView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Mode toggle
-            HStack {
-                Picker("", selection: $mode.animation(.bouncy)) {
-                    ForEach(ChannelViewMode.allCases, id: \.self) { m in
-                        Text(m.displayName).tag(m)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .controlSize(.regular)
-                .frame(width: 160)
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
-
-            regulatoryInfoBanner
-
-            if channels.isEmpty {
-                Spacer()
-                Image(systemName: "antenna.radiowaves.left.and.right.slash")
-                    .font(.largeTitle)
-                    .foregroundColor(.secondary)
-                Text(String(localized: "spectrum.empty.no_channel_data", comment: "Empty state when no channel data exists"))
-                    .foregroundColor(.secondary)
-                Spacer()
-            } else if mode == .simple {
-                simpleList
+            if !isWiFiAvailable {
+                WiFiOffView()
             } else {
-                tableView
+            // Mode toggle
+                HStack {
+                    Picker("", selection: $mode.animation(.bouncy)) {
+                        ForEach(ChannelViewMode.allCases, id: \.self) { m in
+                            Text(m.displayName).tag(m)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .controlSize(.regular)
+                    .frame(width: 160)
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+
+                regulatoryInfoBanner
+
+                if channels.isEmpty {
+                    Spacer()
+                    Image(systemName: "antenna.radiowaves.left.and.right.slash")
+                        .font(.largeTitle)
+                        .foregroundColor(.secondary)
+                    Text(String(localized: "spectrum.empty.no_channel_data", comment: "Empty state when no channel data exists"))
+                        .foregroundColor(.secondary)
+                    Spacer()
+                } else if mode == .simple {
+                    simpleList
+                } else {
+                    tableView
+                }
             }
         }
     }

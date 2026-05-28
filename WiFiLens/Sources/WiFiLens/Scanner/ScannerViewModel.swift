@@ -1,5 +1,6 @@
 import SwiftUI
 import Foundation
+import CoreWLAN
 
 enum ScanAccessState: Equatable {
     case waitingForAuthorization
@@ -48,6 +49,8 @@ final class ScannerViewModel {
     var hiddenBands: Set<String> = []       // band IDs ("24"/"5"/"6") to hide
     var hideHiddenSSIDs: Bool = false       // hide networks with empty SSID
     private(set) var lastNetworks: [WiFiNetwork] = []  // cached for toggle rebuild + MCP
+    let wifiPowerMonitor = WiFiPowerMonitor()
+    var wifiPowerState: WiFiPowerState = .poweredOn
 
     var band24 = BandChartViewModel(band: .band24GHz)
     var band5 = BandChartViewModel(band: .band5GHz)
@@ -57,12 +60,15 @@ final class ScannerViewModel {
     var isScanning = false
     var interfaceName: String = ""
     var accessState: ScanAccessState = .waitingForAuthorization
+    var isWiFiAvailable: Bool { wifiPowerState == .poweredOn }
 
     private var hasStarted = false
     private var startupTask: Task<Void, Never>?
+    private var wifiMonitoringTask: Task<Void, Never>?
 
     init() {
-        mcpServer.dataProvider = { [weak self] in self?.lastNetworks ?? [] }
+        wifiPowerState = wifiPowerMonitor.currentState
+        updateMCPDataProvider()
     }
 
     /// Trigger the Location Services authorization flow:
@@ -153,17 +159,9 @@ final class ScannerViewModel {
             locationManager.requestPermissionIfNeeded()
             locationManager.refreshStatus()
 
-            if locationManager.isAuthorizedForSSID {
-                await startScanningAfterAuth()
-            } else if locationManager.authorizationStatus == .notDetermined {
-                accessState = .waitingForAuthorization
-                AppLogger.scanner.info("start() — waiting for authorization callback")
-            } else {
-                AppLogger.scanner.warning("start() — authorization denied/restricted")
-                accessState = .denied
-                stop()
-                return
-            }
+            // Observe WiFi power state changes — drives scan start/stop
+            startWiFiMonitoring()
+            await reconcileWiFiState(wifiPowerState)
         }
 
         startupTask = task
@@ -173,6 +171,7 @@ final class ScannerViewModel {
 
     private func startScanningAfterAuth() async {
         guard !isScanning else { return }
+        guard wifiPowerState == .poweredOn else { return }
         supportedBands = await scanner.supportedBands()
         AppLogger.scanner.info("start() — supported bands = \(supportedBands.map { $0.id }.sorted())")
         // Fetch device capabilities once for the regulatory pipeline
@@ -189,16 +188,48 @@ final class ScannerViewModel {
     func handleSceneDidBecomeActive() async {
         locationManager.refreshStatus()
         updateInterfaceName()
+        await reconcileWiFiState(wifiPowerMonitor.currentState)
+    }
 
-        if locationManager.isAuthorizedForSSID {
-            if !isScanning {
-                await startScanningAfterAuth()
+    private func startWiFiMonitoring() {
+        guard wifiMonitoringTask == nil else { return }
+
+        wifiMonitoringTask = Task { [weak self] in
+            guard let self else { return }
+            let stream = self.wifiPowerMonitor.events
+            for await state in stream {
+                await self.reconcileWiFiState(state)
             }
-        } else {
+        }
+    }
+
+    private func reconcileWiFiState(_ state: WiFiPowerState) async {
+        wifiPowerState = state
+        updateMCPDataProvider()
+
+        switch state {
+        case .poweredOn:
+            if locationManager.isAuthorizedForSSID {
+                await startScanningAfterAuth()
+            } else if locationManager.authorizationStatus == .notDetermined {
+                accessState = .waitingForAuthorization
+                AppLogger.scanner.info("reconcileWiFiState() — waiting for authorization callback")
+            } else {
+                AppLogger.scanner.warning("reconcileWiFiState() — authorization denied/restricted")
+                accessState = .denied
+                stop()
+            }
+
+        case .poweredOff, .interfaceUnavailable:
             stop()
-            accessState = locationManager.authorizationStatus == .notDetermined
-                ? .waitingForAuthorization
-                : .denied
+        }
+    }
+
+    private func updateMCPDataProvider() {
+        if isWiFiAvailable {
+            mcpServer.dataProvider = { [weak self] in self?.lastNetworks ?? [] }
+        } else {
+            mcpServer.dataProvider = { [] }
         }
     }
 
@@ -229,10 +260,11 @@ final class ScannerViewModel {
                 switch event {
                 case .failure(let message):
                     AppLogger.scanner.error("scan failure: \(message)")
-                    accessState = .scanFailed(message)
+                    if isWiFiAvailable {
+                        accessState = .scanning
+                    }
 
                 case .networks(let networks):
-//                    AppLogger.scanner.info("scan success — \(networks.count) networks")
                     applyNetworks(networks)
                     networkInfo = NetworkInfoService.fetchAll()
                     channelQualities = computeChannelQualities()

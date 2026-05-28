@@ -188,7 +188,6 @@ struct SettingsView: View {
                 }
 
                 // MARK: - Diagnostics
-
                 Section {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(String(localized: "settings.diagnostics.logs_description", comment: "Explanation that logs are local-only, not collected, and under user control"))

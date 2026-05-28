@@ -58,7 +58,7 @@ private struct AppRootView: View {
                 }
 
                 if visitedPages.contains(.channels) {
-                    ChannelQualityView(channels: viewModel.channelRecommendations)
+                    ChannelQualityView(channels: viewModel.channelRecommendations, isWiFiAvailable: viewModel.isWiFiAvailable)
                         .opacity(selectedPage == .channels ? 1 : 0)
                         .allowsHitTesting(selectedPage == .channels)
                         .disabled(selectedPage != .channels)
@@ -72,7 +72,7 @@ private struct AppRootView: View {
                 }
 
                 if visitedPages.contains(.roaming) {
-                    RoamingTestView(viewModel: roamingViewModel)
+                    RoamingTestView(viewModel: roamingViewModel, isWiFiAvailable: viewModel.isWiFiAvailable)
                         .opacity(selectedPage == .roaming ? 1 : 0)
                         .allowsHitTesting(selectedPage == .roaming)
                         .disabled(selectedPage != .roaming)
@@ -141,6 +141,9 @@ private struct AppRootView: View {
                     bleViewModel.stopScanning()
                 }
             }
+            .onChange(of: viewModel.wifiPowerState) { _, newState in
+                roamingViewModel.handleWiFiPowerStateChange(newState)
+            }
             .alert(String(localized: "permission.crash_detected_title", comment: "Alert title when previous crash is detected on launch"), isPresented: $showCrashLog) {
                 Button(String(localized: "common.action.dismiss", comment: "Dismiss/close alert button"), role: .cancel) {}
             } message: {
@@ -165,6 +168,7 @@ private struct AppRootView: View {
         }
         .task {
             await viewModel.start()
+            roamingViewModel.handleWiFiPowerStateChange(viewModel.wifiPowerState)
             updateMCPServer()
         }
         .onChange(of: scenePhase) { _, newPhase in
