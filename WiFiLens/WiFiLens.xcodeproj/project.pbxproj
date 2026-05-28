@@ -1006,8 +1006,8 @@
 				INFOPLIST_KEY_CFBundleIconFile = twa;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens uses Bluetooth to scan nearby devices and analyze wireless environments.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "On macOS 14 Sonoma and Later, Location Services permission is required to get Wi-Fi SSIDs. Please enable Location Services in System Preferences > Security & Privacy > Privacy > Location Services.";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location Services is required to read Wi-Fi network names (SSIDs). Without it, network names appear as \U201Cn/a\U201D but signal strength and channel data remain fully available.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1178,8 +1178,8 @@
 				INFOPLIST_KEY_CFBundleIconFile = twa;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens uses Bluetooth to scan nearby devices and analyze wireless environments.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "On macOS 14 Sonoma and Later, Location Services permission is required to get Wi-Fi SSIDs. Please enable Location Services in System Preferences > Security & Privacy > Privacy > Location Services.";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location Services is required to read Wi-Fi network names (SSIDs). Without it, network names appear as \U201Cn/a\U201D but signal strength and channel data remain fully available.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1223,8 +1223,8 @@
 				INFOPLIST_KEY_CFBundleIconFile = twa;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens uses Bluetooth to scan nearby devices and analyze wireless environments.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "On macOS 14 Sonoma and Later, Location Services permission is required to get Wi-Fi SSIDs. Please enable Location Services in System Preferences > Security & Privacy > Privacy > Location Services.";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location Services is required to read Wi-Fi network names (SSIDs). Without it, network names appear as \U201Cn/a\U201D but signal strength and channel data remain fully available.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1268,8 +1268,8 @@
 				INFOPLIST_KEY_CFBundleIconFile = twa;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens uses Bluetooth to scan nearby devices and analyze wireless environments.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "On macOS 14 Sonoma and Later, Location Services permission is required to get Wi-Fi SSIDs. Please enable Location Services in System Preferences > Security & Privacy > Privacy > Location Services.";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location Services is required to read Wi-Fi network names (SSIDs). Without it, network names appear as \U201Cn/a\U201D but signal strength and channel data remain fully available.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

@@ -2,10 +2,10 @@
   "sourceLanguage" : "en",
   "strings" : {
     "—" : {
-
+      "shouldTranslate" : false
     },
     "·" : {
-
+      "shouldTranslate" : false
     },
     "·  %@  ·  Ch %@" : {
       "localizations" : {
@@ -15,16 +15,14 @@
             "value" : "·  %1$@  ·  Ch %2$@"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "· %@" : {
-
-    },
-    "{\"mcpServers\":{\"wifi-lens\":{\"command\":\"WiFiLensMCP\",\"args\":[\"%@\"]}}}" : {
-
+      "shouldTranslate" : false
     },
     "%@" : {
-
+      "shouldTranslate" : false
     },
     "%@ — %@" : {
       "localizations" : {
@@ -34,7 +32,8 @@
             "value" : "%1$@ — %2$@"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "%@ %@" : {
       "localizations" : {
@@ -44,7 +43,8 @@
             "value" : "%1$@ %2$@"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "%@ %@%@" : {
       "localizations" : {
@@ -54,16 +54,17 @@
             "value" : "%1$@ %2$@%3$@"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "%@ dBm" : {
-
+      "shouldTranslate" : false
     },
     "%@/100" : {
-
+      "shouldTranslate" : false
     },
     "0" : {
-
+      "shouldTranslate" : false
     },
     "ble.control.start_scanning" : {
       "comment" : "Button to start BLE scanning",
@@ -810,7 +811,7 @@
       }
     },
     "Ch %@" : {
-
+      "shouldTranslate" : false
     },
     "CH %@  %@ dBm" : {
       "localizations" : {
@@ -820,7 +821,8 @@
             "value" : "CH %1$@  %2$@ dBm"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "channels.badge.current" : {
       "comment" : "Dot badge marking current channel",
@@ -1824,7 +1826,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "加载"
           }
         }
@@ -2088,7 +2090,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "保存"
           }
         }
@@ -2974,7 +2976,8 @@
             "value" : "·  %1$@  ·  Ch %2$@"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "format.channel_rssi" : {
       "comment" : "Channel number and RSSI in tooltip",
@@ -2992,7 +2995,8 @@
             "value" : "CH %1$@  %2$@ dBm"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "format.channel_short" : {
       "comment" : "Channel number short format",
@@ -3004,13 +3008,20 @@
             "value" : "Ch %@"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "format.claude_config_json" : {
       "comment" : "Claude Desktop MCP config JSON template",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "{\"mcpServers\":{\"wifi-lens\":{\"command\":\"WiFiLensMCP\",\"args\":[\"%@\"]}}}"
+          }
+        },
+        "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "{\"mcpServers\":{\"wifi-lens\":{\"command\":\"WiFiLensMCP\",\"args\":[\"%@\"]}}}"
@@ -3040,7 +3051,8 @@
             "value" : "· %@"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "format.label_dash_value" : {
       "comment" : "Two-part label separated by em dash",
@@ -3052,7 +3064,8 @@
             "value" : "%1$@ — %2$@"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "format.label_space_value" : {
       "comment" : "Two-part label separated by space",
@@ -3064,7 +3077,8 @@
             "value" : "%1$@ %2$@"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "format.label_space_value_no_space" : {
       "comment" : "Three-part concatenated label",
@@ -3148,7 +3162,8 @@
             "value" : "%@"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "format.rssi_dbm" : {
       "comment" : "RSSI value with dBm unit",
@@ -3184,7 +3199,8 @@
             "value" : "RSSI %@ dBm"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "format.sample_count" : {
       "comment" : "Sample count with number",
@@ -5124,7 +5140,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "加载会话失败"
           }
         }
@@ -5172,7 +5188,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "保存会话失败"
           }
         }
@@ -5220,7 +5236,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "加载漫游会话"
           }
         }
@@ -5244,7 +5260,7 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "保存漫游会话"
           }
         }
@@ -5491,7 +5507,7 @@
       }
     },
     "RSSI %@ dBm" : {
-
+      "shouldTranslate" : false
     },
     "settings.app.description" : {
       "comment" : "Short app description in Settings",
@@ -5661,30 +5677,6 @@
         }
       }
     },
-    "settings.diagnostics.logs_description" : {
-      "comment" : "Explanation that logs are stored locally, never collected, and under user control",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diagnostic logs are stored locally on your device. WiFi Lens never collects, uploads, or shares them. You are free to review, share, or delete these logs at any time."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "診断ログはお使いのデバイスにのみ保存されます。WiFi Lensがこれらを収集・アップロード・共有することは一切ありません。ログの確認、共有、削除はいつでも自由に行えます。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "诊断日志仅存储在您的设备本地。WiFi Lens 不会收集、上传或分享这些日志。您可以随时自由查看、分享或删除它们。"
-          }
-        }
-      }
-    },
     "settings.diagnostics.header" : {
       "comment" : "Diagnostics settings section header",
       "extractionState" : "manual",
@@ -5709,6 +5701,30 @@
         }
       }
     },
+    "settings.diagnostics.logs_description" : {
+      "comment" : "Explanation that logs are stored locally, never collected, and under user control",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagnostic logs are stored locally on your device. WiFi Lens never collects, uploads, or shares them. You are free to review, share, or delete these logs at any time."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "診断ログはお使いのデバイスにのみ保存されます。WiFi Lensがこれらを収集・アップロード・共有することは一切ありません。ログの確認、共有、削除はいつでも自由に行えます。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "诊断日志仅存储在您的设备本地。WiFi Lens 不会收集、上传或分享这些日志。您可以随时自由查看、分享或删除它们。"
+          }
+        }
+      }
+    },
     "settings.features.ble_description" : {
       "comment" : "Description of Bluetooth analysis feature",
       "extractionState" : "manual",
@@ -5716,19 +5732,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scan for nearby Bluetooth devices and analyze signal strength and activity patterns."
+            "value" : "Scan for nearby Bluetooth devices and analyze signal strength and activity patterns. Disabled by default."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "近くのBluetoothデバイスをスキャンし、信号強度とアクティビティパターンを分析します。"
+            "value" : "近隣のBluetoothデバイスをスキャンし、信号強度とアクティビティパターンを分析します。デフォルトでは無効です。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "扫描附近的蓝牙设备，分析信号强度和活动模式。"
+            "value" : "扫描附近的蓝牙设备，分析信号强度和活动模式。默认关闭。"
           }
         }
       }
@@ -5884,19 +5900,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bluetooth access allows WiFi Lens to discover nearby BLE devices and analyze their signal strength, helping you identify sources of wireless interference."
+            "value" : "Only requested when Bluetooth Analysis is enabled. Allows discovering nearby BLE devices and analyzing their signal strength."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bluetoothアクセスにより、近隣のBLEデバイスを検出して信号強度を分析し、無線干渉の原因特定に役立てることができます。"
+            "value" : "Bluetooth分析の有効時のみ要求されます。近隣のBLEデバイスの検出と信号強度の分析を可能にします。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "蓝牙权限用于发现附近的 BLE 设备并分析其信号强度，帮助您识别无线干扰源。"
+            "value" : "仅在开启蓝牙分析时请求。用于发现附近的 BLE 设备并分析其信号强度。"
           }
         }
       }
@@ -6895,7 +6911,8 @@
             "value" : "—"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "symbol.middle_dot" : {
       "comment" : "Middle dot separator",
@@ -6931,7 +6948,8 @@
             "value" : "0"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "table.column.bandwidth" : {
       "comment" : "Channel bandwidth column header",

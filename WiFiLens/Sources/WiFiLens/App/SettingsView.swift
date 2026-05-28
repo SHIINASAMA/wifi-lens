@@ -134,7 +134,7 @@ struct SettingsView: View {
                         Button(String(localized: "common.action.open_location_settings", comment: "Button to open Location Services settings")) {
                             locationPermission.openLocationPreferences()
                         }
-                        .buttonStyle(.borderless)
+                        .buttonStyle(.link)
                         .font(.callout)
                     }
                     .padding(.vertical, 4)
@@ -156,7 +156,7 @@ struct SettingsView: View {
                         Button(String(localized: "common.action.open_bluetooth_settings", comment: "Button to open Bluetooth settings")) {
                             bluetoothPermission?.openBluetoothPreferences()
                         }
-                        .buttonStyle(.borderless)
+                        .buttonStyle(.link)
                         .font(.callout)
                         .disabled(bluetoothPermission == nil)
                         .opacity(bluetoothPermission == nil ? 0.5 : 1.0)
@@ -186,7 +186,7 @@ struct SettingsView: View {
                         Text(String(localized: "settings.mcp.claude_config_label", comment: "Label for Claude Desktop config snippet"))
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        Text(#"{"mcpServers":{"wifi-lens":{"command":"WiFiLensMCP","args":["\#(mcpPort)"]}}}"#)
+                        Text(String(format: String(localized: "format.claude_config_json", comment: "Claude Desktop MCP config JSON template"), mcpPort))
                             .font(.system(size: 10, design: .monospaced))
                             .foregroundColor(.secondary)
                             .textSelection(.enabled)
@@ -307,14 +307,10 @@ private struct PermissionDescriptionText: View {
     }
 
     var body: some View {
-        ZStack(alignment: .leading) {
-            Text(text)
-                .font(.callout)
-                .foregroundColor(.secondary)
-                .lineLimit(2)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .frame(height: 36, alignment: .topLeading)
+        Text(text)
+            .font(.callout)
+            .foregroundColor(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

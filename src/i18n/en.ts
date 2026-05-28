@@ -159,7 +159,7 @@ export const en = {
     },
     permissions: {
       heading: 'Why We Request Permissions',
-      body: 'Wi‑Fi — Core functionality: scanning and analyzing nearby wireless networks.\n\nBluetooth — Used to discover nearby Bluetooth devices for coexistence analysis. All discovery runs locally on your machine.\n\nLocation Services — macOS requires this permission for any app that reads Wi‑Fi network names (SSIDs). WiFi Lens never accesses your GPS coordinates and never logs your location.',
+      body: 'Wi‑Fi — Core functionality: scanning and analyzing nearby wireless networks.\n\nBluetooth — Optionally used to discover nearby BLE devices for coexistence analysis. This feature is disabled by default and can be enabled in Settings. All discovery runs locally on your machine.\n\nLocation Services — macOS requires this permission for any app that reads Wi‑Fi network names (SSIDs). WiFi Lens never accesses your GPS coordinates and never logs your location.',
     },
     localOnly: {
       heading: 'Everything Stays on Your Machine',
