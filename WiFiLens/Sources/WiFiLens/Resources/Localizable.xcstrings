@@ -3018,19 +3018,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "{\"mcpServers\":{\"wifi-lens\":{\"command\":\"WiFiLensMCP\",\"args\":[\"%@\"]}}}"
+            "value" : "{\"mcpServers\":{\"wifi-lens\":{\"command\":\"WiFiLensMCP\",\"args\":[\"%ld\"]}}}"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "{\"mcpServers\":{\"wifi-lens\":{\"command\":\"WiFiLensMCP\",\"args\":[\"%@\"]}}}"
+            "value" : "{\"mcpServers\":{\"wifi-lens\":{\"command\":\"WiFiLensMCP\",\"args\":[\"%ld\"]}}}"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "{\"mcpServers\":{\"wifi-lens\":{\"command\":\"WiFiLensMCP\",\"args\":[\"%@\"]}}}"
+            "value" : "{\"mcpServers\":{\"wifi-lens\":{\"command\":\"WiFiLensMCP\",\"args\":[\"%ld\"]}}}"
           }
         }
       }
