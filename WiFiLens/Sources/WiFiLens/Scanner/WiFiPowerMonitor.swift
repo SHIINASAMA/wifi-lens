@@ -9,11 +9,6 @@ enum WiFiPowerState: Sendable {
 
 @MainActor
 final class WiFiPowerMonitor: NSObject, CWEventDelegate {
-    private enum StateChangeSource: String {
-        case callback = "system callback"
-        case polling = "polling fallback"
-    }
-
     private var continuation: AsyncStream<WiFiPowerState>.Continuation?
     private var pollingTask: Task<Void, Never>?
     private(set) var currentState: WiFiPowerState = .poweredOn
@@ -29,7 +24,7 @@ final class WiFiPowerMonitor: NSObject, CWEventDelegate {
         super.init()
         CWWiFiClient.shared().delegate = self
         try? CWWiFiClient.shared().startMonitoringEvent(with: .powerDidChange)
-        refreshState(source: .callback)
+        refreshState()
         startPolling()
     }
 
@@ -38,7 +33,7 @@ final class WiFiPowerMonitor: NSObject, CWEventDelegate {
         try? CWWiFiClient.shared().stopMonitoringEvent(with: .powerDidChange)
     }
 
-    private func refreshState(source: StateChangeSource) {
+    func refreshState() {
         let previous = currentState
         if let iface = CWWiFiClient.shared().interface() {
             currentState = iface.powerOn() ? .poweredOn : .poweredOff
@@ -46,21 +41,23 @@ final class WiFiPowerMonitor: NSObject, CWEventDelegate {
             currentState = .interfaceUnavailable
         }
         if currentState != previous {
-            AppLogger.scanner.info("WiFi power state changed [\(source.rawValue)]: \(previous.logLabel) -> \(currentState.logLabel)")
+            AppLogger.scanner.info("WiFi power state changed: \(previous.logLabel) -> \(currentState.logLabel)")
             continuation?.yield(currentState)
         }
     }
 
+    /// Low-frequency polling as safety net — CoreWLAN callbacks can occasionally miss events
+    /// when the user toggles WiFi rapidly from the menu bar.
     private func startPolling() {
         guard pollingTask == nil else { return }
 
         pollingTask = Task { [weak self] in
             guard let self else { return }
             while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(1))
+                try? await Task.sleep(for: .seconds(5))
                 guard !Task.isCancelled else { break }
                 await MainActor.run {
-                    self.refreshState(source: .polling)
+                    self.refreshState()
                 }
             }
         }
@@ -70,7 +67,7 @@ final class WiFiPowerMonitor: NSObject, CWEventDelegate {
 
     nonisolated func powerStateDidChangeForWiFiInterface(withName interfaceName: String) {
         Task { @MainActor in
-            refreshState(source: .callback)
+            refreshState()
         }
     }
 }

@@ -104,6 +104,7 @@ private struct BluetoothIconShape: Shape {
 struct SidebarView: View {
     @Binding var selectedPage: SidebarPage
     var locationManager: LocationPermissionManager
+    var isWiFiAvailable: Bool
 
     var body: some View {
         List(selection: $selectedPage) {
@@ -121,9 +122,13 @@ struct SidebarView: View {
                                 .frame(width: 16, height: 16)
                         })
                             .tag(page)
+                            .disabled(page.requiresWiFi && !isWiFiAvailable)
+                            .opacity(page.requiresWiFi && !isWiFiAvailable ? 0.4 : 1.0)
                     } else {
                         Label(page.label, systemImage: page.icon)
                             .tag(page)
+                            .disabled(page.requiresWiFi && !isWiFiAvailable)
+                            .opacity(page.requiresWiFi && !isWiFiAvailable ? 0.4 : 1.0)
                     }
                 }
 #if DEBUG

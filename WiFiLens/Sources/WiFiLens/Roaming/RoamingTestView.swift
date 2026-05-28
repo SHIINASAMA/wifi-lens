@@ -48,27 +48,22 @@ private let timeFormatter: DateComponentsFormatter = {
 
 struct RoamingTestView: View {
     @Bindable var viewModel: RoamingTestViewModel
-    let isWiFiAvailable: Bool
 
     var body: some View {
         VStack(spacing: 0) {
-            if !isWiFiAvailable {
-                WiFiOffView()
-            } else if !viewModel.isPortable {
+            if !viewModel.isPortable {
                 nonPortableWarning
             }
 
-            if isWiFiAvailable {
-                switch viewModel.state {
-                case .idle:
-                    idleState
-                case .ready, .running, .stopped:
-                    runningContent
-                }
+            switch viewModel.state {
+            case .idle:
+                idleState
+            case .ready, .running, .stopped:
+                runningContent
             }
         }
         .task {
-            if isWiFiAvailable, viewModel.state == .idle {
+            if viewModel.state == .idle {
                 viewModel.checkReadiness()
             }
         }

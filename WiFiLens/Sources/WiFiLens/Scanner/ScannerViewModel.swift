@@ -161,7 +161,7 @@ final class ScannerViewModel {
 
             // Observe WiFi power state changes — drives scan start/stop
             startWiFiMonitoring()
-            await reconcileWiFiState(wifiPowerState)
+            reconcileWiFiState(wifiPowerState)
         }
 
         startupTask = task
@@ -188,7 +188,8 @@ final class ScannerViewModel {
     func handleSceneDidBecomeActive() async {
         locationManager.refreshStatus()
         updateInterfaceName()
-        await reconcileWiFiState(wifiPowerMonitor.currentState)
+        wifiPowerMonitor.refreshState()
+        reconcileWiFiState(wifiPowerMonitor.currentState)
     }
 
     private func startWiFiMonitoring() {
@@ -198,19 +199,19 @@ final class ScannerViewModel {
             guard let self else { return }
             let stream = self.wifiPowerMonitor.events
             for await state in stream {
-                await self.reconcileWiFiState(state)
+                self.reconcileWiFiState(state)
             }
         }
     }
 
-    private func reconcileWiFiState(_ state: WiFiPowerState) async {
+    private func reconcileWiFiState(_ state: WiFiPowerState) {
         wifiPowerState = state
         updateMCPDataProvider()
 
         switch state {
         case .poweredOn:
             if locationManager.isAuthorizedForSSID {
-                await startScanningAfterAuth()
+                Task { await startScanningAfterAuth() }
             } else if locationManager.authorizationStatus == .notDetermined {
                 accessState = .waitingForAuthorization
                 AppLogger.scanner.info("reconcileWiFiState() — waiting for authorization callback")
@@ -246,6 +247,16 @@ final class ScannerViewModel {
             let stream = await scanner.startScanning(interval: interval)
             for await event in stream {
                 guard !Task.isCancelled else { break }
+
+                // Guard: stop scanning immediately if WiFi was turned off.
+                // CoreWLAN callbacks handle the common case; this covers missed events.
+                wifiPowerMonitor.refreshState()
+                guard isWiFiAvailable else {
+                    AppLogger.scanner.info("startScanLoop() — WiFi unavailable, stopping")
+                    stop()
+                    break
+                }
+
                 locationManager.refreshStatus()
 
                 if !locationManager.isAuthorizedForSSID {

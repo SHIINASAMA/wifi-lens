@@ -22,11 +22,7 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            if viewModel.isWiFiAvailable {
-                dashboardContent
-            } else {
-                WiFiOffView()
-            }
+            dashboardContent
         }
         .frame(minWidth: 700, idealWidth: 1000, minHeight: 600)
         .onChange(of: viewModel.hiddenBands) { _, _ in viewModel.applyGlobalFilterToBands() }

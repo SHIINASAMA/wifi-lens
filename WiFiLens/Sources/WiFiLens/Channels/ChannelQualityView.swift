@@ -14,7 +14,6 @@ enum ChannelViewMode: String, CaseIterable {
 
 struct ChannelQualityView: View {
     let channels: [ChannelRecommendation]
-    let isWiFiAvailable: Bool
     @State private var mode: ChannelViewMode = .simple
     @State private var sortKey: SortKey = .rfScore
     @State private var sortAscending: Bool = false
@@ -47,11 +46,8 @@ struct ChannelQualityView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            if !isWiFiAvailable {
-                WiFiOffView()
-            } else {
             // Mode toggle
-                HStack {
+            HStack {
                     Picker("", selection: $mode.animation(.bouncy)) {
                         ForEach(ChannelViewMode.allCases, id: \.self) { m in
                             Text(m.displayName).tag(m)
@@ -79,7 +75,6 @@ struct ChannelQualityView: View {
                 } else {
                     tableView
                 }
-            }
         }
     }
 

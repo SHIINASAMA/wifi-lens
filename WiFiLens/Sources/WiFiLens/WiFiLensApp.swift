@@ -35,6 +35,8 @@ private struct AppRootView: View {
                 accessState: viewModel.accessState,
                 openLocationPreferences: viewModel.locationManager.openLocationPreferences
             )
+        } else if selectedPage.requiresWiFi && !viewModel.isWiFiAvailable {
+            WiFiOffView()
         } else {
             ZStack {
                 if visitedPages.contains(.overview) {
@@ -58,7 +60,7 @@ private struct AppRootView: View {
                 }
 
                 if visitedPages.contains(.channels) {
-                    ChannelQualityView(channels: viewModel.channelRecommendations, isWiFiAvailable: viewModel.isWiFiAvailable)
+                    ChannelQualityView(channels: viewModel.channelRecommendations)
                         .opacity(selectedPage == .channels ? 1 : 0)
                         .allowsHitTesting(selectedPage == .channels)
                         .disabled(selectedPage != .channels)
@@ -72,7 +74,7 @@ private struct AppRootView: View {
                 }
 
                 if visitedPages.contains(.roaming) {
-                    RoamingTestView(viewModel: roamingViewModel, isWiFiAvailable: viewModel.isWiFiAvailable)
+                    RoamingTestView(viewModel: roamingViewModel)
                         .opacity(selectedPage == .roaming ? 1 : 0)
                         .allowsHitTesting(selectedPage == .roaming)
                         .disabled(selectedPage != .roaming)
@@ -113,7 +115,7 @@ private struct AppRootView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: $sidebarVisibility) {
-            SidebarView(selectedPage: $selectedPage, locationManager: viewModel.locationManager)
+            SidebarView(selectedPage: $selectedPage, locationManager: viewModel.locationManager, isWiFiAvailable: viewModel.isWiFiAvailable)
                 .navigationSplitViewColumnWidth(min: 160, ideal: 180)
                 .background(
                     GeometryReader { geo in

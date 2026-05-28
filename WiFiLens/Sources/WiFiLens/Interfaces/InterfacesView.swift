@@ -30,11 +30,8 @@ struct InterfacesView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            if !scannerViewModel.isWiFiAvailable {
-                WiFiOffView()
-            } else {
-                // Mode toggle
-                HStack {
+            // Mode toggle
+            HStack {
                     Picker("", selection: $mode.animation(.bouncy)) {
                         ForEach(InterfaceViewMode.allCases, id: \.self) { m in
                             Text(m.displayName).tag(m)
@@ -62,7 +59,6 @@ struct InterfacesView: View {
                 } else {
                     detailsView
                 }
-            }
         }
     }
 
