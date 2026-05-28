@@ -190,11 +190,14 @@ struct SettingsView: View {
                 // MARK: - Diagnostics
 
                 Section {
-                    HStack {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(String(localized: "settings.diagnostics.logs_description", comment: "Explanation that logs are local-only, not collected, and under user control"))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
                         Button(String(localized: "common.action.reveal_logs", comment: "Button to reveal log files in Finder")) {
                             AppLogger.revealInFinder()
                         }
-                        Spacer()
                     }
                 } header: {
                     Text(String(localized: "settings.diagnostics.header", comment: "Diagnostics settings section header"))

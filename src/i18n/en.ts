@@ -177,7 +177,7 @@ export const en = {
     contact: 'Questions? Open a GitHub Issue or reach us at wifi-lens@outlook.com',
   },
   footer: {
-    copyright: '© 2025 WiFi Lens. Understand your Wi‑Fi.',
+    copyright: '© 2026 WiFi Lens. Understand your Wi‑Fi.',
     x: '@WiFiLens',
     email: 'wifi-lens@outlook.com',
     privacy: 'Privacy',

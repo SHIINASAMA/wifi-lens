@@ -284,7 +284,7 @@ struct RoamingTestView: View {
                     Image(systemName: "arrow.triangle.swap")
                         .font(.title2)
                         .foregroundColor(.secondary.opacity(0.5))
-                    Text(String(localized: viewModel.isRunning ? "Waiting for AP transitions..." : "No AP transitions detected"))
+                    Text(String(localized: viewModel.isRunning ? "roaming.state.waiting" : "roaming.state.no_transitions"))
                         .font(.callout)
                         .foregroundColor(.secondary)
                     Spacer()

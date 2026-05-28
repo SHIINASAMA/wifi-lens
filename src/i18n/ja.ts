@@ -177,7 +177,7 @@ export const ja = {
     contact: 'ご質問は？GitHub Issueを作成するか、wifi-lens@outlook.com までご連絡ください。',
   },
   footer: {
-    copyright: '© 2025 WiFi Lens — Wi‑Fiを可視化する。',
+    copyright: '© 2026 WiFi Lens — Wi‑Fiを可視化する。',
     x: '@WiFiLens',
     email: 'wifi-lens@outlook.com',
     privacy: 'プライバシー',

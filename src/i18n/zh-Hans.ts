@@ -177,7 +177,7 @@ export const zhHans = {
     contact: '有问题？在 GitHub 提交 Issue 或发送邮件至 wifi-lens@outlook.com',
   },
   footer: {
-    copyright: '© 2025 WiFi Lens — 洞悉你的 Wi‑Fi。',
+    copyright: '© 2026 WiFi Lens — 洞悉你的 Wi‑Fi。',
     x: '@WiFiLens',
     email: 'wifi-lens@outlook.com',
     privacy: '隐私',

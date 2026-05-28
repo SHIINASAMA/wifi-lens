@@ -5613,6 +5613,30 @@
         }
       }
     },
+    "settings.diagnostics.logs_description" : {
+      "comment" : "Explanation that logs are stored locally, never collected, and under user control",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagnostic logs are stored locally on your device. WiFi Lens never collects, uploads, or shares them. You are free to review, share, or delete these logs at any time."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "診断ログはお使いのデバイスにのみ保存されます。WiFi Lensがこれらを収集・アップロード・共有することは一切ありません。ログの確認、共有、削除はいつでも自由に行えます。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "诊断日志仅存储在您的设备本地。WiFi Lens 不会收集、上传或分享这些日志。您可以随时自由查看、分享或删除它们。"
+          }
+        }
+      }
+    },
     "settings.diagnostics.header" : {
       "comment" : "Diagnostics settings section header",
       "extractionState" : "manual",
