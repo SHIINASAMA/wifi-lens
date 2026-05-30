@@ -148,9 +148,14 @@ enum ChannelQualityCalculator {
         for band in supportedBands.sorted() {
             let bandAPs = aps.filter { $0.band == band }
 
-            let channels = band == "24"
-                ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
-                : stride(from: band == "5" ? 36 : 1, through: band == "5" ? 165 : 233, by: 4).map { $0 }
+            let channels: [Int] = {
+                switch band {
+                case "24": return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+                case "5":  return stride(from: 36, through: 144, by: 4).map { $0 }
+                          + stride(from: 149, through: 165, by: 4).map { $0 }
+                default:   return stride(from: 1, through: 233, by: 4).map { $0 }
+                }
+            }()
 
             let bandDisplay = band == "24" ? String(localized: "wifi.band.24ghz", comment: "2.4 GHz Wi-Fi band name") : band == "5" ? String(localized: "wifi.band.5ghz", comment: "5 GHz Wi-Fi band name") : String(localized: "wifi.band.6ghz", comment: "6 GHz Wi-Fi band name")
 

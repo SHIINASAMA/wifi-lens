@@ -1233,7 +1233,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens-pro";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.kaoru.wifi-lens-pro";
 				PRODUCT_NAME = "WiFi Lens Pro";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
@@ -1278,7 +1278,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.kaoru.wifi-lens-pro";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.kaoru.wifi-lens-pro";
 				PRODUCT_NAME = "WiFI Lens Pro";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
