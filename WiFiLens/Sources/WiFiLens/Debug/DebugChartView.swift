@@ -16,7 +16,7 @@ private struct DebugOscillator {
 
 struct DebugChartView: View {
     @State private var bandVM = BandChartViewModel(band: .band5GHz)
-    @State private var scannerVM = ScannerViewModel()
+    @State private var selectedNetworkID: String? = nil
     @State private var timer: Timer?
 
     // Oscillator
@@ -39,8 +39,14 @@ struct DebugChartView: View {
 
             Divider()
 
-            BandChartView(viewModel: bandVM, scannerViewModel: scannerVM)
-                .padding(.horizontal, 8)
+            BandChartView(
+                model: bandVM.renderModel,
+                selectedNetworkID: $selectedNetworkID,
+                onResetZoom: { bandVM.resetZoom() },
+                onToggleExpand: { bandVM.toggleExpand() },
+                onApplyZoom: { lo, hi in bandVM.applyZoom(lo: lo, hi: hi) }
+            )
+            .padding(.horizontal, 8)
         }
         .onAppear { startTimer() }
         .onDisappear { stopTimer() }
@@ -154,7 +160,7 @@ struct DebugChartView: View {
             band: selectedBand,
             spanDirection: nil
         )
-        let series = ChartSeriesData(
+        let domain = ChartSeriesDomainData(
             id: "debug-signal",
             ssid: "TestSignal",
             bssid: "aa:bb:cc:dd:ee:ff",
@@ -163,9 +169,20 @@ struct DebugChartView: View {
             apex: Double(block.left + block.right) / 2.0,
             right: block.right,
             rssi: rssi,
-            color: .blue,
-            isVisible: true
+            phyMode: "",
+            channelWidth: "",
+            supportsK: false,
+            supportsR: false,
+            supportsV: false,
+            supportsWPA3: false,
+            isHiddenSSID: false,
+            security: "",
+            mcs: "",
+            nss: "",
+            country: ""
         )
+        let render = ChartSeriesRenderState(displayRSSI: Double(rssi), color: .blue, isVisible: true)
+        let series = ChartSeriesData(domain: domain, render: render)
         bandVM.debugInject(series: [series])
     }
 }

@@ -4,6 +4,8 @@ import Foundation
 /// Stored per BSSID for trend charts and future data export.
 struct NetworkSnapshot: Codable {
     let timestamp: Date
+    let bssid: String
+    let ssid: String
     let rssi: Int
     let channel: Int
     let band: String
@@ -17,4 +19,5 @@ struct NetworkSnapshot: Codable {
     let supportsR: Bool
     let supportsV: Bool
     let supportsWPA3: Bool
+    let isHiddenSSID: Bool
 }

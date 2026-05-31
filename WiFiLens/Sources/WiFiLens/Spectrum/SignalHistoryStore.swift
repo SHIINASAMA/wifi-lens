@@ -59,4 +59,10 @@ final class SignalHistoryStore {
         guard let snaps = snapshots[bssid], snaps.count >= 2 else { return nil }
         return snaps
     }
+
+    /// All RSSI history (unfiltered) for session persistence.
+    var allHistory: [String: [Int]] { history }
+
+    /// All snapshots (unfiltered) for session persistence.
+    var allSnapshots: [String: [NetworkSnapshot]] { snapshots }
 }

@@ -300,6 +300,43 @@ final class ScannerViewModel {
         return Array(seen.values)
     }
 
+    private func makeSnapshot(for network: WiFiNetwork, timestamp: Date) -> NetworkSnapshot {
+        let ie = network.ieData.map { IEParser.parse(data: $0) }
+        let phyMode = ie.map { phyLabel($0) } ?? ""
+        let channelWidth = ie.map { chanWidthLabel($0) } ?? ""
+        let ssid = network.ssid ?? ""
+        let mcs = ie?.mcsSummary ?? ""
+        let nss = ie?.nssSummary ?? ""
+        let security = ie?.securitySummary ?? ""
+        let country = ie?.countryCode ?? ""
+        let supportsK = ie?.supports80211k ?? false
+        let supportsR = ie?.supports80211r ?? false
+        let supportsV = ie?.supports80211v ?? false
+        let supportsWPA3 = ie?.supportsWPA3 ?? false
+        let isHiddenSSID = ie?.isHiddenSSID ?? false
+
+        return NetworkSnapshot(
+            timestamp: timestamp,
+            bssid: network.bssid,
+            ssid: ssid,
+            rssi: network.rssi,
+            channel: network.channel.channelNumber,
+            band: network.channel.band.id,
+            phyMode: phyMode,
+            channelWidth: channelWidth,
+            mcs: mcs,
+            nss: nss,
+            security: security,
+            country: country,
+            supportsK: supportsK,
+            supportsR: supportsR,
+            supportsV: supportsV,
+            supportsWPA3: supportsWPA3,
+            isHiddenSSID: isHiddenSSID
+        )
+    }
+
+
     private func applyNetworks(_ networks: [WiFiNetwork]) {
         lastNetworks = networks
         let deduped = deduplicateNetworks(networks)
@@ -307,28 +344,14 @@ final class ScannerViewModel {
         // Record RSSI history + snapshots, build trend/history/snapshot lookups
         let now = Date()
         for nw in deduped {
-            let ie = nw.ieData.map { IEParser.parse(data: $0) }
-            let snap = NetworkSnapshot(
-                timestamp: now,
-                rssi: nw.rssi,
-                channel: nw.channel.channelNumber,
-                band: nw.channel.band.id,
-                phyMode: ie.map { phyLabel($0) } ?? "",
-                channelWidth: ie.map { chanWidthLabel($0) } ?? "",
-                mcs: ie?.mcsSummary ?? "",
-                nss: ie?.nssSummary ?? "",
-                security: ie?.securitySummary ?? "",
-                country: ie?.countryCode ?? "",
-                supportsK: ie?.supports80211k ?? false,
-                supportsR: ie?.supports80211r ?? false,
-                supportsV: ie?.supports80211v ?? false,
-                supportsWPA3: ie?.supportsWPA3 ?? false
-            )
+            let snap = makeSnapshot(for: nw, timestamp: now)
             signalHistory.record(bssid: nw.bssid, rssi: nw.rssi, snapshot: snap)
         }
         var trends: [String: (direction: TrendDirection, delta: Int)] = [:]
         for nw in deduped {
-            if let t = signalHistory.trend(for: nw.bssid) { trends[nw.bssid] = t }
+            if let t = signalHistory.trend(for: nw.bssid) {
+                trends[nw.bssid] = t
+            }
         }
         var snapshotDict: [String: [NetworkSnapshot]] = [:]
         for nw in deduped {
@@ -360,14 +383,14 @@ final class ScannerViewModel {
 
         // Validate selected network still exists in the new scan
         if let selectedID = selectedNetworkID {
-            let allIDs = bandViewModels.flatMap { $0.renderedAllSeriesData.map(\.id) }
+            let allIDs = bandViewModels.flatMap { $0.allSeriesData.map(\.id) }
             if !allIDs.contains(selectedID) {
                 selectedNetworkID = nil
             }
         }
 
         let ssidCount = bandViewModels.reduce(0) { count, vm in
-            count + vm.renderedAllSeriesData.filter { $0.ssid != "n/a" }.count
+            count + vm.allSeriesData.filter { $0.ssid != "n/a" }.count
         }
         accessState = ssidCount > 0 ? .scanning : .grantedButSSIDUnavailable
     }

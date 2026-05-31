@@ -52,12 +52,6 @@ private struct AppRootView: View {
                         .opacity(selectedPage == .spectrum ? 1 : 0)
                         .allowsHitTesting(selectedPage == .spectrum)
                         .disabled(selectedPage != .spectrum)
-                        .onReceive(NotificationCenter.default.publisher(for: .freezeAllBands)) { _ in
-                            guard selectedPage == .spectrum else { return }
-                            for vm in viewModel.bandViewModels {
-                                vm.toggleFreeze()
-                            }
-                        }
                 }
 
                 if visitedPages.contains(.channels) {
@@ -218,7 +212,6 @@ private struct WindowAccessor: NSViewRepresentable {
 }
 
 extension Notification.Name {
-    static let freezeAllBands = Notification.Name("freezeAllBands")
     static let exportBandAsPNG = Notification.Name("exportBandAsPNG")
     static let exportBandAsCSV = Notification.Name("exportBandAsCSV")
 }
@@ -299,13 +292,6 @@ struct WiFiLensApp: App {
                 }
                 .disabled(viewModel.bandViewModels.isEmpty)
                 .keyboardShortcut("e", modifiers: [.command, .shift])
-
-                Divider()
-
-                Button(String(localized: "common.action.freeze_all", comment: "Freeze all spectrum charts button")) {
-                    NotificationCenter.default.post(name: .freezeAllBands, object: nil)
-                }
-                .keyboardShortcut(".", modifiers: [.command])
             }
 
             CommandGroup(replacing: .appSettings) {
@@ -361,7 +347,13 @@ struct WiFiLensApp: App {
     private func exportPNG(for vm: BandChartViewModel) {
         let size = vm.chartSize.width > 0 ? vm.chartSize : CGSize(width: 800, height: 300)
         let renderer = ImageRenderer(
-            content: BandChartView(viewModel: vm, scannerViewModel: viewModel)
+            content: WiFiBandChart(
+                model: vm.renderModel,
+                selectedNetworkID: $viewModel.selectedNetworkID,
+                onResetZoom: { vm.resetZoom() },
+                onToggleExpand: { vm.toggleExpand() },
+                onApplyZoom: { lo, hi in vm.applyZoom(lo: lo, hi: hi) }
+            )
                 .frame(width: size.width, height: size.height)
         )
         renderer.scale = 2.0

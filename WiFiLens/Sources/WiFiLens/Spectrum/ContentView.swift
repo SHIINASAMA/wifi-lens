@@ -2,6 +2,10 @@ import SwiftUI
 
 private let headerHeight: CGFloat = 28
 
+#if PRO
+private enum SpectrumMode { case live, recording }
+#endif
+
 struct ContentView: View {
     @Bindable var viewModel: ScannerViewModel
 
@@ -13,6 +17,10 @@ struct ContentView: View {
     @State private var isTrendCollapsed = false
     @AppStorage("hiddenTableColumns") private var hiddenColumnsData: String = ""
 
+#if PRO
+    @State private var mode: SpectrumMode = .live
+#endif
+
     private var hiddenColumns: Binding<Set<String>> {
         Binding(
             get: { Set(hiddenColumnsData.split(separator: ",").map(String.init).filter { !$0.isEmpty }) },
@@ -22,11 +30,49 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            dashboardContent
+#if PRO
+            modeToolbar
+#endif
+            contentArea
         }
         .frame(minWidth: 700, idealWidth: 1000, minHeight: 600)
         .onChange(of: viewModel.hiddenBands) { _, _ in viewModel.applyGlobalFilterToBands() }
         .onChange(of: viewModel.hideHiddenSSIDs) { _, _ in viewModel.applyGlobalFilterToBands() }
+    }
+
+    // MARK: - Mode toolbar (Pro only)
+
+#if PRO
+    private var modeToolbar: some View {
+        HStack {
+            Spacer()
+            Picker("", selection: $mode) {
+                Text(String(localized: "spectrum.mode.live", comment: "Live spectrum mode")).tag(SpectrumMode.live)
+                Text(String(localized: "spectrum.mode.recording_page", comment: "Recording page mode")).tag(SpectrumMode.recording)
+            }
+            .pickerStyle(.segmented)
+            .frame(width: 160)
+            Spacer()
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 4)
+    }
+#endif
+
+    // MARK: - Content area
+
+    @ViewBuilder
+    private var contentArea: some View {
+#if PRO
+        switch mode {
+        case .live:
+            dashboardContent
+        case .recording:
+            HistoryView(scannerViewModel: viewModel)
+        }
+#else
+        dashboardContent
+#endif
     }
 
     // MARK: - Dashboard Content
@@ -102,16 +148,6 @@ struct ContentView: View {
             Text(section.title)
                 .font(.system(size: 12, weight: .semibold))
 
-            if section.isChart, let bandVM = section.bandVM {
-                Button {
-                    bandVM.toggleFreeze()
-                } label: {
-                    Image(systemName: bandVM.isFrozen ? "play.fill" : "pause.fill")
-                }
-                .buttonStyle(.plain)
-                .help(bandVM.isFrozen ? String(localized: "common.action.resume", comment: "Resume action button") : String(localized: "common.action.pause", comment: "Pause action button"))
-            }
-
             Spacer()
 
             Text(section.subtitle)
@@ -132,19 +168,25 @@ struct ContentView: View {
     private func sectionContent(_ section: SectionInfo, height: CGFloat) -> some View {
         switch section.kind {
         case .band(let bandVM):
-            BandChartView(viewModel: bandVM, scannerViewModel: viewModel)
-                .frame(height: height)
-                .background {
-                    GeometryReader { geometry in
-                        Color.clear
-                            .onAppear {
-                                bandVM.chartSize = geometry.size
-                            }
-                            .onChange(of: geometry.size) { _, newSize in
-                                bandVM.chartSize = newSize
-                            }
-                    }
+            WiFiBandChart(
+                model: bandVM.renderModel,
+                selectedNetworkID: $viewModel.selectedNetworkID,
+                onResetZoom: { bandVM.resetZoom() },
+                onToggleExpand: { bandVM.toggleExpand() },
+                onApplyZoom: { lo, hi in bandVM.applyZoom(lo: lo, hi: hi) }
+            )
+            .frame(height: height)
+            .background {
+                GeometryReader { geometry in
+                    Color.clear
+                        .onAppear {
+                            bandVM.chartSize = geometry.size
+                        }
+                        .onChange(of: geometry.size) { _, newSize in
+                            bandVM.chartSize = newSize
+                        }
                 }
+            }
 
         case .trend(let snaps, let color):
             TrendChartView(snapshots: snaps, color: color)
@@ -270,16 +312,6 @@ struct ContentView: View {
         let title: String
         let subtitle: String
 
-        var isChart: Bool {
-            if case .band = kind { return true }
-            return false
-        }
-
-        var bandVM: BandChartViewModel? {
-            if case .band(let vm) = kind { return vm }
-            return nil
-        }
-
         @ViewBuilder
         var icon: some View {
             switch kind {
@@ -305,15 +337,15 @@ struct ContentView: View {
             sections.append(SectionInfo(
                 kind: .band(vm),
                 title: vm.band.displayName,
-                subtitle: String(format: String(localized: "spectrum.trend.network_count_fmt", comment: "Network count for trend chart"), vm.renderedNetworkCount)
+                subtitle: String(format: String(localized: "spectrum.trend.network_count_fmt", comment: "Network count for trend chart"), vm.networkCount)
             ))
         }
 
         // Shared trend section — shows signal history for selected network across any band
         if let selID = viewModel.selectedNetworkID {
             for vm in viewModel.bandViewModels {
-                if let snaps = vm.renderedSnapshots(for: selID),
-                   let series = vm.renderedSeries(for: selID),
+                if let snaps = vm.snapshots(for: selID),
+                   let series = vm.series(for: selID),
                    snaps.count >= 2 {
                     sections.append(SectionInfo(
                         kind: .trend(snapshots: snaps, color: series.color),

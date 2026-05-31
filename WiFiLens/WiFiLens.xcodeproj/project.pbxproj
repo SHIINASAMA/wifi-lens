@@ -10,7 +10,6 @@
 		01ABB72FF2349B86A426CC1D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B31CBEBC05DEA7ADB03FE01 /* ContentView.swift */; };
 		027A3CECC33E6608D9F53B53 /* LocationPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69959B95B194A96FA8D337C /* LocationPermissionManager.swift */; };
 		0898D535D9CCA525F89735FA /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51DDD97F3B94514DE0790B51 /* Constants.swift */; };
-		12AA3A17CCE99E41D313C900 /* FilterPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A7ED53B7BCC8C0A11662151 /* FilterPopoverView.swift */; };
 		1E5141F704005BF06DB684A1 /* CoreWLAN.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1067F6AA96EC6320C6472F59 /* CoreWLAN.framework */; };
 		237EB0EBBBFBAC33EAE1380B /* BluetoothPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6CDF2DB455AB04A0A7C8BBF /* BluetoothPermissionManager.swift */; };
 		23F1AB88A28C6E035AA916AA /* BandChartViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58FF378E09090DEBAAFA77F6 /* BandChartViewModel.swift */; };
@@ -24,6 +23,9 @@
 		56818EA68B0747B083E0FDF8 /* DeviceCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0470288A92AF41C793DAE70B /* DeviceCapabilities.swift */; };
 		5A390BC860BEB1F0D50DAC76 /* BLEChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E1C6C7FE18D0034F66CD3E /* BLEChannel.swift */; };
 		6680C83EB72E9C488E7F7616 /* BandChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */; };
+			3DC8FED8F49854F4CDFD4DCC /* BandChartRenderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCB /* BandChartRenderModel.swift */; };
+			3DC8FED8F49854F4CDFD4DCE /* BandChartLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCD /* BandChartLayout.swift */; };
+				3DC8FED8F49854F4CDFD4DD1 /* SnapshotToChartAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DD0 /* SnapshotToChartAdapter.swift */; };
 		6ACEE4EC462933B7C4320468 /* ChannelBand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4079C5A47F59C655689BCFB8 /* ChannelBand.swift */; };
 		6ECFD8E459A49E4A6FA0FCB0 /* WiFiScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */; };
 		6EE067F9A1CC14BACCA0F3DB /* BLERSSISample.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCF8EF1A4D0D355ED657A6 /* BLERSSISample.swift */; };
@@ -75,6 +77,9 @@
 		FB1E32502FC7316C009D1BDC /* BLETrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */; };
 		FB1E32512FC7316C009D1BDC /* BLEScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D7CF00F0FEAA84B6E2F64C9 /* BLEScannerView.swift */; };
 		FB1E32522FC7316C009D1BDC /* BandChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */; };
+			3DC8FED8F49854F4CDFD4DDE /* BandChartRenderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCB /* BandChartRenderModel.swift */; };
+			3DC8FED8F49854F4CDFD4DCF /* BandChartLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCD /* BandChartLayout.swift */; };
+				3DC8FED8F49854F4CDFD4DD2 /* SnapshotToChartAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DD0 /* SnapshotToChartAdapter.swift */; };
 		FB1E32532FC7316C009D1BDC /* BandChartViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58FF378E09090DEBAAFA77F6 /* BandChartViewModel.swift */; };
 		FB1E32542FC7316C009D1BDC /* ChannelQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */; };
 		FB1E32552FC7316C009D1BDC /* CWChannel+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5DDCE8EACD706BD2BCEE4B /* CWChannel+Extensions.swift */; };
@@ -91,7 +96,6 @@
 		FB1E32602FC7316C009D1BDC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B31CBEBC05DEA7ADB03FE01 /* ContentView.swift */; };
 		FB1E32612FC7316C009D1BDC /* SparkleUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */; };
 		FB1E32622FC7316C009D1BDC /* LocationPermissionRequiredView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */; };
-		FB1E32632FC7316C009D1BDC /* FilterPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A7ED53B7BCC8C0A11662151 /* FilterPopoverView.swift */; };
 		FB1E32642FC7316C009D1BDC /* LocationPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69959B95B194A96FA8D337C /* LocationPermissionManager.swift */; };
 		FB1E32652FC7316C009D1BDC /* NativeTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3299502DE1A130760C8A7 /* NativeTableView.swift */; };
 		FB1E32662FC7316C009D1BDC /* MCPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573B52FBBEBB9005F8214 /* MCPServer.swift */; };
@@ -105,6 +109,9 @@
 		FB1E326E2FC7316C009D1BDC /* ScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */; };
 		FB1E326F2FC7316C009D1BDC /* HelpCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C72FBCD25C005F8214 /* HelpCenterView.swift */; };
 		FB1E32702FC7316C009D1BDC /* ChartTimeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */; };
+				FB9B7F4E2FC2D9650057B038 /* ChartTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4A2FC2D9650057B038 /* ChartTypes.swift */; };
+				FB9B7F4F2FC2D9650057B038 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4B2FC2D9650057B038 /* ChartView.swift */; };
+				FB9B7F522FC2D9650057B038 /* DetailOverviewChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */; };
 		FB1E32712FC7316C009D1BDC /* ChartGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F362FC2D9650057B038 /* ChartGeometry.swift */; };
 		FB1E32722FC7316C009D1BDC /* SplineInterpolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */; };
 		FB1E32732FC7316C009D1BDC /* RangeSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */; };
@@ -164,6 +171,9 @@
 		FB92F9252FBE208500BCEC67 /* DebugThroughputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */; };
 		FB92F9282FBE208500BCEC67 /* DebugRoamingChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */; };
 		FB9B7F3B2FC2D9650057B038 /* ChartTimeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */; };
+			FB9B7F4C2FC2D9650057B038 /* ChartTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4A2FC2D9650057B038 /* ChartTypes.swift */; };
+			FB9B7F4D2FC2D9650057B038 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4B2FC2D9650057B038 /* ChartView.swift */; };
+			FB9B7F512FC2D9650057B038 /* DetailOverviewChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */; };
 		FB9B7F3C2FC2D9650057B038 /* ChartGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F362FC2D9650057B038 /* ChartGeometry.swift */; };
 		FB9B7F3D2FC2D9650057B038 /* SplineInterpolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */; };
 		FB9B7F3E2FC2D9650057B038 /* ChartRendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F372FC2D9650057B038 /* ChartRendering.swift */; };
@@ -199,12 +209,14 @@
 		1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelSpanCalculator.swift; sourceTree = "<group>"; };
 		1D7CF00F0FEAA84B6E2F64C9 /* BLEScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEScannerView.swift; sourceTree = "<group>"; };
 		28A3299502DE1A130760C8A7 /* NativeTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeTableView.swift; sourceTree = "<group>"; };
-		2A7ED53B7BCC8C0A11662151 /* FilterPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterPopoverView.swift; sourceTree = "<group>"; };
 		2D296EB5CEF7484BA599C2F9 /* BLEDeviceTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDeviceTracker.swift; sourceTree = "<group>"; };
 		310AD5ABC56B4211E30DD1DE /* SpanDirection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanDirection.swift; sourceTree = "<group>"; };
 		36E1D69278614400AA3B660C /* ExponentialMovingAverage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExponentialMovingAverage.swift; sourceTree = "<group>"; };
 		38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLETrendChartView.swift; sourceTree = "<group>"; };
 		3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartView.swift; sourceTree = "<group>"; };
+			3DC8FED8F49854F4CDFD4DCB /* BandChartRenderModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartRenderModel.swift; sourceTree = "<group>"; };
+			3DC8FED8F49854F4CDFD4DCD /* BandChartLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartLayout.swift; sourceTree = "<group>"; };
+				3DC8FED8F49854F4CDFD4DD0 /* SnapshotToChartAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotToChartAdapter.swift; sourceTree = "<group>"; };
 		3EAF444453E304ABB57AF3AA /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		4079C5A47F59C655689BCFB8 /* ChannelBand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelBand.swift; sourceTree = "<group>"; };
 		51DDD97F3B94514DE0790B51 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -275,6 +287,9 @@
 		FB9B7F362FC2D9650057B038 /* ChartGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartGeometry.swift; sourceTree = "<group>"; };
 		FB9B7F372FC2D9650057B038 /* ChartRendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartRendering.swift; sourceTree = "<group>"; };
 		FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartTimeFormatting.swift; sourceTree = "<group>"; };
+		FB9B7F4A2FC2D9650057B038 /* ChartTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartTypes.swift; sourceTree = "<group>"; };
+		FB9B7F4B2FC2D9650057B038 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
+		FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailOverviewChart.swift; sourceTree = "<group>"; };
 		FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplineInterpolation.swift; sourceTree = "<group>"; };
 		FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSelectorView.swift; sourceTree = "<group>"; };
 		FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermissionRequiredView.swift; sourceTree = "<group>"; };
@@ -386,12 +401,14 @@
 				7B31CBEBC05DEA7ADB03FE01 /* ContentView.swift */,
 				58FF378E09090DEBAAFA77F6 /* BandChartViewModel.swift */,
 				3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */,
+			3DC8FED8F49854F4CDFD4DCB /* BandChartRenderModel.swift */,
+			3DC8FED8F49854F4CDFD4DCD /* BandChartLayout.swift */,
+				3DC8FED8F49854F4CDFD4DD0 /* SnapshotToChartAdapter.swift */,
 				C51C237F247C80EC5176F5C0 /* ChartSeriesData.swift */,
 				1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */,
 				FB0573AC2FBB54ED005F8214 /* SignalHistoryStore.swift */,
 				FB0573AE2FBB5BD6005F8214 /* NetworkSnapshot.swift */,
 				FB0573B02FBB5BEE005F8214 /* TrendChartView.swift */,
-				2A7ED53B7BCC8C0A11662151 /* FilterPopoverView.swift */,
 				8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */,
 			);
 			path = Spectrum;
@@ -588,6 +605,9 @@
 				FB9B7F362FC2D9650057B038 /* ChartGeometry.swift */,
 				FB9B7F372FC2D9650057B038 /* ChartRendering.swift */,
 				FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */,
+				FB9B7F4A2FC2D9650057B038 /* ChartTypes.swift */,
+				FB9B7F4B2FC2D9650057B038 /* ChartView.swift */,
+				FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */,
 				FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */,
 				FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */,
 			);
@@ -781,7 +801,6 @@
 				FBD7B3492FBAED57002C8F5A /* SparkleUpdater.swift in Sources */,
 				FBAD00012FC400000057B038 /* LocationPermissionRequiredView.swift in Sources */,
 				FBD000012FC4000000ABC001 /* WiFiOffView.swift in Sources */,
-				12AA3A17CCE99E41D313C900 /* FilterPopoverView.swift in Sources */,
 				027A3CECC33E6608D9F53B53 /* LocationPermissionManager.swift in Sources */,
 				3711656F0C3ECD58CA29D407 /* NativeTableView.swift in Sources */,
 				FB0573B62FBBEBB9005F8214 /* MCPServer.swift in Sources */,
@@ -796,6 +815,9 @@
 				C1D2E3F4A5B6123456780001 /* WiFiPowerMonitor.swift in Sources */,
 				FB0573C92FBCD25C005F8214 /* HelpCenterView.swift in Sources */,
 				FB9B7F3B2FC2D9650057B038 /* ChartTimeFormatting.swift in Sources */,
+				FB9B7F4C2FC2D9650057B038 /* ChartTypes.swift in Sources */,
+				FB9B7F4D2FC2D9650057B038 /* ChartView.swift in Sources */,
+				FB9B7F512FC2D9650057B038 /* DetailOverviewChart.swift in Sources */,
 				FB9B7F3C2FC2D9650057B038 /* ChartGeometry.swift in Sources */,
 				FB9B7F3D2FC2D9650057B038 /* SplineInterpolation.swift in Sources */,
 				FB9B7F412FC2D9650057B038 /* RangeSelectorView.swift in Sources */,
@@ -832,6 +854,9 @@
 				85C7DEE09D3045078A2ADFF5 /* ExponentialMovingAverage.swift in Sources */,
 				C477C7396F754B85A69816B6 /* KalmanFilter1D.swift in Sources */,
 				DCAC1361D1814E4895FD4B4F /* HysteresisEMA.swift in Sources */,
+				3DC8FED8F49854F4CDFD4DCE /* BandChartLayout.swift in Sources */,
+				3DC8FED8F49854F4CDFD4DD1 /* SnapshotToChartAdapter.swift in Sources */,
+				3DC8FED8F49854F4CDFD4DCC /* BandChartRenderModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -858,6 +883,8 @@
 				FB1E32512FC7316C009D1BDC /* BLEScannerView.swift in Sources */,
 				FB1E32522FC7316C009D1BDC /* BandChartView.swift in Sources */,
 				FB1E32532FC7316C009D1BDC /* BandChartViewModel.swift in Sources */,
+				3DC8FED8F49854F4CDFD4DCF /* BandChartLayout.swift in Sources */,
+				3DC8FED8F49854F4CDFD4DD2 /* SnapshotToChartAdapter.swift in Sources */,
 				FB1E32542FC7316C009D1BDC /* ChannelQualityView.swift in Sources */,
 				FB1E32552FC7316C009D1BDC /* CWChannel+Extensions.swift in Sources */,
 				FB1E32562FC7316C009D1BDC /* ChannelBand.swift in Sources */,
@@ -874,7 +901,6 @@
 				FB1E32612FC7316C009D1BDC /* SparkleUpdater.swift in Sources */,
 				FB1E32622FC7316C009D1BDC /* LocationPermissionRequiredView.swift in Sources */,
 				FBD000022FC4000000ABC001 /* WiFiOffView.swift in Sources */,
-				FB1E32632FC7316C009D1BDC /* FilterPopoverView.swift in Sources */,
 				FB1E32642FC7316C009D1BDC /* LocationPermissionManager.swift in Sources */,
 				FB1E32652FC7316C009D1BDC /* NativeTableView.swift in Sources */,
 				FB1E32662FC7316C009D1BDC /* MCPServer.swift in Sources */,
@@ -889,6 +915,9 @@
 				A1B2C3D4E5F6789012340001 /* WiFiPowerMonitor.swift in Sources */,
 				FB1E326F2FC7316C009D1BDC /* HelpCenterView.swift in Sources */,
 				FB1E32702FC7316C009D1BDC /* ChartTimeFormatting.swift in Sources */,
+				FB9B7F4E2FC2D9650057B038 /* ChartTypes.swift in Sources */,
+				FB9B7F4F2FC2D9650057B038 /* ChartView.swift in Sources */,
+				FB9B7F522FC2D9650057B038 /* DetailOverviewChart.swift in Sources */,
 				FB1E32712FC7316C009D1BDC /* ChartGeometry.swift in Sources */,
 				FB1E32722FC7316C009D1BDC /* SplineInterpolation.swift in Sources */,
 				FB1E32732FC7316C009D1BDC /* RangeSelectorView.swift in Sources */,
@@ -925,6 +954,7 @@
 				FB1E32922FC7316C009D1BDC /* ExponentialMovingAverage.swift in Sources */,
 				FB1E32932FC7316C009D1BDC /* KalmanFilter1D.swift in Sources */,
 				FB1E32942FC7316C009D1BDC /* HysteresisEMA.swift in Sources */,
+				3DC8FED8F49854F4CDFD4DDE /* BandChartRenderModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

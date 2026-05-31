@@ -125,7 +125,7 @@ enum ChannelSpanCalculator {
                 }
             }()
 
-            series.append(ChartSeriesData(
+            let domain = ChartSeriesDomainData(
                 id: stableID,
                 ssid: nw.ssid ?? "n/a",
                 bssid: nw.bssid,
@@ -134,7 +134,6 @@ enum ChannelSpanCalculator {
                 apex: apex,
                 right: right,
                 rssi: nw.rssi,
-                color: colorHasher.color(for: nw.ssid, bssid: nw.bssid),
                 phyMode: ie.map { phyLabel($0) } ?? "",
                 channelWidth: ie.map { widthLabel($0) } ?? "",
                 supportsK: ie?.supports80211k ?? false,
@@ -145,11 +144,17 @@ enum ChannelSpanCalculator {
                 security: ie?.securitySummary ?? "",
                 mcs: ie?.mcsSummary ?? "",
                 nss: ie?.nssSummary ?? "",
-                country: ie?.countryCode ?? "",
+                country: ie?.countryCode ?? ""
+            )
+            let render = ChartSeriesRenderState(
+                displayRSSI: Double(nw.rssi),
+                color: colorHasher.color(for: nw.ssid, bssid: nw.bssid),
                 isVisible: !hiddenBSSIDs.contains(nw.bssid),
                 trendArrow: arrow,
                 trendDelta: trend?.delta ?? 0
-            ))
+            )
+
+            series.append(ChartSeriesData(domain: domain, render: render))
         }
         return series
     }

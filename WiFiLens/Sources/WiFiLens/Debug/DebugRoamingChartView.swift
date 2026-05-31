@@ -501,10 +501,10 @@ private struct DebugRoamingTimelineChart: View {
         VStack(spacing: 0) {
             detailChart
             GeometryReader { geo in
-                TimelineRangeSelector(
-                    totalDuration: elapsedTime,
-                    minWindow: 5,
-                    defaultWindow: 30,
+                RangeSelector(
+                    domain: 0...elapsedTime,
+                    minWindowSpan: 5,
+                    defaultWindowSpan: 30,
                     overviewHeight: overviewHeight,
                     overview: {
                         DebugOverviewCanvas(
@@ -515,14 +515,15 @@ private struct DebugRoamingTimelineChart: View {
                             highlightedTime: activeHoverTime
                         )
                     },
-                    timeFormatter: { timeFormatter.string(from: $0) ?? "0:00" },
-                    onRangeChange: { range in
+                    edgeLabel: { timeFormatter.string(from: $0) ?? "0:00" },
+                    onWindowChange: { range in
                         visibleStart = range.start
                         visibleEnd = range.end
                     },
-                    onHoverTime: { time in
+                    onHover: { time in
                         overviewHoverTime = time
-                    }
+                    },
+                    followMax: true
                 )
                 .onAppear { overviewPlotWidth = geo.size.width }
                 .onChange(of: geo.size.width) { _, w in overviewPlotWidth = w }

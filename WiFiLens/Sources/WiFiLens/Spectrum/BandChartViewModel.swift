@@ -3,16 +3,8 @@ import SwiftUI
 @MainActor
 @Observable
 final class BandChartViewModel {
-    private struct RenderSnapshot {
-        var allSeriesData: [ChartSeriesData]
-        var displayedSeriesData: [ChartSeriesData]
-        var snapshots: [String: [NetworkSnapshot]]
-        var channelOccupancy: [Int: Int]
-    }
-
     let band: ChannelBand
 
-    var isFrozen: Bool = false
     var isExpanded: Bool = false
     var zoomMin: Double?
     var zoomMax: Double?
@@ -22,21 +14,37 @@ final class BandChartViewModel {
     private(set) var displayedSeriesData: [ChartSeriesData] = []
     private(set) var interfaceName: String = ""
     private(set) var currentFilterQuery: String = ""
-    private(set) var allSnapshots: [String: [NetworkSnapshot]] = [:]  // bssid → snapshots
-    private(set) var channelOccupancy: [Int: Int] = [:]  // channel → network count
+    private(set) var allSnapshots: [String: [NetworkSnapshot]] = [:]
+    private(set) var channelOccupancy: [Int: Int] = [:]
     private var currentHiddenBands: Set<String> = []
     private var currentHideHiddenSSIDs: Bool = false
-    private var frozenSnapshot: RenderSnapshot?
     private var animationTimer: Timer?
     var chartSize: CGSize = .zero
 
     var hasFilter: Bool { !currentFilterQuery.trimmingCharacters(in: .whitespaces).isEmpty }
-    var renderedAllSeriesData: [ChartSeriesData] { frozenSnapshot?.allSeriesData ?? allSeriesData }
-    var renderedDisplayedSeriesData: [ChartSeriesData] { frozenSnapshot?.displayedSeriesData ?? displayedSeriesData }
-    var renderedSnapshots: [String: [NetworkSnapshot]] { frozenSnapshot?.snapshots ?? allSnapshots }
-    var renderedChannelOccupancy: [Int: Int] { frozenSnapshot?.channelOccupancy ?? channelOccupancy }
-    var renderedNetworkCount: Int { renderedAllSeriesData.count }
-    var renderedIsEmpty: Bool { renderedAllSeriesData.isEmpty }
+    var networkCount: Int { allSeriesData.count }
+    var isEmpty: Bool { allSeriesData.isEmpty }
+
+    var xDataMin: Int { band == .band24GHz ? -1 : 1 }
+    var xDataMax: Int { band.maxChannel }
+    var yMin: Double { Double(Constants.rssiNoiseFloor) }
+    var axisTickStartChannel: Int { 1 }
+
+    var renderModel: BandChartRenderModel {
+        BandChartRenderModel(
+            xDataMin: xDataMin,
+            xDataMax: xDataMax,
+            yMin: yMin,
+            visibleSeriesData: visibleSeriesData(),
+            displayedSeriesData: displayedSeriesData,
+            strongestRSSI: strongestRSSI(),
+            isEmpty: isEmpty,
+            zoomMin: zoomMin,
+            zoomMax: zoomMax,
+            isExpanded: isExpanded,
+            axisTickStartChannel: axisTickStartChannel
+        )
+    }
 
     init(band: ChannelBand) {
         self.band = band
@@ -56,15 +64,6 @@ final class BandChartViewModel {
         }
     }
 
-    private func currentRenderSnapshot() -> RenderSnapshot {
-        RenderSnapshot(
-            allSeriesData: allSeriesData,
-            displayedSeriesData: displayedSeriesData,
-            snapshots: allSnapshots,
-            channelOccupancy: channelOccupancy
-        )
-    }
-
     private func refreshRenderedState() {
         displayedSeriesData = makeDisplayedSeriesData(
             from: allSeriesData,
@@ -73,51 +72,28 @@ final class BandChartViewModel {
         )
     }
 
-    private func selectedSeriesExists(_ selectedNetworkID: String?) -> Bool {
-        guard let selectedNetworkID else { return true }
-        return renderedAllSeriesData.contains { $0.id == selectedNetworkID }
-    }
-
     func validateSelection(_ selectedNetworkID: String?) -> Bool {
-        selectedSeriesExists(selectedNetworkID)
+        guard let selectedNetworkID else { return true }
+        return allSeriesData.contains { $0.id == selectedNetworkID }
     }
 
-    func renderedSnapshots(for selectedNetworkID: String?) -> [NetworkSnapshot]? {
+    func snapshots(for selectedNetworkID: String?) -> [NetworkSnapshot]? {
         guard let selectedNetworkID,
-              let series = renderedDisplayedSeriesData.first(where: { $0.id == selectedNetworkID })
+              let series = displayedSeriesData.first(where: { $0.id == selectedNetworkID })
         else { return nil }
-        return renderedSnapshots[series.bssid]
+        return allSnapshots[series.bssid]
     }
 
-    func renderedSeries(for selectedNetworkID: String?) -> ChartSeriesData? {
+    func series(for selectedNetworkID: String?) -> ChartSeriesData? {
         guard let selectedNetworkID else { return nil }
-        return renderedDisplayedSeriesData.first(where: { $0.id == selectedNetworkID })
-    }
-
-    func setFreeze(_ frozen: Bool) {
-        guard isFrozen != frozen else { return }
-        isFrozen = frozen
-        if frozen {
-            frozenSnapshot = currentRenderSnapshot()
-        } else {
-            frozenSnapshot = nil
-            refreshRenderedState()
-        }
-    }
-
-    func toggleFreeze() {
-        setFreeze(!isFrozen)
-    }
-
-    func syncFreezeState(from frozen: Bool) {
-        setFreeze(frozen)
+        return displayedSeriesData.first(where: { $0.id == selectedNetworkID })
     }
 
     func visibleSeriesData() -> [ChartSeriesData] {
-        renderedDisplayedSeriesData.filter { $0.isVisible && !$0.isFilteredOut }
+        displayedSeriesData.filter { $0.isVisible && !$0.isFilteredOut }
     }
 
-    func strongestRenderedRSSI() -> Int {
+    func strongestRSSI() -> Int {
         Int(visibleSeriesData().map(\.displayRSSI).max() ?? 0)
     }
 
@@ -156,9 +132,7 @@ final class BandChartViewModel {
             anyAnimating = true
             allSeriesData[i].displayRSSI += delta * 0.25
         }
-        if !isFrozen {
-            refreshRenderedState()
-        }
+        refreshRenderedState()
         if !anyAnimating {
             stopAnimation()
         }
@@ -170,7 +144,6 @@ extension BandChartViewModel {
     func updateNetworks(_ networks: [WiFiNetwork], colorHasher: SSIDColorHasher, filterQuery: String, trends: [String: (direction: TrendDirection, delta: Int)] = [:], snapshots: [String: [NetworkSnapshot]] = [:], hiddenBSSIDs: Set<String> = [], hiddenBands: Set<String> = [], hideHiddenSSIDs: Bool = false) {
         var dataArray = ChannelSpanCalculator.toSeriesData(networks, colorHasher: colorHasher, trends: trends, hiddenBSSIDs: hiddenBSSIDs)
 
-        // Carry displayRSSI forward so animation continues from the current visual position
         let prevByID = Dictionary(uniqueKeysWithValues: allSeriesData.map { ($0.id, $0.displayRSSI) })
         for i in dataArray.indices {
             dataArray[i].displayRSSI = prevByID[dataArray[i].id] ?? Double(dataArray[i].rssi)
@@ -194,9 +167,7 @@ extension BandChartViewModel {
         currentHiddenBands = hiddenBands
         currentHideHiddenSSIDs = hideHiddenSSIDs
         currentFilterQuery = filterQuery
-        if !isFrozen {
-            refreshRenderedState()
-        }
+        refreshRenderedState()
         startAnimation()
     }
 
@@ -226,9 +197,7 @@ extension BandChartViewModel {
         }
         currentHiddenBands = hiddenBands
         currentHideHiddenSSIDs = hideHiddenSSIDs
-        if !isFrozen {
-            refreshRenderedState()
-        }
+        refreshRenderedState()
     }
 
     func toggleExpand() {
@@ -246,7 +215,7 @@ extension BandChartViewModel {
     }
 
     func applyZoom(lo: Double, hi: Double) {
-        let clampedMin = Swift.max(Double(band == .band24GHz ? 1 : 1), lo)
+        let clampedMin = Swift.max(1.0, lo)
         let clampedMax = Swift.min(Double(band.maxChannel), hi)
         let range = clampedMax - clampedMin
         guard range >= Double(Constants.minZoomRange) else { return }
@@ -257,7 +226,6 @@ extension BandChartViewModel {
 
 #if DEBUG
 extension BandChartViewModel {
-    /// Feed pre-built series data directly (bypasses WiFiNetwork → ChannelSpanCalculator pipeline).
     func debugInject(series: [ChartSeriesData]) {
         var dataArray = series
         let prevByID = Dictionary(uniqueKeysWithValues: allSeriesData.map { ($0.id, $0.displayRSSI) })
@@ -278,9 +246,7 @@ extension BandChartViewModel {
             )
         }
         allSeriesData = dataArray
-        if !isFrozen {
-            refreshRenderedState()
-        }
+        refreshRenderedState()
         startAnimation()
     }
 }

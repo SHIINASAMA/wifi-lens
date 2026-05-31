@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 import Testing
 @testable import WiFiLens
 
@@ -17,68 +18,28 @@ import Testing
         supportsV: Bool = true,
         isHiddenSSID: Bool = false
     ) -> ChartSeriesData {
-        ChartSeriesData(
-            id: id, ssid: ssid, bssid: bssid,
-            channel: channel, left: channel - 2, apex: Double(channel),
-            right: channel + 2, rssi: rssi,
-            displayRSSI: Double(rssi), phyMode: phyMode,
-            channelWidth: channelWidth, supportsK: supportsK,
-            supportsR: supportsR, supportsV: supportsV,
-            isHiddenSSID: isHiddenSSID
+        let domain = ChartSeriesDomainData(
+            id: id,
+            ssid: ssid,
+            bssid: bssid,
+            channel: channel,
+            left: channel - 2,
+            apex: Double(channel),
+            right: channel + 2,
+            rssi: rssi,
+            phyMode: phyMode,
+            channelWidth: channelWidth,
+            supportsK: supportsK,
+            supportsR: supportsR,
+            supportsV: supportsV,
+            supportsWPA3: false,
+            isHiddenSSID: isHiddenSSID,
+            security: "",
+            mcs: "",
+            nss: "",
+            country: ""
         )
-    }
-
-    // MARK: - Freeze / Unfreeze
-
-    @Test func freezeCapturesCurrentState() {
-        let vm = BandChartViewModel(band: .band24GHz)
-        vm.debugInject(series: [makeSeries(ssid: "BeforeFreeze", rssi: -40)])
-
-        #expect(!vm.isFrozen)
-        #expect(vm.renderedAllSeriesData.first?.ssid == "BeforeFreeze")
-
-        vm.setFreeze(true)
-
-        #expect(vm.isFrozen)
-        // Frozen snapshot should still show old data
-        #expect(vm.renderedAllSeriesData.first?.ssid == "BeforeFreeze")
-
-        // Inject new data while frozen
-        vm.debugInject(series: [makeSeries(ssid: "AfterFreeze", rssi: -60)])
-        // Still shows frozen data
-        #expect(vm.renderedAllSeriesData.first?.ssid == "BeforeFreeze")
-    }
-
-    @Test func unfreezeRestoresLiveData() {
-        let vm = BandChartViewModel(band: .band24GHz)
-        vm.debugInject(series: [makeSeries(ssid: "Initial", rssi: -40)])
-
-        vm.setFreeze(true)
-        vm.debugInject(series: [makeSeries(ssid: "NewData", rssi: -60)])
-        #expect(vm.renderedAllSeriesData.first?.ssid == "Initial")
-
-        vm.setFreeze(false)
-        #expect(!vm.isFrozen)
-        #expect(vm.renderedAllSeriesData.first?.ssid == "NewData")
-    }
-
-    @Test func toggleFreezeFlipsState() {
-        let vm = BandChartViewModel(band: .band24GHz)
-        #expect(!vm.isFrozen)
-        vm.toggleFreeze()
-        #expect(vm.isFrozen)
-        vm.toggleFreeze()
-        #expect(!vm.isFrozen)
-    }
-
-    @Test func syncFreezeStateToTrueDoesNothingWhenAlreadyFrozen() {
-        let vm = BandChartViewModel(band: .band24GHz)
-        vm.debugInject(series: [makeSeries(ssid: "Initial")])
-        vm.setFreeze(true)
-        vm.debugInject(series: [makeSeries(ssid: "After")])
-        // Sync to true again should keep frozen snapshot
-        vm.syncFreezeState(from: true)
-        #expect(vm.renderedAllSeriesData.first?.ssid == "Initial")
+        return ChartSeriesData(domain: domain, render: ChartSeriesRenderState(displayRSSI: Double(rssi)))
     }
 
     // MARK: - Filter
@@ -165,7 +126,6 @@ import Testing
             supportsK: true, supportsR: true, supportsV: true,
             channelWidth: "160"
         )
-        // High RSSI + uncongested + all protocols + wide channel → high score
         #expect(score > 85)
     }
 
@@ -175,7 +135,6 @@ import Testing
             supportsK: false, supportsR: false, supportsV: false,
             channelWidth: "20"
         )
-        // Low RSSI + congested + no protocols + narrow channel → low score
         #expect(score < 40)
     }
 
@@ -200,11 +159,118 @@ import Testing
         #expect(vm.isViewVisible)
     }
 
-    @Test func settingIsViewVisibleDoesNotCrashWhenNoData() {
-        let vm = BandChartViewModel(band: .band24GHz)
-        vm.isViewVisible = false
-        #expect(!vm.isViewVisible)
-        vm.isViewVisible = true
-        #expect(vm.isViewVisible)
+    // MARK: - BandChartLayout
+
+    @Test func axisTickValuesSkipChannelsBelowStart() {
+        let ticks = BandChartLayout.axisTickValues(xMin: -1, xMax: 14, maxChannel: 14, axisTickStartChannel: 1)
+        #expect(!ticks.isEmpty)
+        #expect(ticks.allSatisfy { $0 >= 1 })
+        #expect(ticks.first == 1)
+    }
+
+    @Test func heatmapBinsGroupByApex() {
+        let series = [
+            makeSeries(id: "1", ssid: "A", channel: 6),
+            makeSeries(id: "2", ssid: "B", channel: 6),
+            makeSeries(id: "3", ssid: "C", channel: 11),
+        ]
+        let heatmap = BandChartLayout.heatmapBins(series: series)
+        #expect(heatmap.bins.count == 2)
+        #expect(heatmap.maxCount == 2)
+        #expect(heatmap.bins.first?.colors.count == 2)
+        #expect(heatmap.bins.last?.colors.count == 1)
+    }
+
+    @Test func placeLabelsKeepsSelectedSeries() {
+        let selected = makeSeries(id: "selected", ssid: "Selected", channel: 6, rssi: -40)
+        let other = makeSeries(id: "other", ssid: "Other", channel: 6, rssi: -45)
+        let rect = CGRect(x: 0, y: 0, width: 200, height: 100)
+        let labels = BandChartLayout.placeLabels(
+            seriesData: [other, selected],
+            chartRect: rect,
+            xMin: 1,
+            scaleX: 10,
+            scaleY: 1,
+            yMin: Double(Constants.rssiNoiseFloor),
+            selectedNetworkID: "selected"
+        )
+        #expect(labels.contains { $0.series.id == "selected" })
+    }
+
+    @Test func nearestSeriesFindsClosestCurve() {
+        let series = makeSeries(id: "hit", ssid: "Hit", channel: 6, rssi: -40)
+        let geo = ChartGeometry(
+            chartRect: CGRect(x: 0, y: 0, width: 200, height: 120),
+            xMin: 1,
+            xMax: 14,
+            yMin: Double(Constants.rssiNoiseFloor),
+            yMax: 0
+        )
+        let point = geo.dataToPoint(x: Double(series.apex), y: Double(series.displayRSSI))
+        let hit = BandChartLayout.nearestSeries(at: point, in: [series], geometry: geo, radius: 20)
+        #expect(hit?.0.id == "hit")
+    }
+
+    // MARK: - SnapshotToChartAdapter
+
+    @Test func channelWidthMHzParsesCorrectly() {
+        #expect(SnapshotToChartAdapter.channelWidthMHz(from: "160") == 160)
+        #expect(SnapshotToChartAdapter.channelWidthMHz(from: "80") == 80)
+        #expect(SnapshotToChartAdapter.channelWidthMHz(from: "40") == 40)
+        #expect(SnapshotToChartAdapter.channelWidthMHz(from: "20") == 20)
+        #expect(SnapshotToChartAdapter.channelWidthMHz(from: "") == 20)
+        #expect(SnapshotToChartAdapter.channelWidthMHz(from: "invalid") == 20)
+    }
+
+    @Test func toSeriesDataFiltersByBand() {
+        let snap24 = NetworkSnapshot(
+            timestamp: Date(), bssid: "aa:bb:cc:dd:ee:01", ssid: "Net2G",
+            rssi: -50, channel: 6, band: "24", phyMode: "ax",
+            channelWidth: "40", mcs: "", nss: "", security: "",
+            country: "", supportsK: true, supportsR: true,
+            supportsV: true, supportsWPA3: false, isHiddenSSID: false
+        )
+        let snap5 = NetworkSnapshot(
+            timestamp: Date(), bssid: "aa:bb:cc:dd:ee:02", ssid: "Net5G",
+            rssi: -45, channel: 52, band: "5", phyMode: "ac",
+            channelWidth: "80", mcs: "", nss: "", security: "",
+            country: "", supportsK: false, supportsR: false,
+            supportsV: false, supportsWPA3: true, isHiddenSSID: false
+        )
+        let dict = ["bssid1": snap24, "bssid2": snap5]
+        let hasher = SSIDColorHasher()
+
+        let series2G = SnapshotToChartAdapter.toSeriesData(snapshotsByBSSID: dict, band: .band24GHz, colorHasher: hasher)
+        #expect(series2G.count == 1)
+        #expect(series2G.first?.ssid == "Net2G")
+
+        let series5G = SnapshotToChartAdapter.toSeriesData(snapshotsByBSSID: dict, band: .band5GHz, colorHasher: hasher)
+        #expect(series5G.count == 1)
+        #expect(series5G.first?.ssid == "Net5G")
+    }
+
+    @Test func toSeriesDataEmptyInputProducesEmptyOutput() {
+        let series = SnapshotToChartAdapter.toSeriesData(
+            snapshotsByBSSID: [:],
+            band: .band5GHz,
+            colorHasher: SSIDColorHasher()
+        )
+        #expect(series.isEmpty)
+    }
+
+    @Test func toSeriesDataSkipsInvalidBand() {
+        let snap = NetworkSnapshot(
+            timestamp: Date(), bssid: "aa:bb:cc:dd:ee:03", ssid: "BadBand",
+            rssi: -50, channel: 6, band: "99", phyMode: "ax",
+            channelWidth: "20", mcs: "", nss: "", security: "",
+            country: "", supportsK: false, supportsR: false,
+            supportsV: false, supportsWPA3: false, isHiddenSSID: false
+        )
+        let series = SnapshotToChartAdapter.toSeriesData(
+            snapshotsByBSSID: ["bssid": snap],
+            band: .band5GHz,
+            colorHasher: SSIDColorHasher()
+        )
+        #expect(series.isEmpty)
     }
 }
