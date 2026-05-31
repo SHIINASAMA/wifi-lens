@@ -18,5 +18,6 @@ struct WiFiOffView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, 24)
+        .accessibilityIdentifier("wifi-off-view")
     }
 }

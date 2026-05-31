@@ -15,13 +15,6 @@
     {
       "target" : {
         "containerPath" : "container:WiFiLens.xcodeproj",
-        "identifier" : "32B8DFED1C1CBAD8FD8C797C",
-        "name" : "WiFiLensTests"
-      }
-    },
-    {
-      "target" : {
-        "containerPath" : "container:WiFiLens.xcodeproj",
         "identifier" : "FBA000070000000000000007",
         "name" : "WiFiLensUITests"
       }

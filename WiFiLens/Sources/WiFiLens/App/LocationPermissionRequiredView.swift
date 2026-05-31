@@ -15,21 +15,25 @@ struct LocationPermissionRequiredView: View {
                 Button(String(localized: "common.action.open_system_settings", comment: "Button to open macOS System Settings")) {
                     openLocationPreferences()
                 }
+                .accessibilityIdentifier("open-location-settings-button")
             case .denied:
                 Text(String(localized: "permission.location.required_short", comment: "Short label: Location Services required"))
                     .foregroundColor(.secondary)
                 Button(String(localized: "common.action.open_location_preferences", comment: "Button to open Location Services preferences")) {
                     openLocationPreferences()
                 }
+                .accessibilityIdentifier("open-location-settings-button")
             default:
                 Text(String(localized: "permission.location.required_short", comment: "Short label: Location Services required"))
                     .foregroundColor(.secondary)
                 Button(String(localized: "common.action.open_location_preferences", comment: "Button to open Location Services preferences")) {
                     openLocationPreferences()
                 }
+                .accessibilityIdentifier("open-location-settings-button")
             }
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityIdentifier("location-permission-view")
     }
 }

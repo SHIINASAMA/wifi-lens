@@ -54,6 +54,7 @@ struct SettingsView: View {
                         Text(String(localized: "common.label.dark", comment: "Dark appearance theme option")).tag("dark")
                     }
                     .pickerStyle(.segmented)
+                    .accessibilityIdentifier("settings-theme-picker")
                     if BuildConfig.current == .pro {
                         Toggle(String(localized: "settings.appearance.hide_badge", comment: "Toggle to hide the title badge"), isOn: $hideTitleBadge)
                     }
@@ -71,6 +72,7 @@ struct SettingsView: View {
                         Text(String(localized: "settings.scan.interval_10s", comment: "10 second scan interval option")).tag(10)
                     }
                     .pickerStyle(.menu)
+                    .accessibilityIdentifier("settings-scan-interval-picker")
 
                     Picker(String(localized: "settings.region.header", comment: "Regulatory region picker label"), selection: $regionOverride) {
                         Text(String(localized: "settings.region.auto_detect", comment: "Auto-detect regulatory region option")).tag("auto")
@@ -80,6 +82,7 @@ struct SettingsView: View {
                         Text(String(localized: "settings.region.eu_etsi", comment: "EU ETSI regulatory region option")).tag("EU")
                     }
                     .pickerStyle(.menu)
+                    .accessibilityIdentifier("settings-region-picker")
 
                     Text(String(localized: "settings.region.description", comment: "Description of how regional regulation filtering works"))
                         .font(.caption)
@@ -106,6 +109,7 @@ struct SettingsView: View {
                                 }
                             ))
                                 .labelsHidden()
+                                .accessibilityIdentifier("settings-ble-toggle")
                         }
                         Text(String(localized: "settings.features.ble_description", comment: "Description of Bluetooth analysis feature"))
                             .font(.callout)
@@ -129,6 +133,7 @@ struct SettingsView: View {
                                 .font(.body)
                             Spacer()
                             PermissionStatusBadge(isAuthorized: locationPermission.isAuthorizedForSSID)
+                                .accessibilityIdentifier("permission-location-badge")
                         }
                         PermissionDescriptionText(String(localized: "settings.permissions.location_desc", comment: "Description of why Location Services is needed"))
                         Button(String(localized: "common.action.open_location_settings", comment: "Button to open Location Services settings")) {
@@ -148,6 +153,7 @@ struct SettingsView: View {
                                 .font(.body)
                             Spacer()
                             PermissionStatusBadge(isAuthorized: bluetoothPermission?.isAuthorized ?? false)
+                                .accessibilityIdentifier("permission-bluetooth-badge")
                                 .opacity(bluetoothPermission != nil ? 1.0 : 0.5)
                         }
                         PermissionDescriptionText(
@@ -170,6 +176,7 @@ struct SettingsView: View {
                 // MARK: - MCP
                 Section {
                     Toggle(String(localized: "settings.mcp.enable_toggle", comment: "Toggle to enable the MCP HTTP server"), isOn: $mcpEnabled)
+                        .accessibilityIdentifier("settings-mcp-toggle")
                     Text(String(localized: "settings.mcp.description", comment: "Description of the MCP server feature"))
                         .font(.caption)
                         .foregroundColor(.secondary)
@@ -178,6 +185,7 @@ struct SettingsView: View {
                         Text(String(localized: "settings.mcp.port_label", comment: "MCP server port field label"))
                         TextField("", value: $mcpPort, format: .number)
                             .frame(width: 80)
+                            .accessibilityIdentifier("settings-mcp-port-field")
                         Stepper("", value: $mcpPort, in: 1024...65535)
                             .labelsHidden()
                     }
@@ -200,6 +208,7 @@ struct SettingsView: View {
                 if BuildConfig.current == .oss {
                 Section {
                     Toggle(String(localized: "settings.updates.auto_check", comment: "Toggle for automatic update checking"), isOn: $autoCheck)
+                        .accessibilityIdentifier("settings-auto-check-toggle")
                         .onChange(of: autoCheck) { _, newValue in
                             updater.automaticallyChecksForUpdates = newValue
                             AppLogger.app.info("Sparkle auto-check \(newValue ? "enabled" : "disabled")")
@@ -209,6 +218,7 @@ struct SettingsView: View {
                             updater.checkForUpdates()
                             AppLogger.app.info("Sparkle manual update check triggered")
                         }
+                        .accessibilityIdentifier("settings-check-now-button")
                         Spacer()
                     }
                 } header: {
@@ -226,6 +236,7 @@ struct SettingsView: View {
                         Button(String(localized: "common.action.reveal_logs", comment: "Button to reveal log files in Finder")) {
                             AppLogger.revealInFinder()
                         }
+                        .accessibilityIdentifier("settings-reveal-logs-button")
                     }
                 } header: {
                     Text(String(localized: "settings.diagnostics.header", comment: "Diagnostics settings section header"))
@@ -240,6 +251,7 @@ struct SettingsView: View {
                                 NSWorkspace.shared.open(url)
                             }
                         }
+                        .accessibilityIdentifier("settings-privacy-policy-button")
                         Spacer()
                     }
                 } header: {
@@ -253,6 +265,7 @@ struct SettingsView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityIdentifier("settings-scroll-view")
         .onAppear {
             refreshPermissionStatuses()
         }

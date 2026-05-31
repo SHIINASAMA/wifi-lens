@@ -112,6 +112,7 @@ struct SidebarView: View {
             Section {
                 Label(SidebarPage.overview.label, systemImage: SidebarPage.overview.icon)
                     .tag(SidebarPage.overview)
+                    .accessibilityIdentifier("sidebar-overview")
             }
             Divider()
             Section {
@@ -125,16 +126,19 @@ struct SidebarView: View {
                             .tag(page)
                             .disabled(page.requiresWiFi && !isWiFiAvailable)
                             .opacity(page.requiresWiFi && !isWiFiAvailable ? 0.4 : 1.0)
+                            .accessibilityIdentifier("sidebar-bleScanner")
                     } else {
                         Label(page.label, systemImage: page.icon)
                             .tag(page)
                             .disabled(page.requiresWiFi && !isWiFiAvailable)
                             .opacity(page.requiresWiFi && !isWiFiAvailable ? 0.4 : 1.0)
+                            .accessibilityIdentifier("sidebar-\(page.rawValue)")
                     }
                 }
 #if DEBUG
                 Label(SidebarPage.debugChart.label, systemImage: SidebarPage.debugChart.icon)
                     .tag(SidebarPage.debugChart)
+                    .accessibilityIdentifier("sidebar-debugChart")
 #endif
             }
             Divider()
@@ -143,6 +147,7 @@ struct SidebarView: View {
 //                    .tag(SidebarPage.help)
                 Label(SidebarPage.settings.label, systemImage: SidebarPage.settings.icon)
                     .tag(SidebarPage.settings)
+                    .accessibilityIdentifier("sidebar-settings")
             }
         }
         .background(.ultraThinMaterial)

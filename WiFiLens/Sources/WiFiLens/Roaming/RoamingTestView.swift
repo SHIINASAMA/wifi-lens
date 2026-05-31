@@ -219,6 +219,7 @@ struct RoamingTestView: View {
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
+                .accessibilityIdentifier("roaming-save-session-button")
             }
 
             if viewModel.state != .running {
@@ -229,6 +230,7 @@ struct RoamingTestView: View {
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
+                .accessibilityIdentifier("roaming-load-session-button")
             }
 
             if viewModel.isRunning {
@@ -241,6 +243,7 @@ struct RoamingTestView: View {
                 .tint(.red)
                 .controlSize(.small)
                 .help(String(localized: "roaming.control.stop_tooltip", comment: "Tooltip for stop roaming test button"))
+                .accessibilityIdentifier("roaming-stop-test-button")
             } else {
                 Button {
                     viewModel.startTest()
@@ -251,6 +254,7 @@ struct RoamingTestView: View {
                 .controlSize(.small)
                 .disabled(!viewModel.canStart)
                 .help(String(localized: "roaming.control.start_tooltip", comment: "Tooltip for start roaming test button"))
+                .accessibilityIdentifier("roaming-start-test-button")
             }
         }
         .padding(.horizontal, 16)

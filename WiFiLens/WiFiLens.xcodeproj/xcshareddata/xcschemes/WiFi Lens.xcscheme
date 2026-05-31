@@ -33,7 +33,32 @@
             reference = "container:Tests/TestPlans/Default.xctestplan"
             default = "YES">
          </TestPlanReference>
+         <TestPlanReference
+            reference = "container:Tests/TestPlans/UITests.xctestplan">
+         </TestPlanReference>
       </TestPlans>
+      <Testables>
+         <TestableReference
+            skipped = "NO"
+            useTestTargetApplicationEnvironment = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FBA000070000000000000007"
+               BuildableName = "WiFiLensUITests.xctest"
+               BlueprintName = "WiFiLensUITests"
+               ReferencedContainer = "container:WiFiLens.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "4815C3B026D255EF85C56198"
+            BuildableName = "WiFi Lens.app"
+            BlueprintName = "WiFiLens"
+            ReferencedContainer = "container:WiFiLens.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"

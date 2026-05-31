@@ -18,14 +18,17 @@
 		318908BC49D244B1EEE68A9A /* ChannelSpanCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */; };
 		3711656F0C3ECD58CA29D407 /* NativeTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3299502DE1A130760C8A7 /* NativeTableView.swift */; };
 		39B4C850463F4305990A6943 /* SignalSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6180984B78D4363B6840C79 /* SignalSmoothing.swift */; };
+		3DC8FED8F49854F4CDFD4DCC /* BandChartRenderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCB /* BandChartRenderModel.swift */; };
+		3DC8FED8F49854F4CDFD4DCE /* BandChartLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCD /* BandChartLayout.swift */; };
+		3DC8FED8F49854F4CDFD4DCF /* BandChartLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCD /* BandChartLayout.swift */; };
+		3DC8FED8F49854F4CDFD4DD1 /* SnapshotToChartAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DD0 /* SnapshotToChartAdapter.swift */; };
+		3DC8FED8F49854F4CDFD4DD2 /* SnapshotToChartAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DD0 /* SnapshotToChartAdapter.swift */; };
+		3DC8FED8F49854F4CDFD4DDE /* BandChartRenderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCB /* BandChartRenderModel.swift */; };
 		46B405FC484C9C9A5509E8AC /* SpanDirection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310AD5ABC56B4211E30DD1DE /* SpanDirection.swift */; };
 		530D1F7F7F44460CABA342AB /* RoamingTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B13DBF938D654926B205302C /* RoamingTestView.swift */; };
 		56818EA68B0747B083E0FDF8 /* DeviceCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0470288A92AF41C793DAE70B /* DeviceCapabilities.swift */; };
 		5A390BC860BEB1F0D50DAC76 /* BLEChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E1C6C7FE18D0034F66CD3E /* BLEChannel.swift */; };
 		6680C83EB72E9C488E7F7616 /* BandChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */; };
-			3DC8FED8F49854F4CDFD4DCC /* BandChartRenderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCB /* BandChartRenderModel.swift */; };
-			3DC8FED8F49854F4CDFD4DCE /* BandChartLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCD /* BandChartLayout.swift */; };
-				3DC8FED8F49854F4CDFD4DD1 /* SnapshotToChartAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DD0 /* SnapshotToChartAdapter.swift */; };
 		6ACEE4EC462933B7C4320468 /* ChannelBand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4079C5A47F59C655689BCFB8 /* ChannelBand.swift */; };
 		6ECFD8E459A49E4A6FA0FCB0 /* WiFiScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */; };
 		6EE067F9A1CC14BACCA0F3DB /* BLERSSISample.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCF8EF1A4D0D355ED657A6 /* BLERSSISample.swift */; };
@@ -77,9 +80,6 @@
 		FB1E32502FC7316C009D1BDC /* BLETrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */; };
 		FB1E32512FC7316C009D1BDC /* BLEScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D7CF00F0FEAA84B6E2F64C9 /* BLEScannerView.swift */; };
 		FB1E32522FC7316C009D1BDC /* BandChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */; };
-			3DC8FED8F49854F4CDFD4DDE /* BandChartRenderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCB /* BandChartRenderModel.swift */; };
-			3DC8FED8F49854F4CDFD4DCF /* BandChartLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCD /* BandChartLayout.swift */; };
-				3DC8FED8F49854F4CDFD4DD2 /* SnapshotToChartAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DD0 /* SnapshotToChartAdapter.swift */; };
 		FB1E32532FC7316C009D1BDC /* BandChartViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58FF378E09090DEBAAFA77F6 /* BandChartViewModel.swift */; };
 		FB1E32542FC7316C009D1BDC /* ChannelQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */; };
 		FB1E32552FC7316C009D1BDC /* CWChannel+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5DDCE8EACD706BD2BCEE4B /* CWChannel+Extensions.swift */; };
@@ -109,9 +109,6 @@
 		FB1E326E2FC7316C009D1BDC /* ScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */; };
 		FB1E326F2FC7316C009D1BDC /* HelpCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C72FBCD25C005F8214 /* HelpCenterView.swift */; };
 		FB1E32702FC7316C009D1BDC /* ChartTimeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */; };
-				FB9B7F4E2FC2D9650057B038 /* ChartTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4A2FC2D9650057B038 /* ChartTypes.swift */; };
-				FB9B7F4F2FC2D9650057B038 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4B2FC2D9650057B038 /* ChartView.swift */; };
-				FB9B7F522FC2D9650057B038 /* DetailOverviewChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */; };
 		FB1E32712FC7316C009D1BDC /* ChartGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F362FC2D9650057B038 /* ChartGeometry.swift */; };
 		FB1E32722FC7316C009D1BDC /* SplineInterpolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */; };
 		FB1E32732FC7316C009D1BDC /* RangeSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */; };
@@ -171,13 +168,18 @@
 		FB92F9252FBE208500BCEC67 /* DebugThroughputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */; };
 		FB92F9282FBE208500BCEC67 /* DebugRoamingChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */; };
 		FB9B7F3B2FC2D9650057B038 /* ChartTimeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */; };
-			FB9B7F4C2FC2D9650057B038 /* ChartTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4A2FC2D9650057B038 /* ChartTypes.swift */; };
-			FB9B7F4D2FC2D9650057B038 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4B2FC2D9650057B038 /* ChartView.swift */; };
-			FB9B7F512FC2D9650057B038 /* DetailOverviewChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */; };
 		FB9B7F3C2FC2D9650057B038 /* ChartGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F362FC2D9650057B038 /* ChartGeometry.swift */; };
 		FB9B7F3D2FC2D9650057B038 /* SplineInterpolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */; };
 		FB9B7F3E2FC2D9650057B038 /* ChartRendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F372FC2D9650057B038 /* ChartRendering.swift */; };
 		FB9B7F412FC2D9650057B038 /* RangeSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */; };
+		FB9B7F4C2FC2D9650057B038 /* ChartTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4A2FC2D9650057B038 /* ChartTypes.swift */; };
+		FB9B7F4D2FC2D9650057B038 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4B2FC2D9650057B038 /* ChartView.swift */; };
+		FB9B7F4E2FC2D9650057B038 /* ChartTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4A2FC2D9650057B038 /* ChartTypes.swift */; };
+		FB9B7F4F2FC2D9650057B038 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4B2FC2D9650057B038 /* ChartView.swift */; };
+		FB9B7F512FC2D9650057B038 /* DetailOverviewChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */; };
+		FB9B7F522FC2D9650057B038 /* DetailOverviewChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */; };
+		FBA000010000000000000001 /* WiFiLensUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA000040000000000000004 /* WiFiLensUITests.swift */; };
+		FBA000020000000000000002 /* WiFiLensUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA000050000000000000005 /* WiFiLensUITestsLaunchTests.swift */; };
 		FBAD00012FC400000057B038 /* LocationPermissionRequiredView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */; };
 		FBB1F0AC2FC61E3D00E9D2C6 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = FBB1F0AB2FC61E3D00E9D2C6 /* Localizable.xcstrings */; };
 		FBB2CA8A2FC0CB7500FC2D2C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */; };
@@ -200,6 +202,13 @@
 			remoteGlobalIDString = 4815C3B026D255EF85C56198;
 			remoteInfo = WiFiLens;
 		};
+		FBA000080000000000000008 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 70C77BA3C6064FF4D1D77E59 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4815C3B026D255EF85C56198;
+			remoteInfo = WiFiLens;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -214,9 +223,9 @@
 		36E1D69278614400AA3B660C /* ExponentialMovingAverage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExponentialMovingAverage.swift; sourceTree = "<group>"; };
 		38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLETrendChartView.swift; sourceTree = "<group>"; };
 		3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartView.swift; sourceTree = "<group>"; };
-			3DC8FED8F49854F4CDFD4DCB /* BandChartRenderModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartRenderModel.swift; sourceTree = "<group>"; };
-			3DC8FED8F49854F4CDFD4DCD /* BandChartLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartLayout.swift; sourceTree = "<group>"; };
-				3DC8FED8F49854F4CDFD4DD0 /* SnapshotToChartAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotToChartAdapter.swift; sourceTree = "<group>"; };
+		3DC8FED8F49854F4CDFD4DCB /* BandChartRenderModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartRenderModel.swift; sourceTree = "<group>"; };
+		3DC8FED8F49854F4CDFD4DCD /* BandChartLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartLayout.swift; sourceTree = "<group>"; };
+		3DC8FED8F49854F4CDFD4DD0 /* SnapshotToChartAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotToChartAdapter.swift; sourceTree = "<group>"; };
 		3EAF444453E304ABB57AF3AA /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		4079C5A47F59C655689BCFB8 /* ChannelBand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelBand.swift; sourceTree = "<group>"; };
 		51DDD97F3B94514DE0790B51 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -287,11 +296,14 @@
 		FB9B7F362FC2D9650057B038 /* ChartGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartGeometry.swift; sourceTree = "<group>"; };
 		FB9B7F372FC2D9650057B038 /* ChartRendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartRendering.swift; sourceTree = "<group>"; };
 		FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartTimeFormatting.swift; sourceTree = "<group>"; };
+		FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplineInterpolation.swift; sourceTree = "<group>"; };
+		FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSelectorView.swift; sourceTree = "<group>"; };
 		FB9B7F4A2FC2D9650057B038 /* ChartTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartTypes.swift; sourceTree = "<group>"; };
 		FB9B7F4B2FC2D9650057B038 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 		FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailOverviewChart.swift; sourceTree = "<group>"; };
-		FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplineInterpolation.swift; sourceTree = "<group>"; };
-		FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSelectorView.swift; sourceTree = "<group>"; };
+		FBA000030000000000000003 /* WiFiLensUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WiFiLensUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FBA000040000000000000004 /* WiFiLensUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiLensUITests.swift; sourceTree = "<group>"; };
+		FBA000050000000000000005 /* WiFiLensUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiLensUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermissionRequiredView.swift; sourceTree = "<group>"; };
 		FBB1F0AB2FC61E3D00E9D2C6 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = SOURCE_ROOT; };
@@ -401,8 +413,8 @@
 				7B31CBEBC05DEA7ADB03FE01 /* ContentView.swift */,
 				58FF378E09090DEBAAFA77F6 /* BandChartViewModel.swift */,
 				3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */,
-			3DC8FED8F49854F4CDFD4DCB /* BandChartRenderModel.swift */,
-			3DC8FED8F49854F4CDFD4DCD /* BandChartLayout.swift */,
+				3DC8FED8F49854F4CDFD4DCB /* BandChartRenderModel.swift */,
+				3DC8FED8F49854F4CDFD4DCD /* BandChartLayout.swift */,
 				3DC8FED8F49854F4CDFD4DD0 /* SnapshotToChartAdapter.swift */,
 				C51C237F247C80EC5176F5C0 /* ChartSeriesData.swift */,
 				1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */,
@@ -494,6 +506,7 @@
 				BD784856886985BCC6FC4F02 /* WiFi Lens.app */,
 				8F405489976429A068F15F86 /* WiFiLensTests.xctest */,
 				FB1E32A42FC7316C009D1BDC /* WiFi Lens Pro.app */,
+				FBA000030000000000000003 /* WiFiLensUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -614,6 +627,15 @@
 			path = Charts;
 			sourceTree = "<group>";
 		};
+		FBA000060000000000000006 /* WiFiLensUITests */ = {
+			isa = PBXGroup;
+			children = (
+				FBA000040000000000000004 /* WiFiLensUITests.swift */,
+				FBA000050000000000000005 /* WiFiLensUITestsLaunchTests.swift */,
+			);
+			path = WiFiLensUITests;
+			sourceTree = "<group>";
+		};
 		FBB77CDE2FC6BF9800CED0FB /* TestPlans */ = {
 			isa = PBXGroup;
 			children = (
@@ -642,6 +664,7 @@
 			children = (
 				FBB77CDE2FC6BF9800CED0FB /* TestPlans */,
 				FBD329482FBF0E2F00D01613 /* WiFiLensTests */,
+				FBA000060000000000000006 /* WiFiLensUITests */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -710,6 +733,24 @@
 			productReference = FB1E32A42FC7316C009D1BDC /* WiFi Lens Pro.app */;
 			productType = "com.apple.product-type.application";
 		};
+		FBA000070000000000000007 /* WiFiLensUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FBA0000D000000000000000D /* Build configuration list for PBXNativeTarget "WiFiLensUITests" */;
+			buildPhases = (
+				FBA0000A000000000000000A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FBA000090000000000000009 /* PBXTargetDependency */,
+			);
+			name = WiFiLensUITests;
+			packageProductDependencies = (
+			);
+			productName = WiFiLensUITests;
+			productReference = FBA000030000000000000003 /* WiFiLensUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -718,6 +759,11 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					FBA000070000000000000007 = {
+						TestTargetID = 4815C3B026D255EF85C56198;
+					};
+				};
 			};
 			buildConfigurationList = C7B2E8745D5E0030C0227E6E /* Build configuration list for PBXProject "WiFiLens" */;
 			developmentRegion = en;
@@ -743,6 +789,7 @@
 				4815C3B026D255EF85C56198 /* WiFiLens */,
 				FB1E32402FC7316C009D1BDC /* WiFiLensPro */,
 				32B8DFED1C1CBAD8FD8C797C /* WiFiLensTests */,
+				FBA000070000000000000007 /* WiFiLensUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -958,6 +1005,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FBA0000A000000000000000A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FBA000010000000000000001 /* WiFiLensUITests.swift in Sources */,
+				FBA000020000000000000002 /* WiFiLensUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -965,6 +1021,11 @@
 			isa = PBXTargetDependency;
 			target = 4815C3B026D255EF85C56198 /* WiFiLens */;
 			targetProxy = B3934361D41B2103307CC777 /* PBXContainerItemProxy */;
+		};
+		FBA000090000000000000009 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4815C3B026D255EF85C56198 /* WiFiLens */;
+			targetProxy = FBA000080000000000000008 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -974,15 +1035,18 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.nolze.WiFiLensTests;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.kaoru.WiFiLensTests;
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WiFi Lens.app/Contents/MacOS/WiFi Lens";
 			};
@@ -993,15 +1057,18 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 9V9YSD2N25;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.nolze.WiFiLensTests;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.kaoru.WiFiLensTests;
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WiFi Lens.app/Contents/MacOS/WiFi Lens";
 			};
@@ -1316,6 +1383,42 @@
 			};
 			name = Release;
 		};
+		FBA0000B000000000000000B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 9V9YSD2N25;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.kaoru.WiFiLensUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
+				TEST_TARGET = WiFiLens;
+				TEST_TARGET_NAME = WiFiLens;
+			};
+			name = Debug;
+		};
+		FBA0000C000000000000000C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 9V9YSD2N25;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.6;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.kaoru.WiFiLensUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
+				TEST_TARGET = WiFiLens;
+				TEST_TARGET_NAME = WiFiLens;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1351,6 +1454,15 @@
 			buildConfigurations = (
 				FB1E32A02FC7316C009D1BDC /* Debug */,
 				FB1E32A22FC7316C009D1BDC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FBA0000D000000000000000D /* Build configuration list for PBXNativeTarget "WiFiLensUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FBA0000B000000000000000B /* Debug */,
+				FBA0000C000000000000000C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

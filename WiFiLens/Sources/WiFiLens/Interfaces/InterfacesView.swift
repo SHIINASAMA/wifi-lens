@@ -40,6 +40,7 @@ struct InterfacesView: View {
                     .pickerStyle(.segmented)
                     .controlSize(.regular)
                     .frame(width: 240)
+                    .accessibilityIdentifier("interfaces-mode-picker")
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 16)

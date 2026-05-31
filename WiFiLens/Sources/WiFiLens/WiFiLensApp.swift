@@ -45,6 +45,7 @@ private struct AppRootView: View {
                         .opacity(selectedPage == .overview ? 1 : 0)
                         .allowsHitTesting(selectedPage == .overview)
                         .disabled(selectedPage != .overview)
+                        .accessibilityIdentifier("page-overview")
                 }
 
                 if visitedPages.contains(.spectrum) {
@@ -52,6 +53,7 @@ private struct AppRootView: View {
                         .opacity(selectedPage == .spectrum ? 1 : 0)
                         .allowsHitTesting(selectedPage == .spectrum)
                         .disabled(selectedPage != .spectrum)
+                        .accessibilityIdentifier("page-spectrum")
                 }
 
                 if visitedPages.contains(.channels) {
@@ -59,6 +61,7 @@ private struct AppRootView: View {
                         .opacity(selectedPage == .channels ? 1 : 0)
                         .allowsHitTesting(selectedPage == .channels)
                         .disabled(selectedPage != .channels)
+                        .accessibilityIdentifier("page-channels")
                 }
 
                 if visitedPages.contains(.interfaces) {
@@ -66,6 +69,7 @@ private struct AppRootView: View {
                         .opacity(selectedPage == .interfaces ? 1 : 0)
                         .allowsHitTesting(selectedPage == .interfaces)
                         .disabled(selectedPage != .interfaces)
+                        .accessibilityIdentifier("page-interfaces")
                 }
 
                 if visitedPages.contains(.roaming) {
@@ -73,6 +77,7 @@ private struct AppRootView: View {
                         .opacity(selectedPage == .roaming ? 1 : 0)
                         .allowsHitTesting(selectedPage == .roaming)
                         .disabled(selectedPage != .roaming)
+                        .accessibilityIdentifier("page-roaming")
                 }
 
                 if visitedPages.contains(.bleScanner) {
@@ -80,6 +85,7 @@ private struct AppRootView: View {
                         .opacity(selectedPage == .bleScanner ? 1 : 0)
                         .allowsHitTesting(selectedPage == .bleScanner)
                         .disabled(selectedPage != .bleScanner)
+                        .accessibilityIdentifier("page-bleScanner")
                 }
 
                 if visitedPages.contains(.help) {
@@ -87,6 +93,7 @@ private struct AppRootView: View {
                         .opacity(selectedPage == .help ? 1 : 0)
                         .allowsHitTesting(selectedPage == .help)
                         .disabled(selectedPage != .help)
+                        .accessibilityIdentifier("page-help")
                 }
 
                 if visitedPages.contains(.settings) {
@@ -94,6 +101,7 @@ private struct AppRootView: View {
                         .opacity(selectedPage == .settings ? 1 : 0)
                         .allowsHitTesting(selectedPage == .settings)
                         .disabled(selectedPage != .settings)
+                        .accessibilityIdentifier("page-settings")
                 }
 
 #if DEBUG
@@ -102,6 +110,7 @@ private struct AppRootView: View {
                         .opacity(selectedPage == .debugChart ? 1 : 0)
                         .allowsHitTesting(selectedPage == .debugChart)
                         .disabled(selectedPage != .debugChart)
+                        .accessibilityIdentifier("page-debugChart")
                 }
 #endif
             }

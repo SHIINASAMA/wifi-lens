@@ -80,6 +80,7 @@ private struct BLEScannerContentView: View {
             .buttonStyle(.plain)
             .help(viewModel.isScanning ? String(localized: "ble.control.stop_scanning", comment: "Button to stop BLE scanning") : String(localized: "ble.control.start_scanning", comment: "Button to start BLE scanning"))
             .disabled(viewModel.bluetoothState != .poweredOn)
+            .accessibilityIdentifier("ble-scan-toggle-button")
 
             Circle()
                 .fill(stateColor)
@@ -100,6 +101,7 @@ private struct BLEScannerContentView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
+        .accessibilityIdentifier("ble-control-bar")
     }
 
     // MARK: - Content

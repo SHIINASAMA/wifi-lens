@@ -56,6 +56,7 @@ struct ChannelQualityView: View {
                     .pickerStyle(.segmented)
                     .controlSize(.regular)
                     .frame(width: 160)
+                    .accessibilityIdentifier("channel-quality-mode-picker")
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
