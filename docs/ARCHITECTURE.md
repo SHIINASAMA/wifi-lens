@@ -6,13 +6,22 @@ macOS Wi-Fi spectrum analyzer (SwiftUI + CoreWLAN + AppKit interop). Targets mac
 
 ```
 CoreWLAN scan → WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gaussian curves)
-                          → BandChartViewModel (per-band rendering state)
+                          → BandChartViewModel (per-band state → BandChartRenderModel)
                           → ScannerViewModel (single source of truth)
                               ├── combinedTableRows → NativeTableView (AppKit NSTableView)
                               ├── channelQualities → ChannelQualityCalculator → ChannelQualityView
-                              ├── bandViewModels → BandChartView (SwiftUI Canvas)
+                              ├── bandViewModels → WiFiBandChart → Chart (universal renderer)
                               ├── networkInfo → InterfacesView
-                              └── roamingSamples → RoamingTestViewModel → RoamingTestView (Timeline Chart)
+                              └── roamingSamples → RoamingTestViewModel → RoamingTestView
+
+Chart Engine (Charts/):
+  Caller builds [ChartSeries] + ChartAxisConfig + ChartStyle
+      → Chart<Overlay> → GeometryReader → ChartGeometry
+      → Canvas: grid, axes, clip, draw series by interpolation mode
+      → overlay(geo, series)
+
+  DetailOverviewChart wraps two Charts + RangeSelector for linked zoom/overview.
+  See docs/CHARTS.md for full architecture.
 ```
 
 ## Source Layout
@@ -20,11 +29,11 @@ CoreWLAN scan → WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gau
 | Path | Responsibility |
 |------|---------------|
 | `Scanner/` | CoreWLAN scan loop, ViewModel, network/channel models |
-| `Spectrum/` | BandChartView (Canvas), TrendChartView, ContentView (dashboard), SignalHistoryStore |
+| `Spectrum/` | WiFiBandChart, BandChartViewModel, BandChartRenderModel, BandChartLayout, ContentView (dashboard), ChartSeriesData, ChannelSpanCalculator, SignalHistoryStore, NetworkSnapshot, TrendChartView, SnapshotToChartAdapter, SSIDColorHasher |
 | `Channels/` | ChannelQualityCalculator, ChannelQualityView |
-| `Charts/` | Shared Canvas utilities: ChartGeometry, splines, grid/axis rendering, time formatting, range selector |
-| `Interfaces/` | InterfacesView, ThroughputMonitor, NetworkInfoService |
-| `Roaming/` | RoamingTestView, RoamingTestViewModel, AP transition tracking, timeline chart with range selector |
+| `Charts/` | Universal Chart engine: ChartView, ChartTypes, DetailOverviewChart, RangeSelectorView, ChartGeometry, SplineInterpolation, ChartTimeFormatting, ChartRendering (legacy) |
+| `Interfaces/` | InterfacesView, ThroughputMonitor, ThroughputChartView, NetworkInfoService |
+| `Roaming/` | RoamingTestView, RoamingTestViewModel, AP transition tracking, timeline chart with DetailOverviewChart |
 | `SignalProcessing/` | RSSI signal smoothing (EMA, Kalman, Hysteresis EMA) |
 | `Table/` | NativeTableView (NSViewRepresentable wrapping NSTableView) |
 | `App/` | OverviewView, SidebarView, SettingsView, Logging, CrashReporter, SparkleUpdater, TitleBadge |
@@ -40,11 +49,14 @@ CoreWLAN scan → WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gau
 - `ScannerViewModel` is `@Observable`, passed via `@Bindable` through the view tree
 - Selection flows bidirectionally: table row → `selectedNetworkID` → chart highlight; chart curve click → `selectedNetworkID` → table row highlight
 - `NativeTableView` uses `Coordinator` as `NSTableViewDelegate` + `NSTableViewDataSource`
-- Chart curves are Gaussian bell shapes computed in `ChartSeriesData.curvePoints`/`displayCurvePoints`; `displayRSSI` animates toward `rssi` for smooth transitions
-- All Canvas charts share utilities from `Charts/`: `ChartGeometry` for coordinate mapping, `ChartRendering` for grid/axis/area-fill, `SplineInterpolation` for Catmull-Rom and clamped cubic curves, `RangeSelectorView` for timeline window selection
+- **Chart Engine** — All chart views build `[ChartSeries]` arrays and delegate rendering to the universal `Chart<Overlay>` component. Domain-specific overlays (tooltips, heatmaps, data labels, transition markers) are injected via a `ViewBuilder` closure. See `docs/CHARTS.md`.
+- `WiFiBandChart` is decoupled from `BandChartViewModel` via `BandChartRenderModel` — a value-type snapshot created each render pass, so the view never holds a reference to the ViewModel
+- **ChartSeriesData split**: `ChartSeriesDomainData` (immutable network identity) + `ChartSeriesRenderState` (mutable visual state: animated `displayRSSI`, `color`, filter/visibility flags, trend indicators). `ChartSeriesData` wraps both with computed passthrough properties
+- `displayRSSI` animates toward `rssi` each tick for smooth Gaussian curve transitions
 - AP roaming transitions share a single timestamp between old and new segments, eliminating gaps on the timeline
 - Signal history (`SignalHistoryStore`) keeps 20 snapshots per BSSID in memory
 - `StableScore` provides hysteresis for quality level boundaries (upgrade margin 2, downgrade margin 5)
+- `ChannelBand(id:)` failable initializer maps String band IDs ("24"/"5"/"6") to enum cases, used by `SnapshotToChartAdapter` for history playback
 
 ## Localization
 
@@ -60,7 +72,7 @@ CoreWLAN scan → WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gau
 ## Testing
 
 - Framework: Swift Testing (`import Testing`, `@Test`, `#expect()`)
-- Tests cover pure-logic modules: `ChannelSpanCalculator`, `IEParser`, `SSIDColorHasher`, `ChannelQualityCalculator`, `NetworkTableRow`
+- Tests cover pure-logic modules: `ChannelSpanCalculator`, `IEParser`, `SSIDColorHasher`, `ChannelQualityCalculator`, `NetworkTableRow`, `BandChartViewModel`, `BandChartLayout`, `SnapshotToChartAdapter`
 - Test target uses `@testable import WiFiLens`
 
 ## Design Conventions

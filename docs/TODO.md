@@ -9,7 +9,7 @@
 ## Product Directions
 
 - [ ] Unify export into a single reporting flow: multi-band export, richer CSV schema, and session snapshots suitable for sharing/debugging
-- [ ] Replace custom chart hit-testing/zoom/labels with a charting approach that supports hover, selection, and accessibility more naturally
+- [x] Replace custom chart hit-testing/zoom/labels with a charting approach that supports hover, selection, and accessibility more naturally — achieved via universal `Chart<Overlay>` engine (see `docs/CHARTS.md`)
 - [ ] Turn signal history into a first-class session model: persisted timelines, monitored SSIDs, threshold alerts, and historical comparisons
 - [ ] Add a small verification matrix for UI regressions across light/dark mode, localization, and no-permission / no-data states
 

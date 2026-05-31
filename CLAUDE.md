@@ -9,6 +9,7 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | File | Purpose |
 |------|---------|
 | `docs/ARCHITECTURE.md` | Architecture, data flow, key patterns, design conventions |
+| `docs/CHARTS.md` | Universal Chart engine, types, rendering pipeline, WiFi spectrum integration |
 | `docs/TODO.md` | Feature roadmap and checked-off items |
 | `docs/ISSUES.md` | Bugs, regressions, and deferred work with status |
 
