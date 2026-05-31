@@ -63,11 +63,7 @@ struct ThroughputChartView: View {
         axis.yTickLabelOffset = 24
         axis.yTickFont = .system(size: 8)
         axis.gridColor = .gray.opacity(0.12)
-
-        // Custom Y tick labels with rate formatting
-        // We override via overlay... actually let's use the built-in Y grid with custom labels
-        // The Chart will draw grid lines at step intervals; labels are formatted numbers
-        // For throughput we need rate labels like "1.5M"
+        axis.yTickLabel = { rateLabel(abs($0)) }
 
         // X-axis time labels
         let tickIndices = evenlySpacedTickIndices(count: samples.count, targetCount: min(6, max(3, samples.count / 15)))
@@ -107,5 +103,12 @@ struct ThroughputChartView: View {
             ChartSeries(id: "download", points: dlPts, style: dlStyle),
             ChartSeries(id: "upload", points: ulPts, style: ulStyle),
         ]
+    }
+
+    private func rateLabel(_ bytesPerSec: Double) -> String {
+        if bytesPerSec < 1_024 { return String(format: "%.0f", bytesPerSec) }
+        if bytesPerSec < 1_048_576 { return String(format: "%.0fK", bytesPerSec / 1_024) }
+        if bytesPerSec < 1_073_741_824 { return String(format: "%.1fM", bytesPerSec / 1_048_576) }
+        return String(format: "%.1fG", bytesPerSec / 1_073_741_824)
     }
 }

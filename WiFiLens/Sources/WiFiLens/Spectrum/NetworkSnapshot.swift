@@ -20,4 +20,63 @@ struct NetworkSnapshot: Codable {
     let supportsV: Bool
     let supportsWPA3: Bool
     let isHiddenSSID: Bool
+
+    init(
+        timestamp: Date,
+        bssid: String,
+        ssid: String,
+        rssi: Int,
+        channel: Int,
+        band: String,
+        phyMode: String,
+        channelWidth: String,
+        mcs: String,
+        nss: String,
+        security: String,
+        country: String,
+        supportsK: Bool,
+        supportsR: Bool,
+        supportsV: Bool,
+        supportsWPA3: Bool,
+        isHiddenSSID: Bool
+    ) {
+        self.timestamp = timestamp
+        self.bssid = bssid
+        self.ssid = ssid
+        self.rssi = rssi
+        self.channel = channel
+        self.band = band
+        self.phyMode = phyMode
+        self.channelWidth = channelWidth
+        self.mcs = mcs
+        self.nss = nss
+        self.security = security
+        self.country = country
+        self.supportsK = supportsK
+        self.supportsR = supportsR
+        self.supportsV = supportsV
+        self.supportsWPA3 = supportsWPA3
+        self.isHiddenSSID = isHiddenSSID
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        timestamp = try container.decode(Date.self, forKey: .timestamp)
+        bssid = try container.decodeIfPresent(String.self, forKey: .bssid) ?? ""
+        ssid = try container.decodeIfPresent(String.self, forKey: .ssid) ?? ""
+        rssi = try container.decode(Int.self, forKey: .rssi)
+        channel = try container.decode(Int.self, forKey: .channel)
+        band = try container.decode(String.self, forKey: .band)
+        phyMode = try container.decode(String.self, forKey: .phyMode)
+        channelWidth = try container.decode(String.self, forKey: .channelWidth)
+        mcs = try container.decode(String.self, forKey: .mcs)
+        nss = try container.decode(String.self, forKey: .nss)
+        security = try container.decode(String.self, forKey: .security)
+        country = try container.decode(String.self, forKey: .country)
+        supportsK = try container.decode(Bool.self, forKey: .supportsK)
+        supportsR = try container.decode(Bool.self, forKey: .supportsR)
+        supportsV = try container.decode(Bool.self, forKey: .supportsV)
+        supportsWPA3 = try container.decode(Bool.self, forKey: .supportsWPA3)
+        isHiddenSSID = try container.decodeIfPresent(Bool.self, forKey: .isHiddenSSID) ?? false
+    }
 }

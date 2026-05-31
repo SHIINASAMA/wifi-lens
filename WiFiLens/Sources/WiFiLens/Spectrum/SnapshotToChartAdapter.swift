@@ -44,7 +44,8 @@ enum SnapshotToChartAdapter {
     static func toSeriesData(
         snapshotsByBSSID: [String: NetworkSnapshot],
         band: ChannelBand,
-        colorHasher: SSIDColorHasher
+        colorHasher: SSIDColorHasher,
+        trends: [String: (direction: TrendDirection, delta: Int)] = [:]
     ) -> [ChartSeriesData] {
         var series: [ChartSeriesData] = []
         for (bssid, snap) in snapshotsByBSSID {
@@ -59,6 +60,16 @@ enum SnapshotToChartAdapter {
             )
             let apex = Double(left + right) / 2.0
             let stableID = "\(bssid)-\(snap.channel)-\(band.rawValue)"
+
+            let trend = trends[bssid]
+            let arrow: String = {
+                switch trend?.direction {
+                case .up:     return "▲"
+                case .down:   return "▼"
+                case .stable: return "●"
+                case .none:   return ""
+                }
+            }()
 
             let domain = ChartSeriesDomainData(
                 id: stableID,
@@ -84,7 +95,9 @@ enum SnapshotToChartAdapter {
             let render = ChartSeriesRenderState(
                 displayRSSI: Double(snap.rssi),
                 color: colorHasher.color(for: snap.ssid, bssid: bssid),
-                isVisible: true
+                isVisible: true,
+                trendArrow: arrow,
+                trendDelta: trend?.delta ?? 0
             )
             series.append(ChartSeriesData(domain: domain, render: render))
         }

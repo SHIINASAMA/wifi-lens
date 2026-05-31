@@ -66,7 +66,6 @@ struct Chart<Overlay: View>: View {
                     interaction.onHover?(nil, nil)
                 }
             }
-            .onTapGesture { _ in }
             .simultaneousGesture(
                 interaction.zoomGestureEnabled && interaction.onZoom != nil
                     ? zoomGesture(geo: geo)
@@ -91,7 +90,7 @@ struct Chart<Overlay: View>: View {
         let dataMax = allY.max() ?? 0
         let rawMin = axis.yMin ?? dataMin
         let rawMax = axis.yMax ?? dataMax
-        let step = axis.yStep
+        let step = max(1e-6, axis.yStep)
         let yMin = floor(rawMin / step) * step
         let yMax = ceil(rawMax / step) * step
         return (yMin, yMax)
@@ -112,23 +111,28 @@ struct Chart<Overlay: View>: View {
 
         // Y-axis grid + labels
         if axis.showYGrid {
-            let step = Int(axis.yStep)
-            for val in stride(from: Int(geo.yMin), through: Int(geo.yMax), by: step) where Double(val) >= geo.yMin {
-                let y = rect.maxY - (Double(val) - geo.yMin) * geo.scaleY
+            let step = max(1e-6, axis.yStep)
+            let count = Int(((geo.yMax - geo.yMin) / step).rounded())
+            for i in 0...count {
+                let val = geo.yMin + Double(i) * step
+                let y = rect.maxY - (val - geo.yMin) * geo.scaleY
                 var line = Path()
                 line.move(to: CGPoint(x: rect.minX, y: y))
                 line.addLine(to: CGPoint(x: rect.maxX, y: y))
                 context.stroke(line, with: .color(axis.gridColor), lineWidth: 1)
                 context.draw(
-                    Text("\(val)").font(axis.yTickFont).foregroundColor(axis.yTickColor),
+                    Text(axis.yTickLabel(val)).font(axis.yTickFont).foregroundColor(axis.yTickColor),
                     at: CGPoint(x: rect.minX - axis.yTickLabelOffset, y: y)
                 )
             }
         }
 
         // X-axis ticks + labels
+        var lastLabelX: CGFloat = -.greatestFiniteMagnitude
         for tick in axis.xTicks where tick.position >= geo.xMin && tick.position <= geo.xMax {
             let x = rect.minX + (tick.position - geo.xMin) * geo.scaleX
+            if axis.minXTickSpacing > 0, abs(x - lastLabelX) < axis.minXTickSpacing { continue }
+            lastLabelX = x
             context.draw(
                 Text(tick.label).font(axis.xTickFont).foregroundColor(axis.xTickColor),
                 at: CGPoint(x: x, y: rect.maxY + axis.xTickLabelOffset)

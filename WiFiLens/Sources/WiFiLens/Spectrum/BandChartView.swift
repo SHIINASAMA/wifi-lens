@@ -11,12 +11,6 @@ struct WiFiBandChart: View {
     @State private var hoverPoint: CGPoint = .zero
     @State private var isHovering: Bool = false
 
-    private let leftAxisWidth: CGFloat = 38
-    private let bottomAxisHeight: CGFloat = 42
-    private let chartMarginTop: CGFloat = 6
-    private let chartMarginRight: CGFloat = 8
-    private let chartMarginBottom: CGFloat = 4
-
     var body: some View {
         VStack(spacing: 0) {
             chartToolbar
@@ -82,11 +76,7 @@ struct WiFiBandChart: View {
     }
 
     private func computeGeo(size: CGSize) -> ChartGeometry {
-        let chartRect = CGRect(
-            x: leftAxisWidth, y: chartMarginTop,
-            width: size.width - leftAxisWidth - chartMarginRight,
-            height: size.height - bottomAxisHeight - chartMarginTop - chartMarginBottom
-        )
+        let chartRect = chartStyle.chartRect(size: size)
         let xMin = model.zoomMin ?? Double(model.xDataMin)
         let xMax = model.zoomMax ?? Double(model.xDataMax)
         let yMin = model.yMin
@@ -183,7 +173,7 @@ struct WiFiBandChart: View {
         let labels = BandChartLayout.placeLabels(
             seriesData: seriesList, chartRect: geo.chartRect,
             xMin: geo.xMin, scaleX: geo.scaleX, scaleY: geo.scaleY,
-            yMin: model.yMin, selectedNetworkID: selectedNetworkID
+            yMin: geo.yMin, selectedNetworkID: selectedNetworkID
         )
         return ForEach(labels, id: \.series.id) { item in
             Text("\(item.series.channel) \(item.series.displaySSID)\(trendSuffix(for: item.series))")
@@ -226,9 +216,29 @@ struct WiFiBandChart: View {
             VStack(spacing: 0) {
                 chartToolbar
                 GeometryReader { geometry in
+                    let geo = computeGeo(size: geometry.size)
                     Chart(series: buildSeries(), axis: axisConfig, style: chartStyle) { chartGeo, _ in
                         heatmapOverlay(geo: chartGeo)
                         dataLabelOverlay(geo: chartGeo)
+                    }
+                    .onContinuousHover(coordinateSpace: .local) { phase in
+                        switch phase {
+                        case .active(let location):
+                            isHovering = true
+                            if let (series, pt) = BandChartLayout.nearestSeries(at: location, in: visibleSeries, geometry: geo, radius: 14) {
+                                hoveredSeries = series; hoverPoint = pt
+                            } else { hoveredSeries = nil }
+                        case .ended:
+                            isHovering = false; hoveredSeries = nil
+                        }
+                    }
+                    .onTapGesture { selectedNetworkID = hoveredSeries?.id }
+                    .gesture(zoomGesture(in: geometry, geo: geo))
+                    .overlay {
+                        if isHovering, let series = hoveredSeries {
+                            ChartTooltip(ssid: series.displaySSID, rssi: series.rssi, channel: series.channel, bssid: series.bssid)
+                                .position(x: clampX(hoverPoint.x, in: geo.chartRect), y: max(hoverPoint.y - 22, 4))
+                        }
                     }
                 }
             }

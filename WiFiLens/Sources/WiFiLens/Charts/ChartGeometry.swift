@@ -8,8 +8,8 @@ struct ChartGeometry {
     let yMin: Double
     let yMax: Double
 
-    var scaleX: CGFloat { chartRect.width / (xMax - xMin) }
-    var scaleY: CGFloat { chartRect.height / (yMax - yMin) }
+    var scaleX: CGFloat { chartRect.width / max(1e-6, xMax - xMin) }
+    var scaleY: CGFloat { chartRect.height / max(1e-6, yMax - yMin) }
 
     func dataToPoint(x: Double, y: Double) -> CGPoint {
         CGPoint(

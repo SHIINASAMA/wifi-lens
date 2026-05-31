@@ -71,6 +71,8 @@ struct ChartAxisConfig {
     var xTickFont: Font = .caption2
     var yTickColor: Color = .secondary
     var xTickColor: Color = .secondary
+    var yTickLabel: (Double) -> String = { "\(Int($0))" }
+    var minXTickSpacing: CGFloat = 32   // skip labels closer than this; 0 = draw all
 
     struct XTick {
         var position: Double    // data-space x
@@ -91,8 +93,8 @@ struct ChartStyle {
         CGRect(
             x: leftAxisWidth,
             y: marginTop,
-            width: size.width - leftAxisWidth - marginRight,
-            height: size.height - bottomAxisHeight - marginTop - marginBottom
+            width: max(0, size.width - leftAxisWidth - marginRight),
+            height: max(0, size.height - bottomAxisHeight - marginTop - marginBottom)
         )
     }
 }

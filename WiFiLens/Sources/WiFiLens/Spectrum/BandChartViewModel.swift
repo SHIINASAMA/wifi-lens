@@ -8,7 +8,6 @@ final class BandChartViewModel {
     var isExpanded: Bool = false
     var zoomMin: Double?
     var zoomMax: Double?
-    var showFilterPopover: Bool = false
 
     private(set) var allSeriesData: [ChartSeriesData] = []
     private(set) var displayedSeriesData: [ChartSeriesData] = []
@@ -206,7 +205,6 @@ extension BandChartViewModel {
 
     func clearFilter() {
         applyFilter("")
-        showFilterPopover = false
     }
 
     func resetZoom() {

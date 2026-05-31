@@ -153,9 +153,12 @@ extension DetailOverviewChart where DetailOverlay == EmptyView, OverviewOverlay 
         self.detailStyle = detailStyle
         self.overviewStyle = overviewStyle
         self.detailAxis = detailAxis
+        self.overviewAxis = ChartAxisConfig(showYGrid: false, showXGrid: false, showYAxis: false, showXAxis: false)
         self.domainLabel = domainLabel
         self.onHover = onHover
         self.detailOverlay = { _ in EmptyView() }
         self.overviewOverlay = { EmptyView() }
+        _windowStart = State(initialValue: domain.lowerBound)
+        _windowEnd = State(initialValue: min(domain.upperBound, domain.lowerBound + min(defaultWindowSpan, domain.span)))
     }
 }
