@@ -1164,7 +1164,8 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location Services is required to read Wi-Fi network names (SSIDs). Without it, network names appear as “n/a” but signal strength and channel data remain fully available.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Used for local network access required by Wi-Fi diagnostic and analysis features.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "macOS requires this permission for any app that reads Wi‑Fi network names (SSIDs). WiFi Lens never accesses your GPS coordinates and never logs your location.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1337,7 +1338,8 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location Services is required to read Wi-Fi network names (SSIDs). Without it, network names appear as “n/a” but signal strength and channel data remain fully available.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Used for local network access required by Wi-Fi diagnostic and analysis features.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "macOS requires this permission for any app that reads Wi‑Fi network names (SSIDs). WiFi Lens never accesses your GPS coordinates and never logs your location.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1383,7 +1385,8 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location Services is required to read Wi-Fi network names (SSIDs). Without it, network names appear as “n/a” but signal strength and channel data remain fully available.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Used for local network access required by Wi-Fi diagnostic and analysis features.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "macOS requires this permission for any app that reads Wi‑Fi network names (SSIDs). WiFi Lens never accesses your GPS coordinates and never logs your location.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1428,7 +1431,8 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location Services is required to read Wi-Fi network names (SSIDs). Without it, network names appear as “n/a” but signal strength and channel data remain fully available.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Used for local network access required by Wi-Fi diagnostic and analysis features.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "macOS requires this permission for any app that reads Wi‑Fi network names (SSIDs). WiFi Lens never accesses your GPS coordinates and never logs your location.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
