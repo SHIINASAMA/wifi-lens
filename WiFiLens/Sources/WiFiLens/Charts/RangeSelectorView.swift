@@ -205,7 +205,9 @@ struct RangeSelector<Content: View>: View {
         .frame(height: overviewHeight)
         .onChange(of: domain.upperBound) { _, _ in
             guard domainSpan > 0 else { rangeStart = 0; rangeEnd = 1; pinnedWindowStart = 0; reportWindow(); return }
-            windowSpan = min(max(windowSpan, minWindowSpan), max(minWindowSpan, domainSpan))
+            windowSpan = isFollowingMax
+                ? min(defaultWindowSpan, max(minWindowSpan, domainSpan))
+                : min(max(windowSpan, minWindowSpan), max(minWindowSpan, domainSpan))
             if isFollowingMax { snapToMax() }
             else {
                 pinnedWindowStart = min(max(domain.lowerBound, pinnedWindowStart), max(domain.lowerBound, domain.upperBound - clampedWindowSpan))

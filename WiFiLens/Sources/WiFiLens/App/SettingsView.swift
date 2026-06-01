@@ -74,6 +74,11 @@ struct SettingsView: View {
                     .pickerStyle(.menu)
                     .accessibilityIdentifier("settings-scan-interval-picker")
 
+                    Text(String(localized: "settings.scan.interval_description", comment: "Description clarifying the scan interval only affects the live spectrum view, not recording"))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
                     Picker(String(localized: "settings.region.header", comment: "Regulatory region picker label"), selection: $regionOverride) {
                         Text(String(localized: "settings.region.auto_detect", comment: "Auto-detect regulatory region option")).tag("auto")
                         Text(String(localized: "settings.region.us_fcc", comment: "US FCC regulatory region option")).tag("US")

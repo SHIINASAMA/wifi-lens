@@ -139,6 +139,18 @@ final class ScannerViewModel {
 
     private var scanTask: Task<Void, Never>?
 
+    /// Current scan interval in seconds. Set to override the UserDefaults-configured
+    /// interval (e.g. 1 s during recording). When changed while scanning, the scan
+    /// loop is restarted with the new interval.
+    var scanIntervalSeconds: Int = 3 {
+        didSet {
+            guard oldValue != scanIntervalSeconds else { return }
+            guard isScanning else { return }
+            AppLogger.scanner.info("scanIntervalSeconds changed \(oldValue) → \(scanIntervalSeconds), restarting scan loop")
+            restartScanLoop()
+        }
+    }
+
     func start() async {
         if let startupTask {
             await startupTask.value
@@ -181,6 +193,8 @@ final class ScannerViewModel {
         regulatoryPipeline.cachedSupportedChannelsRaw = await scanner.supportedWLANChannelsRaw()
         AppLogger.scanner.debug("device — supported \(rawChannels.count) channels, PHY=\(regulatoryPipeline.deviceCachedCapabilities.phySummary), DFS=\(regulatoryPipeline.deviceCachedCapabilities.supportsDFS), 6GHz=\(regulatoryPipeline.deviceCachedCapabilities.supports6GHz)")
         updateInterfaceName()
+        let stored = UserDefaults.standard.integer(forKey: "scanIntervalSeconds")
+        scanIntervalSeconds = max(1, stored > 0 ? stored : 3)
         startScanLoop()
         hasStarted = true
     }
@@ -234,16 +248,20 @@ final class ScannerViewModel {
         }
     }
 
+    private func restartScanLoop() {
+        scanTask?.cancel()
+        startScanLoop()
+    }
+
     private func startScanLoop() {
-        AppLogger.scanner.info("startScanLoop() — starting")
+        AppLogger.scanner.info("startScanLoop() — starting with interval \(scanIntervalSeconds)s")
         scanTask?.cancel()
         isScanning = true
         accessState = .scanning
         throughputMonitor.start()
 
         scanTask = Task {
-            let intervalSeconds = UserDefaults.standard.integer(forKey: "scanIntervalSeconds")
-            let interval: Duration = .seconds(max(1, intervalSeconds > 0 ? intervalSeconds : 3))
+            let interval: Duration = .seconds(max(1, scanIntervalSeconds))
             let stream = await scanner.startScanning(interval: interval)
             for await event in stream {
                 guard !Task.isCancelled else { break }

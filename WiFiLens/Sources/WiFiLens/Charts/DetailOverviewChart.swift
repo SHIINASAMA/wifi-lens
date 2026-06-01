@@ -33,6 +33,16 @@ struct DetailOverviewChart<DetailOverlay: View, OverviewOverlay: View>: View {
     @State private var windowStart: Double = 0
     @State private var windowEnd: Double = 30
 
+    /// In followMax mode the window is derived directly from domain so the detail
+    /// chart axis stays in sync with incoming data without the one-frame delay
+    /// inherent in the RangeSelector → onWindowChange callback chain.
+    private var displayWindow: ClosedRange<Double> {
+        guard followMax else { return windowStart...windowEnd }
+        let span = min(defaultWindowSpan, max(minWindowSpan, domain.span))
+        let start = max(domain.lowerBound, domain.upperBound - span)
+        return start...domain.upperBound
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             detailChart
@@ -47,19 +57,19 @@ struct DetailOverviewChart<DetailOverlay: View, OverviewOverlay: View>: View {
     // MARK: - Detail Chart
 
     private var detailChart: some View {
-        let window = windowStart...windowEnd
+        let window = displayWindow
         return Chart(
-            series: seriesInWindow(window),
+            series: seriesForWindow(window),
             axis: detailAxisForWindow(window),
             style: detailStyle
         ) { geo, _ in detailOverlay(window) }
         .frame(height: detailHeight)
     }
 
-    private func seriesInWindow(_ window: ClosedRange<Double>) -> [ChartSeries] {
-        series.map { s in
-            ChartSeries(id: s.id, points: s.points.filter { window.contains($0.x) }, style: s.style)
-        }
+    private func seriesForWindow(_ window: ClosedRange<Double>) -> [ChartSeries] {
+        // Axis bounds + clip rect handle the visible window.
+        // Pre-filtering points breaks spline interpolation at window boundaries.
+        series
     }
 
     private func detailAxisForWindow(_ window: ClosedRange<Double>) -> ChartAxisConfig {
@@ -110,6 +120,7 @@ struct DetailOverviewChart<DetailOverlay: View, OverviewOverlay: View>: View {
         let step = max(1, (domain.upperBound - domain.lowerBound) / 4)
         var ticks: [Double] = [domain.lowerBound]
         var t = ceil(domain.lowerBound / step) * step
+        if t == domain.lowerBound { t += step }
         while t < domain.upperBound { ticks.append(t); t += step }
         ticks.append(domain.upperBound)
 

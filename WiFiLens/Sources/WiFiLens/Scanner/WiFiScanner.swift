@@ -11,12 +11,17 @@ actor WiFiScanner {
     private var shouldStop = false
 
     /// Emits scan results or failures at the configured interval.
+    /// Scans are scheduled at wall-clock intervals (every `interval` seconds from the
+    /// first scan), so scan duration does not push the next scan later.
     /// On scan failure, retries up to 3 times with exponential backoff (1s → 2s → 4s).
     func startScanning(interval: Duration = Constants.scanInterval) -> AsyncStream<WiFiScanEvent> {
         shouldStop = false
         AppLogger.scanner.debug("startScanning() — reset stop flag")
+        let intervalSec = Double(interval.components.seconds) + Double(interval.components.attoseconds) / 1e18
         return AsyncStream { continuation in
             let task = Task {
+                let startTime = Date()
+                var scanIndex = 0
                 while !shouldStop && !Task.isCancelled {
                     let scanResult = await scanWithRetry()
                     switch scanResult {
@@ -28,10 +33,15 @@ actor WiFiScanner {
                         continuation.yield(.failure(msg))
                     }
 
-                    do {
-                        try await Task.sleep(for: interval)
-                    } catch {
-                        break
+                    scanIndex += 1
+                    let nextTarget = startTime.addingTimeInterval(Double(scanIndex) * intervalSec)
+                    let remaining = nextTarget.timeIntervalSinceNow
+                    if remaining > 0.01 {
+                        do {
+                            try await Task.sleep(for: .seconds(remaining))
+                        } catch {
+                            break
+                        }
                     }
                 }
                 continuation.finish()

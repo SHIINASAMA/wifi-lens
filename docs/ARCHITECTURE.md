@@ -55,6 +55,7 @@ Chart Engine (Charts/):
 - `displayRSSI` animates toward `rssi` each tick for smooth Gaussian curve transitions
 - AP roaming transitions share a single timestamp between old and new segments, eliminating gaps on the timeline
 - Signal history (`SignalHistoryStore`) keeps 20 snapshots per BSSID in memory
+- `ScannerViewModel.scanIntervalSeconds` supports dynamic override — `RecordingViewModel` sets it to 1 s during recording and restores the UserDefaults-configured value on stop. The `didSet` automatically cancels and restarts the scan loop with the new interval when `isScanning` is true. This prevents the recording chart domain (real-time `Date()`) from pulling ahead of the data points (gated by scan interval).
 - `StableScore` provides hysteresis for quality level boundaries (upgrade margin 2, downgrade margin 5)
 - `ChannelBand(id:)` failable initializer maps String band IDs ("24"/"5"/"6") to enum cases, used by `SnapshotToChartAdapter` for history playback
 

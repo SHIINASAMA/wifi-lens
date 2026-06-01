@@ -57,6 +57,9 @@
       },
       "shouldTranslate" : false
     },
+    "%@ APs" : {
+
+    },
     "%@ dBm" : {
       "shouldTranslate" : false
     },
@@ -5074,6 +5077,294 @@
         }
       }
     },
+    "pro.feature.recording" : {
+      "comment" : "Session recording feature",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Session recording"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション録画"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "会话录制"
+          }
+        }
+      }
+    },
+    "recording.chart.empty" : {
+      "comment" : "Empty state when no data has been recorded yet for the timeline chart",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No recorded data yet"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画データがありません"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无录制数据"
+          }
+        }
+      }
+    },
+    "recording.empty.hint" : {
+      "comment" : "Hint to switch to Live tab to start scanning first",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch to the Live tab to start scanning for nearby APs."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LiveタブでAPのスキャンを開始してください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请切换到实时标签页开始扫描附近的AP。"
+          }
+        }
+      }
+    },
+    "recording.empty.no_aps" : {
+      "comment" : "No APs detected placeholder on recording page",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No access points detected"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクセスポイントが見つかりません"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未检测到接入点"
+          }
+        }
+      }
+    },
+    "recording.error.load_failed" : {
+      "comment" : "Error when session file loading fails",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to load session file"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションファイルの読み込みに失敗しました"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "加载会话文件失败"
+          }
+        }
+      }
+    },
+    "recording.no_ap_data" : {
+      "comment" : "No AP data available",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No AP data available"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APデータがありません"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无AP数据可用"
+          }
+        }
+      }
+    },
+    "recording.no_session" : {
+      "comment" : "No session loaded placeholder",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No session loaded"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションが読み込まれていません"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未加载会话"
+          }
+        }
+      }
+    },
+    "recording.start" : {
+      "comment" : "Start recording button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Recording"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画開始"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始录制"
+          }
+        }
+      }
+    },
+    "recording.state.idle" : {
+      "comment" : "Idle recording state — no APs detected",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No AP data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APデータなし"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无AP数据"
+          }
+        }
+      }
+    },
+    "recording.state.ready" : {
+      "comment" : "Ready to start recording state",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ready to record"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画準備完了"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "准备录制"
+          }
+        }
+      }
+    },
+    "recording.state.recording" : {
+      "comment" : "Recording in progress label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画中…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制中…"
+          }
+        }
+      }
+    },
+    "recording.state.stopped" : {
+      "comment" : "Recording stopped state",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording stopped"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画停止"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制已停止"
+          }
+        }
+      }
+    },
     "roaming.control.start_tooltip" : {
       "comment" : "Tooltip for start roaming test button",
       "extractionState" : "manual",
@@ -6417,6 +6708,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "刷新间隔"
+          }
+        }
+      }
+    },
+    "settings.scan.interval_description" : {
+      "comment" : "Description clarifying the scan interval only affects the live spectrum view, not recording",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applies to the live spectrum view. Recording always uses a 1-second interval for maximum detail."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライブスペクトラムビューに適用されます。録画は常に1秒間隔で最大の詳細度を確保します。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "适用于实时频谱视图。录制始终使用 1 秒间隔以确保最大细节。"
           }
         }
       }
