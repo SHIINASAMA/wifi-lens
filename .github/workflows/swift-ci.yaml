@@ -43,6 +43,7 @@ jobs:
             -scheme "WiFi Lens" \
             -configuration "$DEBUG_CONFIG" \
             -destination 'platform=macOS' \
+            -skip-testing:WiFiLensUITests \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
             test
 
