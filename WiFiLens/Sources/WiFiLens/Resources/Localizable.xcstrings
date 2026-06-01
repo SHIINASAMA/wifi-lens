@@ -58,15 +58,33 @@
       "shouldTranslate" : false
     },
     "%@ APs" : {
-
+      "comment" : "Access Point count with number",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld APs"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 台のAP"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 个AP"
+          }
+        }
+      }
     },
     "%@ dBm" : {
       "shouldTranslate" : false
     },
     "%@/100" : {
-      "shouldTranslate" : false
-    },
-    "0" : {
       "shouldTranslate" : false
     },
     "ble.control.start_scanning" : {
@@ -6688,30 +6706,6 @@
         }
       }
     },
-    "settings.scan.interval_label" : {
-      "comment" : "Scan refresh interval picker label",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Refresh interval"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "更新間隔"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "刷新间隔"
-          }
-        }
-      }
-    },
     "settings.scan.interval_description" : {
       "comment" : "Description clarifying the scan interval only affects the live spectrum view, not recording",
       "extractionState" : "manual",
@@ -6732,6 +6726,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "适用于实时频谱视图。录制始终使用 1 秒间隔以确保最大细节。"
+          }
+        }
+      }
+    },
+    "settings.scan.interval_label" : {
+      "comment" : "Scan refresh interval picker label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh interval"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新間隔"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刷新间隔"
           }
         }
       }
@@ -7068,6 +7086,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "显示："
+          }
+        }
+      }
+    },
+    "spectrum.mode.live" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライブ"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "实时"
+          }
+        }
+      }
+    },
+    "spectrum.mode.recording_page" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制"
           }
         }
       }
