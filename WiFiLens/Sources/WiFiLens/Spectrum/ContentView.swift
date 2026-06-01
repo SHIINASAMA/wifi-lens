@@ -19,6 +19,7 @@ struct ContentView: View {
 
 #if PRO
     @State private var mode: SpectrumMode = .live
+    @State private var recordingViewModel: RecordingViewModel?
 #endif
 
     private var hiddenColumns: Binding<Set<String>> {
@@ -38,6 +39,16 @@ struct ContentView: View {
         .frame(minWidth: 700, idealWidth: 1000, minHeight: 600)
         .onChange(of: viewModel.hiddenBands) { _, _ in viewModel.applyGlobalFilterToBands() }
         .onChange(of: viewModel.hideHiddenSSIDs) { _, _ in viewModel.applyGlobalFilterToBands() }
+#if PRO
+        .onChange(of: mode) { _, newMode in
+            if newMode == .recording {
+                if recordingViewModel == nil {
+                    recordingViewModel = RecordingViewModel(scannerViewModel: viewModel)
+                }
+                recordingViewModel?.checkReadiness()
+            }
+        }
+#endif
     }
 
     // MARK: - Mode toolbar (Pro only)
@@ -68,7 +79,9 @@ struct ContentView: View {
         case .live:
             dashboardContent
         case .recording:
-            HistoryView(scannerViewModel: viewModel)
+            if let rvm = recordingViewModel {
+                RecordingView(viewModel: rvm)
+            }
         }
 #else
         dashboardContent

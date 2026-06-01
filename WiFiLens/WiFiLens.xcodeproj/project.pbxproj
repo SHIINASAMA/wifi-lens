@@ -154,6 +154,13 @@
 		FB1E329E2FC7316C009D1BDC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */; };
 		FB1E32A82FC731CA009D1BDC /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = FB1E32A72FC731CA009D1BDC /* Sparkle */; };
 		FB2E3B2E2FC5ACDA00D2610E /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB2E3B2D2FC5ACDA00D2610E /* CoreBluetooth.framework */; };
+		FB3C16BD2FCC34F3007A7B64 /* RecordingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C16B42FCC34F3007A7B64 /* RecordingViewModel.swift */; };
+		FB3C16BF2FCC34F3007A7B64 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C16B72FCC34F3007A7B64 /* SessionStore.swift */; };
+		FB3C16C02FCC34F3007A7B64 /* PurchaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C16BA2FCC34F3007A7B64 /* PurchaseView.swift */; };
+		FB3C16C12FCC34F3007A7B64 /* RecordingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C16B32FCC34F3007A7B64 /* RecordingView.swift */; };
+		FB3C16C22FCC34F3007A7B64 /* ScanSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C16B62FCC34F3007A7B64 /* ScanSession.swift */; };
+		FB3C16C32FCC34F3007A7B64 /* ProUnlockManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C16B92FCC34F3007A7B64 /* ProUnlockManager.swift */; };
+		FB3C16C52FCC34F3007A7B64 /* RecordingTimelineChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C16C62FCC34F3007A7B64 /* RecordingTimelineChart.swift */; };
 		FB6F41CC2FC4889B0009F29B /* RegulatoryDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C92FC4889B0009F29B /* RegulatoryDomain.swift */; };
 		FB6F41CD2FC4889B0009F29B /* RegulatoryDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C82FC4889B0009F29B /* RegulatoryDatabase.swift */; };
 		FB6F41CE2FC4889B0009F29B /* ChannelRecommendation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C52FC4889B0009F29B /* ChannelRecommendation.swift */; };
@@ -276,6 +283,13 @@
 		FB1E32A42FC7316C009D1BDC /* WiFi Lens Pro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "WiFi Lens Pro.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB2E3B2D2FC5ACDA00D2610E /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		FB32F4D62FC88535003F98C6 /* WiFiLensPro-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "WiFiLensPro-Info.plist"; sourceTree = "<group>"; };
+		FB3C16B32FCC34F3007A7B64 /* RecordingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingView.swift; sourceTree = "<group>"; };
+		FB3C16B42FCC34F3007A7B64 /* RecordingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingViewModel.swift; sourceTree = "<group>"; };
+		FB3C16B62FCC34F3007A7B64 /* ScanSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSession.swift; sourceTree = "<group>"; };
+		FB3C16B72FCC34F3007A7B64 /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
+		FB3C16B92FCC34F3007A7B64 /* ProUnlockManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProUnlockManager.swift; sourceTree = "<group>"; };
+		FB3C16BA2FCC34F3007A7B64 /* PurchaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseView.swift; sourceTree = "<group>"; };
+		FB3C16C62FCC34F3007A7B64 /* RecordingTimelineChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingTimelineChart.swift; sourceTree = "<group>"; };
 		FB5A212C2FC31C6100828D9F /* WiFiLens-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "WiFiLens-Info.plist"; sourceTree = "<group>"; };
 		FB6F41C52FC4889B0009F29B /* ChannelRecommendation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelRecommendation.swift; sourceTree = "<group>"; };
 		FB6F41C62FC4889B0009F29B /* DeviceCompatibilityFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCompatibilityFilter.swift; sourceTree = "<group>"; };
@@ -549,6 +563,7 @@
 				49FEC4F42675BFAD1316DDEC /* Debug */,
 				8FFEB5302BE8674E56110FAE /* Interfaces */,
 				786696F9D6046171197C0641 /* MCP */,
+				FB3C16BC2FCC34F3007A7B64 /* Pro */,
 				FB6F41CB2FC4889B0009F29B /* Regulatory */,
 				FB8BB5FE2FBB039A00FD072E /* Resources */,
 				9F327AEB42954B939E2CC19F /* Roaming */,
@@ -578,6 +593,44 @@
 				FB0573B72FBBF7CF005F8214 /* main.swift */,
 			);
 			path = WiFiLensMCP;
+			sourceTree = "<group>";
+		};
+		FB3C16B52FCC34F3007A7B64 /* Recording */ = {
+			isa = PBXGroup;
+			children = (
+				FB3C16C62FCC34F3007A7B64 /* RecordingTimelineChart.swift */,
+				FB3C16B32FCC34F3007A7B64 /* RecordingView.swift */,
+				FB3C16B42FCC34F3007A7B64 /* RecordingViewModel.swift */,
+			);
+			path = Recording;
+			sourceTree = "<group>";
+		};
+		FB3C16B82FCC34F3007A7B64 /* Session */ = {
+			isa = PBXGroup;
+			children = (
+				FB3C16B62FCC34F3007A7B64 /* ScanSession.swift */,
+				FB3C16B72FCC34F3007A7B64 /* SessionStore.swift */,
+			);
+			path = Session;
+			sourceTree = "<group>";
+		};
+		FB3C16BB2FCC34F3007A7B64 /* StoreKit */ = {
+			isa = PBXGroup;
+			children = (
+				FB3C16B92FCC34F3007A7B64 /* ProUnlockManager.swift */,
+				FB3C16BA2FCC34F3007A7B64 /* PurchaseView.swift */,
+			);
+			path = StoreKit;
+			sourceTree = "<group>";
+		};
+		FB3C16BC2FCC34F3007A7B64 /* Pro */ = {
+			isa = PBXGroup;
+			children = (
+				FB3C16B52FCC34F3007A7B64 /* Recording */,
+				FB3C16B82FCC34F3007A7B64 /* Session */,
+				FB3C16BB2FCC34F3007A7B64 /* StoreKit */,
+			);
+			path = Pro;
 			sourceTree = "<group>";
 		};
 		FB6F41CB2FC4889B0009F29B /* Regulatory */ = {
@@ -919,6 +972,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB1E32482FC7316C009D1BDC /* BluetoothPermissionManager.swift in Sources */,
+				FB3C16BD2FCC34F3007A7B64 /* RecordingViewModel.swift in Sources */,
+				FB3C16BF2FCC34F3007A7B64 /* SessionStore.swift in Sources */,
+				FB3C16C02FCC34F3007A7B64 /* PurchaseView.swift in Sources */,
+				FB3C16C12FCC34F3007A7B64 /* RecordingView.swift in Sources */,
+				FB3C16C22FCC34F3007A7B64 /* ScanSession.swift in Sources */,
+				FB3C16C32FCC34F3007A7B64 /* ProUnlockManager.swift in Sources */,
+				FB3C16C52FCC34F3007A7B64 /* RecordingTimelineChart.swift in Sources */,
 				FB1E32492FC7316C009D1BDC /* BLEChannel.swift in Sources */,
 				FB1E324A2FC7316C009D1BDC /* BLEAdvertisementEvent.swift in Sources */,
 				FB1E324B2FC7316C009D1BDC /* BLERSSISample.swift in Sources */,
@@ -1038,7 +1098,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 9V9YSD2N25;
+				DEVELOPMENT_TEAM = ZMK8PL8T8J;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1060,7 +1120,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 9V9YSD2N25;
+				DEVELOPMENT_TEAM = ZMK8PL8T8J;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1085,7 +1145,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 9V9YSD2N25;
+				DEVELOPMENT_TEAM = ZMK8PL8T8J;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -1258,7 +1318,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 9V9YSD2N25;
+				DEVELOPMENT_TEAM = ZMK8PL8T8J;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -1304,7 +1364,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 9V9YSD2N25;
+				DEVELOPMENT_TEAM = ZMK8PL8T8J;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -1349,7 +1409,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 9V9YSD2N25;
+				DEVELOPMENT_TEAM = ZMK8PL8T8J;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -1390,7 +1450,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 9V9YSD2N25;
+				DEVELOPMENT_TEAM = ZMK8PL8T8J;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.kaoru.WiFiLensUITests;
@@ -1408,7 +1468,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 9V9YSD2N25;
+				DEVELOPMENT_TEAM = ZMK8PL8T8J;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.kaoru.WiFiLensUITests;
