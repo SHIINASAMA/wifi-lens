@@ -16,6 +16,7 @@ on:
 env:
   DEBUG_CONFIG: Debug
   RELEASE_CONFIG: Release
+  KEYCHAIN_PW: "ci-temporary-keychain-password"
 
 jobs:
   build-and-test:
@@ -53,19 +54,37 @@ jobs:
     runs-on: macos-26
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      SPARKLE_VERSION: "2.9.2"
     defaults:
       run:
         working-directory: WiFiLens
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Release
+      - name: Import Developer ID Certificate
+        run: |
+          CERT_PATH="$RUNNER_TEMP/developer-id.p12"
+          echo "${{ secrets.DEVELOPER_ID_CERTIFICATE_BASE64 }}" | base64 -d > "$CERT_PATH"
+
+          security create-keychain -p "$KEYCHAIN_PW" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PW" build.keychain
+          security import "$CERT_PATH" -k build.keychain -P "${{ secrets.P12_PASSWORD }}" -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PW" build.keychain
+
+          IDENTITY=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application" | head -1 | sed 's/.*"\(.*\)"/\1/')
+          echo "SIGNING_IDENTITY=$IDENTITY" >> $GITHUB_ENV
+
+      - name: Build Release (Signed)
         run: |
           xcodebuild -project WiFiLens.xcodeproj \
             -scheme "WiFi Lens" \
             -configuration "$RELEASE_CONFIG" \
             -derivedDataPath .build/DerivedData \
-            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
+            DEVELOPMENT_TEAM="ZMK8PL8T8J" \
+            OTHER_CODE_SIGN_FLAGS="--timestamp --options=runtime" \
             build
 
       - name: Discover App
@@ -79,12 +98,16 @@ jobs:
         run: |
           cp -R "$APP_PATH" "$APP_NAME.app"
 
-      - name: Create DMG
+      - name: Create DMG & Sign
         run: |
           hdiutil create -volname "$APP_NAME" \
             -srcfolder "$APP_NAME.app" \
             -ov -format UDZO "$APP_NAME.dmg"
-          echo "DMG_SIZE=$(stat -f%z "$APP_NAME.dmg")" >> $GITHUB_ENV
+
+          codesign --sign "$SIGNING_IDENTITY" --timestamp --options=runtime "$APP_NAME.dmg"
+
+          DMG_SIZE=$(stat -f%z "$APP_NAME.dmg")
+          echo "DMG_SIZE=$DMG_SIZE" >> $GITHUB_ENV
 
       - name: Get Version
         run: |
@@ -93,33 +116,42 @@ jobs:
           BUNDLE_VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_NAME.app/Contents/Info.plist" 2>/dev/null || echo "$TAG")
           echo "BUNDLE_VERSION=$BUNDLE_VERSION" >> $GITHUB_ENV
 
-      - name: Generate Appcast
+      - name: Download Sparkle Tools
+        run: |
+          curl -sSL "https://github.com/sparkle-project/Sparkle/releases/download/${SPARKLE_VERSION}/Sparkle-${SPARKLE_VERSION}.tar.xz" \
+            -o "$RUNNER_TEMP/sparkle.tar.xz"
+          tar xf "$RUNNER_TEMP/sparkle.tar.xz" -C "$RUNNER_TEMP"
+          SPARKLE_BIN_DIR=$(dirname "$(find "$RUNNER_TEMP" -name sign_update -type f | head -1)")
+          echo "$SPARKLE_BIN_DIR" >> $GITHUB_PATH
+
+      - name: Generate Signed Appcast
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_ED25519_PRIVATE_KEY }}
         run: |
           ENCODED_DMG=$(printf '%s' "$APP_NAME.dmg" | sed 's/ /%20/g')
           ENCLOSURE_URL="https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/${ENCODED_DMG}"
-          VER="${{ env.VERSION }}"
-          BVER="${{ env.BUNDLE_VERSION }}"
-          SIZE="${{ env.DMG_SIZE }}"
+          EDSIGNATURE=$(sign_update -s "$SPARKLE_PRIVATE_KEY" "$APP_NAME.dmg")
 
           echo '<?xml version="1.0" encoding="utf-8"?>' > appcast.xml
           echo '<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">' >> appcast.xml
           echo '  <channel>' >> appcast.xml
           echo "    <title>${APP_NAME}</title>" >> appcast.xml
           echo '    <item>' >> appcast.xml
-          echo "      <title>Version ${VER}</title>" >> appcast.xml
-          echo "      <sparkle:version>${VER}</sparkle:version>" >> appcast.xml
-          echo "      <sparkle:shortVersionString>${BVER}</sparkle:shortVersionString>" >> appcast.xml
+          echo "      <title>Version ${VERSION}</title>" >> appcast.xml
+          echo "      <sparkle:version>${VERSION}</sparkle:version>" >> appcast.xml
+          echo "      <sparkle:shortVersionString>${BUNDLE_VERSION}</sparkle:shortVersionString>" >> appcast.xml
           echo '      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>' >> appcast.xml
           echo "      <enclosure url=\"${ENCLOSURE_URL}\"" >> appcast.xml
-          echo "                 sparkle:version=\"${VER}\"" >> appcast.xml
-          echo "                 sparkle:shortVersionString=\"${BVER}\"" >> appcast.xml
-          echo "                 length=\"${SIZE}\"" >> appcast.xml
+          echo "                 sparkle:version=\"${VERSION}\"" >> appcast.xml
+          echo "                 sparkle:shortVersionString=\"${BUNDLE_VERSION}\"" >> appcast.xml
+          echo "                 sparkle:edSignature=\"${EDSIGNATURE}\"" >> appcast.xml
+          echo "                 length=\"${DMG_SIZE}\"" >> appcast.xml
           echo '                 type="application/octet-stream" />' >> appcast.xml
           echo '    </item>' >> appcast.xml
           echo '  </channel>' >> appcast.xml
           echo '</rss>' >> appcast.xml
 
-      - name: Create Draft Release
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ env.VERSION }}
