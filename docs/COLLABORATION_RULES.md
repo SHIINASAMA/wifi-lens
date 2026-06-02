@@ -7,7 +7,7 @@ metadata:
 
 # AI Assistant Collaboration Rules
 
-The following rules are **hard constraints** and must be followed in all circumstances. The rules in CLAUDE.md carry equal weight; this document clarifies and reinforces them.
+The following rules are **hard constraints** and must be followed in all circumstances. The rules in AGENTS.md / CLAUDE.md carry equal weight; this document clarifies and reinforces them.
 
 ## Project Language
 
@@ -27,13 +27,13 @@ The following rules are **hard constraints** and must be followed in all circums
 
 ## Must Follow
 
-- **CLAUDE.md takes priority**: CLAUDE.md and the project documentation under `docs/` are the authoritative guides for this project and must be consulted for every decision.
+- **AGENTS.md / CLAUDE.md takes priority**: AGENTS.md, CLAUDE.md, and the project documentation under `docs/` are the authoritative guides for this project and must be consulted for every decision.
 
 - **Enter plan mode**: Non-trivial implementation tasks must enter plan mode (EnterPlanMode) and receive approval before any code is written.
 
 - **Build verification**: All code changes must be verified by running `xcodebuild build` successfully.
 
-- **Docs go in `docs/`**: All new `.md` files must be placed under the `docs/` directory. The only exceptions are this file (`docs/COLLABORATION_RULES.md`) and `CLAUDE.md` and `README.md` at the repo root.
+- **Docs go in `docs/`**: All new `.md` files must be placed under the `docs/` directory. The only exceptions are this file (`docs/COLLABORATION_RULES.md`) and `AGENTS.md`, `CLAUDE.md`, and `README.md` at the repo root.
 
 ## Behavioral Style
 
