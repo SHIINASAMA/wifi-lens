@@ -5,41 +5,38 @@ metadata:
   type: feedback
 ---
 
-# AI 助手行为准则
+# AI Assistant Collaboration Rules
 
-以下规则是**硬性约束**，必须在所有情况下遵循。CLAUDE.md 中的规则文本具有同等效力，本文档澄清和强化。
+The following rules are **hard constraints** and must be followed in all circumstances. The rules in CLAUDE.md carry equal weight; this document clarifies and reinforces them.
 
-## 禁止操作
+## Project Language
 
-- **禁止提交 (git commit)**：除非用户在当前对话轮次中明确说出
-"提交"/"commit"/"帮我提交"等指示，否则绝对不得运行 `git commit`。
-包括 `git commit --amend`、`git commit -m`、commit 到子模块等任何变体。
+- **English is the primary language of this project.** All documentation, code comments, commit messages, and communication must be written in English. Localization strings (`.xcstrings`) are the only exception — they support `en`, `ja`, and `zh-Hans`.
 
-- **禁止推送 (git push)**：除非用户明确说 "推送"/"push"，否则不得运行 `git push`。
-包括 `git push --force`、推送到任何远程等任何变体。
+## Prohibited Actions
 
-- **禁止删除文件**：除非用户明确指示，否则不得删除源代码文件。
-重命名、移动文件同理。
+- **No committing (git commit)**: Unless the user explicitly says "commit" or equivalent in the current conversation turn, never run `git commit`. This includes `git commit --amend`, `git commit -m`, committing to submodules, and any other variant.
 
-- **禁止修改 Git 配置**：不得运行 `git config` 修改仓库配置。
+- **No pushing (git push)**: Unless the user explicitly says "push", never run `git push`. This includes `git push --force`, pushing to any remote, and any other variant.
 
-- **禁止破坏性 Git 操作**：`git reset --hard`、`git clean -f` 等必须经用户确认。
+- **No deleting files**: Never delete source files unless the user explicitly instructs you to. The same applies to renaming and moving files.
 
-## 必须遵循
+- **No modifying Git config**: Never run `git config` to modify repository configuration.
 
-- **CLAUDE.md 优先**：CLAUDE.md 和 `docs/` 中的项目文档是对本项目的权威指南，
-必须在每次决策时参考。
+- **No destructive Git operations**: `git reset --hard`, `git clean -f`, and similar must be confirmed by the user.
 
-- **进入方案模式**：非平凡的实现任务在动手前必须进入方案模式（EnterPlanMode）并获批准。
+## Must Follow
 
-- **构建验证**：所有代码修改后必须运行 `xcodebuild build` 验证通过。
+- **CLAUDE.md takes priority**: CLAUDE.md and the project documentation under `docs/` are the authoritative guides for this project and must be consulted for every decision.
 
-- **文档放 `docs/`**：所有新建 `.md` 文件必须放在 `docs/` 目录下，
-唯一例外是本文件（`docs/COLLABORATION_RULES.md`）和仓库根的 `CLAUDE.md`、`README.md`。
+- **Enter plan mode**: Non-trivial implementation tasks must enter plan mode (EnterPlanMode) and receive approval before any code is written.
 
-## 行为风格
+- **Build verification**: All code changes must be verified by running `xcodebuild build` successfully.
 
-- **简洁回复**：直接给出结果和关键信息，不需要每次总结做得怎么样。
-- **不猜测**：需要决策信息时直接问，不要假设。
-- **忠实于用户意图**：用户说"这是一个实现了一半的重构"即表示已知此状态，
-无需反复提醒或标记为 bug。
+- **Docs go in `docs/`**: All new `.md` files must be placed under the `docs/` directory. The only exceptions are this file (`docs/COLLABORATION_RULES.md`) and `CLAUDE.md` and `README.md` at the repo root.
+
+## Behavioral Style
+
+- **Concise responses**: Deliver results and key information directly. No need to summarize what was done after every response.
+- **Don't guess**: Ask directly when a decision requires more information; don't assume.
+- **Respect user intent**: If the user says "this is a half-finished refactor", that means they are aware of that state. Don't repeatedly flag it or mark it as a bug.
