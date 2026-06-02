@@ -109,6 +109,20 @@ jobs:
           DMG_SIZE=$(stat -f%z "$APP_NAME.dmg")
           echo "DMG_SIZE=$DMG_SIZE" >> $GITHUB_ENV
 
+      - name: Notarize DMG
+        run: |
+          echo "${{ secrets.APPLE_API_KEY_BASE64 }}" | base64 -d > "$RUNNER_TEMP/api-key.p8"
+
+          xcrun notarytool submit "$APP_NAME.dmg" \
+            --key "$RUNNER_TEMP/api-key.p8" \
+            --key-id "${{ secrets.APPLE_API_KEY_ID }}" \
+            --issuer "${{ secrets.APPLE_API_ISSUER_ID }}" \
+            --wait
+
+      - name: Staple Notarization Ticket
+        run: |
+          xcrun stapler staple "$APP_NAME.dmg"
+
       - name: Get Version
         run: |
           TAG=${GITHUB_REF#refs/tags/v}
