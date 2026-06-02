@@ -152,7 +152,7 @@ final class ScannerViewModel {
     }
 
     func start() async {
-        guard Bundle(identifier: "io.github.kaoru.WiFiLensTests") == nil else { return }
+        wifiPowerMonitor.startMonitoring()
         if let startupTask {
             await startupTask.value
             return

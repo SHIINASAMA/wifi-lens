@@ -11,6 +11,7 @@ enum WiFiPowerState: Sendable {
 final class WiFiPowerMonitor: NSObject, CWEventDelegate {
     private var continuation: AsyncStream<WiFiPowerState>.Continuation?
     private var pollingTask: Task<Void, Never>?
+    private var isMonitoring = false
     private(set) var currentState: WiFiPowerState = .poweredOn
 
     var events: AsyncStream<WiFiPowerState> {
@@ -22,19 +23,25 @@ final class WiFiPowerMonitor: NSObject, CWEventDelegate {
 
     override init() {
         super.init()
-        guard Bundle(identifier: "io.github.kaoru.WiFiLensTests") == nil else { return }
+    }
+
+    deinit {
+        pollingTask?.cancel()
+        guard isMonitoring else { return }
+        try? CWWiFiClient.shared().stopMonitoringEvent(with: .powerDidChange)
+    }
+
+    func startMonitoring() {
+        guard !isMonitoring else { return }
+        isMonitoring = true
         CWWiFiClient.shared().delegate = self
         try? CWWiFiClient.shared().startMonitoringEvent(with: .powerDidChange)
         refreshState()
         startPolling()
     }
 
-    deinit {
-        pollingTask?.cancel()
-        try? CWWiFiClient.shared().stopMonitoringEvent(with: .powerDidChange)
-    }
-
     func refreshState() {
+        guard isMonitoring else { return }
         let previous = currentState
         if let iface = CWWiFiClient.shared().interface() {
             currentState = iface.powerOn() ? .poweredOn : .poweredOff

@@ -53,6 +53,7 @@ final class BLEViewModel {
     func startScanning() async {
         guard !isScanning else { return }
 
+        bluetoothPowerMonitor.startMonitoring()
         bluetoothPermission.refreshStatus()
         guard bluetoothPermission.isAuthorized else {
             shouldResumeScanningAfterPowerRestore = false
@@ -173,9 +174,11 @@ final class BLEPowerMonitor: NSObject, CBCentralManagerDelegate {
 
     override init() {
         super.init()
-        if Bundle(identifier: "io.github.kaoru.WiFiLensTests") == nil {
-            centralManager = CBCentralManager(delegate: self, queue: .main)
-        }
+    }
+
+    func startMonitoring() {
+        guard centralManager == nil else { return }
+        centralManager = CBCentralManager(delegate: self, queue: .main)
     }
 
     deinit {
