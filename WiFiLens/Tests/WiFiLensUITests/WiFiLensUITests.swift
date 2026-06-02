@@ -139,51 +139,128 @@ final class WiFiLensUITests: XCTestCase {
         }
     }
 
-    // MARK: - Settings Controls
+    // MARK: - Settings
 
-    func testSettingsControls() throws {
-        // Navigate to settings
-        let settingsSidebar = app.descendants(matching: .any)["sidebar-settings"]
-        XCTAssertTrue(settingsSidebar.waitForExistence(timeout: 5))
-        settingsSidebar.click()
+    private func navigateToSettings() throws {
+        let sidebar = app.descendants(matching: .any)["sidebar-settings"]
+        XCTAssertTrue(sidebar.waitForExistence(timeout: 5))
+        sidebar.click()
+        XCTAssertTrue(app.descendants(matching: .any)["page-settings"].waitForExistence(timeout: 5))
+    }
 
-        let settingsPage = app.descendants(matching: .any)["page-settings"]
-        XCTAssertTrue(settingsPage.waitForExistence(timeout: 5))
-
-        // Scroll down to make all controls visible
+    /// Scroll the settings scroll view to make lower sections visible.
+    private func scrollSettings(byDeltaY deltaY: CGFloat) {
         let scrollView = app.scrollViews["settings-scroll-view"]
         if scrollView.exists {
-            scrollView.scroll(byDeltaX: 0, deltaY: 400)
+            scrollView.scroll(byDeltaX: 0, deltaY: deltaY)
         }
+    }
 
-        // Theme picker
-        let themePicker = app.popUpButtons["settings-theme-picker"]
-        if themePicker.waitForExistence(timeout: 3) {
-            XCTAssertTrue(themePicker.isEnabled)
+    func testSettingsAppearanceAndScan() throws {
+        try navigateToSettings()
+
+        // Theme picker — segmented control (RadioGroup in XCUI).
+        let themeGroup = app.radioGroups["settings-theme-picker"]
+        guard themeGroup.waitForExistence(timeout: 3) else {
+            XCTFail("Theme picker not found.\n\(app.debugDescription)")
+            return
         }
+        let themeButtons = themeGroup.radioButtons
+        XCTAssertEqual(themeButtons.count, 3, "Expected 3 theme options (system/light/dark)")
 
-        // Scan interval picker
+        // Click "Light" (second segment) and verify the selection changes.
+        themeButtons.element(boundBy: 1).click()
+        XCTAssertEqual(themeButtons.element(boundBy: 1).value as? Int, 1,
+                       "Light segment should be selected after click")
+
+        // Click "System" (first segment) to restore.
+        themeButtons.element(boundBy: 0).click()
+
+        // Scan interval picker — menu-style (PopUpButton in XCUI).
         let intervalPicker = app.popUpButtons["settings-scan-interval-picker"]
-        if intervalPicker.waitForExistence(timeout: 3) {
-            XCTAssertTrue(intervalPicker.isEnabled)
+        XCTAssertTrue(intervalPicker.waitForExistence(timeout: 3),
+                      "Scan interval picker not found")
+        intervalPicker.click()
+        // Select "5s" (4th item, tag 5).
+        let intervalItem = intervalPicker.menuItems.element(boundBy: 3)
+        if intervalItem.waitForExistence(timeout: 2) {
+            intervalItem.click()
         }
+        // Dismiss the menu by clicking elsewhere.
+        intervalPicker.click()
 
-        // Region picker
+        // Region picker — menu-style.
         let regionPicker = app.popUpButtons["settings-region-picker"]
-        if regionPicker.waitForExistence(timeout: 3) {
-            XCTAssertTrue(regionPicker.isEnabled)
+        XCTAssertTrue(regionPicker.waitForExistence(timeout: 3),
+                      "Region picker not found")
+        regionPicker.click()
+        let regionItem = regionPicker.menuItems.element(boundBy: 1) // "US"
+        if regionItem.waitForExistence(timeout: 2) {
+            regionItem.click()
         }
+        regionPicker.click()
+    }
 
-        // BLE toggle
-        let bleToggle = app.switches["settings-ble-toggle"]
-        if bleToggle.waitForExistence(timeout: 3) {
-            XCTAssertTrue(bleToggle.isEnabled)
+    func testSettingsFeatureToggles() throws {
+        try navigateToSettings()
+
+        // BLE toggle — renders as CheckBox on macOS (default Toggle style in Form).
+        let bleToggle = app.checkBoxes["settings-ble-toggle"]
+        guard bleToggle.waitForExistence(timeout: 3) else {
+            XCTFail("BLE toggle not found")
+            return
         }
+        let bleWasOn = (bleToggle.value as? Int) == 1
+        bleToggle.click()
+        sleep(1)
+        let bleNowOn = (bleToggle.value as? Int) == 1
+        XCTAssertNotEqual(bleWasOn, bleNowOn, "BLE toggle did not change state")
+        // Restore.
+        bleToggle.click()
 
-        // MCP toggle
+        // MCP toggle and port field — verify they exist (may be below the
+        // visible area; XCUI can find them by identifier regardless).
         let mcpToggle = app.switches["settings-mcp-toggle"]
-        if mcpToggle.waitForExistence(timeout: 3) {
-            XCTAssertTrue(mcpToggle.isEnabled)
-        }
+        XCTAssertTrue(mcpToggle.waitForExistence(timeout: 3),
+                      "MCP toggle not found")
+        let portField = app.textFields["settings-mcp-port-field"]
+        XCTAssertTrue(portField.exists,
+                      "MCP port field not found")
+    }
+
+    func testSettingsDiagnosticsAndPermissions() throws {
+        try navigateToSettings()
+        scrollSettings(byDeltaY: 600)
+
+        // Permission badges.
+        let locationBadge = app.descendants(matching: .any)["permission-location-badge"]
+        XCTAssertTrue(locationBadge.waitForExistence(timeout: 3),
+                      "Location permission badge not found")
+
+        let bluetoothBadge = app.descendants(matching: .any)["permission-bluetooth-badge"]
+        XCTAssertTrue(bluetoothBadge.waitForExistence(timeout: 3),
+                      "Bluetooth permission badge not found")
+
+        // Reveal logs button.
+        let revealLogs = app.buttons["settings-reveal-logs-button"]
+        XCTAssertTrue(revealLogs.waitForExistence(timeout: 3),
+                      "Reveal logs button not found")
+
+        // Privacy policy button.
+        let privacyBtn = app.buttons["settings-privacy-policy-button"]
+        XCTAssertTrue(privacyBtn.waitForExistence(timeout: 3),
+                      "Privacy policy button not found")
+
+#if OSS
+        // Auto-update toggle and check-now button (OSS only).
+        scrollSettings(byDeltaY: 200)
+        let autoCheckToggle = app.switches["settings-auto-check-toggle"]
+        XCTAssertTrue(autoCheckToggle.waitForExistence(timeout: 3),
+                      "Auto-check toggle not found")
+
+        let checkNowBtn = app.buttons["settings-check-now-button"]
+        XCTAssertTrue(checkNowBtn.waitForExistence(timeout: 3),
+                      "Check now button not found")
+#endif
     }
 }
