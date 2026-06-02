@@ -200,6 +200,8 @@ When the chart domain is driven by real-time `Date()` but data points come from 
 
 The Catmull-Rom spline flattens the transition from the last real data point to this terminal segment. Only applied when there is a gap to fill (`duration > last.x`).
 
+See `Pro/docs/ARCHITECTURE.md` (submodule) for the full recording module architecture and `RecordingViewModel` design.
+
 - **Freeze/Pause**: The `isFrozen`/`frozenSnapshot`/`toggleFreeze()` mechanism and `freezeAllBands` notification were removed. The freeze UI (pause button, Cmd-. menu item) was also deleted.
 - **FilterPopoverView**: Deleted. Filtering is now done via the global filter query in `ScannerViewModel`.
 

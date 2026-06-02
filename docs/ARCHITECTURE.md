@@ -5,14 +5,20 @@ macOS Wi-Fi spectrum analyzer (SwiftUI + CoreWLAN + AppKit interop). Targets mac
 ## Data Flow
 
 ```
-CoreWLAN scan → WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gaussian curves)
-                          → BandChartViewModel (per-band state → BandChartRenderModel)
-                          → ScannerViewModel (single source of truth)
-                              ├── combinedTableRows → NativeTableView (AppKit NSTableView)
-                              ├── channelQualities → ChannelQualityCalculator → ChannelQualityView
-                              ├── bandViewModels → WiFiBandChart → Chart (universal renderer)
-                              ├── networkInfo → InterfacesView
-                              └── roamingSamples → RoamingTestViewModel → RoamingTestView
+WiFi — CoreWLAN scan → WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gaussian curves)
+                                   → BandChartViewModel (per-band state → BandChartRenderModel)
+                                   → ScannerViewModel (single source of truth)
+                                       ├── combinedTableRows → NativeTableView (AppKit NSTableView)
+                                       ├── channelQualities → ChannelQualityCalculator → ChannelQualityView
+                                       ├── bandViewModels → WiFiBandChart → Chart (universal renderer)
+                                       ├── networkInfo → InterfacesView (throughput, gateway, DNS)
+                                       ├── roamingSamples → RoamingTestViewModel → RoamingTestView
+                                       ├── mcpServer → MCPServer → HTTP API (127.0.0.1:19840)
+                                       └── regulatoryData → RegulatoryPipeline → ChannelRecommendation
+
+BLE — CoreBluetooth scan → BLEAdvertisementEvent → BLEDeviceTracker → BLEViewModel
+                                                                       ├── BLEScannerView
+                                                                       └── BLETrendChartView (via Chart engine)
 
 Chart Engine (Charts/):
   Caller builds [ChartSeries] + ChartAxisConfig + ChartStyle
@@ -22,26 +28,31 @@ Chart Engine (Charts/):
 
   DetailOverviewChart wraps two Charts + RangeSelector for linked zoom/overview.
   See docs/CHARTS.md for full architecture.
+  See docs/BLE.md for BLE scan architecture.
+  See docs/REGULATORY.md for regulatory pipeline.
+  Pro features documented in Pro/docs/ARCHITECTURE.md (separate submodule).
 ```
 
 ## Source Layout
 
 | Path | Responsibility |
 |------|---------------|
-| `Scanner/` | CoreWLAN scan loop, ViewModel, network/channel models |
+| `WiFiLensApp.swift` | Root `@main` App struct, Scene, menu commands, window group |
+| `Scanner/` | CoreWLAN scan loop, ViewModel, network/channel models, WiFi power monitoring, CWChannel extensions |
 | `Spectrum/` | WiFiBandChart, BandChartViewModel, BandChartRenderModel, BandChartLayout, ContentView (dashboard), ChartSeriesData, ChannelSpanCalculator, SignalHistoryStore, NetworkSnapshot, TrendChartView, SnapshotToChartAdapter, SSIDColorHasher |
 | `Channels/` | ChannelQualityCalculator, ChannelQualityView |
 | `Charts/` | Universal Chart engine: ChartView, ChartTypes, DetailOverviewChart, RangeSelectorView, ChartGeometry, SplineInterpolation, ChartTimeFormatting, ChartRendering (legacy) |
 | `Interfaces/` | InterfacesView, ThroughputMonitor, ThroughputChartView, NetworkInfoService |
 | `Roaming/` | RoamingTestView, RoamingTestViewModel, AP transition tracking, timeline chart with DetailOverviewChart |
-| `SignalProcessing/` | RSSI signal smoothing (EMA, Kalman, Hysteresis EMA) |
+| `SignalProcessing/` | RSSI signal smoothing: SignalSmoothing protocol, ExponentialMovingAverage, KalmanFilter1D, HysteresisEMA |
 | `Table/` | NativeTableView (NSViewRepresentable wrapping NSTableView) |
-| `App/` | OverviewView, SidebarView, SettingsView, Logging, CrashReporter, SparkleUpdater, TitleBadge |
-| `BLE/` | BLEScanner, BLEDeviceTracker, BLEViewModel, BLEScannerView, BLETrendChartView, BLEAdvertisementEvent |
+| `App/` | OverviewView, SidebarView, SettingsView, Logging, CrashReporter, SparkleUpdater, TitleBadge, HelpCenterView, LocationPermissionRequiredView, WiFiOffView, MetricKitManager |
+| `BLE/` | BLEScanner, BLEDeviceTracker, BLEViewModel, BLEScannerView, BLETrendChartView, BLEAdvertisementEvent, BLEChannel, BLEDeviceSnapshot, BLERSSISample, BluetoothPermissionManager. See docs/BLE.md |
 | `Debug/` | DebugChartView, DebugRoamingChartView (DEV builds only) |
-| `MCP/` | HTTP server exposing scan data to MCP clients |
-| `Regulatory/` | RegulatoryPipeline, RegulatoryDatabase, RegulatoryFilter, RegionInferenceEngine, ChannelRecommendation |
-| `Utilities/` | Constants, Color extensions, BuildConfig |
+| `MCP/` | MCPServer — embedded HTTP/1.1 JSON API (NWListener on 127.0.0.1:19840) exposing scan data |
+| `Regulatory/` | RegulatoryPipeline, RegulatoryDatabase, RegulatoryFilter, RegionInferenceEngine, ChannelRecommendation, DeviceCompatibilityFilter, RegulatoryDomain. See docs/REGULATORY.md |
+| `Utilities/` | Constants, Color extensions, BuildConfig, DeviceCapabilities, GatewayPinger |
+| `Pro/` | Paid features (Recording, Session, StoreKit) — see `Pro/docs/ARCHITECTURE.md` in submodule |
 | `Resources/` | Localizable.xcstrings (String Catalog) |
 
 ## Key Patterns
@@ -55,7 +66,7 @@ Chart Engine (Charts/):
 - `displayRSSI` animates toward `rssi` each tick for smooth Gaussian curve transitions
 - AP roaming transitions share a single timestamp between old and new segments, eliminating gaps on the timeline
 - Signal history (`SignalHistoryStore`) keeps 20 snapshots per BSSID in memory
-- `ScannerViewModel.scanIntervalSeconds` supports dynamic override — `RecordingViewModel` sets it to 1 s during recording and restores the UserDefaults-configured value on stop. The `didSet` automatically cancels and restarts the scan loop with the new interval when `isScanning` is true. This prevents the recording chart domain (real-time `Date()`) from pulling ahead of the data points (gated by scan interval).
+- `ScannerViewModel.scanIntervalSeconds` supports dynamic override — external code (e.g., recording feature in Pro submodule, see `Pro/docs/ARCHITECTURE.md`) can set it to a custom value and restore the UserDefaults-configured value on stop. The `didSet` automatically cancels and restarts the scan loop with the new interval when `isScanning` is true. This prevents chart domains driven by real-time `Date()` from pulling ahead of data points (gated by scan interval).
 - `StableScore` provides hysteresis for quality level boundaries (upgrade margin 2, downgrade margin 5)
 - `ChannelBand(id:)` failable initializer maps String band IDs ("24"/"5"/"6") to enum cases, used by `SnapshotToChartAdapter` for history playback
 

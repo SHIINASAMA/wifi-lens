@@ -1,18 +1,21 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI coding agents (Codex, Copilot, Cursor, Windsurf, Claude Code, and others) when working in this repository.
 
 ## Docs Directory
 
-All detailed documentation lives under `docs/`. When adding or updating documentation, always place it there. Never create standalone `.md` files at the repo root (except this file and README).
+All detailed documentation lives under `docs/`. When adding or updating documentation, always place it there. Never create standalone `.md` files at the repo root (except this file, `CLAUDE.md`, and `README.md`).
 
 | File | Purpose |
 |------|---------|
 | `docs/ARCHITECTURE.md` | Architecture, data flow, key patterns, design conventions |
 | `docs/CHARTS.md` | Universal Chart engine, types, rendering pipeline, WiFi spectrum integration |
+| `docs/BLE.md` | BLE scanner architecture, data flow, types, views |
+| `docs/REGULATORY.md` | Regulatory pipeline, region inference, channel recommendation |
 | `docs/COLLABORATION_RULES.md` | AI assistant behavior rules — enforced prohibitions and must-follows |
 | `docs/TODO.md` | Feature roadmap and checked-off items |
 | `docs/ISSUES.md` | Bugs, regressions, and deferred work with status |
+| `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
 
 ## Build & Test
 
@@ -47,5 +50,6 @@ The website deploys to GitHub Pages via `.github/workflows/pages.yml`, triggered
 
 - Never commit without explicit user instruction
 - Never push unless asked
-- **All `.md` docs go in `docs/`** — this CLAUDE.md and README are the only exceptions
+- **English is the primary language.** All docs, code comments, commit messages, and communication must be in English. Only `.xcstrings` localization files are exceptions.
+- **All `.md` docs go in `docs/`** — this AGENTS.md, CLAUDE.md, and README are the only exceptions
 - When creating new docs, update the table in this file
