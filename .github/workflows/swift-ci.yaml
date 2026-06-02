@@ -100,12 +100,12 @@ jobs:
         run: |
           cp -R "$APP_PATH" "$APP_NAME.app"
 
-      - name: Create DMG & Sign
+      - name: Create DMG
         run: |
-          hdiutil create -volname "$APP_NAME" \
-            -srcfolder "$APP_NAME.app" \
-            -ov -format UDZO "$APP_NAME.dmg"
+          bash scripts/create-dmg.sh "$APP_NAME.app" "$APP_NAME.dmg"
 
+      - name: Sign DMG
+        run: |
           codesign --sign "$SIGNING_IDENTITY" --timestamp --options=runtime "$APP_NAME.dmg"
 
           DMG_SIZE=$(stat -f%z "$APP_NAME.dmg")
