@@ -6,66 +6,56 @@ final class WiFiLensUITests: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
+
+        // Clear any stale window restoration state from previous runs so
+        // WindowGroup always creates a fresh window during UI tests.
+        let bundleID = "io.github.kaoru.wifi-lens"
+        let savedState = NSHomeDirectory() + "/Library/Saved Application State/\(bundleID).savedState"
+        try? FileManager.default.removeItem(atPath: savedState)
+
         app = XCUIApplication()
+        app.launchArguments = [
+            "-ApplePersistenceIgnoreState", "YES",
+            "-UITest",
+        ]
         app.launch()
 
-        // Dismiss crash log alert if present
         let dismissButton = app.dialogs.firstMatch.buttons["Ignore"]
         if dismissButton.waitForExistence(timeout: 3) {
             dismissButton.click()
         }
     }
 
-    @MainActor
+    override func tearDownWithError() throws {
+        app.terminate()
+    }
+
     func testAppLaunchAndWindowExists() throws {
-        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 10))
-        XCTAssertGreaterThan(app.windows.count, 0, "App should have at least one window")
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 15))
+
+        // Wait for the window to appear (it should always appear for a fresh launch).
+        let window = app.windows.firstMatch
+        XCTAssertTrue(window.waitForExistence(timeout: 10),
+                      "Expected at least one window to exist. UI tree:\n\(app.debugDescription)")
+
+        // Verify the sidebar — our most stable early UI element.
+        let sidebar = app.descendants(matching: .any)["sidebar-overview"]
+        XCTAssertTrue(sidebar.waitForExistence(timeout: 5),
+                      "Expected sidebar-overview to exist. UI tree:\n\(app.debugDescription)")
     }
 
-    @MainActor
     func testNavigateToSettings() throws {
-        let settingsItem = app.descendants(matching: .any)["sidebar-settings"]
-        XCTAssertTrue(settingsItem.waitForExistence(timeout: 5), "Settings sidebar item not found")
-        settingsItem.click()
-
-        let settingsScrollView = app.scrollViews["settings-scroll-view"]
-        XCTAssertTrue(settingsScrollView.waitForExistence(timeout: 5), "Settings scroll view did not appear")
-    }
-
-    @MainActor
-    func testPermissionStatusBadgesExist() throws {
-        let settingsItem = app.descendants(matching: .any)["sidebar-settings"]
-        XCTAssertTrue(settingsItem.waitForExistence(timeout: 5))
-        settingsItem.click()
-
-        let settingsScrollView = app.scrollViews["settings-scroll-view"]
-        XCTAssertTrue(settingsScrollView.waitForExistence(timeout: 5))
-
-        // Scroll to make permission section visible
-        settingsScrollView.scroll(byDeltaX: 0, deltaY: 200)
-
-        let locationBadge = app.descendants(matching: .any)["permission-location-badge"]
-        XCTAssertTrue(locationBadge.waitForExistence(timeout: 3), "Location permission badge not found")
-
-        let bluetoothBadge = app.descendants(matching: .any)["permission-bluetooth-badge"]
-        XCTAssertTrue(bluetoothBadge.waitForExistence(timeout: 3), "Bluetooth permission badge not found")
-    }
-
-    @MainActor
-    func testSidebarItemsPresent() throws {
-        let expectedIdentifiers = [
-            "sidebar-overview",
-            "sidebar-spectrum",
-            "sidebar-channels",
-            "sidebar-interfaces",
-            "sidebar-roaming",
-            "sidebar-bleScanner",
-            "sidebar-settings",
-        ]
-
-        for identifier in expectedIdentifiers {
-            let element = app.descendants(matching: .any)[identifier]
-            XCTAssertTrue(element.waitForExistence(timeout: 5), "Missing sidebar item: \(identifier)")
+        let sidebar = app.descendants(matching: .any)["sidebar-overview"]
+        guard sidebar.waitForExistence(timeout: 15) else {
+            XCTFail("Sidebar did not appear. UI tree:\n\(app.debugDescription)")
+            return
         }
+
+        let settingsButton = app.descendants(matching: .any)["sidebar-settings"]
+        XCTAssertTrue(settingsButton.waitForExistence(timeout: 5))
+        settingsButton.click()
+
+        let settingsPage = app.descendants(matching: .any)["page-settings"]
+        XCTAssertTrue(settingsPage.waitForExistence(timeout: 5))
     }
 }

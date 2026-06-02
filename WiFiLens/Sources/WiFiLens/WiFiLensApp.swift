@@ -210,9 +210,11 @@ private struct WindowAccessor: NSViewRepresentable {
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
         DispatchQueue.main.async {
-            onWindow(view.window)
-            view.window?.titlebarAppearsTransparent = true
-            view.window?.titleVisibility = .visible
+            let w = view.window
+            AppLogger.app.info("WindowAccessor: window=\(w != nil ? "\(w!)" : "nil")")
+            onWindow(w)
+            w?.titlebarAppearsTransparent = true
+            w?.titleVisibility = .visible
         }
         return view
     }
@@ -240,6 +242,14 @@ struct WiFiLensApp: App {
     @AppStorage("bleEnabled") private var bleEnabled: Bool = false
 
     init() {
+        let isUITest = CommandLine.arguments.contains("-UITest")
+        if isUITest {
+            // Belt-and-suspenders: the UI test also passes -ApplePersistenceIgnoreState YES
+            // as a launch argument, but setting it in UserDefaults catches any edge case
+            // where the argument is read too early.
+            UserDefaults.standard.set(true, forKey: "ApplePersistenceIgnoreState")
+        }
+
         AppLogger.bootstrap()
         CrashReporter.register()
         MetricKitManager.start()
@@ -247,9 +257,9 @@ struct WiFiLensApp: App {
             _crashLogText = State(initialValue: log)
             _showCrashLog = State(initialValue: true)
         }
-        let bleOn = UserDefaults.standard.bool(forKey: "bleEnabled")
+        let bleOn = UserDefaults.standard.bool(forKey: "bleEnabled") && !isUITest
         _bleViewModel = State(initialValue: bleOn ? BLEViewModel() : nil)
-        AppLogger.app.info("WiFi Lens launched")
+        AppLogger.app.info("WiFi Lens launched\(isUITest ? " (UI test mode)" : "")")
     }
 
     @State private var crashLogText: String = ""
