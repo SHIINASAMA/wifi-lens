@@ -28,8 +28,6 @@ jobs:
         working-directory: WiFiLens
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true
 
       - name: Build
         run: |
@@ -47,7 +45,6 @@ jobs:
             -configuration "$DEBUG_CONFIG" \
             -destination 'platform=macOS' \
             -skip-testing:WiFiLensUITests \
-            -skip-testing:WiFiLensProUITests \
             CODE_SIGNING_ALLOWED=NO \
             test
 
@@ -63,8 +60,6 @@ jobs:
         working-directory: WiFiLens
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true
 
       - name: Import Developer ID Certificate
         run: |

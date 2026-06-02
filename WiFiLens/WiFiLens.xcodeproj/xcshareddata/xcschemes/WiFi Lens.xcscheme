@@ -39,11 +39,8 @@
       </MacroExpansion>
       <TestPlans>
          <TestPlanReference
-            reference = "container:Tests/TestPlans/Default.xctestplan"
+            reference = "container:Tests/TestPlans/OSS.xctestplan"
             default = "YES">
-         </TestPlanReference>
-         <TestPlanReference
-            reference = "container:Tests/TestPlans/UITests.xctestplan">
          </TestPlanReference>
       </TestPlans>
       <Testables>

@@ -372,9 +372,10 @@
 		FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = SOURCE_ROOT; };
 		FBB2CA8B2FC0E14000FC2D2C /* BuildConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildConfig.swift; sourceTree = "<group>"; };
 		FBB2CA8C2FC0E14000FC2D2C /* TitleBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleBadge.swift; sourceTree = "<group>"; };
-		FBB77CDD2FC6BF9800CED0FB /* Default.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Default.xctestplan; sourceTree = "<group>"; };
 		FBBD167A2FCF39F50093F940 /* WiFiLensProUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WiFiLensProUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBBD168A2FCF3A9C0093F940 /* ProUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProUITests.swift; sourceTree = "<group>"; };
+		FBBD16932FCF4E560093F940 /* OSS.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = OSS.xctestplan; sourceTree = "<group>"; };
+		FBBD16942FCF4E6A0093F940 /* Pro.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = Pro.xctestplan; path = Sources/WiFiLens/Pro/Tests/TestPlans/Pro.xctestplan; sourceTree = SOURCE_ROOT; };
 		FBD000002FC4000000ABC001 /* WiFiOffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiOffView.swift; sourceTree = "<group>"; };
 		FBD329512FC500000057B038 /* MetricKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricKitManager.swift; sourceTree = "<group>"; };
 		FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdater.swift; sourceTree = "<group>"; };
@@ -744,7 +745,8 @@
 		FBB77CDE2FC6BF9800CED0FB /* TestPlans */ = {
 			isa = PBXGroup;
 			children = (
-				FBB77CDD2FC6BF9800CED0FB /* Default.xctestplan */,
+				FBBD16932FCF4E560093F940 /* OSS.xctestplan */,
+				FBBD16942FCF4E6A0093F940 /* Pro.xctestplan */,
 			);
 			path = TestPlans;
 			sourceTree = "<group>";
