@@ -124,14 +124,14 @@ struct SidebarView: View {
                                 .frame(width: 16, height: 16)
                         })
                             .tag(page)
-                            .disabled(page.requiresWiFi && !isWiFiAvailable)
-                            .opacity(page.requiresWiFi && !isWiFiAvailable ? 0.4 : 1.0)
+                            .disabled(!UITestMode.isActive && page.requiresWiFi && !isWiFiAvailable)
+                            .opacity(!UITestMode.isActive && page.requiresWiFi && !isWiFiAvailable ? 0.4 : 1.0)
                             .accessibilityIdentifier("sidebar-bleScanner")
                     } else {
                         Label(page.label, systemImage: page.icon)
                             .tag(page)
-                            .disabled(page.requiresWiFi && !isWiFiAvailable)
-                            .opacity(page.requiresWiFi && !isWiFiAvailable ? 0.4 : 1.0)
+                            .disabled(!UITestMode.isActive && page.requiresWiFi && !isWiFiAvailable)
+                            .opacity(!UITestMode.isActive && page.requiresWiFi && !isWiFiAvailable ? 0.4 : 1.0)
                             .accessibilityIdentifier("sidebar-\(page.rawValue)")
                     }
                 }

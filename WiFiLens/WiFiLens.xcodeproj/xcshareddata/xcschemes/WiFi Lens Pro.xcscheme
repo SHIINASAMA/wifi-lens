@@ -34,6 +34,19 @@
             default = "YES">
          </TestPlanReference>
       </TestPlans>
+      <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FBBD16792FCF39F50093F940"
+               BuildableName = "WiFiLensProUITests.xctest"
+               BlueprintName = "WiFiLensProUITests"
+               ReferencedContainer = "container:WiFiLens.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"

@@ -6,22 +6,6 @@
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES"
       buildArchitectures = "Automatic">
-      <BuildActionEntries>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "32B8DFED1C1CBAD8FD8C797C"
-               BuildableName = "WiFiLensTests.xctest"
-               BlueprintName = "WiFiLensTests"
-               ReferencedContainer = "container:WiFiLens.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-      </BuildActionEntries>
    </BuildAction>
    <TestAction
       buildConfiguration = "Debug"
@@ -29,23 +13,15 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "32B8DFED1C1CBAD8FD8C797C"
-            BuildableName = "WiFiLensTests.xctest"
-            BlueprintName = "WiFiLensTests"
-            ReferencedContainer = "container:WiFiLens.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <Testables>
          <TestableReference
-            skipped = "NO">
+            skipped = "NO"
+            parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "32B8DFED1C1CBAD8FD8C797C"
-               BuildableName = "WiFiLensTests.xctest"
-               BlueprintName = "WiFiLensTests"
+               BlueprintIdentifier = "FBBD16792FCF39F50093F940"
+               BuildableName = "WiFiLensProUITests.xctest"
+               BlueprintName = "WiFiLensProUITests"
                ReferencedContainer = "container:WiFiLens.xcodeproj">
             </BuildableReference>
          </TestableReference>

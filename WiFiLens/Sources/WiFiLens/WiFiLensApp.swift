@@ -26,7 +26,7 @@ private struct AppRootView: View {
     }
 
     private var showsLocationPermissionRequiredView: Bool {
-        selectedPage.requiresLocationAuthorization && !hasLocationAuthorization
+        !UITestMode.isActive && selectedPage.requiresLocationAuthorization && !hasLocationAuthorization
     }
 
     @ViewBuilder
@@ -36,7 +36,7 @@ private struct AppRootView: View {
                 accessState: viewModel.accessState,
                 openLocationPreferences: viewModel.locationManager.openLocationPreferences
             )
-        } else if selectedPage.requiresWiFi && !viewModel.isWiFiAvailable {
+        } else if !UITestMode.isActive && selectedPage.requiresWiFi && !viewModel.isWiFiAvailable {
             WiFiOffView()
         } else {
             ZStack {
@@ -242,8 +242,7 @@ struct WiFiLensApp: App {
     @AppStorage("bleEnabled") private var bleEnabled: Bool = false
 
     init() {
-        let isUITest = CommandLine.arguments.contains("-UITest")
-        if isUITest {
+        if UITestMode.isActive {
             // Belt-and-suspenders: the UI test also passes -ApplePersistenceIgnoreState YES
             // as a launch argument, but setting it in UserDefaults catches any edge case
             // where the argument is read too early.
@@ -257,9 +256,9 @@ struct WiFiLensApp: App {
             _crashLogText = State(initialValue: log)
             _showCrashLog = State(initialValue: true)
         }
-        let bleOn = UserDefaults.standard.bool(forKey: "bleEnabled") && !isUITest
+        let bleOn = UserDefaults.standard.bool(forKey: "bleEnabled") && !UITestMode.isActive
         _bleViewModel = State(initialValue: bleOn ? BLEViewModel() : nil)
-        AppLogger.app.info("WiFi Lens launched\(isUITest ? " (UI test mode)" : "")")
+        AppLogger.app.info("WiFi Lens launched\(UITestMode.isActive ? " (UI test mode)" : "")")
     }
 
     @State private var crashLogText: String = ""

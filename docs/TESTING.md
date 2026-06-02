@@ -5,13 +5,17 @@
 | Target | Framework | Purpose |
 |--------|-----------|---------|
 | WiFiLensTests | Swift Testing (`@Test`, `#expect()`) | Pure-logic unit tests with `@testable import WiFiLens` |
-| WiFiLensUITests | XCTest (`XCTestCase`) | End-to-end UI tests via XCUI accessibility tree |
+| WiFiLensUITests | XCTest (`XCTestCase`) | End-to-end UI tests for the OSS app |
+| WiFiLensProUITests | XCTest (`XCTestCase`) | End-to-end UI tests for the Pro app (Recording, StoreKit) |
 
 ## Running Tests
 
 ```sh
-# All tests (unit + UI)
+# All tests (unit + UI) — OSS target
 xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test
+
+# Pro target tests
+xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens Pro" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test
 ```
 
 ## Unit Tests (WiFiLensTests)
@@ -53,3 +57,26 @@ If the tree shows `Application → MenuBar / TouchBar` without a `Window`, windo
 ### Accessibility Identifiers
 
 All key UI elements carry `.accessibilityIdentifier()` for stable querying (see `docs/ARCHITECTURE.md` for the full convention). Examples: `sidebar-overview`, `page-settings`, `location-permission-view`, `wifi-off-view`, `settings-theme-picker`.
+
+## Pro UI Tests (WiFiLensProUITests)
+
+Pro tests live under `WiFiLens/Sources/WiFiLens/Pro/Tests/` and test the `WiFiLensPro` target (bundle ID: `com.kaoru.wifi-lens-pro`). They require the Pro scheme (`WiFi Lens Pro`) with `TEST_TARGET_NAME = WiFiLensPro`.
+
+### Pro Accessibility Identifiers
+
+SwiftUI `.accessibilityIdentifier()` does not reliably propagate to AppKit views on macOS (known issue). Pro elements inherit the nearest ancestor identifier that does propagate (`page-spectrum`). Tests use element type / count / position rather than custom identifiers.
+
+| Element | Detection method |
+|---------|-----------------|
+| Mode picker (Live/Recording) | `container.radioButtons.count == 2` — the only RadioGroup on the spectrum page |
+| Recording view active | Button count changes vs Live dashboard |
+
+### Xcode Target Setup
+
+A `WiFiLensProUITests` target must be created manually in Xcode:
+
+1. **Add target**: File → New → Target → macOS → UI Testing Bundle, name `WiFiLensProUITests`
+2. **Set TEST_TARGET_NAME** = `WiFiLensPro` in the target's build settings
+3. **Add test files** from `WiFiLens/Sources/WiFiLens/Pro/Tests/` to the target
+4. **Add to scheme**: Open `WiFi Lens Pro` scheme → Test → add `WiFiLensProUITests` to testables
+5. **Delete the template** `WiFiLensProUITests.swift` / `WiFiLensProUITestsLaunchTests.swift` that Xcode generates
