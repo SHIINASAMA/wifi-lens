@@ -22,6 +22,7 @@ final class WiFiPowerMonitor: NSObject, CWEventDelegate {
 
     override init() {
         super.init()
+        guard Bundle(identifier: "io.github.kaoru.WiFiLensTests") == nil else { return }
         CWWiFiClient.shared().delegate = self
         try? CWWiFiClient.shared().startMonitoringEvent(with: .powerDidChange)
         refreshState()

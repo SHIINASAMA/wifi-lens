@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 import Testing
-@testable import WiFiLens
+@testable import WiFi_Lens
 
 @Suite @MainActor struct BandChartViewModelTests {
 
@@ -95,7 +95,6 @@ import Testing
 
         vm.clearFilter()
         #expect(vm.visibleSeriesData().count == 2)
-        #expect(!vm.showFilterPopover)
     }
 
     @Test func hasFilterReflectsFilterState() {

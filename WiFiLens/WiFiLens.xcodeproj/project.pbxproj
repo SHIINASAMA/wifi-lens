@@ -199,6 +199,27 @@
 		FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */; };
 		FCCEB24ABEECEAE7B03195AD /* BLEDeviceTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D296EB5CEF7484BA599C2F9 /* BLEDeviceTracker.swift */; };
 		FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6203A2551742DF77D61785FE /* WiFiChannel.swift */; };
+		67B6475699ADED9C42E8F7CC /* BLEModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B06040A5BF8B6FAF01FFB696 /* BLEModelTests.swift */; };
+		2A8E470AAD8FCE2CC1D14305 /* BandChartViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC084FA8AE0EE5E703D922DA /* BandChartViewModelTests.swift */; };
+		AA4D4D9D9D1C2FA5D32CC290 /* ChannelQualityCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCB49F38A652E6A07BD027F /* ChannelQualityCalculatorTests.swift */; };
+		122F4DD99EC9891A0BD9ECFE /* ChannelSpanCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B77C42448FC4F5A8180F9885 /* ChannelSpanCalculatorTests.swift */; };
+		19134AC983FA95FB8033EB8F /* ChartUtilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E83547C1A36ADDD9E827B26A /* ChartUtilityTests.swift */; };
+		EEF6495F8D90DE97D0C86ADF /* ChartViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A7A45AB88716DC3AC18610B /* ChartViewTests.swift */; };
+		C1E94A4D89C952711DBDB34E /* ColorExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53CD49099277F06E8FB3E04D /* ColorExtensionTests.swift */; };
+		FABE49BBA198BBD12DD618F2 /* DeviceCompatibilityFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3053495094BB40125310557F /* DeviceCompatibilityFilterTests.swift */; };
+		BAB34552BFD72F7A42CD918A /* IEParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A94372ADF30D10E0F015CD /* IEParserTests.swift */; };
+		13E648DDB1578ECF42926E36 /* MCPServerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5024CBB8BFCAFF56FEF0756 /* MCPServerTests.swift */; };
+		2ED34E17AE03E25A409037BD /* NetworkTableRowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */; };
+		3F19474AB44B5B07E9E5AF9E /* RegionInferenceEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AC04B2DAF7F8FB54DC3FFD2 /* RegionInferenceEngineTests.swift */; };
+		90CF4B22A68C668A58043390 /* RegulatoryDatabaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07A4C1B8DFCDFBA81A6DFFA /* RegulatoryDatabaseTests.swift */; };
+		2B79435DB2D70F8EFE1DFDAA /* RegulatoryFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE17427BAD036F393D712B6F /* RegulatoryFilterTests.swift */; };
+		DFB84AA1AE224EE57DFCBB16 /* RegulatoryModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB542909E9B4730B02260F1 /* RegulatoryModelTests.swift */; };
+		63C14F72B35F2CC98430CFA0 /* RoamingModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CE94087AFA3CB5A003A5012 /* RoamingModelTests.swift */; };
+		869A4E799B9BF9BB3D1FBCF9 /* RoamingTestViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70E4041B5972D72DD79BF56 /* RoamingTestViewModelTests.swift */; };
+		62A04C6993321BEA64FC8E7D /* SSIDColorHasherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33A24CA582895A784C2E6014 /* SSIDColorHasherTests.swift */; };
+		9E204E0C8B6D8E29583263B0 /* ScannerModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E044182AAA5DC5A000A0D69 /* ScannerModelTests.swift */; };
+		896F4371837628B3E6454853 /* SignalProcessingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786042C29EF01CE698FEBBF8 /* SignalProcessingTests.swift */; };
+		2B7B4CBC96F724AA4970AC7F /* SpectrumModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DD34695BFD8D4277DF0BDB0 /* SpectrumModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -336,6 +357,27 @@
 		FBD329512FC500000057B038 /* MetricKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricKitManager.swift; sourceTree = "<group>"; };
 		FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdater.swift; sourceTree = "<group>"; };
 		FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B06040A5BF8B6FAF01FFB696 /* BLEModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEModelTests.swift; sourceTree = "<group>"; };
+		FC084FA8AE0EE5E703D922DA /* BandChartViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartViewModelTests.swift; sourceTree = "<group>"; };
+		5BCB49F38A652E6A07BD027F /* ChannelQualityCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityCalculatorTests.swift; sourceTree = "<group>"; };
+		B77C42448FC4F5A8180F9885 /* ChannelSpanCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelSpanCalculatorTests.swift; sourceTree = "<group>"; };
+		E83547C1A36ADDD9E827B26A /* ChartUtilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartUtilityTests.swift; sourceTree = "<group>"; };
+		8A7A45AB88716DC3AC18610B /* ChartViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartViewTests.swift; sourceTree = "<group>"; };
+		53CD49099277F06E8FB3E04D /* ColorExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtensionTests.swift; sourceTree = "<group>"; };
+		3053495094BB40125310557F /* DeviceCompatibilityFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCompatibilityFilterTests.swift; sourceTree = "<group>"; };
+		39A94372ADF30D10E0F015CD /* IEParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IEParserTests.swift; sourceTree = "<group>"; };
+		A5024CBB8BFCAFF56FEF0756 /* MCPServerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPServerTests.swift; sourceTree = "<group>"; };
+		8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTableRowTests.swift; sourceTree = "<group>"; };
+		4AC04B2DAF7F8FB54DC3FFD2 /* RegionInferenceEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionInferenceEngineTests.swift; sourceTree = "<group>"; };
+		D07A4C1B8DFCDFBA81A6DFFA /* RegulatoryDatabaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegulatoryDatabaseTests.swift; sourceTree = "<group>"; };
+		AE17427BAD036F393D712B6F /* RegulatoryFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegulatoryFilterTests.swift; sourceTree = "<group>"; };
+		2DB542909E9B4730B02260F1 /* RegulatoryModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegulatoryModelTests.swift; sourceTree = "<group>"; };
+		5CE94087AFA3CB5A003A5012 /* RoamingModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingModelTests.swift; sourceTree = "<group>"; };
+		C70E4041B5972D72DD79BF56 /* RoamingTestViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingTestViewModelTests.swift; sourceTree = "<group>"; };
+		33A24CA582895A784C2E6014 /* SSIDColorHasherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSIDColorHasherTests.swift; sourceTree = "<group>"; };
+		7E044182AAA5DC5A000A0D69 /* ScannerModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerModelTests.swift; sourceTree = "<group>"; };
+		786042C29EF01CE698FEBBF8 /* SignalProcessingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalProcessingTests.swift; sourceTree = "<group>"; };
+		5DD34695BFD8D4277DF0BDB0 /* SpectrumModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -700,14 +742,27 @@
 		FBD329482FBF0E2F00D01613 /* WiFiLensTests */ = {
 			isa = PBXGroup;
 			children = (
-				FBD329432FBF0E2F00D01613 /* ChannelQualityCalculatorTests.swift */,
-				FBD329442FBF0E2F00D01613 /* ChannelSpanCalculatorTests.swift */,
-				FBD329452FBF0E2F00D01613 /* IEParserTests.swift */,
-				FBD329462FBF0E2F00D01613 /* NetworkTableRowTests.swift */,
-				FBD329472FBF0E2F00D01613 /* SSIDColorHasherTests.swift */,
-				FBD3294A2FBF0E2F00D01613 /* MCPServerTests.swift */,
-				FBD3294B2FBF0E2F00D01613 /* BandChartViewModelTests.swift */,
-				FBD3294C2FBF0E2F00D01613 /* RoamingTestViewModelTests.swift */,
+				B06040A5BF8B6FAF01FFB696 /* BLEModelTests.swift */,
+				FC084FA8AE0EE5E703D922DA /* BandChartViewModelTests.swift */,
+				5BCB49F38A652E6A07BD027F /* ChannelQualityCalculatorTests.swift */,
+				B77C42448FC4F5A8180F9885 /* ChannelSpanCalculatorTests.swift */,
+				E83547C1A36ADDD9E827B26A /* ChartUtilityTests.swift */,
+				8A7A45AB88716DC3AC18610B /* ChartViewTests.swift */,
+				53CD49099277F06E8FB3E04D /* ColorExtensionTests.swift */,
+				3053495094BB40125310557F /* DeviceCompatibilityFilterTests.swift */,
+				39A94372ADF30D10E0F015CD /* IEParserTests.swift */,
+				A5024CBB8BFCAFF56FEF0756 /* MCPServerTests.swift */,
+				8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */,
+				4AC04B2DAF7F8FB54DC3FFD2 /* RegionInferenceEngineTests.swift */,
+				D07A4C1B8DFCDFBA81A6DFFA /* RegulatoryDatabaseTests.swift */,
+				AE17427BAD036F393D712B6F /* RegulatoryFilterTests.swift */,
+				2DB542909E9B4730B02260F1 /* RegulatoryModelTests.swift */,
+				5CE94087AFA3CB5A003A5012 /* RoamingModelTests.swift */,
+				C70E4041B5972D72DD79BF56 /* RoamingTestViewModelTests.swift */,
+				33A24CA582895A784C2E6014 /* SSIDColorHasherTests.swift */,
+				7E044182AAA5DC5A000A0D69 /* ScannerModelTests.swift */,
+				786042C29EF01CE698FEBBF8 /* SignalProcessingTests.swift */,
+				5DD34695BFD8D4277DF0BDB0 /* SpectrumModelTests.swift */,
 			);
 			path = WiFiLensTests;
 			sourceTree = "<group>";
@@ -964,6 +1019,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				67B6475699ADED9C42E8F7CC /* BLEModelTests.swift in Sources */,
+				2A8E470AAD8FCE2CC1D14305 /* BandChartViewModelTests.swift in Sources */,
+				AA4D4D9D9D1C2FA5D32CC290 /* ChannelQualityCalculatorTests.swift in Sources */,
+				122F4DD99EC9891A0BD9ECFE /* ChannelSpanCalculatorTests.swift in Sources */,
+				19134AC983FA95FB8033EB8F /* ChartUtilityTests.swift in Sources */,
+				EEF6495F8D90DE97D0C86ADF /* ChartViewTests.swift in Sources */,
+				C1E94A4D89C952711DBDB34E /* ColorExtensionTests.swift in Sources */,
+				FABE49BBA198BBD12DD618F2 /* DeviceCompatibilityFilterTests.swift in Sources */,
+				BAB34552BFD72F7A42CD918A /* IEParserTests.swift in Sources */,
+				13E648DDB1578ECF42926E36 /* MCPServerTests.swift in Sources */,
+				2ED34E17AE03E25A409037BD /* NetworkTableRowTests.swift in Sources */,
+				3F19474AB44B5B07E9E5AF9E /* RegionInferenceEngineTests.swift in Sources */,
+				90CF4B22A68C668A58043390 /* RegulatoryDatabaseTests.swift in Sources */,
+				2B79435DB2D70F8EFE1DFDAA /* RegulatoryFilterTests.swift in Sources */,
+				DFB84AA1AE224EE57DFCBB16 /* RegulatoryModelTests.swift in Sources */,
+				63C14F72B35F2CC98430CFA0 /* RoamingModelTests.swift in Sources */,
+				869A4E799B9BF9BB3D1FBCF9 /* RoamingTestViewModelTests.swift in Sources */,
+				62A04C6993321BEA64FC8E7D /* SSIDColorHasherTests.swift in Sources */,
+				9E204E0C8B6D8E29583263B0 /* ScannerModelTests.swift in Sources */,
+				896F4371837628B3E6454853 /* SignalProcessingTests.swift in Sources */,
+				2B7B4CBC96F724AA4970AC7F /* SpectrumModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

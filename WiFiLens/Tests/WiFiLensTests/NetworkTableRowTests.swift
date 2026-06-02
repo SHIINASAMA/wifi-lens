@@ -1,6 +1,6 @@
 import Testing
 import SwiftUI
-@testable import WiFiLens
+@testable import WiFi_Lens
 
 struct NetworkTableRowTests {
 

@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import WiFiLens
+@testable import WiFi_Lens
 
 /// Helper to build raw IE data in TLV format: each IE is [tag][length][value...].
 private func buildIEData(_ ies: [[UInt8]]) -> Data {

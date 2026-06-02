@@ -23,7 +23,7 @@ All detailed documentation lives under `docs/`. When adding or updating document
 # App — always use xcodebuild, never swift build / swift test
 # Build configurations: Debug / Release
 xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' build
-xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' test
+xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test
 xed WiFiLens/WiFiLens.xcodeproj                   # open in Xcode GUI
 
 # Website — Vite + Tailwind CSS, outputs to _site/
@@ -32,9 +32,14 @@ npm run build                            # production build
 npm run preview                          # preview production build
 ```
 
-The product name is `WiFi Lens.app` (with space). If Xcode regenerates the project and `TEST_HOST` breaks, fix it to: `$(BUILT_PRODUCTS_DIR)/WiFi Lens.app/Contents/MacOS/WiFi Lens`.
+The product name is `WiFi Lens.app` (with space). Unit tests use Swift Testing (`@Test`) with `TEST_HOST` — the test bundle is injected into the app process for `@testable import` symbol resolution. All test `.swift` files must be added to the WiFiLensTests target's Sources build phase (in `project.pbxproj`) for `xcodebuild test` to compile and run them. The `WiFiLensTests` scheme must reference the test bundle in both `<Testables>` and `<MacroExpansion>`.
 
-The website deploys to GitHub Pages via `.github/workflows/pages.yml`, triggered on push when any site source file changes.
+When adding new test files, ensure they are:
+1. Added as PBXFileReference in project.pbxproj
+2. Added to the WiFiLensTests PBXGroup
+3. Added as PBXBuildFile (assigned to WiFiLensTests target)
+4. Listed in the WiFiLensTests target's Sources build phase (`files = (...)`)
+5. Listed in the WiFiLensTests scheme's `<Testables>`
 
 ## Key Facts
 

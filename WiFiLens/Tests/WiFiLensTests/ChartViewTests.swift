@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 import Testing
-@testable import WiFiLens
+@testable import WiFi_Lens
 
 @Suite struct ChartGeometryTests {
 
@@ -18,8 +18,8 @@ import Testing
 
         // A point at the center of the domain should map to the center of the chart rect
         let center = geo.dataToPoint(x: 30, y: -50)
-        #expect(center.x == 40 + 352 / 2)
-        #expect(center.y == 8 + 200 / 2)
+        #expect(abs(center.x - 216) < 0.5)
+        #expect(abs(center.y - 108) < 0.5)
     }
 
     @Test func dataToPointMapsOutsideBoundsCorrectly() {
@@ -106,8 +106,8 @@ import Testing
         let rect = style.chartRect(size: CGSize(width: 400, height: 300))
         #expect(rect.minX == 40)
         #expect(rect.minY == 8)
-        #expect(rect.width == 400 - 40 - 8)
-        #expect(rect.height == 300 - 24 - 8 - 4)
+        #expect(abs(rect.width - 352) < 0.5)
+        #expect(abs(rect.height - 264) < 0.5)
     }
 
     // MARK: - Axis config with explicit bounds

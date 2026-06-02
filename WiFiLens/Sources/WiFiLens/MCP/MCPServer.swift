@@ -106,7 +106,7 @@ final class MCPServer: @unchecked Sendable {
             for nw in networks {
                 bands[nw.channel.band.id, default: [:]][nw.channel.channelNumber, default: 0] += 1
             }
-            return Self.jsonResponse(bands.mapValues { $0.mapValues { $0 } })
+            return Self.jsonResponse(bands.mapValues { $0.reduce(into: [String: Int]()) { $0[String($1.key)] = $1.value } })
 
         default:
             // /networks/:bssid

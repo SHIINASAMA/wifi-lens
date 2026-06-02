@@ -173,7 +173,9 @@ final class BLEPowerMonitor: NSObject, CBCentralManagerDelegate {
 
     override init() {
         super.init()
-        centralManager = CBCentralManager(delegate: self, queue: .main)
+        if Bundle(identifier: "io.github.kaoru.WiFiLensTests") == nil {
+            centralManager = CBCentralManager(delegate: self, queue: .main)
+        }
     }
 
     deinit {
