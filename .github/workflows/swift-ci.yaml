@@ -84,6 +84,7 @@ jobs:
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
             DEVELOPMENT_TEAM="ZMK8PL8T8J" \
+            ENABLE_HARDENED_RUNTIME=YES \
             OTHER_CODE_SIGN_FLAGS="--timestamp --options=runtime" \
             build
 
@@ -113,11 +114,22 @@ jobs:
         run: |
           echo "${{ secrets.APPLE_API_KEY_BASE64 }}" | base64 -d > "$RUNNER_TEMP/api-key.p8"
 
+          NOTARY_EXIT=0
           xcrun notarytool submit "$APP_NAME.dmg" \
             --key "$RUNNER_TEMP/api-key.p8" \
             --key-id "${{ secrets.APPLE_API_KEY_ID }}" \
             --issuer "${{ secrets.APPLE_API_ISSUER_ID }}" \
-            --wait
+            --wait | tee "$RUNNER_TEMP/notary-output.txt" || NOTARY_EXIT=$?
+
+          SUBMISSION_ID=$(grep -o 'id: [a-f0-9-]*' "$RUNNER_TEMP/notary-output.txt" | head -1 | cut -d' ' -f2)
+          if [ -n "$SUBMISSION_ID" ]; then
+            echo "--- Notarization Log ---"
+            xcrun notarytool log "$SUBMISSION_ID" \
+              --key "$RUNNER_TEMP/api-key.p8" \
+              --key-id "${{ secrets.APPLE_API_KEY_ID }}" \
+              --issuer "${{ secrets.APPLE_API_ISSUER_ID }}"
+          fi
+          exit $NOTARY_EXIT
 
       - name: Staple Notarization Ticket
         run: |
