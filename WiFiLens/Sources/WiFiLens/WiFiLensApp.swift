@@ -279,7 +279,7 @@ struct WiFiLensApp: App {
             .preferredColorScheme(colorScheme)
         }
         .windowResizability(.contentSize)
-        .defaultSize(width: 900, height: 550)
+        .defaultSize(width: 900, height: 700)
         .onChange(of: bleEnabled) { _, enabled in
             if enabled {
                 bleViewModel = BLEViewModel()
