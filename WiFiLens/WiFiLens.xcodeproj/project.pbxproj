@@ -206,14 +206,21 @@
 		FB9B7F4F2FC2D9650057B038 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4B2FC2D9650057B038 /* ChartView.swift */; };
 		FB9B7F512FC2D9650057B038 /* DetailOverviewChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */; };
 		FB9B7F522FC2D9650057B038 /* DetailOverviewChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */; };
-		FBA000010000000000000001 /* WiFiLensUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA000040000000000000004 /* WiFiLensUITests.swift */; };
+		FBA000010000000000000001 /* AppLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA000230000000000000023 /* AppLaunchTests.swift */; };
 		FBA000020000000000000002 /* WiFiLensUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA000050000000000000005 /* WiFiLensUITestsLaunchTests.swift */; };
+		FBA000200000000000000020 /* UITestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA000210000000000000021 /* UITestHelpers.swift */; };
+		FBA000220000000000000022 /* SpectrumPageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA000250000000000000025 /* SpectrumPageTests.swift */; };
+		FBA000240000000000000024 /* ChannelsPageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA000270000000000000027 /* ChannelsPageTests.swift */; };
+		FBA000260000000000000026 /* InterfacesPageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA000290000000000000029 /* InterfacesPageTests.swift */; };
+		FBA000280000000000000028 /* RoamingPageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA0002B00000000000000002B /* RoamingPageTests.swift */; };
+		FBA0002A00000000000000002A /* BLEScannerPageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA0002D00000000000000002D /* BLEScannerPageTests.swift */; };
+		FBA0002C00000000000000002C /* SettingsPageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA0002F00000000000000002F /* SettingsPageTests.swift */; };
 		FBAD00012FC400000057B038 /* LocationPermissionRequiredView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */; };
 		FBB1F0AC2FC61E3D00E9D2C6 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = FBB1F0AB2FC61E3D00E9D2C6 /* Localizable.xcstrings */; };
 		FBB2CA8A2FC0CB7500FC2D2C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */; };
 		FBB2CA8D2FC0E14000FC2D2C /* TitleBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB2CA8C2FC0E14000FC2D2C /* TitleBadge.swift */; };
 		FBB2CA8E2FC0E14000FC2D2C /* BuildConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB2CA8B2FC0E14000FC2D2C /* BuildConfig.swift */; };
-		FBBD16912FCF3A9C0093F940 /* ProUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBD168A2FCF3A9C0093F940 /* ProUITests.swift */; };
+		FBBD16912FCF3A9C0093F940 /* RecordingModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBD168A2FCF3A9C0093F940 /* RecordingModeTests.swift */; };
 		FBD000012FC4000000ABC001 /* WiFiOffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD000002FC4000000ABC001 /* WiFiOffView.swift */; };
 		FBD000022FC4000000ABC001 /* WiFiOffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD000002FC4000000ABC001 /* WiFiOffView.swift */; };
 		FBD329502FC500000057B038 /* MetricKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD329512FC500000057B038 /* MetricKitManager.swift */; };
@@ -365,15 +372,22 @@
 		FB9B7F4B2FC2D9650057B038 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 		FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailOverviewChart.swift; sourceTree = "<group>"; };
 		FBA000030000000000000003 /* WiFiLensUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WiFiLensUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		FBA000040000000000000004 /* WiFiLensUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiLensUITests.swift; sourceTree = "<group>"; };
 		FBA000050000000000000005 /* WiFiLensUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiLensUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		FBA000210000000000000021 /* UITestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestHelpers.swift; sourceTree = "<group>"; };
+		FBA000230000000000000023 /* AppLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchTests.swift; sourceTree = "<group>"; };
+		FBA000250000000000000025 /* SpectrumPageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumPageTests.swift; sourceTree = "<group>"; };
+		FBA000270000000000000027 /* ChannelsPageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelsPageTests.swift; sourceTree = "<group>"; };
+		FBA000290000000000000029 /* InterfacesPageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterfacesPageTests.swift; sourceTree = "<group>"; };
+		FBA0002B00000000000000002B /* RoamingPageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingPageTests.swift; sourceTree = "<group>"; };
+		FBA0002D00000000000000002D /* BLEScannerPageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEScannerPageTests.swift; sourceTree = "<group>"; };
+		FBA0002F00000000000000002F /* SettingsPageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPageTests.swift; sourceTree = "<group>"; };
 		FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermissionRequiredView.swift; sourceTree = "<group>"; };
 		FBB1F0AB2FC61E3D00E9D2C6 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		FBB2CA892FC0CB7500FC2D2C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = SOURCE_ROOT; };
 		FBB2CA8B2FC0E14000FC2D2C /* BuildConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildConfig.swift; sourceTree = "<group>"; };
 		FBB2CA8C2FC0E14000FC2D2C /* TitleBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleBadge.swift; sourceTree = "<group>"; };
 		FBBD167A2FCF39F50093F940 /* WiFiLensProUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WiFiLensProUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		FBBD168A2FCF3A9C0093F940 /* ProUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProUITests.swift; sourceTree = "<group>"; };
+		FBBD168A2FCF3A9C0093F940 /* RecordingModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingModeTests.swift; sourceTree = "<group>"; };
 		FBBD16932FCF4E560093F940 /* OSS.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = OSS.xctestplan; sourceTree = "<group>"; };
 		FBBD16942FCF4E6A0093F940 /* PRO.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = PRO.xctestplan; path = Sources/WiFiLens/Pro/Tests/TestPlans/PRO.xctestplan; sourceTree = SOURCE_ROOT; };
 		FBD000002FC4000000ABC001 /* WiFiOffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiOffView.swift; sourceTree = "<group>"; };
@@ -736,8 +750,15 @@
 		FBA000060000000000000006 /* WiFiLensUITests */ = {
 			isa = PBXGroup;
 			children = (
-				FBA000040000000000000004 /* WiFiLensUITests.swift */,
 				FBA000050000000000000005 /* WiFiLensUITestsLaunchTests.swift */,
+				FBA000210000000000000021 /* UITestHelpers.swift */,
+				FBA000230000000000000023 /* AppLaunchTests.swift */,
+				FBA000250000000000000025 /* SpectrumPageTests.swift */,
+				FBA000270000000000000027 /* ChannelsPageTests.swift */,
+				FBA000290000000000000029 /* InterfacesPageTests.swift */,
+				FBA0002B00000000000000002B /* RoamingPageTests.swift */,
+				FBA0002D00000000000000002D /* BLEScannerPageTests.swift */,
+				FBA0002F00000000000000002F /* SettingsPageTests.swift */,
 			);
 			path = WiFiLensUITests;
 			sourceTree = "<group>";
@@ -754,7 +775,7 @@
 		FBBD168E2FCF3A9C0093F940 /* WiFiLensProUITests */ = {
 			isa = PBXGroup;
 			children = (
-				FBBD168A2FCF3A9C0093F940 /* ProUITests.swift */,
+				FBBD168A2FCF3A9C0093F940 /* RecordingModeTests.swift */,
 			);
 			name = WiFiLensProUITests;
 			path = Sources/WiFiLens/Pro/Tests/WiFiLensProUITests;
@@ -1200,8 +1221,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBA000010000000000000001 /* WiFiLensUITests.swift in Sources */,
+				FBA000010000000000000001 /* AppLaunchTests.swift in Sources */,
 				FBA000020000000000000002 /* WiFiLensUITestsLaunchTests.swift in Sources */,
+				FBA000200000000000000020 /* UITestHelpers.swift in Sources */,
+				FBA000220000000000000022 /* SpectrumPageTests.swift in Sources */,
+				FBA000240000000000000024 /* ChannelsPageTests.swift in Sources */,
+				FBA000260000000000000026 /* InterfacesPageTests.swift in Sources */,
+				FBA000280000000000000028 /* RoamingPageTests.swift in Sources */,
+				FBA0002A00000000000000002A /* BLEScannerPageTests.swift in Sources */,
+				FBA0002C00000000000000002C /* SettingsPageTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1209,7 +1237,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBBD16912FCF3A9C0093F940 /* ProUITests.swift in Sources */,
+				FBBD16912FCF3A9C0093F940 /* RecordingModeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
