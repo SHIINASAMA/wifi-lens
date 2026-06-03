@@ -72,7 +72,7 @@ struct DebugChartView: View {
                 .buttonStyle(.plain)
                 .help(isRunning ? "Pause" : "Resume")
 
-                Picker("Band", selection: $selectedBand) {
+                Picker("Band", selection: $selectedBand.animation(.bouncy)) {
                     Text("2.4 GHz").tag(ChannelBand.band24GHz)
                     Text("5 GHz").tag(ChannelBand.band5GHz)
                     Text("6 GHz").tag(ChannelBand.band6GHz)
@@ -125,7 +125,7 @@ struct DebugChartView: View {
         VStack(alignment: .leading, spacing: 2) {
             Text("Width: \(channelWidthMHz) MHz")
                 .foregroundColor(.secondary)
-            Picker("", selection: $channelWidthMHz) {
+            Picker("", selection: $channelWidthMHz.animation(.bouncy)) {
                 Text("20").tag(20)
                 Text("40").tag(40)
                 Text("80").tag(80)

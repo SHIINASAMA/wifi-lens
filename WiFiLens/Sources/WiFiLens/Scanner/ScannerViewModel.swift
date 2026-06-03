@@ -480,11 +480,12 @@ final class ScannerViewModel {
             let raw = UserDefaults.standard.string(forKey: "regulatoryRegionOverride") ?? "auto"
             return raw == "auto" ? nil : RegulatoryDomain(rawValue: raw)
         }()
-        return regulatoryPipeline.computeRecommendations(
+        let regulatoryResults = regulatoryPipeline.computeRecommendations(
             from: channelQualities,
             networks: lastNetworks,
             userDefaultsOverride: override
         )
+        return RecommendationReasonCalculator.compute(for: regulatoryResults)
     }
 
     func toggleVisibility(bssid: String) {

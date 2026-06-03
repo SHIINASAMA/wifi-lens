@@ -224,6 +224,9 @@ private struct ChannelCard: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(Color(hex: channel.rfLevel.color))
                     if channel.rfIsRecommended { badge(String(localized: "channels.badge.recommended", comment: "Star badge marking recommended channel"), color: "#FF9F0A") }
+                    if channel.rfIsRecommended && !channel.recommendationReasons.isEmpty {
+                        ReasonPopover(reasons: channel.recommendationReasons)
+                    }
                     if channel.isCurrentChannel { badge(String(localized: "channels.badge.current", comment: "Dot badge marking current channel"), color: "#007AFF") }
                     if channel.classification == .advanced {
                         badge(String(localized: "channels.badge.dfs", comment: "Badge for DFS/advanced classification"), color: "#FF9F0A")

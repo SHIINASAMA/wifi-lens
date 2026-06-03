@@ -22,7 +22,7 @@ struct DebugContainerView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Picker("", selection: $selectedPage) {
+            Picker("", selection: $selectedPage.animation(.bouncy)) {
                 ForEach(DebugPage.allCases, id: \.self) { page in
                     Text(page.label).tag(page)
                 }

@@ -59,7 +59,7 @@ struct OverviewView: View {
                             connectionCard(wifi)
                             signalHealthRow(wifi)
                             diagnosticCard(wifi)
-                            if let current = currentChannelQuality, displayScore < 70 {
+                            if let current = currentChannelQuality, hasBetterChannel(current) {
                                 channelAdviceCard(current)
                             }
                         } else {
@@ -306,8 +306,13 @@ struct OverviewView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("\(ch.bandDisplay) — \(ch.rfLevel.displayName)")
-                            .font(.system(size: 12, weight: .medium))
+                        HStack(spacing: 4) {
+                            Text("\(ch.bandDisplay) — \(ch.rfLevel.displayName)")
+                                .font(.system(size: 12, weight: .medium))
+                            if !ch.recommendationReasons.isEmpty {
+                                ReasonPopover(reasons: ch.recommendationReasons)
+                            }
+                        }
                         Text(String(format: String(localized: "format.network_score_with_ap_count", comment: "Network score display with nearby AP count"), ch.rfScore, ch.apCount))
                             .font(.system(size: 10))
                             .foregroundColor(.secondary)
@@ -315,12 +320,12 @@ struct OverviewView: View {
                     Spacer()
                 }
                 .padding(10)
-                .background(.thinMaterial)
+                .background(Color.primary.opacity(0.04))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
         }
         .padding(16)
-        .background(.regularMaterial)
+        .background(Color.primary.opacity(0.04))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
@@ -404,6 +409,10 @@ struct OverviewView: View {
     }
 
     // MARK: - Helpers
+
+    private func hasBetterChannel(_ current: ChannelRecommendation) -> Bool {
+        recommendedChannels.contains(where: { $0.channel != current.channel && $0.rfScore > current.rfScore })
+    }
 
     private func rssiColor(_ rssi: Int) -> Color {
         if rssi >= -55 { return .green }

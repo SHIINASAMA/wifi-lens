@@ -85,6 +85,9 @@
 		FB0573C22FBC47F1005F8214 /* CrashReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C12FBC47F1005F8214 /* CrashReporter.swift */; };
 		FB0573C422FBBEAE4005F8214 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = FB0573C412FBBEAE4005F8214 /* Logging */; };
 		FB0573C42FBC7405005F8214 /* ChannelQualityCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */; };
+		FB0573D02FBD0001005F8214 /* RecommendationReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573D32FBD0001005F8217 /* RecommendationReason.swift */; };
+		FB0573D12FBD0001005F8215 /* RecommendationReasonCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573D42FBD0001005F8218 /* RecommendationReasonCalculator.swift */; };
+		FB0573D22FBD0001005F8216 /* ReasonPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573D52FBD0001005F8219 /* ReasonPopover.swift */; };
 		FB0573C62FBC741D005F8214 /* ChannelQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */; };
 		FB0573C92FBCD25C005F8214 /* HelpCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C72FBCD25C005F8214 /* HelpCenterView.swift */; };
 		FB0573CA2FBCD25C005F8214 /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C82FBCD25C005F8214 /* OverviewView.swift */; };
@@ -147,6 +150,9 @@
 		FB1E327F2FC7316C009D1BDC /* RegulatoryDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C92FC4889B0009F29B /* RegulatoryDomain.swift */; };
 		FB1E32802FC7316C009D1BDC /* RegulatoryDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C82FC4889B0009F29B /* RegulatoryDatabase.swift */; };
 		FB1E32812FC7316C009D1BDC /* ChannelRecommendation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C52FC4889B0009F29B /* ChannelRecommendation.swift */; };
+		FB1E32D02FC7316C009D1BDC /* RecommendationReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573D32FBD0001005F8217 /* RecommendationReason.swift */; };
+		FB1E32D12FC7316C009D1BDC /* RecommendationReasonCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573D42FBD0001005F8218 /* RecommendationReasonCalculator.swift */; };
+		FB1E32D22FC7316C009D1BDC /* ReasonPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573D52FBD0001005F8219 /* ReasonPopover.swift */; };
 		FB1E32822FC7316C009D1BDC /* DeviceCompatibilityFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C62FC4889B0009F29B /* DeviceCompatibilityFilter.swift */; };
 		FB1E32832FC7316C009D1BDC /* RegulatoryFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41CA2FC4889B0009F29B /* RegulatoryFilter.swift */; };
 		FB1E32842FC7316C009D1BDC /* RegionInferenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C72FC4889B0009F29B /* RegionInferenceEngine.swift */; };
@@ -331,6 +337,9 @@
 		FB0573BF2FBC47CC005F8214 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		FB0573C12FBC47F1005F8214 /* CrashReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReporter.swift; sourceTree = "<group>"; };
 		FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityCalculator.swift; sourceTree = "<group>"; };
+		FB0573D32FBD0001005F8217 /* RecommendationReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendationReason.swift; sourceTree = "<group>"; };
+		FB0573D42FBD0001005F8218 /* RecommendationReasonCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendationReasonCalculator.swift; sourceTree = "<group>"; };
+		FB0573D52FBD0001005F8219 /* ReasonPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReasonPopover.swift; sourceTree = "<group>"; };
 		FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityView.swift; sourceTree = "<group>"; };
 		FB0573C72FBCD25C005F8214 /* HelpCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpCenterView.swift; sourceTree = "<group>"; };
 		FB0573C82FBCD25C005F8214 /* OverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewView.swift; sourceTree = "<group>"; };
@@ -614,6 +623,9 @@
 			children = (
 				FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */,
 				FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */,
+				FB0573D32FBD0001005F8217 /* RecommendationReason.swift */,
+				FB0573D42FBD0001005F8218 /* RecommendationReasonCalculator.swift */,
+				FB0573D52FBD0001005F8219 /* ReasonPopover.swift */,
 			);
 			path = Channels;
 			sourceTree = "<group>";
@@ -1028,6 +1040,9 @@
 				EB51C6874A66A7A95F5C1C58 /* Color+Extensions.swift in Sources */,
 				0898D535D9CCA525F89735FA /* Constants.swift in Sources */,
 				FB0573C42FBC7405005F8214 /* ChannelQualityCalculator.swift in Sources */,
+				FB0573D02FBD0001005F8214 /* RecommendationReason.swift in Sources */,
+				FB0573D12FBD0001005F8215 /* RecommendationReasonCalculator.swift in Sources */,
+				FB0573D22FBD0001005F8216 /* ReasonPopover.swift in Sources */,
 				01ABB72FF2349B86A426CC1D /* ContentView.swift in Sources */,
 				FBD7B3492FBAED57002C8F5A /* SparkleUpdater.swift in Sources */,
 				FBAD00012FC400000057B038 /* LocationPermissionRequiredView.swift in Sources */,
@@ -1194,6 +1209,9 @@
 				FB1E327F2FC7316C009D1BDC /* RegulatoryDomain.swift in Sources */,
 				FB1E32802FC7316C009D1BDC /* RegulatoryDatabase.swift in Sources */,
 				FB1E32812FC7316C009D1BDC /* ChannelRecommendation.swift in Sources */,
+				FB1E32D02FC7316C009D1BDC /* RecommendationReason.swift in Sources */,
+				FB1E32D12FC7316C009D1BDC /* RecommendationReasonCalculator.swift in Sources */,
+				FB1E32D22FC7316C009D1BDC /* ReasonPopover.swift in Sources */,
 				FB1E32822FC7316C009D1BDC /* DeviceCompatibilityFilter.swift in Sources */,
 				FB1E32832FC7316C009D1BDC /* RegulatoryFilter.swift in Sources */,
 				FB1E32842FC7316C009D1BDC /* RegionInferenceEngine.swift in Sources */,

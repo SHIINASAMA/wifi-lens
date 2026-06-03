@@ -57,7 +57,7 @@ struct ContentView: View {
     private var modeToolbar: some View {
         HStack {
             Spacer()
-            Picker("", selection: $mode) {
+            Picker("", selection: $mode.animation(.bouncy)) {
                 Text(String(localized: "spectrum.mode.live", comment: "Live spectrum mode")).tag(SpectrumMode.live)
                 Text(String(localized: "spectrum.mode.recording_page", comment: "Recording page mode")).tag(SpectrumMode.recording)
             }

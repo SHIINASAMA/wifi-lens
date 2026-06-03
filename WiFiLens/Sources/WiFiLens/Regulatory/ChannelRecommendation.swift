@@ -63,6 +63,10 @@ struct ChannelRecommendation: Identifiable, Sendable {
 
     var restrictionReasons: [RestrictionReason] = []
 
+    // MARK: - Recommendation Reasons (user-facing)
+
+    var recommendationReasons: [RecommendationReason] = []
+
     // MARK: - Device Compatibility
 
     var deviceCompatible: Bool = true

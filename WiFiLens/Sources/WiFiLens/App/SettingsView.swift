@@ -48,7 +48,7 @@ struct SettingsView: View {
 
                 // MARK: - Appearance
                 Section {
-                    Picker(String(localized: "settings.appearance.theme_label", comment: "Theme picker label"), selection: $appearance) {
+                    Picker(String(localized: "settings.appearance.theme_label", comment: "Theme picker label"), selection: $appearance.animation(.bouncy)) {
                         Text(String(localized: "common.label.system", comment: "Follow system setting option")).tag("system")
                         Text(String(localized: "common.label.light", comment: "Light appearance theme option")).tag("light")
                         Text(String(localized: "common.label.dark", comment: "Dark appearance theme option")).tag("dark")
@@ -64,7 +64,7 @@ struct SettingsView: View {
 
                 // MARK: - Scanner
                 Section(String(localized: "settings.scan.header", comment: "Scan interval settings section header")) {
-                    Picker(String(localized: "settings.scan.interval_label", comment: "Scan refresh interval picker label"), selection: $scanInterval) {
+                    Picker(String(localized: "settings.scan.interval_label", comment: "Scan refresh interval picker label"), selection: $scanInterval.animation(.bouncy)) {
                         Text(String(localized: "settings.scan.interval_1s", comment: "1 second scan interval option")).tag(1)
                         Text(String(localized: "settings.scan.interval_2s", comment: "2 second scan interval option")).tag(2)
                         Text(String(localized: "settings.scan.interval_3s", comment: "3 second scan interval option")).tag(3)
@@ -79,7 +79,7 @@ struct SettingsView: View {
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
 
-                    Picker(String(localized: "settings.region.header", comment: "Regulatory region picker label"), selection: $regionOverride) {
+                    Picker(String(localized: "settings.region.header", comment: "Regulatory region picker label"), selection: $regionOverride.animation(.bouncy)) {
                         Text(String(localized: "settings.region.auto_detect", comment: "Auto-detect regulatory region option")).tag("auto")
                         Text(String(localized: "settings.region.us_fcc", comment: "US FCC regulatory region option")).tag("US")
                         Text(String(localized: "settings.region.jp_mic", comment: "Japan MIC regulatory region option")).tag("JP")

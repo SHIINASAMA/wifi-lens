@@ -40,7 +40,7 @@ Chart Engine (Charts/):
 | `WiFiLensApp.swift` | Root `@main` App struct, Scene, menu commands, window group |
 | `Scanner/` | CoreWLAN scan loop, ViewModel, network/channel models, WiFi power monitoring, CWChannel extensions |
 | `Spectrum/` | WiFiBandChart, BandChartViewModel, BandChartRenderModel, BandChartLayout, ContentView (dashboard), ChartSeriesData, ChannelSpanCalculator, SignalHistoryStore, NetworkSnapshot, TrendChartView, SnapshotToChartAdapter, SSIDColorHasher |
-| `Channels/` | ChannelQualityCalculator, ChannelQualityView |
+| `Channels/` | ChannelQualityCalculator, ChannelQualityView, RecommendationReason, RecommendationReasonCalculator, ReasonPopover |
 | `Charts/` | Universal Chart engine: ChartView, ChartTypes, DetailOverviewChart, RangeSelectorView, ChartGeometry, SplineInterpolation, ChartTimeFormatting, ChartRendering (legacy) |
 | `Interfaces/` | InterfacesView, ThroughputMonitor, ThroughputChartView, NetworkInfoService |
 | `Roaming/` | RoamingTestView, RoamingTestViewModel, AP transition tracking, timeline chart with DetailOverviewChart |
@@ -95,3 +95,4 @@ Chart Engine (Charts/):
 - RSSI colors: green ≥ -55, yellow ≥ -70, orange ≥ -85, red below
 - Quality colors: hex strings from `QualityLevel.color`
 - Overlap badge on channel cards includes trailing "overlap" label for context
+- **Multi-target builds**: When adding new `.swift` source files, they must be added to both the `WiFiLens` and `WiFiLensPro` targets' `PBXSourcesBuildPhase` in `project.pbxproj`. The Pro target maintains its own independent build phase — omitting it causes "cannot find type in scope" errors in the `WiFi Lens Pro` scheme.

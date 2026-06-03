@@ -4,6 +4,9 @@
     "—" : {
       "shouldTranslate" : false
     },
+    "?" : {
+
+    },
     "·" : {
       "shouldTranslate" : false
     },
@@ -86,6 +89,9 @@
     },
     "%@/100" : {
       "shouldTranslate" : false
+    },
+    "•" : {
+
     },
     "ble.control.start_scanning" : {
       "comment" : "Button to start BLE scanning",
@@ -1301,6 +1307,366 @@
         }
       }
     },
+    "channels.reason.cac_required" : {
+      "comment" : "Recommendation reason: cac_required — Channel Availability Check required",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requires a channel check before use"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用前にチャンネル確認が必要です"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用前需要进行信道检查"
+          }
+        }
+      }
+    },
+    "channels.reason.clear_spectrum" : {
+      "comment" : "Recommendation reason: clear_spectrum — no APs detected on this channel",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No other networks on this channel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このチャンネルには他のネットワークがありません"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此信道上没有其他网络"
+          }
+        }
+      }
+    },
+    "channels.reason.congested" : {
+      "comment" : "Recommendation reason: congested — many APs, consider switching",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Many nearby networks — switching may improve speed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "近隣のネットワークが多い — 切り替えで速度が向上する可能性があります"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "附近网络较多 — 切换信道可能会提升速度"
+          }
+        }
+      }
+    },
+    "channels.reason.current_channel" : {
+      "comment" : "Recommendation reason: current_channel — this is the connected channel",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your current channel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在接続中のチャンネル"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您当前使用的信道"
+          }
+        }
+      }
+    },
+    "channels.reason.currently_optimal" : {
+      "comment" : "Recommendation reason: currently_optimal — already on a great channel",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Already on a great channel — no change needed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "既に良好なチャンネルに接続しています"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已在使用优质信道 — 无需更改"
+          }
+        }
+      }
+    },
+    "channels.reason.dfs_required" : {
+      "comment" : "Recommendation reason: dfs_required — radar detection required",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uses radar detection (may occasionally switch channels)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レーダー検出が必要（チャンネルが切り替わることがあります）"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要雷达检测（偶尔会切换信道）"
+          }
+        }
+      }
+    },
+    "channels.reason.high_interference" : {
+      "comment" : "Recommendation reason: high_interference — interference score is high",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Strong interference from nearby networks"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "近隣ネットワークからの強い干渉"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "附近网络的干扰较强"
+          }
+        }
+      }
+    },
+    "channels.reason.high_overlap" : {
+      "comment" : "Recommendation reason: high_overlap — significant overlap with nearby channels",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Significant overlap with nearby channels"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隣接チャンネルとの重なりが多い"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "与相邻信道重叠较多"
+          }
+        }
+      }
+    },
+    "channels.reason.indoor_only" : {
+      "comment" : "Recommendation reason: indoor_only — restricted to indoor use",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restricted to indoor use only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "屋内利用のみに制限されています"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅限室内使用"
+          }
+        }
+      }
+    },
+    "channels.reason.less_crowded_band" : {
+      "comment" : "Recommendation reason: less_crowded_band — 5/6 GHz less crowded than 2.4 GHz",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This band is less crowded than 2.4 GHz"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2.4GHz帯より混雑が少ない周波数帯です"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此频段不如 2.4 GHz 拥挤"
+          }
+        }
+      }
+    },
+    "channels.reason.low_congestion" : {
+      "comment" : "Recommendation reason: low_congestion — 1-2 APs on or near this channel",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Few devices on this channel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このチャンネルを使用している機器が少ない"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此信道上的设备较少"
+          }
+        }
+      }
+    },
+    "channels.reason.low_interference" : {
+      "comment" : "Recommendation reason: low_interference — interference score is low",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Low wireless interference"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無線干渉が少ない"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无线干扰较低"
+          }
+        }
+      }
+    },
+    "channels.reason.low_overlap" : {
+      "comment" : "Recommendation reason: low_overlap — minimal adjacent-channel overlap",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimal overlap with neighboring channels"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隣接チャンネルとの重なりが少ない"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "与相邻信道的重叠较少"
+          }
+        }
+      }
+    },
+    "channels.reason.popover.title" : {
+      "comment" : "Title for recommendation reason popover",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Why this channel?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このチャンネルが推奨される理由"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "为什么推荐此信道？"
+          }
+        }
+      }
+    },
+    "channels.reason.radar_sensitive" : {
+      "comment" : "Recommendation reason: radar_sensitive — occasionally affected by radar",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Occasionally affected by radar signals"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レーダー信号の影響を受けることがあります"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "偶尔受雷达信号影响"
+          }
+        }
+      }
+    },
     "channels.table.col.adjacent" : {
       "comment" : "Adjacent channel count column header",
       "extractionState" : "manual",
@@ -1949,30 +2315,6 @@
         }
       }
     },
-    "common.action.overwrite" : {
-      "comment" : "Button to discard current data and start a new session",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Overwrite"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "上書き"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "覆盖"
-          }
-        }
-      }
-    },
     "common.action.open_system_settings" : {
       "comment" : "Button to open macOS System Settings",
       "extractionState" : "manual",
@@ -1993,6 +2335,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开系统设置"
+          }
+        }
+      }
+    },
+    "common.action.overwrite" : {
+      "comment" : "Button to discard current data and start a new session",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overwrite"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上書き"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "覆盖"
           }
         }
       }
@@ -4238,19 +4604,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Better Channels"
+            "value" : "Top Channels"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "より良いチャンネル"
+            "value" : "優良チャンネル"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "更优信道"
+            "value" : "优秀信道"
           }
         }
       }
@@ -5287,54 +5653,6 @@
         }
       }
     },
-    "recording.overwrite.message" : {
-      "comment" : "Warning that starting a new recording will discard the current session data",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Starting a new recording will discard the current session data. Save before continuing if you want to keep it."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新しい録画を開始すると、現在のセッションデータは破棄されます。保存する場合は先に保存してください。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "开始新录制将丢弃当前会话数据。如需保留，请先保存。"
-          }
-        }
-      }
-    },
-    "recording.overwrite.title" : {
-      "comment" : "Alert title confirming overwrite of existing recording data",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Overwrite Existing Recording?"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "録画データを上書きしますか？"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "覆盖现有录制数据？"
-          }
-        }
-      }
-    },
     "recording.no_ap_data" : {
       "comment" : "No AP data available",
       "extractionState" : "manual",
@@ -5379,6 +5697,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未加载会话"
+          }
+        }
+      }
+    },
+    "recording.overwrite.message" : {
+      "comment" : "Warning that starting a new recording will discard the current session data",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starting a new recording will discard the current session data. Save before continuing if you want to keep it."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しい録画を開始すると、現在のセッションデータは破棄されます。保存する場合は先に保存してください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始新录制将丢弃当前会话数据。如需保留，请先保存。"
+          }
+        }
+      }
+    },
+    "recording.overwrite.title" : {
+      "comment" : "Alert title confirming overwrite of existing recording data",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overwrite Existing Recording?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画データを上書きしますか？"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "覆盖现有录制数据？"
           }
         }
       }
@@ -7642,6 +8008,30 @@
         }
       }
     },
+    "table.column.focus" : {
+      "comment" : "Focus column header for the checkbox toggle column in network table",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Focus"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "注目"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "专注"
+          }
+        }
+      }
+    },
     "table.column.hidden" : {
       "comment" : "Hidden network indicator column header",
       "extractionState" : "manual",
@@ -7782,30 +8172,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "SSID"
-          }
-        }
-      }
-    },
-    "table.column.focus" : {
-      "comment" : "Focus column header for the checkbox toggle column in network table",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Focus"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "注目"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "专注"
           }
         }
       }
