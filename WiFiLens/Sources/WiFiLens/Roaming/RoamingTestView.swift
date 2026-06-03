@@ -48,6 +48,7 @@ private let timeFormatter: DateComponentsFormatter = {
 
 struct RoamingTestView: View {
     @Bindable var viewModel: RoamingTestViewModel
+    @State private var showStartConfirmation = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -66,6 +67,15 @@ struct RoamingTestView: View {
             if viewModel.state == .idle {
                 viewModel.checkReadiness()
             }
+        }
+        .alert(String(localized: "roaming.overwrite.title", comment: "Confirm overwrite roaming session data"),
+               isPresented: $showStartConfirmation) {
+            Button(String(localized: "common.action.cancel", comment: "Cancel action"), role: .cancel) { }
+            Button(String(localized: "common.action.overwrite", comment: "Overwrite / discard and start new session"), role: .destructive) {
+                viewModel.startTest()
+            }
+        } message: {
+            Text(String(localized: "roaming.overwrite.message", comment: "Warning that starting a new roaming test will discard current session data"))
         }
     }
 
@@ -246,7 +256,11 @@ struct RoamingTestView: View {
                 .accessibilityIdentifier("roaming-stop-test-button")
             } else {
                 Button {
-                    viewModel.startTest()
+                    if viewModel.state == .stopped, viewModel.totalSamples > 0 {
+                        showStartConfirmation = true
+                    } else {
+                        viewModel.startTest()
+                    }
                 } label: {
                     Label(String(localized: "common.action.start", comment: "Start action button"), systemImage: "play.fill")
                 }

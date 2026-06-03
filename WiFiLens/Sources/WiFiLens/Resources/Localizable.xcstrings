@@ -1949,6 +1949,30 @@
         }
       }
     },
+    "common.action.overwrite" : {
+      "comment" : "Button to discard current data and start a new session",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overwrite"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上書き"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "覆盖"
+          }
+        }
+      }
+    },
     "common.action.open_system_settings" : {
       "comment" : "Button to open macOS System Settings",
       "extractionState" : "manual",
@@ -5263,6 +5287,54 @@
         }
       }
     },
+    "recording.overwrite.message" : {
+      "comment" : "Warning that starting a new recording will discard the current session data",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starting a new recording will discard the current session data. Save before continuing if you want to keep it."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しい録画を開始すると、現在のセッションデータは破棄されます。保存する場合は先に保存してください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始新录制将丢弃当前会话数据。如需保留，请先保存。"
+          }
+        }
+      }
+    },
+    "recording.overwrite.title" : {
+      "comment" : "Alert title confirming overwrite of existing recording data",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overwrite Existing Recording?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画データを上書きしますか？"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "覆盖现有录制数据？"
+          }
+        }
+      }
+    },
     "recording.no_ap_data" : {
       "comment" : "No AP data available",
       "extractionState" : "manual",
@@ -5571,6 +5643,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "延迟"
+          }
+        }
+      }
+    },
+    "roaming.overwrite.message" : {
+      "comment" : "Warning that starting a new roaming test will discard current session data",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starting a new roaming test will discard the current session data. Save before continuing if you want to keep it."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいローミングテストを開始すると、現在のセッションデータは破棄されます。保存する場合は先に保存してください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始新漫游测试将丢弃当前会话数据。如需保留，请先保存。"
+          }
+        }
+      }
+    },
+    "roaming.overwrite.title" : {
+      "comment" : "Alert title confirming overwrite of roaming test data",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overwrite Roaming Session?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ローミングセッションを上書きしますか？"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "覆盖漫游会话？"
           }
         }
       }
