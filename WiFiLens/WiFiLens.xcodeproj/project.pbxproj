@@ -182,10 +182,10 @@
 		FB2E3B2E2FC5ACDA00D2610E /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB2E3B2D2FC5ACDA00D2610E /* CoreBluetooth.framework */; };
 		FB3C16BD2FCC34F3007A7B64 /* RecordingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C16B42FCC34F3007A7B64 /* RecordingViewModel.swift */; };
 		FB3C16BF2FCC34F3007A7B64 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C16B72FCC34F3007A7B64 /* SessionStore.swift */; };
-		FB3C16C02FCC34F3007A7B64 /* PurchaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C16BA2FCC34F3007A7B64 /* PurchaseView.swift */; };
+
 		FB3C16C12FCC34F3007A7B64 /* RecordingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C16B32FCC34F3007A7B64 /* RecordingView.swift */; };
 		FB3C16C22FCC34F3007A7B64 /* ScanSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C16B62FCC34F3007A7B64 /* ScanSession.swift */; };
-		FB3C16C32FCC34F3007A7B64 /* ProUnlockManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C16B92FCC34F3007A7B64 /* ProUnlockManager.swift */; };
+
 		FB3C16C52FCC34F3007A7B64 /* RecordingTimelineChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3C16C62FCC34F3007A7B64 /* RecordingTimelineChart.swift */; };
 		FB6F41CC2FC4889B0009F29B /* RegulatoryDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C92FC4889B0009F29B /* RegulatoryDomain.swift */; };
 		FB6F41CD2FC4889B0009F29B /* RegulatoryDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C82FC4889B0009F29B /* RegulatoryDatabase.swift */; };
@@ -354,8 +354,8 @@
 		FB3C16B42FCC34F3007A7B64 /* RecordingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingViewModel.swift; sourceTree = "<group>"; };
 		FB3C16B62FCC34F3007A7B64 /* ScanSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSession.swift; sourceTree = "<group>"; };
 		FB3C16B72FCC34F3007A7B64 /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
-		FB3C16B92FCC34F3007A7B64 /* ProUnlockManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProUnlockManager.swift; sourceTree = "<group>"; };
-		FB3C16BA2FCC34F3007A7B64 /* PurchaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseView.swift; sourceTree = "<group>"; };
+
+
 		FB3C16C62FCC34F3007A7B64 /* RecordingTimelineChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingTimelineChart.swift; sourceTree = "<group>"; };
 		FB5A212C2FC31C6100828D9F /* WiFiLens-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "WiFiLens-Info.plist"; sourceTree = "<group>"; };
 		FB6F41C52FC4889B0009F29B /* ChannelRecommendation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelRecommendation.swift; sourceTree = "<group>"; };
@@ -695,21 +695,11 @@
 			path = Session;
 			sourceTree = "<group>";
 		};
-		FB3C16BB2FCC34F3007A7B64 /* StoreKit */ = {
-			isa = PBXGroup;
-			children = (
-				FB3C16B92FCC34F3007A7B64 /* ProUnlockManager.swift */,
-				FB3C16BA2FCC34F3007A7B64 /* PurchaseView.swift */,
-			);
-			path = StoreKit;
-			sourceTree = "<group>";
-		};
 		FB3C16BC2FCC34F3007A7B64 /* Pro */ = {
 			isa = PBXGroup;
 			children = (
 				FB3C16B52FCC34F3007A7B64 /* Recording */,
 				FB3C16B82FCC34F3007A7B64 /* Session */,
-				FB3C16BB2FCC34F3007A7B64 /* StoreKit */,
 			);
 			path = Pro;
 			sourceTree = "<group>";
@@ -1147,10 +1137,8 @@
 				FB1E32482FC7316C009D1BDC /* BluetoothPermissionManager.swift in Sources */,
 				FB3C16BD2FCC34F3007A7B64 /* RecordingViewModel.swift in Sources */,
 				FB3C16BF2FCC34F3007A7B64 /* SessionStore.swift in Sources */,
-				FB3C16C02FCC34F3007A7B64 /* PurchaseView.swift in Sources */,
 				FB3C16C12FCC34F3007A7B64 /* RecordingView.swift in Sources */,
 				FB3C16C22FCC34F3007A7B64 /* ScanSession.swift in Sources */,
-				FB3C16C32FCC34F3007A7B64 /* ProUnlockManager.swift in Sources */,
 				FB3C16C52FCC34F3007A7B64 /* RecordingTimelineChart.swift in Sources */,
 				FB1E32492FC7316C009D1BDC /* BLEChannel.swift in Sources */,
 				FB1E324A2FC7316C009D1BDC /* BLEAdvertisementEvent.swift in Sources */,
