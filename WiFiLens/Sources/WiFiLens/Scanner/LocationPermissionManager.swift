@@ -55,7 +55,4 @@ final class LocationPermissionManager: NSObject, CLLocationManagerDelegate {
         }
     }
 
-    func terminateApp() {
-        NSApplication.shared.terminate(nil)
-    }
 }
