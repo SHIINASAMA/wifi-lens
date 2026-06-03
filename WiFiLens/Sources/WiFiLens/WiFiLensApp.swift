@@ -88,14 +88,6 @@ private struct AppRootView: View {
                         .accessibilityIdentifier("page-bleScanner")
                 }
 
-                if visitedPages.contains(.help) {
-                    HelpCenterView()
-                        .opacity(selectedPage == .help ? 1 : 0)
-                        .allowsHitTesting(selectedPage == .help)
-                        .disabled(selectedPage != .help)
-                        .accessibilityIdentifier("page-help")
-                }
-
                 if visitedPages.contains(.settings) {
                     SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel?.bluetoothPermission, bleEnabled: $bleEnabled)
                         .opacity(selectedPage == .settings ? 1 : 0)

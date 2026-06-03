@@ -7,7 +7,6 @@ enum SidebarPage: String, CaseIterable {
     case interfaces
     case roaming
     case bleScanner
-    case help
     case settings
 #if DEBUG
     case debugChart
@@ -15,7 +14,7 @@ enum SidebarPage: String, CaseIterable {
 
     var requiresLocationAuthorization: Bool {
         switch self {
-        case .overview, .help, .settings, .bleScanner:
+        case .overview, .settings, .bleScanner:
             false
         case .spectrum, .channels, .interfaces, .roaming:
             true
@@ -28,7 +27,7 @@ enum SidebarPage: String, CaseIterable {
 
     var requiresWiFi: Bool {
         switch self {
-        case .overview, .help, .settings, .bleScanner:
+        case .overview, .settings, .bleScanner:
             false
         case .spectrum, .channels, .interfaces, .roaming:
             true
@@ -47,7 +46,6 @@ enum SidebarPage: String, CaseIterable {
         case .interfaces: String(localized: "nav.interfaces", comment: "Interfaces sidebar navigation item")
         case .roaming:   String(localized: "nav.roaming_test", comment: "Roaming Test sidebar navigation item")
         case .bleScanner: String(localized: "nav.ble_scanner", comment: "BLE Scanner sidebar navigation item")
-        case .help:       String(localized: "nav.help", comment: "Help sidebar navigation item")
         case .settings:   String(localized: "common.action.settings", comment: "Settings button or menu item")
 #if DEBUG
         case .debugChart: String(localized: "nav.debug_chart", comment: "Debug Chart sidebar navigation item (dev only)")
@@ -63,7 +61,6 @@ enum SidebarPage: String, CaseIterable {
         case .interfaces: "cable.connector"
         case .roaming:   "arrow.triangle.swap"
         case .bleScanner: "personalhotspot"
-        case .help:       "questionmark.circle"
         case .settings:   "gearshape"
 #if DEBUG
         case .debugChart: "ladybug"
