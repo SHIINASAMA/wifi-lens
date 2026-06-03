@@ -302,6 +302,7 @@ struct ContentView: View {
         case "mcs":           cmp = (Int(a.mcs) ?? 0) < (Int(b.mcs) ?? 0) ? .orderedAscending : (Int(a.mcs) ?? 0) > (Int(b.mcs) ?? 0) ? .orderedDescending : .orderedSame
         case "nss":           cmp = (Int(a.nss) ?? 0) < (Int(b.nss) ?? 0) ? .orderedAscending : (Int(a.nss) ?? 0) > (Int(b.nss) ?? 0) ? .orderedDescending : .orderedSame
         case "country":       cmp = a.country.localizedCaseInsensitiveCompare(b.country)
+        case "lastSeen":      cmp = a.lastSeen.localizedCaseInsensitiveCompare(b.lastSeen)
         default:              cmp = .orderedSame
         }
         return ascending ? cmp : (cmp == .orderedAscending ? .orderedDescending : cmp == .orderedDescending ? .orderedAscending : .orderedSame)

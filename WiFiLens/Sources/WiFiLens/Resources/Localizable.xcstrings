@@ -5143,6 +5143,30 @@
         }
       }
     },
+    "recording.chart.select_aps" : {
+      "comment" : "Prompt to check AP signal sources below the chart to show their signals",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check the APs you want to focus on in the table below"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下のテーブルで表示したいAPにチェックを入れてください"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请在下表中勾选想要关注的AP信号源"
+          }
+        }
+      }
+    },
     "recording.empty.hint" : {
       "comment" : "Hint to switch to Live tab to start scanning first",
       "extractionState" : "manual",
@@ -5211,6 +5235,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "加载会话文件失败"
+          }
+        }
+      }
+    },
+    "recording.last_seen.now" : {
+      "comment" : "Just now indicator for last seen time column",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "now"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "たった今"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刚刚"
           }
         }
       }
@@ -7570,6 +7618,30 @@
         }
       }
     },
+    "table.column.seen" : {
+      "comment" : "Last seen time column header showing how long since each AP was observed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最終確認"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最后出现"
+          }
+        }
+      }
+    },
     "table.column.ssid" : {
       "comment" : "SSID column header in network table",
       "extractionState" : "manual",
@@ -7590,6 +7662,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "SSID"
+          }
+        }
+      }
+    },
+    "table.column.focus" : {
+      "comment" : "Focus column header for the checkbox toggle column in network table",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Focus"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "注目"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "专注"
           }
         }
       }

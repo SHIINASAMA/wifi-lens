@@ -36,10 +36,10 @@ struct NativeTableView: NSViewRepresentable {
 
         // Checkbox column
         let checkColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("check"))
-        checkColumn.title = ""
-        checkColumn.width = 22
-        checkColumn.minWidth = 22
-        checkColumn.maxWidth = 22
+        checkColumn.title = String(localized: "table.column.focus", comment: "Focus column header for the checkbox toggle column in network table")
+        checkColumn.width = 42
+        checkColumn.minWidth = 38
+        checkColumn.maxWidth = 46
         checkColumn.isEditable = false
         tableView.addTableColumn(checkColumn)
 
@@ -50,6 +50,7 @@ struct NativeTableView: NSViewRepresentable {
         addColumn(to: tableView, id: "Ch", title: String(localized: "table.column.channel", comment: "Channel column header (abbreviated)"), width: 50, sortKey: "channel", ascending: true)
         addColumn(to: tableView, id: "RSSI", title: String(localized: "channels.table.col.rssi", comment: "RSSI column header"), width: 75, sortKey: "rssi", ascending: false)
         addColumn(to: tableView, id: "BSSID", title: String(localized: "interfaces.field.bssid", comment: "BSSID field label"), width: 150, sortKey: "bssid", ascending: true)
+        addColumn(to: tableView, id: "Seen", title: String(localized: "table.column.seen", comment: "Last seen column header"), width: 56, sortKey: "lastSeen", ascending: false)
         addColumn(to: tableView, id: "PHY", title: String(localized: "interfaces.field.phy", comment: "PHY mode field label (short)"), width: 36, sortKey: "phyMode", ascending: true)
         addColumn(to: tableView, id: "BW", title: String(localized: "table.column.bandwidth", comment: "Channel bandwidth column header"), width: 40, sortKey: "channelWidth", ascending: false)
         addColumn(to: tableView, id: "k", title: String(localized: "table.column.dot11k", comment: "802.11k support indicator column header"), width: 28, sortKey: "supportsK", ascending: false)
@@ -241,6 +242,7 @@ struct NativeTableView: NSViewRepresentable {
                 }
                 textField.stringValue = "\(network.rssi) dBm\(deltaStr)"
             case "BSSID": textField.stringValue = network.bssid
+            case "Seen":  textField.stringValue = network.lastSeen; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
             case "PHY":   textField.stringValue = network.phyMode; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
             case "BW":    textField.stringValue = network.channelWidth; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
             case "k":     textField.stringValue = network.supportsK ? "✓" : ""; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
@@ -317,7 +319,7 @@ struct NativeTableView: NSViewRepresentable {
         private func columnFont(for columnID: String) -> NSFont {
             switch columnID {
             case "BSSID": return .systemFont(ofSize: 11)
-            case "PHY", "BW", "k", "r", "v", "Score", "Sec", "MCS", "NSS", "CC":
+            case "PHY", "BW", "k", "r", "v", "Score", "Sec", "MCS", "NSS", "CC", "Seen":
                 return .systemFont(ofSize: 10)
             default: return .systemFont(ofSize: 12)
             }
@@ -331,6 +333,7 @@ struct NativeTableView: NSViewRepresentable {
             case "Ch":    return String(row.channel)
             case "RSSI":  return "\(row.rssi) dBm  ▲ +99"
             case "BSSID": return row.bssid
+            case "Seen":  return row.lastSeen.isEmpty ? "0s" : row.lastSeen
             case "PHY":   return row.phyMode
             case "BW":    return row.channelWidth
             case "k":     return row.supportsK ? "✓" : ""
