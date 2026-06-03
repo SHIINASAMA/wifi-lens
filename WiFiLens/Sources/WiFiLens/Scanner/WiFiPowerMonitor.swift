@@ -21,13 +21,10 @@ final class WiFiPowerMonitor: NSObject, CWEventDelegate {
         }
     }
 
-    override init() {
-        super.init()
-    }
-
     deinit {
         pollingTask?.cancel()
         guard isMonitoring else { return }
+        CWWiFiClient.shared().delegate = nil
         try? CWWiFiClient.shared().stopMonitoringEvent(with: .powerDidChange)
     }
 
@@ -72,6 +69,10 @@ final class WiFiPowerMonitor: NSObject, CWEventDelegate {
     }
 
     // MARK: - CWEventDelegate
+
+    /// CWEventDelegate is deprecated since macOS 10.15, but Apple provides no replacement
+    /// for instant power‑state change notification. The delegate callback is still delivered
+    /// reliably on macOS 14+ and is safe to keep.
 
     nonisolated func powerStateDidChangeForWiFiInterface(withName interfaceName: String) {
         Task { @MainActor in

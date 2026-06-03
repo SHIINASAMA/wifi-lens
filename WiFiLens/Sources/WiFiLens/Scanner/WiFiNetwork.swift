@@ -10,11 +10,12 @@ struct WiFiNetwork: Sendable, Identifiable {
     let isIBSS: Bool
     let ieData: Data?
 
-    init(from cwNetwork: CWNetwork) {
+    init?(from cwNetwork: CWNetwork) {
+        guard let wlanChannel = cwNetwork.wlanChannel else { return nil }
         ssid = cwNetwork.ssid
         bssid = cwNetwork.bssid ?? "unknown"
         rssi = cwNetwork.rssiValue
-        channel = WiFiChannel(from: cwNetwork.wlanChannel!)
+        channel = WiFiChannel(from: wlanChannel)
         isIBSS = cwNetwork.ibss
         ieData = cwNetwork.informationElementData
     }

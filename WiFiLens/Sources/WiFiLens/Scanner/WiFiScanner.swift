@@ -59,7 +59,7 @@ actor WiFiScanner {
         for attempt in 1...3 {
             do {
                 let networks = try client.interface()?.scanForNetworks(withSSID: nil) ?? []
-                let wrapped = networks.map { WiFiNetwork(from: $0) }
+                let wrapped = networks.compactMap { WiFiNetwork(from: $0) }
                 return .success(wrapped)
             } catch {
                 let msg = String(describing: error)

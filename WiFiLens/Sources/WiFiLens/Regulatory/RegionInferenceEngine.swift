@@ -62,10 +62,12 @@ enum RegionInferenceEngine {
 
         // Channel fingerprint alone → medium (hardware/driver is authoritative)
         if channelValid {
-            if apValid && channelCandidate != apResult.domain {
+            if apValid && channelCandidate != apResult.domain,
+               let chanSource = contributions.first(where: { $0.kind == .supportedChannels }),
+               let apSource = contributions.first(where: { $0.kind == .apBeaconCountry }) {
                 conflicts.append(RegionConflict(
-                    sourceA: contributions.first(where: { $0.kind == .supportedChannels })!,
-                    sourceB: contributions.first(where: { $0.kind == .apBeaconCountry })!,
+                    sourceA: chanSource,
+                    sourceB: apSource,
                     resolution: "AP beacon disagrees with hardware supported channels; trusting hardware"
                 ))
             }
@@ -130,9 +132,10 @@ enum RegionInferenceEngine {
         // Conflict: take majority, or first if tie
         var counts: [RegulatoryDomain: Int] = [:]
         for d in domains { counts[d, default: 0] += 1 }
-        let winner = counts.max(by: { $0.value < $1.value })!.key
-
-        return (winner, false, nil)
+        guard let winner = counts.max(by: { $0.value < $1.value }) else {
+            return (domains.first ?? .unknown, false, nil)
+        }
+        return (winner.key, false, nil)
     }
 
     /// Determine regulatory domain by comparing hardware-supported channels

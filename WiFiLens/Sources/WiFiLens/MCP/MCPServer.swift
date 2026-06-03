@@ -20,7 +20,11 @@ final class MCPServer: @unchecked Sendable {
     func start() throws {
         guard !isRunning else { return }
         let params = NWParameters.tcp
-        params.requiredLocalEndpoint = NWEndpoint.hostPort(host: "127.0.0.1", port: NWEndpoint.Port(rawValue: port)!)
+        guard let endpointPort = NWEndpoint.Port(rawValue: port) else {
+            AppLogger.mcp.error("Invalid MCP port: \(port)")
+            return
+        }
+        params.requiredLocalEndpoint = NWEndpoint.hostPort(host: "127.0.0.1", port: endpointPort)
         listener = try NWListener(using: params)
         listener?.newConnectionHandler = { [weak self] conn in
             self?.handle(conn)
