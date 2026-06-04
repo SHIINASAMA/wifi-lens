@@ -5,10 +5,13 @@ import SwiftUI
 struct ReasonPopover: View {
     let reasons: [RecommendationReason]
     @State private var isHovering = false
+    @State private var isTapped = false
+
+    private var showPopover: Bool { isHovering || isTapped }
 
     var body: some View {
         Button {
-            // no-op — hover drives the popover
+            isTapped.toggle()
         } label: {
             ZStack {
                 Circle()
@@ -20,12 +23,18 @@ struct ReasonPopover: View {
             }
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(String(localized: "channels.reason.popover.title",
+                                   comment: "Title for recommendation reason popover"))
         .onHover { hovering in
             withAnimation(.easeOut(duration: 0.15)) {
                 isHovering = hovering
             }
+            if !hovering { isTapped = false }
         }
-        .popover(isPresented: $isHovering, arrowEdge: .trailing) {
+        .popover(isPresented: Binding<Bool>(
+            get: { isHovering || isTapped },
+            set: { newValue in if !newValue { isTapped = false; isHovering = false } }
+        ), arrowEdge: .trailing) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(String(localized: "channels.reason.popover.title",
                             comment: "Title for recommendation reason popover"))

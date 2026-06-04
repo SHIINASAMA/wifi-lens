@@ -114,6 +114,7 @@ struct SettingsView: View {
                                 }
                             ))
                                 .labelsHidden()
+                                .accessibilityLabel(String(localized: "settings.features.ble_label", comment: "Bluetooth analysis feature toggle label"))
                                 .accessibilityIdentifier("settings-ble-toggle")
                         }
                         Text(String(localized: "settings.features.ble_description", comment: "Description of Bluetooth analysis feature"))
@@ -190,6 +191,7 @@ struct SettingsView: View {
                         Text(String(localized: "settings.mcp.port_label", comment: "MCP server port field label"))
                         TextField("", value: $mcpPort, format: .number)
                             .frame(width: 80)
+                            .accessibilityLabel(String(localized: "settings.mcp.port_label", comment: "MCP server port field label"))
                             .accessibilityIdentifier("settings-mcp-port-field")
                         Stepper("", value: $mcpPort, in: 1024...65535)
                             .labelsHidden()
@@ -301,6 +303,7 @@ private struct PermissionStatusBadge: View {
             Circle()
                 .fill(isAuthorized ? Color.green : Color.orange)
                 .frame(width: 8, height: 8)
+                .accessibilityHidden(true)
                 .animation(.easeInOut(duration: 0.22), value: isAuthorized)
             ZStack {
                 Text(String(localized: "common.label.granted", comment: "Permission granted status"))

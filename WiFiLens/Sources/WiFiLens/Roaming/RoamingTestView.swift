@@ -85,6 +85,7 @@ struct RoamingTestView: View {
         HStack(spacing: 8) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundColor(.orange)
+                .accessibilityHidden(true)
             Text(String(localized: "roaming.warning.not_portable", comment: "Warning that roaming test needs a laptop, not desktop Mac"))
                 .font(.system(size: 11))
             Spacer()
@@ -103,6 +104,7 @@ struct RoamingTestView: View {
                 Image(systemName: "wifi.slash")
                     .font(.largeTitle)
                     .foregroundColor(.secondary)
+                    .accessibilityHidden(true)
                 Text(error)
                     .font(.callout)
                     .foregroundColor(.secondary)
@@ -143,6 +145,7 @@ struct RoamingTestView: View {
                     Circle()
                         .fill(viewModel.isRunning ? Color.green : Color.secondary)
                         .frame(width: 6, height: 6)
+                        .accessibilityHidden(true)
                     Text(viewModel.currentSSID ?? "—")
                         .font(.system(size: 15, weight: .semibold))
                 }
@@ -167,10 +170,14 @@ struct RoamingTestView: View {
             // Right: metrics
             HStack(spacing: 20) {
                 metricLabel(String(localized: "channels.table.col.rssi", comment: "RSSI column header"), "\(viewModel.currentRSSI) dBm", rssiColor(viewModel.currentRSSI))
+                    .accessibilityLabel(String(format: String(localized: "roaming.accessibility.rssi_fmt", comment: "RSSI accessibility label with value and quality"), viewModel.currentRSSI, rssiQualityDescription(viewModel.currentRSSI)))
                 metricLabel(String(localized: "overview.health.channel_label", comment: "Channel quality health indicator label"), "\(viewModel.currentChannel)", .primary)
+                    .accessibilityLabel(String(format: String(localized: "common.accessibility.metric_fmt", comment: "Label: value format for VoiceOver metric"), String(localized: "overview.health.channel_label", comment: "Channel quality health indicator label"), "\(viewModel.currentChannel)"))
                 metricLabel(String(localized: "interfaces.field.tx_rate", comment: "Transmit rate field label"), String(format: "%.0f Mbps", viewModel.currentTxRate), .primary)
+                    .accessibilityLabel(String(format: String(localized: "common.accessibility.metric_fmt", comment: "Label: value format for VoiceOver metric"), String(localized: "interfaces.field.tx_rate", comment: "Transmit rate field label"), String(format: "%.0f Mbps", viewModel.currentTxRate)))
                 if let latency = viewModel.gatewayLatency {
                     metricLabel(String(localized: "roaming.field.latency", comment: "Latency field label in roaming view"), String(format: "%.1f ms", latency), latencyColor(latency))
+                        .accessibilityLabel(String(format: String(localized: "roaming.accessibility.latency_fmt", comment: "Latency accessibility label with value and quality"), String(format: "%.1f", latency), latencyQualityDescription(latency)))
                 }
             }
         }
@@ -187,6 +194,7 @@ struct RoamingTestView: View {
                 .font(.system(size: 13, weight: .medium, design: .monospaced))
                 .foregroundColor(color)
         }
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Status bar
@@ -197,6 +205,7 @@ struct RoamingTestView: View {
                 Image(systemName: "clock")
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
+                    .accessibilityHidden(true)
                 Text(timeFormatter.string(from: viewModel.elapsedTime) ?? "0:00")
                     .font(.system(size: 13, design: .monospaced))
             }
@@ -205,6 +214,7 @@ struct RoamingTestView: View {
                 Image(systemName: "chart.xyaxis.line")
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
+                    .accessibilityHidden(true)
                 Text("\(viewModel.totalSamples) \(String(localized: "common.label.samples", comment: "Sample count unit label"))")
                     .font(.system(size: 12))
                     .foregroundColor(.secondary)
@@ -214,6 +224,7 @@ struct RoamingTestView: View {
                 Image(systemName: "arrow.triangle.swap")
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
+                    .accessibilityHidden(true)
                 Text("\(viewModel.transitions.count) \(String(localized: "common.label.transitions", comment: "AP transition count unit label"))")
                     .font(.system(size: 12))
                     .foregroundColor(.secondary)
@@ -229,6 +240,7 @@ struct RoamingTestView: View {
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
+                .accessibilityLabel(String(localized: "common.action.save", comment: "Save button label"))
                 .accessibilityIdentifier("roaming-save-session-button")
             }
 
@@ -240,6 +252,7 @@ struct RoamingTestView: View {
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
+                .accessibilityLabel(String(localized: "common.action.load", comment: "Load button label"))
                 .accessibilityIdentifier("roaming-load-session-button")
             }
 
@@ -253,6 +266,7 @@ struct RoamingTestView: View {
                 .tint(.red)
                 .controlSize(.small)
                 .help(String(localized: "roaming.control.stop_tooltip", comment: "Tooltip for stop roaming test button"))
+                .accessibilityLabel(String(localized: "roaming.control.stop_tooltip", comment: "Tooltip for stop roaming test button"))
                 .accessibilityIdentifier("roaming-stop-test-button")
             } else {
                 Button {
@@ -268,6 +282,7 @@ struct RoamingTestView: View {
                 .controlSize(.small)
                 .disabled(!viewModel.canStart)
                 .help(String(localized: "roaming.control.start_tooltip", comment: "Tooltip for start roaming test button"))
+                .accessibilityLabel(String(localized: "roaming.control.start_tooltip", comment: "Tooltip for start roaming test button"))
                 .accessibilityIdentifier("roaming-start-test-button")
             }
         }
@@ -302,6 +317,7 @@ struct RoamingTestView: View {
                     Image(systemName: "arrow.triangle.swap")
                         .font(.title2)
                         .foregroundColor(.secondary.opacity(0.5))
+                        .accessibilityHidden(true)
                     Text(String(localized: viewModel.isRunning ? "roaming.state.waiting" : "roaming.state.no_transitions"))
                         .font(.callout)
                         .foregroundColor(.secondary)
@@ -332,7 +348,9 @@ struct RoamingTestView: View {
                                     tableCell(t.fromBSSID, mono: true)
                                     tableCell(t.toBSSID, mono: true)
                                     tableCell("\(t.rssiBefore) dBm", color: rssiColor(t.rssiBefore))
+                                        .accessibilityLabel(String(format: String(localized: "roaming.accessibility.rssi_fmt", comment: "RSSI accessibility label with value and quality"), t.rssiBefore, rssiQualityDescription(t.rssiBefore)))
                                     tableCell("\(t.rssiAfter) dBm", color: rssiColor(t.rssiAfter))
+                                        .accessibilityLabel(String(format: String(localized: "roaming.accessibility.rssi_fmt", comment: "RSSI accessibility label with value and quality"), t.rssiAfter, rssiQualityDescription(t.rssiAfter)))
                                     tableCell("\(t.channelBefore)")
                                     tableCell("\(t.channelAfter)")
                                 }
@@ -618,6 +636,7 @@ private struct RoamingTimelineChart: View {
                     Image(systemName: "chart.xyaxis.line")
                         .font(.title2)
                         .foregroundColor(.secondary.opacity(0.5))
+                        .accessibilityHidden(true)
                     Text(String(localized: "common.empty.no_chart_data", comment: "Empty state when no chart data is available"))
                         .font(.callout)
                         .foregroundColor(.secondary)
@@ -761,4 +780,17 @@ private func latencyColor(_ ms: Double) -> Color {
     if ms < 5 { return .green }
     if ms < 20 { return .yellow }
     return .red
+}
+
+private func rssiQualityDescription(_ rssi: Int) -> String {
+    if rssi >= -55 { return String(localized: "overview.signal.strong", comment: "Strong signal level label") }
+    if rssi >= -70 { return String(localized: "overview.signal.good", comment: "Good signal level label") }
+    if rssi >= -85 { return String(localized: "channels.quality.moderate", comment: "Moderate channel quality tier") }
+    return String(localized: "overview.signal.weak", comment: "Weak signal level label")
+}
+
+private func latencyQualityDescription(_ ms: Double) -> String {
+    if ms < 5 { return String(localized: "roaming.latency.excellent", comment: "Excellent latency level") }
+    if ms < 20 { return String(localized: "roaming.latency.good", comment: "Good latency level") }
+    return String(localized: "roaming.latency.poor", comment: "Poor latency level")
 }

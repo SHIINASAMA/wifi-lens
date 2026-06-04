@@ -7,6 +7,7 @@ struct WiFiOffView: View {
             Image(systemName: "wifi.slash")
                 .font(.system(size: 48))
                 .foregroundColor(.secondary)
+                .accessibilityHidden(true)
             Text(String(localized: "wifi.off.title", comment: "Title when Wi-Fi is turned off"))
                 .font(.title3)
                 .multilineTextAlignment(.center)

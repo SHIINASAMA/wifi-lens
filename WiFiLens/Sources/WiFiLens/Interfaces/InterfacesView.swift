@@ -100,7 +100,7 @@ struct InterfacesView: View {
                         .font(.title3)
                         .fontWeight(.semibold)
                     HStack(spacing: 6) {
-                        Circle().fill(.green).frame(width: 6, height: 6)
+                        Circle().fill(.green).frame(width: 6, height: 6).accessibilityHidden(true)
                         Text(String(localized: "common.label.connected", comment: "Connected state indicator"))
                             .font(.caption)
                             .foregroundColor(.secondary)
@@ -197,6 +197,13 @@ struct InterfacesView: View {
         .frame(maxWidth: .infinity)
         .background(.thinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 10))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel({
+            if let sub = subtitle {
+                return String(format: String(localized: "common.accessibility.metric_sub_fmt", comment: "Label: value, subtitle format for VoiceOver metric"), title, value, sub)
+            }
+            return String(format: String(localized: "common.accessibility.metric_fmt", comment: "Label: value format for VoiceOver metric"), title, value)
+        }())
     }
 
     // MARK: - Link Details
@@ -523,6 +530,7 @@ struct InterfacesView: View {
                 }
             }
             .frame(height: 4)
+            .accessibilityHidden(true)
         )
     }
 
@@ -537,6 +545,7 @@ struct InterfacesView: View {
                 }
             }
             .frame(height: 4)
+            .accessibilityHidden(true)
         )
     }
 

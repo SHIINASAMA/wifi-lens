@@ -193,12 +193,14 @@ struct NativeTableView: NSViewRepresentable {
                 checkbox.tag = row
                 checkbox.target = self
                 checkbox.action = #selector(Coordinator.checkboxToggled(_:))
+                checkbox.setAccessibilityLabel(String(localized: "table.accessibility.toggle_visibility", comment: "Toggle network visibility checkbox"))
                 container.addSubview(checkbox)
                 return container
             }
 
             if columnID == "dot" {
                 let view = NSView(frame: NSRect(x: 0, y: 0, width: 20, height: 20))
+                view.setAccessibilityElement(false)
                 let dot = NSView(frame: NSRect(x: 8, y: 6, width: 8, height: 8))
                 dot.wantsLayer = true
                 dot.layer?.cornerRadius = 4

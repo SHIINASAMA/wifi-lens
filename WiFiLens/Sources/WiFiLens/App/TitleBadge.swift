@@ -32,6 +32,7 @@ struct TitleBadge: View {
         .overlay {
             Capsule().stroke(Color(red: 130/255, green: 89/255, blue: 221/255), lineWidth: 1)
         }
+        .accessibilityHidden(true)
     }
 
     // MARK: - PRO Badge
@@ -75,5 +76,6 @@ struct TitleBadge: View {
                 shimmerOffset = 1.5
             }
         }
+        .accessibilityHidden(true)
     }
 }

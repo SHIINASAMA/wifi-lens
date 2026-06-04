@@ -5,7 +5,7 @@
       "shouldTranslate" : false
     },
     "?" : {
-
+      "shouldTranslate" : false
     },
     "·" : {
       "shouldTranslate" : false
@@ -91,7 +91,7 @@
       "shouldTranslate" : false
     },
     "•" : {
-
+      "shouldTranslate" : false
     },
     "ble.control.start_scanning" : {
       "comment" : "Button to start BLE scanning",
@@ -850,6 +850,54 @@
         }
       },
       "shouldTranslate" : false
+    },
+    "channels.accessibility.card_label" : {
+      "comment" : "Channel card accessibility label with channel, band, quality, and score",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Channel %lld, %@, %@, score %lld out of 100"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チャンネル%lld, %@, %@, スコア%lld/100"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "频道%lld, %@, %@, 评分%lld/100"
+          }
+        }
+      }
+    },
+    "channels.accessibility.sort_by" : {
+      "comment" : "Sort by column accessibility label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort by %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@でソート"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按%@排序"
+          }
+        }
+      }
     },
     "channels.badge.current" : {
       "comment" : "Dot badge marking current channel",
@@ -1927,6 +1975,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "评分"
+          }
+        }
+      }
+    },
+    "common.accessibility.metric_fmt" : {
+      "comment" : "Label: value format for VoiceOver metric",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@: %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@: %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@: %@"
+          }
+        }
+      }
+    },
+    "common.accessibility.metric_sub_fmt" : {
+      "comment" : "Label: value, subtitle format for VoiceOver metric",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@: %@, %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@: %@, %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@: %@, %@"
           }
         }
       }
@@ -4597,6 +4693,30 @@
         }
       }
     },
+    "overview.accessibility.globe_label" : {
+      "comment" : "3D visualization of Wi‑Fi networks around the globe",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3D visualization of Wi‑Fi networks around the globe"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "地球上のWi‑Fiネットワークの3D可視化"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全球Wi‑Fi网络的3D可视化"
+          }
+        }
+      }
+    },
     "overview.channel_advice.header" : {
       "comment" : "Header for recommended channels card",
       "extractionState" : "manual",
@@ -5869,6 +5989,54 @@
         }
       }
     },
+    "roaming.accessibility.latency_fmt" : {
+      "comment" : "Latency accessibility label with value and quality",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Latency: %@ ms, %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遅延: %@ ms, %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "延迟: %@ ms, %@"
+          }
+        }
+      }
+    },
+    "roaming.accessibility.rssi_fmt" : {
+      "comment" : "RSSI accessibility label with value and quality",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RSSI: %lld dBm, %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RSSI: %lld dBm, %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RSSI: %lld dBm, %@"
+          }
+        }
+      }
+    },
     "roaming.control.start_tooltip" : {
       "comment" : "Tooltip for start roaming test button",
       "extractionState" : "manual",
@@ -6009,6 +6177,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "延迟"
+          }
+        }
+      }
+    },
+    "roaming.latency.excellent" : {
+      "comment" : "Excellent latency level",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Excellent"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "非常に良好"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "极佳"
+          }
+        }
+      }
+    },
+    "roaming.latency.good" : {
+      "comment" : "Good latency level",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Good"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "良好"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "良好"
+          }
+        }
+      }
+    },
+    "roaming.latency.poor" : {
+      "comment" : "Poor latency level",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poor"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不良"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "差"
           }
         }
       }
@@ -7408,6 +7648,78 @@
         }
       }
     },
+    "sidebar.hint.requires_wifi" : {
+      "comment" : "Accessibility hint when sidebar item is disabled due to no Wi‑Fi",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requires Wi‑Fi"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wi‑Fiが必要です"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要Wi‑Fi"
+          }
+        }
+      }
+    },
+    "spectrum.accessibility.chart_label_fmt" : {
+      "comment" : "Chart accessibility label with network count",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spectrum chart, %lld networks"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スペクトラムチャート, %lld ネットワーク"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "频谱图, %lld 个网络"
+          }
+        }
+      }
+    },
+    "spectrum.accessibility.close_expanded" : {
+      "comment" : "Close expanded chart button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close expanded chart"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拡大チャートを閉じる"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭展开的图表"
+          }
+        }
+      }
+    },
     "spectrum.empty.no_channel_data" : {
       "comment" : "Empty state when no channel data exists",
       "extractionState" : "manual",
@@ -7863,6 +8175,30 @@
         }
       },
       "shouldTranslate" : false
+    },
+    "table.accessibility.toggle_visibility" : {
+      "comment" : "Toggle network visibility checkbox",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle network visibility"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ネットワークの表示切替"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换网络可见性"
+          }
+        }
+      }
     },
     "table.column.bandwidth" : {
       "comment" : "Channel bandwidth column header",

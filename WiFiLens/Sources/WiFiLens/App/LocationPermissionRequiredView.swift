@@ -8,6 +8,7 @@ struct LocationPermissionRequiredView: View {
         VStack(spacing: 16) {
             Spacer()
             ProgressView().scaleEffect(1.5)
+                .accessibilityLabel(String(localized: "permission.location.waiting", comment: "Status while waiting for Location Services authorization"))
             switch accessState {
             case .waitingForAuthorization:
                 Text(String(localized: "permission.location.waiting", comment: "Status while waiting for Location Services authorization"))

@@ -119,16 +119,23 @@ struct SidebarView: View {
                             BluetoothIconShape()
                                 .stroke(.foreground, style: .init(lineWidth: 1.1, lineCap: .round, lineJoin: .round))
                                 .frame(width: 16, height: 16)
+                                .accessibilityHidden(true)
                         })
                             .tag(page)
                             .disabled(!UITestMode.isActive && page.requiresWiFi && !isWiFiAvailable)
                             .opacity(!UITestMode.isActive && page.requiresWiFi && !isWiFiAvailable ? 0.4 : 1.0)
+                            .accessibilityHint(!UITestMode.isActive && page.requiresWiFi && !isWiFiAvailable
+                                ? String(localized: "sidebar.hint.requires_wifi", comment: "Accessibility hint when sidebar item is disabled due to no Wi‑Fi")
+                                : "")
                             .accessibilityIdentifier("sidebar-bleScanner")
                     } else {
                         Label(page.label, systemImage: page.icon)
                             .tag(page)
                             .disabled(!UITestMode.isActive && page.requiresWiFi && !isWiFiAvailable)
                             .opacity(!UITestMode.isActive && page.requiresWiFi && !isWiFiAvailable ? 0.4 : 1.0)
+                            .accessibilityHint(!UITestMode.isActive && page.requiresWiFi && !isWiFiAvailable
+                                ? String(localized: "sidebar.hint.requires_wifi", comment: "Accessibility hint when sidebar item is disabled due to no Wi‑Fi")
+                                : "")
                             .accessibilityIdentifier("sidebar-\(page.rawValue)")
                     }
                 }

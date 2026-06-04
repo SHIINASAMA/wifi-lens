@@ -33,6 +33,7 @@ struct WiFiBandChart: View {
                         .frame(width: 24, height: 24)
                 }
                 .help(String(localized: "common.action.reset_zoom", comment: "Reset chart zoom to default"))
+                .accessibilityLabel(String(localized: "common.action.reset_zoom", comment: "Reset chart zoom to default"))
             }
             Spacer()
         }
@@ -144,6 +145,7 @@ struct WiFiBandChart: View {
                                 .position(x: clampX(hoverPoint.x, in: geo.chartRect), y: max(hoverPoint.y - 22, 4))
                         }
                     }
+                    .accessibilityLabel(String(format: String(localized: "spectrum.accessibility.chart_label_fmt", comment: "Chart accessibility label with network count"), model.visibleSeriesData.count))
                 }
             }
         }
@@ -240,6 +242,7 @@ struct WiFiBandChart: View {
                                 .position(x: clampX(hoverPoint.x, in: geo.chartRect), y: max(hoverPoint.y - 22, 4))
                         }
                     }
+                    .accessibilityLabel(String(format: String(localized: "spectrum.accessibility.chart_label_fmt", comment: "Chart accessibility label with network count"), model.visibleSeriesData.count))
                 }
             }
             .padding()
@@ -247,6 +250,7 @@ struct WiFiBandChart: View {
                 Image(systemName: "xmark.circle.fill").font(.title).foregroundColor(.secondary)
             }
             .buttonStyle(.plain).padding(8)
+            .accessibilityLabel(String(localized: "spectrum.accessibility.close_expanded", comment: "Close expanded chart button"))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

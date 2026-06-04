@@ -20,6 +20,7 @@ private struct BLEDisabledView: View {
             Image(systemName: "antenna.radiowaves.left.and.right.slash")
                 .font(.system(size: 48))
                 .foregroundColor(.secondary)
+                .accessibilityHidden(true)
             Text(String(localized: "ble.disabled.title", comment: "Title when BLE feature is disabled in settings"))
                 .font(.title3)
                 .multilineTextAlignment(.center)
@@ -81,10 +82,14 @@ private struct BLEScannerContentView: View {
             .help(viewModel.isScanning ? String(localized: "ble.control.stop_scanning", comment: "Button to stop BLE scanning") : String(localized: "ble.control.start_scanning", comment: "Button to start BLE scanning"))
             .disabled(viewModel.bluetoothState != .poweredOn)
             .accessibilityIdentifier("ble-scan-toggle-button")
+            .accessibilityLabel(viewModel.isScanning
+                ? String(localized: "ble.control.stop_scanning", comment: "Button to stop BLE scanning")
+                : String(localized: "ble.control.start_scanning", comment: "Button to start BLE scanning"))
 
             Circle()
                 .fill(stateColor)
                 .frame(width: 8, height: 8)
+                .accessibilityHidden(true)
 
             Text(stateLabel)
                 .font(.subheadline)
@@ -123,6 +128,7 @@ private struct BLEScannerContentView: View {
                     Circle()
                         .fill(rssiColor(device.smoothedRSSI))
                         .frame(width: 6, height: 6)
+                        .accessibilityHidden(true)
                     Text(device.displayName)
                         .font(.body)
                         .lineLimit(1)
@@ -180,6 +186,7 @@ private struct BLEScannerContentView: View {
                     Circle()
                         .fill(chartColor)
                         .frame(width: 8, height: 8)
+                        .accessibilityHidden(true)
                     Text(String(format: String(localized: "ble.rssi_history_fmt", comment: "RSSI history chart title with device name"), device.displayName))
                         .font(.caption)
                         .foregroundColor(.secondary)
@@ -189,11 +196,11 @@ private struct BLEScannerContentView: View {
                 // Legend
                 HStack(spacing: 12) {
                     HStack(spacing: 4) {
-                        Circle().fill(chartColor.opacity(0.3)).frame(width: 6, height: 6)
+                        Circle().fill(chartColor.opacity(0.3)).frame(width: 6, height: 6).accessibilityHidden(true)
                         Text(String(localized: "ble.trend.raw", comment: "Raw RSSI chart label")).font(.caption2).foregroundColor(.secondary)
                     }
                     HStack(spacing: 4) {
-                        Circle().fill(chartColor).frame(width: 6, height: 6)
+                        Circle().fill(chartColor).frame(width: 6, height: 6).accessibilityHidden(true)
                         Text(String(localized: "ble.trend.smooth", comment: "Smoothed RSSI chart label")).font(.caption2).foregroundColor(.secondary)
                     }
                 }
@@ -253,6 +260,7 @@ private struct BLEScannerContentView: View {
             Image(systemName: "antenna.radiowaves.left.and.right")
                 .font(.system(size: 32))
                 .foregroundColor(.secondary.opacity(0.5))
+                .accessibilityHidden(true)
             Text(String(localized: "ble.empty.idle", comment: "Empty state prompting user to start scanning"))
                 .font(.body)
                 .foregroundColor(.secondary)
@@ -277,6 +285,7 @@ private struct BLEScannerContentView: View {
             Image(systemName: "antenna.radiowaves.left.and.right.slash")
                 .font(.system(size: 32))
                 .foregroundColor(.secondary.opacity(0.5))
+                .accessibilityHidden(true)
             Text(String(localized: "ble.state.bluetooth_off_title", comment: "Title when Bluetooth is disabled"))
                 .font(.body)
                 .foregroundColor(.secondary)
@@ -293,6 +302,7 @@ private struct BLEScannerContentView: View {
             Image(systemName: "hand.raised.slash")
                 .font(.system(size: 32))
                 .foregroundColor(.secondary.opacity(0.5))
+                .accessibilityHidden(true)
             Text(String(localized: "ble.state.bluetooth_perm_denied_title", comment: "Title when Bluetooth permission is denied"))
                 .font(.body)
                 .foregroundColor(.secondary)
@@ -311,6 +321,7 @@ private struct BLEScannerContentView: View {
             Image(systemName: "antenna.radiowaves.left.and.right")
                 .font(.system(size: 32))
                 .foregroundColor(.secondary.opacity(0.5))
+                .accessibilityHidden(true)
             Text(String(localized: "ble.state.bluetooth_perm_required_title", comment: "Title when Bluetooth permission is needed"))
                 .font(.body)
                 .foregroundColor(.secondary)
@@ -329,6 +340,7 @@ private struct BLEScannerContentView: View {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 32))
                 .foregroundColor(.orange)
+                .accessibilityHidden(true)
             Text(message)
                 .font(.body)
                 .foregroundColor(.secondary)

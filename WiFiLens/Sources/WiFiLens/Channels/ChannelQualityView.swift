@@ -183,6 +183,7 @@ struct ChannelQualityView: View {
         }
         .buttonStyle(.plain)
         .padding(.vertical, 5)
+        .accessibilityLabel(String(format: String(localized: "channels.accessibility.sort_by", comment: "Sort by column accessibility label"), text))
     }
 
     private func rowBG(_ id: String, idx: Int) -> Color {
@@ -208,6 +209,7 @@ private struct ChannelCard: View {
                     Circle()
                         .fill(Color(hex: channel.rfLevel.color).opacity(0.15))
                         .frame(width: 44, height: 44)
+                        .accessibilityHidden(true)
                     Text("\(channel.channel)")
                         .font(.system(size: 18, weight: .bold, design: .rounded))
                         .foregroundColor(Color(hex: channel.rfLevel.color))
@@ -278,6 +280,9 @@ private struct ChannelCard: View {
         .padding(12)
         .background(.regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 10))
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(String(format: String(localized: "channels.accessibility.card_label", comment: "Channel card accessibility label with channel, band, quality, and score"),
+            channel.channel, channel.bandDisplay, channel.rfLevel.displayName, channel.rfScore))
     }
 
     private func badge(_ text: String, color: String) -> some View {

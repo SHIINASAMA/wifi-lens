@@ -48,6 +48,7 @@ struct OverviewView: View {
                         let stateColor = wifi != nil ? rssiColor(wifi!.rssi ?? -100) : Color.secondary
                         EarthGlobeView(color: stateColor)
                             .frame(width: 240, height: 240)
+                            .accessibilityHidden(true)
 
                         if !viewModel.locationManager.isAuthorizedForSSID {
                             authorizationCard
@@ -94,7 +95,7 @@ struct OverviewView: View {
                         .font(.title3)
                         .fontWeight(.semibold)
                     HStack(spacing: 6) {
-                        Circle().fill(Color.green).frame(width: 6, height: 6)
+                        Circle().fill(Color.green).frame(width: 6, height: 6).accessibilityHidden(true)
                         Text(String(localized: "common.label.connected", comment: "Connected state indicator"))
                             .font(.caption)
                             .foregroundColor(.secondary)
@@ -111,6 +112,7 @@ struct OverviewView: View {
                     Text("\(wifi.rssi ?? -100) dBm")
                         .font(.system(size: 12, design: .monospaced))
                         .foregroundColor(rssiColor(wifi.rssi ?? -100))
+                        .accessibilityLabel(String(format: String(localized: "roaming.accessibility.rssi_fmt", comment: "RSSI accessibility label with value and quality"), wifi.rssi ?? -100, signalLabel(wifi.rssi ?? -100)))
                     signalBars(wifi.rssi ?? -100)
                 }
             }
@@ -164,6 +166,7 @@ struct OverviewView: View {
             Image(systemName: icon)
                 .font(.system(size: 18))
                 .foregroundColor(color)
+                .accessibilityHidden(true)
             Text(value)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(.primary)
@@ -176,6 +179,8 @@ struct OverviewView: View {
         .padding(.vertical, 12)
         .background(Color.primary.opacity(0.04))
         .clipShape(RoundedRectangle(cornerRadius: 10))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(format: String(localized: "common.accessibility.metric_fmt", comment: "Label: value format for VoiceOver metric"), label, value))
     }
 
     // MARK: - Diagnostic Card
@@ -188,6 +193,7 @@ struct OverviewView: View {
                 .font(.system(size: 28))
                 .foregroundColor(diag.color)
                 .frame(width: 36)
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(diag.title)
@@ -300,6 +306,7 @@ struct OverviewView: View {
                         Circle()
                             .fill(Color(hex: ch.rfLevel.color).opacity(0.15))
                             .frame(width: 32, height: 32)
+                            .accessibilityHidden(true)
                         Text("\(ch.channel)")
                             .font(.system(size: 14, weight: .bold, design: .rounded))
                             .foregroundColor(Color(hex: ch.rfLevel.color))
@@ -439,8 +446,10 @@ struct OverviewView: View {
                 RoundedRectangle(cornerRadius: 1)
                     .fill(i < active ? rssiColor(rssi) : Color.secondary.opacity(0.15))
                     .frame(width: 4, height: CGFloat(6 + i * 4))
+                    .accessibilityHidden(true)
             }
         }
+        .accessibilityLabel(String(format: String(localized: "roaming.accessibility.rssi_fmt", comment: "RSSI accessibility label with value and quality"), rssi, signalLabel(rssi)))
     }
 
     private func bandName(_ ch: Int) -> String {
