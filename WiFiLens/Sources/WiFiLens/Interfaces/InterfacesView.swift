@@ -84,6 +84,7 @@ struct InterfacesView: View {
             .frame(maxWidth: 640)
         }
         .frame(maxWidth: .infinity)
+        .scrollClipDisabled()
     }
 
     // MARK: - Hero
