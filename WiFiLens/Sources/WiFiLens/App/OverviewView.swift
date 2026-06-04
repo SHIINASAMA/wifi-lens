@@ -128,8 +128,7 @@ struct OverviewView: View {
             .frame(height: 6)
         }
         .padding(16)
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
     }
 
     // MARK: - Signal Health Row
@@ -177,8 +176,7 @@ struct OverviewView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
-        .background(Color.primary.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
         .accessibilityElement(children: .combine)
         .accessibilityLabel(String(format: String(localized: "common.accessibility.metric_fmt", comment: "Label: value format for VoiceOver metric"), label, value))
     }
@@ -206,8 +204,7 @@ struct OverviewView: View {
             Spacer()
         }
         .padding(16)
-        .background(Color.primary.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
     }
 
     private struct Diagnosis {
@@ -327,13 +324,11 @@ struct OverviewView: View {
                     Spacer()
                 }
                 .padding(10)
-                .background(Color.primary.opacity(0.04))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 8))
             }
         }
         .padding(16)
-        .background(Color.primary.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
     }
 
     // MARK: - No Connection
@@ -350,8 +345,7 @@ struct OverviewView: View {
         }
         .padding(32)
         .frame(maxWidth: .infinity)
-        .background(Color.primary.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
     }
 
     private var wifiOffCard: some View {
@@ -383,7 +377,7 @@ struct OverviewView: View {
             .controlSize(.small)
         }
         .padding(12)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
+        .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 10))
     }
 
     // MARK: - Environment Summary
@@ -404,8 +398,7 @@ struct OverviewView: View {
             Spacer()
         }
         .padding(16)
-        .background(Color.primary.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
     }
 
     private var bandSummary: String {

@@ -225,7 +225,7 @@ struct RangeSelector<Content: View>: View {
             .font(.system(size: 9, design: .monospaced))
             .foregroundColor(.primary)
             .padding(.horizontal, 4).padding(.vertical, 2)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 3))
+            .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 3))
     }
 
     private func snapToMax() {

@@ -127,8 +127,7 @@ struct InterfacesView: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity)
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
         .task(id: wifi.router) {
             guard let router = wifi.router else { return }
             let pinger = GatewayPinger()
@@ -153,6 +152,7 @@ struct InterfacesView: View {
                 color: rssiColor(wifi.rssi ?? -100),
                 bar: rssiBar(wifi.rssi ?? -100)
             )
+            .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
 
             // PHY Mode
             indicatorPill(
@@ -162,6 +162,7 @@ struct InterfacesView: View {
                 color: .accentColor,
                 bar: nil
             )
+            .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
 
             // Stability
             let stab = stability(wifi)
@@ -172,6 +173,7 @@ struct InterfacesView: View {
                 color: stab.color,
                 bar: scoreBar(stab.score, color: stab.color)
             )
+            .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
         }
     }
 
@@ -195,8 +197,6 @@ struct InterfacesView: View {
         }
         .frame(height: 100)
         .frame(maxWidth: .infinity)
-        .background(.thinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
         .accessibilityElement(children: .combine)
         .accessibilityLabel({
             if let sub = subtitle {
@@ -227,8 +227,7 @@ struct InterfacesView: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity)
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
     }
 
     // MARK: - Other Interfaces
@@ -253,8 +252,7 @@ struct InterfacesView: View {
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(.thinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 6))
                 }
             }
         }
@@ -749,8 +747,7 @@ private struct InterfaceCard: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
         }
-        .background(.thinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 7))
+        .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 7))
     }
 
     private func rssiColor(_ rssi: Int) -> Color {

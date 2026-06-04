@@ -100,8 +100,7 @@ struct ChannelQualityView: View {
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(.ultraThinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 6))
                 .padding(.horizontal, 16)
                 .padding(.top, 10)
             }
@@ -278,8 +277,7 @@ private struct ChannelCard: View {
             .frame(width: 100)
         }
         .padding(12)
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 10))
         .accessibilityElement(children: .contain)
         .accessibilityLabel(String(format: String(localized: "channels.accessibility.card_label", comment: "Channel card accessibility label with channel, band, quality, and score"),
             channel.channel, channel.bandDisplay, channel.rfLevel.displayName, channel.rfScore))

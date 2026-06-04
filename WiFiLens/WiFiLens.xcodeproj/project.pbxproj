@@ -22,6 +22,7 @@
 		2B7B4CBC96F724AA4970AC7F /* SpectrumModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DD34695BFD8D4277DF0BDB0 /* SpectrumModelTests.swift */; };
 		2ED34E17AE03E25A409037BD /* NetworkTableRowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */; };
 		2FA3CB9C5DD2446AAA549779 /* GatewayPinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF472346A62545B9866DA8ED /* GatewayPinger.swift */; };
+		C7E5A90CB7E5498F80CDA217 /* GlassBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E84926DD82E4B90B6509CD8 /* GlassBackground.swift */; };
 		318908BC49D244B1EEE68A9A /* ChannelSpanCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */; };
 		3711656F0C3ECD58CA29D407 /* NativeTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3299502DE1A130760C8A7 /* NativeTableView.swift */; };
 		39B4C850463F4305990A6943 /* SignalSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6180984B78D4363B6840C79 /* SignalSmoothing.swift */; };
@@ -161,6 +162,7 @@
 		FB1E328A2FC7316C009D1BDC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */; };
 		FB1E328B2FC7316C009D1BDC /* DeviceCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0470288A92AF41C793DAE70B /* DeviceCapabilities.swift */; };
 		FB1E328C2FC7316C009D1BDC /* GatewayPinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF472346A62545B9866DA8ED /* GatewayPinger.swift */; };
+		CA0AC8EDAF744A1CB744F092 /* GlassBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E84926DD82E4B90B6509CD8 /* GlassBackground.swift */; };
 		FB1E328D2FC7316C009D1BDC /* RoamingRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8367630A1EDF4515917A144A /* RoamingRecord.swift */; };
 		FB1E328E2FC7316C009D1BDC /* RoamingTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F790DC6E08D43C5BD058D96 /* RoamingTestViewModel.swift */; };
 		FB1E328F2FC7316C009D1BDC /* RoamingTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B13DBF938D654926B205302C /* RoamingTestView.swift */; };
@@ -313,6 +315,7 @@
 		BB7BA76DD3B1E6198BDAEEA7 /* BLEViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEViewModel.swift; sourceTree = "<group>"; };
 		BD784856886985BCC6FC4F02 /* WiFi Lens.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "WiFi Lens.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF472346A62545B9866DA8ED /* GatewayPinger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayPinger.swift; sourceTree = "<group>"; };
+		9E84926DD82E4B90B6509CD8 /* GlassBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassBackground.swift; sourceTree = "<group>"; };
 		C51C237F247C80EC5176F5C0 /* ChartSeriesData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartSeriesData.swift; sourceTree = "<group>"; };
 		C6CDF2DB455AB04A0A7C8BBF /* BluetoothPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPermissionManager.swift; sourceTree = "<group>"; };
 		C70E4041B5972D72DD79BF56 /* RoamingTestViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingTestViewModelTests.swift; sourceTree = "<group>"; };
@@ -659,6 +662,7 @@
 				69F66DB715821EBD11B6D1AA /* Color+Extensions.swift */,
 				0470288A92AF41C793DAE70B /* DeviceCapabilities.swift */,
 				BF472346A62545B9866DA8ED /* GatewayPinger.swift */,
+				9E84926DD82E4B90B6509CD8 /* GlassBackground.swift */,
 				51DDD97F3B94514DE0790B51 /* Constants.swift */,
 			);
 			path = Utilities;
@@ -1084,6 +1088,7 @@
 				FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */,
 				56818EA68B0747B083E0FDF8 /* DeviceCapabilities.swift in Sources */,
 				2FA3CB9C5DD2446AAA549779 /* GatewayPinger.swift in Sources */,
+				C7E5A90CB7E5498F80CDA217 /* GlassBackground.swift in Sources */,
 				847B77DBC638404081A7BFC2 /* RoamingRecord.swift in Sources */,
 				7E778683F723499D93511520 /* RoamingTestViewModel.swift in Sources */,
 				530D1F7F7F44460CABA342AB /* RoamingTestView.swift in Sources */,
@@ -1213,6 +1218,7 @@
 				FB1E328A2FC7316C009D1BDC /* SettingsView.swift in Sources */,
 				FB1E328B2FC7316C009D1BDC /* DeviceCapabilities.swift in Sources */,
 				FB1E328C2FC7316C009D1BDC /* GatewayPinger.swift in Sources */,
+				CA0AC8EDAF744A1CB744F092 /* GlassBackground.swift in Sources */,
 				FB1E328D2FC7316C009D1BDC /* RoamingRecord.swift in Sources */,
 				FB1E328E2FC7316C009D1BDC /* RoamingTestViewModel.swift in Sources */,
 				FB1E328F2FC7316C009D1BDC /* RoamingTestView.swift in Sources */,

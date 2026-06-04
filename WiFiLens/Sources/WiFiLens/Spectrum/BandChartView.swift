@@ -269,6 +269,6 @@ private struct ChartTooltip: View {
             Text(bssid).font(.system(size: 8)).foregroundColor(.secondary)
         }
         .padding(.horizontal, 6).padding(.vertical, 4)
-        .background(.regularMaterial).clipShape(RoundedRectangle(cornerRadius: 4))
+        .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 4))
     }
 }

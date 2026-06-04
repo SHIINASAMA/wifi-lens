@@ -701,7 +701,7 @@ private struct RoamingTimelineChart: View {
         .foregroundColor(.primary)
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .background(.regularMaterial, in: Capsule())
+        .glassBackground(.regular, in: Capsule())
         .padding(.leading, 12)
         .padding(.top, 6)
     }
