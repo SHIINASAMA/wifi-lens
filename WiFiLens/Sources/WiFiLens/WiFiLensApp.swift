@@ -272,6 +272,26 @@ struct WiFiLensApp: App {
         }
         .windowResizability(.contentSize)
         .defaultSize(width: 900, height: 700)
+        .onChange(of: appearance) { _, newValue in
+            let target: NSAppearance?
+            switch newValue {
+            case "light": target = NSAppearance(named: .aqua)
+            case "dark":  target = NSAppearance(named: .darkAqua)
+            default:
+                let name = NSApp.effectiveAppearance.name
+                target = name == .darkAqua || name == .vibrantDark
+                    ? NSAppearance(named: .darkAqua)
+                    : NSAppearance(named: .aqua)
+            }
+            guard let target else { return }
+            NSAnimationContext.runAnimationGroup { ctx in
+                ctx.duration = 0.4
+                ctx.allowsImplicitAnimation = true
+                for window in NSApp.windows {
+                    window.animator().appearance = target
+                }
+            }
+        }
         .onChange(of: bleEnabled) { _, enabled in
             if enabled {
                 bleViewModel = BLEViewModel()
