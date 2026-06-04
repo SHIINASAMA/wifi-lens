@@ -7936,6 +7936,30 @@
         }
       }
     },
+    "spectrum.mode.label" : {
+      "comment" : "Spectrum view mode picker accessibility label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spectrum mode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スペクトラムモード"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "频谱模式"
+          }
+        }
+      }
+    },
     "spectrum.mode.live" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -56,17 +56,18 @@ struct ContentView: View {
 #if PRO
     private var modeToolbar: some View {
         HStack {
-            Spacer()
             Picker("", selection: $mode.animation(.bouncy)) {
                 Text(String(localized: "spectrum.mode.live", comment: "Live spectrum mode")).tag(SpectrumMode.live)
                 Text(String(localized: "spectrum.mode.recording_page", comment: "Recording page mode")).tag(SpectrumMode.recording)
             }
             .pickerStyle(.segmented)
+            .controlSize(.regular)
             .frame(width: 160)
-            Spacer()
+            .accessibilityLabel(String(localized: "spectrum.mode.label", comment: "Spectrum view mode picker"))
+            .accessibilityIdentifier("spectrum-mode-picker")
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 4)
+        .padding(.horizontal, 16)
+        .padding(.top, 16)
     }
 #endif
 
