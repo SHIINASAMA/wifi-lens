@@ -235,10 +235,8 @@ struct WiFiLensApp: App {
 
     init() {
         if UITestMode.isActive {
-            // Belt-and-suspenders: the UI test also passes -ApplePersistenceIgnoreState YES
-            // as a launch argument, but setting it in UserDefaults catches any edge case
-            // where the argument is read too early.
-            UserDefaults.standard.set(true, forKey: "ApplePersistenceIgnoreState")
+            // UI tests pass -ApplePersistenceIgnoreState YES as a launch argument
+            // to disable window state restoration.
         }
 
         AppLogger.bootstrap()

@@ -1349,7 +1349,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.6;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Used for local network access required by Wi-Fi diagnostic and analysis features.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "WiFi Lens can run an MCP server on localhost when you enable it in Settings, so local tools like Claude Desktop can read Wi-Fi scan data. The server is off by default. No data leaves this Mac.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "macOS requires this permission for any app that reads Wi‑Fi network names (SSIDs). WiFi Lens never accesses your GPS coordinates and never logs your location.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1522,7 +1522,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.6;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Used for local network access required by Wi-Fi diagnostic and analysis features.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "WiFi Lens can run an MCP server on localhost when you enable it in Settings, so local tools like Claude Desktop can read Wi-Fi scan data. The server is off by default. No data leaves this Mac.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "macOS requires this permission for any app that reads Wi‑Fi network names (SSIDs). WiFi Lens never accesses your GPS coordinates and never logs your location.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1567,7 +1567,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.6;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Used for local network access required by Wi-Fi diagnostic and analysis features.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "WiFi Lens can run an MCP server on localhost when you enable it in Settings, so local tools like Claude Desktop can read Wi-Fi scan data. The server is off by default. No data leaves this Mac.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "macOS requires this permission for any app that reads Wi‑Fi network names (SSIDs). WiFi Lens never accesses your GPS coordinates and never logs your location.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1613,7 +1613,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.6;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Used for local network access required by Wi-Fi diagnostic and analysis features.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "WiFi Lens can run an MCP server on localhost when you enable it in Settings, so local tools like Claude Desktop can read Wi-Fi scan data. The server is off by default. No data leaves this Mac.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "macOS requires this permission for any app that reads Wi‑Fi network names (SSIDs). WiFi Lens never accesses your GPS coordinates and never logs your location.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1622,7 +1622,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.kaoru.wifi-lens-pro";
-				PRODUCT_NAME = "WiFI Lens Pro";
+				PRODUCT_NAME = "WiFi Lens Pro";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
