@@ -7,6 +7,7 @@ private enum SpectrumMode { case live, recording }
 #endif
 
 struct ContentView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Bindable var viewModel: ScannerViewModel
 
     @State private var sortOrder: [NSSortDescriptor] = [NSSortDescriptor(key: "ssid", ascending: true)]
@@ -56,7 +57,7 @@ struct ContentView: View {
 #if PRO
     private var modeToolbar: some View {
         HStack {
-            Picker("", selection: $mode.animation(.bouncy)) {
+            Picker("", selection: $mode.animation(reduceMotion ? nil : .bouncy)) {
                 Text(String(localized: "spectrum.mode.live", comment: "Live spectrum mode")).tag(SpectrumMode.live)
                 Text(String(localized: "spectrum.mode.recording_page", comment: "Recording page mode")).tag(SpectrumMode.recording)
             }
@@ -172,7 +173,7 @@ struct ContentView: View {
         .frame(height: headerHeight)
         .contentShape(Rectangle())
         .onTapGesture {
-            withAnimation { toggleCollapse(section) }
+            withAnimation(reduceMotion ? nil : .default) { toggleCollapse(section) }
         }
     }
 
@@ -248,7 +249,7 @@ struct ContentView: View {
                 viewModel.hiddenBands.insert(bandID)
             }
             // Collapse / expand matching chart section with animation
-            withAnimation {
+            withAnimation(reduceMotion ? nil : .default) {
                 switch bandID {
                 case "24": is2GHzCollapsed = !show
                 case "5":  is5GHzCollapsed = !show

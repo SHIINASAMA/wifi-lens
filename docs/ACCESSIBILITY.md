@@ -12,7 +12,7 @@ This document tracks the app's accessibility implementation status across all Ap
 | Larger Text | ❌ Incomplete | ❌ **Skipped** | macOS SwiftUI `DynamicTypeSize` does not track system setting; `@ScaledMetric` is inert on macOS |
 | Differentiate Without Color | ✅ Universal | ⚠️ **Partial** | Quality labels + RSSI values augment color; Canvas curves need legend overlay |
 | Sufficient Contrast | ✅ Universal | ✅ **Done** | System Materials provide adequate contrast; verified via Accessibility Inspector |
-| Reduce Motion | ✅ Native | 🔜 **Planned** | Gaussian curve animations, `.bouncy` transitions need motion-respecting guard |
+| Reduce Motion | ✅ Native | ✅ **Done** | Gaussian curve animations, `.bouncy` transitions need motion-respecting guard |
 | Captions / Audio Description | N/A | — | No video/audio content |
 
 ## Architecture

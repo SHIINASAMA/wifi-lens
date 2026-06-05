@@ -3,6 +3,11 @@ import SwiftUI
 @MainActor
 @Observable
 final class BandChartViewModel {
+
+    /// Set by the app root to respect Reduce Motion accessibility setting.
+    nonisolated(unsafe) static var reduceMotion = false
+
+ {
     let band: ChannelBand
 
     var isExpanded: Bool = false
@@ -129,7 +134,7 @@ final class BandChartViewModel {
             let delta = target - allSeriesData[i].displayRSSI
             if abs(delta) < 0.2 { continue }
             anyAnimating = true
-            allSeriesData[i].displayRSSI += delta * 0.25
+            allSeriesData[i].displayRSSI += BandChartViewModel.reduceMotion ? delta : delta * 0.25
         }
         refreshRenderedState()
         if !anyAnimating {

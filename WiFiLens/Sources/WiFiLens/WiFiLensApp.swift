@@ -15,6 +15,7 @@ private struct AppRootView: View {
     let updateMCPServer: @MainActor () -> Void
 
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var sidebarWidth: CGFloat = 180
     @State private var sidebarCollapsed = false
     @AppStorage("hideTitleBadge") private var hideTitleBadge = true
@@ -116,6 +117,7 @@ private struct AppRootView: View {
                 .background(
                     GeometryReader { geo in
                         Color.clear.onAppear {
+            BandChartViewModel.reduceMotion = reduceMotion
                             sidebarWidth = geo.size.width
                         }
                         .onChange(of: geo.size.width) { _, w in
@@ -162,6 +164,7 @@ private struct AppRootView: View {
             window?.setFrameAutosaveName("WiFiLensMainWindow")
         })
         .onAppear {
+            BandChartViewModel.reduceMotion = reduceMotion
             visitedPages.insert(selectedPage)
         }
         .task {
@@ -190,7 +193,7 @@ private struct AppRootView: View {
                     .padding(.top, titleBarY)
                     .ignoresSafeArea()
                     .allowsHitTesting(false)
-                    .animation(.easeInOut(duration: 0.25), value: x)
+                    .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: x)
             }
         }
     }

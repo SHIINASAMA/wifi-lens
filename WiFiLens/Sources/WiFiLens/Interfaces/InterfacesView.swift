@@ -22,6 +22,7 @@ struct InterfacesView: View {
     let scannerViewModel: ScannerViewModel
     let throughputMonitor: ThroughputMonitor
     @State private var mode: InterfaceViewMode = .simple
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var gatewayLatency: Double?
 
     private var wifiInterface: NetworkInterfaceInfo? {
@@ -32,7 +33,7 @@ struct InterfacesView: View {
         VStack(spacing: 0) {
             // Mode toggle
             HStack {
-                    Picker("", selection: $mode.animation(.bouncy)) {
+                    Picker("", selection: $mode.animation(reduceMotion ? nil : .bouncy)) {
                         ForEach(InterfaceViewMode.allCases, id: \.self) { m in
                             Text(m.displayName).tag(m)
                         }
@@ -333,7 +334,7 @@ struct InterfacesView: View {
 
     private var monitorChartHeader: some View {
         Button {
-            withAnimation { isMonitorChartCollapsed.toggle() }
+            withAnimation(reduceMotion ? nil : .default) { isMonitorChartCollapsed.toggle() }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: isMonitorChartCollapsed ? "chevron.right" : "chevron.down")
@@ -357,7 +358,7 @@ struct InterfacesView: View {
 
     private var monitorTableHeader: some View {
         Button {
-            withAnimation { isMonitorTableCollapsed.toggle() }
+            withAnimation(reduceMotion ? nil : .default) { isMonitorTableCollapsed.toggle() }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: isMonitorTableCollapsed ? "chevron.right" : "chevron.down")

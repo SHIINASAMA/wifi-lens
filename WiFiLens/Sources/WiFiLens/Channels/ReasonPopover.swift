@@ -5,6 +5,7 @@ import SwiftUI
 struct ReasonPopover: View {
     let reasons: [RecommendationReason]
     @State private var isHovering = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isTapped = false
 
     private var showPopover: Bool { isHovering || isTapped }
@@ -26,7 +27,7 @@ struct ReasonPopover: View {
         .accessibilityLabel(String(localized: "channels.reason.popover.title",
                                    comment: "Title for recommendation reason popover"))
         .onHover { hovering in
-            withAnimation(.easeOut(duration: 0.15)) {
+            withAnimation(reduceMotion ? nil : .easeOut(duration: 0.15)) {
                 isHovering = hovering
             }
             if !hovering { isTapped = false }

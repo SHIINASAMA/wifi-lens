@@ -16,6 +16,7 @@ struct ChannelQualityView: View {
     let channels: [ChannelRecommendation]
     @State private var mode: ChannelViewMode = .simple
     @State private var sortKey: SortKey = .rfScore
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var sortAscending: Bool = false
     @State private var selectedID: String?
 
@@ -48,7 +49,7 @@ struct ChannelQualityView: View {
         VStack(spacing: 0) {
             // Mode toggle
             HStack {
-                    Picker("", selection: $mode.animation(.bouncy)) {
+                    Picker("", selection: $mode.animation(reduceMotion ? nil : .bouncy)) {
                         ForEach(ChannelViewMode.allCases, id: \.self) { m in
                             Text(m.displayName).tag(m)
                         }

@@ -12,6 +12,7 @@ struct SettingsView: View {
     let bluetoothPermission: BluetoothPermissionManager?
     @Binding var bleEnabled: Bool
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var autoCheck: Bool
     @AppStorage("scanIntervalSeconds") private var scanInterval: Int = 3
@@ -48,7 +49,7 @@ struct SettingsView: View {
 
                 // MARK: - Appearance
                 Section {
-                    Picker(String(localized: "settings.appearance.theme_label", comment: "Theme picker label"), selection: $appearance.animation(.bouncy)) {
+                    Picker(String(localized: "settings.appearance.theme_label", comment: "Theme picker label"), selection: $appearance.animation(reduceMotion ? nil : .bouncy)) {
                         Text(String(localized: "common.label.system", comment: "Follow system setting option")).tag("system")
                         Text(String(localized: "common.label.light", comment: "Light appearance theme option")).tag("light")
                         Text(String(localized: "common.label.dark", comment: "Dark appearance theme option")).tag("dark")
@@ -64,7 +65,7 @@ struct SettingsView: View {
 
                 // MARK: - Scanner
                 Section(String(localized: "settings.scan.header", comment: "Scan interval settings section header")) {
-                    Picker(String(localized: "settings.scan.interval_label", comment: "Scan refresh interval picker label"), selection: $scanInterval.animation(.bouncy)) {
+                    Picker(String(localized: "settings.scan.interval_label", comment: "Scan refresh interval picker label"), selection: $scanInterval.animation(reduceMotion ? nil : .bouncy)) {
                         Text(String(localized: "settings.scan.interval_1s", comment: "1 second scan interval option")).tag(1)
                         Text(String(localized: "settings.scan.interval_2s", comment: "2 second scan interval option")).tag(2)
                         Text(String(localized: "settings.scan.interval_3s", comment: "3 second scan interval option")).tag(3)
@@ -79,7 +80,7 @@ struct SettingsView: View {
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
 
-                    Picker(String(localized: "settings.region.header", comment: "Regulatory region picker label"), selection: $regionOverride.animation(.bouncy)) {
+                    Picker(String(localized: "settings.region.header", comment: "Regulatory region picker label"), selection: $regionOverride.animation(reduceMotion ? nil : .bouncy)) {
                         Text(String(localized: "settings.region.auto_detect", comment: "Auto-detect regulatory region option")).tag("auto")
                         Text(String(localized: "settings.region.us_fcc", comment: "US FCC regulatory region option")).tag("US")
                         Text(String(localized: "settings.region.jp_mic", comment: "Japan MIC regulatory region option")).tag("JP")
@@ -108,7 +109,7 @@ struct SettingsView: View {
                             Toggle("", isOn: Binding(
                                 get: { bleEnabled },
                                 set: { newValue in
-                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) {
                                         bleEnabled = newValue
                                     }
                                 }
@@ -177,7 +178,7 @@ struct SettingsView: View {
                 } header: {
                     Text(String(localized: "settings.section.permissions", comment: "System permissions subsection header in settings"))
                 }
-                .animation(.easeInOut(duration: 0.3), value: bleEnabled)
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.3), value: bleEnabled)
 
                 // MARK: - MCP
                 Section {
@@ -291,6 +292,7 @@ struct SettingsView: View {
 
 private struct PermissionStatusBadge: View {
     let isAuthorized: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var statusText: String {
         isAuthorized
@@ -304,7 +306,7 @@ private struct PermissionStatusBadge: View {
                 .fill(isAuthorized ? Color.green : Color.orange)
                 .frame(width: 8, height: 8)
                 .accessibilityHidden(true)
-                .animation(.easeInOut(duration: 0.22), value: isAuthorized)
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: isAuthorized)
             ZStack {
                 Text(String(localized: "common.label.granted", comment: "Permission granted status"))
                     .opacity(isAuthorized ? 1 : 0)
@@ -314,7 +316,7 @@ private struct PermissionStatusBadge: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .contentTransition(.opacity)
-                .animation(.easeInOut(duration: 0.22), value: isAuthorized)
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: isAuthorized)
         }
         .accessibilityLabel(statusText)
     }
