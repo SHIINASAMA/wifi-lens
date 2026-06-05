@@ -202,7 +202,7 @@ struct SettingsView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
                         Text(String(format: String(localized: "format.claude_config_json", comment: "Claude Desktop MCP config JSON template"), mcpPort))
-                            .font(.system(size: 10, design: .monospaced))
+                            .font(.caption.monospaced())
                             .foregroundColor(.secondary)
                             .textSelection(.enabled)
                     }

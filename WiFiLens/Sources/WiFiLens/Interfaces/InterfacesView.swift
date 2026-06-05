@@ -120,7 +120,7 @@ struct InterfacesView: View {
                         .foregroundColor(.secondary)
                     if let latency = gatewayLatency {
                         Text(String(format: "%.1f ms", latency))
-                            .font(.system(size: 11, design: .monospaced))
+                            .font(.caption.monospacedDigit())
                             .foregroundColor(latencyColor(latency))
                     }
                 }
@@ -181,12 +181,12 @@ struct InterfacesView: View {
     private func indicatorPill(title: String, value: String, subtitle: String?, color: Color, bar: AnyView?) -> some View {
         VStack(spacing: 0) {
             Spacer(minLength: 0)
-            Text(title).font(.system(size: 9)).foregroundColor(.secondary)
+            Text(title).font(.caption2).foregroundColor(.secondary)
             Spacer().frame(height: 6)
-            Text(value).font(.system(size: 15, weight: .semibold)).foregroundColor(color)
+            Text(value).font(.title3.weight(.semibold)).foregroundColor(color)
             Spacer().frame(height: 4)
             if let sub = subtitle {
-                Text(sub).font(.system(size: 10)).foregroundColor(.secondary)
+                Text(sub).font(.caption).foregroundColor(.secondary)
             }
             Spacer().frame(height: 4)
             if let bar = bar {
@@ -342,7 +342,7 @@ struct InterfacesView: View {
                 Image(systemName: "chart.line.uptrend.xyaxis")
                     .font(.caption)
                 Text(String(localized: "interfaces.field.throughput", comment: "Throughput section header"))
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.callout.weight(.semibold))
                 Spacer()
                 Text(selectedMonitorRate)
                     .font(.caption)
@@ -366,7 +366,7 @@ struct InterfacesView: View {
                 Image(systemName: "list.bullet.rectangle")
                     .font(.caption)
                 Text(String(localized: "nav.interfaces", comment: "Interfaces sidebar navigation item"))
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.callout.weight(.semibold))
                 Spacer()
                 Text("\(monitorInterfaces.count) \(String(localized: "interfaces.label.interfaces", comment: "Interfaces plural unit"))")
                     .font(.caption)
@@ -409,12 +409,12 @@ struct InterfacesView: View {
                     } label: {
                         HStack(spacing: 10) {
                             Image(systemName: name.hasPrefix("en") ? "wifi" : "cable.connector")
-                                .font(.system(size: 12))
+                                .font(.callout)
                                 .foregroundColor(isSelected ? .accentColor : .secondary)
                                 .frame(width: 20)
 
                             Text(name)
-                                .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
+                                .font(isSelected ? .subheadline.weight(.semibold) : .subheadline)
                                 .foregroundColor(.primary)
                                 .frame(width: 60, alignment: .leading)
 
@@ -422,18 +422,18 @@ struct InterfacesView: View {
 
                             if let s = lastSample {
                                 Text(rateDown(s.rateIn))
-                                    .font(.system(size: 11, design: .monospaced))
+                                    .font(.caption.monospacedDigit())
                                     .foregroundColor(s.rateIn == 0 ? .secondary.opacity(0.5) : .green)
                                     .frame(width: 72, alignment: .trailing)
                                     .lineLimit(1)
                                 Text(rateUp(s.rateOut))
-                                    .font(.system(size: 11, design: .monospaced))
+                                    .font(.caption.monospacedDigit())
                                     .foregroundColor(s.rateOut == 0 ? .secondary.opacity(0.5) : .blue)
                                     .frame(width: 72, alignment: .trailing)
                                     .lineLimit(1)
                             } else {
-                                Text("—").font(.system(size: 12)).foregroundColor(.secondary).frame(width: 72)
-                                Text("—").font(.system(size: 12)).foregroundColor(.secondary).frame(width: 72)
+                                Text("—").font(.callout).foregroundColor(.secondary).frame(width: 72)
+                                Text("—").font(.callout).foregroundColor(.secondary).frame(width: 72)
                             }
                         }
                         .padding(.horizontal, 16)
@@ -645,11 +645,11 @@ private struct InterfaceCard: View {
         let isEmpty = value.isEmpty || value == "—"
         return HStack(spacing: 4) {
             Text(label)
-                .font(.system(size: 10))
+                .font(.caption)
                 .foregroundColor(.secondary)
                 .frame(width: 56, alignment: .trailing)
             Text(isEmpty ? "—" : value)
-                .font(.system(size: 12, design: isEmpty ? .default : .monospaced))
+                .font(isEmpty ? .callout : .callout.monospacedDigit())
                 .foregroundColor(isEmpty ? .secondary.opacity(0.6) : .primary)
                 .textSelection(.enabled)
                 .lineLimit(1)
@@ -662,11 +662,11 @@ private struct InterfaceCard: View {
         let isEmpty = value.isEmpty || value == "—"
         return HStack(spacing: 4) {
             Text(label)
-                .font(.system(size: 10))
+                .font(.caption)
                 .foregroundColor(.secondary)
                 .frame(width: 56, alignment: .trailing)
             Text(isEmpty ? "—" : value)
-                .font(.system(size: 12))
+                .font(.callout)
                 .foregroundColor(isEmpty ? .secondary.opacity(0.6) : .primary)
                 .lineLimit(1)
             Spacer(minLength: 0)
@@ -680,7 +680,7 @@ private struct InterfaceCard: View {
         case .virtual:  (String(localized: "interfaces.label.virtual", comment: "Virtual interface type label"), .secondary.opacity(0.8))
         }
         return Text(label)
-            .font(.system(size: 8, weight: .semibold))
+            .font(.caption2.weight(.semibold))
             .foregroundColor(color)
             .padding(.horizontal, 5)
             .padding(.vertical, 2)
@@ -696,11 +696,11 @@ private struct InterfaceCard: View {
             HStack(spacing: 6) {
                 typeBadge(t)
                 Text(t == .wifi ? (info.ssid ?? info.interfaceName) : info.interfaceName)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
                 if t == .wifi, !info.displayRSSI.isEmpty, info.displayRSSI != "—" {
                     Text(info.displayRSSI)
-                        .font(.system(size: 10, design: .monospaced))
+                        .font(.caption.monospacedDigit())
                         .foregroundColor(rssiColor(info.rssi ?? -100))
                         .padding(.horizontal, 5)
                         .padding(.vertical, 1)
@@ -710,7 +710,7 @@ private struct InterfaceCard: View {
                 Spacer()
                 if t != .virtual {
                     Text(info.interfaceName)
-                        .font(.system(size: 9))
+                        .font(.caption2)
                         .foregroundColor(.secondary)
                 }
             }

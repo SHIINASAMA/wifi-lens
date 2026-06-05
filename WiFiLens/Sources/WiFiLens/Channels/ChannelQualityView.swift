@@ -91,10 +91,10 @@ struct ChannelQualityView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 6) {
                         Image(systemName: "info.circle.fill")
-                            .font(.system(size: 10))
+                            .font(.caption)
                             .foregroundColor(.accentColor)
                         Text(String(localized: "channels.banner.regulatory", comment: "Info banner about regulatory-aware recommendations"))
-                            .font(.system(size: 10))
+                            .font(.caption)
                             .foregroundColor(.secondary)
                     }
                 }
@@ -173,10 +173,10 @@ struct ChannelQualityView: View {
                 Text(text)
                 if sortKey == key {
                     Image(systemName: sortAscending ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 7, weight: .bold))
+                        .font(.caption2.weight(.bold))
                 }
             }
-            .font(.system(size: 10, weight: .medium))
+            .font(.caption.weight(.medium))
             .foregroundColor(sortKey == key ? .primary : .secondary)
             .frame(maxWidth: .infinity, alignment: .center)
         }
@@ -191,7 +191,7 @@ struct ChannelQualityView: View {
     }
 
     private func cell(_ text: String, bold: Bool = false, color: Color = .primary) -> some View {
-        Text(text).font(.system(size: 11, weight: bold ? .semibold : .regular))
+        Text(text).font(bold ? .caption.weight(.semibold) : .caption)
             .foregroundColor(color).frame(maxWidth: .infinity, alignment: .center).padding(.vertical, 5)
     }
 }
@@ -210,11 +210,11 @@ private struct ChannelCard: View {
                         .frame(width: 44, height: 44)
                         .accessibilityHidden(true)
                     Text("\(channel.channel)")
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .font(.title2.weight(.bold).monospacedDigit())
                         .foregroundColor(Color(hex: channel.rfLevel.color))
                 }
                 Text(channel.bandDisplay)
-                    .font(.system(size: 9))
+                    .font(.caption2)
                     .foregroundColor(.secondary)
             }
             .frame(width: 54)
@@ -222,7 +222,7 @@ private struct ChannelCard: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
                     Text(channel.rfLevel.displayName)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.subheadline.weight(.semibold))
                         .foregroundColor(Color(hex: channel.rfLevel.color))
                     if channel.rfIsRecommended { badge(String(localized: "channels.badge.recommended", comment: "Star badge marking recommended channel"), color: "#FF9F0A") }
                     if channel.rfIsRecommended && !channel.recommendationReasons.isEmpty {
@@ -245,7 +245,7 @@ private struct ChannelCard: View {
                 }
                 .frame(height: 6)
                 Text("\(channel.rfScore)/100")
-                    .font(.system(size: 11, design: .monospaced))
+                    .font(.caption.monospacedDigit())
                     .foregroundColor(.secondary)
             }
 
@@ -253,24 +253,24 @@ private struct ChannelCard: View {
 
             VStack(alignment: .trailing, spacing: 4) {
                 HStack(spacing: 4) {
-                    Text(String(localized: "channels.card.co_label", comment: "Co-channel label on detail card")).font(.system(size: 9)).foregroundColor(.secondary)
-                    Text("\(channel.coChannelCount)").font(.system(size: 12, weight: .medium))
-                    Text(String(localized: "channels.card.adj_label", comment: "Adjacent channel label on detail card")).font(.system(size: 9)).foregroundColor(.secondary)
-                    Text("\(channel.adjacentCount)").font(.system(size: 12, weight: .medium))
+                    Text(String(localized: "channels.card.co_label", comment: "Co-channel label on detail card")).font(.caption2).foregroundColor(.secondary)
+                    Text("\(channel.coChannelCount)").font(.callout.weight(.medium))
+                    Text(String(localized: "channels.card.adj_label", comment: "Adjacent channel label on detail card")).font(.caption2).foregroundColor(.secondary)
+                    Text("\(channel.adjacentCount)").font(.callout.weight(.medium))
                 }
                 HStack(spacing: 4) {
-                    Image(systemName: "wave.3.right").font(.system(size: 9)).foregroundColor(.secondary)
-                    Text("\(channel.strongestNeighborRSSI) dBm").font(.system(size: 11)).foregroundColor(.secondary)
+                    Image(systemName: "wave.3.right").font(.caption2).foregroundColor(.secondary)
+                    Text("\(channel.strongestNeighborRSSI) dBm").font(.caption).foregroundColor(.secondary)
                 }
                 HStack(spacing: 4) {
                     Text(channel.overlapLevel.displayName)
-                        .font(.system(size: 10))
+                        .font(.caption)
                         .foregroundColor(overlapColor(channel.overlapLevel))
                         .padding(.horizontal, 6).padding(.vertical, 2)
                         .background(overlapColor(channel.overlapLevel).opacity(0.12))
                         .clipShape(RoundedRectangle(cornerRadius: 4))
                     Text(String(localized: "channels.card.overlap_label", comment: "Overlap label on detail card"))
-                        .font(.system(size: 9))
+                        .font(.caption2)
                         .foregroundColor(.secondary)
                 }
             }
@@ -285,7 +285,7 @@ private struct ChannelCard: View {
 
     private func badge(_ text: String, color: String) -> some View {
         Text(text)
-            .font(.system(size: 9, weight: .medium))
+            .font(.caption2.weight(.medium))
             .foregroundColor(Color(hex: color))
     }
 

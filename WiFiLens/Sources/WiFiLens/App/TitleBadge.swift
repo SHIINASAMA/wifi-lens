@@ -22,7 +22,7 @@ struct TitleBadge: View {
             // no action yet
         } label: {
             Text(String(localized: "settings.app.title_badge_oss", comment: "OSS edition title badge text"))
-                .font(.system(size: 13, weight: .medium))
+                .font(.subheadline.weight(.medium))
                 .foregroundColor(Color(red: 130/255, green: 89/255, blue: 221/255))
                 .frame(height: 34)
                 .padding(.horizontal, 14)
@@ -45,10 +45,10 @@ struct TitleBadge: View {
         } label: {
             Label {
                 Text(String(localized: "settings.app.title_badge_pro", comment: "PRO edition title badge text"))
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.subheadline.weight(.semibold))
             } icon: {
                 Image(systemName: "star.fill")
-                    .font(.system(size: 10))
+                    .font(.caption)
             }
             .foregroundColor(Color(red: 180/255, green: 130/255, blue: 30/255))
             .frame(height: 34)

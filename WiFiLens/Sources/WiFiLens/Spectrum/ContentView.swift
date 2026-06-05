@@ -160,7 +160,7 @@ struct ContentView: View {
             section.icon
 
             Text(section.title)
-                .font(.system(size: 12, weight: .semibold))
+                .font(.callout.weight(.semibold))
 
             Spacer()
 
@@ -219,7 +219,7 @@ struct ContentView: View {
     private var tableFilterBar: some View {
         HStack(spacing: 12) {
             Text(String(localized: "spectrum.filter.show_label", comment: "Label for band filter checkboxes"))
-                .font(.system(size: 10))
+                .font(.caption)
                 .foregroundColor(.secondary)
             bandToggle(String(localized: "wifi.band.24ghz", comment: "2.4 GHz Wi-Fi band name"), bandID: "24")
             bandToggle(String(localized: "wifi.band.5ghz", comment: "5 GHz Wi-Fi band name"), bandID: "5")
@@ -229,7 +229,7 @@ struct ContentView: View {
             Text("·")
                 .foregroundColor(.secondary)
             Toggle(isOn: $viewModel.hideHiddenSSIDs) {
-                Text(String(localized: "spectrum.filter.hide_hidden", comment: "Toggle to hide networks with hidden SSIDs")).font(.system(size: 11))
+                Text(String(localized: "spectrum.filter.hide_hidden", comment: "Toggle to hide networks with hidden SSIDs")).font(.caption)
             }
             .toggleStyle(.checkbox)
             Spacer()
@@ -258,7 +258,7 @@ struct ContentView: View {
             }
         })
         return Toggle(isOn: isOn) {
-            Text(label).font(.system(size: 11))
+            Text(label).font(.caption)
         }
         .toggleStyle(.checkbox)
     }

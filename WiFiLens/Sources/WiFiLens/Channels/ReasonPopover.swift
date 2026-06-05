@@ -18,7 +18,7 @@ struct ReasonPopover: View {
                     .fill(.ultraThinMaterial)
                     .frame(width: 20, height: 20)
                 Text("?")
-                    .font(.system(size: 11, weight: .bold))
+                    .font(.caption.weight(.bold))
                     .foregroundColor(.secondary)
             }
         }
@@ -38,15 +38,15 @@ struct ReasonPopover: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(String(localized: "channels.reason.popover.title",
                             comment: "Title for recommendation reason popover"))
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.caption.weight(.semibold))
 
                 ForEach(reasons, id: \.self) { reason in
                     HStack(alignment: .top, spacing: 6) {
                         Text("•")
                             .foregroundColor(.secondary)
-                            .font(.system(size: 11))
+                            .font(.caption)
                         Text(reason.displayText)
-                            .font(.system(size: 11))
+                            .font(.caption)
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }

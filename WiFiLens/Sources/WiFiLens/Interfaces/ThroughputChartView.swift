@@ -11,18 +11,18 @@ struct ThroughputChartView: View {
                 HStack(spacing: 4) {
                     Circle().fill(.green).frame(width: 6, height: 6)
                     Text(String(localized: "common.label.download", comment: "Download/throughput receive label"))
-                        .font(.system(size: 10))
+                        .font(.caption)
                         .foregroundColor(.secondary)
                 }
                 HStack(spacing: 4) {
                     Circle().fill(.blue).frame(width: 6, height: 6)
                     Text(String(localized: "common.label.upload", comment: "Upload/throughput send label"))
-                        .font(.system(size: 10))
+                        .font(.caption)
                         .foregroundColor(.secondary)
                 }
                 Spacer()
                 Text(interfaceName)
-                    .font(.system(size: 10, weight: .medium))
+                    .font(.caption.weight(.medium))
                     .foregroundColor(.secondary)
             }
             .padding(.horizontal, chartStyle.leftAxisWidth + 4)
