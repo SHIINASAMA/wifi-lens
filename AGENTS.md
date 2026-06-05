@@ -11,6 +11,7 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/ARCHITECTURE.md` | Architecture, data flow, key patterns, design conventions |
 | `docs/CHARTS.md` | Universal Chart engine, types, rendering pipeline, WiFi spectrum integration |
 | `docs/BLE.md` | BLE scanner architecture, data flow, types, views |
+| `docs/ACCESSIBILITY.md` | Accessibility implementation status, App Store Connect categories, gaps, testing |
 | `docs/REGULATORY.md` | Regulatory pipeline, region inference, channel recommendation |
 | `docs/TESTING.md` | Test architecture, UI test setup, launch arguments, Pro target setup, common issues |
 | `docs/COLLABORATION_RULES.md` | AI assistant behavior rules — enforced prohibitions and must-follows |
