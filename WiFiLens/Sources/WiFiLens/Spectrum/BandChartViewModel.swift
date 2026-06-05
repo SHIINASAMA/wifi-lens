@@ -7,7 +7,6 @@ final class BandChartViewModel {
     /// Set by the app root to respect Reduce Motion accessibility setting.
     nonisolated(unsafe) static var reduceMotion = false
 
- {
     let band: ChannelBand
 
     var isExpanded: Bool = false

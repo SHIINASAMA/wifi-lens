@@ -16,6 +16,7 @@ struct BLETrendChartView: View {
                 .frame(height: chartHeight)
         } else {
             Chart(series: buildSeries(), axis: axisConfig, style: chartStyle)
+                .accessibilityLabel("BLE RSSI trend chart, \(samples.count) samples, range \(Int(samples.map(\.smoothedRSSI).min() ?? 0)) to \(Int(samples.map(\.smoothedRSSI).max() ?? 0)) dBm")
                 .frame(height: chartHeight)
         }
     }

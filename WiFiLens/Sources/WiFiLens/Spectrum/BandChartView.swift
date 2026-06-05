@@ -126,6 +126,7 @@ struct WiFiBandChart: View {
                         heatmapOverlay(geo: chartGeo)
                         dataLabelOverlay(geo: chartGeo)
                     }
+                    .accessibilityLabel("WiFi spectrum chart")
                     .onContinuousHover(coordinateSpace: .local) { phase in
                         switch phase {
                         case .active(let location):
@@ -168,6 +169,8 @@ struct WiFiBandChart: View {
                 }
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Channel occupancy heatmap")
     }
 
     private func dataLabelOverlay(geo: ChartGeometry) -> some View {
@@ -223,6 +226,7 @@ struct WiFiBandChart: View {
                         heatmapOverlay(geo: chartGeo)
                         dataLabelOverlay(geo: chartGeo)
                     }
+                    .accessibilityLabel("WiFi spectrum chart")
                     .onContinuousHover(coordinateSpace: .local) { phase in
                         switch phase {
                         case .active(let location):
