@@ -7,6 +7,7 @@ This document tracks the app's accessibility implementation status across all Ap
 | Category | macOS Support | Status | Notes |
 |----------|:---:|:---:|------|
 | Dark Mode | ✅ Native | ✅ **Done** | Three-way picker (System/Light/Dark), `preferredColorScheme` |
+| Keyboard Navigation | ✅ Native | ✅ **Done** | Cmd+1~6 for sidebar pages, Cmd+, for Settings, Cmd+Shift+E for export |
 | VoiceOver | ✅ Native | ✅ **Done** | Controls labeled, Canvas charts have descriptive accessibility labels |
 | Voice Control | ✅ Native | ✅ **Done** | VoiceOver labels covered; Canvas interactive via system hit testing |
 | Larger Text | ❌ Incomplete | ❌ **Skipped** | macOS SwiftUI `DynamicTypeSize` does not track system setting; `@ScaledMetric` is inert on macOS |

@@ -154,6 +154,7 @@ struct SidebarView: View {
                     .accessibilityIdentifier("sidebar-settings")
             }
         }
+        .id(selectedPage)
         .background(.ultraThinMaterial)
         .frame(minWidth: 160, idealWidth: 180)
     }

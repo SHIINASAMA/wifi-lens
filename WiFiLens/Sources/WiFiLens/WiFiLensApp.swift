@@ -308,7 +308,39 @@ struct WiFiLensApp: App {
             if mcpEnabled { updateMCPServer() }
         }
         .commands {
-            CommandGroup(after: .toolbar) {
+            CommandGroup(before: .toolbar) {
+                Button(String(localized: "nav.overview", comment: "Navigate to Overview page")) {
+                    selectedPage = .overview
+                }
+                .keyboardShortcut("1", modifiers: .command)
+                
+                Button(String(localized: "nav.spectrum", comment: "Navigate to Spectrum page")) {
+                    selectedPage = .spectrum
+                }
+                .keyboardShortcut("2", modifiers: .command)
+                
+                Button(String(localized: "nav.channels", comment: "Navigate to Channels page")) {
+                    selectedPage = .channels
+                }
+                .keyboardShortcut("3", modifiers: .command)
+                
+                Button(String(localized: "nav.interfaces", comment: "Navigate to Interfaces page")) {
+                    selectedPage = .interfaces
+                }
+                .keyboardShortcut("4", modifiers: .command)
+                
+                Button(String(localized: "nav.roaming_test", comment: "Navigate to Roaming page")) {
+                    selectedPage = .roaming
+                }
+                .keyboardShortcut("5", modifiers: .command)
+                
+                Button(String(localized: "nav.ble_scanner", comment: "Navigate to BLE Scanner page")) {
+                    selectedPage = .bleScanner
+                }
+                .keyboardShortcut("6", modifiers: .command)
+            }
+
+                        CommandGroup(after: .toolbar) {
                 Menu(String(localized: "common.action.export", comment: "Export menu item or button")) {
                     ForEach(viewModel.bandViewModels, id: \.band.id) { vm in
                         Menu(vm.band.displayName) {
