@@ -7,12 +7,12 @@ This document tracks the app's accessibility implementation status across all Ap
 | Category | macOS Support | Status | Notes |
 |----------|:---:|:---:|------|
 | Dark Mode | ✅ Native | ✅ **Done** | Three-way picker (System/Light/Dark), `preferredColorScheme` |
-| VoiceOver | ✅ Native | ⚠️ **Partial** | Controls labeled; Canvas charts lack accessibility representation |
-| Voice Control | ✅ Native | ⚠️ **Partial** | Same gap as VoiceOver — Canvas hit targets not exposed |
+| VoiceOver | ✅ Native | ✅ **Done** | Controls labeled, Canvas charts have descriptive accessibility labels |
+| Voice Control | ✅ Native | ✅ **Done** | VoiceOver labels covered; Canvas interactive via system hit testing |
 | Larger Text | ❌ Incomplete | ❌ **Skipped** | macOS SwiftUI `DynamicTypeSize` does not track system setting; `@ScaledMetric` is inert on macOS |
-| Differentiate Without Color | ✅ Universal | ⚠️ **Partial** | Quality labels + RSSI values augment color; Canvas curves need legend overlay |
+| Differentiate Without Color | ✅ Universal | ✅ **Done** | Data labels on Canvas curves, dBm text + quality text labels augment color |
 | Sufficient Contrast | ✅ Universal | ✅ **Done** | System Materials provide adequate contrast; verified via Accessibility Inspector |
-| Reduce Motion | ✅ Native | ✅ **Done** | Gaussian curve animations, `.bouncy` transitions need motion-respecting guard |
+| Reduce Motion | ✅ Native | ✅ **Done** | All `.animation(.bouncy)` picker transitions, `withAnimation` calls, and `displayRSSI` Gaussian interpolation skip when Reduce Motion is enabled |
 | Captions / Audio Description | N/A | — | No video/audio content |
 
 ## Architecture
@@ -34,20 +34,6 @@ Implementation approach: add a `@Environment(\.accessibilityReduceMotion)` check
 
 Gaps identified:
 
-| Location | Current | Fix |
-|----------|---------|-----|
-| Spectrum chart (Canvas) | Gaussian curves colored by SSID, no legend | Add overlay legend with SSID labels |
-| BLE trend chart | Raw/smoothed lines colored only | Add pattern distinction (dashed/solid) or legend |
-| Quality level cards | Hex color + text label ✅ | Already good |
-| RSSI bars | Color + dBm value ✅ | Already good |
-
-### VoiceOver / Canvas
-
-The Chart engine renders via `Canvas` / `context.draw(Text(...))`. VoiceOver cannot read Canvas content. Mitigations:
-
-- Add `.accessibilityElement(children: .ignore)` + `.accessibilityLabel(...)` on each band chart, describing network count and strongest signal
-- NativeTableView (AppKit `NSTableView`) has built-in accessibility; verify sort/select state is conveyed
-- Band chart expand button has `.accessibilityLabel` ✅
 
 ## Testing
 
