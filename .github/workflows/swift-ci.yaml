@@ -102,7 +102,7 @@ jobs:
 
       - name: Create DMG
         run: |
-          bash scripts/create-dmg.sh "$APP_NAME.app" "$APP_NAME.dmg"
+          bash ../scripts/create-dmg.sh "$APP_NAME.app" "$APP_NAME.dmg"
 
       - name: Sign DMG
         run: |
