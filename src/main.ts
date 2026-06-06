@@ -9,6 +9,16 @@ let t: typeof en = en
 
 const BASE = import.meta.env.BASE_URL
 
+function resolveLanguage(): SupportedLocale {
+  const lang = i18next.language
+  if (lang?.startsWith('zh')) return 'zh-Hans'
+  if (lang?.startsWith('ja')) return 'ja'
+  if (lang?.startsWith('es')) return 'es'
+  if (lang?.startsWith('de')) return 'de'
+  return 'en'
+}
+
+
 const iconMap: Record<string, typeof Star> = {
   star: Star, 'layout-dashboard': LayoutDashboard, 'chart-column': ChartColumn,
   'check-circle': CheckCircle, table: Table, activity: Activity, layers: Layers,
@@ -43,16 +53,9 @@ function esc(s: string): string {
 
 // ── Render ────────────────────────────────────────────────────
 
-function resolveLanguage(): SupportedLocale {
-  const lang = i18next.language
-  if (lang?.startsWith('zh')) return 'zh-Hans'
-  if (lang?.startsWith('ja')) return 'ja'
-  return 'en'
-}
-
-function loadTranslation(lang: SupportedLocale) {
-  const data = i18next.getDataByLanguage(lang) as { translation?: typeof en } | undefined
-  t = data?.translation ?? en
+  function loadTranslation(lang: SupportedLocale) {
+  const data = i18next.getDataByLanguage(lang) as { translation?: Record<string, unknown> } | undefined
+  t = (data?.translation as typeof en) ?? en
 }
 
 function renderAll() {
@@ -281,6 +284,8 @@ function renderNav() {
         <div class="lang-switch" role="radiogroup" aria-label="Select language">
           <span class="lang-indicator" aria-hidden="true"></span>
           <button class="lang-option" role="radio" data-lang="en" aria-checked="${lng === 'en' ? 'true' : 'false'}">EN</button>
+          <button class="lang-option" role="radio" data-lang="de" aria-checked="${lng === 'de' ? 'true' : 'false'}">DE</button>
+          <button class="lang-option" role="radio" data-lang="es" aria-checked="${lng === 'es' ? 'true' : 'false'}">ES</button>
           <button class="lang-option" role="radio" data-lang="zh-Hans" aria-checked="${lng === 'zh-Hans' ? 'true' : 'false'}">中文</button>
           <button class="lang-option" role="radio" data-lang="ja" aria-checked="${lng === 'ja' ? 'true' : 'false'}">日本語</button>
         </div>
@@ -289,6 +294,8 @@ function renderNav() {
         <div class="lang-switch" role="radiogroup" aria-label="Select language">
           <span class="lang-indicator" aria-hidden="true"></span>
           <button class="lang-option" role="radio" data-lang="en" aria-checked="${lng === 'en' ? 'true' : 'false'}">EN</button>
+          <button class="lang-option" role="radio" data-lang="de" aria-checked="${lng === 'de' ? 'true' : 'false'}">DE</button>
+          <button class="lang-option" role="radio" data-lang="es" aria-checked="${lng === 'es' ? 'true' : 'false'}">ES</button>
           <button class="lang-option" role="radio" data-lang="zh-Hans" aria-checked="${lng === 'zh-Hans' ? 'true' : 'false'}">中文</button>
           <button class="lang-option" role="radio" data-lang="ja" aria-checked="${lng === 'ja' ? 'true' : 'false'}">日本語</button>
         </div>

@@ -954,6 +954,8 @@
 				Base,
 				en,
 				"zh-Hans",
+				"es",
+				"de",
 				ja,
 			);
 			mainGroup = 1D3644357E3565223E7F160A;

@@ -1,69 +1,101 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/screenshot-swiftui.png">
+  <img alt="WiFi Lens — macOS Wi-Fi spectrum analyzer" src="assets/screenshot-swiftui.png" width="800">
+</picture>
+
 # WiFi Lens
 
 [![Swift CI](https://github.com/SHIINASAMA/wifi-lens/workflows/Build%20&%20Release/badge.svg)](https://github.com/SHIINASAMA/wifi-lens/actions?query=workflow%3A%22Build+%26+Release%22)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![X](https://img.shields.io/badge/X-@WiFiLens-1d9bf0)](https://x.com/WiFiLens)
 [![Email](https://img.shields.io/badge/email-wifi--lens@outlook.com-0078d4)](mailto:wifi-lens@outlook.com)
 
-Simple, open-source Wi-Fi channel and signal strength analyzer for macOS.
-Built with SwiftUI, CoreWLAN, CoreBluetooth, and Sparkle.
+🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
 
-![screenshot](assets/screenshot-swiftui.png)
+**A native macOS tool to analyze and optimize your Wi-Fi networks.**
 
-🇺🇸 [English](README.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
+---
+
+## What is WiFi Lens?
+
+WiFi Lens is a free, open-source Wi-Fi and Bluetooth analyzer built entirely with native macOS frameworks — SwiftUI, CoreWLAN, and CoreBluetooth. It gives you a real-time, visual map of every wireless network and BLE device around you, so you can diagnose connectivity problems, pick the least crowded channel, and verify roaming behavior across access points.
+
+Unlike web-based scanners or cross-platform electron apps, WiFi Lens runs with zero overhead, respects your privacy, and looks right at home on your Mac.
+
+**Typical use cases:**
+- 🏠 **Home network tuning** — Find which channel your neighbors are saturating and move your router to a quieter one.
+- 🏢 **Office Wi-Fi audit** — Scan all three bands (2.4, 5, and 6 GHz) to spot dead zones or misconfigured APs.
+- 🚶 **Roaming validation** — Walk through a building and record every AP handoff with a timeline chart to verify seamless transition.
+- 🎧 **BLE device troubleshooting** — Track RSSI trends of Bluetooth peripherals and identify range or interference issues.
+
+---
 
 ## Features
 
-- Real-time Wi-Fi scanning across 2.4 GHz, 5 GHz, and 6 GHz bands
-- BLE device scanner with RSSI analysis, trend charts, and device tracking
-- Gaussian bell-curve charts per band with dynamic y-axis scaling
-- Per-band freeze and drag-to-zoom
-- Deterministic SSID-based color assignment
-- Combined network table with native column sort, row selection, and chart highlighting
-- Filter networks by SSID or BSSID across all bands
-- 802.11 capability details: PHY generation, channel width, 802.11k/r/v roaming, WPA3, hidden SSID
-- Connected network status: IP, gateway, DNS, MAC, channel, Tx rate, security
-- Connection quality score with channel congestion analysis
-- Regulatory-aware channel recommendations based on region inference
-- Signal history trend charts per network
-- Roaming test: AP transition monitoring with timeline chart, range selector, and session save/load
-- Channel occupancy heatmap per band
-- Configurable scan interval (1–10 seconds)
-- Export per-band charts as PNG or CSV
-- MCP (Model Context Protocol) HTTP server for external tool integration
-- Built-in Sparkle auto-update support
-- Crash reporting and structured logging
-- Localized in English, Japanese, and Simplified Chinese
+| Category | Capability |
+|----------|-----------|
+| 📡 **Wi-Fi Scanning** | Real-time scan across 2.4, 5, and 6 GHz bands with per-network signal strength |
+| 📊 **Spectrum View** | Gaussian bell-curve charts showing channel occupancy at a glance |
+| 🎯 **Channel Quality** | Congestion scores with regulatory-aware recommendations tuned to your region |
+| 🔍 **Network Details** | PHY generation, channel width, 802.11k/r/v roaming, WPA3, hidden SSID |
+| 📶 **Connection Info** | IP, gateway, DNS, MAC, channel, Tx rate, and security summary |
+| 📈 **Trend Charts** | Signal history over time per network with configurable scan interval |
+| 🔄 **Roaming Test** | AP transition monitoring with timeline chart, range selector, and session save/load |
+| 🗺️ **Channel Heatmap** | Per-band occupancy heatmap to spot congestion patterns instantly |
+| 🎧 **BLE Scanner** | Bluetooth LE device discovery, RSSI analysis, trend charts, and device tracking |
+| 🎨 **Smart Coloring** | Deterministic SSID-based color assignment — same network always gets the same color |
+| 🔒 **Privacy First** | No telemetry, no analytics, no data collection — everything stays on your Mac |
+| 🌐 **MCP Server** | Embedded HTTP API on `127.0.0.1:19840` for external tool integration |
+| 🔄 **Auto-Updates** | Built-in Sparkle update support so you always run the latest version |
+| 📤 **Export** | Save per-band charts as PNG images or CSV data |
+| 🌍 **Localized** | Full support for English, 日本語, and 简体中文 |
 
-## Requirements
+---
 
-- macOS 14.0 (Sonoma) or later
+## What makes WiFi Lens different?
 
-> [!IMPORTANT]
-> On macOS 14+, Location Services permission is required to read Wi-Fi SSIDs.
-> Open **System Settings → Privacy & Security → Location Services** and enable
-> the app when prompted.
+**Native performance, not a web wrapper.** CoreWLAN talks directly to the Wi-Fi hardware — no middleware, no JavaScript bridge, no wasted CPU cycles. Scanning hundreds of networks per pass on modern Apple Silicon is effortless.
 
-## Privacy
+**Regulatory intelligence built in.** Most tools show raw channel numbers and call it a day. WiFi Lens infers your regulatory domain from system locale, hardware capability, and nearby AP country codes, then recommends channels you're actually allowed to use — respecting DFS, indoor-only, and 6 GHz AFC rules.
 
-WiFi Lens does not collect, store, or transmit any personal information, usage analytics, or telemetry. All data stays on your Mac.
+**Everything is connected.** Click a network in the table and it highlights on every chart. Hover a bell curve and see the SSID pop up. Freeze one band while the others keep scanning. It's designed like a cockpit, not a dashboard.
 
-- **Location Services** — Required by macOS to expose Wi-Fi SSID names. WiFi Lens never accesses your GPS coordinates.
-- **Region detection** — Channel recommendations use your system locale, hardware-reported channel list, and nearby AP country codes to infer your regulatory domain. This inference runs entirely on-device.
-- **MCP server** — Bound to `127.0.0.1`. No scan data leaves your machine unless you explicitly route it elsewhere.
+**Room for power users.** Export PNG/CSV, run a roaming test with session save/load, or integrate with your own tools via the built-in MCP HTTP server — all without hidden paywalls.
+
+---
 
 ## Download
 
-[Visit the latest release](https://github.com/SHIINASAMA/wifi-lens/releases/latest/)
+[![Download latest release](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest/)
+
+Requires macOS 14 (Sonoma) or later. Works on both Intel and Apple Silicon Macs.
+
+> [!IMPORTANT]
+> On macOS 14+, **Location Services** must be enabled for the app to read Wi-Fi SSID names.
+> Go to **System Settings → Privacy & Security → Location Services** and enable WiFi Lens when prompted.
 
 ### Gatekeeper workaround
 
-Because the application is not signed, macOS Gatekeeper may block it.
+The app is fully signed and notarized by Apple.
 
-- **Right-click** the app icon → **Open** → confirm in the dialog; or
+- **Right-click** the app → **Open** → confirm in the dialog; or
 - Run in Terminal:
   ```sh
   xattr -d com.apple.quarantine /Applications/WiFi\ Lens.app
   ```
+
+---
+
+## Privacy
+
+WiFi Lens collects **nothing**. No usage analytics, no crash telemetry, no network traffic to external servers.
+
+- **Location Services** — Required by macOS to expose Wi-Fi SSID names. WiFi Lens never reads your GPS position.
+- **Region detection** — Uses system locale, hardware-reported channel list, and nearby AP country codes. Runs entirely on-device.
+- **MCP server** — Bound to `127.0.0.1` only. No scan data leaves your machine unless you route it elsewhere.
+
+---
 
 ## Develop
 
@@ -95,27 +127,28 @@ npm run build         # production build
 npm run preview       # preview production build
 ```
 
-For documentation on architecture, roadmap, and known issues, see the [docs/](docs/) directory.
+Architecture, testing, and roadmap docs live in [docs/](docs/).
+
+---
+
+## Contributing
+
+Bug reports and feature ideas are welcome — open an [issue](https://github.com/SHIINASAMA/wifi-lens/issues) or start a [discussion](https://github.com/SHIINASAMA/wifi-lens/discussions).
+
+Pull requests should follow the conventions in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and include test coverage where practical. See [docs/COLLABORATION_RULES.md](docs/COLLABORATION_RULES.md) for AI assistant guidelines if you use coding agents.
+
+---
 
 ## Acknowledgments
 
-This project began as a fork of [tiny-wifi-analyzer](https://github.com/nolze/tiny-wifi-analyzer) by [nolze](https://github.com/nolze), who built the original Python-based Wi-Fi scanner. Since then the app has been fully rewritten in Swift with SwiftUI and CoreWLAN, evolving into a native macOS application under a new name.
+Forked from [tiny-wifi-analyzer](https://github.com/nolze/tiny-wifi-analyzer) by [nolze](https://github.com/nolze), who built the original Python-based Wi-Fi scanner. Since then the app has been fully rewritten in Swift with SwiftUI and CoreWLAN, evolving into the native macOS application it is today.
+
+---
 
 ## License
 
-```
-Copyright 2020 nolze
-Copyright 2026 SHIINASAMA
+Apache License 2.0 © 2020 nolze, 2026 SHIINASAMA. See [LICENSE](LICENSE) for full text.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+---
 
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-```
+**Topics:** `macos` `wifi` `network` `tool` `swift` `bluetooth` `analyzer` `swiftui` `corewlan` `corebluetooth` `open-source` `mcp`
