@@ -40,12 +40,12 @@ struct Chart<Overlay: View>: View {
     @State private var hoverScreenPt: CGPoint?
 
     private var accessibilityDescription: String {
-        let visibleSeries = series.filter { !$0.points.isEmpty && $0.style.strokeOpacity > 0 && $0.style.areaOpacity > 0 || $0.style.lineWidth > 0 }
+        let visibleSeries = series.filter { !$0.points.isEmpty && ($0.style.strokeOpacity > 0 || $0.style.areaOpacity > 0 || $0.style.lineWidth > 0) }
         guard !visibleSeries.isEmpty else { return "Empty chart" }
         let seriesCount = visibleSeries.count
         let pointCount = visibleSeries.reduce(0) { $0 + $1.points.count }
-        guard let allPoints = visibleSeries.flatMap({ $0.points }).map({ $0.y }).min() as Double?,
-              let maxY = visibleSeries.flatMap({ $0.points }).map({ $0.y }).max() as Double? else {
+        guard let allPoints = visibleSeries.flatMap({ $0.points }).map({ $0.y }).min(),
+              let maxY = visibleSeries.flatMap({ $0.points }).map({ $0.y }).max() else {
             return "Chart with \(seriesCount) series"
         }
         return "Chart with \(seriesCount) series, \(pointCount) data points, values from \(Int(allPoints)) to \(Int(maxY))"

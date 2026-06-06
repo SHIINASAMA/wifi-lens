@@ -305,7 +305,7 @@ struct OverviewView: View {
                             .frame(width: 32, height: 32)
                             .accessibilityHidden(true)
                         Text("\(ch.channel)")
-                            .font(.title3.weight(.bold).monospacedDigit())
+                            .font(.title3.weight(.bold))
                             .foregroundColor(Color(hex: ch.rfLevel.color))
                     }
 

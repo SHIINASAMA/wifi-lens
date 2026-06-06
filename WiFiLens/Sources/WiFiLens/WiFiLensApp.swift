@@ -164,7 +164,6 @@ private struct AppRootView: View {
             window?.setFrameAutosaveName("WiFiLensMainWindow")
         })
         .onAppear {
-            BandChartViewModel.reduceMotion = reduceMotion
             visitedPages.insert(selectedPage)
         }
         .task {

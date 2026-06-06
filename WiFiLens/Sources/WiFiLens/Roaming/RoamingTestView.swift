@@ -152,7 +152,7 @@ struct RoamingTestView: View {
                 HStack(spacing: 8) {
                     if let bssid = viewModel.currentBSSID {
                         Text(bssid)
-                            .font(.caption.monospacedDigit())
+                            .font(.caption.monospaced())
                             .foregroundColor(.secondary)
                     }
                     if let phy = viewModel.currentPhyMode {

@@ -211,7 +211,7 @@ private struct ChannelCard: View {
                         .frame(width: 44, height: 44)
                         .accessibilityHidden(true)
                     Text("\(channel.channel)")
-                        .font(.title2.weight(.bold).monospacedDigit())
+                        .font(.title2.weight(.bold))
                         .foregroundColor(Color(hex: channel.rfLevel.color))
                 }
                 Text(channel.bandDisplay)
