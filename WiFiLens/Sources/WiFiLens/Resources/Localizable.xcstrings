@@ -93,6 +93,29 @@
     "•" : {
       "shouldTranslate" : false
     },
+    "ble.accessibility.trend_chart_fmt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BLE RSSI trend chart, %1$d samples, range %2$d to %3$d dBm"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BLE RSSIトレンドチャート、%1$dサンプル、範囲 %2$d〜%3$d dBm"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "BLE RSSI 趋势图，%1$d 个样本，范围 %2$d 至 %3$d dBm"
+          }
+        }
+      }
+    },
     "ble.control.start_scanning" : {
       "comment" : "Button to start BLE scanning",
       "extractionState" : "manual",

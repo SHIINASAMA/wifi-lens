@@ -87,7 +87,7 @@ struct RoamingTestView: View {
                 .foregroundColor(.orange)
                 .accessibilityHidden(true)
             Text(String(localized: "roaming.warning.not_portable", comment: "Warning that roaming test needs a laptop, not desktop Mac"))
-                .font(.system(size: 11))
+                .font(.caption)
             Spacer()
         }
         .padding(.horizontal, 16)
@@ -147,19 +147,19 @@ struct RoamingTestView: View {
                         .frame(width: 6, height: 6)
                         .accessibilityHidden(true)
                     Text(viewModel.currentSSID ?? "—")
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.title3.weight(.semibold))
                 }
                 HStack(spacing: 8) {
                     if let bssid = viewModel.currentBSSID {
                         Text(bssid)
-                            .font(.system(size: 10, design: .monospaced))
+                            .font(.caption.monospaced())
                             .foregroundColor(.secondary)
                     }
                     if let phy = viewModel.currentPhyMode {
                         Text("·")
                             .foregroundColor(.secondary)
                         Text(phy)
-                            .font(.system(size: 10))
+                            .font(.caption)
                             .foregroundColor(.secondary)
                     }
                 }
@@ -188,10 +188,10 @@ struct RoamingTestView: View {
     private func metricLabel(_ title: String, _ value: String, _ color: Color) -> some View {
         VStack(spacing: 2) {
             Text(title)
-                .font(.system(size: 9))
+                .font(.caption2)
                 .foregroundColor(.secondary)
             Text(value)
-                .font(.system(size: 13, weight: .medium, design: .monospaced))
+                .font(.subheadline.weight(.medium).monospacedDigit())
                 .foregroundColor(color)
         }
         .accessibilityElement(children: .combine)
@@ -203,30 +203,30 @@ struct RoamingTestView: View {
         HStack(spacing: 16) {
             HStack(spacing: 4) {
                 Image(systemName: "clock")
-                    .font(.system(size: 10))
+                    .font(.caption)
                     .foregroundColor(.secondary)
                     .accessibilityHidden(true)
                 Text(timeFormatter.string(from: viewModel.elapsedTime) ?? "0:00")
-                    .font(.system(size: 13, design: .monospaced))
+                    .font(.subheadline.monospacedDigit())
             }
 
             HStack(spacing: 4) {
                 Image(systemName: "chart.xyaxis.line")
-                    .font(.system(size: 10))
+                    .font(.caption)
                     .foregroundColor(.secondary)
                     .accessibilityHidden(true)
                 Text("\(viewModel.totalSamples) \(String(localized: "common.label.samples", comment: "Sample count unit label"))")
-                    .font(.system(size: 12))
+                    .font(.callout)
                     .foregroundColor(.secondary)
             }
 
             HStack(spacing: 4) {
                 Image(systemName: "arrow.triangle.swap")
-                    .font(.system(size: 10))
+                    .font(.caption)
                     .foregroundColor(.secondary)
                     .accessibilityHidden(true)
                 Text("\(viewModel.transitions.count) \(String(localized: "common.label.transitions", comment: "AP transition count unit label"))")
-                    .font(.system(size: 12))
+                    .font(.callout)
                     .foregroundColor(.secondary)
             }
 
@@ -366,7 +366,7 @@ struct RoamingTestView: View {
 
     private func tableHeader(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 10, weight: .medium))
+            .font(.caption.weight(.medium))
             .foregroundColor(.secondary)
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.vertical, 5)
@@ -374,7 +374,7 @@ struct RoamingTestView: View {
 
     private func tableCell(_ text: String, mono: Bool = false, color: Color = .primary) -> some View {
         Text(text)
-            .font(.system(size: 11, design: mono ? .monospaced : .default))
+            .font(mono ? .caption.monospacedDigit() : .caption)
             .foregroundColor(color)
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.vertical, 5)
@@ -442,7 +442,7 @@ private struct ChartCanvas: View {
                 context.stroke(line, with: .color(.secondary.opacity(0.15)), lineWidth: 0.5)
 
                 let label = Text("\(rssi)")
-                    .font(.system(size: 9))
+                    .font(.caption2)
                     .foregroundColor(.secondary)
                 let resolved = context.resolve(label)
                 let labelSize = resolved.measure(in: CGSize(width: leftAxisWidth - 4, height: 20))
@@ -455,7 +455,7 @@ private struct ChartCanvas: View {
             while t <= totalSecs {
                 let x = plotLeft + CGFloat(t) * scaleX
                 let label = Text(timeFormatter.string(from: t + timeOffset) ?? "0")
-                    .font(.system(size: 9))
+                    .font(.caption2)
                     .foregroundColor(.secondary)
                 let resolved = context.resolve(label)
                 context.draw(resolved, at: CGPoint(x: x, y: plotBottom + 6))
@@ -472,7 +472,7 @@ private struct ChartCanvas: View {
                 let midX = xPos(visibleSamples[midIdx].timestamp)
                 let color = bssidColors[segment.bssid] ?? .blue
                 let label = Text(segment.bssid)
-                    .font(.system(size: 9, weight: .medium))
+                    .font(.caption2.weight(.medium))
                     .foregroundColor(color)
                 let resolved = context.resolve(label)
                 let labelW = resolved.measure(in: CGSize(width: 200, height: 20)).width
@@ -614,7 +614,7 @@ private struct RoamingTimelineChart: View {
             ForEach(Array(allTicks.enumerated()), id: \.offset) { i, tick in
                 if i > 0 { Spacer(minLength: 0) }
                 Text(timeFormatter.string(from: tick) ?? "0")
-                    .font(.system(size: 9, design: .monospaced))
+                    .font(.caption2.monospacedDigit())
                     .foregroundColor(.secondary)
             }
         }
@@ -697,7 +697,7 @@ private struct RoamingTimelineChart: View {
                 Text(String(format: "RTT %.1f ms", latency))
             }
         }
-        .font(.system(size: 10, weight: .medium, design: .monospaced))
+        .font(.caption.weight(.medium).monospacedDigit())
         .foregroundColor(.primary)
         .padding(.horizontal, 8)
         .padding(.vertical, 4)

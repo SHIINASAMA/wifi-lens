@@ -18,7 +18,7 @@ private struct BLEDisabledView: View {
         VStack(spacing: 16) {
             Spacer()
             Image(systemName: "antenna.radiowaves.left.and.right.slash")
-                .font(.system(size: 48))
+                .font(.largeTitle)
                 .foregroundColor(.secondary)
                 .accessibilityHidden(true)
             Text(String(localized: "ble.disabled.title", comment: "Title when BLE feature is disabled in settings"))
@@ -258,7 +258,7 @@ private struct BLEScannerContentView: View {
         VStack(spacing: 12) {
             Spacer()
             Image(systemName: "antenna.radiowaves.left.and.right")
-                .font(.system(size: 32))
+                .font(.largeTitle)
                 .foregroundColor(.secondary.opacity(0.5))
                 .accessibilityHidden(true)
             Text(String(localized: "ble.empty.idle", comment: "Empty state prompting user to start scanning"))
@@ -283,7 +283,7 @@ private struct BLEScannerContentView: View {
         VStack(spacing: 12) {
             Spacer()
             Image(systemName: "antenna.radiowaves.left.and.right.slash")
-                .font(.system(size: 32))
+                .font(.largeTitle)
                 .foregroundColor(.secondary.opacity(0.5))
                 .accessibilityHidden(true)
             Text(String(localized: "ble.state.bluetooth_off_title", comment: "Title when Bluetooth is disabled"))
@@ -300,7 +300,7 @@ private struct BLEScannerContentView: View {
         VStack(spacing: 12) {
             Spacer()
             Image(systemName: "hand.raised.slash")
-                .font(.system(size: 32))
+                .font(.largeTitle)
                 .foregroundColor(.secondary.opacity(0.5))
                 .accessibilityHidden(true)
             Text(String(localized: "ble.state.bluetooth_perm_denied_title", comment: "Title when Bluetooth permission is denied"))
@@ -319,7 +319,7 @@ private struct BLEScannerContentView: View {
         VStack(spacing: 12) {
             Spacer()
             Image(systemName: "antenna.radiowaves.left.and.right")
-                .font(.system(size: 32))
+                .font(.largeTitle)
                 .foregroundColor(.secondary.opacity(0.5))
                 .accessibilityHidden(true)
             Text(String(localized: "ble.state.bluetooth_perm_required_title", comment: "Title when Bluetooth permission is needed"))
@@ -338,7 +338,7 @@ private struct BLEScannerContentView: View {
         VStack(spacing: 12) {
             Spacer()
             Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 32))
+                .font(.largeTitle)
                 .foregroundColor(.orange)
                 .accessibilityHidden(true)
             Text(message)

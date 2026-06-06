@@ -116,7 +116,7 @@ struct WiFiBandChart: View {
                 VStack {
                     Spacer()
                     Text(String(localized: "common.label.loading", comment: "Loading indicator text"))
-                        .foregroundColor(Color(hex: "#888888")).font(.system(size: 16))
+                        .foregroundColor(Color(hex: "#888888")).font(.title3)
                     Spacer()
                 }
             } else {
@@ -126,6 +126,7 @@ struct WiFiBandChart: View {
                         heatmapOverlay(geo: chartGeo)
                         dataLabelOverlay(geo: chartGeo)
                     }
+                    .accessibilityLabel("WiFi spectrum chart")
                     .onContinuousHover(coordinateSpace: .local) { phase in
                         switch phase {
                         case .active(let location):
@@ -168,6 +169,8 @@ struct WiFiBandChart: View {
                 }
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Channel occupancy heatmap")
     }
 
     private func dataLabelOverlay(geo: ChartGeometry) -> some View {
@@ -179,7 +182,7 @@ struct WiFiBandChart: View {
         )
         return ForEach(labels, id: \.series.id) { item in
             Text("\(item.series.channel) \(item.series.displaySSID)\(trendSuffix(for: item.series))")
-                .font(.system(size: 9)).foregroundColor(item.series.color)
+                .font(.caption2).foregroundColor(item.series.color)
                 .opacity(item.opacity).position(x: item.x, y: item.y)
         }
     }
@@ -223,6 +226,7 @@ struct WiFiBandChart: View {
                         heatmapOverlay(geo: chartGeo)
                         dataLabelOverlay(geo: chartGeo)
                     }
+                    .accessibilityLabel("WiFi spectrum chart")
                     .onContinuousHover(coordinateSpace: .local) { phase in
                         switch phase {
                         case .active(let location):
@@ -264,9 +268,9 @@ private struct ChartTooltip: View {
     let ssid: String; let rssi: Int; let channel: Int; let bssid: String
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(ssid).font(.system(size: 10, weight: .semibold)).foregroundColor(.primary)
-            Text("CH \(channel)  \(rssi) dBm").font(.system(size: 9)).foregroundColor(.secondary)
-            Text(bssid).font(.system(size: 8)).foregroundColor(.secondary)
+            Text(ssid).font(.caption.weight(.semibold)).foregroundColor(.primary)
+            Text("CH \(channel)  \(rssi) dBm").font(.caption2).foregroundColor(.secondary)
+            Text(bssid).font(.caption2).foregroundColor(.secondary)
         }
         .padding(.horizontal, 6).padding(.vertical, 4)
         .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 4))

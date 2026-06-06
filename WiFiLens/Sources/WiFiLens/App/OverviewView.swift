@@ -110,7 +110,7 @@ struct OverviewView: View {
 
                 VStack(alignment: .trailing, spacing: 4) {
                     Text("\(wifi.rssi ?? -100) dBm")
-                        .font(.system(size: 12, design: .monospaced))
+                        .font(.caption.monospacedDigit())
                         .foregroundColor(rssiColor(wifi.rssi ?? -100))
                         .accessibilityLabel(String(format: String(localized: "roaming.accessibility.rssi_fmt", comment: "RSSI accessibility label with value and quality"), wifi.rssi ?? -100, signalLabel(wifi.rssi ?? -100)))
                     signalBars(wifi.rssi ?? -100)
@@ -163,15 +163,15 @@ struct OverviewView: View {
     private func healthPill(icon: String, label: String, value: String, color: Color) -> some View {
         VStack(spacing: 6) {
             Image(systemName: icon)
-                .font(.system(size: 18))
+                .font(.title2)
                 .foregroundColor(color)
                 .accessibilityHidden(true)
             Text(value)
-                .font(.system(size: 12, weight: .semibold))
+                .font(.callout.weight(.semibold))
                 .foregroundColor(.primary)
                 .lineLimit(1)
             Text(label)
-                .font(.system(size: 9))
+                .font(.caption2)
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity)
@@ -188,16 +188,16 @@ struct OverviewView: View {
 
         return HStack(spacing: 12) {
             Image(systemName: diag.icon)
-                .font(.system(size: 28))
+                .font(.largeTitle)
                 .foregroundColor(diag.color)
                 .frame(width: 36)
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(diag.title)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.subheadline.weight(.semibold))
                 Text(diag.message)
-                    .font(.system(size: 11))
+                    .font(.caption)
                     .foregroundColor(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -294,7 +294,7 @@ struct OverviewView: View {
                 Image(systemName: "lightbulb.fill")
                     .foregroundColor(.yellow)
                 Text(String(localized: "overview.channel_advice.header", comment: "Header for recommended channels card"))
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.callout.weight(.semibold))
             }
 
             ForEach(recommendedChannels.prefix(2).filter { $0.channel != current.channel }) { ch in
@@ -305,20 +305,20 @@ struct OverviewView: View {
                             .frame(width: 32, height: 32)
                             .accessibilityHidden(true)
                         Text("\(ch.channel)")
-                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                            .font(.title3.weight(.bold))
                             .foregroundColor(Color(hex: ch.rfLevel.color))
                     }
 
                     VStack(alignment: .leading, spacing: 2) {
                         HStack(spacing: 4) {
                             Text("\(ch.bandDisplay) — \(ch.rfLevel.displayName)")
-                                .font(.system(size: 12, weight: .medium))
+                                .font(.callout.weight(.medium))
                             if !ch.recommendationReasons.isEmpty {
                                 ReasonPopover(reasons: ch.recommendationReasons)
                             }
                         }
                         Text(String(format: String(localized: "format.network_score_with_ap_count", comment: "Network score display with nearby AP count"), ch.rfScore, ch.apCount))
-                            .font(.system(size: 10))
+                            .font(.caption)
                             .foregroundColor(.secondary)
                     }
                     Spacer()
@@ -390,9 +390,9 @@ struct OverviewView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(String(format: String(localized: "overview.environment.summary_fmt", comment: "Banner showing count of detected networks"), totalNetworks))
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.subheadline.weight(.semibold))
                 Text(bandSummary)
-                    .font(.system(size: 11))
+                    .font(.caption)
                     .foregroundColor(.secondary)
             }
             Spacer()

@@ -5,6 +5,7 @@ import SwiftUI
 struct ReasonPopover: View {
     let reasons: [RecommendationReason]
     @State private var isHovering = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isTapped = false
 
     private var showPopover: Bool { isHovering || isTapped }
@@ -18,7 +19,7 @@ struct ReasonPopover: View {
                     .fill(.ultraThinMaterial)
                     .frame(width: 20, height: 20)
                 Text("?")
-                    .font(.system(size: 11, weight: .bold))
+                    .font(.caption.weight(.bold))
                     .foregroundColor(.secondary)
             }
         }
@@ -26,7 +27,7 @@ struct ReasonPopover: View {
         .accessibilityLabel(String(localized: "channels.reason.popover.title",
                                    comment: "Title for recommendation reason popover"))
         .onHover { hovering in
-            withAnimation(.easeOut(duration: 0.15)) {
+            withAnimation(reduceMotion ? nil : .easeOut(duration: 0.15)) {
                 isHovering = hovering
             }
             if !hovering { isTapped = false }
@@ -38,15 +39,15 @@ struct ReasonPopover: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(String(localized: "channels.reason.popover.title",
                             comment: "Title for recommendation reason popover"))
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.caption.weight(.semibold))
 
                 ForEach(reasons, id: \.self) { reason in
                     HStack(alignment: .top, spacing: 6) {
                         Text("•")
                             .foregroundColor(.secondary)
-                            .font(.system(size: 11))
+                            .font(.caption)
                         Text(reason.displayText)
-                            .font(.system(size: 11))
+                            .font(.caption)
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }

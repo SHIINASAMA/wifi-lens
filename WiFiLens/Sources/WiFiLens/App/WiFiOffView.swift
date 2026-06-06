@@ -5,7 +5,7 @@ struct WiFiOffView: View {
         VStack(spacing: 16) {
             Spacer()
             Image(systemName: "wifi.slash")
-                .font(.system(size: 48))
+                .font(.largeTitle)
                 .foregroundColor(.secondary)
                 .accessibilityHidden(true)
             Text(String(localized: "wifi.off.title", comment: "Title when Wi-Fi is turned off"))

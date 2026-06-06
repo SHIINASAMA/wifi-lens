@@ -15,6 +15,7 @@ private struct AppRootView: View {
     let updateMCPServer: @MainActor () -> Void
 
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var sidebarWidth: CGFloat = 180
     @State private var sidebarCollapsed = false
     @AppStorage("hideTitleBadge") private var hideTitleBadge = true
@@ -116,6 +117,7 @@ private struct AppRootView: View {
                 .background(
                     GeometryReader { geo in
                         Color.clear.onAppear {
+            BandChartViewModel.reduceMotion = reduceMotion
                             sidebarWidth = geo.size.width
                         }
                         .onChange(of: geo.size.width) { _, w in
@@ -190,7 +192,7 @@ private struct AppRootView: View {
                     .padding(.top, titleBarY)
                     .ignoresSafeArea()
                     .allowsHitTesting(false)
-                    .animation(.easeInOut(duration: 0.25), value: x)
+                    .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: x)
             }
         }
     }
@@ -305,7 +307,39 @@ struct WiFiLensApp: App {
             if mcpEnabled { updateMCPServer() }
         }
         .commands {
-            CommandGroup(after: .toolbar) {
+            CommandGroup(before: .toolbar) {
+                Button(String(localized: "nav.overview", comment: "Navigate to Overview page")) {
+                    selectedPage = .overview
+                }
+                .keyboardShortcut("1", modifiers: .command)
+                
+                Button(String(localized: "nav.spectrum", comment: "Navigate to Spectrum page")) {
+                    selectedPage = .spectrum
+                }
+                .keyboardShortcut("2", modifiers: .command)
+                
+                Button(String(localized: "nav.channels", comment: "Navigate to Channels page")) {
+                    selectedPage = .channels
+                }
+                .keyboardShortcut("3", modifiers: .command)
+                
+                Button(String(localized: "nav.interfaces", comment: "Navigate to Interfaces page")) {
+                    selectedPage = .interfaces
+                }
+                .keyboardShortcut("4", modifiers: .command)
+                
+                Button(String(localized: "nav.roaming_test", comment: "Navigate to Roaming page")) {
+                    selectedPage = .roaming
+                }
+                .keyboardShortcut("5", modifiers: .command)
+                
+                Button(String(localized: "nav.ble_scanner", comment: "Navigate to BLE Scanner page")) {
+                    selectedPage = .bleScanner
+                }
+                .keyboardShortcut("6", modifiers: .command)
+            }
+
+                        CommandGroup(after: .toolbar) {
                 Menu(String(localized: "common.action.export", comment: "Export menu item or button")) {
                     ForEach(viewModel.bandViewModels, id: \.band.id) { vm in
                         Menu(vm.band.displayName) {
