@@ -324,7 +324,7 @@ struct OverviewView: View {
                     Spacer()
                 }
                 .padding(10)
-                .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 8))
+//                .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 8))
             }
         }
         .padding(16)

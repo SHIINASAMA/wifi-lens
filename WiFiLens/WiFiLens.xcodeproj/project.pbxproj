@@ -31,6 +31,9 @@
 		3DC8FED8F49854F4CDFD4DCF /* BandChartLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCD /* BandChartLayout.swift */; };
 		3DC8FED8F49854F4CDFD4DD1 /* SnapshotToChartAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DD0 /* SnapshotToChartAdapter.swift */; };
 		3DC8FED8F49854F4CDFD4DD2 /* SnapshotToChartAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DD0 /* SnapshotToChartAdapter.swift */; };
+		FB0573E32FBD0002005F9004 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573E02FBD0002005F9001 /* ExportService.swift */; };
+		FB0573E42FBD0002005F9005 /* MarkdownReportExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573E12FBD0002005F9002 /* MarkdownReportExporter.swift */; };
+		FB0573E52FBD0002005F9006 /* MarkdownExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573E22FBD0002005F9003 /* MarkdownExportService.swift */; };
 		3DC8FED8F49854F4CDFD4DDE /* BandChartRenderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCB /* BandChartRenderModel.swift */; };
 		3F19474AB44B5B07E9E5AF9E /* RegionInferenceEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AC04B2DAF7F8FB54DC3FFD2 /* RegionInferenceEngineTests.swift */; };
 		46B405FC484C9C9A5509E8AC /* SpanDirection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310AD5ABC56B4211E30DD1DE /* SpanDirection.swift */; };
@@ -406,6 +409,9 @@
 		FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdater.swift; sourceTree = "<group>"; };
 		FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		FC084FA8AE0EE5E703D922DA /* BandChartViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartViewModelTests.swift; sourceTree = "<group>"; };
+		FB0573E02FBD0002005F9001 /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
+		FB0573E12FBD0002005F9002 /* MarkdownReportExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownReportExporter.swift; sourceTree = "<group>"; };
+		FB0573E22FBD0002005F9003 /* MarkdownExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownExportService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -651,6 +657,7 @@
 				14F4ABDD1A4A4FAD821DF0CB /* SignalProcessing */,
 				76E1D8231AF6132E0568C813 /* Spectrum */,
 				B1279BAD6D501300C4F2A85F /* Table */,
+				FB0573E82FBD0002005F9009 /* SnapshotExport */,
 				DD6657406F0FB50F2D9B7FB4 /* Utilities */,
 			);
 			path = WiFiLens;
@@ -666,6 +673,14 @@
 				51DDD97F3B94514DE0790B51 /* Constants.swift */,
 			);
 			path = Utilities;
+			sourceTree = "<group>";
+		};
+		FB0573E82FBD0002005F9009 /* SnapshotExport */ = {
+			isa = PBXGroup;
+			children = (
+				FB0573E02FBD0002005F9001 /* ExportService.swift */,
+			);
+			path = SnapshotExport;
 			sourceTree = "<group>";
 		};
 		FB0573B82FBBF7CF005F8214 /* WiFiLensMCP */ = {
@@ -700,8 +715,18 @@
 			children = (
 				FB3C16B52FCC34F3007A7B64 /* Recording */,
 				FB3C16B82FCC34F3007A7B64 /* Session */,
+				FB0573E62FBD0002005F9007 /* SnapshotExport */,
 			);
 			path = Pro;
+			sourceTree = "<group>";
+		};
+		FB0573E62FBD0002005F9007 /* SnapshotExport */ = {
+			isa = PBXGroup;
+			children = (
+				FB0573E12FBD0002005F9002 /* MarkdownReportExporter.swift */,
+				FB0573E22FBD0002005F9003 /* MarkdownExportService.swift */,
+			);
+			path = SnapshotExport;
 			sourceTree = "<group>";
 		};
 		FB6F41CB2FC4889B0009F29B /* Regulatory */ = {
@@ -1101,6 +1126,7 @@
 				DCAC1361D1814E4895FD4B4F /* HysteresisEMA.swift in Sources */,
 				3DC8FED8F49854F4CDFD4DCE /* BandChartLayout.swift in Sources */,
 				3DC8FED8F49854F4CDFD4DD1 /* SnapshotToChartAdapter.swift in Sources */,
+				FB0573E32FBD0002005F9004 /* ExportService.swift in Sources */,
 				3DC8FED8F49854F4CDFD4DCC /* BandChartRenderModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1229,6 +1255,9 @@
 				FB1E32922FC7316C009D1BDC /* ExponentialMovingAverage.swift in Sources */,
 				FB1E32932FC7316C009D1BDC /* KalmanFilter1D.swift in Sources */,
 				FB1E32942FC7316C009D1BDC /* HysteresisEMA.swift in Sources */,
+				FB0573E52FBD0002005F9006 /* MarkdownExportService.swift in Sources */,
+				FB0573E42FBD0002005F9005 /* MarkdownReportExporter.swift in Sources */,
+				FB0573E32FBD0002005F9004 /* ExportService.swift in Sources */,
 				3DC8FED8F49854F4CDFD4DDE /* BandChartRenderModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -216,11 +216,6 @@ private struct WindowAccessor: NSViewRepresentable {
     func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
-extension Notification.Name {
-    static let exportBandAsPNG = Notification.Name("exportBandAsPNG")
-    static let exportBandAsCSV = Notification.Name("exportBandAsCSV")
-}
-
 @main
 struct WiFiLensApp: App {
     @State private var viewModel = ScannerViewModel()
@@ -312,48 +307,56 @@ struct WiFiLensApp: App {
                     selectedPage = .overview
                 }
                 .keyboardShortcut("1", modifiers: .command)
-                
+
                 Button(String(localized: "nav.spectrum", comment: "Navigate to Spectrum page")) {
                     selectedPage = .spectrum
                 }
                 .keyboardShortcut("2", modifiers: .command)
-                
+
                 Button(String(localized: "nav.channels", comment: "Navigate to Channels page")) {
                     selectedPage = .channels
                 }
                 .keyboardShortcut("3", modifiers: .command)
-                
+
                 Button(String(localized: "nav.interfaces", comment: "Navigate to Interfaces page")) {
                     selectedPage = .interfaces
                 }
                 .keyboardShortcut("4", modifiers: .command)
-                
+
                 Button(String(localized: "nav.roaming_test", comment: "Navigate to Roaming page")) {
                     selectedPage = .roaming
                 }
                 .keyboardShortcut("5", modifiers: .command)
-                
+
                 Button(String(localized: "nav.ble_scanner", comment: "Navigate to BLE Scanner page")) {
                     selectedPage = .bleScanner
                 }
                 .keyboardShortcut("6", modifiers: .command)
             }
 
-                        CommandGroup(after: .toolbar) {
+            CommandGroup(after: .toolbar) {
                 Menu(String(localized: "common.action.export", comment: "Export menu item or button")) {
+                    Button(String(localized: "export.snapshot_image", comment: "Export chart snapshot as single PNG image")) {
+                        exportSnapshotImage()
+                    }
+                    .keyboardShortcut("e", modifiers: [.command, .shift])
+
+#if PRO
+                    Button(String(localized: "export.snapshot_markdown", comment: "Export as self-contained Markdown report")) {
+                        exportSnapshotMarkdown()
+                    }
+                    .keyboardShortcut("m", modifiers: [.command, .shift])
+#endif
+
+                    Divider()
+
                     ForEach(viewModel.bandViewModels, id: \.band.id) { vm in
-                        Menu(vm.band.displayName) {
-                            Button(String(localized: "spectrum.export.png_short", comment: "PNG export format short label")) {
-                                exportPNG(for: vm)
-                            }
-                            Button(String(localized: "spectrum.export.csv_short", comment: "CSV export format short label")) {
-                                exportCSV(for: vm)
-                            }
+                        Button(String(format: String(localized: "spectrum.export.csv_fmt", comment: "CSV export menu item with band name"), vm.band.displayName)) {
+                            exportCSV(for: vm)
                         }
                     }
                 }
                 .disabled(viewModel.bandViewModels.isEmpty)
-                .keyboardShortcut("e", modifiers: [.command, .shift])
             }
 
             CommandGroup(replacing: .appSettings) {
@@ -406,34 +409,16 @@ struct WiFiLensApp: App {
     }
 
     @MainActor
-    private func exportPNG(for vm: BandChartViewModel) {
-        let size = vm.chartSize.width > 0 ? vm.chartSize : CGSize(width: 800, height: 300)
-        let renderer = ImageRenderer(
-            content: WiFiBandChart(
-                model: vm.renderModel,
-                selectedNetworkID: $viewModel.selectedNetworkID,
-                onResetZoom: { vm.resetZoom() },
-                onToggleExpand: { vm.toggleExpand() },
-                onApplyZoom: { lo, hi in vm.applyZoom(lo: lo, hi: hi) }
-            )
-                .frame(width: size.width, height: size.height)
-        )
-        renderer.scale = 2.0
-        guard let nsImage = renderer.nsImage,
-              let tiff = nsImage.tiffRepresentation,
-              let bitmap = NSBitmapImageRep(data: tiff),
-              let png = bitmap.representation(using: .png, properties: [:])
-        else { return }
-
-        let panel = NSSavePanel()
-        panel.allowedContentTypes = [.png]
-        panel.nameFieldStringValue = "\(vm.band.displayName.lowercased().replacingOccurrences(of: " ", with: "-"))_wifi.png"
-        panel.begin { response in
-            if response == .OK, let url = panel.url {
-                try? png.write(to: url)
-            }
-        }
+    private func exportSnapshotImage() {
+        ExportService.exportImage(viewModel: viewModel)
     }
+
+#if PRO
+    @MainActor
+    private func exportSnapshotMarkdown() {
+        MarkdownExportService.export(viewModel: viewModel)
+    }
+#endif
 
     @MainActor
     private func exportCSV(for vm: BandChartViewModel) {
