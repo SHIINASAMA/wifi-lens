@@ -161,7 +161,8 @@ final class ScannerViewModel {
         }
         guard !hasStarted else { return }
 
-        let task = Task { @MainActor in
+        let task = Task { @MainActor [weak self] in
+            guard let self else { return }
             AppLogger.scanner.info("start() — begin")
 
             locationManager.onAuthorizationGranted = { [weak self] in
