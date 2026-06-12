@@ -401,10 +401,12 @@ struct WiFiLensApp: App {
         viewModel.mcpServer.stop()
         guard mcpEnabled else { return }
         viewModel.mcpServer.port = UInt16(mcpPort)
-        do {
-            try viewModel.mcpServer.start()
-        } catch {
-            AppLogger.mcp.error("MCP server failed to start: \(error)")
+        Task { @MainActor in
+            do {
+                try await viewModel.mcpServer.start()
+            } catch {
+                AppLogger.mcp.error("MCP server failed to start: \(error)")
+            }
         }
     }
 

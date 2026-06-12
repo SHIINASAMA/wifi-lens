@@ -337,7 +337,6 @@
 		FB0573AE2FBB5BD6005F8214 /* NetworkSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSnapshot.swift; sourceTree = "<group>"; };
 		FB0573B02FBB5BEE005F8214 /* TrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendChartView.swift; sourceTree = "<group>"; };
 		FB0573B52FBBEBB9005F8214 /* MCPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPServer.swift; sourceTree = "<group>"; };
-		FB0573B72FBBF7CF005F8214 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		FB0573B92FBBFC31005F8214 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		FB0573BD2FBC22C2005F8214 /* InterfacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterfacesView.swift; sourceTree = "<group>"; };
 		FB0573BF2FBC47CC005F8214 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
@@ -477,7 +476,6 @@
 		2BB8E28CC6CC66A93DA47095 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				FB0573B82FBBF7CF005F8214 /* WiFiLensMCP */,
 				DA6A83BCB3A09FD57BB9E12F /* WiFiLens */,
 			);
 			path = Sources;
@@ -681,14 +679,6 @@
 				FB0573E02FBD0002005F9001 /* ExportService.swift */,
 			);
 			path = SnapshotExport;
-			sourceTree = "<group>";
-		};
-		FB0573B82FBBF7CF005F8214 /* WiFiLensMCP */ = {
-			isa = PBXGroup;
-			children = (
-				FB0573B72FBBF7CF005F8214 /* main.swift */,
-			);
-			path = WiFiLensMCP;
 			sourceTree = "<group>";
 		};
 		FB3C16B52FCC34F3007A7B64 /* Recording */ = {

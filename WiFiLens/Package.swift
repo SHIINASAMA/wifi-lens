@@ -8,7 +8,6 @@ let package = Package(
     platforms: [.macOS(.v14)],
     products: [
         .executable(name: "WiFiLens", targets: ["WiFiLens"]),
-        .executable(name: "WiFiLensMCP", targets: ["WiFiLensMCP"]),
     ],
     dependencies: [
         .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.8.0"),
@@ -20,15 +19,10 @@ let package = Package(
             name: "WiFiLens",
             dependencies: [
                 .product(name: "Sparkle", package: "Sparkle"),
+                .product(name: "MCP", package: "swift-sdk"),
                 .product(name: "Logging", package: "swift-log"),
             ],
             resources: [.process("Resources")]
-        ),
-        .executableTarget(
-            name: "WiFiLensMCP",
-            dependencies: [
-                .product(name: "MCP", package: "swift-sdk"),
-            ]
         ),
         .testTarget(
             name: "WiFiLensTests",

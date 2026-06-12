@@ -5357,31 +5357,31 @@
                 "en": {
                     "stringUnit": {
                         "state": "translated",
-                        "value": "{\"mcpServers\":{\"wifi-lens\":{\"command\":\"WiFiLensMCP\",\"args\":[\"%ld\"]}}}"
+                        "value": "{\"mcpServers\":{\"wifi-lens\":{\"url\":\"http://127.0.0.1:%ld\"}}}"
                     }
                 },
                 "ja": {
                     "stringUnit": {
                         "state": "translated",
-                        "value": "{\"mcpServers\":{\"wifi-lens\":{\"command\":\"WiFiLensMCP\",\"args\":[\"%ld\"]}}}"
+                        "value": "{\"mcpServers\":{\"wifi-lens\":{\"url\":\"http://127.0.0.1:%ld\"}}}"
                     }
                 },
                 "zh-Hans": {
                     "stringUnit": {
                         "state": "translated",
-                        "value": "{\"mcpServers\":{\"wifi-lens\":{\"command\":\"WiFiLensMCP\",\"args\":[\"%ld\"]}}}"
+                        "value": "{\"mcpServers\":{\"wifi-lens\":{\"url\":\"http://127.0.0.1:%ld\"}}}"
                     }
                 },
                 "de": {
                     "stringUnit": {
                         "state": "translated",
-                        "value": "{\"mcpServers\":{\"wifi-lens\":{\"command\":\"WiFiLensMCP\",\"args\":[\"%ld\"]}}}"
+                        "value": "{\"mcpServers\":{\"wifi-lens\":{\"url\":\"http://127.0.0.1:%ld\"}}}"
                     }
                 },
                 "es": {
                     "stringUnit": {
                         "state": "translated",
-                        "value": "{\"mcpServers\":{\"wifi-lens\":{\"command\":\"WiFiLensMCP\",\"args\":[\"%ld\"]}}}"
+                        "value": "{\"mcpServers\":{\"wifi-lens\":{\"url\":\"http://127.0.0.1:%ld\"}}}"
                     }
                 }
             }
