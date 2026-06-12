@@ -22,7 +22,6 @@
 		2B7B4CBC96F724AA4970AC7F /* SpectrumModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DD34695BFD8D4277DF0BDB0 /* SpectrumModelTests.swift */; };
 		2ED34E17AE03E25A409037BD /* NetworkTableRowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */; };
 		2FA3CB9C5DD2446AAA549779 /* GatewayPinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF472346A62545B9866DA8ED /* GatewayPinger.swift */; };
-		C7E5A90CB7E5498F80CDA217 /* GlassBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E84926DD82E4B90B6509CD8 /* GlassBackground.swift */; };
 		318908BC49D244B1EEE68A9A /* ChannelSpanCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */; };
 		3711656F0C3ECD58CA29D407 /* NativeTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3299502DE1A130760C8A7 /* NativeTableView.swift */; };
 		39B4C850463F4305990A6943 /* SignalSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6180984B78D4363B6840C79 /* SignalSmoothing.swift */; };
@@ -31,9 +30,6 @@
 		3DC8FED8F49854F4CDFD4DCF /* BandChartLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCD /* BandChartLayout.swift */; };
 		3DC8FED8F49854F4CDFD4DD1 /* SnapshotToChartAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DD0 /* SnapshotToChartAdapter.swift */; };
 		3DC8FED8F49854F4CDFD4DD2 /* SnapshotToChartAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DD0 /* SnapshotToChartAdapter.swift */; };
-		FB0573E32FBD0002005F9004 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573E02FBD0002005F9001 /* ExportService.swift */; };
-		FB0573E42FBD0002005F9005 /* MarkdownReportExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573E12FBD0002005F9002 /* MarkdownReportExporter.swift */; };
-		FB0573E52FBD0002005F9006 /* MarkdownExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573E22FBD0002005F9003 /* MarkdownExportService.swift */; };
 		3DC8FED8F49854F4CDFD4DDE /* BandChartRenderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCB /* BandChartRenderModel.swift */; };
 		3F19474AB44B5B07E9E5AF9E /* RegionInferenceEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AC04B2DAF7F8FB54DC3FFD2 /* RegionInferenceEngineTests.swift */; };
 		46B405FC484C9C9A5509E8AC /* SpanDirection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310AD5ABC56B4211E30DD1DE /* SpanDirection.swift */; };
@@ -68,6 +64,8 @@
 		C1D2E3F4A5B6123456780001 /* WiFiPowerMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A1B3C8D4F6123456780001 /* WiFiPowerMonitor.swift */; };
 		C1E94A4D89C952711DBDB34E /* ColorExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53CD49099277F06E8FB3E04D /* ColorExtensionTests.swift */; };
 		C477C7396F754B85A69816B6 /* KalmanFilter1D.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9F90F78BD04526AE0566CC /* KalmanFilter1D.swift */; };
+		C7E5A90CB7E5498F80CDA217 /* GlassBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E84926DD82E4B90B6509CD8 /* GlassBackground.swift */; };
+		CA0AC8EDAF744A1CB744F092 /* GlassBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E84926DD82E4B90B6509CD8 /* GlassBackground.swift */; };
 		D661CA0D0AE39DCBD4B91D38 /* BLEScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55DE3CF5A0CF1AE0ADFECAE1 /* BLEScanner.swift */; };
 		DA7DEF71C1E8ED4068EB7D66 /* ScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */; };
 		DCAC1361D1814E4895FD4B4F /* HysteresisEMA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01A62377C8474773A0ACA7CD /* HysteresisEMA.swift */; };
@@ -90,13 +88,15 @@
 		FB0573C422FBBEAE4005F8214 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = FB0573C412FBBEAE4005F8214 /* Logging */; };
 		FB0573C42FBC7405005F8214 /* ChannelQualityCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */; };
 		FB0573C62FBC741D005F8214 /* ChannelQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */; };
-
 		FB0573CA2FBCD25C005F8214 /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C82FBCD25C005F8214 /* OverviewView.swift */; };
 		FB0573CC2FBCD8FA005F8214 /* ThroughputMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */; };
 		FB0573CE2FBCD9B9005F8214 /* ThroughputChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CD2FBCD9B9005F8214 /* ThroughputChartView.swift */; };
 		FB0573D02FBD0001005F8214 /* RecommendationReason.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573D32FBD0001005F8217 /* RecommendationReason.swift */; };
 		FB0573D12FBD0001005F8215 /* RecommendationReasonCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573D42FBD0001005F8218 /* RecommendationReasonCalculator.swift */; };
 		FB0573D22FBD0001005F8216 /* ReasonPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573D52FBD0001005F8219 /* ReasonPopover.swift */; };
+		FB0573E32FBD0002005F9004 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573E02FBD0002005F9001 /* ExportService.swift */; };
+		FB0573E42FBD0002005F9005 /* MarkdownReportExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573E12FBD0002005F9002 /* MarkdownReportExporter.swift */; };
+		FB0573E52FBD0002005F9006 /* MarkdownExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573E22FBD0002005F9003 /* MarkdownExportService.swift */; };
 		FB1E32482FC7316C009D1BDC /* BluetoothPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6CDF2DB455AB04A0A7C8BBF /* BluetoothPermissionManager.swift */; };
 		FB1E32492FC7316C009D1BDC /* BLEChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E1C6C7FE18D0034F66CD3E /* BLEChannel.swift */; };
 		FB1E324A2FC7316C009D1BDC /* BLEAdvertisementEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE1ECDC700E5809F5B7FF4 /* BLEAdvertisementEvent.swift */; };
@@ -135,7 +135,6 @@
 		FB1E326C2FC7316C009D1BDC /* DebugRoamingChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */; };
 		FB1E326D2FC7316C009D1BDC /* SSIDColorHasher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */; };
 		FB1E326E2FC7316C009D1BDC /* ScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */; };
-
 		FB1E32702FC7316C009D1BDC /* ChartTimeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */; };
 		FB1E32712FC7316C009D1BDC /* ChartGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F362FC2D9650057B038 /* ChartGeometry.swift */; };
 		FB1E32722FC7316C009D1BDC /* SplineInterpolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */; };
@@ -165,7 +164,6 @@
 		FB1E328A2FC7316C009D1BDC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */; };
 		FB1E328B2FC7316C009D1BDC /* DeviceCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0470288A92AF41C793DAE70B /* DeviceCapabilities.swift */; };
 		FB1E328C2FC7316C009D1BDC /* GatewayPinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF472346A62545B9866DA8ED /* GatewayPinger.swift */; };
-		CA0AC8EDAF744A1CB744F092 /* GlassBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E84926DD82E4B90B6509CD8 /* GlassBackground.swift */; };
 		FB1E328D2FC7316C009D1BDC /* RoamingRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8367630A1EDF4515917A144A /* RoamingRecord.swift */; };
 		FB1E328E2FC7316C009D1BDC /* RoamingTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F790DC6E08D43C5BD058D96 /* RoamingTestViewModel.swift */; };
 		FB1E328F2FC7316C009D1BDC /* RoamingTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B13DBF938D654926B205302C /* RoamingTestView.swift */; };
@@ -232,6 +230,7 @@
 		FBBD169A2FD062F60093F940 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = FBBD16982FD062F60093F940 /* PrivacyInfo.xcprivacy */; };
 		FBBD169C2FD063630093F940 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBBD169B2FD063630093F940 /* Assets.xcassets */; };
 		FBBD169D2FD063630093F940 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBBD169B2FD063630093F940 /* Assets.xcassets */; };
+		FBC557F82FDBC43A0013FD7D /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573E02FBD0002005F9001 /* ExportService.swift */; };
 		FBD000012FC4000000ABC001 /* WiFiOffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD000002FC4000000ABC001 /* WiFiOffView.swift */; };
 		FBD000022FC4000000ABC001 /* WiFiOffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD000002FC4000000ABC001 /* WiFiOffView.swift */; };
 		FBD329502FC500000057B038 /* MetricKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD329512FC500000057B038 /* MetricKitManager.swift */; };
@@ -307,6 +306,7 @@
 		8F405489976429A068F15F86 /* WiFiLensTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WiFiLensTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSIDColorHasher.swift; sourceTree = "<group>"; };
 		9C5DDCE8EACD706BD2BCEE4B /* CWChannel+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CWChannel+Extensions.swift"; sourceTree = "<group>"; };
+		9E84926DD82E4B90B6509CD8 /* GlassBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassBackground.swift; sourceTree = "<group>"; };
 		9F790DC6E08D43C5BD058D96 /* RoamingTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingTestViewModel.swift; sourceTree = "<group>"; };
 		A5024CBB8BFCAFF56FEF0756 /* MCPServerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPServerTests.swift; sourceTree = "<group>"; };
 		AE17427BAD036F393D712B6F /* RegulatoryFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegulatoryFilterTests.swift; sourceTree = "<group>"; };
@@ -318,7 +318,6 @@
 		BB7BA76DD3B1E6198BDAEEA7 /* BLEViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEViewModel.swift; sourceTree = "<group>"; };
 		BD784856886985BCC6FC4F02 /* WiFi Lens.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "WiFi Lens.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF472346A62545B9866DA8ED /* GatewayPinger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayPinger.swift; sourceTree = "<group>"; };
-		9E84926DD82E4B90B6509CD8 /* GlassBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassBackground.swift; sourceTree = "<group>"; };
 		C51C237F247C80EC5176F5C0 /* ChartSeriesData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartSeriesData.swift; sourceTree = "<group>"; };
 		C6CDF2DB455AB04A0A7C8BBF /* BluetoothPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPermissionManager.swift; sourceTree = "<group>"; };
 		C70E4041B5972D72DD79BF56 /* RoamingTestViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingTestViewModelTests.swift; sourceTree = "<group>"; };
@@ -343,13 +342,15 @@
 		FB0573C12FBC47F1005F8214 /* CrashReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReporter.swift; sourceTree = "<group>"; };
 		FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityCalculator.swift; sourceTree = "<group>"; };
 		FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityView.swift; sourceTree = "<group>"; };
-
 		FB0573C82FBCD25C005F8214 /* OverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewView.swift; sourceTree = "<group>"; };
 		FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThroughputMonitor.swift; sourceTree = "<group>"; };
 		FB0573CD2FBCD9B9005F8214 /* ThroughputChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThroughputChartView.swift; sourceTree = "<group>"; };
 		FB0573D32FBD0001005F8217 /* RecommendationReason.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendationReason.swift; sourceTree = "<group>"; };
 		FB0573D42FBD0001005F8218 /* RecommendationReasonCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendationReasonCalculator.swift; sourceTree = "<group>"; };
 		FB0573D52FBD0001005F8219 /* ReasonPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReasonPopover.swift; sourceTree = "<group>"; };
+		FB0573E02FBD0002005F9001 /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
+		FB0573E12FBD0002005F9002 /* MarkdownReportExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownReportExporter.swift; sourceTree = "<group>"; };
+		FB0573E22FBD0002005F9003 /* MarkdownExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownExportService.swift; sourceTree = "<group>"; };
 		FB1E32A42FC7316C009D1BDC /* WiFi Lens Pro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "WiFi Lens Pro.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB2E3B2D2FC5ACDA00D2610E /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		FB32F4D62FC88535003F98C6 /* WiFiLensPro-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "WiFiLensPro-Info.plist"; sourceTree = "<group>"; };
@@ -408,9 +409,6 @@
 		FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdater.swift; sourceTree = "<group>"; };
 		FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		FC084FA8AE0EE5E703D922DA /* BandChartViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartViewModelTests.swift; sourceTree = "<group>"; };
-		FB0573E02FBD0002005F9001 /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
-		FB0573E12FBD0002005F9002 /* MarkdownReportExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownReportExporter.swift; sourceTree = "<group>"; };
-		FB0573E22FBD0002005F9003 /* MarkdownExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownExportService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -576,7 +574,6 @@
 				FBB2CA8C2FC0E14000FC2D2C /* TitleBadge.swift */,
 				FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */,
 				FB0573C82FBCD25C005F8214 /* OverviewView.swift */,
-
 				FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */,
 				FB0573C12FBC47F1005F8214 /* CrashReporter.swift */,
 				FB0573BF2FBC47CC005F8214 /* Logging.swift */,
@@ -673,6 +670,15 @@
 			path = Utilities;
 			sourceTree = "<group>";
 		};
+		FB0573E62FBD0002005F9007 /* SnapshotExport */ = {
+			isa = PBXGroup;
+			children = (
+				FB0573E12FBD0002005F9002 /* MarkdownReportExporter.swift */,
+				FB0573E22FBD0002005F9003 /* MarkdownExportService.swift */,
+			);
+			path = SnapshotExport;
+			sourceTree = "<group>";
+		};
 		FB0573E82FBD0002005F9009 /* SnapshotExport */ = {
 			isa = PBXGroup;
 			children = (
@@ -708,15 +714,6 @@
 				FB0573E62FBD0002005F9007 /* SnapshotExport */,
 			);
 			path = Pro;
-			sourceTree = "<group>";
-		};
-		FB0573E62FBD0002005F9007 /* SnapshotExport */ = {
-			isa = PBXGroup;
-			children = (
-				FB0573E12FBD0002005F9002 /* MarkdownReportExporter.swift */,
-				FB0573E22FBD0002005F9003 /* MarkdownExportService.swift */,
-			);
-			path = SnapshotExport;
 			sourceTree = "<group>";
 		};
 		FB6F41CB2FC4889B0009F29B /* Regulatory */ = {
@@ -951,7 +948,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 2650;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					FBA000070000000000000007 = {
 						TestTargetID = 4815C3B026D255EF85C56198;
@@ -969,8 +966,8 @@
 				Base,
 				en,
 				"zh-Hans",
-				"es",
-				"de",
+				es,
+				de,
 				ja,
 			);
 			mainGroup = 1D3644357E3565223E7F160A;
@@ -1072,7 +1069,6 @@
 				A952EA4DBE85899D61989DF9 /* SSIDColorHasher.swift in Sources */,
 				DA7DEF71C1E8ED4068EB7D66 /* ScannerViewModel.swift in Sources */,
 				C1D2E3F4A5B6123456780001 /* WiFiPowerMonitor.swift in Sources */,
-
 				FB9B7F3B2FC2D9650057B038 /* ChartTimeFormatting.swift in Sources */,
 				FB9B7F4C2FC2D9650057B038 /* ChartTypes.swift in Sources */,
 				FB9B7F4D2FC2D9650057B038 /* ChartView.swift in Sources */,
@@ -1200,7 +1196,6 @@
 				FB1E326D2FC7316C009D1BDC /* SSIDColorHasher.swift in Sources */,
 				FB1E326E2FC7316C009D1BDC /* ScannerViewModel.swift in Sources */,
 				A1B2C3D4E5F6789012340001 /* WiFiPowerMonitor.swift in Sources */,
-
 				FB1E32702FC7316C009D1BDC /* ChartTimeFormatting.swift in Sources */,
 				FB9B7F4E2FC2D9650057B038 /* ChartTypes.swift in Sources */,
 				FB9B7F4F2FC2D9650057B038 /* ChartView.swift in Sources */,
@@ -1247,7 +1242,7 @@
 				FB1E32942FC7316C009D1BDC /* HysteresisEMA.swift in Sources */,
 				FB0573E52FBD0002005F9006 /* MarkdownExportService.swift in Sources */,
 				FB0573E42FBD0002005F9005 /* MarkdownReportExporter.swift in Sources */,
-				FB0573E32FBD0002005F9004 /* ExportService.swift in Sources */,
+				FBC557F82FDBC43A0013FD7D /* ExportService.swift in Sources */,
 				3DC8FED8F49854F4CDFD4DDE /* BandChartRenderModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1305,7 +1300,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = ZMK8PL8T8J;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1327,7 +1322,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = ZMK8PL8T8J;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1352,8 +1347,10 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = ZMK8PL8T8J;
 				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
@@ -1390,6 +1387,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1420,7 +1418,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = ZMK8PL8T8J;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -1440,6 +1440,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 6.0;
@@ -1450,6 +1451,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1480,7 +1482,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = ZMK8PL8T8J;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_RESOURCE_ACCESS_LOCATION = YES;
@@ -1507,6 +1511,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
@@ -1524,6 +1529,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = ZMK8PL8T8J;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1570,8 +1576,10 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = ZMK8PL8T8J;
 				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
@@ -1615,6 +1623,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = ZMK8PL8T8J;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1657,7 +1666,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = ZMK8PL8T8J;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.kaoru.WiFiLensUITests;
@@ -1675,7 +1684,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = ZMK8PL8T8J;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.kaoru.WiFiLensUITests;
@@ -1693,7 +1702,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = ZMK8PL8T8J;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1723,7 +1732,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = ZMK8PL8T8J;
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
