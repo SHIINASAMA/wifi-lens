@@ -11,9 +11,9 @@ export const de = {
     title: 'WiFi Lens',
     subtitle: 'Ein natives Wi‑Fi Analyzer für macOS, das dir hilft, Überlastung zu erkennen, Verbindungsqualität zu diagnostizieren und Roaming-Verhalten in Echtzeit zu überprüfen.',
     cta: {
-      oss: 'Kostenlos Downloaden',
+      oss: 'Download',
       secondary: 'Für AI-Workflows',
-      proSoon: 'Mac App Store bald verfügbar',
+      proSoon: 'Mac App Store jetzt verfügbar',
     },
     hint: 'Local-first · Open Source · Kein Tracking',
   },
@@ -140,14 +140,15 @@ export const de = {
     },
     pro: {
       title: 'WiFi Lens PRO',
-      badge: 'Geplant für Mac App Store',
-      desc: 'Eine zukünftige Mac App Store-Version ist geplant für Leute die einen einfacheren Installationsweg wollen.',
+      badge: 'Im Mac App Store verfügbar',
+      desc: 'Holen Sie sich WiFi Lens PRO direkt aus dem Mac App Store für einfachere Installation und automatische Updates.',
       features: [
         'Gleiche zentrale Analyzer-Erfahrung',
         'Einfacherer Installationsfluss',
-        'Mac App Store-Verteilung wenn verfügbar',
+        'Mac App Store-Verteilung mit automatischen Updates',
       ],
-      cta: 'Geplant',
+      cta: 'Im Mac App Store herunterladen',
+      url: 'https://apps.apple.com/app/id6776590746',
     },
   },
   privacy: {

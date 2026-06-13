@@ -11,9 +11,9 @@ export const zhHans = {
     title: 'WiFi Lens',
     subtitle: '一款 macOS 原生 Wi‑Fi 分析工具，帮助你实时发现信道拥塞、诊断连接质量并验证漫游行为。',
     cta: {
-      oss: '免费下载',
+      oss: '下载',
       secondary: 'AI 工作流',
-      proSoon: 'Mac App Store 即将推出',
+      proSoon: 'Mac App Store 已上线',
     },
     hint: '本地优先  ·  开源  ·  无追踪',
   },
@@ -140,14 +140,15 @@ export const zhHans = {
     },
     pro: {
       title: 'WiFi Lens PRO',
-      badge: '即将在 Mac App Store 推出',
-      desc: '计划在未来推出 Mac App Store 版本，为希望获得更简单安装方式的用户提供选择。',
+      badge: 'Mac App Store 已上线',
+      desc: '直接从 Mac App Store 获取 WiFi Lens PRO，享受更简单的安装和自动更新。',
       features: [
         '相同的核心分析体验',
         '更简单的安装流程',
-        'Mac App Store 分发（筹备中）',
+        'Mac App Store 分发，支持自动更新',
       ],
-      cta: '筹备中',
+      cta: '在 Mac App Store 下载',
+      url: 'https://apps.apple.com/app/id6776590746',
     },
   },
   privacy: {

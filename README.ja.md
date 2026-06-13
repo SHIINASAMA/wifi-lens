@@ -66,6 +66,7 @@ Web ベースのスキャナやクロスプラットフォームの Electron ア
 ## ダウンロード
 
 [![最新リリースをダウンロード](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest/)
+[![Mac App Store でダウンロード](https://img.shields.io/badge/Download-Mac%20App%20Store-black?logo=apple)](https://apps.apple.com/app/id6776590746)
 
 macOS 14 (Sonoma) 以降が必要。Intel および Apple Silicon Mac の両方で動作します。
 

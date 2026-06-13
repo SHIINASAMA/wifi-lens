@@ -68,6 +68,7 @@ Unlike web-based scanners or cross-platform electron apps, WiFi Lens runs with z
 ## Download
 
 [![Download latest release](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest/)
+[![Download on the Mac App Store](https://img.shields.io/badge/Download-Mac%20App%20Store-black?logo=apple)](https://apps.apple.com/app/id6776590746)
 
 Requires macOS 14 (Sonoma) or later. Works on both Intel and Apple Silicon Macs.
 

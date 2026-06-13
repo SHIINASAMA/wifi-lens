@@ -66,6 +66,7 @@ Im Gegensatz zu webbasierten Scannern oder plattformübergreifenden Electron-App
 ## Download
 
 [![Letzte Version herunterladen](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest/)
+[![Im Mac App Store herunterladen](https://img.shields.io/badge/Download-Mac%20App%20Store-black?logo=apple)](https://apps.apple.com/app/id6776590746)
 
 Erfordert macOS 14 (Sonoma) oder später. Funktioniert auf Intel und Apple Silicon Macs.
 

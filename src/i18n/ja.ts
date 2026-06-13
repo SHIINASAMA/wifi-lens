@@ -11,9 +11,9 @@ export const ja = {
     title: 'WiFi Lens',
     subtitle: 'macOS 向けのネイティブ Wi‑Fi アナライザ。混雑の検出、接続品質の診断、ローミング動作の検証をリアルタイムで行えます。',
     cta: {
-      oss: '無料ダウンロード',
+      oss: 'ダウンロード',
       secondary: 'AI ワークフロー向け',
-      proSoon: 'Mac App Store で近日公開予定',
+      proSoon: 'Mac App Store で利用可能',
     },
     hint: 'ローカル優先  ·  オープンソース  ·  トラッキングなし',
   },
@@ -140,14 +140,15 @@ export const ja = {
     },
     pro: {
       title: 'WiFi Lens PRO',
-      badge: 'Mac App Store で提供予定',
-      desc: 'よりシンプルなインストール方法を求める方向けに、Mac App Store でのリリースを計画中です。',
+      badge: 'Mac App Store で利用可能',
+      desc: 'Mac App Store から直接入手でき、よりシンプルなインストールと自動更新が可能です。',
       features: [
         '同じコアアナライザ体験',
         'よりシンプルなインストールフロー',
-        'Mac App Store での配信（準備中）',
+        'Mac App Store での配信（自動更新付き）',
       ],
-      cta: '準備中',
+      cta: 'Mac App Store でダウンロード',
+      url: 'https://apps.apple.com/app/id6776590746',
     },
   },
   privacy: {
