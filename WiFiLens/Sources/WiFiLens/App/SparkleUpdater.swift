@@ -50,7 +50,11 @@ final class SparkleUpdater: ObservableObject {
             userDriverDelegate: nil
         )
         updater = controller.updater
-        updater.automaticallyChecksForUpdates = UserDefaults.standard.bool(forKey: autoCheckKey)
+        let autoCheck = UserDefaults.standard.bool(forKey: autoCheckKey)
+        updater.automaticallyChecksForUpdates = autoCheck
+        if autoCheck {
+            updater.checkForUpdatesInBackground()
+        }
     }
 
     var automaticallyChecksForUpdates: Bool {
