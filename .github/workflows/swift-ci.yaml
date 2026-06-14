@@ -108,9 +108,6 @@ jobs:
         run: |
           codesign --sign "$SIGNING_IDENTITY" --timestamp --options=runtime "$APP_NAME.dmg"
 
-          DMG_SIZE=$(stat -f%z "$APP_NAME.dmg")
-          echo "DMG_SIZE=$DMG_SIZE" >> $GITHUB_ENV
-
       - name: Notarize DMG
         run: |
           echo "${{ secrets.APPLE_API_KEY_BASE64 }}" | base64 -d > "$RUNNER_TEMP/api-key.p8"
@@ -140,44 +137,29 @@ jobs:
         run: |
           TAG=${GITHUB_REF#refs/tags/v}
           echo "VERSION=$TAG" >> $GITHUB_ENV
-          BUNDLE_VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_NAME.app/Contents/Info.plist" 2>/dev/null || echo "$TAG")
-          echo "BUNDLE_VERSION=$BUNDLE_VERSION" >> $GITHUB_ENV
 
       - name: Download Sparkle Tools
         run: |
           curl -sSL "https://github.com/sparkle-project/Sparkle/releases/download/${SPARKLE_VERSION}/Sparkle-${SPARKLE_VERSION}.tar.xz" \
             -o "$RUNNER_TEMP/sparkle.tar.xz"
           tar xf "$RUNNER_TEMP/sparkle.tar.xz" -C "$RUNNER_TEMP"
-          SPARKLE_BIN_DIR=$(dirname "$(find "$RUNNER_TEMP" -name sign_update -type f | head -1)")
+          SPARKLE_BIN_DIR=$(dirname "$(find "$RUNNER_TEMP" -name generate_appcast -type f | head -1)")
           echo "$SPARKLE_BIN_DIR" >> $GITHUB_PATH
 
       - name: Generate Signed Appcast
         env:
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_ED25519_PRIVATE_KEY }}
         run: |
-          ENCODED_DMG=$(printf '%s' "$APP_NAME.dmg" | sed 's/ /%20/g')
-          ENCLOSURE_URL="https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/${ENCODED_DMG}"
           echo "$SPARKLE_PRIVATE_KEY" > "$RUNNER_TEMP/sparkle-ed-key"
-          EDSIGNATURE=$(sign_update -p --ed-key-file "$RUNNER_TEMP/sparkle-ed-key" "$APP_NAME.dmg")
 
-          echo '<?xml version="1.0" encoding="utf-8"?>' > appcast.xml
-          echo '<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">' >> appcast.xml
-          echo '  <channel>' >> appcast.xml
-          echo "    <title>${APP_NAME}</title>" >> appcast.xml
-          echo '    <item>' >> appcast.xml
-          echo "      <title>Version ${VERSION}</title>" >> appcast.xml
-          echo "      <sparkle:version>${VERSION}</sparkle:version>" >> appcast.xml
-          echo "      <sparkle:shortVersionString>${BUNDLE_VERSION}</sparkle:shortVersionString>" >> appcast.xml
-          echo '      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>' >> appcast.xml
-          echo "      <enclosure url=\"${ENCLOSURE_URL}\"" >> appcast.xml
-          echo "                 sparkle:version=\"${VERSION}\"" >> appcast.xml
-          echo "                 sparkle:shortVersionString=\"${BUNDLE_VERSION}\"" >> appcast.xml
-          echo "                 sparkle:edSignature=\"${EDSIGNATURE}\"" >> appcast.xml
-          echo "                 length=\"${DMG_SIZE}\"" >> appcast.xml
-          echo '                 type="application/octet-stream" />' >> appcast.xml
-          echo '    </item>' >> appcast.xml
-          echo '  </channel>' >> appcast.xml
-          echo '</rss>' >> appcast.xml
+          mkdir -p "$RUNNER_TEMP/appcast-dir"
+          cp "$APP_NAME.dmg" "$RUNNER_TEMP/appcast-dir/"
+
+          generate_appcast \
+            --ed-key-file "$RUNNER_TEMP/sparkle-ed-key" \
+            --download-url-prefix "https://github.com/${{ github.repository }}/releases/download/v${{ env.VERSION }}/" \
+            -o appcast.xml \
+            "$RUNNER_TEMP/appcast-dir"
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
