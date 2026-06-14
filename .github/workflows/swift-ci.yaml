@@ -92,28 +92,28 @@ jobs:
       - name: Discover App
         run: |
           APP_PATH=$(find .build/DerivedData/Build/Products/"$RELEASE_CONFIG" -maxdepth 1 -name "*.app" | head -1)
-          APP_NAME=$(basename "$APP_PATH" .app)
+          DMG_BASENAME="WiFiLens"
           echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
-          echo "APP_NAME=$APP_NAME" >> $GITHUB_ENV
+          echo "DMG_BASENAME=$DMG_BASENAME" >> $GITHUB_ENV
 
       - name: Prepare App Bundle
         run: |
-          cp -R "$APP_PATH" "$APP_NAME.app"
+          cp -R "$APP_PATH" "$DMG_BASENAME.app"
 
       - name: Create DMG
         run: |
-          bash ../scripts/create-dmg.sh "$APP_NAME.app" "$APP_NAME.dmg"
+          bash ../scripts/create-dmg.sh "$DMG_BASENAME.app" "$DMG_BASENAME.dmg"
 
       - name: Sign DMG
         run: |
-          codesign --sign "$SIGNING_IDENTITY" --timestamp --options=runtime "$APP_NAME.dmg"
+          codesign --sign "$SIGNING_IDENTITY" --timestamp --options=runtime "$DMG_BASENAME.dmg"
 
       - name: Notarize DMG
         run: |
           echo "${{ secrets.APPLE_API_KEY_BASE64 }}" | base64 -d > "$RUNNER_TEMP/api-key.p8"
 
           NOTARY_EXIT=0
-          xcrun notarytool submit "$APP_NAME.dmg" \
+          xcrun notarytool submit "$DMG_BASENAME.dmg" \
             --key "$RUNNER_TEMP/api-key.p8" \
             --key-id "${{ secrets.APPLE_API_KEY_ID }}" \
             --issuer "${{ secrets.APPLE_API_ISSUER_ID }}" \
@@ -131,7 +131,7 @@ jobs:
 
       - name: Staple Notarization Ticket
         run: |
-          xcrun stapler staple "$APP_NAME.dmg"
+          xcrun stapler staple "$DMG_BASENAME.dmg"
 
       - name: Get Version
         run: |
@@ -153,7 +153,7 @@ jobs:
           echo "$SPARKLE_PRIVATE_KEY" > "$RUNNER_TEMP/sparkle-ed-key"
 
           mkdir -p "$RUNNER_TEMP/appcast-dir"
-          cp "$APP_NAME.dmg" "$RUNNER_TEMP/appcast-dir/"
+          cp "$DMG_BASENAME.dmg" "$RUNNER_TEMP/appcast-dir/"
 
           generate_appcast \
             --ed-key-file "$RUNNER_TEMP/sparkle-ed-key" \
@@ -166,7 +166,7 @@ jobs:
         with:
           tag_name: v${{ env.VERSION }}
           files: |
-            WiFiLens/${{ env.APP_NAME }}.dmg
+            WiFiLens/${{ env.DMG_BASENAME }}.dmg
             WiFiLens/appcast.xml
           draft: false
           generate_release_notes: true

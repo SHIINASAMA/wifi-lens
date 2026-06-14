@@ -3,10 +3,41 @@ import Sparkle
 
 private let autoCheckKey = "SUEnableAutomaticChecks"
 
+private final class UpdaterDelegate: NSObject, SPUUpdaterDelegate {
+    func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
+        let nsError = error as NSError
+        AppLogger.sparkle.error("aborted: code=\(nsError.code) domain=\(nsError.domain) \(error.localizedDescription)")
+    }
+
+    func updater(_ updater: SPUUpdater, failedToDownloadUpdate item: SUAppcastItem, error: Error) {
+        let nsError = error as NSError
+        AppLogger.sparkle.error("download failed: code=\(nsError.code) domain=\(nsError.domain) \(error.localizedDescription)")
+    }
+
+    func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
+        AppLogger.sparkle.info("found update: \(item.displayVersionString) (\(item.versionString))")
+    }
+
+    func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: Error) {
+        let nsError = error as NSError
+        AppLogger.sparkle.info("no update found: code=\(nsError.code) domain=\(nsError.domain) \(error.localizedDescription)")
+    }
+
+    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
+        if let error {
+            let nsError = error as NSError
+            AppLogger.sparkle.error("update cycle finished with error: code=\(nsError.code) domain=\(nsError.domain) \(error.localizedDescription)")
+        } else {
+            AppLogger.sparkle.info("update cycle finished")
+        }
+    }
+}
+
 @MainActor
 final class SparkleUpdater: ObservableObject {
     let controller: SPUStandardUpdaterController
     private let updater: SPUUpdater
+    private let updaterDelegate = UpdaterDelegate()
 
     init() {
         if UserDefaults.standard.object(forKey: autoCheckKey) == nil {
@@ -15,7 +46,7 @@ final class SparkleUpdater: ObservableObject {
 
         controller = SPUStandardUpdaterController(
             startingUpdater: true,
-            updaterDelegate: nil,
+            updaterDelegate: updaterDelegate,
             userDriverDelegate: nil
         )
         updater = controller.updater
