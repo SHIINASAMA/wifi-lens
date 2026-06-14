@@ -40,10 +40,6 @@ private struct BLEScannerContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            controlBar
-
-            Divider()
-
             if viewModel.bluetoothState == .poweredOff {
                 bluetoothOffView
             } else if viewModel.bluetoothState == .unauthorized
@@ -54,59 +50,15 @@ private struct BLEScannerContentView: View {
                 permissionRequiredView
             } else if let error = viewModel.errorMessage {
                 errorView(error)
-            } else if viewModel.devices.isEmpty, viewModel.isScanning {
-                scanningEmptyView
-            } else if viewModel.devices.isEmpty {
-                idleView
             } else {
-                contentView
-            }
-        }
-    }
-
-    // MARK: - Control bar
-
-    private var controlBar: some View {
-        HStack(spacing: 12) {
-            Button {
-                if viewModel.isScanning {
-                    viewModel.stopScanning()
+                interferenceBanner
+                if viewModel.devices.isEmpty {
+                    scanningEmptyView
                 } else {
-                    Task { await viewModel.startScanning() }
+                    contentView
                 }
-            } label: {
-                Image(systemName: viewModel.isScanning ? "stop.fill" : "play.fill")
-                    .frame(width: 16, height: 16)
-            }
-            .buttonStyle(.plain)
-            .help(viewModel.isScanning ? String(localized: "ble.control.stop_scanning", comment: "Button to stop BLE scanning") : String(localized: "ble.control.start_scanning", comment: "Button to start BLE scanning"))
-            .disabled(viewModel.bluetoothState != .poweredOn)
-            .accessibilityIdentifier("ble-scan-toggle-button")
-            .accessibilityLabel(viewModel.isScanning
-                ? String(localized: "ble.control.stop_scanning", comment: "Button to stop BLE scanning")
-                : String(localized: "ble.control.start_scanning", comment: "Button to start BLE scanning"))
-
-            Circle()
-                .fill(stateColor)
-                .frame(width: 8, height: 8)
-                .accessibilityHidden(true)
-
-            Text(stateLabel)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-
-            Spacer()
-
-            if !viewModel.devices.isEmpty {
-                Text(String(format: String(localized: "ble.device_count_fmt", comment: "Device count with number"), viewModel.devices.count))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .padding(.trailing, 8)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-        .accessibilityIdentifier("ble-control-bar")
     }
 
     // MARK: - Content
@@ -252,21 +204,28 @@ private struct BLEScannerContentView: View {
         }
     }
 
-    // MARK: - Empty / error states
+    // MARK: - Interference tip
 
-    private var idleView: some View {
-        VStack(spacing: 12) {
-            Spacer()
-            Image(systemName: "antenna.radiowaves.left.and.right")
-                .font(.largeTitle)
-                .foregroundColor(.secondary.opacity(0.5))
-                .accessibilityHidden(true)
-            Text(String(localized: "ble.empty.idle", comment: "Empty state prompting user to start scanning"))
-                .font(.body)
-                .foregroundColor(.secondary)
-            Spacer()
+    private var interferenceBanner: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 6) {
+                Image(systemName: "info.circle.fill")
+                    .font(.caption)
+                    .foregroundColor(.accentColor)
+                Text(String(localized: "ble.banner.interference", comment: "Info banner about BLE and 2.4 GHz Wi-Fi interference"))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
         }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 6))
+        .padding(.horizontal, 16)
+        .padding(.top, 10)
+        .padding(.bottom, 16)
     }
+
+    // MARK: - Empty / error states
 
     private var scanningEmptyView: some View {
         VStack(spacing: 12) {
@@ -351,25 +310,6 @@ private struct BLEScannerContentView: View {
     }
 
     // MARK: - Helpers
-
-    private var stateColor: Color {
-        switch viewModel.bluetoothState {
-        case .poweredOn where viewModel.isScanning:
-            .green
-        case .poweredOn:
-            .blue
-        case .poweredOff, .unsupported:
-            .red
-        case .unauthorized:
-            .orange
-        default:
-            .gray
-        }
-    }
-
-    private var stateLabel: String {
-        viewModel.isScanning ? String(localized: "common.label.scanning", comment: "Scanning in progress status") : viewModel.bluetoothState.label
-    }
 
     private func rssiColor(_ rssi: Double) -> Color {
         switch rssi {
