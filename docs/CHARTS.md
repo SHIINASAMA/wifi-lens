@@ -202,9 +202,6 @@ The Catmull-Rom spline flattens the transition from the last real data point to 
 
 See `Pro/docs/ARCHITECTURE.md` (submodule) for the full recording module architecture and `RecordingViewModel` design.
 
-- **Freeze/Pause**: The `isFrozen`/`frozenSnapshot`/`toggleFreeze()` mechanism and `freezeAllBands` notification were removed. The freeze UI (pause button, Cmd-. menu item) was also deleted.
-- **FilterPopoverView**: Deleted. Filtering is now done via the global filter query in `ScannerViewModel`.
-
 ## Caller Quick Reference
 
 ```swift

@@ -31,11 +31,6 @@ Detection: `@Environment(\.accessibilityReduceMotion)` on any SwiftUI `View`.
 
 Implementation approach: add a `@Environment(\.accessibilityReduceMotion)` check at View level where animations are defined, branching to `.animation(.none, value: ...)` when enabled.
 
-### Differentiate Without Color
-
-Gaps identified:
-
-
 ## Testing
 
 ```sh
