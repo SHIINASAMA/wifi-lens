@@ -14,15 +14,12 @@ final class SparkleUpdater: ObservableObject {
         }
 
         controller = SPUStandardUpdaterController(
-            startingUpdater: false,
+            startingUpdater: true,
             updaterDelegate: nil,
             userDriverDelegate: nil
         )
         updater = controller.updater
-
-        if UserDefaults.standard.bool(forKey: autoCheckKey) {
-            try? updater.start()
-        }
+        updater.automaticallyChecksForUpdates = UserDefaults.standard.bool(forKey: autoCheckKey)
     }
 
     var automaticallyChecksForUpdates: Bool {
@@ -34,14 +31,6 @@ final class SparkleUpdater: ObservableObject {
     }
 
     func checkForUpdates() {
-        if !updater.canCheckForUpdates {
-            do {
-                try updater.start()
-            } catch {
-                AppLogger.sparkle.error("start failed: \(error.localizedDescription)")
-                return
-            }
-        }
         AppLogger.sparkle.info("manual check triggered")
         controller.checkForUpdates(nil)
     }

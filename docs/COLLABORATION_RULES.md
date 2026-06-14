@@ -25,6 +25,8 @@ The following rules are **hard constraints** and must be followed in all circums
 
 - **No destructive Git operations**: `git reset --hard`, `git clean -f`, and similar must be confirmed by the user.
 
+- **Verify target before editing pbxproj**: OSS and PRO target build settings blocks look nearly identical. Check `baseConfigurationReference` (`OSS.xcconfig` vs `PRO.xcconfig`) before modifying any block. Never use `replace_all` on pbxproj — edit each occurrence individually with enough context.
+
 ## Must Follow
 
 - **AGENTS.md / CLAUDE.md takes priority**: AGENTS.md, CLAUDE.md, and the project documentation under `docs/` are the authoritative guides for this project and must be consulted for every decision.
