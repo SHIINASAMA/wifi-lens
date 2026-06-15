@@ -1,52 +1,69 @@
 export const de = {
+  a11y: {
+    skipLink: 'Zum Hauptinhalt springen',
+    menu: 'Menü',
+    backToTop: 'Zurück nach oben',
+    selectLanguage: 'Sprache auswählen',
+  },
+  meta: {
+    title: 'WiFi Lens — macOS Wi‑Fi Spektrum-Analysator',
+    description: 'WiFi Lens — Ein nativer macOS Wi‑Fi Spektrum-Analysator. Scannen, diagnostizieren und roamen mit Vertrauen.',
+  },
   nav: {
     features: 'Funktionen',
-    mcp: 'MCP',
+    mcp: 'AI Workflows',
     download: 'Download',
+    faq: 'FAQ',
     privacy: 'Privatsphäre',
     docs: 'Dokumentation',
   },
   hero: {
     badge: 'macOS 14+ · Native · Local-first',
     title: 'WiFi Lens',
-    subtitle: 'Ein natives Wi‑Fi Analyzer für macOS, das dir hilft, Überlastung zu erkennen, Verbindungsqualität zu diagnostizieren und Roaming-Verhalten in Echtzeit zu überprüfen.',
+    subtitle: 'Ein nativer Wi‑Fi Analyzer für macOS, der dir zeigt, wo dein WLAN Probleme hat, ob Kanäle überlastet sind und ob deine Geräte richtig roamen.',
     cta: {
       oss: 'Download',
-      secondary: 'Für AI-Workflows',
+      secondary: 'AI-Workflows',
       proSoon: 'Mac App Store jetzt verfügbar',
     },
     hint: 'Local-first · Open Source · Kein Tracking',
   },
+  stats: [
+    { value: 'Alle Bänder', label: '2.4/5/6 GHz' },
+    { value: 'Echtzeit', label: 'Scanning' },
+    { value: 'macOS', label: 'Native App' },
+    { value: 'Vollständig', label: 'Lokal & Offline' },
+  ],
   features: {
     title: 'Tiefe Einblicke in deine drahtlose Umgebung',
     scanning: {
       title: 'Tri-Band Spektrum-Scanning',
-      desc: 'Siehe nahe 2.4 GHz, 5 GHz und 6 GHz Netzwerke in Echtzeit aktualisieren. Zoom, friere ein und vergleiche Kanalüberlappung ohne das große Bild zu verlieren.',
+      desc: 'Sieh alle nahen Wi‑Fi Netzwerke auf 2,4 GHz, 5 GHz und 6 GHz auf einen Blick. Zoome, friere ein und entdecke die überlastetsten Kanäle sofort.',
     },
     table: {
       title: 'Umfassende Netzwerk-Tabelle',
-      desc: 'Untersuche RSSI, Kanal, Band, Sicherheit, Anbieter und Fähigkeiten für jedes sichtbare Netzwerk. Sortiere, filtere und kreuzreferenziere Zeilen mit der Spektrum-Ansicht während der Untersuchung.',
+      desc: 'Liste alle umliegenden Wi‑Fi Netzwerke in einer Tabelle auf – Signalstärke, Kanal, Sicherheitstyp und Hersteller auf einen Blick. Schnell filtern, um Probleme zu finden.',
     },
     roaming: {
       title: 'Roaming-Test mit Zeitstrahl',
-      desc: 'Verfolge Access-Point-Übergänge beim Bewegen durch einen Raum. Überprüfe Übergänge, Signaländerungen und gespeicherte Sitzungen um Roaming-Verhalten zu bestätigen.',
+      desc: 'Geh in deiner Wohnung umher und sieh, wo das Signal schwächer wird und wann dein Gerät den Router wechselt. Speichere Sitzungen, um später Änderungen nachzuvollziehen.',
     },
     quality: {
       title: 'Kanal-Qualitäts-Bewertung',
-      desc: 'Finde sauberere Kanäle über alle Wi‑Fi Bände auf einen Blick. Punktzahlen, Stufen und Empfehlungen helfen dir zu entscheiden wo du als nächstes wechseln sollst.',
+      desc: 'Bewerte deine Wi‑Fi Kanäle. Welcher Kanal ist am saubersten und hat die wenigsten Störungen – Bewertungen und Empfehlungen helfen dir, den besten auszuwählen.',
     },
     overview: {
       title: 'Diagnose-Dashboard für Verbindung',
-      desc: 'Starte mit der Verbindung die du gerade verwendest. WiFi Lens hebt Signalgesundheit, Kanalqualität, Sicherheit und die wahrscheinlichste Ursache des Problems hervor.',
+      desc: 'Beginne mit dem Netzwerk, das du gerade nutzt. WiFi Lens prüft Signalqualität, Kanalüberlastung und Sicherheitseinstellungen und gibt klare Verbesserungsvorschläge.',
     },
     privacy: {
       title: 'Standardmäßig Privat',
-      desc: 'Keine Analytics, keine Telemetrie und keine Cloud-Abhängigkeit. Deine Scans bleiben auf deinem Mac, und sogar MCP-Zugriff bleibt lokal an deiner Maschine.',
+      desc: 'Keine Sammlung von Privatsphäre, kein Cloud-Upload. Alle Daten werden lokal auf deinem Mac verarbeitet – selbst KI-Funktionen greifen nur auf deine lokale Maschine zu.',
     },
   },
   demo: {
     title: 'Siehe die App in Aktion',
-    subtitle: 'Sechs fokussierte Ansichten zur Fehlerbehebung von Wi‑Fi-Leistung, Abdeckung und Kanalnutzung.',
+    subtitle: 'Fokussierte Ansichten zur Fehlerbehebung von Wi‑Fi-Leistung, Abdeckung und Kanalnutzung.',
     items: [
       {
         title: 'Diagnose-Dashboard',
@@ -58,36 +75,36 @@ export const de = {
       {
         title: 'Spektrum-Scanner',
         alt: 'Tri-Band Spektrum-Scanner mit Netzwerkkurven und Kanalbelegung über Wi‑Fi-Bänder',
-        desc: 'Sieh zu wie nahe Netzwerke in Live-Spektrum-Diagrammen über alle Haupt-Wi‑Fi-Bänder erscheinen. Nutze es um Überlappung, Überlastung und laute Kanalgruppen schnell zu erkennen.',
+        desc: 'Sieh die Live-Aktivität aller nahen Netzwerke über alle Wi‑Fi-Bänder. Finde schnell heraus, wo es am vollsten ist und welche Kanäle überlastet sind.',
         bullets: ['Live Tri-Band Spektrum-Ansicht', 'Überlastete Kanäle schnell erkennen', 'Zoom, einfrieren und Details prüfen'],
         image: '/screenshots/spectrum.png',
       },
       {
         title: 'Kanal-Qualitäts-Analyse',
         alt: 'Kanal-Qualitäts-Analyse mit regionsbasierter Bewertung, DFS-Erkennung und Gerätekompatibilitätsfilter',
-        desc: 'Vergleiche Kanal-Bewertungen bevor du dein Netzwerk-Setup änderst. WiFi Lens zeigt sauberere Optionen mit regionsbasierter Filterung, Überlappungskontext und Gerätekompatibilitätsprüfungen.',
+        desc: 'Vergleiche Kanalbewertungen, bevor du deine Router-Einstellungen änderst. WiFi Lens gibt passendere Empfehlungen basierend auf deiner Region und Umgebung und prüft die Gerätekompatibilität.',
         bullets: ['Pro-Kanal Qualitätsbewertungen', 'Regionsbasierte Empfehlungen', 'Vorschläge für sauberere Kanäle'],
         image: '/screenshots/channels.png',
       },
       {
         title: 'Netzwerk-Tabelle',
         alt: 'Sortierbare Netzwerk-Tabelle mit Wi‑Fi-Details inklusive RSSI, Kanal, Sicherheit, Anbieter und Fähigkeiten',
-        desc: 'Durchsuche die vollständige Liste sichtbarer Netzwerke mit einer kompakten, nativen Tabelle. Jede Zeile zeigt Signalstärke, Kanal, Band, Sicherheitstyp, Anbieter-OUI und 802.11-Fähigkeiten.',
-        bullets: ['RSSI, Kanal, Band und Sicherheitstyp', 'Anbieter-OUI und Fähigkeits-Flags', 'Schnell nach SSID oder BSSID filtern'],
+        desc: 'Tauche in die vollständige Liste aller sichtbaren Netzwerke mit detaillierten Parametern ein. Jede Zeile zeigt Signalstärke, Kanal, Band, Sicherheitstyp und Hersteller – für alle, die genauer hinsehen wollen.',
+        bullets: ['Signalstärke, Kanal, Band, Sicherheitstyp', 'Hersteller- und Fähigkeitsangaben', 'Schnell nach Netzwerknamen oder Geräteadresse filtern'],
         image: '/screenshots/table.png',
       },
       {
         title: 'Roaming-Test',
         alt: 'Roaming-Test-Zeitstrahl mit Access-Point-Übergängen, Signalverlauf und Handoff-Details',
-        desc: 'Validiere Roaming-Verhalten beim Durchlaufen eines Raums mit einem Laptop. Überprüfe Handoffs, Signalverlauf und gespeicherte Sitzungen um zu verstehen wie Clients zwischen APs wechseln.',
-        bullets: ['AP-Übergänge über die Zeit erkennen', 'Signalabfälle während Bewegung visualisieren', 'Roaming-Sitzungen speichern und neu laden'],
+        desc: 'Geh mit deinem Laptop in der Wohnung umher und sieh, wie deine Geräte zwischen Zugangspunkten wechseln. Überprüfe Handoffs, Signalverlauf und gespeicherte Sitzungen, um die tatsächliche Wi‑Fi-Abdeckung zu verstehen.',
+        bullets: ['Erkenne, wann Geräte zu einem anderen AP wechseln', 'Sieh Signaländerungen während der Bewegung', 'Speichere und lade Roaming-Sitzungen erneut'],
         image: '/screenshots/roaming.png',
       },
       {
         title: 'Netzwerk-Schnittstellen',
         alt: 'Netzwerk-Schnittstellen-Ansicht mit Verbindungsdetails und Live-Durchsatz-Überwachung',
-        desc: 'Untersuche Wi‑Fi und nicht-Wi‑Fi Schnittstellen von einem Ort aus. Wechsle zwischen High-Level-Status, detaillierter Link-Information und Live-Durchsatz-Monitoring.',
-        bullets: ['Wechsle zwischen schnellem Status und tiefem Detail', 'Beobachte Live-Durchsatz über die Zeit', 'Untersuche Wi‑Fi, Ethernet, VPN und virtuelle Links'],
+        desc: 'Alle Netzwerkschnittstellen auf einer Seite – Wi‑Fi, Kabel, VPN und mehr. Sieh detaillierte Verbindungsinformationen und überwache die Live-Geschwindigkeit.',
+        bullets: ['Schnellstatus und Tiefendetails mit einem Klick', 'Überwache Live-Geschwindigkeit', 'Zeige Wi‑Fi, Ethernet, VPN und mehr'],
         image: '/screenshots/interfaces.png',
       },
     ],
@@ -104,7 +121,7 @@ export const de = {
     ],
   },
   mcp: {
-    title: 'Lass AI deine lokale Wi‑Fi-Umgebung untersuchen',
+    title: 'Mit deinem Wi‑Fi chatten wie im Gespräch',
     subtitle: 'WiFi Lens kann Live-Scandaten zu Tools wie Claude Desktop über MCP exponieren, sodass du Fragen zu nahen Netzwerken und Kanalnutzung stellen kannst ohne Daten in die Cloud zu senden.',
     endpoints: {
       title: 'Drei JSON-Endpoints',
@@ -139,17 +156,32 @@ export const de = {
       url: 'https://github.com/SHIINASAMA/wifi-lens/releases/latest',
     },
     pro: {
-      title: 'WiFi Lens PRO',
-      badge: 'Im Mac App Store verfügbar',
-      desc: 'Holen Sie sich WiFi Lens PRO direkt aus dem Mac App Store für einfachere Installation und automatische Updates.',
+      title: 'WiFi Lens unterstützen',
+      badge: 'Sponsoring & Upgrade',
+      desc: 'WiFi Lens wird hauptsächlich von einem einzelnen Entwickler gewartet. Mit dem Kauf der Pro-Version im App Store unterstützt du die Weiterentwicklung und schaltest erweiterte Funktionen wie Spektrum-Sitzungsaufzeichnung frei.',
       features: [
-        'Gleiche zentrale Analyzer-Erfahrung',
-        'Einfacherer Installationsfluss',
-        'Mac App Store-Verteilung mit automatischen Updates',
+        'Alles aus WiFi Lens OSS',
+        'Spektrum-Sitzungsaufzeichnung und -wiedergabe',
+        'Nebeneinander-Spektrumvergleich über Zeiträume',
+        'Aufzeichnungen für Offline-Analyse exportieren',
+        'Einfache Installation mit automatischen Updates',
+        'Unterstützt die kontinuierliche Wartung durch den Indie-Entwickler',
       ],
       cta: 'Im Mac App Store herunterladen',
       url: 'https://apps.apple.com/app/id6776590746',
     },
+  },
+  faq: {
+    title: 'Häufig gestellte Fragen',
+    items: [
+      { q: 'Ist WiFi Lens kostenlos?', a: 'Absolut. WiFi Lens OSS ist Open Source und vollständig kostenlos — du kannst es ohne Einschränkungen von GitHub herunterladen und nutzen. Die Pro-Version ist ein einmaliges Sponsoring über den App Store, das einige aufnahme-bezogene erweiterte Funktionen freischaltet. Die Kernfunktionen der Wi‑Fi-Analyse sind in beiden Versionen identisch.' },
+      { q: 'Was ist der Unterschied zwischen Pro und OSS?', a: 'Die OSS-Version deckt alle Kernfunktionen ab: Spektrum-Scanning, Netzwerktabelle, Kanal-Bewertung, Roaming-Tests und MCP-KI-Integration. Die Pro-Version fügt Spektrum-Sitzungsaufzeichnung (Erfassen und Wiedergeben von Spektrumänderungen über die Zeit) und nebeneinander Spektrumvergleich über Zeiträume hinzu. Wenn du keine Aufnahme und Wiedergabe benötigst, hat die OSS-Version alles, was du brauchst.' },
+      { q: 'Werden meine Daten in die Cloud hochgeladen?', a: 'Absolut nicht. WiFi Lens hat keinerlei Backend-Server. Alle Daten werden lokal auf deinem Mac verarbeitet. Selbst die MCP-KI-Integration kommuniziert nur über die lokale Schnittstelle deines Rechners — nichts wird an einen entfernten Server gesendet. Um es klar zu sagen: Wir sammeln nichts.' },
+      { q: 'Welche macOS-Version benötige ich?', a: 'WiFi Lens erfordert macOS 14 (Sonoma) oder neuer. Es unterstützt sowohl Apple Silicon als auch Intel Macs. Ein kurzer Hinweis: Das Scannen des 6-GHz-Bandes erfordert, dass deine Mac-Hardware Wi‑Fi 6E oder Wi‑Fi 7 unterstützt (verfügbar bei neueren Apple Silicon Modellen). Ältere Intel Macs oder nicht-6E-Modelle können weiterhin alle 2,4-GHz- und 5-GHz-Funktionen ohne Einschränkung nutzen.' },
+      { q: 'Warum zeigen einige 6-GHz-Netzwerke kein 6-GHz-Label?', a: 'Dies ist eine Einschränkung auf macOS-Systemebene. Die drahtlosen Scan-APIs, die macOS den Apps bereitstellt, kennzeichnen ein Netzwerk nicht immer explizit als zum 6-GHz-Band gehörend. Bei Wi‑Fi 6E-Netzwerken kodiert das System die Bandinformationen typischerweise über die Kanalnummer oder die Mittenfrequenz, anstatt direkt ein "6 GHz"-Label zurückzugeben. Infolgedessen können einige 6-GHz-Netzwerke in den Scanergebnissen als 5 GHz oder ohne spezifisches Bandlabel erscheinen. Dies ist Systemverhalten, kein Fehler — es bedeutet nicht, dass das Gerät kein 6-GHz-Netzwerk verwendet.' },
+      { q: 'Funktioniert es unter Windows oder Linux?', a: 'WiFi Lens ist eine macOS-native App und unterstützt Windows oder Linux nicht. Es nutzt das CoreWLAN-Framework von macOS zum Auslesen von Wi‑Fi-Daten, und es gibt kein äquivalentes Framework auf anderen Betriebssystemen.' },
+      { q: 'Warum verlangt es eine Standortberechtigung?', a: 'Das ist nicht unsere Anforderung — es ist eine macOS-Richtlinie. Apple schreibt vor, dass jede App, die Wi‑Fi-Netzwerknamen (SSIDs) lesen kann, eine Standortberechtigung einholen muss. WiFi Lens greift niemals auf deine GPS-Koordinaten zu und zeichnet niemals deinen Standort auf.' },
+    ],
   },
   privacy: {
     title: 'Deine Daten bleiben auf deinem Mac. Immer.',
@@ -160,7 +192,7 @@ export const de = {
     },
     permissions: {
       heading: 'Warum Wir Berechtigungen Anfordern',
-      body: 'Wi‑Fi — Kernfunktionalität: Scanning und Analysieren naher drahtloser Netzwerke.\n\nBluetooth — Optional verwendet um nahe BLE-Geräte für Koeistenz-Analyse zu entdecken. Diese Funktion ist standardmäßig deaktiviert und kann in Einstellungen aktiviert werden. Alle Entdeckung läuft lokal auf deiner Maschine.\n\nLocation Services — macOS erfordert diese Berechtigung für jede App die Wi‑Fi-Netzwerknamen (SSIDs) liest. WiFi Lens greift nie deine GPS-Koordinaten zu und registriert nie deine Position.\n\nLokales Netzwerk — Optional verwendet wenn du den MCP-Server in Einstellungen aktivierst. Der Server hört nur auf localhost (127.0.0.1) sodass lokale Tools wie Claude Desktop Wi‑Fi-Scandaten lesen können. Es ist standardmäßig aus, und keine Daten verlassen deinen Mac.',
+      body: 'Wi‑Fi — Kernfunktion: Scannen und Analysieren naher drahtloser Netzwerke.\n\nBluetooth — Optional: Erkennt nahe Bluetooth-Geräte für Koexistenz-Analyse. Standardmäßig deaktiviert, in den Einstellungen aktivierbar. Alle Erkennung läuft lokal auf deinem Gerät.\n\nOrtungsdienste — macOS verlangt diese Berechtigung für jede App, die Wi‑Fi-Netzwerknamen (SSIDs) liest. WiFi Lens greift nie auf deine GPS-Koordinaten zu und zeichnet nie deinen Standort auf.\n\nLokales Netzwerk — Nur verwendet, wenn du den MCP-Server in den Einstellungen aktivierst. Der Server horcht nur auf localhost (127.0.0.1), damit lokale Tools wie Claude Desktop Wi‑Fi-Scandaten lesen können. Standardmäßig deaktiviert – keine Daten verlassen deinen Mac.',
     },
     localOnly: {
       heading: 'Alles Bleibt Auf Deiner Maschine',
@@ -178,7 +210,7 @@ export const de = {
     contact: 'Fragen? Öffne ein GitHub Issue oder erreiche uns unter wifi-lens@outlook.com',
   },
   footer: {
-    copyright: '© 2026 WiFi Lens. Verstehe dein Wi‑Fi.',
+    copyright: '© 2026 WiFi Lens — Durchschaue dein Wi‑Fi.',
     x: '@WiFiLens',
     email: 'wifi-lens@outlook.com',
     privacy: 'Privatsphäre',

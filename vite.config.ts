@@ -5,5 +5,14 @@ export default defineConfig({
   build: {
     outDir: '_site',
     emptyOutDir: true,
+    target: 'esnext',
+  },
+  esbuild: {
+    target: 'esnext',
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'esnext',
+    },
   },
 })
