@@ -66,6 +66,7 @@ WiFi Lens 是一款免费开源的 Wi-Fi 和蓝牙分析器，完全使用 macOS
 ## 下载
 
 [![下载最新版本](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest/)
+[![在 Mac App Store 下载](https://img.shields.io/badge/Download-Mac%20App%20Store-black?logo=apple)](https://apps.apple.com/app/id6776590746)
 
 需要 macOS 14 (Sonoma) 或更高版本。兼容 Intel 和 Apple Silicon Mac。
 

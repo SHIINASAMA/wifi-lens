@@ -66,6 +66,7 @@ A diferencia de los escáneres basados en web o las aplicaciones multiplataforma
 ## Descargar
 
 [![Descargar última versión](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest/)
+[![Descargar en el Mac App Store](https://img.shields.io/badge/Download-Mac%20App%20Store-black?logo=apple)](https://apps.apple.com/app/id6776590746)
 
 Requiere macOS 14 (Sonoma) o posterior. Funciona en Macs Intel y Apple Silicon.
 
