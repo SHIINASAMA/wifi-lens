@@ -13,6 +13,12 @@
 
 **Wi-Fi ネットワークを分析・最適化するためのネイティブ macOS ツール。**
 
+<p align="center">
+  <a href="https://apps.apple.com/app/id6776590746">
+    <img src="https://developer.apple.com/assets/elements/badges/download-on-the-mac-app-store.svg" alt="Mac App Store でダウンロード" width="240">
+  </a>
+</p>
+
 ---
 
 ## WiFi Lens とは？
