@@ -59,7 +59,7 @@ Unlike web-based scanners or cross-platform electron apps, WiFi Lens runs with z
 
 **Regulatory intelligence built in.** Most tools show raw channel numbers and call it a day. WiFi Lens infers your regulatory domain from system locale, hardware capability, and nearby AP country codes, then recommends channels you're actually allowed to use — respecting DFS, indoor-only, and 6 GHz AFC rules.
 
-**Everything is connected.** Click a network in the table and it highlights on every chart. Hover a bell curve and see the SSID pop up. Freeze one band while the others keep scanning. It's designed like a cockpit, not a dashboard.
+**Everything is connected.** Click a network in the table and it highlights on every chart. Hover a bell curve and see the SSID pop up. It's designed like a cockpit, not a dashboard.
 
 **Room for power users.** Export PNG/CSV, run a roaming test with session save/load, or integrate with your own tools via the built-in MCP HTTP server — all without hidden paywalls.
 

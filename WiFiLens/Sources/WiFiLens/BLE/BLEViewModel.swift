@@ -44,6 +44,7 @@ final class BLEViewModel {
     init() {
         bluetoothState = bluetoothPowerMonitor.currentState
         startBluetoothMonitoring()
+        bluetoothPowerMonitor.startMonitoring()
     }
 
     func requestPermission() {

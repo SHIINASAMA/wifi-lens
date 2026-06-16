@@ -188,74 +188,38 @@
         }
       }
     },
-    "ble.control.start_scanning" : {
-      "comment" : "Button to start BLE scanning",
+    "ble.banner.interference" : {
+      "comment" : "Info banner about BLE and 2.4 GHz Wi-Fi interference",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scannen starten"
+            "value" : "Bluetooth arbeitet im 2,4-GHz-Band – viele BLE-Geräte können 2,4-GHz-WLANs stören und umgekehrt."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start scanning"
+            "value" : "Bluetooth operates in the 2.4 GHz band — dense BLE activity can interfere with 2.4 GHz Wi-Fi networks and nearby Bluetooth devices."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Iniciar escaneo"
+            "value" : "Bluetooth opera en la banda de 2,4 GHz: una alta densidad de dispositivos BLE puede interferir con redes Wi-Fi de 2,4 GHz y con otros dispositivos Bluetooth cercanos."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "スキャンを開始"
+            "value" : "Bluetoothは2.4GHz帯で動作します。密集したBLE環境では2.4GHz Wi-Fiネットワークや近隣のBluetoothデバイスに干渉する可能性があります。"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "开始扫描"
-          }
-        }
-      }
-    },
-    "ble.control.stop_scanning" : {
-      "comment" : "Button to stop BLE scanning",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scannen stoppen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stop scanning"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Detener escaneo"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "スキャンを停止"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "停止扫描"
+            "value" : "蓝牙运行于 2.4 GHz 频段，密集的 BLE 设备可能干扰 2.4 GHz Wi-Fi 网络及附近的蓝牙设备。"
           }
         }
       }
@@ -364,42 +328,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "蓝牙分析已关闭"
-          }
-        }
-      }
-    },
-    "ble.empty.idle" : {
-      "comment" : "Empty state prompting user to start scanning",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tippe auf Play, um den BLE-Scan zu starten"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tap play to start scanning for BLE devices"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toca reproducir para iniciar el escaneo de dispositivos BLE"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "再生ボタンをタップして BLE デバイスのスキャンを開始"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "轻点播放按钮开始扫描 BLE 设备"
           }
         }
       }
@@ -5972,7 +5900,8 @@
             "value" : "{\"mcpServers\":{\"wifi-lens\":{\"url\":\"http://127.0.0.1:%ld\"}}}"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "format.dot_prefix" : {
       "comment" : "Dot-prefixed label",
