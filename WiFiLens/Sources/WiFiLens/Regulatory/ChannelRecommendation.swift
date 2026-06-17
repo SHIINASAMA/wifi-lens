@@ -25,6 +25,11 @@ struct ChannelRecommendation: Identifiable, Sendable {
     /// regulatory-advanced (e.g., DFS), or RF-good and regulatory-recommended.
     var rfIsRecommended: Bool = false
 
+    /// Predicted future score from the dynamic scoring model.
+    /// Accounts for AP count trends and migration pressure from recent recommendations.
+    /// Used for recommendation selection instead of the raw RF snapshot score.
+    var predictedScore: Int = 0
+
     var id: String { "\(band)-\(channel)" }
 
     // MARK: - Classification
@@ -96,5 +101,6 @@ struct ChannelRecommendation: Identifiable, Sendable {
         self.isCurrentChannel = rf.isCurrentChannel
         self.showInSimpleView = rf.showInSimpleView
         self.rfIsRecommended = rf.isRecommended
+        self.predictedScore = rf.predictedScore
     }
 }

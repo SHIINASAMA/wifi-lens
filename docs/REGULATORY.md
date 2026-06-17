@@ -32,12 +32,13 @@ Hardware Supported Channels (CoreWLAN)  ─┐
 
 ## Data Flow
 
-`ScannerViewModel` gathers channel qualities via `ChannelQualityCalculator`, then passes them along with network IEs, device capabilities, and user preferences to `RegulatoryPipeline.computeRecommendations()`. The pipeline returns classified `[ChannelRecommendation]` for display in the channel quality views.
+`ScannerViewModel` gathers channel qualities via `ChannelQualityCalculator`, then passes them through `DynamicChannelScorer.computePredictedScores()` to produce predicted scores that model future channel state. The predicted-scored qualities are then passed along with network IEs, device capabilities, and user preferences to `RegulatoryPipeline.computeRecommendations()`. The pipeline returns classified `[ChannelRecommendation]` for display in the channel quality views.
 
 ## Key Types
 
 | File | Type | Purpose |
 |------|------|---------|
+| `DynamicChannelScorer.swift` | `final class` | Predictive scoring model — tracks AP history, estimates migration pressure, computes predicted scores |
 | `RegulatoryPipeline.swift` | `final class` | `@Observable` orchestrator — collects inputs, calls inference + filter, exposes `inferredRegion` |
 | `RegionInferenceEngine.swift` | `enum` | Multi-source region inference with confidence scoring |
 | `RegulatoryFilter.swift` | `enum` | 5-stage classification pipeline |
@@ -120,6 +121,24 @@ Restricted channels are hidden by default (`showInSimpleView = false`).
 | EU (ETSI) | 1–13 | 36–144 (DFS on 52–144) | 1–93 LPI |
 
 `RegulatoryChannelMeta` attaches per-channel caveats (DFS, radar sensitivity, CAC, indoor-only, max EIRP, AFC, Wi-Fi 6E/7 availability).
+
+## Dynamic Channel Scoring
+
+The recommendation algorithm faces a feedback loop: recommending an optimal channel changes the environment when users follow the recommendation. `DynamicChannelScorer` addresses this by predicting future channel state instead of relying on static snapshots.
+
+### Model
+
+1. **AP count history** — Each channel maintains a rolling window of 5 scan results, smoothed via EMA (α=0.4). This captures occupancy trends (growing, stable, declining).
+
+2. **Migration pressure** — Channels recommended in the previous scan are assigned a migration pressure factor (30%). This models the expected influx of APs from users who act on the recommendation.
+
+3. **Predicted score** — Computed as: `currentScore - trendPenalty - migrationPenalty`. The predicted score is used for top-2 recommendation selection (replacing raw RF score).
+
+### Effect
+
+- Recently recommended channels are automatically penalized, preventing repeated self-defeating recommendations.
+- Channels with rising AP trends are down-ranked before they become congested.
+- The model self-stabilizes: once a channel is no longer recommended, the penalty decays over subsequent scans.
 
 ## Key Patterns
 

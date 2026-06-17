@@ -16,6 +16,7 @@ struct ChannelQuality: Identifiable {
     var isRecommended: Bool = false
     var isCurrentChannel: Bool = false
     var showInSimpleView: Bool = true
+    var predictedScore: Int = 0
 
     var id: String { "\(band)-\(channel)" }
 
@@ -196,12 +197,13 @@ enum ChannelQualityCalculator {
                     overlapLevel: overlap,
                     strongestNeighborRSSI: strongest,
                     isRecommended: false,
-                    isCurrentChannel: ch == currentChannel
+                    isCurrentChannel: ch == currentChannel,
+                    predictedScore: score
                 )
             }
 
-            // Mark top 2 per band as recommended (if score ≥ 70)
-            let eligible = scored.filter { $0.qualityScore >= 70 }.sorted(by: { $0.qualityScore > $1.qualityScore }).prefix(2)
+            // Mark top 2 per band as recommended (if predicted score ≥ 70)
+            let eligible = scored.filter { $0.predictedScore >= 70 }.sorted(by: { $0.predictedScore > $1.predictedScore }).prefix(2)
             let recIDs = Set(eligible.map(\.id))
             results += scored.map { q in
                 var q = q
@@ -214,10 +216,11 @@ enum ChannelQualityCalculator {
             }
         }
 
-        // Sort: current channel first, then recommended, then by score, then by channel
+        // Sort: current channel first, then recommended, then by predicted score, then by channel
         return results.sorted { a, b in
             if a.isCurrentChannel != b.isCurrentChannel { return a.isCurrentChannel }
             if a.isRecommended != b.isRecommended { return a.isRecommended }
+            if a.predictedScore != b.predictedScore { return a.predictedScore > b.predictedScore }
             if a.qualityScore != b.qualityScore { return a.qualityScore > b.qualityScore }
             if a.band != b.band { return a.band < b.band }
             return a.channel < b.channel

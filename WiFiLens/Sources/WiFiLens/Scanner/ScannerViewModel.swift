@@ -93,6 +93,7 @@ final class ScannerViewModel {
 
     // Regulatory-aware recommendations (Phase 2: computed alongside channelQualities)
     let regulatoryPipeline = RegulatoryPipeline()
+    let dynamicScorer = DynamicChannelScorer()
     var channelRecommendations: [ChannelRecommendation] = []
     var inferredRegion: RegionInferenceResult? { regulatoryPipeline.inferredRegion }
     var userRegionOverride: RegulatoryDomain? {
@@ -301,6 +302,7 @@ final class ScannerViewModel {
                     applyNetworks(networks)
                     networkInfo = NetworkInfoService.fetchAll()
                     channelQualities = computeChannelQualities()
+                    channelQualities = dynamicScorer.computePredictedScores(channelQualities)
                     channelRecommendations = computeChannelRecommendations()
                 }
             }

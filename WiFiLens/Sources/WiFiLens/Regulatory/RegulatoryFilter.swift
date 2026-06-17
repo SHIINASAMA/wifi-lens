@@ -157,7 +157,11 @@ enum RegulatoryFilter {
             if a.rfIsRecommended != b.rfIsRecommended {
                 return a.rfIsRecommended
             }
-            // RF score descending
+            // Predicted score descending (dynamic model)
+            if a.predictedScore != b.predictedScore {
+                return a.predictedScore > b.predictedScore
+            }
+            // RF score descending (fallback)
             if a.rfScore != b.rfScore {
                 return a.rfScore > b.rfScore
             }
