@@ -32,20 +32,20 @@ Hardware Supported Channels (CoreWLAN)  ─┐
 
 ## Data Flow
 
-`ScannerViewModel` gathers channel qualities via `ChannelQualityCalculator`, then passes them through `DynamicChannelScorer.computePredictedScores()` to produce predicted scores that model future channel state. The predicted-scored qualities are then passed along with network IEs, device capabilities, and user preferences to `RegulatoryPipeline.computeRecommendations()`. The pipeline returns classified `[ChannelRecommendation]` for display in the channel quality views.
+`ScannerViewModel` gathers observed channel qualities via `ChannelQualityCalculator`, then passes them through `DynamicChannelScorer.computePredictedScores()` to produce predictive recommendation state. The predictive-scored qualities are then passed along with network IEs, device capabilities, and user preferences to `RegulatoryPipeline.computeRecommendations()`. The pipeline returns classified `[ChannelRecommendation]` for display in the channel quality views.
 
 ## Key Types
 
 | File | Type | Purpose |
 |------|------|---------|
-| `DynamicChannelScorer.swift` | `final class` | Predictive scoring model — tracks AP history, estimates migration pressure, computes predicted scores |
+| `ChannelQualityCalculator.swift` | `enum` + `final class` | Observed RF scoring plus the embedded `DynamicChannelScorer` predictive model |
 | `RegulatoryPipeline.swift` | `final class` | `@Observable` orchestrator — collects inputs, calls inference + filter, exposes `inferredRegion` |
 | `RegionInferenceEngine.swift` | `enum` | Multi-source region inference with confidence scoring |
 | `RegulatoryFilter.swift` | `enum` | 5-stage classification pipeline |
 | `RegulatoryDatabase.swift` | `enum` | Static per-region channel rules (US/JP/CN/EU, 2.4/5/6 GHz) |
 | `RegulatoryDomain.swift` | `enum` | `US`/`JP`/`CN`/`EU`/`unknown` with locale-based mapping |
 | `DeviceCompatibilityFilter.swift` | `enum` | Checks PHY/band/DFS/6 GHz support per device |
-| `ChannelRecommendation.swift` | `struct` | Output model: RF score + regulatory classification + restriction reasons |
+| `ChannelRecommendation.swift` | `struct` | Output model: observed RF data + predictive score + regulatory classification + restriction reasons |
 
 ## Region Inference
 
@@ -80,7 +80,7 @@ Special signals:
 `RegulatoryFilter.apply()` runs five stages:
 
 ### Stage 1: Wrap
-Each `ChannelQuality` is wrapped into a `ChannelRecommendation`, preserving the original RF score/level/AP counts verbatim.
+Each `ChannelQuality` is wrapped into a `ChannelRecommendation`, preserving the original RF score/level/AP counts verbatim while also carrying the predictive score and prediction-selected state.
 
 ### Stage 2: Region rules
 For each recommendation, looks up `RegulatoryDatabase.rules[region][band]`:
@@ -105,7 +105,7 @@ If incompatible → `.restricted` (`DEVICE_INCOMPATIBLE`).
 Manual classification overrides are applied on top.
 
 ### Stage 5: Sort
-Current channel first, then by classification tier (recommended > advanced > restricted), then RF-recommended first, then score descending, then band/channel.
+Current channel first, then by classification tier (recommended > advanced > restricted), then prediction-selected channels, then predicted score descending, then observed RF score descending, then band/channel.
 
 Restricted channels are hidden by default (`showInSimpleView = false`).
 
@@ -143,6 +143,6 @@ The recommendation algorithm faces a feedback loop: recommending an optimal chan
 ## Key Patterns
 
 - **Decoupled RF + regulatory**: `ChannelQualityCalculator` is never modified by the regulatory pipeline — RF scoring and regulatory filtering are completely independent.
-- **Verbatim RF preservation**: Original RF score, level, and AP counts are preserved as-is in `ChannelRecommendation.rfScore`/`rfLevel`/`apCount`. The regulatory layer only adds classification and restrictions.
+- **Verbatim RF preservation**: Original RF score, level, and AP counts are preserved as-is in `ChannelRecommendation.rfScore`/`rfLevel`/`apCount`. The predictive layer adds `predictedScore`, and the regulatory layer adds classification and restrictions.
 - **Confidence downgrade**: Low-confidence region inference downgrades all `.recommended` channels to `.advanced` rather than `.restricted`, so users still see useful recommendations with a caveat.
 - **Comparable sort order**: `ChannelRecommendation.Classification.order` (recommended=2, advanced=1, restricted=0) enables tiered sorting by simple integer comparison.

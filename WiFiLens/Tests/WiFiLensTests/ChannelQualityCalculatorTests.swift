@@ -200,9 +200,9 @@ struct ChannelQualityCalculatorTests {
         }
     }
 
-    // MARK: - Recommendations
+    // MARK: - Predictive handoff
 
-    @Test func recommendsCleanChannelsOverOccupied() async throws {
+    @Test func calculatorDoesNotSelectRecommendations() async throws {
         // 3 APs on different 5 GHz channels with moderate signal
         let aps = [
             ap(36, -30, band: .band5GHz),
@@ -210,20 +210,15 @@ struct ChannelQualityCalculatorTests {
             ap(44, -40, band: .band5GHz),
         ]
         let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
-        let recommended = result.filter { $0.band == "5" && $0.isRecommended }
-        // Top 2 by score: empty channels (score=100) are recommended over occupied ones
-        #expect(recommended.count == 2)
-        #expect(recommended.allSatisfy { $0.qualityScore == 100 })
-        #expect(recommended.allSatisfy { $0.apCount == 0 })
+        #expect(result.allSatisfy { $0.isRecommended == false })
     }
 
-    @Test func noRecommendationBelow70() async throws {
+    @Test func predictedScoreStartsAsObservedScore() async throws {
         // Six 160 MHz co-channel APs at strong RSSI → score well below 70
         let aps = (0..<6).map { _ in ap(36, -30, width: .mhz160, band: .band5GHz) }
         let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
         let ch36 = result.first(where: { $0.channel == 36 })!
-        #expect(ch36.qualityScore < 70)
-        #expect(ch36.isRecommended == false)
+        #expect(ch36.predictedScore == ch36.qualityScore)
     }
 
     // MARK: - Simple view filtering
@@ -239,7 +234,7 @@ struct ChannelQualityCalculatorTests {
         #expect(result.first(where: { $0.channel == 48 })!.showInSimpleView == true)
         // ch 36: has AP → shown
         #expect(result.first(where: { $0.channel == 36 })!.showInSimpleView == true)
-        // ch 56: no AP, not current, not in top 2 recommendations → hidden
+        // ch 56: no AP and not current → hidden until the predictive scorer marks it recommended
         let ch56 = result.first(where: { $0.channel == 56 })!
         #expect(ch56.showInSimpleView == false)
     }

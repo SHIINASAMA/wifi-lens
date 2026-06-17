@@ -28,7 +28,7 @@ enum RecommendationReasonCalculator {
                 reasons.append(.clearSpectrum)
             case 1...2:
                 reasons.append(.lowCongestion)
-            case 6... where !ch.rfIsRecommended:
+            case 6... where !ch.isRecommended:
                 reasons.append(.congested)
             default:
                 break
@@ -38,7 +38,7 @@ enum RecommendationReasonCalculator {
             switch ch.overlapLevel {
             case .low where ch.adjacentCount <= 1:
                 reasons.append(.lowOverlap)
-            case .high where !ch.rfIsRecommended:
+            case .high where !ch.isRecommended:
                 reasons.append(.highOverlap)
             default:
                 break
@@ -48,7 +48,7 @@ enum RecommendationReasonCalculator {
             switch ch.interferenceScore {
             case ...15:
                 reasons.append(.lowInterference)
-            case 40... where !ch.rfIsRecommended:
+            case 40... where !ch.isRecommended:
                 reasons.append(.highInterference)
             default:
                 break

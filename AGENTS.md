@@ -15,7 +15,7 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/MCP.md` | MCP Streamable HTTP server (port, protocol, tools, data format, integration) |
 | `docs/REGULATORY.md` | Regulatory pipeline, region inference, channel recommendation |
 | `docs/superpowers/specs/2026-06-17-channel-recommendation-design.md` | Channel recommendation redesign for issue #3 |
-| `docs/superpowers/plans/2026-06-17-channel-recommendation.md` | Implementation plan for counterfactual channel recommendation |
+| `docs/superpowers/plans/2026-06-17-channel-recommendation.md` | Implementation plan for predictive channel recommendation |
 | `docs/TESTING.md` | Test architecture, UI test setup, launch arguments, Pro target setup, common issues |
 | `docs/COLLABORATION_RULES.md` | AI assistant behavior rules — enforced prohibitions and must-follows |
 | `docs/TODO.md` | Feature roadmap and checked-off items |

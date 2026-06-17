@@ -154,7 +154,7 @@ struct ChannelQualityView: View {
                         cell(ch.overlapLevel.displayName)
                         cell("\(ch.strongestNeighborRSSI)")
                         cell("\(ch.interferenceScore)")
-                        cell(ch.classification != .recommended ? ch.classification.displayName : ch.isRecommended ? "★" : "")
+                        cell(ch.isRecommended ? "★" : ch.classification != .recommended ? ch.classification.displayName : "")
                     }
                     .background(rowBG(ch.id, idx: idx))
                     .contentShape(Rectangle())
@@ -225,8 +225,8 @@ private struct ChannelCard: View {
                     Text(channel.rfLevel.displayName)
                         .font(.subheadline.weight(.semibold))
                         .foregroundColor(Color(hex: channel.rfLevel.color))
-                    if channel.rfIsRecommended { badge(String(localized: "channels.badge.recommended", comment: "Star badge marking recommended channel"), color: "#FF9F0A") }
-                    if channel.rfIsRecommended && !channel.recommendationReasons.isEmpty {
+                    if channel.isRecommended { badge(String(localized: "channels.badge.recommended", comment: "Star badge marking recommended channel"), color: "#FF9F0A") }
+                    if channel.isRecommended && !channel.recommendationReasons.isEmpty {
                         ReasonPopover(reasons: channel.recommendationReasons)
                     }
                     if channel.isCurrentChannel { badge(String(localized: "channels.badge.current", comment: "Dot badge marking current channel"), color: "#007AFF") }

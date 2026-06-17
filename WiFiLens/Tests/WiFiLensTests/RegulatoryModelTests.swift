@@ -235,7 +235,7 @@ struct ChannelRecommendationTests {
         #expect(rec.bandDisplay == "5 GHz")
         #expect(rec.rfScore == 85)
         #expect(rec.rfLevel == .good)
-        #expect(rec.rfIsRecommended == true)
+        #expect(rec.modelSelected == true)
         #expect(rec.isRecommended == true)
         #expect(rec.apCount == 1)
     }
@@ -275,10 +275,12 @@ struct ChannelRecommendationTests {
         let rf = makeChannelQuality()
         var rec = ChannelRecommendation(from: rf)
         rec.classification = .restricted
+        rec.modelSelected = true
         rec.deviceCompatible = false
         rec.deviceIncompatibilityReason = "DFS required"
         rec.restrictionReasons = [ChannelRecommendation.RestrictionReason(code: "DFS", description: "DFS channel")]
         #expect(rec.classification == .restricted)
+        #expect(rec.isRecommended == false)
         #expect(rec.deviceCompatible == false)
         #expect(rec.deviceIncompatibilityReason == "DFS required")
         #expect(rec.restrictionReasons.count == 1)

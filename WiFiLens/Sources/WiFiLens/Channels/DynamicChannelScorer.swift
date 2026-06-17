@@ -14,11 +14,12 @@ import Foundation
 /// The predicted score is used for recommendation selection instead of the raw
 /// RF snapshot score, producing recommendations that remain valid after users
 /// act on them.
-@MainActor
 final class DynamicChannelScorer {
     private let maxHistory = 5
     private let emaAlpha = 0.4
     private let migrationFraction = 0.3
+    private let minimumRecommendedScore = 70
+    private let maxRecommendationsPerBand = 2
 
     struct ChannelHistory {
         var apCounts: [Int] = []
@@ -34,7 +35,7 @@ final class DynamicChannelScorer {
         previousRecommendations.removeAll()
     }
 
-    /// Compute predicted scores for all channels and update `predictedScore` on each.
+    /// Compute predicted scores and select per-band recommendations from the predictive model.
     func computePredictedScores(_ qualities: [ChannelQuality]) -> [ChannelQuality] {
         let bandAPCounts = computeBandTotalAPCounts(qualities)
         var result: [ChannelQuality] = []
@@ -67,12 +68,40 @@ final class DynamicChannelScorer {
             result.append(q)
         }
 
-        let newRecs = Set(result.filter { $0.predictedScore >= 70 }
-            .sorted { $0.predictedScore > $1.predictedScore }
-            .prefix(2).map(\.id))
-        previousRecommendations = newRecs
+        var recommendationIDs = Set<String>()
+        let bands = Set(result.map(\.band))
+        for band in bands {
+            let bandRecommendations = result
+                .filter { $0.band == band && $0.predictedScore >= minimumRecommendedScore }
+                .sorted(by: Self.recommendationOrder)
+                .prefix(maxRecommendationsPerBand)
+            recommendationIDs.formUnion(bandRecommendations.map(\.id))
+        }
 
-        return result
+        result = result.map { channel in
+            var channel = channel
+            channel.isRecommended = recommendationIDs.contains(channel.id)
+            channel.showInSimpleView = finalSimpleViewVisibility(for: channel)
+            return channel
+        }
+
+        previousRecommendations = recommendationIDs
+        return result.sorted(by: Self.displayOrder)
+    }
+
+    private static func recommendationOrder(_ a: ChannelQuality, _ b: ChannelQuality) -> Bool {
+        if a.predictedScore != b.predictedScore { return a.predictedScore > b.predictedScore }
+        if a.qualityScore != b.qualityScore { return a.qualityScore > b.qualityScore }
+        return a.channel < b.channel
+    }
+
+    private static func displayOrder(_ a: ChannelQuality, _ b: ChannelQuality) -> Bool {
+        if a.isCurrentChannel != b.isCurrentChannel { return a.isCurrentChannel }
+        if a.isRecommended != b.isRecommended { return a.isRecommended }
+        if a.predictedScore != b.predictedScore { return a.predictedScore > b.predictedScore }
+        if a.qualityScore != b.qualityScore { return a.qualityScore > b.qualityScore }
+        if a.band != b.band { return a.band < b.band }
+        return a.channel < b.channel
     }
 
     private func predictAPCount(_ h: ChannelHistory) -> Double {
@@ -119,5 +148,9 @@ final class DynamicChannelScorer {
             counts[q.band, default: 0] += q.apCount
         }
         return counts
+    }
+
+    private func finalSimpleViewVisibility(for channel: ChannelQuality) -> Bool {
+        channel.initiallyVisibleInSimpleView || channel.isRecommended
     }
 }

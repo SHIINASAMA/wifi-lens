@@ -1,6 +1,8 @@
 import Foundation
 
 /// Per-channel congestion analysis result.
+/// This model preserves the observed RF environment only.
+/// Predictive recommendation selection is applied later by `DynamicChannelScorer`.
 struct ChannelQuality: Identifiable {
     let channel: Int
     let band: String
@@ -89,6 +91,12 @@ struct ChannelQuality: Identifiable {
             }
         }
     }
+
+    /// Base simple-view visibility from the observed RF snapshot alone.
+    /// The predictive scorer may later expand this to include recommendation-selected channels.
+    var initiallyVisibleInSimpleView: Bool {
+        isCurrentChannel || apCount > 0
+    }
 }
 
 /// Hysteresis wrapper that smooths quality score fluctuations across level boundaries.
@@ -142,7 +150,7 @@ enum ChannelQualityCalculator {
         let apex: Double          // span midpoint
     }
 
-    /// Produce a quality rating for every relevant channel in each band.
+    /// Produce an observed RF quality rating for every relevant channel in each band.
     static func compute(aps: [APInfo], currentChannel: Int? = nil, supportedBands: Set<String> = ["24", "5", "6"]) -> [ChannelQuality] {
         var results: [ChannelQuality] = []
 
@@ -198,29 +206,16 @@ enum ChannelQualityCalculator {
                     strongestNeighborRSSI: strongest,
                     isRecommended: false,
                     isCurrentChannel: ch == currentChannel,
+                    showInSimpleView: ch == currentChannel || overlapCount > 0,
                     predictedScore: score
                 )
             }
-
-            // Mark top 2 per band as recommended (if predicted score ≥ 70)
-            let eligible = scored.filter { $0.predictedScore >= 70 }.sorted(by: { $0.predictedScore > $1.predictedScore }).prefix(2)
-            let recIDs = Set(eligible.map(\.id))
-            results += scored.map { q in
-                var q = q
-                q.isRecommended = recIDs.contains(q.id)
-                // Simple view: current channel, recommended, or congested/busy
-                q.showInSimpleView = q.isCurrentChannel
-                    || q.isRecommended
-                    || q.apCount > 0
-                return q
-            }
+            results += scored
         }
 
-        // Sort: current channel first, then recommended, then by predicted score, then by channel
+        // Sort the observed RF view without relying on any later predictive mutation.
         return results.sorted { a, b in
             if a.isCurrentChannel != b.isCurrentChannel { return a.isCurrentChannel }
-            if a.isRecommended != b.isRecommended { return a.isRecommended }
-            if a.predictedScore != b.predictedScore { return a.predictedScore > b.predictedScore }
             if a.qualityScore != b.qualityScore { return a.qualityScore > b.qualityScore }
             if a.band != b.band { return a.band < b.band }
             return a.channel < b.channel

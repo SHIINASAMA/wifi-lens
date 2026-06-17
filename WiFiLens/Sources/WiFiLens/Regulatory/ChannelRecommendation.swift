@@ -20,10 +20,10 @@ struct ChannelRecommendation: Identifiable, Sendable {
     var isCurrentChannel: Bool = false
     var showInSimpleView: Bool = true
 
-    /// Original RF recommendation (top-2 per band, score ≥ 70).
-    /// Distinct from `classification` — a channel can be RF-recommended but
-    /// regulatory-advanced (e.g., DFS), or RF-good and regulatory-recommended.
-    var rfIsRecommended: Bool = false
+    /// Recommendation selected by the predictive scoring model before regulatory filtering.
+    /// Distinct from `classification` — a channel can be prediction-selected but
+    /// still be downgraded by regulatory or device constraints.
+    var modelSelected: Bool = false
 
     /// Predicted future score from the dynamic scoring model.
     /// Accounts for AP count trends and migration pressure from recent recommendations.
@@ -79,9 +79,8 @@ struct ChannelRecommendation: Identifiable, Sendable {
 
     // MARK: - Legacy compatibility
 
-    /// RF recommendation: top-2 per band with score ≥ 70.
-    /// For backward compatibility with OverviewView.
-    var isRecommended: Bool { rfIsRecommended }
+    /// Final recommendation after predictive selection and downstream regulatory filtering.
+    var isRecommended: Bool { modelSelected && classification == .recommended }
 
     // MARK: - Initializers
 
@@ -100,7 +99,7 @@ struct ChannelRecommendation: Identifiable, Sendable {
         self.strongestNeighborRSSI = rf.strongestNeighborRSSI
         self.isCurrentChannel = rf.isCurrentChannel
         self.showInSimpleView = rf.showInSimpleView
-        self.rfIsRecommended = rf.isRecommended
+        self.modelSelected = rf.isRecommended
         self.predictedScore = rf.predictedScore
     }
 }
