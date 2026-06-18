@@ -1,5 +1,4 @@
 import Foundation
-import SwiftUI
 
 #if DEBUG
 
@@ -74,6 +73,11 @@ struct DebugAPConfig: Codable, Identifiable, Equatable {
     var country: String
     var trend: DebugTrend
     var trendDelta: Int
+}
+
+struct DebugChartSeriesSource {
+    var ap: DebugAPConfig
+    var domain: ChartSeriesDomainData
 }
 
 struct DebugScenarioStore {
@@ -174,7 +178,7 @@ enum DebugScenarioBuilder {
         return copy
     }
 
-    static func seriesData(from scenario: DebugScenario, band: ChannelBand) -> [ChartSeriesData] {
+    static func seriesSources(from scenario: DebugScenario, band: ChannelBand) -> [DebugChartSeriesSource] {
         normalized(scenario).aps
             .filter(\.enabled)
             .map { ap in
@@ -206,15 +210,7 @@ enum DebugScenarioBuilder {
                     nss: "",
                     country: normalizedAP.country
                 )
-                let render = ChartSeriesRenderState(
-                    displayRSSI: Double(normalizedAP.rssi),
-                    color: Color(hex: normalizedAP.colorHex),
-                    isFilteredOut: normalizedAP.filtered,
-                    isVisible: normalizedAP.visible,
-                    trendArrow: normalizedAP.trend.arrow,
-                    trendDelta: normalizedAP.trendDelta
-                )
-                return ChartSeriesData(domain: domain, render: render)
+                return DebugChartSeriesSource(ap: normalizedAP, domain: domain)
             }
     }
 

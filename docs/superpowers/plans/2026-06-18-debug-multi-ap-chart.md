@@ -43,7 +43,8 @@
 
 **Interfaces:**
 - Produces: `DebugScenario`, `DebugAPConfig`, `DebugTrend`, `DebugScenarioPreset`, `DebugScenarioBuilder`, `DebugScenarioStore`.
-- Produces: `DebugScenarioBuilder.seriesData(from:band:) -> [ChartSeriesData]`.
+- Produces: `DebugScenarioBuilder.seriesSources(from:band:) -> [DebugChartSeriesSource]`.
+- Produces: `DebugChartSeriesAdapter.seriesData(from:band:) -> [ChartSeriesData]`.
 - Consumes: `ChannelBand`, `ChannelSpanCalculator`, `ChartSeriesData`, `ChartSeriesDomainData`, `ChartSeriesRenderState`, `Color(hex:)`.
 
 - [ ] **Step 1: Write failing tests**
@@ -60,7 +61,7 @@ Add tests for:
 Run:
 
 ```sh
-xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test
+xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test -only-testing:WiFiLensTests
 ```
 
 Expected: build fails because `DebugScenario` and related types do not exist yet.
@@ -71,7 +72,7 @@ Add `#if DEBUG` models, default presets, clamping helpers, `UserDefaults` persis
 
 - [ ] **Step 4: Add files to Xcode project and verify GREEN**
 
-Add the new Swift files to the project and run the same `xcodebuild test` command. Expected: tests pass or fail only with concrete implementation issues to fix.
+Add the new Swift files to the project and run the same unit-only `xcodebuild test -only-testing:WiFiLensTests` command. Expected: tests pass or fail only with concrete implementation issues to fix.
 
 ## Task 2: Multi-AP Chart-Over-Table UI
 
@@ -121,10 +122,10 @@ Expected: build succeeds.
 Run:
 
 ```sh
-xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test
+xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test -only-testing:WiFiLensTests
 ```
 
-Expected: test action succeeds.
+Expected: unit test action succeeds. If the local macOS test runner cannot launch, run `build-for-testing` and report the runner failure separately from compile results.
 
 - [ ] **Step 2: Run build**
 

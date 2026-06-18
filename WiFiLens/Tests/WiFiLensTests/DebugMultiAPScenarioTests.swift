@@ -99,7 +99,7 @@ import Testing
             aps: [enabled, disabled]
         )
 
-        let series = DebugScenarioBuilder.seriesData(from: scenario, band: .band5GHz)
+        let series = DebugChartSeriesAdapter.seriesData(from: scenario, band: .band5GHz)
         let block = ChannelSpanCalculator.channelBlock(
             primaryChannel: 52,
             widthMHz: 80,
@@ -137,7 +137,7 @@ import Testing
         )
         let scenario = DebugScenario(version: 1, bandID: ChannelBand.band24GHz.id, presetID: nil, aps: [ap])
 
-        let series = DebugScenarioBuilder.seriesData(from: scenario, band: .band24GHz)
+        let series = DebugChartSeriesAdapter.seriesData(from: scenario, band: .band24GHz)
 
         #expect(series.count == 1)
         #expect(series[0].ssid == "")
@@ -166,8 +166,40 @@ import Testing
 
             #expect(!scenario.aps.isEmpty)
             #expect(scenario.aps.allSatisfy { $0.channel >= 1 && $0.channel <= band.maxChannel })
-            #expect(DebugScenarioBuilder.seriesData(from: scenario, band: band).count > 0)
+            #expect(DebugChartSeriesAdapter.seriesData(from: scenario, band: band).count > 0)
         }
+    }
+
+    @Test func normalizationClampsWideRowsWhenSwitchingTo24GHz() {
+        let ap = DebugAPConfig(
+            id: UUID(uuidString: "00000000-0000-0000-0000-000000000031")!,
+            enabled: true,
+            ssid: "Wide",
+            bssidSuffix: "31",
+            channel: 149,
+            widthMHz: 80,
+            rssi: -52,
+            colorHex: "#3B82F6",
+            hiddenSSID: false,
+            visible: true,
+            filtered: false,
+            supportsK: false,
+            supportsR: false,
+            supportsV: false,
+            supportsWPA3: false,
+            country: "",
+            trend: .none,
+            trendDelta: 0
+        )
+        let scenario = DebugScenario(version: 1, bandID: ChannelBand.band24GHz.id, presetID: nil, aps: [ap])
+
+        let normalized = DebugScenarioBuilder.normalized(scenario)
+        let series = DebugChartSeriesAdapter.seriesData(from: normalized, band: .band24GHz)
+
+        #expect(normalized.aps[0].channel == ChannelBand.band24GHz.maxChannel)
+        #expect(normalized.aps[0].widthMHz == 20)
+        #expect(series[0].channel == ChannelBand.band24GHz.maxChannel)
+        #expect(series[0].channelWidth == "20")
     }
 
     @Test func storeFallsBackToDefaultPresetWhenPayloadIsInvalid() {

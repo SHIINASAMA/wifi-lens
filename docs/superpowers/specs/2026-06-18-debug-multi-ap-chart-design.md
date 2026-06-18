@@ -8,7 +8,6 @@ The first implementation stores the current debug scenario in `UserDefaults`. Th
 
 ## Non-Goals
 
-- Do not add a new sidebar destination.
 - Do not create a separate chart renderer.
 - Do not edit AP parameters through modal sheets or a side inspector.
 - Do not implement JSON import/export in the first pass.
@@ -31,7 +30,9 @@ The new mode should keep this same path. Rendering bugs in labels, heatmap bins,
 
 ## User Experience
 
-`DebugChartView` gets a top-level mode picker:
+The spectrum-specific debug workflow is exposed through its own debug sidebar destination, `Spectrum Debug Chart`. The broader `Debug Chart` destination remains available for non-spectrum debug charts such as Throughput and Roaming. This keeps future debug chart categories from crowding a single page.
+
+`SpectrumDebugContainerView` gets a top-level mode picker:
 
 - `Single AP`: the current oscillator-based debug chart remains available.
 - `Multi AP`: a new workbench for table-driven custom scenarios.
@@ -59,7 +60,8 @@ The table is the primary editor. Each edit updates the in-memory scenario, persi
 
 ### Top Bar
 
-- Mode picker: `Single AP` / `Multi AP`
+- Sidebar destination: `Spectrum Debug Chart`
+- Spectrum mode picker: `Single AP` / `Multi AP`
 - Band picker: `2.4 GHz` / `5 GHz` / `6 GHz`
 - Preset picker: fills the table with a known rendering scenario
 - Add AP button: appends a default AP valid for the current band
@@ -170,7 +172,8 @@ The future JSON feature should use the same `DebugScenario` encoder and decoder.
 Create a small debug-only adapter:
 
 ```swift
-DebugScenarioBuilder.seriesData(from scenario: DebugScenario, band: ChannelBand) -> [ChartSeriesData]
+DebugScenarioBuilder.seriesSources(from scenario: DebugScenario, band: ChannelBand) -> [DebugChartSeriesSource]
+DebugChartSeriesAdapter.seriesData(from scenario: DebugScenario, band: ChannelBand) -> [ChartSeriesData]
 ```
 
 Rules:
@@ -180,6 +183,7 @@ Rules:
 - Use `ChannelSpanCalculator.channelBlock(primaryChannel:widthMHz:band:spanDirection:)` to match production span behavior.
 - Use stable IDs based on `DebugAPConfig.id` and band.
 - Generate deterministic BSSIDs from `bssidSuffix` or the row index.
+- Keep `DebugScenarioBuilder` free of SwiftUI dependencies. It returns normalized AP data and chart domain data; `DebugChartSeriesAdapter` converts `colorHex` to SwiftUI `Color` at the view boundary.
 - Set `displayRSSI` equal to `rssi` when injecting new rows, then let `BandChartViewModel` preserve animated display values on subsequent injections.
 - Map `trend` to the same arrow strings used by production conversion.
 
@@ -213,6 +217,7 @@ Add focused Swift Testing coverage for pure logic:
 - `DebugScenario` encode/decode round trip.
 - Preset generation returns valid AP rows for each target band.
 - Scenario-to-series conversion computes expected left/apex/right channel spans.
+- Band switching normalization clamps invalid channels and widths, for example a 5 GHz `80 MHz` row moved to 2.4 GHz becomes a valid 2.4 GHz row.
 - Disabled AP rows are not injected.
 - Hidden, visible, filtered, protocol, country, color, and trend fields map to `ChartSeriesData`.
 - UserDefaults store load failure falls back to default data.

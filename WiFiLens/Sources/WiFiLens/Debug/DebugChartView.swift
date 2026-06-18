@@ -19,6 +19,23 @@ private struct DebugOscillator {
     }
 }
 
+enum DebugChartSeriesAdapter {
+    static func seriesData(from scenario: DebugScenario, band: ChannelBand) -> [ChartSeriesData] {
+        DebugScenarioBuilder.seriesSources(from: scenario, band: band).map { source in
+            let ap = source.ap
+            let render = ChartSeriesRenderState(
+                displayRSSI: Double(ap.rssi),
+                color: Color(hex: ap.colorHex),
+                isFilteredOut: ap.filtered,
+                isVisible: ap.visible,
+                trendArrow: ap.trend.arrow,
+                trendDelta: ap.trendDelta
+            )
+            return ChartSeriesData(domain: source.domain, render: render)
+        }
+    }
+}
+
 struct DebugChartView: View {
     let mode: DebugChartMode
 
@@ -546,7 +563,7 @@ struct DebugChartView: View {
         if bandVM.band != selectedBand {
             bandVM = BandChartViewModel(band: selectedBand)
         }
-        let series = DebugScenarioBuilder.seriesData(from: multiScenario, band: selectedBand)
+        let series = DebugChartSeriesAdapter.seriesData(from: multiScenario, band: selectedBand)
         bandVM.debugInject(series: series)
         if !bandVM.validateSelection(selectedNetworkID) {
             selectedNetworkID = nil
