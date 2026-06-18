@@ -1,25 +1,23 @@
 import Foundation
 
-struct ChartAxisLabelRects: Equatable {
+struct ChartAxisLabelRects: Equatable, Sendable {
     let yAxis: CGRect
     let xAxis: CGRect
 }
 
-struct ChartRegions: Equatable {
+struct ChartRegions: Equatable, Sendable {
     let frameRect: CGRect
     let plotRect: CGRect
     let annotationRect: CGRect
     let axisLabelRects: ChartAxisLabelRects
-    let contentClipRect: CGRect
 }
 
 /// Coordinate mapping between data space and chart pixel space.
-struct ChartGeometry {
+struct ChartGeometry: Sendable {
     let frameRect: CGRect
     let plotRect: CGRect
     let annotationRect: CGRect
     let axisLabelRects: ChartAxisLabelRects
-    let contentClipRect: CGRect
     let xMin: Double
     let xMax: Double
     let yMin: Double
@@ -34,7 +32,6 @@ struct ChartGeometry {
         plotRect: CGRect,
         annotationRect: CGRect,
         axisLabelRects: ChartAxisLabelRects,
-        contentClipRect: CGRect,
         xMin: Double,
         xMax: Double,
         yMin: Double,
@@ -44,7 +41,6 @@ struct ChartGeometry {
         self.plotRect = plotRect
         self.annotationRect = annotationRect
         self.axisLabelRects = axisLabelRects
-        self.contentClipRect = contentClipRect
         self.xMin = xMin
         self.xMax = xMax
         self.yMin = yMin
@@ -57,7 +53,6 @@ struct ChartGeometry {
             plotRect: chartRect,
             annotationRect: chartRect,
             axisLabelRects: ChartAxisLabelRects(yAxis: .zero, xAxis: .zero),
-            contentClipRect: chartRect,
             xMin: xMin,
             xMax: xMax,
             yMin: yMin,

@@ -100,7 +100,6 @@ struct Chart<Overlay: View>: View {
             plotRect: regions.plotRect,
             annotationRect: regions.annotationRect,
             axisLabelRects: regions.axisLabelRects,
-            contentClipRect: regions.contentClipRect,
             xMin: xMin,
             xMax: xMax,
             yMin: yMin,

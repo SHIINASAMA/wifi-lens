@@ -84,7 +84,7 @@ struct BandChartLayout {
             let opacity: Double = hasSelection ? (isSelected ? 1.0 : 0.25) : 1.0
             let labelSize = estimatedLabelSize(for: series, kind: .regular, bounds: annotationRect)
             let rawX = plotRect.minX + (series.apex - xMin) * scaleX
-            let rawY = plotRect.maxY - (series.displayRSSI - yMin) * scaleY - 8
+            let rawY = plotRect.maxY - (series.displayRSSI - yMin) * scaleY - 8 - labelSize.height / 2
             let clampedX = clamp(
                 rawX,
                 min: annotationRect.minX + labelSize.width / 2,

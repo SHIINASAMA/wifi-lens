@@ -65,7 +65,6 @@ import Testing
                 yAxis: CGRect(x: 0, y: 30, width: 50, height: 200),
                 xAxis: CGRect(x: 50, y: 230, width: 400, height: 70)
             ),
-            contentClipRect: CGRect(x: 0, y: 0, width: 500, height: 300),
             xMin: 0,
             xMax: 100,
             yMin: -100,
@@ -91,7 +90,6 @@ import Testing
                 yAxis: CGRect(x: 0, y: 8, width: 40, height: 200),
                 xAxis: CGRect(x: 40, y: 208, width: 352, height: 24)
             ),
-            contentClipRect: CGRect(x: 0, y: 0, width: 400, height: 240),
             xMin: 0,
             xMax: 60,
             yMin: -100,

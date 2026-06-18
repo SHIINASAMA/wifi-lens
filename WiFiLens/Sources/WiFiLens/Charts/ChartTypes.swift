@@ -146,8 +146,7 @@ struct ChartStyle {
             frameRect: frameRect,
             plotRect: plotRect,
             annotationRect: adjustedAnnotationRect,
-            axisLabelRects: ChartAxisLabelRects(yAxis: yAxisRect, xAxis: xAxisRect),
-            contentClipRect: frameRect
+            axisLabelRects: ChartAxisLabelRects(yAxis: yAxisRect, xAxis: xAxisRect)
         )
     }
 }

@@ -25,7 +25,6 @@ The chart engine separates plot geometry from annotation geometry.
 | `chartRect` | Compatibility alias | Alias of `plotRect` for existing callers |
 | `axisLabelRects` | `Chart` | Reserved areas for X and Y tick labels |
 | `annotationRect` | `Chart` | Legal placement area for chart-owned labels and annotations |
-| `contentClipRect` | `Chart` | Default clipping boundary for chart-owned overlay content |
 
 Business overlays should use `annotationRect` for persistent labels and callouts. They should not infer label bounds from `plotRect` or duplicate axis-margin calculations. Domain-specific layout code remains responsible for collision resolution, but it must solve placement inside the annotation bounds supplied by `ChartGeometry`.
 

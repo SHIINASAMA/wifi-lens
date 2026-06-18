@@ -77,12 +77,21 @@ struct WiFiBandChart: View {
     }
 
     private func computeGeo(size: CGSize) -> ChartGeometry {
-        let chartRect = chartStyle.chartRect(size: size)
+        let regions = chartStyle.regions(size: size)
         let xMin = model.zoomMin ?? Double(model.xDataMin)
         let xMax = model.zoomMax ?? Double(model.xDataMax)
         let yMin = model.yMin
         let yMax = min(0.0, ceil(Double(model.strongestRSSI) / 10.0) * 10)
-        return ChartGeometry(chartRect: chartRect, xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax)
+        return ChartGeometry(
+            frameRect: regions.frameRect,
+            plotRect: regions.plotRect,
+            annotationRect: regions.annotationRect,
+            axisLabelRects: regions.axisLabelRects,
+            xMin: xMin,
+            xMax: xMax,
+            yMin: yMin,
+            yMax: yMax
+        )
     }
 
     // MARK: - Axis & Style

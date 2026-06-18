@@ -283,6 +283,31 @@ import Testing
         #expect(annotationRect.contains(rect))
     }
 
+    @Test func regularLabelSitsAboveCurveApex() throws {
+        let series = makeSeries(id: "above", ssid: "Above", channel: 6, rssi: -60)
+        let plotRect = CGRect(x: 38, y: 6, width: 320, height: 160)
+        let annotationRect = CGRect(x: 58, y: 26, width: 280, height: 120)
+        let scaleY = plotRect.height / 60
+        let yMin = Double(Constants.rssiNoiseFloor)
+
+        let labels = BandChartLayout.placeLabels(
+            seriesData: [series],
+            plotRect: plotRect,
+            annotationRect: annotationRect,
+            xMin: 1,
+            scaleX: 24,
+            scaleY: scaleY,
+            yMin: yMin,
+            selectedNetworkID: nil
+        )
+
+        let label = try #require(labels.first)
+        let rect = BandChartLayout.estimatedLabelRect(for: label)
+        let apexY = plotRect.maxY - (series.displayRSSI - yMin) * scaleY
+
+        #expect(rect.maxY <= apexY - 8)
+    }
+
     @Test func longSSIDPlacementUsesCappedContainedLabelSize() throws {
         let series = makeSeries(
             id: "long",
