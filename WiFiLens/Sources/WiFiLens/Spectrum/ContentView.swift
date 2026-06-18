@@ -1,6 +1,63 @@
 import SwiftUI
 
-private let headerHeight: CGFloat = 28
+struct SpectrumSectionLayout {
+    static let headerHeight: CGFloat = 28
+
+    struct Section {
+        let kind: Kind
+        let isCollapsed: Bool
+    }
+
+    enum Kind {
+        case band
+        case trend
+        case table
+
+        var weight: CGFloat {
+            switch self {
+            case .band: return 1.0
+            case .trend: return 0.5
+            case .table: return 1.5
+            }
+        }
+
+        var minimumContentHeight: CGFloat {
+            switch self {
+            case .band: return 60
+            case .trend: return 100
+            case .table: return 60
+            }
+        }
+    }
+
+    static func computeContentHeights(sections: [Section], totalHeight: CGFloat) -> [CGFloat] {
+        let contentPool = max(0, totalHeight - CGFloat(sections.count) * headerHeight)
+        let expanded = sections.enumerated().filter { !$0.element.isCollapsed }
+        let minimumTotal = expanded.reduce(CGFloat.zero) { $0 + $1.element.kind.minimumContentHeight }
+
+        guard !expanded.isEmpty else {
+            return Array(repeating: 0, count: sections.count)
+        }
+
+        if contentPool <= minimumTotal {
+            let scale = minimumTotal > 0 ? contentPool / minimumTotal : 0
+            return sections.map { section in
+                section.isCollapsed ? 0 : section.kind.minimumContentHeight * scale
+            }
+        }
+
+        let extraPool = contentPool - minimumTotal
+        let totalWeight = expanded.reduce(CGFloat.zero) { $0 + $1.element.kind.weight }
+
+        return sections.map { section in
+            guard !section.isCollapsed else { return 0 }
+            let extra = totalWeight > 0 ? extraPool * section.kind.weight / totalWeight : 0
+            return section.kind.minimumContentHeight + extra
+        }
+    }
+}
+
+private let headerHeight: CGFloat = SpectrumSectionLayout.headerHeight
 
 #if PRO
 private enum SpectrumMode { case live, recording }
@@ -124,30 +181,19 @@ struct ContentView: View {
 
     /// Compute proportional heights: charts weight 1, table weight 1.5
     private func computeHeights(sections: [SectionInfo], totalH: CGFloat) -> [CGFloat] {
-        let allHeaders = CGFloat(sections.count) * headerHeight
-        let contentPool = totalH - allHeaders
-
-        // Build weights for each section
-        let weights = sections.map { section -> CGFloat in
-            if case .table = section.kind { return 1.5 }
-            if case .trend = section.kind { return 0.5 }
-            return 1.0
-        }
-        let totalWeight = sections.enumerated()
-            .filter { !isCollapsed($0.element) }
-            .map { weights[$0.offset] }
-            .reduce(0, +)
-
-        var result: [CGFloat] = Array(repeating: 0, count: sections.count)
-        for (idx, section) in sections.enumerated() {
-            if isCollapsed(section) {
-                result[idx] = headerHeight
-            } else {
-                let fraction = weights[idx] / max(1, totalWeight)
-                result[idx] = max(60, contentPool * fraction)
+        let layoutSections = sections.map {
+            let kind: SpectrumSectionLayout.Kind
+            switch $0.kind {
+            case .band: kind = .band
+            case .trend: kind = .trend
+            case .table: kind = .table
             }
+            return SpectrumSectionLayout.Section(
+                kind: kind,
+                isCollapsed: isCollapsed($0)
+            )
         }
-        return result
+        return SpectrumSectionLayout.computeContentHeights(sections: layoutSections, totalHeight: totalH)
     }
 
     // MARK: - Section Header

@@ -213,3 +213,42 @@ import Testing
         #expect(axis.yStep == 10)
     }
 }
+
+@Suite struct SpectrumSectionLayoutTests {
+
+    @Test func trendSectionReceivesEnoughHeightForItsChart() {
+        let sections: [SpectrumSectionLayout.Section] = [
+            .init(kind: .band, isCollapsed: false),
+            .init(kind: .band, isCollapsed: false),
+            .init(kind: .band, isCollapsed: false),
+            .init(kind: .trend, isCollapsed: false),
+            .init(kind: .table, isCollapsed: false),
+        ]
+
+        let heights = SpectrumSectionLayout.computeContentHeights(
+            sections: sections,
+            totalHeight: 600
+        )
+
+        #expect(heights[3] >= SpectrumSectionLayout.Kind.trend.minimumContentHeight)
+    }
+
+    @Test func expandedSectionsStayWithinAvailableHeight() {
+        let sections: [SpectrumSectionLayout.Section] = [
+            .init(kind: .band, isCollapsed: false),
+            .init(kind: .band, isCollapsed: false),
+            .init(kind: .band, isCollapsed: false),
+            .init(kind: .trend, isCollapsed: false),
+            .init(kind: .table, isCollapsed: false),
+        ]
+
+        let totalHeight: CGFloat = 600
+        let heights = SpectrumSectionLayout.computeContentHeights(
+            sections: sections,
+            totalHeight: totalHeight
+        )
+        let totalAllocated = heights.reduce(0, +) + CGFloat(sections.count) * SpectrumSectionLayout.headerHeight
+
+        #expect(totalAllocated <= totalHeight)
+    }
+}
