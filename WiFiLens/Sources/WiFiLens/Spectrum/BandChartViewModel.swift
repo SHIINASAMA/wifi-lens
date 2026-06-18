@@ -58,11 +58,12 @@ final class BandChartViewModel {
         let bandHidden = hiddenBands.contains(band.id)
         return source.map { series in
             var series = series
+            let sourceFilteredOut = series.isFilteredOut
             let textFilter = needle.isEmpty
                 || series.ssid.lowercased().contains(needle)
                 || series.bssid.lowercased().contains(needle)
             let hiddenSSIDFilter = !hideHiddenSSIDs || !series.isHiddenSSID
-            series.isFilteredOut = bandHidden || !textFilter || !hiddenSSIDFilter
+            series.isFilteredOut = sourceFilteredOut || bandHidden || !textFilter || !hiddenSSIDFilter
             return series
         }
     }

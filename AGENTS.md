@@ -18,6 +18,8 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/COLLABORATION_RULES.md` | AI assistant behavior rules — enforced prohibitions and must-follows |
 | `docs/TODO.md` | Feature roadmap and checked-off items |
 | `docs/ISSUES.md` | Bugs, regressions, and deferred work with status |
+| `docs/superpowers/specs/2026-06-18-debug-multi-ap-chart-design.md` | Design spec for the DebugChartView multi-AP chart workbench |
+| `docs/superpowers/plans/2026-06-18-debug-multi-ap-chart.md` | Implementation plan for the DebugChartView multi-AP chart workbench |
 | `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
 
 ## Build & Test
@@ -26,7 +28,7 @@ All detailed documentation lives under `docs/`. When adding or updating document
 # App — always use xcodebuild, never swift build / swift test
 # Build configurations: Debug / Release
 xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' build
-xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test
+xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test -only-testing:WiFiLensTests
 xed WiFiLens/WiFiLens.xcodeproj                   # open in Xcode GUI
 
 # Website — Vite + Tailwind CSS, outputs to _site/
@@ -36,6 +38,8 @@ npm run preview                          # preview production build
 ```
 
 The product name is `WiFi Lens.app` (with space). Unit tests use Swift Testing (`@Test`) with `TEST_HOST` — the test bundle is injected into the app process for `@testable import` symbol resolution. All test `.swift` files must be added to the WiFiLensTests target's Sources build phase (in `project.pbxproj`) for `xcodebuild test` to compile and run them. The `WiFiLensTests` scheme must reference the test bundle in both `<Testables>` and `<MacroExpansion>`.
+
+Do not run UI test bundles (`WiFiLensUITests`, `WiFiLensProUITests`) or full scheme test commands that include UI tests unless the user explicitly asks for UI tests. Default verification is build plus `-only-testing:WiFiLensTests`.
 
 When adding new test files, ensure they are:
 1. Added as PBXFileReference in project.pbxproj

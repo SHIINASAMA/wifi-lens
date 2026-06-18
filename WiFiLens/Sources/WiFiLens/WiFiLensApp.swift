@@ -98,6 +98,14 @@ private struct AppRootView: View {
                 }
 
 #if DEBUG
+                if visitedPages.contains(.spectrumDebugChart) {
+                    SpectrumDebugContainerView()
+                        .opacity(selectedPage == .spectrumDebugChart ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .spectrumDebugChart)
+                        .disabled(selectedPage != .spectrumDebugChart)
+                        .accessibilityIdentifier("page-spectrumDebugChart")
+                }
+
                 if visitedPages.contains(.debugChart) {
                     DebugContainerView()
                         .opacity(selectedPage == .debugChart ? 1 : 0)

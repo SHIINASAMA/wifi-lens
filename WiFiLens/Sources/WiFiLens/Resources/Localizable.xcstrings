@@ -7658,6 +7658,42 @@
         }
       }
     },
+    "nav.spectrum_debug_chart" : {
+      "comment" : "Spectrum Debug Chart sidebar navigation item (dev only)",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spektrum-Debug-Diagramm"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spectrum Debug Chart"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gráfico de depuración del espectro"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スペクトラムデバッグチャート"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "频谱图调试图表"
+          }
+        }
+      }
+    },
     "overview.accessibility.globe_label" : {
       "comment" : "3D visualization of Wi‑Fi networks around the globe",
       "extractionState" : "manual",

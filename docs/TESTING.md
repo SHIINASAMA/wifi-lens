@@ -10,12 +10,21 @@
 
 ## Running Tests
 
-```sh
-# All tests (unit + UI) — OSS target
-xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test
+Default verification should use `xcodebuild build` plus unit-test-only runs. Do not run UI test bundles unless the user explicitly asks for UI tests.
 
-# Pro target tests
-xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens Pro" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test
+```sh
+# Build verification — OSS target
+xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' build
+
+# Unit tests only — OSS target
+xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test -only-testing:WiFiLensTests
+
+# Build verification — Pro target
+xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens Pro" -configuration Debug -destination 'platform=macOS' build
+
+# UI tests — run only when explicitly requested by the user
+xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test -only-testing:WiFiLensUITests
+xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens Pro" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test -only-testing:WiFiLensProUITests
 ```
 
 ## Unit Tests (WiFiLensTests)

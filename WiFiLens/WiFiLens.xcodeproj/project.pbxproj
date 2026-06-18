@@ -21,6 +21,9 @@
 		2B79435DB2D70F8EFE1DFDAA /* RegulatoryFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE17427BAD036F393D712B6F /* RegulatoryFilterTests.swift */; };
 		2B7B4CBC96F724AA4970AC7F /* SpectrumModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DD34695BFD8D4277DF0BDB0 /* SpectrumModelTests.swift */; };
 		2ED34E17AE03E25A409037BD /* NetworkTableRowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */; };
+		ADB001000000000000000004 /* DebugMultiAPScenario.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB001000000000000000003 /* DebugMultiAPScenario.swift */; };
+		ADB001000000000000000005 /* DebugMultiAPScenario.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB001000000000000000003 /* DebugMultiAPScenario.swift */; };
+		ADB001000000000000000002 /* DebugMultiAPScenarioTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB001000000000000000001 /* DebugMultiAPScenarioTests.swift */; };
 		2FA3CB9C5DD2446AAA549779 /* GatewayPinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF472346A62545B9866DA8ED /* GatewayPinger.swift */; };
 		318908BC49D244B1EEE68A9A /* ChannelSpanCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */; };
 		3711656F0C3ECD58CA29D407 /* NativeTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3299502DE1A130760C8A7 /* NativeTableView.swift */; };
@@ -324,6 +327,8 @@
 		CA9F90F78BD04526AE0566CC /* KalmanFilter1D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KalmanFilter1D.swift; sourceTree = "<group>"; };
 		CEDCF8EF1A4D0D355ED657A6 /* BLERSSISample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLERSSISample.swift; sourceTree = "<group>"; };
 		D07A4C1B8DFCDFBA81A6DFFA /* RegulatoryDatabaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegulatoryDatabaseTests.swift; sourceTree = "<group>"; };
+		ADB001000000000000000003 /* DebugMultiAPScenario.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugMultiAPScenario.swift; sourceTree = "<group>"; };
+		ADB001000000000000000001 /* DebugMultiAPScenarioTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugMultiAPScenarioTests.swift; sourceTree = "<group>"; };
 		D6180984B78D4363B6840C79 /* SignalSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalSmoothing.swift; sourceTree = "<group>"; };
 		D69959B95B194A96FA8D337C /* LocationPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermissionManager.swift; sourceTree = "<group>"; };
 		D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewModel.swift; sourceTree = "<group>"; };
@@ -483,6 +488,7 @@
 			isa = PBXGroup;
 			children = (
 				FB92F91F2FBE208500BCEC67 /* DebugChartView.swift */,
+				ADB001000000000000000003 /* DebugMultiAPScenario.swift */,
 				FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */,
 				FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */,
 				FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */,
@@ -809,6 +815,7 @@
 				E83547C1A36ADDD9E827B26A /* ChartUtilityTests.swift */,
 				8A7A45AB88716DC3AC18610B /* ChartViewTests.swift */,
 				53CD49099277F06E8FB3E04D /* ColorExtensionTests.swift */,
+				ADB001000000000000000001 /* DebugMultiAPScenarioTests.swift */,
 				3053495094BB40125310557F /* DeviceCompatibilityFilterTests.swift */,
 				39A94372ADF30D10E0F015CD /* IEParserTests.swift */,
 				A5024CBB8BFCAFF56FEF0756 /* MCPServerTests.swift */,
@@ -1063,6 +1070,7 @@
 				FB0573C22FBC47F1005F8214 /* CrashReporter.swift in Sources */,
 				FBD329502FC500000057B038 /* MetricKitManager.swift in Sources */,
 				FB92F9212FBE208500BCEC67 /* DebugChartView.swift in Sources */,
+				ADB001000000000000000004 /* DebugMultiAPScenario.swift in Sources */,
 				FB92F9232FBE208500BCEC67 /* DebugContainerView.swift in Sources */,
 				FB92F9252FBE208500BCEC67 /* DebugThroughputView.swift in Sources */,
 				FB92F9282FBE208500BCEC67 /* DebugRoamingChartView.swift in Sources */,
@@ -1128,6 +1136,7 @@
 				19134AC983FA95FB8033EB8F /* ChartUtilityTests.swift in Sources */,
 				EEF6495F8D90DE97D0C86ADF /* ChartViewTests.swift in Sources */,
 				C1E94A4D89C952711DBDB34E /* ColorExtensionTests.swift in Sources */,
+				ADB001000000000000000002 /* DebugMultiAPScenarioTests.swift in Sources */,
 				FABE49BBA198BBD12DD618F2 /* DeviceCompatibilityFilterTests.swift in Sources */,
 				BAB34552BFD72F7A42CD918A /* IEParserTests.swift in Sources */,
 				13E648DDB1578ECF42926E36 /* MCPServerTests.swift in Sources */,
@@ -1190,6 +1199,7 @@
 				FB1E32672FC7316C009D1BDC /* CrashReporter.swift in Sources */,
 				FB1E32682FC7316C009D1BDC /* MetricKitManager.swift in Sources */,
 				FB1E32692FC7316C009D1BDC /* DebugChartView.swift in Sources */,
+				ADB001000000000000000005 /* DebugMultiAPScenario.swift in Sources */,
 				FB1E326A2FC7316C009D1BDC /* DebugContainerView.swift in Sources */,
 				FB1E326B2FC7316C009D1BDC /* DebugThroughputView.swift in Sources */,
 				FB1E326C2FC7316C009D1BDC /* DebugRoamingChartView.swift in Sources */,

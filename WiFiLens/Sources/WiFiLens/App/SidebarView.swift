@@ -9,6 +9,7 @@ enum SidebarPage: String, CaseIterable {
     case bleScanner
     case settings
 #if DEBUG
+    case spectrumDebugChart
     case debugChart
 #endif
 
@@ -19,7 +20,7 @@ enum SidebarPage: String, CaseIterable {
         case .spectrum, .channels, .interfaces, .roaming:
             true
 #if DEBUG
-        case .debugChart:
+        case .spectrumDebugChart, .debugChart:
             true
 #endif
         }
@@ -32,7 +33,7 @@ enum SidebarPage: String, CaseIterable {
         case .spectrum, .channels, .interfaces, .roaming:
             true
 #if DEBUG
-        case .debugChart:
+        case .spectrumDebugChart, .debugChart:
             true
 #endif
         }
@@ -48,6 +49,7 @@ enum SidebarPage: String, CaseIterable {
         case .bleScanner: String(localized: "nav.ble_scanner", comment: "BLE Scanner sidebar navigation item")
         case .settings:   String(localized: "common.action.settings", comment: "Settings button or menu item")
 #if DEBUG
+        case .spectrumDebugChart: String(localized: "nav.spectrum_debug_chart", comment: "Spectrum Debug Chart sidebar navigation item (dev only)")
         case .debugChart: String(localized: "nav.debug_chart", comment: "Debug Chart sidebar navigation item (dev only)")
 #endif
         }
@@ -63,6 +65,7 @@ enum SidebarPage: String, CaseIterable {
         case .bleScanner: "personalhotspot"
         case .settings:   "gearshape"
 #if DEBUG
+        case .spectrumDebugChart: "antenna.radiowaves.left.and.right"
         case .debugChart: "ladybug"
 #endif
         }
@@ -140,6 +143,10 @@ struct SidebarView: View {
                     }
                 }
 #if DEBUG
+                Label(SidebarPage.spectrumDebugChart.label, systemImage: SidebarPage.spectrumDebugChart.icon)
+                    .tag(SidebarPage.spectrumDebugChart)
+                    .accessibilityIdentifier("sidebar-spectrumDebugChart")
+
                 Label(SidebarPage.debugChart.label, systemImage: SidebarPage.debugChart.icon)
                     .tag(SidebarPage.debugChart)
                     .accessibilityIdentifier("sidebar-debugChart")

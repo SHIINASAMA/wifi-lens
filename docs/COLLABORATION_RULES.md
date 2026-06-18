@@ -35,6 +35,8 @@ The following rules are **hard constraints** and must be followed in all circums
 
 - **Build verification**: All code changes must be verified by running `xcodebuild build` successfully.
 
+- **No UI tests by default**: Do not run `WiFiLensUITests`, `WiFiLensProUITests`, or full scheme `xcodebuild test` commands that include UI test bundles unless the user explicitly asks for UI tests. Use build verification and unit-test-only verification by default.
+
 - **Docs go in `docs/`**: All new `.md` files must be placed under the `docs/` directory. The only exceptions are this file (`docs/COLLABORATION_RULES.md`) and `AGENTS.md`, `CLAUDE.md`, and `README.md` at the repo root.
 
 ## Behavioral Style
