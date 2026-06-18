@@ -83,6 +83,20 @@ import Testing
         #expect(visible.first?.ssid == "Visible")
     }
 
+    @Test func debugInjectPreservesInjectedFilteredState() {
+        let vm = BandChartViewModel(band: .band24GHz)
+        var visibleSeries = makeSeries(id: "1", ssid: "Visible")
+        visibleSeries.isFilteredOut = false
+        var filteredSeries = makeSeries(id: "2", ssid: "Filtered")
+        filteredSeries.isFilteredOut = true
+
+        vm.debugInject(series: [visibleSeries, filteredSeries])
+
+        #expect(vm.displayedSeriesData.count == 2)
+        #expect(vm.displayedSeriesData.first { $0.id == "2" }?.isFilteredOut == true)
+        #expect(vm.visibleSeriesData().map(\.id) == ["1"])
+    }
+
     @Test func clearFilterRestoresAllVisible() {
         let vm = BandChartViewModel(band: .band24GHz)
         vm.debugInject(series: [
