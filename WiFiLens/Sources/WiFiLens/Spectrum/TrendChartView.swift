@@ -13,7 +13,7 @@ struct TrendChartView: View {
                 .padding(.vertical, 12)
         } else {
             Chart(series: buildSeries(), axis: axisConfig, style: chartStyle)
-                .frame(height: 100)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 

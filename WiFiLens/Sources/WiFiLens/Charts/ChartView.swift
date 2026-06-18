@@ -91,11 +91,20 @@ struct Chart<Overlay: View>: View {
     // MARK: - Geometry
 
     private func computeGeo(size: CGSize) -> ChartGeometry {
-        let chartRect = style.chartRect(size: size)
+        let regions = style.regions(size: size)
         let (yMin, yMax) = computeYRange()
         let xMin = computeXMin()
         let xMax = computeXMax()
-        return ChartGeometry(chartRect: chartRect, xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax)
+        return ChartGeometry(
+            frameRect: regions.frameRect,
+            plotRect: regions.plotRect,
+            annotationRect: regions.annotationRect,
+            axisLabelRects: regions.axisLabelRects,
+            xMin: xMin,
+            xMax: xMax,
+            yMin: yMin,
+            yMax: yMax
+        )
     }
 
     private func computeYRange() -> (Double, Double) {

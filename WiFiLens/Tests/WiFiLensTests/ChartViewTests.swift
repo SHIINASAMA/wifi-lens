@@ -56,6 +56,51 @@ import Testing
         #expect(abs(screen.y - original.y) < 0.001)
     }
 
+    @Test func chartGeometryMappingUsesPlotRect() {
+        let geo = ChartGeometry(
+            frameRect: CGRect(x: 0, y: 0, width: 500, height: 300),
+            plotRect: CGRect(x: 50, y: 30, width: 400, height: 200),
+            annotationRect: CGRect(x: 60, y: 40, width: 380, height: 180),
+            axisLabelRects: ChartAxisLabelRects(
+                yAxis: CGRect(x: 0, y: 30, width: 50, height: 200),
+                xAxis: CGRect(x: 50, y: 230, width: 400, height: 70)
+            ),
+            xMin: 0,
+            xMax: 100,
+            yMin: -100,
+            yMax: 0
+        )
+
+        let point = geo.dataToPoint(x: 50, y: -50)
+        #expect(abs(point.x - 250) < 0.001)
+        #expect(abs(point.y - 130) < 0.001)
+
+        let data = geo.pointToData(screenPoint: point)
+        #expect(abs(data.x - 50) < 0.001)
+        #expect(abs(data.y - -50) < 0.001)
+    }
+
+    @Test func chartGeometryKeepsChartRectAsPlotRectAlias() {
+        let plot = CGRect(x: 40, y: 8, width: 352, height: 200)
+        let geo = ChartGeometry(
+            frameRect: CGRect(x: 0, y: 0, width: 400, height: 240),
+            plotRect: plot,
+            annotationRect: plot,
+            axisLabelRects: ChartAxisLabelRects(
+                yAxis: CGRect(x: 0, y: 8, width: 40, height: 200),
+                xAxis: CGRect(x: 40, y: 208, width: 352, height: 24)
+            ),
+            xMin: 0,
+            xMax: 60,
+            yMin: -100,
+            yMax: 0
+        )
+
+        #expect(geo.plotRect == plot)
+        #expect(geo.chartRect == plot)
+        #expect(geo.frameRect.contains(geo.annotationRect))
+    }
+
     // MARK: - ChartSeries interpolation modes
 
     @Test func gaussianInterpolationGeneratesSmoothCurve() {
@@ -110,6 +155,47 @@ import Testing
         #expect(abs(rect.height - 264) < 0.5)
     }
 
+    @Test func chartStyleAnnotationRectStaysInsideFrame() {
+        let style = ChartStyle(
+            leftAxisWidth: 40,
+            bottomAxisHeight: 24,
+            marginTop: 8,
+            marginRight: 8,
+            marginBottom: 4,
+            annotationPadding: EdgeInsets(top: 6, leading: 4, bottom: 2, trailing: 4)
+        )
+
+        let frame = CGRect(x: 0, y: 0, width: 400, height: 300)
+        let regions = style.regions(size: frame.size)
+
+        #expect(regions.frameRect == frame)
+        #expect(regions.plotRect == style.chartRect(size: frame.size))
+        #expect(frame.contains(regions.annotationRect))
+        #expect(regions.annotationRect.minX >= regions.plotRect.minX)
+        #expect(regions.annotationRect.minY >= regions.plotRect.minY)
+    }
+
+    @Test func chartStyleRegionsClampCollapsedSizes() {
+        let style = ChartStyle(
+            leftAxisWidth: 40,
+            bottomAxisHeight: 24,
+            marginTop: 8,
+            marginRight: 8,
+            marginBottom: 4,
+            annotationPadding: EdgeInsets(top: 20, leading: 20, bottom: 20, trailing: 20)
+        )
+
+        let regions = style.regions(size: CGSize(width: 10, height: 10))
+
+        #expect(regions.frameRect.width >= 0)
+        #expect(regions.frameRect.height >= 0)
+        #expect(regions.plotRect.width >= 0)
+        #expect(regions.plotRect.height >= 0)
+        #expect(regions.annotationRect.width >= 0)
+        #expect(regions.annotationRect.height >= 0)
+        #expect(regions.frameRect.contains(regions.annotationRect))
+    }
+
     // MARK: - Axis config with explicit bounds
 
     @Test func axisBoundsConstrainGeometryComputation() {
@@ -123,5 +209,44 @@ import Testing
         #expect(axis.xMin == 20)
         #expect(axis.xMax == 40)
         #expect(axis.yStep == 10)
+    }
+}
+
+@Suite struct SpectrumSectionLayoutTests {
+
+    @Test func trendSectionReceivesEnoughHeightForItsChart() {
+        let sections: [SpectrumSectionLayout.Section] = [
+            .init(kind: .band, isCollapsed: false),
+            .init(kind: .band, isCollapsed: false),
+            .init(kind: .band, isCollapsed: false),
+            .init(kind: .trend, isCollapsed: false),
+            .init(kind: .table, isCollapsed: false),
+        ]
+
+        let heights = SpectrumSectionLayout.computeContentHeights(
+            sections: sections,
+            totalHeight: 600
+        )
+
+        #expect(heights[3] >= SpectrumSectionLayout.Kind.trend.minimumContentHeight)
+    }
+
+    @Test func expandedSectionsStayWithinAvailableHeight() {
+        let sections: [SpectrumSectionLayout.Section] = [
+            .init(kind: .band, isCollapsed: false),
+            .init(kind: .band, isCollapsed: false),
+            .init(kind: .band, isCollapsed: false),
+            .init(kind: .trend, isCollapsed: false),
+            .init(kind: .table, isCollapsed: false),
+        ]
+
+        let totalHeight: CGFloat = 600
+        let heights = SpectrumSectionLayout.computeContentHeights(
+            sections: sections,
+            totalHeight: totalHeight
+        )
+        let totalAllocated = heights.reduce(0, +) + CGFloat(sections.count) * SpectrumSectionLayout.headerHeight
+
+        #expect(totalAllocated <= totalHeight)
     }
 }
