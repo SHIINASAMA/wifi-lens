@@ -74,6 +74,9 @@ function renderAll() {
 
 /* ── Nav ───────────────────────────────────────────────────── */
 
+const langLabels: Record<string, string> = { en: 'EN', de: 'DE', es: 'ES', ja: '日本語', 'zh-Hans': '中文' }
+const langOrder: SupportedLocale[] = ['en', 'de', 'es', 'ja', 'zh-Hans']
+
 function renderNav() {
   return /* html */ `
   <nav id="nav">
@@ -81,9 +84,14 @@ function renderNav() {
       <img src="${BASE}icon.png" alt="WiFi Lens" />
       WiFi Lens
     </a>
-    <button class="hamburger" aria-label="${esc(t.a11y.menu)}" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
+    <div class="nav-right">
+      <select class="lang-select" aria-label="${esc(t.a11y.selectLanguage)}">
+        ${langOrder.map(l => `<option value="${l}"${l === lng ? ' selected' : ''}>${langLabels[l]}</option>`).join('')}
+      </select>
+      <button class="hamburger" aria-label="${esc(t.a11y.menu)}" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
     <div class="links">
       <a href="#features">${t.nav.features}</a>
       <a href="#mcp" class="nav-hide-md">${t.nav.mcp}</a>
@@ -94,11 +102,7 @@ function renderNav() {
       <a href="https://github.com/SHIINASAMA/wifi-lens" aria-label="GitHub">${ghSVG}</a>
       <div class="lang-switch" role="radiogroup" aria-label="${esc(t.a11y.selectLanguage)}">
         <span class="lang-indicator" aria-hidden="true"></span>
-        <button class="lang-option" role="radio" data-lang="en">EN</button>
-        <button class="lang-option" role="radio" data-lang="de">DE</button>
-        <button class="lang-option" role="radio" data-lang="es">ES</button>
-        <button class="lang-option" role="radio" data-lang="ja">日本語</button>
-        <button class="lang-option" role="radio" data-lang="zh-Hans">中文</button>
+        ${langOrder.map(l => `<button class="lang-option" role="radio" data-lang="${l}">${langLabels[l]}</button>`).join('')}
       </div>
     </div>
   </nav>`
@@ -468,6 +472,7 @@ function hydrateUI() {
       const totalGap = barAreaW * 0.15
       const barW = (barAreaW - totalGap) / BAR_COUNT
       const barGap = totalGap / BAR_COUNT
+      const visibleStep = w < 500 ? 2 : 1
 
       for (let i = 0; i < BAR_COUNT; i++) {
         if (Math.random() < 0.05) {
@@ -476,7 +481,7 @@ function hydrateUI() {
         barHeights[i] += (barTargets[i] - barHeights[i]) * 0.08
       }
 
-      for (let i = 0; i < BAR_COUNT; i++) {
+      for (let i = 0; i < BAR_COUNT; i += visibleStep) {
         const bh = barHeights[i] * barAreaH
         if (bh < 2) continue
         const bx = barX0 + i * (barW + barGap)
@@ -553,7 +558,7 @@ function hydrateUI() {
     statObs.observe(statsEl)
   }
 
-  // ── Language switcher ──────────────────────────────────────
+  // ── Language switcher (pill on desktop) ────────────────────
   document.querySelectorAll<HTMLButtonElement>('.lang-option').forEach(btn => {
     btn.addEventListener('click', async () => {
       const target = btn.dataset.lang as SupportedLocale
@@ -562,10 +567,54 @@ function hydrateUI() {
     })
   })
   updateLangIndicator()
+
+  // ── Language switcher (select on mobile) ───────────────────
+  const langSelect = document.querySelector<HTMLSelectElement>('.lang-select')
+  if (langSelect) {
+    langSelect.value = lng
+    langSelect.addEventListener('change', async () => {
+      const target = langSelect.value as SupportedLocale
+      if (target === lng) return
+      await switchTo(target)
+    })
+  }
+
+  // ── Mobile hamburger menu ───────────────────────────────────
+  const navEl = document.getElementById('nav')
+  if (navEl) {
+    const hamburger = navEl.querySelector('.hamburger')
+    if (hamburger) {
+      hamburger.addEventListener('click', () => {
+        const open = navEl.classList.toggle('mobile-open')
+        hamburger.classList.toggle('open', open)
+        hamburger.setAttribute('aria-expanded', String(open))
+        document.body.classList.toggle('menu-open', open)
+      })
+      navEl.querySelectorAll('.links a[href^="#"]').forEach(a => {
+        a.addEventListener('click', () => {
+          navEl.classList.remove('mobile-open')
+          hamburger.classList.remove('open')
+          hamburger.setAttribute('aria-expanded', 'false')
+          document.body.classList.remove('menu-open')
+        })
+      })
+    }
+  }
 }
 
 async function switchTo(target: SupportedLocale) {
   const scrollY = window.scrollY
+
+  // Close mobile menu if open
+  const navEl = document.getElementById('nav')
+  if (navEl) {
+    navEl.classList.remove('mobile-open')
+    const hamburger = navEl.querySelector('.hamburger')
+    hamburger?.classList.remove('open')
+    hamburger?.setAttribute('aria-expanded', 'false')
+    document.body.classList.remove('menu-open')
+  }
+
   await changeLanguage(target)
   lng = target
   loadTranslation(lng)
@@ -634,28 +683,6 @@ async function init() {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     window.scrollTo({ top: 0, behavior: prefersReduced ? 'auto' : 'smooth' })
   })
-
-  // ── Mobile hamburger menu ───────────────────────────────────
-  const navEl = document.getElementById('nav')
-  if (navEl) {
-    const hamburger = navEl.querySelector('.hamburger')
-    if (hamburger) {
-      hamburger.addEventListener('click', () => {
-        const open = navEl.classList.toggle('mobile-open')
-        hamburger.classList.toggle('open', open)
-        hamburger.setAttribute('aria-expanded', String(open))
-        document.body.classList.toggle('menu-open', open)
-      })
-      navEl.querySelectorAll('.links a[href^="#"]').forEach(a => {
-        a.addEventListener('click', () => {
-          navEl.classList.remove('mobile-open')
-          hamburger.classList.remove('open')
-          hamburger.setAttribute('aria-expanded', 'false')
-          document.body.classList.remove('menu-open')
-        })
-      })
-    }
-  }
 
   window.addEventListener('resize', updateLangIndicator, { passive: true })
   document.fonts.ready.then(updateLangIndicator)
