@@ -4,6 +4,33 @@ import Testing
 
 @Suite struct DebugMultiAPScenarioTests {
 
+    @Test func debugNavigationSeparatesSpectrumChartDebugPage() {
+        #expect(SidebarPage.allCases.contains(.spectrumDebugChart))
+        #expect(SidebarPage.allCases.contains(.debugChart))
+        #expect(SidebarPage.spectrumDebugChart.icon == "antenna.radiowaves.left.and.right")
+        #expect(SidebarPage.debugChart.icon == "ladybug")
+        #expect(SidebarPage.spectrumDebugChart.requiresLocationAuthorization)
+        #expect(SidebarPage.spectrumDebugChart.requiresWiFi)
+    }
+
+    @Test func spectrumDebugPagesContainSingleAndMultiAPEntries() {
+        #expect(SpectrumDebugPage.allCases.map(\.rawValue) == [
+            "singleAP",
+            "multiAP",
+        ])
+        #expect(SpectrumDebugPage.singleAP.label == "Single AP")
+        #expect(SpectrumDebugPage.multiAP.label == "Multi AP")
+    }
+
+    @Test func debugPagesKeepOnlyNonSpectrumChartEntries() {
+        #expect(DebugPage.allCases.map(\.rawValue) == [
+            "throughput",
+            "roaming",
+        ])
+        #expect(DebugPage.throughput.label == "Throughput")
+        #expect(DebugPage.roaming.label == "Roaming")
+    }
+
     @Test func scenarioRoundTripsThroughJSON() throws {
         let scenario = DebugScenario(
             version: 1,

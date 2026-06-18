@@ -2,18 +2,9 @@ import SwiftUI
 
 #if DEBUG
 
-private enum DebugChartMode: String, CaseIterable, Identifiable {
+enum DebugChartMode: String {
     case singleAP
     case multiAP
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .singleAP: "Single AP"
-        case .multiAP: "Multi AP"
-        }
-    }
 }
 
 private struct DebugOscillator {
@@ -29,7 +20,8 @@ private struct DebugOscillator {
 }
 
 struct DebugChartView: View {
-    @State private var mode: DebugChartMode = .singleAP
+    let mode: DebugChartMode
+
     @State private var bandVM = BandChartViewModel(band: .band5GHz)
     @State private var selectedNetworkID: String?
     @State private var timer: Timer?
@@ -54,14 +46,12 @@ struct DebugChartView: View {
         "#2563EB", "#16A34A", "#EA580C", "#7C3AED",
     ]
 
+    init(mode: DebugChartMode = .singleAP) {
+        self.mode = mode
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            modeControls
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-
-            Divider()
-
             switch mode {
             case .singleAP:
                 singleAPWorkbench
@@ -78,14 +68,6 @@ struct DebugChartView: View {
             }
         }
         .onDisappear { stopTimer() }
-        .onChange(of: mode) { _, newMode in
-            switch newMode {
-            case .singleAP:
-                enterSingleAPMode()
-            case .multiAP:
-                enterMultiAPMode()
-            }
-        }
         .onChange(of: isRunning) { _, running in
             guard mode == .singleAP else { return }
             if running { startTimer() } else { stopTimer() }
@@ -97,22 +79,6 @@ struct DebugChartView: View {
     }
 
     // MARK: - Workbenches
-
-    private var modeControls: some View {
-        HStack(spacing: 12) {
-            Picker("Mode", selection: $mode.animation(.bouncy)) {
-                ForEach(DebugChartMode.allCases) { mode in
-                    Text(mode.title).tag(mode)
-                }
-            }
-            .pickerStyle(.segmented)
-            .controlSize(.small)
-            .frame(width: 210)
-            .accessibilityIdentifier("debug-chart-mode-picker")
-
-            Spacer()
-        }
-    }
 
     private var singleAPWorkbench: some View {
         VStack(spacing: 0) {

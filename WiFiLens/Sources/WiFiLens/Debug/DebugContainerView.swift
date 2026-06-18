@@ -2,23 +2,73 @@ import SwiftUI
 
 #if DEBUG
 
+enum SpectrumDebugPage: String, CaseIterable {
+    case singleAP
+    case multiAP
+
+    var label: String {
+        switch self {
+        case .singleAP: "Single AP"
+        case .multiAP:  "Multi AP"
+        }
+    }
+}
+
 enum DebugPage: String, CaseIterable {
-    case spectrum
     case throughput
     case roaming
 
     var label: String {
         switch self {
-        case .spectrum:   "Spectrum"
         case .throughput: "Throughput"
         case .roaming:    "Roaming"
         }
     }
 }
 
+struct SpectrumDebugContainerView: View {
+    @State private var selectedPage: SpectrumDebugPage = .singleAP
+    @State private var visitedTabs: Set<SpectrumDebugPage> = [.singleAP]
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Picker("", selection: $selectedPage.animation(.bouncy)) {
+                ForEach(SpectrumDebugPage.allCases, id: \.self) { page in
+                    Text(page.label).tag(page)
+                }
+            }
+            .pickerStyle(.segmented)
+            .controlSize(.regular)
+            .frame(width: 220)
+            .padding(.vertical, 6)
+            .onChange(of: selectedPage) { _, newTab in
+                visitedTabs.insert(newTab)
+            }
+
+            Divider()
+
+            ZStack {
+                if visitedTabs.contains(.singleAP) {
+                    DebugChartView(mode: .singleAP)
+                        .opacity(selectedPage == .singleAP ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .singleAP)
+                        .disabled(selectedPage != .singleAP)
+                }
+
+                if visitedTabs.contains(.multiAP) {
+                    DebugChartView(mode: .multiAP)
+                        .opacity(selectedPage == .multiAP ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .multiAP)
+                        .disabled(selectedPage != .multiAP)
+                }
+            }
+        }
+    }
+}
+
 struct DebugContainerView: View {
-    @State private var selectedPage: DebugPage = .spectrum
-    @State private var visitedTabs: Set<DebugPage> = [.spectrum]
+    @State private var selectedPage: DebugPage = .throughput
+    @State private var visitedTabs: Set<DebugPage> = [.throughput]
 
     var body: some View {
         VStack(spacing: 0) {
@@ -29,7 +79,7 @@ struct DebugContainerView: View {
             }
             .pickerStyle(.segmented)
             .controlSize(.regular)
-            .frame(width: 180)
+            .frame(width: 220)
             .padding(.vertical, 6)
             .onChange(of: selectedPage) { _, newTab in
                 visitedTabs.insert(newTab)
@@ -38,13 +88,6 @@ struct DebugContainerView: View {
             Divider()
 
             ZStack {
-                if visitedTabs.contains(.spectrum) {
-                    DebugChartView()
-                        .opacity(selectedPage == .spectrum ? 1 : 0)
-                        .allowsHitTesting(selectedPage == .spectrum)
-                        .disabled(selectedPage != .spectrum)
-                }
-
                 if visitedTabs.contains(.throughput) {
                     DebugThroughputView()
                         .opacity(selectedPage == .throughput ? 1 : 0)
