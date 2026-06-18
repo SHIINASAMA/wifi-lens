@@ -200,7 +200,8 @@ import Testing
         let rect = CGRect(x: 0, y: 0, width: 200, height: 100)
         let labels = BandChartLayout.placeLabels(
             seriesData: [other, selected],
-            chartRect: rect,
+            plotRect: rect,
+            annotationRect: rect,
             xMin: 1,
             scaleX: 10,
             scaleY: 1,
@@ -208,6 +209,129 @@ import Testing
             selectedNetworkID: "selected"
         )
         #expect(labels.contains { $0.series.id == "selected" })
+    }
+
+    @Test func placeLabelsKeepLeftAndTopEdgeInsideAnnotationRect() throws {
+        let series = makeSeries(
+            id: "left-edge",
+            ssid: "DIRECT-XX-HP Laser XXXXnw",
+            channel: 1,
+            rssi: -40
+        )
+        let plotRect = CGRect(x: 38, y: 6, width: 320, height: 160)
+        let annotationRect = CGRect(x: 58, y: 26, width: 280, height: 120)
+
+        let labels = BandChartLayout.placeLabels(
+            seriesData: [series],
+            plotRect: plotRect,
+            annotationRect: annotationRect,
+            xMin: 1,
+            scaleX: 24,
+            scaleY: 160 / 60,
+            yMin: Double(Constants.rssiNoiseFloor),
+            selectedNetworkID: nil
+        )
+
+        let label = try #require(labels.first)
+        let rect = BandChartLayout.estimatedLabelRect(for: label)
+        #expect(annotationRect.contains(rect))
+    }
+
+    @Test func placeLabelsUseDownwardLaneNearTopBoundary() throws {
+        let first = makeSeries(id: "first", ssid: "Collision-A", channel: 52, rssi: -40)
+        let second = makeSeries(id: "second", ssid: "Collision-B", channel: 52, rssi: -41)
+        let plotRect = CGRect(x: 38, y: 6, width: 360, height: 180)
+        let annotationRect = CGRect(x: 58, y: 26, width: 320, height: 140)
+
+        let labels = BandChartLayout.placeLabels(
+            seriesData: [first, second],
+            plotRect: plotRect,
+            annotationRect: annotationRect,
+            xMin: 36,
+            scaleX: 8,
+            scaleY: 180 / 60,
+            yMin: Double(Constants.rssiNoiseFloor),
+            selectedNetworkID: nil
+        )
+
+        #expect(labels.count == 2)
+        let rects = labels.map { BandChartLayout.estimatedLabelRect(for: $0) }
+        #expect(rects.allSatisfy { annotationRect.contains($0) })
+        #expect(!rects[0].intersects(rects[1]))
+    }
+
+    @Test func acceptedLabelRectIsCenteredOnPlacementPosition() throws {
+        let series = makeSeries(id: "centered", ssid: "Centered", channel: 11, rssi: -90)
+        let plotRect = CGRect(x: 38, y: 6, width: 320, height: 160)
+        let annotationRect = CGRect(x: 58, y: 26, width: 280, height: 120)
+
+        let labels = BandChartLayout.placeLabels(
+            seriesData: [series],
+            plotRect: plotRect,
+            annotationRect: annotationRect,
+            xMin: 1,
+            scaleX: 24,
+            scaleY: 160 / 60,
+            yMin: Double(Constants.rssiNoiseFloor),
+            selectedNetworkID: nil
+        )
+
+        let label = try #require(labels.first)
+        let rect = BandChartLayout.estimatedLabelRect(for: label)
+        #expect(rect.midX == label.x)
+        #expect(rect.midY == label.y)
+        #expect(annotationRect.contains(rect))
+    }
+
+    @Test func longSSIDPlacementUsesCappedContainedLabelSize() throws {
+        let series = makeSeries(
+            id: "long",
+            ssid: "This network name is intentionally far longer than the label estimate may draw without truncation",
+            channel: 6,
+            rssi: -40
+        )
+        let plotRect = CGRect(x: 38, y: 6, width: 320, height: 160)
+        let annotationRect = CGRect(x: 58, y: 26, width: 280, height: 120)
+
+        let labels = BandChartLayout.placeLabels(
+            seriesData: [series],
+            plotRect: plotRect,
+            annotationRect: annotationRect,
+            xMin: 1,
+            scaleX: 24,
+            scaleY: 160 / 60,
+            yMin: Double(Constants.rssiNoiseFloor),
+            selectedNetworkID: nil
+        )
+
+        let label = try #require(labels.first)
+        let rect = BandChartLayout.estimatedLabelRect(for: label)
+        #expect(label.size.width == 220)
+        #expect(rect.width == label.size.width)
+        #expect(annotationRect.contains(rect))
+    }
+
+    @Test func selectedLabelFallsBackInsideTooSmallAnnotationRect() throws {
+        let selected = makeSeries(id: "selected", ssid: "SelectedNameCannotFit", channel: 6, rssi: -40)
+        let plotRect = CGRect(x: 0, y: 0, width: 200, height: 100)
+        let annotationRect = CGRect(x: 20, y: 20, width: 5, height: 5)
+
+        let labels = BandChartLayout.placeLabels(
+            seriesData: [selected],
+            plotRect: plotRect,
+            annotationRect: annotationRect,
+            xMin: 1,
+            scaleX: 10,
+            scaleY: 1,
+            yMin: Double(Constants.rssiNoiseFloor),
+            selectedNetworkID: "selected"
+        )
+
+        let label = try #require(labels.first)
+        let rect = BandChartLayout.estimatedLabelRect(for: label)
+        #expect(label.series.id == "selected")
+        #expect(label.kind == .marker)
+        #expect(annotationRect.contains(rect))
     }
 
     @Test func nearestSeriesFindsClosestCurve() {

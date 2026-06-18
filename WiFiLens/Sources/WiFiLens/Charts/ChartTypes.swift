@@ -88,13 +88,66 @@ struct ChartStyle {
     var marginTop: CGFloat = 8
     var marginRight: CGFloat = 8
     var marginBottom: CGFloat = 4
+    var annotationPadding: EdgeInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
+    var annotationAvoidsAxisLabels: Bool = true
 
     func chartRect(size: CGSize) -> CGRect {
-        CGRect(
+        regions(size: size).plotRect
+    }
+
+    func regions(size: CGSize) -> ChartRegions {
+        let frameRect = CGRect(
+            origin: .zero,
+            size: CGSize(width: max(0, size.width), height: max(0, size.height))
+        )
+        let plotRect = CGRect(
             x: leftAxisWidth,
             y: marginTop,
-            width: max(0, size.width - leftAxisWidth - marginRight),
-            height: max(0, size.height - bottomAxisHeight - marginTop - marginBottom)
+            width: max(0, frameRect.width - leftAxisWidth - marginRight),
+            height: max(0, frameRect.height - bottomAxisHeight - marginTop - marginBottom)
+        )
+        let yAxisRect = CGRect(
+            x: frameRect.minX,
+            y: plotRect.minY,
+            width: max(0, plotRect.minX - frameRect.minX),
+            height: plotRect.height
+        )
+        let xAxisRect = CGRect(
+            x: plotRect.minX,
+            y: plotRect.maxY,
+            width: plotRect.width,
+            height: max(0, frameRect.maxY - plotRect.maxY)
+        )
+        let baseAnnotationRect = annotationAvoidsAxisLabels ? plotRect : frameRect
+        let annotationMinX = min(
+            max(baseAnnotationRect.minX + annotationPadding.leading, frameRect.minX),
+            frameRect.maxX
+        )
+        let annotationMinY = min(
+            max(baseAnnotationRect.minY + annotationPadding.top, frameRect.minY),
+            frameRect.maxY
+        )
+        let annotationMaxX = min(
+            max(baseAnnotationRect.maxX - annotationPadding.trailing, annotationMinX),
+            frameRect.maxX
+        )
+        let annotationMaxY = min(
+            max(baseAnnotationRect.maxY - annotationPadding.bottom, annotationMinY),
+            frameRect.maxY
+        )
+        let adjustedAnnotationRect = CGRect(
+            x: annotationMinX,
+            y: annotationMinY,
+            width: annotationMaxX - annotationMinX,
+            height: annotationMaxY - annotationMinY
+        )
+
+        return ChartRegions(
+            frameRect: frameRect,
+            plotRect: plotRect,
+            annotationRect: adjustedAnnotationRect,
+            axisLabelRects: ChartAxisLabelRects(yAxis: yAxisRect, xAxis: xAxisRect),
+            contentClipRect: frameRect
         )
     }
 }

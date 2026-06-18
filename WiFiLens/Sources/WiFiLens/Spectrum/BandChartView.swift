@@ -176,14 +176,49 @@ struct WiFiBandChart: View {
     private func dataLabelOverlay(geo: ChartGeometry) -> some View {
         let seriesList = model.displayedSeriesData
         let labels = BandChartLayout.placeLabels(
-            seriesData: seriesList, chartRect: geo.chartRect,
-            xMin: geo.xMin, scaleX: geo.scaleX, scaleY: geo.scaleY,
-            yMin: geo.yMin, selectedNetworkID: selectedNetworkID
+            seriesData: seriesList,
+            plotRect: geo.plotRect,
+            annotationRect: geo.annotationRect,
+            xMin: geo.xMin,
+            scaleX: geo.scaleX,
+            scaleY: geo.scaleY,
+            yMin: geo.yMin,
+            selectedNetworkID: selectedNetworkID
         )
         return ForEach(labels, id: \.series.id) { item in
-            Text("\(item.series.channel) \(item.series.displaySSID)\(trendSuffix(for: item.series))")
-                .font(.caption2).foregroundColor(item.series.color)
-                .opacity(item.opacity).position(x: item.x, y: item.y)
+            dataLabel(item)
+        }
+    }
+
+    @ViewBuilder
+    private func dataLabel(_ item: BandChartLayout.LabelPlacement) -> some View {
+        switch item.kind {
+        case .regular, .compact:
+            Text(labelText(for: item))
+                .font(.caption2)
+                .foregroundColor(item.series.color)
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .frame(width: item.size.width, height: item.size.height)
+                .opacity(item.opacity)
+                .position(x: item.x, y: item.y)
+        case .marker:
+            Circle()
+                .fill(item.series.color)
+                .frame(width: item.size.width, height: item.size.height)
+                .opacity(item.opacity)
+                .position(x: item.x, y: item.y)
+        }
+    }
+
+    private func labelText(for item: BandChartLayout.LabelPlacement) -> String {
+        switch item.kind {
+        case .regular:
+            return "\(item.series.channel) \(item.series.displaySSID)\(trendSuffix(for: item.series))"
+        case .compact:
+            return "CH \(item.series.channel)"
+        case .marker:
+            return ""
         }
     }
 
