@@ -6,6 +6,54 @@ __MACOSX/
 .LSOverride
 Icon[]
 
+# Xcode user data
+xcuserdata/
+*.xcuserstate
+
+# Xcode build
+build/
+DerivedData/
+
+# Swift Package Manager
+.build/
+Packages/
+.swiftpm/xcode/
+
+# CocoaPods
+Pods/
+
+# Carthage
+Carthage/Build/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# Archives
+*.xcarchive
+
+# Playground
+timeline.xctimeline
+playground.xcworkspace
+
+# SwiftPM resolved file（按团队策略决定）
+# Package.resolved
+
+# Tuist
+Tuist/.build/
+
+# Xcode project user-specific files
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcscmblueprint
+*.xcbkptlist
+
+# XcodeGen (project is generated, but keep project.yml)
+# *.xcodeproj/ is tracked, but user data is excluded above
+
 # Resource forks
 ._*
 
