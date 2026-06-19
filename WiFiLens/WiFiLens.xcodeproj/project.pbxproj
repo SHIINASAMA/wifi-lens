@@ -41,7 +41,6 @@
 		6680C83EB72E9C488E7F7616 /* BandChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC8FED8F49854F4CDFD4DCA /* BandChartView.swift */; };
 		67B6475699ADED9C42E8F7CC /* BLEModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B06040A5BF8B6FAF01FFB696 /* BLEModelTests.swift */; };
 		6ACEE4EC462933B7C4320468 /* ChannelBand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4079C5A47F59C655689BCFB8 /* ChannelBand.swift */; };
-		6D5E4C3B2A19081716151413 /* DynamicChannelScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5E4C3B2A19081716151412 /* DynamicChannelScorer.swift */; };
 		6ECFD8E459A49E4A6FA0FCB0 /* WiFiScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */; };
 		6EE067F9A1CC14BACCA0F3DB /* BLERSSISample.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDCF8EF1A4D0D355ED657A6 /* BLERSSISample.swift */; };
 		7E778683F723499D93511520 /* RoamingTestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F790DC6E08D43C5BD058D96 /* RoamingTestViewModel.swift */; };
@@ -88,7 +87,6 @@
 		FB0573C22FBC47F1005F8214 /* CrashReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C12FBC47F1005F8214 /* CrashReporter.swift */; };
 		FB0573C422FBBEAE4005F8214 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = FB0573C412FBBEAE4005F8214 /* Logging */; };
 		FB0573C42FBC7405005F8214 /* ChannelQualityCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */; };
-		6ABD0BED037344A9A47057E6 /* DynamicChannelScorerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8580BAAE52BC4E1EA91AACF0 /* DynamicChannelScorerTests.swift */; };
 		FB0573C62FBC741D005F8214 /* ChannelQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */; };
 		FB0573CA2FBCD25C005F8214 /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C82FBCD25C005F8214 /* OverviewView.swift */; };
 		FB0573CC2FBCD8FA005F8214 /* ThroughputMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */; };
@@ -114,7 +112,6 @@
 		FB1E32542FC7316C009D1BDC /* ChannelQualityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */; };
 		FB1E32552FC7316C009D1BDC /* CWChannel+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5DDCE8EACD706BD2BCEE4B /* CWChannel+Extensions.swift */; };
 		FB1E32562FC7316C009D1BDC /* ChannelBand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4079C5A47F59C655689BCFB8 /* ChannelBand.swift */; };
-		FB1E32AA2FC7316C009D1BDC /* DynamicChannelScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5E4C3B2A19081716151412 /* DynamicChannelScorer.swift */; };
 		FB1E32572FC7316C009D1BDC /* NetworkSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573AE2FBB5BD6005F8214 /* NetworkSnapshot.swift */; };
 		FB1E32582FC7316C009D1BDC /* TrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573B02FBB5BEE005F8214 /* TrendChartView.swift */; };
 		FB1E32592FC7316C009D1BDC /* ChannelSpanCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */; };
@@ -298,7 +295,6 @@
 		5DD34695BFD8D4277DF0BDB0 /* SpectrumModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumModelTests.swift; sourceTree = "<group>"; };
 		6203A2551742DF77D61785FE /* WiFiChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiChannel.swift; sourceTree = "<group>"; };
 		69F66DB715821EBD11B6D1AA /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
-		6D5E4C3B2A19081716151412 /* DynamicChannelScorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicChannelScorer.swift; sourceTree = "<group>"; };
 		786042C29EF01CE698FEBBF8 /* SignalProcessingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalProcessingTests.swift; sourceTree = "<group>"; };
 		7B31CBEBC05DEA7ADB03FE01 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7E044182AAA5DC5A000A0D69 /* ScannerModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerModelTests.swift; sourceTree = "<group>"; };
@@ -345,7 +341,6 @@
 		FB0573BF2FBC47CC005F8214 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		FB0573C12FBC47F1005F8214 /* CrashReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReporter.swift; sourceTree = "<group>"; };
 		FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityCalculator.swift; sourceTree = "<group>"; };
-		8580BAAE52BC4E1EA91AACF0 /* DynamicChannelScorerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicChannelScorerTests.swift; sourceTree = "<group>"; };
 		FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelQualityView.swift; sourceTree = "<group>"; };
 		FB0573C82FBCD25C005F8214 /* OverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewView.swift; sourceTree = "<group>"; };
 		FB0573CB2FBCD8FA005F8214 /* ThroughputMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThroughputMonitor.swift; sourceTree = "<group>"; };
@@ -630,7 +625,6 @@
 			isa = PBXGroup;
 			children = (
 				FB0573C32FBC7405005F8214 /* ChannelQualityCalculator.swift */,
-				6D5E4C3B2A19081716151412 /* DynamicChannelScorer.swift */,
 				FB0573C52FBC741D005F8214 /* ChannelQualityView.swift */,
 				FB0573D32FBD0001005F8217 /* RecommendationReason.swift */,
 				FB0573D42FBD0001005F8218 /* RecommendationReasonCalculator.swift */,
@@ -816,7 +810,6 @@
 				8A7A45AB88716DC3AC18610B /* ChartViewTests.swift */,
 				53CD49099277F06E8FB3E04D /* ColorExtensionTests.swift */,
 				3053495094BB40125310557F /* DeviceCompatibilityFilterTests.swift */,
-				8580BAAE52BC4E1EA91AACF0 /* DynamicChannelScorerTests.swift */,
 				39A94372ADF30D10E0F015CD /* IEParserTests.swift */,
 				A5024CBB8BFCAFF56FEF0756 /* MCPServerTests.swift */,
 				8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */,
@@ -1048,7 +1041,6 @@
 				FB0573C62FBC741D005F8214 /* ChannelQualityView.swift in Sources */,
 				9F1D29EF11E510D9D72BB7D1 /* CWChannel+Extensions.swift in Sources */,
 				6ACEE4EC462933B7C4320468 /* ChannelBand.swift in Sources */,
-				6D5E4C3B2A19081716151413 /* DynamicChannelScorer.swift in Sources */,
 				FB0573AF2FBB5BD6005F8214 /* NetworkSnapshot.swift in Sources */,
 				FB0573B12FBB5BEE005F8214 /* TrendChartView.swift in Sources */,
 				318908BC49D244B1EEE68A9A /* ChannelSpanCalculator.swift in Sources */,
@@ -1137,7 +1129,6 @@
 				EEF6495F8D90DE97D0C86ADF /* ChartViewTests.swift in Sources */,
 				C1E94A4D89C952711DBDB34E /* ColorExtensionTests.swift in Sources */,
 				FABE49BBA198BBD12DD618F2 /* DeviceCompatibilityFilterTests.swift in Sources */,
-				6ABD0BED037344A9A47057E6 /* DynamicChannelScorerTests.swift in Sources */,
 				BAB34552BFD72F7A42CD918A /* IEParserTests.swift in Sources */,
 				13E648DDB1578ECF42926E36 /* MCPServerTests.swift in Sources */,
 				2ED34E17AE03E25A409037BD /* NetworkTableRowTests.swift in Sources */,
@@ -1180,7 +1171,6 @@
 				FB1E32542FC7316C009D1BDC /* ChannelQualityView.swift in Sources */,
 				FB1E32552FC7316C009D1BDC /* CWChannel+Extensions.swift in Sources */,
 				FB1E32562FC7316C009D1BDC /* ChannelBand.swift in Sources */,
-				FB1E32AA2FC7316C009D1BDC /* DynamicChannelScorer.swift in Sources */,
 				FB1E32572FC7316C009D1BDC /* NetworkSnapshot.swift in Sources */,
 				FB1E32582FC7316C009D1BDC /* TrendChartView.swift in Sources */,
 				FB1E32592FC7316C009D1BDC /* ChannelSpanCalculator.swift in Sources */,

@@ -2,127 +2,104 @@
 
 ## Goal
 
-Resolve issue #3 by making channel recommendation explicitly predictive instead of purely snapshot-based.
+Resolve issue #3 by making channel recommendation explicitly counterfactual.
 
 The recommendation should answer:
 
-> Which channels are most likely to remain good after users act on the recommendation?
+> If the current AP were configured to use this channel, would it face meaningfully less external interference than it faces now?
 
-WiFi Lens still displays the observed RF environment, but recommendation selection should use a future-looking score that accounts for short-term channel trends and migration pressure caused by prior recommendations.
+WiFi Lens still displays the observed RF environment, including the current AP. Recommendation selection uses a separate score that excludes the current target AP from the interference calculation.
 
 ## Product Semantics
-
-WiFi Lens recommends channels for the Wi-Fi environment the user is inspecting, not a guaranteed globally optimal configuration.
 
 Two distinct channel views are required:
 
 | View | Meaning | Consumer |
 |------|---------|----------|
-| `qualityScore` | Observed RF quality in the current scan snapshot | Charts, diagnostics, current environment display |
-| `predictedScore` | Expected near-future quality after trend and migration penalties | Recommendation selection, advice cards, recommendation ordering |
+| `qualityScore` | Observed RF quality in the current scan snapshot, including all APs | Charts, diagnostics, current environment display |
+| `recommendationScore` | Counterfactual quality after excluding the current target AP | Recommendation selection, advice cards, recommendation ordering |
 
-Observed RF data remains visible because users still need to understand what the scanner is seeing right now. Predictive scoring exists to prevent self-defeating recommendations that immediately degrade after adoption.
+Observed RF data remains visible because users need to understand what the scanner sees right now. Counterfactual scoring exists so the user's own AP does not make its current channel look artificially bad or make a candidate look artificially good for the wrong reason.
 
-## Core Model
+## Target AP Identification
 
-`DynamicChannelScorer` is the recommendation authority.
+The target AP is the Wi-Fi network the Mac is currently connected to.
 
-Its inputs are per-channel observed RF measurements from `ChannelQualityCalculator`. Its outputs are:
+Identification order:
 
-- `predictedScore`
-- `isRecommended`
-- recommendation-aware ordering for UI display
+1. Current BSSID from CoreWLAN/network interface data (`.exact`)
+2. Current SSID fallback when BSSID is unavailable (`.ssidFallback`)
+3. Unknown target (`.unknown`)
 
-The model keeps lightweight per-channel history:
-
-1. AP count history over recent scans
-2. EMA-smoothed occupancy trend
-3. Whether the channel was recommended in the previous cycle
-
-The predictive score is:
-
-`predictedScore = currentScore - trendPenalty - migrationPenalty`
-
-Where:
-
-- `trendPenalty` penalizes channels whose AP count trend is rising
-- `migrationPenalty` penalizes channels that were just recommended, modeling expected follow-on congestion
+When the target is unknown, WiFi Lens still computes observed RF scores, but does not make counterfactual recommendations.
 
 ## Recommendation Selection
 
-Recommendation selection should be simple and deterministic:
+Selection is deterministic and band-local:
 
-- Select recommendations independently per band
-- Candidate threshold: `predictedScore >= 70`
-- Maximum recommendations per band: 2
-- Higher `predictedScore` wins
-- `qualityScore` is the tie-breaker after `predictedScore`
-
-This model intentionally stays band-local. Cross-band migration remains a separate product problem because it mixes congestion, compatibility, and coverage tradeoffs.
+- Compute `qualityScore` from all observed APs.
+- Compute `recommendationScore` from the same AP set after excluding the target AP.
+- If the current channel's `recommendationScore >= 80`, do not recommend a move.
+- Candidate channels must have `recommendationScore >= 70`.
+- Candidate channels must improve on the current channel by at least 10 points.
+- Select at most 2 channels per band.
+- Higher `recommendationScore` wins; `qualityScore` and channel number are tie-breakers.
 
 ## Pipeline Ownership
 
-The pipeline must have one clear source of truth at each stage:
+The pipeline has one source of truth at each stage:
 
-1. `ChannelQualityCalculator` computes observed RF only
-2. `DynamicChannelScorer` computes predictive recommendation state
-3. `RegulatoryPipeline` classifies or downgrades predictive candidates
-4. UI surfaces final recommendations after regulatory filtering
+1. `ScannerViewModel` gathers AP identity and current connection identity.
+2. `ChannelQualityCalculator` computes observed RF, counterfactual scores, and pre-regulatory recommendation selection.
+3. `RegulatoryPipeline` classifies or downgrades selected candidates.
+4. UI surfaces final recommendations after regulatory filtering.
 
-`ChannelQualityCalculator` must not make recommendation decisions. It can initialize `predictedScore` to `qualityScore` as the predictive scorer baseline, but recommendation membership belongs to `DynamicChannelScorer`.
+There is no forecasting model, AP trend penalty, EMA occupancy model, or previous-recommendation penalty in this design.
 
 ## Regulatory Interaction
 
-A channel can be prediction-selected and still fail to become a final recommendation.
+A channel can be score-selected and still fail to become a final recommendation.
 
 Examples:
 
-- DFS channel with strong predicted quality becomes `.advanced`
+- DFS channel with strong counterfactual quality becomes `.advanced`
 - Device-incompatible channel becomes `.restricted`
 - Low-confidence region inference can downgrade `.recommended` to `.advanced`
-
-This means downstream models should distinguish:
-
-- prediction-selected channels
-- final recommended channels
 
 The UI should only show recommendation badges and advice for final recommendations that survive regulatory filtering.
 
 ## UI Semantics
 
-The UI should follow these rules:
-
-- Score bars and environment health use `qualityScore`
-- Recommendation badges and advice cards use predictive recommendation state
-- Recommendation ordering prefers `predictedScore`
-- If regulatory filtering downgrades a predictive candidate, it should no longer appear as a final recommendation
-
-This avoids the previous split-brain behavior where sorting changed but recommendation badges did not.
+- Score bars and environment health use `qualityScore`.
+- Recommendation badges and advice cards use final `isRecommended`.
+- Advice card score/level uses `recommendationScore`.
+- Recommendation ordering prefers `recommendationScore`.
 
 ## Non-Goals
 
 This design does not include:
 
-- explicit self-occupancy simulation of a hypothetical future AP
-- long-horizon forecasting
+- near-future forecasting
+- adoption-rate or previous-recommendation penalties
 - global coordination across users
-- learning population-level adoption rates from remote telemetry
+- remote telemetry learning
 - replacing regulatory or device compatibility filtering
 
-The model is intentionally local, lightweight, and explainable.
+The model is intentionally local, deterministic, and explainable.
 
 ## Testing Strategy
 
 Unit tests should cover:
 
-- `ChannelQualityCalculator` preserving observed RF only
-- `DynamicChannelScorer` selecting recommendations from `predictedScore`
-- previously recommended channels receiving migration penalties on later scans
-- recommendation selection being independent per band
-- final `ChannelRecommendation.isRecommended` requiring both prediction selection and regulatory acceptance
+- target AP exclusion from `recommendationScore`
+- external APs still reducing `recommendationScore`
+- unknown target suppressing recommendations
+- current-good-enough threshold suppressing moves
+- minimum improvement threshold
+- final `ChannelRecommendation.isRecommended` requiring both score selection and regulatory acceptance
 
 Integration tests should verify:
 
-- `ScannerViewModel` always runs observed RF through the predictive scorer before building recommendations
+- `ScannerViewModel` passes BSSID/SSID identity into `ChannelQualityCalculator`
 - `OverviewView` and `ChannelQualityView` surface final recommendations, not raw RF placeholders
 - regulatory downgrades suppress final recommendation badges while keeping observed RF data intact

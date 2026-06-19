@@ -141,7 +141,7 @@ enum RegulatoryFilter {
         }
 
         // Step 5: Sort — current channel first, then by classification tier,
-        // then prediction-selected channels, then predicted score, then observed RF score.
+        // then counterfactual-selected channels, then recommendation score, then observed RF score.
         recommendations.sort { a, b in
             // Current channel always first
             if a.isCurrentChannel != b.isCurrentChannel {
@@ -151,13 +151,13 @@ enum RegulatoryFilter {
             if a.classification.order != b.classification.order {
                 return a.classification.order > b.classification.order
             }
-            // Predictive recommendation
-            if a.modelSelected != b.modelSelected {
-                return a.modelSelected
+            // Counterfactual recommendation
+            if a.scoreSelected != b.scoreSelected {
+                return a.scoreSelected
             }
-            // Predicted score descending (dynamic model)
-            if a.predictedScore != b.predictedScore {
-                return a.predictedScore > b.predictedScore
+            // Counterfactual recommendation score descending
+            if a.recommendationScore != b.recommendationScore {
+                return a.recommendationScore > b.recommendationScore
             }
             // RF score descending (fallback)
             if a.rfScore != b.rfScore {

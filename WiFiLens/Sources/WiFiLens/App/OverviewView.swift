@@ -22,6 +22,10 @@ struct OverviewView: View {
         viewModel.channelRecommendations.filter(\.isRecommended)
     }
 
+    private var recommendationAvailability: ChannelRecommendationAvailability {
+        .from(viewModel.channelRecommendations)
+    }
+
     private var totalNetworks: Int {
         guard viewModel.isWiFiAvailable else { return 0 }
         return viewModel.bandViewModels.reduce(0) { $0 + $1.allSeriesData.count }
@@ -62,6 +66,8 @@ struct OverviewView: View {
                             diagnosticCard(wifi)
                             if let current = currentChannelQuality, hasBetterChannel(current) {
                                 channelAdviceCard(current)
+                            } else if !viewModel.channelRecommendations.isEmpty {
+                                channelStatusCard(recommendationAvailability)
                             }
                         } else {
                             noConnectionCard
@@ -288,6 +294,24 @@ struct OverviewView: View {
 
     // MARK: - Channel Advice
 
+    private func channelStatusCard(_ availability: ChannelRecommendationAvailability) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: availability.icon)
+                .foregroundColor(availability == .available ? .orange : .secondary)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(availability.title)
+                    .font(.callout.weight(.semibold))
+                Text(availability.message)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer()
+        }
+        .padding(16)
+        .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
+    }
+
     private func channelAdviceCard(_ current: ChannelRecommendation) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 6) {
@@ -310,15 +334,14 @@ struct OverviewView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 2) {
-                        let predictedLevel = ChannelQuality.QualityLevel.from(score: ch.predictedScore)
                         HStack(spacing: 4) {
-                            Text("\(ch.bandDisplay) — \(predictedLevel.displayName)")
+                            Text("\(ch.bandDisplay) — \(ch.recommendationLevel.displayName)")
                                 .font(.callout.weight(.medium))
                             if !ch.recommendationReasons.isEmpty {
                                 ReasonPopover(reasons: ch.recommendationReasons)
                             }
                         }
-                        Text(String(format: String(localized: "format.network_score_with_ap_count", comment: "Network score display with nearby AP count"), ch.predictedScore, ch.apCount))
+                        Text(String(format: String(localized: "format.network_score_with_ap_count", comment: "Network score display with nearby AP count"), ch.recommendationScore, ch.apCount))
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -412,7 +435,7 @@ struct OverviewView: View {
     // MARK: - Helpers
 
     private func hasBetterChannel(_ current: ChannelRecommendation) -> Bool {
-        recommendedChannels.contains(where: { $0.channel != current.channel && $0.predictedScore > current.predictedScore })
+        recommendedChannels.contains(where: { $0.channel != current.channel && $0.recommendationScore > current.recommendationScore })
     }
 
     private func rssiColor(_ rssi: Int) -> Color {

@@ -45,6 +45,10 @@ struct ChannelQualityView: View {
         }
     }
 
+    private var recommendationAvailability: ChannelRecommendationAvailability {
+        .from(channels)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Mode toggle
@@ -78,6 +82,7 @@ struct ChannelQualityView: View {
                     tableView
                 }
         }
+        .frame(minWidth: 700, idealWidth: 1000, minHeight: 600, idealHeight: 700)
     }
 
     // MARK: - Regulatory Info
@@ -108,61 +113,91 @@ struct ChannelQualityView: View {
         }
     }
 
+    private var recommendationStatusBanner: some View {
+        Group {
+            if !channels.isEmpty {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: recommendationAvailability.icon)
+                        .font(.caption)
+                        .foregroundColor(recommendationAvailability == .available ? .orange : .secondary)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(recommendationAvailability.title)
+                            .font(.caption.weight(.semibold))
+                        Text(recommendationAvailability.message)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 6))
+            }
+        }
+    }
+
     // MARK: - Simple
 
     private var simpleList: some View {
         ScrollView {
             LazyVStack(spacing: 10) {
+                recommendationStatusBanner
                 ForEach(displayed) { ch in
                     ChannelCard(channel: ch)
                 }
             }
             .padding(16)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Table
 
     private var tableView: some View {
         ScrollView {
-            Grid(horizontalSpacing: 0, verticalSpacing: 0) {
-                GridRow {
-                    sortHeader(String(localized: "channels.table.col.ch", comment: "Channel column header (abbreviated)"), .channel)
-                    sortHeader(String(localized: "channels.table.col.band", comment: "Band column header"), .bandDisplay)
-                    sortHeader(String(localized: "channels.table.col.score", comment: "Quality score column header"), .rfScore)
-                    sortHeader(String(localized: "channels.table.col.level", comment: "Quality level column header"), .rfLevel)
-                    sortHeader(String(localized: "channels.table.col.aps", comment: "Access Point count column header"), .apCount)
-                    sortHeader(String(localized: "channels.table.col.co_ch", comment: "Co-channel count column header"), .coChannelCount)
-                    sortHeader(String(localized: "channels.table.col.adjacent", comment: "Adjacent channel count column header"), .adjacentCount)
-                    sortHeader(String(localized: "channels.table.col.overlap", comment: "Overlap column header"), .overlapLevel)
-                    sortHeader(String(localized: "channels.table.col.rssi", comment: "RSSI column header"), .strongestNeighborRSSI)
-                    sortHeader(String(localized: "channels.table.col.interference", comment: "Interference column header"), .interferenceScore)
-                    sortHeader(String(localized: "channels.table.col.class", comment: "Regulatory class column header"), .classification)
-                }
-                .background(.bar)
-
-                ForEach(Array(displayed.enumerated()), id: \.element.id) { idx, ch in
-                    Divider()
+            VStack(spacing: 10) {
+                recommendationStatusBanner
+                Grid(horizontalSpacing: 0, verticalSpacing: 0) {
                     GridRow {
-                        cell("\(ch.channel)", bold: ch.isCurrentChannel, color: ch.isCurrentChannel ? .accentColor : .primary)
-                        cell(ch.bandDisplay)
-                        cell("\(ch.rfScore)", color: Color(hex: ch.rfLevel.color))
-                        cell(ch.rfLevel.displayName, color: Color(hex: ch.rfLevel.color))
-                        cell("\(ch.apCount)")
-                        cell("\(ch.coChannelCount)")
-                        cell("\(ch.adjacentCount)")
-                        cell(ch.overlapLevel.displayName)
-                        cell("\(ch.strongestNeighborRSSI)")
-                        cell("\(ch.interferenceScore)")
-                        cell(ch.isRecommended ? "★" : ch.classification != .recommended ? ch.classification.displayName : "")
+                        sortHeader(String(localized: "channels.table.col.ch", comment: "Channel column header (abbreviated)"), .channel)
+                        sortHeader(String(localized: "channels.table.col.band", comment: "Band column header"), .bandDisplay)
+                        sortHeader(String(localized: "channels.table.col.score", comment: "Quality score column header"), .rfScore)
+                        sortHeader(String(localized: "channels.table.col.level", comment: "Quality level column header"), .rfLevel)
+                        sortHeader(String(localized: "channels.table.col.aps", comment: "Access Point count column header"), .apCount)
+                        sortHeader(String(localized: "channels.table.col.co_ch", comment: "Co-channel count column header"), .coChannelCount)
+                        sortHeader(String(localized: "channels.table.col.adjacent", comment: "Adjacent channel count column header"), .adjacentCount)
+                        sortHeader(String(localized: "channels.table.col.overlap", comment: "Overlap column header"), .overlapLevel)
+                        sortHeader(String(localized: "channels.table.col.rssi", comment: "RSSI column header"), .strongestNeighborRSSI)
+                        sortHeader(String(localized: "channels.table.col.interference", comment: "Interference column header"), .interferenceScore)
+                        sortHeader(String(localized: "channels.table.col.class", comment: "Regulatory class column header"), .classification)
                     }
-                    .background(rowBG(ch.id, idx: idx))
-                    .contentShape(Rectangle())
-                    .onTapGesture { selectedID = ch.id }
+                    .background(.bar)
+
+                    ForEach(Array(displayed.enumerated()), id: \.element.id) { idx, ch in
+                        Divider()
+                        GridRow {
+                            cell("\(ch.channel)", bold: ch.isCurrentChannel, color: ch.isCurrentChannel ? .accentColor : .primary)
+                            cell(ch.bandDisplay)
+                            cell("\(ch.rfScore)", color: Color(hex: ch.rfLevel.color))
+                            cell(ch.rfLevel.displayName, color: Color(hex: ch.rfLevel.color))
+                            cell("\(ch.apCount)")
+                            cell("\(ch.coChannelCount)")
+                            cell("\(ch.adjacentCount)")
+                            cell(ch.overlapLevel.displayName)
+                            cell("\(ch.strongestNeighborRSSI)")
+                            cell("\(ch.interferenceScore)")
+                            cell(ch.isRecommended ? "★" : ch.classification != .recommended ? ch.classification.displayName : "")
+                        }
+                        .background(rowBG(ch.id, idx: idx))
+                        .contentShape(Rectangle())
+                        .onTapGesture { selectedID = ch.id }
+                    }
                 }
             }
             .padding(12)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func sortHeader(_ text: String, _ key: SortKey) -> some View {

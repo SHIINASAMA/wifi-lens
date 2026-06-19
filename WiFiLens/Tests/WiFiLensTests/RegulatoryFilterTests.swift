@@ -50,7 +50,10 @@ import Testing
             strongestNeighborRSSI: -80
         )
         q.isRecommended = score >= 70
-        q.predictedScore = score
+        q.recommendationScore = score
+        q.recommendationLevel = .from(score: score)
+        q.recommendationConfidence = .exact
+        q.recommendationState = q.isRecommended ? .recommended : .insufficientImprovement
         q.isCurrentChannel = false
         q.showInSimpleView = true
         return q
@@ -129,8 +132,8 @@ import Testing
 
     // MARK: - Sort order
 
-    @Test("Results sorted: recommended → advanced → restricted, then by predicted score descending")
-    func sortOrderRespectsClassificationThenPredictedScore() {
+    @Test("Results sorted: recommended → advanced → restricted, then by recommendation score descending")
+    func sortOrderRespectsClassificationThenRecommendationScore() {
         let rf = [
             makeQuality(channel: 36, band: "5", score: 50),   // recommended
             makeQuality(channel: 40, band: "5", score: 90),   // recommended (higher score)

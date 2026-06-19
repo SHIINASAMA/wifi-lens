@@ -1,8 +1,8 @@
 import Foundation
 
 /// Per-channel congestion analysis result.
-/// This model preserves the observed RF environment only.
-/// Predictive recommendation selection is applied later by `DynamicChannelScorer`.
+/// This model preserves the observed RF environment and carries a separate
+/// counterfactual recommendation score that excludes the current target AP.
 struct ChannelQuality: Identifiable {
     let channel: Int
     let band: String
@@ -18,7 +18,10 @@ struct ChannelQuality: Identifiable {
     var isRecommended: Bool = false
     var isCurrentChannel: Bool = false
     var showInSimpleView: Bool = true
-    var predictedScore: Int = 0
+    var recommendationScore: Int = 0
+    var recommendationLevel: QualityLevel = .excellent
+    var recommendationConfidence: RecommendationConfidence = .unknown
+    var recommendationState: RecommendationState = .targetUnknown
 
     var id: String { "\(band)-\(channel)" }
 
@@ -92,15 +95,28 @@ struct ChannelQuality: Identifiable {
         }
     }
 
-    /// Base simple-view visibility from the observed RF snapshot alone.
-    /// The predictive scorer may later expand this to include recommendation-selected channels.
+    enum RecommendationConfidence: String {
+        case exact
+        case ssidFallback
+        case unknown
+    }
+
+    enum RecommendationState: String {
+        case recommended
+        case currentGoodEnough
+        case insufficientImprovement
+        case notCandidate
+        case targetUnknown
+    }
+
+    /// Base simple-view visibility from the RF snapshot and selected recommendations.
     var initiallyVisibleInSimpleView: Bool {
-        isCurrentChannel || apCount > 0
+        isCurrentChannel || isRecommended || apCount > 0
     }
 }
 
-/// Hysteresis wrapper that smooths quality score fluctuations across level boundaries.
-/// Uses wide margins to prevent flickering, and EMA smoothing within the same level.
+/// Hysteresis wrapper that smooths score fluctuations across level boundaries.
+/// Used by the overview card to avoid visual flicker while scan results update.
 struct StableScore {
     private var current: Double
     private var level: ChannelQuality.QualityLevel
@@ -110,25 +126,21 @@ struct StableScore {
         self.level = .from(score: initialScore)
     }
 
-    /// Feed a new raw score. Returns the stabilized score.
     mutating func update(score: Int, downgradeMargin: Int = 10, upgradeMargin: Int = 6) -> Int {
         let rawLevel = ChannelQuality.QualityLevel.from(score: score)
-        let alpha = 0.25  // EMA smoothing factor — lower = more stable
+        let alpha = 0.25
 
         if rawLevel.order > level.order {
-            // Upgrade only if score clearly exceeds current level ceiling
             if score >= level.scoreRange.upperBound + upgradeMargin {
                 current = Double(score)
                 level = rawLevel
             }
         } else if rawLevel.order < level.order {
-            // Downgrade only if score clearly drops below current level floor
             if score <= level.minScore - downgradeMargin {
                 current = Double(score)
                 level = rawLevel
             }
         } else {
-            // Same level: EMA smooth to dampen jitter
             current = alpha * Double(score) + (1 - alpha) * current
         }
         return Int(current.rounded())
@@ -142,20 +154,58 @@ struct StableScore {
 
 /// Computes channel congestion scores per band.
 enum ChannelQualityCalculator {
+    private static let currentGoodEnoughScore = 80
+    private static let minimumRecommendedScore = 70
+    private static let minimumImprovement = 10
+    private static let maxRecommendationsPerBand = 2
+
+    struct TargetAP {
+        let bssid: String?
+        let ssid: String?
+        let channel: Int?
+
+        init(bssid: String?, ssid: String?, channel: Int?) {
+            self.bssid = bssid?.nilIfBlank
+            self.ssid = ssid?.nilIfBlank
+            self.channel = channel
+        }
+    }
+
     struct APInfo {
         let channel: Int
         let rssi: Int
         let channelWidth: String  // "20"/"40"/"80"/"160"
         let band: String          // "24"/"5"/"6"
         let apex: Double          // span midpoint
+        let bssid: String?
+        let ssid: String?
+
+        init(channel: Int, rssi: Int, channelWidth: String, band: String, apex: Double, bssid: String? = nil, ssid: String? = nil) {
+            self.channel = channel
+            self.rssi = rssi
+            self.channelWidth = channelWidth
+            self.band = band
+            self.apex = apex
+            self.bssid = bssid?.nilIfBlank
+            self.ssid = ssid?.nilIfBlank
+        }
     }
 
-    /// Produce an observed RF quality rating for every relevant channel in each band.
-    static func compute(aps: [APInfo], currentChannel: Int? = nil, supportedBands: Set<String> = ["24", "5", "6"]) -> [ChannelQuality] {
+    /// Produce observed RF quality and counterfactual recommendation scores for every relevant channel.
+    static func compute(
+        aps: [APInfo],
+        currentChannel: Int? = nil,
+        supportedBands: Set<String> = ["24", "5", "6"],
+        targetAP: TargetAP? = nil
+    ) -> [ChannelQuality] {
         var results: [ChannelQuality] = []
 
         for band in supportedBands.sorted() {
             let bandAPs = aps.filter { $0.band == band }
+            let targetResolution = resolveTargetAP(targetAP, in: bandAPs)
+            let recommendationAPs = targetResolution.confidence == .unknown
+                ? bandAPs
+                : bandAPs.filter { !targetResolution.matches($0) }
 
             let channels: [Int] = {
                 switch band {
@@ -168,17 +218,11 @@ enum ChannelQualityCalculator {
 
             let bandDisplay = band == "24" ? String(localized: "wifi.band.24ghz", comment: "2.4 GHz Wi-Fi band name") : band == "5" ? String(localized: "wifi.band.5ghz", comment: "5 GHz Wi-Fi band name") : String(localized: "wifi.band.6ghz", comment: "6 GHz Wi-Fi band name")
 
-            // Score each channel
-            let scored = channels.map { ch -> ChannelQuality in
-                let interference = computeInterference(channel: ch, band: band, aps: bandAPs)
-                let score = max(0, min(100, 100 - interference))
-                let level: ChannelQuality.QualityLevel = switch score {
-                case 90...100: .excellent
-                case 70...89:  .good
-                case 50...69:  .moderate
-                case 30...49:  .busy
-                default:       .congested
-                }
+            var scored = channels.map { ch -> ChannelQuality in
+                let observed = score(channel: ch, band: band, aps: bandAPs)
+                let recommendation = score(channel: ch, band: band, aps: recommendationAPs)
+                let level = ChannelQuality.QualityLevel.from(score: observed.score)
+                let recommendationLevel = ChannelQuality.QualityLevel.from(score: recommendation.score)
                 let strongest = bandAPs
                     .filter { overlaps(channel: ch, other: $0, band: band) }
                     .map(\.rssi).max() ?? -100
@@ -196,26 +240,32 @@ enum ChannelQualityCalculator {
                     channel: ch,
                     band: band,
                     bandDisplay: bandDisplay,
-                    qualityScore: score,
+                    qualityScore: observed.score,
                     qualityLevel: level,
                     apCount: overlapCount,
                     coChannelCount: coChanCount,
                     adjacentCount: adjCount,
-                    interferenceScore: interference,
+                    interferenceScore: observed.interference,
                     overlapLevel: overlap,
                     strongestNeighborRSSI: strongest,
                     isRecommended: false,
                     isCurrentChannel: ch == currentChannel,
                     showInSimpleView: ch == currentChannel || overlapCount > 0,
-                    predictedScore: score
+                    recommendationScore: recommendation.score,
+                    recommendationLevel: recommendationLevel,
+                    recommendationConfidence: targetResolution.confidence,
+                    recommendationState: targetResolution.confidence == .unknown ? .targetUnknown : .notCandidate
                 )
             }
+            applyCounterfactualSelection(to: &scored, currentChannel: currentChannel, confidence: targetResolution.confidence)
             results += scored
         }
 
-        // Sort the observed RF view without relying on any later predictive mutation.
+        // Sort the final channel view without relying on external mutation.
         return results.sorted { a, b in
             if a.isCurrentChannel != b.isCurrentChannel { return a.isCurrentChannel }
+            if a.isRecommended != b.isRecommended { return a.isRecommended }
+            if a.recommendationScore != b.recommendationScore { return a.recommendationScore > b.recommendationScore }
             if a.qualityScore != b.qualityScore { return a.qualityScore > b.qualityScore }
             if a.band != b.band { return a.band < b.band }
             return a.channel < b.channel
@@ -223,6 +273,99 @@ enum ChannelQualityCalculator {
     }
 
     // MARK: - Interference model
+
+    private struct ScoreResult {
+        let score: Int
+        let interference: Int
+    }
+
+    private static func score(channel: Int, band: String, aps: [APInfo]) -> ScoreResult {
+        let interference = computeInterference(channel: channel, band: band, aps: aps)
+        return ScoreResult(score: max(0, min(100, 100 - interference)), interference: interference)
+    }
+
+    private struct TargetResolution {
+        let confidence: ChannelQuality.RecommendationConfidence
+        let matcher: (APInfo) -> Bool
+
+        func matches(_ ap: APInfo) -> Bool {
+            matcher(ap)
+        }
+    }
+
+    private static func resolveTargetAP(_ target: TargetAP?, in aps: [APInfo]) -> TargetResolution {
+        guard let target else {
+            return TargetResolution(confidence: .unknown) { _ in false }
+        }
+
+        if let bssid = target.bssid {
+            return TargetResolution(confidence: .exact) { ap in
+                ap.bssid?.caseInsensitiveCompare(bssid) == .orderedSame
+            }
+        }
+
+        if let ssid = target.ssid {
+            return TargetResolution(confidence: .ssidFallback) { ap in
+                ap.ssid == ssid
+            }
+        }
+
+        return TargetResolution(confidence: .unknown) { _ in false }
+    }
+
+    private static func applyCounterfactualSelection(
+        to scored: inout [ChannelQuality],
+        currentChannel: Int?,
+        confidence: ChannelQuality.RecommendationConfidence
+    ) {
+        guard confidence != .unknown, let currentChannel else {
+            for index in scored.indices {
+                scored[index].showInSimpleView = scored[index].initiallyVisibleInSimpleView
+            }
+            return
+        }
+
+        guard let current = scored.first(where: { $0.channel == currentChannel }) else {
+            for index in scored.indices {
+                scored[index].showInSimpleView = scored[index].initiallyVisibleInSimpleView
+            }
+            return
+        }
+
+        if current.recommendationScore >= currentGoodEnoughScore {
+            for index in scored.indices {
+                if scored[index].channel == currentChannel {
+                    scored[index].recommendationState = .currentGoodEnough
+                }
+                scored[index].showInSimpleView = scored[index].initiallyVisibleInSimpleView
+            }
+            return
+        }
+
+        let selectedIDs = Set(scored
+            .filter { candidate in
+                candidate.channel != currentChannel
+                    && candidate.recommendationScore >= minimumRecommendedScore
+                    && candidate.recommendationScore - current.recommendationScore >= minimumImprovement
+            }
+            .sorted { a, b in
+                if a.recommendationScore != b.recommendationScore { return a.recommendationScore > b.recommendationScore }
+                if a.qualityScore != b.qualityScore { return a.qualityScore > b.qualityScore }
+                return a.channel < b.channel
+            }
+            .prefix(maxRecommendationsPerBand)
+            .map(\.id))
+
+        for index in scored.indices {
+            if selectedIDs.contains(scored[index].id) {
+                scored[index].isRecommended = true
+                scored[index].recommendationState = .recommended
+            } else if scored[index].channel != currentChannel {
+                scored[index].recommendationState = .insufficientImprovement
+            }
+            scored[index].showInSimpleView = scored[index].initiallyVisibleInSimpleView
+        }
+    }
 
     private static func computeInterference(channel: Int, band: String, aps: [APInfo]) -> Int {
         var penalty: Double = 0
@@ -269,5 +412,12 @@ enum ChannelQualityCalculator {
 
     private static func overlaps(channel: Int, other: APInfo, band: String) -> Bool {
         overlapFactor(channel: channel, other: other, band: band) > 0
+    }
+}
+
+private extension String {
+    var nilIfBlank: String? {
+        let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
     }
 }

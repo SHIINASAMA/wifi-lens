@@ -1,81 +1,77 @@
 # Channel Recommendation Implementation Plan
 
-**Goal:** Keep the predictive migration model and make it the single coherent recommendation path across RF scoring, regulatory filtering, UI state, tests, and documentation.
+**Goal:** Implement counterfactual channel recommendation consistently across RF scoring, regulatory filtering, UI state, tests, and documentation.
 
 ## Accepted Direction
 
-This plan supersedes the earlier counterfactual rewrite direction.
-
-The codebase standard is now:
+The codebase standard is:
 
 - observed RF scoring stays in `ChannelQualityCalculator`
-- predictive recommendation scoring stays in `DynamicChannelScorer`
-- regulatory filtering may downgrade predictive candidates
+- recommendation scoring is counterfactual and excludes the current target AP
+- regulatory filtering may downgrade score-selected candidates
 - the UI only surfaces final recommendations after filtering
+- no forecasting, EMA occupancy, or previous-recommendation penalty model remains
 
 ## Required Outcomes
 
-1. `ChannelQualityCalculator` no longer selects recommendations.
-2. `DynamicChannelScorer` computes `predictedScore` and owns recommendation membership.
-3. `ChannelRecommendation.isRecommended` reflects final recommendation state, not stale RF placeholders.
-4. UI recommendation badges and advice cards use the final recommendation state.
-5. Unused `DynamicScoringModel.swift` is removed.
-6. Tests verify the predictive path end to end.
-7. Documentation consistently describes the predictive model.
+1. `ChannelQualityCalculator` computes both `qualityScore` and `recommendationScore`.
+2. `ChannelQualityCalculator` selects up to two counterfactual recommendations per band.
+3. `ScannerViewModel` passes current BSSID/SSID identity into RF scoring.
+4. `ChannelRecommendation.isRecommended` reflects final recommendation state, not raw RF placeholders.
+5. UI recommendation badges and advice cards use final recommendation state and `recommendationScore`.
+6. Legacy dynamic scorer files and tests are removed.
+7. Documentation consistently describes the counterfactual model.
 
 ## File-Level Changes
 
 ### `WiFiLens/Sources/WiFiLens/Channels/ChannelQualityCalculator.swift`
 
-- Keep observed RF scoring only
-- Initialize `predictedScore` as a baseline copy of `qualityScore`
-- Do not select recommendations here
-- Do not sort by recommendation state here
+- Add AP identity fields (`bssid`, `ssid`) to `APInfo`.
+- Add `TargetAP` input.
+- Preserve observed RF fields.
+- Compute `recommendationScore` using the AP set with the target AP excluded.
+- Track recommendation confidence (`exact`, `ssidFallback`, `unknown`).
+- Select recommendations using current-good-enough, minimum score, and minimum-improvement thresholds.
 
-### `WiFiLens/Sources/WiFiLens/Channels/ChannelQualityCalculator.swift`
+### `WiFiLens/Sources/WiFiLens/Scanner/ScannerViewModel.swift`
 
-- Compute predictive penalties from trend and migration state
-- Select up to two recommendations per band from `predictedScore`
-- Set `ChannelQuality.isRecommended`
-- Recompute `showInSimpleView`
-- Return recommendation-aware ordering for display
+- Remove `DynamicChannelScorer`.
+- Build `TargetAP` from current network interface BSSID/SSID/channel.
+- Pass AP identity into `ChannelQualityCalculator.compute`.
 
 ### `WiFiLens/Sources/WiFiLens/Regulatory/ChannelRecommendation.swift`
 
-- Preserve observed RF fields
-- Preserve predictive score
-- Track whether the predictive model selected the channel
-- Make `isRecommended` require both prediction selection and regulatory acceptance
+- Preserve observed RF fields.
+- Preserve counterfactual recommendation fields.
+- Make `isRecommended` require both score selection and regulatory acceptance.
 
 ### `WiFiLens/Sources/WiFiLens/Regulatory/RegulatoryFilter.swift`
 
-- Sort by current channel, classification tier, predictive selection, predicted score, then observed RF score
-- Preserve downgraded candidates without presenting them as final recommendations
+- Sort by current channel, classification tier, counterfactual selection, recommendation score, then observed RF score.
+- Preserve downgraded candidates without presenting them as final recommendations.
 
 ### `WiFiLens/Sources/WiFiLens/App/OverviewView.swift`
 
-- Filter recommendation cards from final `isRecommended`
-- Compare better-channel advice using `predictedScore`
-- Show predicted recommendation quality in the advice card
+- Filter recommendation cards from final `isRecommended`.
+- Compare better-channel advice using `recommendationScore`.
+- Show counterfactual recommendation quality in the advice card.
 
-### `WiFiLens/Sources/WiFiLens/Channels/ChannelQualityView.swift`
+### Removed Files
 
-- Use final `isRecommended` for badges and reason popovers
-
-### `WiFiLens/Sources/WiFiLens/Channels/DynamicScoringModel.swift`
-
-- Remove the file because it is unused and contains placeholder logic
+- `WiFiLens/Sources/WiFiLens/Channels/DynamicChannelScorer.swift`
+- `WiFiLens/Tests/WiFiLensTests/DynamicChannelScorerTests.swift`
+- Any unused `DynamicScoringModel.swift` file if present
 
 ## Verification
 
 Run:
 
 ```sh
-xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test
+xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates -only-testing:WiFiLensTests test
 ```
 
 Then confirm:
 
-- recommendation badges now match predictive ordering
-- no source references remain to `DynamicScoringModel`
-- documentation no longer describes the counterfactual rewrite as the active direction
+- target AP exclusion increases `recommendationScore` compared with observed RF when the target AP is the only interferer
+- external APs still reduce `recommendationScore`
+- no source references remain to legacy dynamic scorer files, old predicted-score fields, forecasting scorers, or previous-recommendation penalties
