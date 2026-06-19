@@ -29,6 +29,11 @@ struct SecondaryToolbarCapsule: NSViewRepresentable {
         if #available(macOS 26.0, *) {
             control.borderShape = .capsule
         }
+        // TODO: Enable when CI Xcode ships macOS 27+ SDK (currently Xcode 26.5).
+        // NSSegmentedControl.role is unavailable in the macOS 26 SDK headers.
+        // if #available(macOS 27.0, *) {
+        //     control.role = .valueSelection
+        // }
 
         update(control, with: descriptor, selection: selection)
         return control
