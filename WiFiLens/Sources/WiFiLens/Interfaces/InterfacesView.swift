@@ -8,6 +8,19 @@ enum InterfaceViewMode: String, CaseIterable {
     case details
     case monitor
 
+    static func fromToolbarSelection(_ selection: SecondaryToolbarItemID) -> Self {
+        switch selection {
+        case .interfacesSimple:
+            .simple
+        case .interfacesDetails:
+            .details
+        case .interfacesMonitor:
+            .monitor
+        default:
+            .simple
+        }
+    }
+
     var displayName: String {
         switch self {
         case .simple:  String(localized: "channels.mode.simple", comment: "Simple view mode for channel quality")
@@ -18,11 +31,11 @@ enum InterfaceViewMode: String, CaseIterable {
 }
 
 struct InterfacesView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let interfaces: [NetworkInterfaceInfo]
     let scannerViewModel: ScannerViewModel
     let throughputMonitor: ThroughputMonitor
-    @State private var mode: InterfaceViewMode = .simple
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let mode: InterfaceViewMode
     @State private var gatewayLatency: Double?
 
     private var wifiInterface: NetworkInterfaceInfo? {
@@ -31,36 +44,21 @@ struct InterfacesView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Mode toggle
-            HStack {
-                    Picker("", selection: $mode.animation(reduceMotion ? nil : .bouncy)) {
-                        ForEach(InterfaceViewMode.allCases, id: \.self) { m in
-                            Text(m.displayName).tag(m)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .controlSize(.regular)
-                    .frame(width: 240)
-                    .accessibilityIdentifier("interfaces-mode-picker")
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
-
-                if interfaces.isEmpty {
-                    Spacer()
-                    Image(systemName: "wifi.slash")
-                        .font(.largeTitle)
-                        .foregroundColor(.secondary)
-                    Text(String(localized: "interfaces.empty.no_interfaces", comment: "Empty state when no network interfaces exist"))
-                        .foregroundColor(.secondary)
-                    Spacer()
-                } else if mode == .simple {
-                    dashboardView
-                } else if mode == .monitor {
-                    monitorView
-                } else {
-                    detailsView
-                }
+            if interfaces.isEmpty {
+                Spacer()
+                Image(systemName: "wifi.slash")
+                    .font(.largeTitle)
+                    .foregroundColor(.secondary)
+                Text(String(localized: "interfaces.empty.no_interfaces", comment: "Empty state when no network interfaces exist"))
+                    .foregroundColor(.secondary)
+                Spacer()
+            } else if mode == .simple {
+                dashboardView
+            } else if mode == .monitor {
+                monitorView
+            } else {
+                detailsView
+            }
         }
     }
 

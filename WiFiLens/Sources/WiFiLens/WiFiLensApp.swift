@@ -20,7 +20,12 @@ private struct AppRootView: View {
     @State private var sidebarCollapsed = false
     @AppStorage("hideTitleBadge") private var hideTitleBadge = true
     @AppStorage("bleEnabled") private var bleEnabled: Bool = false
-    @State private var visitedPages: Set<SidebarPage> = [.overview]
+    @State private var secondaryToolbarSelections: [SidebarPage: SecondaryToolbarItemID] = [
+        .channels: .channelsSimple,
+    ]
+#if PRO
+    @State private var spectrumRecordingViewModel: RecordingViewModel?
+#endif
 
     private var hasLocationAuthorization: Bool {
         viewModel.locationManager.isAuthorizedForSSID
@@ -28,6 +33,44 @@ private struct AppRootView: View {
 
     private var showsLocationPermissionRequiredView: Bool {
         !UITestMode.isActive && selectedPage.requiresLocationAuthorization && !hasLocationAuthorization
+    }
+
+    private var activeSecondaryToolbarDescriptor: SecondaryToolbarDescriptor? {
+        SecondaryToolbarDescriptor.forPage(selectedPage)
+    }
+
+    private var activeSecondaryToolbarSelection: Binding<SecondaryToolbarItemID>? {
+        guard let descriptor = activeSecondaryToolbarDescriptor else { return nil }
+
+        return Binding(
+            get: { secondaryToolbarSelections[selectedPage] ?? descriptor.defaultSelection },
+            set: { secondaryToolbarSelections[selectedPage] = $0 }
+        )
+    }
+
+    private var channelViewMode: ChannelViewMode {
+        ChannelViewMode.fromToolbarSelection(
+            secondaryToolbarSelections[.channels] ?? .channelsSimple
+        )
+    }
+
+    private var interfaceViewMode: InterfaceViewMode {
+        InterfaceViewMode.fromToolbarSelection(
+            secondaryToolbarSelections[.interfaces] ?? .interfacesSimple
+        )
+    }
+
+#if PRO
+    private var spectrumViewMode: SpectrumMode {
+        SpectrumMode.fromToolbarSelection(
+            secondaryToolbarSelections[.spectrum] ?? .spectrumLive
+        )
+    }
+#endif
+
+    private var detailNavigationTitle: String {
+        guard selectedPage != .overview else { return "" }
+        return activeSecondaryToolbarDescriptor == nil ? selectedPage.label : ""
     }
 
     @ViewBuilder
@@ -41,78 +84,68 @@ private struct AppRootView: View {
             WiFiOffView()
         } else {
             ZStack {
-                if visitedPages.contains(.overview) {
-                    OverviewView(viewModel: viewModel)
-                        .opacity(selectedPage == .overview ? 1 : 0)
-                        .allowsHitTesting(selectedPage == .overview)
-                        .disabled(selectedPage != .overview)
-                        .accessibilityIdentifier("page-overview")
-                }
+                OverviewView(viewModel: viewModel)
+                    .opacity(selectedPage == .overview ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .overview)
+                    .accessibilityIdentifier("page-overview")
 
-                if visitedPages.contains(.spectrum) {
-                    ContentView(viewModel: viewModel)
-                        .opacity(selectedPage == .spectrum ? 1 : 0)
-                        .allowsHitTesting(selectedPage == .spectrum)
-                        .disabled(selectedPage != .spectrum)
+                if selectedPage == .spectrum {
+#if PRO
+                    ContentView(
+                        viewModel: viewModel,
+                        mode: spectrumViewMode,
+                        recordingViewModel: $spectrumRecordingViewModel
+                    )
                         .accessibilityIdentifier("page-spectrum")
+#else
+                    ContentView(viewModel: viewModel)
+                        .accessibilityIdentifier("page-spectrum")
+#endif
                 }
 
-                if visitedPages.contains(.channels) {
-                    ChannelQualityView(channels: viewModel.channelRecommendations)
-                        .opacity(selectedPage == .channels ? 1 : 0)
-                        .allowsHitTesting(selectedPage == .channels)
-                        .disabled(selectedPage != .channels)
-                        .accessibilityIdentifier("page-channels")
-                }
+                ChannelQualityView(
+                    channels: viewModel.channelRecommendations,
+                    mode: channelViewMode
+                )
+                    .opacity(selectedPage == .channels ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .channels)
+                    .accessibilityIdentifier("page-channels")
 
-                if visitedPages.contains(.interfaces) {
-                    InterfacesView(interfaces: viewModel.networkInfo, scannerViewModel: viewModel, throughputMonitor: viewModel.throughputMonitor)
-                        .opacity(selectedPage == .interfaces ? 1 : 0)
-                        .allowsHitTesting(selectedPage == .interfaces)
-                        .disabled(selectedPage != .interfaces)
+                if selectedPage == .interfaces {
+                    InterfacesView(
+                        interfaces: viewModel.networkInfo,
+                        scannerViewModel: viewModel,
+                        throughputMonitor: viewModel.throughputMonitor,
+                        mode: interfaceViewMode
+                    )
                         .accessibilityIdentifier("page-interfaces")
                 }
 
-                if visitedPages.contains(.roaming) {
-                    RoamingTestView(viewModel: roamingViewModel)
-                        .opacity(selectedPage == .roaming ? 1 : 0)
-                        .allowsHitTesting(selectedPage == .roaming)
-                        .disabled(selectedPage != .roaming)
-                        .accessibilityIdentifier("page-roaming")
-                }
+                RoamingTestView(viewModel: roamingViewModel)
+                    .opacity(selectedPage == .roaming ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .roaming)
+                    .accessibilityIdentifier("page-roaming")
 
-                if visitedPages.contains(.bleScanner) {
-                    BLEScannerView(viewModel: bleViewModel, bleEnabled: bleEnabled)
-                        .opacity(selectedPage == .bleScanner ? 1 : 0)
-                        .allowsHitTesting(selectedPage == .bleScanner)
-                        .disabled(selectedPage != .bleScanner)
-                        .accessibilityIdentifier("page-bleScanner")
-                }
+                BLEScannerView(viewModel: bleViewModel, bleEnabled: bleEnabled)
+                    .opacity(selectedPage == .bleScanner ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .bleScanner)
+                    .accessibilityIdentifier("page-bleScanner")
 
-                if visitedPages.contains(.settings) {
-                    SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel?.bluetoothPermission, bleEnabled: $bleEnabled)
-                        .opacity(selectedPage == .settings ? 1 : 0)
-                        .allowsHitTesting(selectedPage == .settings)
-                        .disabled(selectedPage != .settings)
-                        .accessibilityIdentifier("page-settings")
-                }
+                SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel?.bluetoothPermission, bleEnabled: $bleEnabled)
+                    .opacity(selectedPage == .settings ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .settings)
+                    .accessibilityIdentifier("page-settings")
 
 #if DEBUG
-                if visitedPages.contains(.spectrumDebugChart) {
-                    SpectrumDebugContainerView()
-                        .opacity(selectedPage == .spectrumDebugChart ? 1 : 0)
-                        .allowsHitTesting(selectedPage == .spectrumDebugChart)
-                        .disabled(selectedPage != .spectrumDebugChart)
-                        .accessibilityIdentifier("page-spectrumDebugChart")
-                }
+                SpectrumDebugContainerView()
+                    .opacity(selectedPage == .spectrumDebugChart ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .spectrumDebugChart)
+                    .accessibilityIdentifier("page-spectrumDebugChart")
 
-                if visitedPages.contains(.debugChart) {
-                    DebugContainerView()
-                        .opacity(selectedPage == .debugChart ? 1 : 0)
-                        .allowsHitTesting(selectedPage == .debugChart)
-                        .disabled(selectedPage != .debugChart)
-                        .accessibilityIdentifier("page-debugChart")
-                }
+                DebugContainerView()
+                    .opacity(selectedPage == .debugChart ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .debugChart)
+                    .accessibilityIdentifier("page-debugChart")
 #endif
             }
         }
@@ -138,7 +171,6 @@ private struct AppRootView: View {
                 detailContent
             }
             .onChange(of: selectedPage) { _, newPage in
-                visitedPages.insert(newPage)
                 let spectrumVisible = newPage == .spectrum
                 for vm in viewModel.allBandViewModels {
                     vm.isViewVisible = spectrumVisible
@@ -158,7 +190,7 @@ private struct AppRootView: View {
                 ScrollView { Text(crashLogText).font(.caption.monospaced()).textSelection(.enabled) }
                     .frame(maxHeight: 200)
             }
-            .navigationTitle(selectedPage == .overview ? "" : selectedPage.label)
+            .navigationTitle(detailNavigationTitle)
             .alert(String(localized: "permission.location.services_required_title", comment: "Alert title: Location Services permission needed"), isPresented: $viewModel.locationManager.showDeniedAlert) {
                 Button(String(localized: "common.action.open_system_settings", comment: "Button to open macOS System Settings")) {
                     viewModel.locationManager.openLocationPreferences()
@@ -168,12 +200,17 @@ private struct AppRootView: View {
                 Text(String(localized: "permission.location.services_required_message", comment: "Alert message explaining why Location Services is required"))
             }
         }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                if let descriptor = activeSecondaryToolbarDescriptor,
+                   let selection = activeSecondaryToolbarSelection {
+                    SecondaryToolbarCapsule(descriptor: descriptor, selection: selection)
+                }
+            }
+        }
         .background(WindowAccessor { window in
             window?.setFrameAutosaveName("WiFiLensMainWindow")
         })
-        .onAppear {
-            visitedPages.insert(selectedPage)
-        }
         .task {
             await viewModel.start()
             roamingViewModel.handleWiFiPowerStateChange(viewModel.wifiPowerState)

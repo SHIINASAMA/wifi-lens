@@ -12,3 +12,4 @@
 ## Notes
 
 - This issue list focuses on behaviour-vs-expectations gaps, state-refresh defects, and structural patterns that make completeness hard to assess.
+- `SecondaryToolbarCapsule.swift` — `NSSegmentedControl.role = .valueSelection` (macOS 27 API) is commented out until CI Xcode ships the macOS 27+ SDK. Re-enable when `Xcode_27.app` or later is available on the runner.

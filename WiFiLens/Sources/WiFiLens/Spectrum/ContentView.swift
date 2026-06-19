@@ -60,7 +60,35 @@ struct SpectrumSectionLayout {
 private let headerHeight: CGFloat = SpectrumSectionLayout.headerHeight
 
 #if PRO
-private enum SpectrumMode { case live, recording }
+enum SpectrumMode {
+    case live
+    case recording
+
+    static func fromToolbarSelection(_ selection: SecondaryToolbarItemID) -> Self {
+        switch selection {
+        case .spectrumRecording:
+            .recording
+        default:
+            .live
+        }
+    }
+}
+
+@MainActor
+enum SpectrumRecordingSessionResolver {
+    static func resolve(
+        current: RecordingViewModel?,
+        mode: SpectrumMode,
+        scannerViewModel: ScannerViewModel
+    ) -> RecordingViewModel? {
+        switch mode {
+        case .live:
+            current
+        case .recording:
+            current ?? RecordingViewModel(scannerViewModel: scannerViewModel)
+        }
+    }
+}
 #endif
 
 struct ContentView: View {
@@ -76,8 +104,8 @@ struct ContentView: View {
     @AppStorage("hiddenTableColumns") private var hiddenColumnsData: String = ""
 
 #if PRO
-    @State private var mode: SpectrumMode = .live
-    @State private var recordingViewModel: RecordingViewModel?
+    let mode: SpectrumMode
+    @Binding var recordingViewModel: RecordingViewModel?
 #endif
 
     private var hiddenColumns: Binding<Set<String>> {
@@ -89,9 +117,6 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-#if PRO
-            modeToolbar
-#endif
             contentArea
         }
         .frame(minWidth: 700, idealWidth: 1000, minHeight: 600)
@@ -99,35 +124,27 @@ struct ContentView: View {
         .onChange(of: viewModel.hideHiddenSSIDs) { _, _ in viewModel.applyGlobalFilterToBands() }
 #if PRO
         .onChange(of: mode) { _, newMode in
+            recordingViewModel = SpectrumRecordingSessionResolver.resolve(
+                current: recordingViewModel,
+                mode: newMode,
+                scannerViewModel: viewModel
+            )
             if newMode == .recording {
-                if recordingViewModel == nil {
-                    recordingViewModel = RecordingViewModel(scannerViewModel: viewModel)
-                }
+                recordingViewModel?.checkReadiness()
+            }
+        }
+        .onAppear {
+            recordingViewModel = SpectrumRecordingSessionResolver.resolve(
+                current: recordingViewModel,
+                mode: mode,
+                scannerViewModel: viewModel
+            )
+            if mode == .recording {
                 recordingViewModel?.checkReadiness()
             }
         }
 #endif
     }
-
-    // MARK: - Mode toolbar (Pro only)
-
-#if PRO
-    private var modeToolbar: some View {
-        HStack {
-            Picker("", selection: $mode.animation(reduceMotion ? nil : .bouncy)) {
-                Text(String(localized: "spectrum.mode.live", comment: "Live spectrum mode")).tag(SpectrumMode.live)
-                Text(String(localized: "spectrum.mode.recording_page", comment: "Recording page mode")).tag(SpectrumMode.recording)
-            }
-            .pickerStyle(.segmented)
-            .controlSize(.regular)
-            .frame(width: 160)
-            .accessibilityLabel(String(localized: "spectrum.mode.label", comment: "Spectrum view mode picker"))
-            .accessibilityIdentifier("spectrum-mode-picker")
-        }
-        .padding(.horizontal, 16)
-        .padding(.top, 16)
-    }
-#endif
 
     // MARK: - Content area
 
@@ -140,6 +157,17 @@ struct ContentView: View {
         case .recording:
             if let rvm = recordingViewModel {
                 RecordingView(viewModel: rvm)
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .task {
+                        recordingViewModel = SpectrumRecordingSessionResolver.resolve(
+                            current: recordingViewModel,
+                            mode: mode,
+                            scannerViewModel: viewModel
+                        )
+                        recordingViewModel?.checkReadiness()
+                    }
             }
         }
 #else
