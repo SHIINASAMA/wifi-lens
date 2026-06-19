@@ -43,12 +43,11 @@ struct TitleBadge: View {
         return Button {
             // no action yet
         } label: {
-            Label {
-                Text(String(localized: "settings.app.title_badge_pro", comment: "PRO edition title badge text"))
-                    .font(.subheadline.weight(.semibold))
-            } icon: {
+            HStack(spacing: 4) {
                 Image(systemName: "star.fill")
                     .font(.caption)
+                Text(String(localized: "settings.app.title_badge_pro", comment: "PRO edition title badge text"))
+                    .font(.subheadline.weight(.semibold))
             }
             .foregroundColor(Color(red: 180/255, green: 130/255, blue: 30/255))
             .frame(height: 34)

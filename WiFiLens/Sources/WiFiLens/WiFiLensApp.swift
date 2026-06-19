@@ -16,8 +16,7 @@ private struct AppRootView: View {
 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var sidebarWidth: CGFloat = 180
-    @State private var sidebarCollapsed = false
+
     @AppStorage("hideTitleBadge") private var hideTitleBadge = true
     @AppStorage("bleEnabled") private var bleEnabled: Bool = false
     @State private var secondaryToolbarSelections = SecondaryToolbarSelections()
@@ -87,8 +86,16 @@ private struct AppRootView: View {
         }
     }
 
+
+
     @ToolbarContentBuilder
     private var secondaryToolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .navigation) {
+            if selectedPage == .overview, (BuildConfig.current == .oss || !hideTitleBadge) {
+                TitleBadge(config: .current)
+                    .fixedSize()
+            }
+        }
         ToolbarItem(placement: .principal) {
             switch selectedPage {
             case .channels:
@@ -197,13 +204,9 @@ private struct AppRootView: View {
             SidebarView(selectedPage: $selectedPage, locationManager: viewModel.locationManager, isWiFiAvailable: viewModel.isWiFiAvailable, bleEnabled: bleEnabled)
                 .navigationSplitViewColumnWidth(min: 160, ideal: 180)
                 .background(
-                    GeometryReader { geo in
+                    GeometryReader { _ in
                         Color.clear.onAppear {
-            BandChartViewModel.reduceMotion = reduceMotion
-                            sidebarWidth = geo.size.width
-                        }
-                        .onChange(of: geo.size.width) { _, w in
-                            sidebarWidth = w
+                            BandChartViewModel.reduceMotion = reduceMotion
                         }
                     }
                 )
@@ -247,25 +250,6 @@ private struct AppRootView: View {
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 Task { await viewModel.handleSceneDidBecomeActive() }
-            }
-        }
-        .onChange(of: sidebarVisibility) { _, vis in
-            sidebarCollapsed = vis == .detailOnly
-        }
-        .overlay(alignment: .topLeading) {
-            // --- position parameters ---
-            let trafficLightsX: CGFloat = 149
-            let sidebarGap: CGFloat = 12
-            let titleBarY: CGFloat = 9
-            let x = sidebarCollapsed ? trafficLightsX : sidebarWidth + sidebarGap
-            // ---
-            if selectedPage == .overview, (BuildConfig.current == .oss || !hideTitleBadge) {
-                TitleBadge(config: .current)
-                    .padding(.leading, x)
-                    .padding(.top, titleBarY)
-                    .ignoresSafeArea()
-                    .allowsHitTesting(false)
-                    .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: x)
             }
         }
     }
