@@ -99,6 +99,20 @@ import Testing
         #expect(ch100.restrictionReasons.contains(where: { $0.code == "DFS" }))
     }
 
+    @Test("DFS score-selected channels are not final recommendations")
+    func dfsScoreSelectedChannelsAreNotFinalRecommendations() {
+        let rf = [
+            makeQuality(channel: 52, band: "5", score: 100),
+        ]
+        let input = usFilterInput(rfResults: rf)
+        let result = RegulatoryFilter.apply(to: input)
+        let ch52 = result.first(where: { $0.channel == 52 })!
+
+        #expect(ch52.scoreSelected == true)
+        #expect(ch52.classification == .advanced)
+        #expect(ch52.isRecommended == false)
+    }
+
     @Test("Channels not in region are classified as restricted")
     func channelNotInRegionBlocked() {
         let rf = [

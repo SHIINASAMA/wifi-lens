@@ -130,7 +130,7 @@ The recommendation algorithm answers a local configuration question: if the curr
 
 1. **Observed score** — `qualityScore` is computed from all APs in the current scan snapshot. This is used for charts, current-environment diagnostics, and RF preservation.
 
-2. **Target exclusion** — `recommendationScore` is computed from the same AP set after excluding the current target AP. BSSID matching is exact; SSID fallback is used only when BSSID is unavailable.
+2. **Target exclusion** — `recommendationScore` is computed from the same AP set after excluding the current target AP. BSSID matching is exact. SSID fallback is used only when BSSID is unavailable and exactly one AP with that SSID is visible on the current channel; ambiguous SSID fallback is treated as unknown.
 
 3. **Recommendation selection** — The current channel is considered good enough at `recommendationScore >= 80`. Candidate channels must score at least 70, improve by at least 10 points, and are limited to two per band.
 

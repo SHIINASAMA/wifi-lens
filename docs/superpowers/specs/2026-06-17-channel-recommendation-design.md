@@ -28,10 +28,10 @@ The target AP is the Wi-Fi network the Mac is currently connected to.
 Identification order:
 
 1. Current BSSID from CoreWLAN/network interface data (`.exact`)
-2. Current SSID fallback when BSSID is unavailable (`.ssidFallback`)
+2. Current SSID fallback when BSSID is unavailable and exactly one AP with that SSID is visible on the current channel (`.ssidFallback`)
 3. Unknown target (`.unknown`)
 
-When the target is unknown, WiFi Lens still computes observed RF scores, but does not make counterfactual recommendations.
+When the target is unknown or SSID fallback is ambiguous, WiFi Lens still computes observed RF scores, but does not make counterfactual recommendations.
 
 ## Recommendation Selection
 

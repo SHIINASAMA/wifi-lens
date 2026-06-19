@@ -305,8 +305,14 @@ enum ChannelQualityCalculator {
         }
 
         if let ssid = target.ssid {
+            let candidates = aps.filter { ap in
+                ap.ssid == ssid && target.channel.map { ap.channel == $0 } ?? true
+            }
+            guard candidates.count == 1 else {
+                return TargetResolution(confidence: .unknown) { _ in false }
+            }
             return TargetResolution(confidence: .ssidFallback) { ap in
-                ap.ssid == ssid
+                ap.ssid == ssid && target.channel.map { ap.channel == $0 } ?? true
             }
         }
 
