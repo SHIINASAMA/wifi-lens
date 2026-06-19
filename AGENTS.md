@@ -35,9 +35,9 @@ xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configurati
 xed WiFiLens/WiFiLens.xcodeproj                   # open in Xcode GUI
 
 # Website — Vite + Tailwind CSS, outputs to _site/
-npm ci && npm run dev                    # dev server at localhost:5173/wifi-lens/
-npm run build                            # production build
-npm run preview                          # preview production build
+cd web && npm ci && npm run dev              # dev server at localhost:5173/wifi-lens/
+cd web && npm run build                      # production build
+cd web && npm run preview                    # preview production build
 ```
 
 The product name is `WiFi Lens.app` (with space). Unit tests use Swift Testing (`@Test`) with `TEST_HOST` — the test bundle is injected into the app process for `@testable import` symbol resolution. All test `.swift` files must be added to the WiFiLensTests target's Sources build phase (in `project.pbxproj`) for `xcodebuild test` to compile and run them. The `WiFiLensTests` scheme must reference the test bundle in both `<Testables>` and `<MacroExpansion>`.

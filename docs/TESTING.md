@@ -69,7 +69,7 @@ All key UI elements carry `.accessibilityIdentifier()` for stable querying (see 
 
 ## Pro UI Tests (WiFiLensProUITests)
 
-Pro tests live under `WiFiLens/Sources/WiFiLens/Pro/Tests/` and test the `WiFiLensPro` target (bundle ID: `com.kaoru.wifi-lens-pro`). They require the Pro scheme (`WiFi Lens Pro`) with `TEST_TARGET_NAME = WiFiLensPro`.
+Pro tests live under `Pro/Tests/` (root-level submodule) and test the `WiFiLensPro` target (bundle ID: `com.kaoru.wifi-lens-pro`). They require the Pro scheme (`WiFi Lens Pro`) with `TEST_TARGET_NAME = WiFiLensPro`.
 
 ### Pro Accessibility Identifiers
 
@@ -86,6 +86,6 @@ A `WiFiLensProUITests` target must be created manually in Xcode:
 
 1. **Add target**: File → New → Target → macOS → UI Testing Bundle, name `WiFiLensProUITests`
 2. **Set TEST_TARGET_NAME** = `WiFiLensPro` in the target's build settings
-3. **Add test files** from `WiFiLens/Sources/WiFiLens/Pro/Tests/` to the target
+3. **Add test files** from `Pro/Tests/` to the target
 4. **Add to scheme**: Open `WiFi Lens Pro` scheme → Test → add `WiFiLensProUITests` to testables
 5. **Delete the template** `WiFiLensProUITests.swift` / `WiFiLensProUITestsLaunchTests.swift` that Xcode generates

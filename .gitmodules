@@ -1,3 +1,3 @@
-[submodule "WiFiLens/Sources/WiFiLens/Pro"]
+[submodule "Pro"]
 	path = Pro
 	url = git@github.com:SHIINASAMA/wifi-lens-pro.git

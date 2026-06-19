@@ -5,15 +5,15 @@ on:
     branches:
       - master
     paths:
-      - 'src/**'
-      - 'public/**'
-      - 'index.html'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'vite.config.ts'
-      - 'tailwind.config.js'
-      - 'postcss.config.js'
-      - 'tsconfig.json'
+      - 'web/src/**'
+      - 'web/public/**'
+      - 'web/index.html'
+      - 'web/package.json'
+      - 'web/pnpm-lock.yaml'
+      - 'web/vite.config.ts'
+      - 'web/tailwind.config.js'
+      - 'web/postcss.config.js'
+      - 'web/tsconfig.json'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -45,7 +45,9 @@ jobs:
           cache: pnpm
 
       - run: pnpm install
+        working-directory: web
       - run: pnpm build
+        working-directory: web
 
       - uses: actions/configure-pages@v4
         with:
@@ -53,7 +55,7 @@ jobs:
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: web/_site
 
       - id: deployment
         uses: actions/deploy-pages@v4

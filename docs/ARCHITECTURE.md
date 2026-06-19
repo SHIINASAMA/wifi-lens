@@ -52,8 +52,9 @@ Chart Engine (Charts/):
 | `MCP/` | MCPServer — embedded HTTP/1.1 JSON API (NWListener on 127.0.0.1:19840) exposing scan data |
 | `Regulatory/` | RegulatoryPipeline, RegulatoryDatabase, RegulatoryFilter, RegionInferenceEngine, ChannelRecommendation, DeviceCompatibilityFilter, RegulatoryDomain. See docs/REGULATORY.md |
 | `Utilities/` | Constants, Color extensions, BuildConfig, DeviceCapabilities, GatewayPinger |
-| `Pro/` | Paid features (Recording, Session, StoreKit) — see `Pro/docs/ARCHITECTURE.md` in submodule |
 | `Resources/` | Localizable.xcstrings (String Catalog) |
+
+Pro features (Recording, Session, StoreKit) live in the `Pro/` submodule at the repo root — see `Pro/docs/ARCHITECTURE.md`.
 
 ## Key Patterns
 
