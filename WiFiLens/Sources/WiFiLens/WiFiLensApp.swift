@@ -23,6 +23,9 @@ private struct AppRootView: View {
     @State private var secondaryToolbarSelections: [SidebarPage: SecondaryToolbarItemID] = [
         .channels: .channelsSimple,
     ]
+#if PRO
+    @State private var spectrumRecordingViewModel: RecordingViewModel?
+#endif
 
     private var hasLocationAuthorization: Bool {
         viewModel.locationManager.isAuthorizedForSSID
@@ -89,7 +92,11 @@ private struct AppRootView: View {
             case .spectrum:
                 if DetailPageRenderPolicy.shouldRender(.spectrum, selectedPage: selectedPage) {
 #if PRO
-                    ContentView(viewModel: viewModel, mode: spectrumViewMode)
+                    ContentView(
+                        viewModel: viewModel,
+                        mode: spectrumViewMode,
+                        recordingViewModel: $spectrumRecordingViewModel
+                    )
                         .accessibilityIdentifier("page-spectrum")
 #else
                     ContentView(viewModel: viewModel)

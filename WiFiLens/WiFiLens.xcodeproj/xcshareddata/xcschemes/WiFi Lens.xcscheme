@@ -49,6 +49,17 @@
             useTestTargetApplicationEnvironment = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "32B8DFED1C1CBAD8FD8C797C"
+               BuildableName = "WiFiLensTests.xctest"
+               BlueprintName = "WiFiLensTests"
+               ReferencedContainer = "container:WiFiLens.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            useTestTargetApplicationEnvironment = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "FBA000070000000000000007"
                BuildableName = "WiFiLensUITests.xctest"
                BlueprintName = "WiFiLensUITests"

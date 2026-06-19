@@ -73,6 +73,22 @@ enum SpectrumMode {
         }
     }
 }
+
+@MainActor
+enum SpectrumRecordingSessionResolver {
+    static func resolve(
+        current: RecordingViewModel?,
+        mode: SpectrumMode,
+        scannerViewModel: ScannerViewModel
+    ) -> RecordingViewModel? {
+        switch mode {
+        case .live:
+            current
+        case .recording:
+            current ?? RecordingViewModel(scannerViewModel: scannerViewModel)
+        }
+    }
+}
 #endif
 
 struct ContentView: View {
@@ -89,7 +105,7 @@ struct ContentView: View {
 
 #if PRO
     let mode: SpectrumMode
-    @State private var recordingViewModel: RecordingViewModel?
+    @Binding var recordingViewModel: RecordingViewModel?
 #endif
 
     private var hiddenColumns: Binding<Set<String>> {
@@ -108,10 +124,22 @@ struct ContentView: View {
         .onChange(of: viewModel.hideHiddenSSIDs) { _, _ in viewModel.applyGlobalFilterToBands() }
 #if PRO
         .onChange(of: mode) { _, newMode in
+            recordingViewModel = SpectrumRecordingSessionResolver.resolve(
+                current: recordingViewModel,
+                mode: newMode,
+                scannerViewModel: viewModel
+            )
             if newMode == .recording {
-                if recordingViewModel == nil {
-                    recordingViewModel = RecordingViewModel(scannerViewModel: viewModel)
-                }
+                recordingViewModel?.checkReadiness()
+            }
+        }
+        .onAppear {
+            recordingViewModel = SpectrumRecordingSessionResolver.resolve(
+                current: recordingViewModel,
+                mode: mode,
+                scannerViewModel: viewModel
+            )
+            if mode == .recording {
                 recordingViewModel?.checkReadiness()
             }
         }
@@ -129,6 +157,17 @@ struct ContentView: View {
         case .recording:
             if let rvm = recordingViewModel {
                 RecordingView(viewModel: rvm)
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .task {
+                        recordingViewModel = SpectrumRecordingSessionResolver.resolve(
+                            current: recordingViewModel,
+                            mode: mode,
+                            scannerViewModel: viewModel
+                        )
+                        recordingViewModel?.checkReadiness()
+                    }
             }
         }
 #else
