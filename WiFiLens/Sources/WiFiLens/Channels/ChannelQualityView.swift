@@ -61,8 +61,6 @@ struct ChannelQualityView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            regulatoryInfoBanner
-
             if channels.isEmpty {
                 Spacer()
                 Image(systemName: "antenna.radiowaves.left.and.right.slash")
@@ -80,33 +78,7 @@ struct ChannelQualityView: View {
         .frame(minWidth: 700, idealWidth: 1000, minHeight: 600, idealHeight: 700)
     }
 
-    // MARK: - Regulatory Info
-
-    private var hasRegulatoryChannels: Bool {
-        channels.contains(where: { $0.classification != .recommended })
-    }
-
-    private var regulatoryInfoBanner: some View {
-        Group {
-            if hasRegulatoryChannels {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "info.circle.fill")
-                            .font(.caption)
-                            .foregroundColor(.accentColor)
-                        Text(String(localized: "channels.banner.regulatory", comment: "Info banner about regulatory-aware recommendations"))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 6))
-                .padding(.horizontal, 16)
-                .padding(.top, 10)
-            }
-        }
-    }
+    // MARK: - Recommendation Status
 
     private var recommendationStatusBanner: some View {
         Group {
