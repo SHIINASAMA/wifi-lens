@@ -83,14 +83,13 @@ private struct AppRootView: View {
         } else if !UITestMode.isActive && selectedPage.requiresWiFi && !viewModel.isWiFiAvailable {
             WiFiOffView()
         } else {
-            switch selectedPage {
-            case .overview:
-                if DetailPageRenderPolicy.shouldRender(.overview, selectedPage: selectedPage) {
-                    OverviewView(viewModel: viewModel)
-                        .accessibilityIdentifier("page-overview")
-                }
-            case .spectrum:
-                if DetailPageRenderPolicy.shouldRender(.spectrum, selectedPage: selectedPage) {
+            ZStack {
+                OverviewView(viewModel: viewModel)
+                    .opacity(selectedPage == .overview ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .overview)
+                    .accessibilityIdentifier("page-overview")
+
+                if selectedPage == .spectrum {
 #if PRO
                     ContentView(
                         viewModel: viewModel,
@@ -103,16 +102,16 @@ private struct AppRootView: View {
                         .accessibilityIdentifier("page-spectrum")
 #endif
                 }
-            case .channels:
-                if DetailPageRenderPolicy.shouldRender(.channels, selectedPage: selectedPage) {
-                    ChannelQualityView(
-                        channels: viewModel.channelRecommendations,
-                        mode: channelViewMode
-                    )
-                        .accessibilityIdentifier("page-channels")
-                }
-            case .interfaces:
-                if DetailPageRenderPolicy.shouldRender(.interfaces, selectedPage: selectedPage) {
+
+                ChannelQualityView(
+                    channels: viewModel.channelRecommendations,
+                    mode: channelViewMode
+                )
+                    .opacity(selectedPage == .channels ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .channels)
+                    .accessibilityIdentifier("page-channels")
+
+                if selectedPage == .interfaces {
                     InterfacesView(
                         interfaces: viewModel.networkInfo,
                         scannerViewModel: viewModel,
@@ -121,33 +120,33 @@ private struct AppRootView: View {
                     )
                         .accessibilityIdentifier("page-interfaces")
                 }
-            case .roaming:
-                if DetailPageRenderPolicy.shouldRender(.roaming, selectedPage: selectedPage) {
-                    RoamingTestView(viewModel: roamingViewModel)
-                        .accessibilityIdentifier("page-roaming")
-                }
-            case .bleScanner:
-                if DetailPageRenderPolicy.shouldRender(.bleScanner, selectedPage: selectedPage) {
-                    BLEScannerView(viewModel: bleViewModel, bleEnabled: bleEnabled)
-                        .accessibilityIdentifier("page-bleScanner")
-                }
-            case .settings:
-                if DetailPageRenderPolicy.shouldRender(.settings, selectedPage: selectedPage) {
-                    SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel?.bluetoothPermission, bleEnabled: $bleEnabled)
-                        .accessibilityIdentifier("page-settings")
-                }
-            #if DEBUG
-            case .spectrumDebugChart:
-                if DetailPageRenderPolicy.shouldRender(.spectrumDebugChart, selectedPage: selectedPage) {
-                    SpectrumDebugContainerView()
-                        .accessibilityIdentifier("page-spectrumDebugChart")
-                }
-            case .debugChart:
-                if DetailPageRenderPolicy.shouldRender(.debugChart, selectedPage: selectedPage) {
-                    DebugContainerView()
-                        .accessibilityIdentifier("page-debugChart")
-                }
-            #endif
+
+                RoamingTestView(viewModel: roamingViewModel)
+                    .opacity(selectedPage == .roaming ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .roaming)
+                    .accessibilityIdentifier("page-roaming")
+
+                BLEScannerView(viewModel: bleViewModel, bleEnabled: bleEnabled)
+                    .opacity(selectedPage == .bleScanner ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .bleScanner)
+                    .accessibilityIdentifier("page-bleScanner")
+
+                SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel?.bluetoothPermission, bleEnabled: $bleEnabled)
+                    .opacity(selectedPage == .settings ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .settings)
+                    .accessibilityIdentifier("page-settings")
+
+#if DEBUG
+                SpectrumDebugContainerView()
+                    .opacity(selectedPage == .spectrumDebugChart ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .spectrumDebugChart)
+                    .accessibilityIdentifier("page-spectrumDebugChart")
+
+                DebugContainerView()
+                    .opacity(selectedPage == .debugChart ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .debugChart)
+                    .accessibilityIdentifier("page-debugChart")
+#endif
             }
         }
     }

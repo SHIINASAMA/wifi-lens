@@ -96,4 +96,13 @@ enum DetailPageRenderPolicy {
     static func shouldRender(_ page: SidebarPage, selectedPage: SidebarPage) -> Bool {
         page == selectedPage
     }
+
+    static func needsConditionalRendering(_ page: SidebarPage) -> Bool {
+        switch page {
+        case .spectrum, .interfaces:
+            return true
+        default:
+            return false
+        }
+    }
 }
