@@ -29,11 +29,6 @@ struct SecondaryToolbarCapsule: NSViewRepresentable {
         if #available(macOS 26.0, *) {
             control.borderShape = .capsule
         }
-        #if compiler(>=6.3)
-        if #available(macOS 27.0, *) {
-            control.role = .valueSelection
-        }
-        #endif
 
         update(control, with: descriptor, selection: selection)
         return control
