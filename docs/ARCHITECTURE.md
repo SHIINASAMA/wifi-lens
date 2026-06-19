@@ -69,9 +69,12 @@ Chart Engine (Charts/):
 - `ScannerViewModel.scanIntervalSeconds` supports dynamic override — external code (e.g., recording feature in Pro submodule, see `Pro/docs/ARCHITECTURE.md`) can set it to a custom value and restore the UserDefaults-configured value on stop. The `didSet` automatically cancels and restarts the scan loop with the new interval when `isScanning` is true. This prevents chart domains driven by real-time `Date()` from pulling ahead of data points (gated by scan interval).
 - `StableScore` provides hysteresis for quality level boundaries (upgrade margin 2, downgrade margin 5)
 - `ChannelBand(id:)` failable initializer maps String band IDs ("24"/"5"/"6") to enum cases, used by `SnapshotToChartAdapter` for history playback
+- **Channel recommendation priority**: `ChannelRecommendationAvailability.from()` checks `.currentGoodEnough` and `.targetUnknown` before `.isRecommended`. When the current channel is already good enough, no switching recommendation is shown — even if other channels score higher. This prevents contradictory UI messages (status banner says "good enough" while channel cards show "★ Recommended")
 - Page-internal secondary navigation is hosted in the real window toolbar principal area, while the sidebar remains the primary top-level navigator
 - `AppRootView` owns the active `SecondaryToolbarDescriptor` and per-page selection state for shared business-page mode switching
 - Pages that participate in the shared secondary toolbar consume root-owned mode state instead of rendering their own local segmented controls
+- **Toolbar selection state**: `SecondaryToolbarSelections` is a concrete `Equatable` struct with typed per-page properties (not a `[SidebarPage: ID]` dictionary). Each page's `SecondaryToolbarCapsule` binds directly to its typed property via `@ToolbarContentBuilder`. This lets SwiftUI compare old/new structs and skip `updateNSView` when nothing changed — critical because `WiFiLensApp.body` re-renders frequently due to `ScannerViewModel` observation
+- **@Observable observation chain**: `BandChartViewModel` animation timer modifies `displayedSeriesData` at 60fps. If any parent view reads these properties (e.g. `allSeriesData.count`), the observation chain propagates up to `WiFiLensApp.body`, causing unnecessary re-renders of the entire view hierarchy including the toolbar. Cache frequently-changing derived values (e.g. `cachedTotalNetworks`, `cachedBandSummary`) in `ScannerViewModel` and have child views read the cached values instead
 
 ## Localization
 
