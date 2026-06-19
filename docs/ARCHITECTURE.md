@@ -69,6 +69,9 @@ Chart Engine (Charts/):
 - `ScannerViewModel.scanIntervalSeconds` supports dynamic override — external code (e.g., recording feature in Pro submodule, see `Pro/docs/ARCHITECTURE.md`) can set it to a custom value and restore the UserDefaults-configured value on stop. The `didSet` automatically cancels and restarts the scan loop with the new interval when `isScanning` is true. This prevents chart domains driven by real-time `Date()` from pulling ahead of data points (gated by scan interval).
 - `StableScore` provides hysteresis for quality level boundaries (upgrade margin 2, downgrade margin 5)
 - `ChannelBand(id:)` failable initializer maps String band IDs ("24"/"5"/"6") to enum cases, used by `SnapshotToChartAdapter` for history playback
+- Page-internal secondary navigation is hosted in the real window toolbar principal area, while the sidebar remains the primary top-level navigator
+- `AppRootView` owns the active `SecondaryToolbarDescriptor` and per-page selection state for shared business-page mode switching
+- Pages that participate in the shared secondary toolbar consume root-owned mode state instead of rendering their own local segmented controls
 
 ## Localization
 

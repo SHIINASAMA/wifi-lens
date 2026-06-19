@@ -60,7 +60,19 @@ struct SpectrumSectionLayout {
 private let headerHeight: CGFloat = SpectrumSectionLayout.headerHeight
 
 #if PRO
-private enum SpectrumMode { case live, recording }
+enum SpectrumMode {
+    case live
+    case recording
+
+    static func fromToolbarSelection(_ selection: SecondaryToolbarItemID) -> Self {
+        switch selection {
+        case .spectrumRecording:
+            .recording
+        default:
+            .live
+        }
+    }
+}
 #endif
 
 struct ContentView: View {
@@ -76,7 +88,7 @@ struct ContentView: View {
     @AppStorage("hiddenTableColumns") private var hiddenColumnsData: String = ""
 
 #if PRO
-    @State private var mode: SpectrumMode = .live
+    let mode: SpectrumMode
     @State private var recordingViewModel: RecordingViewModel?
 #endif
 
@@ -89,9 +101,6 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-#if PRO
-            modeToolbar
-#endif
             contentArea
         }
         .frame(minWidth: 700, idealWidth: 1000, minHeight: 600)
@@ -108,26 +117,6 @@ struct ContentView: View {
         }
 #endif
     }
-
-    // MARK: - Mode toolbar (Pro only)
-
-#if PRO
-    private var modeToolbar: some View {
-        HStack {
-            Picker("", selection: $mode.animation(reduceMotion ? nil : .bouncy)) {
-                Text(String(localized: "spectrum.mode.live", comment: "Live spectrum mode")).tag(SpectrumMode.live)
-                Text(String(localized: "spectrum.mode.recording_page", comment: "Recording page mode")).tag(SpectrumMode.recording)
-            }
-            .pickerStyle(.segmented)
-            .controlSize(.regular)
-            .frame(width: 160)
-            .accessibilityLabel(String(localized: "spectrum.mode.label", comment: "Spectrum view mode picker"))
-            .accessibilityIdentifier("spectrum-mode-picker")
-        }
-        .padding(.horizontal, 16)
-        .padding(.top, 16)
-    }
-#endif
 
     // MARK: - Content area
 

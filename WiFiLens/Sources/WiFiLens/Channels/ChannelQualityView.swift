@@ -4,6 +4,17 @@ enum ChannelViewMode: String, CaseIterable {
     case simple
     case table
 
+    static func fromToolbarSelection(_ selection: SecondaryToolbarItemID) -> Self {
+        switch selection {
+        case .channelsSimple:
+            .simple
+        case .channelsTable:
+            .table
+        default:
+            .simple
+        }
+    }
+
     var displayName: String {
         switch self {
         case .simple: String(localized: "channels.mode.simple", comment: "Simple view mode for channel quality")
@@ -14,9 +25,8 @@ enum ChannelViewMode: String, CaseIterable {
 
 struct ChannelQualityView: View {
     let channels: [ChannelRecommendation]
-    @State private var mode: ChannelViewMode = .simple
+    let mode: ChannelViewMode
     @State private var sortKey: SortKey = .rfScore
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var sortAscending: Bool = false
     @State private var selectedID: String?
 
@@ -51,36 +61,21 @@ struct ChannelQualityView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Mode toggle
-            HStack {
-                    Picker("", selection: $mode.animation(reduceMotion ? nil : .bouncy)) {
-                        ForEach(ChannelViewMode.allCases, id: \.self) { m in
-                            Text(m.displayName).tag(m)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .controlSize(.regular)
-                    .frame(width: 160)
-                    .accessibilityIdentifier("channel-quality-mode-picker")
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
+            regulatoryInfoBanner
 
-                regulatoryInfoBanner
-
-                if channels.isEmpty {
-                    Spacer()
-                    Image(systemName: "antenna.radiowaves.left.and.right.slash")
-                        .font(.largeTitle)
-                        .foregroundColor(.secondary)
-                    Text(String(localized: "spectrum.empty.no_channel_data", comment: "Empty state when no channel data exists"))
-                        .foregroundColor(.secondary)
-                    Spacer()
-                } else if mode == .simple {
-                    simpleList
-                } else {
-                    tableView
-                }
+            if channels.isEmpty {
+                Spacer()
+                Image(systemName: "antenna.radiowaves.left.and.right.slash")
+                    .font(.largeTitle)
+                    .foregroundColor(.secondary)
+                Text(String(localized: "spectrum.empty.no_channel_data", comment: "Empty state when no channel data exists"))
+                    .foregroundColor(.secondary)
+                Spacer()
+            } else if mode == .simple {
+                simpleList
+            } else {
+                tableView
+            }
         }
         .frame(minWidth: 700, idealWidth: 1000, minHeight: 600, idealHeight: 700)
     }
