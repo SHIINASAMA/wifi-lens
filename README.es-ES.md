@@ -15,7 +15,7 @@
 
 <p align="center">
   <a href="https://apps.apple.com/app/id6776590746">
-    <img src="https://developer.apple.com/assets/elements/badges/download-on-the-mac-app-store.svg" alt="Descargar en el Mac App Store" width="240">
+    <img src="assets/appstore-badge-en.svg" alt="Descargar en el Mac App Store" width="240">
   </a>
 </p>
 
