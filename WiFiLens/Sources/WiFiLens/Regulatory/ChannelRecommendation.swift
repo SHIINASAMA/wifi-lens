@@ -118,15 +118,15 @@ enum ChannelRecommendationAvailability: String, Sendable {
 
     static func from(_ recommendations: [ChannelRecommendation]) -> Self {
         guard !recommendations.isEmpty else { return .noData }
-        if recommendations.contains(where: \.isRecommended) { return .available }
-        if recommendations.contains(where: { $0.scoreSelected && $0.classification != .recommended }) {
-            return .regulatoryFiltered
-        }
         if recommendations.contains(where: { $0.isCurrentChannel && $0.recommendationState == .currentGoodEnough }) {
             return .currentGoodEnough
         }
         if recommendations.contains(where: { $0.isCurrentChannel && $0.recommendationConfidence == .unknown }) {
             return .targetUnknown
+        }
+        if recommendations.contains(where: \.isRecommended) { return .available }
+        if recommendations.contains(where: { $0.scoreSelected && $0.classification != .recommended }) {
+            return .regulatoryFiltered
         }
         return .noSignificantImprovement
     }
