@@ -80,3 +80,41 @@ struct SecondaryToolbarDescriptor: Equatable {
         }
     }
 }
+
+struct SecondaryToolbarSelections: Equatable {
+    var channels: SecondaryToolbarItemID = .channelsSimple
+    var interfaces: SecondaryToolbarItemID = .interfacesSimple
+#if PRO
+    var spectrum: SecondaryToolbarItemID = .spectrumLive
+#endif
+
+    func selection(for page: SidebarPage) -> SecondaryToolbarItemID? {
+        switch page {
+        case .channels:
+            channels
+        case .interfaces:
+            interfaces
+#if PRO
+        case .spectrum:
+            spectrum
+#endif
+        default:
+            nil
+        }
+    }
+
+    mutating func setSelection(_ selection: SecondaryToolbarItemID, for page: SidebarPage) {
+        switch page {
+        case .channels:
+            channels = selection
+        case .interfaces:
+            interfaces = selection
+#if PRO
+        case .spectrum:
+            spectrum = selection
+#endif
+        default:
+            break
+        }
+    }
+}

@@ -20,9 +20,7 @@ private struct AppRootView: View {
     @State private var sidebarCollapsed = false
     @AppStorage("hideTitleBadge") private var hideTitleBadge = true
     @AppStorage("bleEnabled") private var bleEnabled: Bool = false
-    @State private var secondaryToolbarSelections: [SidebarPage: SecondaryToolbarItemID] = [
-        .channels: .channelsSimple,
-    ]
+    @State private var secondaryToolbarSelections = SecondaryToolbarSelections()
 #if PRO
     @State private var spectrumRecordingViewModel: RecordingViewModel?
 #endif
@@ -43,27 +41,27 @@ private struct AppRootView: View {
         guard let descriptor = activeSecondaryToolbarDescriptor else { return nil }
 
         return Binding(
-            get: { secondaryToolbarSelections[selectedPage] ?? descriptor.defaultSelection },
-            set: { secondaryToolbarSelections[selectedPage] = $0 }
+            get: { secondaryToolbarSelections.selection(for: selectedPage) ?? descriptor.defaultSelection },
+            set: { secondaryToolbarSelections.setSelection($0, for: selectedPage) }
         )
     }
 
     private var channelViewMode: ChannelViewMode {
         ChannelViewMode.fromToolbarSelection(
-            secondaryToolbarSelections[.channels] ?? .channelsSimple
+            secondaryToolbarSelections.channels
         )
     }
 
     private var interfaceViewMode: InterfaceViewMode {
         InterfaceViewMode.fromToolbarSelection(
-            secondaryToolbarSelections[.interfaces] ?? .interfacesSimple
+            secondaryToolbarSelections.interfaces
         )
     }
 
 #if PRO
     private var spectrumViewMode: SpectrumMode {
         SpectrumMode.fromToolbarSelection(
-            secondaryToolbarSelections[.spectrum] ?? .spectrumLive
+            secondaryToolbarSelections.spectrum
         )
     }
 #endif
@@ -71,6 +69,49 @@ private struct AppRootView: View {
     private var detailNavigationTitle: String {
         guard selectedPage != .overview else { return "" }
         return activeSecondaryToolbarDescriptor == nil ? selectedPage.label : ""
+    }
+
+    private func handleSelectedPageChange(_ newPage: SidebarPage) {
+        let spectrumVisible = newPage == .spectrum
+        for vm in viewModel.allBandViewModels {
+            vm.isViewVisible = spectrumVisible
+        }
+
+        guard let vm = bleViewModel else { return }
+        if newPage == .bleScanner {
+            if !vm.isScanning {
+                Task { await vm.startScanning() }
+            }
+        } else if vm.isScanning {
+            vm.stopScanning()
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var secondaryToolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .principal) {
+            switch selectedPage {
+            case .channels:
+                SecondaryToolbarCapsule(
+                    descriptor: SecondaryToolbarDescriptor.forPage(.channels)!,
+                    selection: $secondaryToolbarSelections.channels
+                )
+            case .interfaces:
+                SecondaryToolbarCapsule(
+                    descriptor: SecondaryToolbarDescriptor.forPage(.interfaces)!,
+                    selection: $secondaryToolbarSelections.interfaces
+                )
+#if PRO
+            case .spectrum:
+                SecondaryToolbarCapsule(
+                    descriptor: SecondaryToolbarDescriptor.forPage(.spectrum)!,
+                    selection: $secondaryToolbarSelections.spectrum
+                )
+#endif
+            default:
+                EmptyView()
+            }
+        }
     }
 
     @ViewBuilder
@@ -171,15 +212,7 @@ private struct AppRootView: View {
                 detailContent
             }
             .onChange(of: selectedPage) { _, newPage in
-                let spectrumVisible = newPage == .spectrum
-                for vm in viewModel.allBandViewModels {
-                    vm.isViewVisible = spectrumVisible
-                }
-                if newPage == .bleScanner, let vm = bleViewModel, !vm.isScanning {
-                    Task { await vm.startScanning() }
-                } else if newPage != .bleScanner, let vm = bleViewModel, vm.isScanning {
-                    vm.stopScanning()
-                }
+                handleSelectedPageChange(newPage)
             }
             .onChange(of: viewModel.wifiPowerState) { _, newState in
                 roamingViewModel.handleWiFiPowerStateChange(newState)
@@ -201,12 +234,7 @@ private struct AppRootView: View {
             }
         }
         .toolbar {
-            ToolbarItem(placement: .principal) {
-                if let descriptor = activeSecondaryToolbarDescriptor,
-                   let selection = activeSecondaryToolbarSelection {
-                    SecondaryToolbarCapsule(descriptor: descriptor, selection: selection)
-                }
-            }
+            secondaryToolbarContent
         }
         .background(WindowAccessor { window in
             window?.setFrameAutosaveName("WiFiLensMainWindow")

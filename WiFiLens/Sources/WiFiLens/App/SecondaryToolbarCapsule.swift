@@ -44,7 +44,7 @@ struct SecondaryToolbarCapsule: NSViewRepresentable {
     }
 
     func makeNSView(context: Context) -> SecondaryToolbarSegmentedControl {
-        Self.makeControl(
+        return Self.makeControl(
             descriptor: descriptor,
             selection: selection,
             target: context.coordinator,
