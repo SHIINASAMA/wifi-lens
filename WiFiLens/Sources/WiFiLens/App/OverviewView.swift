@@ -63,7 +63,9 @@ struct OverviewView: View {
                         } else if let wifi {
                             connectionCard(wifi)
                             signalHealthRow(wifi)
-                            diagnosticCard(wifi)
+                            if recommendationAvailability != .currentGoodEnough {
+                                diagnosticCard(wifi)
+                            }
                             if let current = currentChannelQuality, hasBetterChannel(current) {
                                 channelAdviceCard(current)
                             } else if !viewModel.channelRecommendations.isEmpty {
