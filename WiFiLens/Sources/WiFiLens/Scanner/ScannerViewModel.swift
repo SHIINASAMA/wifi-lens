@@ -437,7 +437,13 @@ final class ScannerViewModel {
     }
 
     private func computeChannelQualities() -> [ChannelQuality] {
-        let currentChannel: Int? = networkInfo.first(where: { $0.ssid != nil })?.channel
+        let currentWiFi = networkInfo.first(where: { $0.ssid != nil || $0.bssid != nil })
+        let currentChannel = currentWiFi?.channel
+        let targetAP = ChannelQualityCalculator.TargetAP(
+            bssid: currentWiFi?.bssid,
+            ssid: currentWiFi?.ssid,
+            channel: currentChannel
+        )
 
         // Deduplicate by BSSID+band: wide channels may report the same AP on
         // multiple primary channel numbers; keep only the strongest RSSI per band.
@@ -463,7 +469,9 @@ final class ScannerViewModel {
                 rssi: nw.rssi,
                 channelWidth: width,
                 band: nw.channel.band.id,
-                apex: Double(left + right) / 2.0
+                apex: Double(left + right) / 2.0,
+                bssid: nw.bssid,
+                ssid: nw.ssid
             )
             if let existing = seen[key] {
                 if info.rssi > existing.rssi { seen[key] = info }
@@ -472,7 +480,12 @@ final class ScannerViewModel {
             }
         }
         let aps = Array(seen.values)
-        return ChannelQualityCalculator.compute(aps: aps, currentChannel: currentChannel, supportedBands: Set(supportedBands.map(\.id)))
+        return ChannelQualityCalculator.compute(
+            aps: aps,
+            currentChannel: currentChannel,
+            supportedBands: Set(supportedBands.map(\.id)),
+            targetAP: targetAP
+        )
     }
 
     /// Run the regulatory-aware filtering pipeline on top of RF results.

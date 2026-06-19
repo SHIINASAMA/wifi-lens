@@ -21,7 +21,7 @@ Hardware Supported Channels (CoreWLAN)  ─┐
           2. Apply region rules (allowed/restricted/DFS/indoor/AFC)
           3. Device compatibility check
           4. User classification overrides
-          5. Sort by tier → RF score → band → channel
+          5. Sort by tier → recommendation score → RF score → band → channel
                                    │
                                    ▼
                         [ChannelRecommendation]
@@ -32,19 +32,20 @@ Hardware Supported Channels (CoreWLAN)  ─┐
 
 ## Data Flow
 
-`ScannerViewModel` gathers channel qualities via `ChannelQualityCalculator`, then passes them along with network IEs, device capabilities, and user preferences to `RegulatoryPipeline.computeRecommendations()`. The pipeline returns classified `[ChannelRecommendation]` for display in the channel quality views.
+`ScannerViewModel` gathers visible APs plus the current connection identity (BSSID/SSID/channel), then passes them to `ChannelQualityCalculator`. The calculator produces both observed RF quality and counterfactual recommendation state by excluding the current target AP from recommendation scoring. These qualities are then passed along with network IEs, device capabilities, and user preferences to `RegulatoryPipeline.computeRecommendations()`. The pipeline returns classified `[ChannelRecommendation]` for display in the channel quality views.
 
 ## Key Types
 
 | File | Type | Purpose |
 |------|------|---------|
+| `ChannelQualityCalculator.swift` | `enum` | Observed RF scoring plus counterfactual recommendation scoring |
 | `RegulatoryPipeline.swift` | `final class` | `@Observable` orchestrator — collects inputs, calls inference + filter, exposes `inferredRegion` |
 | `RegionInferenceEngine.swift` | `enum` | Multi-source region inference with confidence scoring |
 | `RegulatoryFilter.swift` | `enum` | 5-stage classification pipeline |
 | `RegulatoryDatabase.swift` | `enum` | Static per-region channel rules (US/JP/CN/EU, 2.4/5/6 GHz) |
 | `RegulatoryDomain.swift` | `enum` | `US`/`JP`/`CN`/`EU`/`unknown` with locale-based mapping |
 | `DeviceCompatibilityFilter.swift` | `enum` | Checks PHY/band/DFS/6 GHz support per device |
-| `ChannelRecommendation.swift` | `struct` | Output model: RF score + regulatory classification + restriction reasons |
+| `ChannelRecommendation.swift` | `struct` | Output model: observed RF data + counterfactual score + regulatory classification + restriction reasons |
 
 ## Region Inference
 
@@ -79,7 +80,7 @@ Special signals:
 `RegulatoryFilter.apply()` runs five stages:
 
 ### Stage 1: Wrap
-Each `ChannelQuality` is wrapped into a `ChannelRecommendation`, preserving the original RF score/level/AP counts verbatim.
+Each `ChannelQuality` is wrapped into a `ChannelRecommendation`, preserving the original RF score/level/AP counts verbatim while also carrying the counterfactual recommendation score and score-selected state.
 
 ### Stage 2: Region rules
 For each recommendation, looks up `RegulatoryDatabase.rules[region][band]`:
@@ -104,7 +105,7 @@ If incompatible → `.restricted` (`DEVICE_INCOMPATIBLE`).
 Manual classification overrides are applied on top.
 
 ### Stage 5: Sort
-Current channel first, then by classification tier (recommended > advanced > restricted), then RF-recommended first, then score descending, then band/channel.
+Current channel first, then by classification tier (recommended > advanced > restricted), then score-selected channels, then recommendation score descending, then observed RF score descending, then band/channel.
 
 Restricted channels are hidden by default (`showInSimpleView = false`).
 
@@ -121,9 +122,28 @@ Restricted channels are hidden by default (`showInSimpleView = false`).
 
 `RegulatoryChannelMeta` attaches per-channel caveats (DFS, radar sensitivity, CAC, indoor-only, max EIRP, AFC, Wi-Fi 6E/7 availability).
 
+## Counterfactual Channel Scoring
+
+The recommendation algorithm answers a local configuration question: if the current AP moved to a candidate channel, how much external interference would it face? The current AP must not count against itself, so recommendation scoring excludes the current target AP while observed RF scoring still includes every visible AP.
+
+### Model
+
+1. **Observed score** — `qualityScore` is computed from all APs in the current scan snapshot. This is used for charts, current-environment diagnostics, and RF preservation.
+
+2. **Target exclusion** — `recommendationScore` is computed from the same AP set after excluding the current target AP. BSSID matching is exact. SSID fallback is used only when BSSID is unavailable and exactly one AP with that SSID is visible on the current channel; ambiguous SSID fallback is treated as unknown.
+
+3. **Recommendation selection** — The current channel is considered good enough at `recommendationScore >= 80`. Candidate channels must score at least 70, improve by at least 10 points, and are limited to two per band.
+
+### Effect
+
+- The current AP does not make its own current channel look artificially congested.
+- External APs still reduce recommendation quality.
+- Unknown target identity suppresses recommendation selection while preserving observed RF display.
+- The algorithm is deterministic and does not use history, trend forecasting, previous-recommendation pressure, or remote adoption assumptions.
+
 ## Key Patterns
 
 - **Decoupled RF + regulatory**: `ChannelQualityCalculator` is never modified by the regulatory pipeline — RF scoring and regulatory filtering are completely independent.
-- **Verbatim RF preservation**: Original RF score, level, and AP counts are preserved as-is in `ChannelRecommendation.rfScore`/`rfLevel`/`apCount`. The regulatory layer only adds classification and restrictions.
+- **Verbatim RF preservation**: Original RF score, level, and AP counts are preserved as-is in `ChannelRecommendation.rfScore`/`rfLevel`/`apCount`. The counterfactual layer adds `recommendationScore`, and the regulatory layer adds classification and restrictions.
 - **Confidence downgrade**: Low-confidence region inference downgrades all `.recommended` channels to `.advanced` rather than `.restricted`, so users still see useful recommendations with a caveat.
 - **Comparable sort order**: `ChannelRecommendation.Classification.order` (recommended=2, advanced=1, restricted=0) enables tiered sorting by simple integer comparison.

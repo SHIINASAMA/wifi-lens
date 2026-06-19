@@ -50,6 +50,10 @@ import Testing
             strongestNeighborRSSI: -80
         )
         q.isRecommended = score >= 70
+        q.recommendationScore = score
+        q.recommendationLevel = .from(score: score)
+        q.recommendationConfidence = .exact
+        q.recommendationState = q.isRecommended ? .recommended : .insufficientImprovement
         q.isCurrentChannel = false
         q.showInSimpleView = true
         return q
@@ -95,6 +99,20 @@ import Testing
         #expect(ch100.restrictionReasons.contains(where: { $0.code == "DFS" }))
     }
 
+    @Test("DFS score-selected channels are not final recommendations")
+    func dfsScoreSelectedChannelsAreNotFinalRecommendations() {
+        let rf = [
+            makeQuality(channel: 52, band: "5", score: 100),
+        ]
+        let input = usFilterInput(rfResults: rf)
+        let result = RegulatoryFilter.apply(to: input)
+        let ch52 = result.first(where: { $0.channel == 52 })!
+
+        #expect(ch52.scoreSelected == true)
+        #expect(ch52.classification == .advanced)
+        #expect(ch52.isRecommended == false)
+    }
+
     @Test("Channels not in region are classified as restricted")
     func channelNotInRegionBlocked() {
         let rf = [
@@ -128,8 +146,8 @@ import Testing
 
     // MARK: - Sort order
 
-    @Test("Results sorted: recommended → advanced → restricted, then by RF score descending")
-    func sortOrderRespectsClassificationThenRFScore() {
+    @Test("Results sorted: recommended → advanced → restricted, then by recommendation score descending")
+    func sortOrderRespectsClassificationThenRecommendationScore() {
         let rf = [
             makeQuality(channel: 36, band: "5", score: 50),   // recommended
             makeQuality(channel: 40, band: "5", score: 90),   // recommended (higher score)

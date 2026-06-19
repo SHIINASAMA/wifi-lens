@@ -235,7 +235,7 @@ struct ChannelRecommendationTests {
         #expect(rec.bandDisplay == "5 GHz")
         #expect(rec.rfScore == 85)
         #expect(rec.rfLevel == .good)
-        #expect(rec.rfIsRecommended == true)
+        #expect(rec.scoreSelected == true)
         #expect(rec.isRecommended == true)
         #expect(rec.apCount == 1)
     }
@@ -275,13 +275,50 @@ struct ChannelRecommendationTests {
         let rf = makeChannelQuality()
         var rec = ChannelRecommendation(from: rf)
         rec.classification = .restricted
+        rec.scoreSelected = true
         rec.deviceCompatible = false
         rec.deviceIncompatibilityReason = "DFS required"
         rec.restrictionReasons = [ChannelRecommendation.RestrictionReason(code: "DFS", description: "DFS channel")]
         #expect(rec.classification == .restricted)
+        #expect(rec.isRecommended == false)
         #expect(rec.deviceCompatible == false)
         #expect(rec.deviceIncompatibilityReason == "DFS required")
         #expect(rec.restrictionReasons.count == 1)
         #expect(rec.restrictionReasons[0].code == "DFS")
+    }
+
+    @Test func recommendationAvailabilityDetectsAvailableRecommendations() {
+        let rec = ChannelRecommendation(from: makeChannelQuality(isRecommended: true))
+        #expect(ChannelRecommendationAvailability.from([rec]) == .available)
+    }
+
+    @Test func recommendationAvailabilityDetectsCurrentGoodEnough() {
+        var current = ChannelRecommendation(from: makeChannelQuality(isRecommended: false))
+        current.isCurrentChannel = true
+        current.recommendationState = .currentGoodEnough
+        #expect(ChannelRecommendationAvailability.from([current]) == .currentGoodEnough)
+    }
+
+    @Test func recommendationAvailabilityDetectsTargetUnknown() {
+        var current = ChannelRecommendation(from: makeChannelQuality(isRecommended: false))
+        current.isCurrentChannel = true
+        current.recommendationConfidence = .unknown
+        current.recommendationState = .targetUnknown
+        #expect(ChannelRecommendationAvailability.from([current]) == .targetUnknown)
+    }
+
+    @Test func recommendationAvailabilityDetectsRegulatoryFiltered() {
+        var candidate = ChannelRecommendation(from: makeChannelQuality(isRecommended: true))
+        candidate.scoreSelected = true
+        candidate.classification = .advanced
+        #expect(ChannelRecommendationAvailability.from([candidate]) == .regulatoryFiltered)
+    }
+
+    @Test func recommendationAvailabilityDefaultsToNoSignificantImprovement() {
+        var current = ChannelRecommendation(from: makeChannelQuality(isRecommended: false))
+        current.isCurrentChannel = true
+        current.recommendationConfidence = .exact
+        current.recommendationState = .insufficientImprovement
+        #expect(ChannelRecommendationAvailability.from([current]) == .noSignificantImprovement)
     }
 }

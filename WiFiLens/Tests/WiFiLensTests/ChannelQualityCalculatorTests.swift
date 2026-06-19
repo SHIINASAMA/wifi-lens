@@ -14,14 +14,18 @@ struct ChannelQualityCalculatorTests {
         _ rssi: Int,
         width: TestChannelWidth = .mhz20,
         band: ChannelBand = .band5GHz,
-        apex: Double = 0
+        apex: Double = 0,
+        bssid: String? = nil,
+        ssid: String? = nil
     ) -> ChannelQualityCalculator.APInfo {
         ChannelQualityCalculator.APInfo(
             channel: channel,
             rssi: rssi,
             channelWidth: width.rawValue,
             band: band.id,
-            apex: apex
+            apex: apex,
+            bssid: bssid,
+            ssid: ssid
         )
     }
 
@@ -200,9 +204,9 @@ struct ChannelQualityCalculatorTests {
         }
     }
 
-    // MARK: - Recommendations
+    // MARK: - Counterfactual recommendation
 
-    @Test func recommendsCleanChannelsOverOccupied() async throws {
+    @Test func calculatorDoesNotSelectRecommendations() async throws {
         // 3 APs on different 5 GHz channels with moderate signal
         let aps = [
             ap(36, -30, band: .band5GHz),
@@ -210,20 +214,193 @@ struct ChannelQualityCalculatorTests {
             ap(44, -40, band: .band5GHz),
         ]
         let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
-        let recommended = result.filter { $0.band == "5" && $0.isRecommended }
-        // Top 2 by score: empty channels (score=100) are recommended over occupied ones
-        #expect(recommended.count == 2)
-        #expect(recommended.allSatisfy { $0.qualityScore == 100 })
-        #expect(recommended.allSatisfy { $0.apCount == 0 })
+        #expect(result.allSatisfy { $0.isRecommended == false })
     }
 
-    @Test func noRecommendationBelow70() async throws {
+    @Test func recommendationScoreStartsAsObservedScoreWithoutTarget() async throws {
         // Six 160 MHz co-channel APs at strong RSSI → score well below 70
         let aps = (0..<6).map { _ in ap(36, -30, width: .mhz160, band: .band5GHz) }
         let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
         let ch36 = result.first(where: { $0.channel == 36 })!
-        #expect(ch36.qualityScore < 70)
-        #expect(ch36.isRecommended == false)
+        #expect(ch36.recommendationScore == ch36.qualityScore)
+        #expect(ch36.recommendationConfidence == .unknown)
+    }
+
+    @Test func targetAPIsExcludedFromRecommendationScore() async throws {
+        let target = ChannelQualityCalculator.TargetAP(
+            bssid: "aa:bb:cc:dd:ee:01",
+            ssid: "Home",
+            channel: 36
+        )
+        let result = ChannelQualityCalculator.compute(
+            aps: [
+                ChannelQualityCalculator.APInfo(
+                    channel: 36,
+                    rssi: -30,
+                    channelWidth: "20",
+                    band: "5",
+                    apex: 36,
+                    bssid: "aa:bb:cc:dd:ee:01",
+                    ssid: "Home"
+                )
+            ],
+            currentChannel: 36,
+            supportedBands: ["5"],
+            targetAP: target
+        )
+        let current = try #require(result.first { $0.channel == 36 })
+        #expect(current.qualityScore < 100)
+        #expect(current.recommendationScore == 100)
+        #expect(current.recommendationConfidence == .exact)
+    }
+
+    @Test func externalAPStillReducesRecommendationScore() async throws {
+        let target = ChannelQualityCalculator.TargetAP(
+            bssid: "aa:bb:cc:dd:ee:01",
+            ssid: "Home",
+            channel: 36
+        )
+        let result = ChannelQualityCalculator.compute(
+            aps: [
+                ChannelQualityCalculator.APInfo(
+                    channel: 36,
+                    rssi: -30,
+                    channelWidth: "20",
+                    band: "5",
+                    apex: 36,
+                    bssid: "aa:bb:cc:dd:ee:01",
+                    ssid: "Home"
+                ),
+                ChannelQualityCalculator.APInfo(
+                    channel: 36,
+                    rssi: -30,
+                    channelWidth: "20",
+                    band: "5",
+                    apex: 36,
+                    bssid: "aa:bb:cc:dd:ee:02",
+                    ssid: "Neighbor"
+                )
+            ],
+            currentChannel: 36,
+            supportedBands: ["5"],
+            targetAP: target
+        )
+        let current = try #require(result.first { $0.channel == 36 })
+        #expect(current.qualityScore < current.recommendationScore)
+        #expect(current.recommendationScore < 100)
+    }
+
+    @Test func ssidFallbackDoesNotExcludeSameSSIDAPsOnOtherChannels() async throws {
+        let target = ChannelQualityCalculator.TargetAP(
+            bssid: nil,
+            ssid: "Mesh",
+            channel: 36
+        )
+        let result = ChannelQualityCalculator.compute(
+            aps: [
+                ap(36, -30, band: .band5GHz, bssid: "aa:bb:cc:dd:ee:01", ssid: "Mesh"),
+                ap(40, -30, band: .band5GHz, bssid: "aa:bb:cc:dd:ee:02", ssid: "Mesh"),
+            ],
+            currentChannel: 36,
+            supportedBands: ["5"],
+            targetAP: target
+        )
+
+        let current = try #require(result.first { $0.channel == 36 })
+        let otherMeshAPChannel = try #require(result.first { $0.channel == 40 })
+        #expect(current.recommendationConfidence == .ssidFallback)
+        #expect(current.recommendationScore == 100)
+        #expect(otherMeshAPChannel.recommendationScore < 100)
+    }
+
+    @Test func currentGoodEnoughSuppressesRecommendations() async throws {
+        let target = ChannelQualityCalculator.TargetAP(
+            bssid: "aa:bb:cc:dd:ee:01",
+            ssid: "Home",
+            channel: 36
+        )
+        let result = ChannelQualityCalculator.compute(
+            aps: [
+                ap(36, -30, band: .band5GHz, bssid: "aa:bb:cc:dd:ee:01", ssid: "Home"),
+                ap(149, -80, band: .band5GHz, bssid: "aa:bb:cc:dd:ee:02", ssid: "Neighbor"),
+            ],
+            currentChannel: 36,
+            supportedBands: ["5"],
+            targetAP: target
+        )
+
+        let current = try #require(result.first { $0.channel == 36 })
+        #expect(current.recommendationState == .currentGoodEnough)
+        #expect(result.allSatisfy { $0.isRecommended == false })
+    }
+
+    @Test func insufficientImprovementSuppressesRecommendations() async throws {
+        let target = ChannelQualityCalculator.TargetAP(
+            bssid: "aa:bb:cc:dd:ee:01",
+            ssid: "Home",
+            channel: 36
+        )
+        let result = ChannelQualityCalculator.compute(
+            aps: [
+                ap(36, -30, band: .band5GHz, bssid: "aa:bb:cc:dd:ee:01", ssid: "Home"),
+                ap(36, -50, band: .band5GHz, bssid: "aa:bb:cc:dd:ee:02", ssid: "Neighbor"),
+                ap(36, -50, band: .band5GHz, bssid: "aa:bb:cc:dd:ee:03", ssid: "Neighbor2"),
+                ap(40, -35, band: .band5GHz, bssid: "aa:bb:cc:dd:ee:04", ssid: "Neighbor3"),
+            ],
+            currentChannel: 36,
+            supportedBands: ["5"],
+            targetAP: target
+        )
+
+        let current = try #require(result.first { $0.channel == 36 })
+        let candidate = try #require(result.first { $0.channel == 40 })
+        #expect(current.recommendationScore < 80)
+        #expect(candidate.recommendationScore - current.recommendationScore < 10)
+        #expect(candidate.isRecommended == false)
+        #expect(candidate.recommendationState == .insufficientImprovement)
+    }
+
+    @Test func recommendationSelectionIsCappedAtTwoPerBand() async throws {
+        let target = ChannelQualityCalculator.TargetAP(
+            bssid: "aa:bb:cc:dd:ee:01",
+            ssid: "Home",
+            channel: 36
+        )
+        let result = ChannelQualityCalculator.compute(
+            aps: [
+                ap(36, -30, band: .band5GHz, bssid: "aa:bb:cc:dd:ee:01", ssid: "Home"),
+                ap(36, -30, band: .band5GHz, bssid: "aa:bb:cc:dd:ee:02", ssid: "Neighbor"),
+                ap(36, -30, band: .band5GHz, bssid: "aa:bb:cc:dd:ee:03", ssid: "Neighbor2"),
+            ],
+            currentChannel: 36,
+            supportedBands: ["5"],
+            targetAP: target
+        )
+
+        #expect(result.filter(\.isRecommended).count == 2)
+    }
+
+    @Test func recommendationsAreSelectedIndependentlyPerBand() async throws {
+        let target = ChannelQualityCalculator.TargetAP(
+            bssid: "aa:bb:cc:dd:ee:01",
+            ssid: "Home",
+            channel: 1
+        )
+        let result = ChannelQualityCalculator.compute(
+            aps: [
+                ap(1, -30, band: .band24GHz, bssid: "aa:bb:cc:dd:ee:01", ssid: "Home"),
+                ap(1, -30, band: .band24GHz, bssid: "aa:bb:cc:dd:ee:02", ssid: "Neighbor24A"),
+                ap(1, -30, band: .band24GHz, bssid: "aa:bb:cc:dd:ee:03", ssid: "Neighbor24B"),
+                ap(1, -30, band: .band6GHz, bssid: "aa:bb:cc:dd:ee:04", ssid: "Neighbor6A"),
+                ap(1, -30, band: .band6GHz, bssid: "aa:bb:cc:dd:ee:05", ssid: "Neighbor6B"),
+            ],
+            currentChannel: 1,
+            supportedBands: ["24", "6"],
+            targetAP: target
+        )
+
+        #expect(result.filter { $0.band == "24" && $0.isRecommended }.count == 2)
+        #expect(result.filter { $0.band == "6" && $0.isRecommended }.count == 2)
     }
 
     // MARK: - Simple view filtering
@@ -239,7 +416,7 @@ struct ChannelQualityCalculatorTests {
         #expect(result.first(where: { $0.channel == 48 })!.showInSimpleView == true)
         // ch 36: has AP → shown
         #expect(result.first(where: { $0.channel == 36 })!.showInSimpleView == true)
-        // ch 56: no AP, not current, not in top 2 recommendations → hidden
+        // ch 56: no AP and not current → hidden unless counterfactual scoring selects it
         let ch56 = result.first(where: { $0.channel == 56 })!
         #expect(ch56.showInSimpleView == false)
     }

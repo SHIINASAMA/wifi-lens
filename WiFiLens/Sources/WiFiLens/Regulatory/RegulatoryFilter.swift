@@ -141,9 +141,7 @@ enum RegulatoryFilter {
         }
 
         // Step 5: Sort — current channel first, then by classification tier,
-        // then RF-recommended first, then RF score descending, then band, then channel.
-        // This preserves the original ChannelQualityCalculator sort order within
-        // each regulatory classification.
+        // then counterfactual-selected channels, then recommendation score, then observed RF score.
         recommendations.sort { a, b in
             // Current channel always first
             if a.isCurrentChannel != b.isCurrentChannel {
@@ -153,11 +151,15 @@ enum RegulatoryFilter {
             if a.classification.order != b.classification.order {
                 return a.classification.order > b.classification.order
             }
-            // RF recommendation
-            if a.rfIsRecommended != b.rfIsRecommended {
-                return a.rfIsRecommended
+            // Counterfactual recommendation
+            if a.scoreSelected != b.scoreSelected {
+                return a.scoreSelected
             }
-            // RF score descending
+            // Counterfactual recommendation score descending
+            if a.recommendationScore != b.recommendationScore {
+                return a.recommendationScore > b.recommendationScore
+            }
+            // RF score descending (fallback)
             if a.rfScore != b.rfScore {
                 return a.rfScore > b.rfScore
             }
