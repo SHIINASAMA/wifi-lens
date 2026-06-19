@@ -1289,7 +1289,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "频道%lld, %@, %@, 评分%lld/100"
+            "value" : "信道%lld, %@, %@, 评分%lld/100"
           }
         }
       }
@@ -1483,6 +1483,30 @@
             "state" : "translated",
             "value" : "Recommended channels are marked with a star and have passed regulatory and device checks."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empfohlene Kanäle sind mit einem Stern markiert und haben regionale Vorschriften und Gerätechecks bestanden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los canales recomendados están marcados con una estrella y han superado las comprobaciones regulatorias y de compatibilidad de dispositivos."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推奨チャンネルは★印が付いており、地域規制とデバイスチェックを通過しています。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推荐信道标有星号，已通过地区法规和设备兼容性检查。"
+          }
         }
       }
     },
@@ -1494,6 +1518,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Channel recommendations available"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kanalempfehlungen verfügbar"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recomendaciones de canal disponibles"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チャンネル推奨が利用可能です"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信道推荐可用"
           }
         }
       }
@@ -1507,6 +1555,30 @@
             "state" : "translated",
             "value" : "After excluding your current AP, this channel is already clean enough, so WiFi Lens does not recommend switching."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Ausschluss Ihres aktuellen APs ist dieser Kanal bereits sauber genug, daher empfiehlt WiFi Lens keinen Wechsel."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tras excluir tu AP actual, este canal ya es lo suficientemente limpio, por lo que WiFi Lens no recomienda cambiar."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在のAPを除外した後、このチャンネルは十分にクリアであるため、WiFi Lensは切り替えを推奨しません。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "排除当前 AP 后，该信道已足够干净，WiFi Lens 不建议切换。"
+          }
         }
       }
     },
@@ -1518,6 +1590,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Current channel is good enough"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktueller Kanal ist ausreichend"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El canal actual es suficiente"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在のチャンネルで十分です"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前信道已足够好"
           }
         }
       }
@@ -1531,6 +1627,30 @@
             "state" : "translated",
             "value" : "Start a scan to evaluate channel quality and recommendations."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starten Sie einen Scan, um die Kanalqualität und Empfehlungen zu bewerten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia un escaneo para evaluar la calidad del canal y las recomendaciones."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スキャンを開始して、チャンネルの品質と推奨を評価してください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始扫描以评估信道质量和推荐。"
+          }
         }
       }
     },
@@ -1542,6 +1662,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No channel data yet"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine Kanaldaten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no hay datos de canal"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チャンネルデータがまだありません"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无信道数据"
           }
         }
       }
@@ -1555,6 +1699,30 @@
             "state" : "translated",
             "value" : "No allowed channel is at least 10 points better than the current channel under counterfactual scoring."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein zulässiger Kanal ist unter gegenläufiger Bewertung mindestens 10 Punkte besser als der aktuelle Kanal."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ningún canal permitido es al menos 10 puntos mejor que el canal actual bajo la puntuación contrafactual."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "反事実スコアリングにおいて、許可されたチャンネルで現在のチャンネルより10点以上優れたものはありません。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在反事实评分下，没有允许的信道比当前信道高出至少 10 分。"
+          }
         }
       }
     },
@@ -1566,6 +1734,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No meaningfully better channel"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein deutlich besserer Kanal"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay un canal significativamente mejor"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有意に優れたチャンネルはありません"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无显著更优的信道"
           }
         }
       }
@@ -1579,6 +1771,30 @@
             "state" : "translated",
             "value" : "One or more counterfactual candidates were downgraded by regional rules or device compatibility checks."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein oder mehrere gegenläufige Kandidaten wurden durch regionale Vorschriften oder Gerätekompatibilitätsprüfungen herabgestuft."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uno o más candidatos contrafactuales fueron degradados por normativas regionales o comprobaciones de compatibilidad de dispositivos."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "反事実候補の一部が、地域規制またはデバイス互換性チェックによりグレードダウンされました。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一个或多个反事实候选信道因地区法规或设备兼容性检查而被降级。"
+          }
         }
       }
     },
@@ -1590,6 +1806,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Candidates filtered by rules"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kandidaten durch Vorschriften gefiltert"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Candidatos filtrados por normativa"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "規制により候補がフィルターされました"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "候选信道已被规则过滤"
           }
         }
       }
@@ -1603,6 +1843,30 @@
             "state" : "translated",
             "value" : "WiFi Lens needs the current AP identity to exclude it from counterfactual scoring."
           }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WiFi Lens benötigt die Identität des aktuellen APs, um ihn aus der gegenläufigen Bewertung auszuschließen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WiFi Lens necesita la identidad del AP actual para excluirlo de la puntuación contrafactual."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WiFi Lens は、反事実スコアリングから現在のAPを除外するために、そのAPの識別情報が必要です。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WiFi Lens 需要当前 AP 的标识以将其从反事实评分中排除。"
+          }
         }
       }
     },
@@ -1614,6 +1878,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Current AP not identified"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktueller AP nicht erkannt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AP actual no identificado"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在のAPが特定されていません"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前 AP 未识别"
           }
         }
       }
@@ -2297,7 +2585,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "您当前使用的信道"
+            "value" : "你当前使用的信道"
           }
         }
       }
@@ -6017,31 +6305,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "{\"mcpServers\":{\"wifi-lens\":{\"url\":\"http://127.0.0.1:%ld\"}}}"
+            "value" : "{\"mcpServers\" :{\"wifi-lens\" :{\"url\" :\"http://127.0.0.1:%ld\"}}}"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "{\"mcpServers\":{\"wifi-lens\":{\"url\":\"http://127.0.0.1:%ld\"}}}"
+            "value" : "{\"mcpServers\" :{\"wifi-lens\" :{\"url\" :\"http://127.0.0.1:%ld\"}}}"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "{\"mcpServers\":{\"wifi-lens\":{\"url\":\"http://127.0.0.1:%ld\"}}}"
+            "value" : "{\"mcpServers\" :{\"wifi-lens\" :{\"url\" :\"http://127.0.0.1:%ld\"}}}"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "{\"mcpServers\":{\"wifi-lens\":{\"url\":\"http://127.0.0.1:%ld\"}}}"
+            "value" : "{\"mcpServers\" :{\"wifi-lens\" :{\"url\" :\"http://127.0.0.1:%ld\"}}}"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "{\"mcpServers\":{\"wifi-lens\":{\"url\":\"http://127.0.0.1:%ld\"}}}"
+            "value" : "{\"mcpServers\" :{\"wifi-lens\" :{\"url\" :\"http://127.0.0.1:%ld\"}}}"
           }
         }
       },
@@ -9357,7 +9645,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keine Access Points erkannt"
+            "value" : "Keine APs erkannt"
           }
         },
         "en" : {
@@ -9369,19 +9657,19 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se detectaron puntos de acceso"
+            "value" : "No se detectaron AP"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アクセスポイントが見つかりません"
+            "value" : "AP が見つかりません"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "未检测到接入点"
+            "value" : "未检测到 AP"
           }
         }
       }
@@ -10716,7 +11004,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "一款简单的 macOS Wi-Fi 频道与信号强度分析工具。"
+            "value" : "一款简单的 macOS Wi-Fi 信道与信号强度分析工具。"
           }
         }
       }
@@ -11004,7 +11292,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "诊断日志仅存储在您的设备本地。WiFi Lens 不会收集、上传或分享这些日志。您可以随时自由查看、分享或删除它们。"
+            "value" : "诊断日志仅存储在你的设备本地。WiFi Lens 不会收集、上传或分享这些日志。你可以随时自由查看、分享或删除它们。"
           }
         }
       }

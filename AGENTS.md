@@ -20,6 +20,7 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/COLLABORATION_RULES.md` | AI assistant behavior rules — enforced prohibitions and must-follows |
 | `docs/TODO.md` | Feature roadmap and checked-off items |
 | `docs/ISSUES.md` | Bugs, regressions, and deferred work with status |
+| `docs/LOCALIZATION_TERMS.md` | Standardized translation terminology for all languages |
 | `docs/superpowers/specs/2026-06-18-debug-multi-ap-chart-design.md` | Design spec for the DebugChartView multi-AP chart workbench |
 | `docs/superpowers/plans/2026-06-18-debug-multi-ap-chart.md` | Implementation plan for the DebugChartView multi-AP chart workbench |
 | `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
