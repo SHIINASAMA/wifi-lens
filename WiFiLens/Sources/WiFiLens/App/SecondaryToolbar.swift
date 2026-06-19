@@ -25,11 +25,6 @@ struct SecondaryToolbarDescriptor: Equatable {
         items.firstIndex { $0.id == id } ?? items.firstIndex { $0.id == defaultSelection } ?? 0
     }
 
-    func itemID(at index: Int) -> SecondaryToolbarItemID? {
-        guard items.indices.contains(index) else { return nil }
-        return items[index].id
-    }
-
     static func forPage(_ page: SidebarPage) -> Self? {
         switch page {
         case .channels:
@@ -82,27 +77,6 @@ struct SecondaryToolbarDescriptor: Equatable {
 #endif
         default:
             nil
-        }
-    }
-}
-
-extension SidebarPage {
-    var supportsSecondaryToolbar: Bool {
-        SecondaryToolbarDescriptor.forPage(self) != nil
-    }
-}
-
-enum DetailPageRenderPolicy {
-    static func shouldRender(_ page: SidebarPage, selectedPage: SidebarPage) -> Bool {
-        page == selectedPage
-    }
-
-    static func needsConditionalRendering(_ page: SidebarPage) -> Bool {
-        switch page {
-        case .spectrum, .interfaces:
-            return true
-        default:
-            return false
         }
     }
 }

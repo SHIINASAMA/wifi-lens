@@ -19,11 +19,4 @@ struct SecondaryToolbarTests {
         #expect(descriptor?.selectionIndex(for: .channelsSimple) == 0)
         #expect(descriptor?.selectionIndex(for: .channelsTable) == 1)
     }
-
-    @Test func secondaryToolbarDescriptor_itemIDAtIndexMatchesOrder() {
-        let descriptor = SecondaryToolbarDescriptor.forPage(.channels)
-        #expect(descriptor?.itemID(at: 0) == .channelsSimple)
-        #expect(descriptor?.itemID(at: 1) == .channelsTable)
-        #expect(descriptor?.itemID(at: 2) == nil)
-    }
 }
