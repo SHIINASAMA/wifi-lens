@@ -1,6 +1,7 @@
 import Testing
 import Foundation
 import SwiftUI
+import ChartLens
 @testable import WiFi_Lens
 
 // MARK: - chartDurationLabel

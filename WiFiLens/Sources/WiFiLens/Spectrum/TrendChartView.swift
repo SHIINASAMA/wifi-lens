@@ -1,4 +1,5 @@
 import SwiftUI
+import ChartLens
 
 struct TrendChartView: View {
     let snapshots: [NetworkSnapshot]

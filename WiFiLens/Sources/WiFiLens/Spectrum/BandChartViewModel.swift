@@ -1,4 +1,5 @@
 import SwiftUI
+import ChartLens
 
 @MainActor
 @Observable

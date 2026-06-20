@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import Testing
+import ChartLens
 @testable import WiFi_Lens
 
 @Suite struct ChartGeometryTests {

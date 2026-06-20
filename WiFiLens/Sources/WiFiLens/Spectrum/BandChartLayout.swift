@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import ChartLens
 
 struct BandChartLayout {
     struct HeatmapBar {

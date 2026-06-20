@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:ChartLens/ChartLens.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:WiFiLens/WiFiLens.xcodeproj">
    </FileRef>
 </Workspace>

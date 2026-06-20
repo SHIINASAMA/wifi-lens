@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import ChartLens
 
 /// Converts recorded NetworkSnapshot data into ChartSeriesData for history playback.
 /// Mirrors ChannelSpanCalculator.toSeriesData() but operates on snapshots instead of WiFiNetwork.

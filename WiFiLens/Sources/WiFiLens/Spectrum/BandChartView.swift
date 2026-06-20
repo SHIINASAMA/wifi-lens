@@ -1,4 +1,5 @@
 import SwiftUI
+import ChartLens
 
 struct WiFiBandChart: View {
     let model: BandChartRenderModel

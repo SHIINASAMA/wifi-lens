@@ -145,11 +145,6 @@
 		FB1E326C2FC7316C009D1BDC /* DebugRoamingChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */; };
 		FB1E326D2FC7316C009D1BDC /* SSIDColorHasher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */; };
 		FB1E326E2FC7316C009D1BDC /* ScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */; };
-		FB1E32702FC7316C009D1BDC /* ChartTimeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */; };
-		FB1E32712FC7316C009D1BDC /* ChartGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F362FC2D9650057B038 /* ChartGeometry.swift */; };
-		FB1E32722FC7316C009D1BDC /* SplineInterpolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */; };
-		FB1E32732FC7316C009D1BDC /* RangeSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */; };
-		FB1E32742FC7316C009D1BDC /* ChartRendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F372FC2D9650057B038 /* ChartRendering.swift */; };
 		FB1E32752FC7316C009D1BDC /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C82FBCD25C005F8214 /* OverviewView.swift */; };
 		FB1E32762FC7316C009D1BDC /* SpanDirection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310AD5ABC56B4211E30DD1DE /* SpanDirection.swift */; };
 		FB1E32772FC7316C009D1BDC /* WiFiLensApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831E90D5B9D07C478A35DD14 /* WiFiLensApp.swift */; };
@@ -200,23 +195,13 @@
 		FB6F41D02FC4889B0009F29B /* RegulatoryFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41CA2FC4889B0009F29B /* RegulatoryFilter.swift */; };
 		FB6F41D12FC4889B0009F29B /* RegionInferenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C72FC4889B0009F29B /* RegionInferenceEngine.swift */; };
 		FB6F41D32FC4889B0009F29B /* RegulatoryPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41D22FC4889B0009F29B /* RegulatoryPipeline.swift */; };
+		FB85B8A92FE6526D00D2D391 /* ChartLens in Frameworks */ = {isa = PBXBuildFile; productRef = FB85B8A82FE6526D00D2D391 /* ChartLens */; };
 		FB8BB6022FBB07F600FD072E /* NetworkInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8BB6012FBB07F600FD072E /* NetworkInfoService.swift */; };
 		FB8BB6042FBB0BA600FD072E /* IEParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8BB6032FBB0BA600FD072E /* IEParser.swift */; };
 		FB92F9212FBE208500BCEC67 /* DebugChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F91F2FBE208500BCEC67 /* DebugChartView.swift */; };
 		FB92F9232FBE208500BCEC67 /* DebugContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */; };
 		FB92F9252FBE208500BCEC67 /* DebugThroughputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */; };
 		FB92F9282FBE208500BCEC67 /* DebugRoamingChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */; };
-		FB9B7F3B2FC2D9650057B038 /* ChartTimeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */; };
-		FB9B7F3C2FC2D9650057B038 /* ChartGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F362FC2D9650057B038 /* ChartGeometry.swift */; };
-		FB9B7F3D2FC2D9650057B038 /* SplineInterpolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */; };
-		FB9B7F3E2FC2D9650057B038 /* ChartRendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F372FC2D9650057B038 /* ChartRendering.swift */; };
-		FB9B7F412FC2D9650057B038 /* RangeSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */; };
-		FB9B7F4C2FC2D9650057B038 /* ChartTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4A2FC2D9650057B038 /* ChartTypes.swift */; };
-		FB9B7F4D2FC2D9650057B038 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4B2FC2D9650057B038 /* ChartView.swift */; };
-		FB9B7F4E2FC2D9650057B038 /* ChartTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4A2FC2D9650057B038 /* ChartTypes.swift */; };
-		FB9B7F4F2FC2D9650057B038 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F4B2FC2D9650057B038 /* ChartView.swift */; };
-		FB9B7F512FC2D9650057B038 /* DetailOverviewChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */; };
-		FB9B7F522FC2D9650057B038 /* DetailOverviewChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */; };
 		FBA000010000000000000001 /* AppLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA000230000000000000023 /* AppLaunchTests.swift */; };
 		FBA000020000000000000002 /* WiFiLensUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA000050000000000000005 /* WiFiLensUITestsLaunchTests.swift */; };
 		FBA000200000000000000020 /* UITestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA000210000000000000021 /* UITestHelpers.swift */; };
@@ -391,14 +376,6 @@
 		FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugContainerView.swift; sourceTree = "<group>"; };
 		FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugThroughputView.swift; sourceTree = "<group>"; };
 		FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugRoamingChartView.swift; sourceTree = "<group>"; };
-		FB9B7F362FC2D9650057B038 /* ChartGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartGeometry.swift; sourceTree = "<group>"; };
-		FB9B7F372FC2D9650057B038 /* ChartRendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartRendering.swift; sourceTree = "<group>"; };
-		FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartTimeFormatting.swift; sourceTree = "<group>"; };
-		FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplineInterpolation.swift; sourceTree = "<group>"; };
-		FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSelectorView.swift; sourceTree = "<group>"; };
-		FB9B7F4A2FC2D9650057B038 /* ChartTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartTypes.swift; sourceTree = "<group>"; };
-		FB9B7F4B2FC2D9650057B038 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
-		FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailOverviewChart.swift; sourceTree = "<group>"; };
 		FBA000030000000000000003 /* WiFiLensUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WiFiLensUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBA000050000000000000005 /* WiFiLensUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiLensUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		FBA000210000000000000021 /* UITestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestHelpers.swift; sourceTree = "<group>"; };
@@ -442,6 +419,7 @@
 				1E5141F704005BF06DB684A1 /* CoreWLAN.framework in Frameworks */,
 				B9AB60F3D002A7B9123D2520 /* CoreLocation.framework in Frameworks */,
 				FB0573B42FBBEAE4005F8214 /* MCP in Frameworks */,
+				FB85B8A92FE6526D00D2D391 /* ChartLens in Frameworks */,
 				FB1E32A82FC731CA009D1BDC /* Sparkle in Frameworks */,
 				FB2E3B2E2FC5ACDA00D2610E /* CoreBluetooth.framework in Frameworks */,
 				FB0573C422FBBEAE4005F8214 /* Logging in Frameworks */,
@@ -667,7 +645,6 @@
 				AD735352E4FE8FE0803C143C /* App */,
 				D214ECC1EF82C7552FF49DE8 /* BLE */,
 				D3E6587CCEDEC199C00591B2 /* Channels */,
-				FB9B7F3A2FC2D9650057B038 /* Charts */,
 				49FEC4F42675BFAD1316DDEC /* Debug */,
 				8FFEB5302BE8674E56110FAE /* Interfaces */,
 				786696F9D6046171197C0641 /* MCP */,
@@ -736,21 +713,6 @@
 				FBB1F0AB2FC61E3D00E9D2C6 /* Localizable.xcstrings */,
 			);
 			path = Resources;
-			sourceTree = "<group>";
-		};
-		FB9B7F3A2FC2D9650057B038 /* Charts */ = {
-			isa = PBXGroup;
-			children = (
-				FB9B7F362FC2D9650057B038 /* ChartGeometry.swift */,
-				FB9B7F372FC2D9650057B038 /* ChartRendering.swift */,
-				FB9B7F382FC2D9650057B038 /* ChartTimeFormatting.swift */,
-				FB9B7F4A2FC2D9650057B038 /* ChartTypes.swift */,
-				FB9B7F4B2FC2D9650057B038 /* ChartView.swift */,
-				FB9B7F502FC2D9650057B038 /* DetailOverviewChart.swift */,
-				FB9B7F392FC2D9650057B038 /* SplineInterpolation.swift */,
-				FB9B7F402FC2D9650057B038 /* RangeSelectorView.swift */,
-			);
-			path = Charts;
 			sourceTree = "<group>";
 		};
 		FBA000060000000000000006 /* WiFiLensUITests */ = {
@@ -909,6 +871,7 @@
 				FB0573B32FBBEAE4005F8214 /* MCP */,
 				FB0573C412FBBEAE4005F8214 /* Logging */,
 				FB1E32A72FC731CA009D1BDC /* Sparkle */,
+				FB85B8A82FE6526D00D2D391 /* ChartLens */,
 			);
 			productName = WiFiLens;
 			productReference = BD784856886985BCC6FC4F02 /* WiFi Lens.app */;
@@ -1009,6 +972,7 @@
 				FB0573B22FBBEAE4005F8214 /* XCRemoteSwiftPackageReference "swift-sdk" */,
 				FB0573C402FBBEAE4005F8214 /* XCRemoteSwiftPackageReference "swift-log" */,
 				FB1E32A62FC731CA009D1BDC /* XCRemoteSwiftPackageReference "Sparkle" */,
+				FB85B8A72FE6526D00D2D391 /* XCLocalSwiftPackageReference "../ChartLens" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BD4D8FFAAD7E961D9EE4F5FE /* Products */;
@@ -1107,14 +1071,6 @@
 				A10000000000000000000021 /* SecondaryToolbar.swift in Sources */,
 				A10000000000000000000022 /* SecondaryToolbarCapsule.swift in Sources */,
 				C1D2E3F4A5B6123456780001 /* WiFiPowerMonitor.swift in Sources */,
-				FB9B7F3B2FC2D9650057B038 /* ChartTimeFormatting.swift in Sources */,
-				FB9B7F4C2FC2D9650057B038 /* ChartTypes.swift in Sources */,
-				FB9B7F4D2FC2D9650057B038 /* ChartView.swift in Sources */,
-				FB9B7F512FC2D9650057B038 /* DetailOverviewChart.swift in Sources */,
-				FB9B7F3C2FC2D9650057B038 /* ChartGeometry.swift in Sources */,
-				FB9B7F3D2FC2D9650057B038 /* SplineInterpolation.swift in Sources */,
-				FB9B7F412FC2D9650057B038 /* RangeSelectorView.swift in Sources */,
-				FB9B7F3E2FC2D9650057B038 /* ChartRendering.swift in Sources */,
 				FB0573CA2FBCD25C005F8214 /* OverviewView.swift in Sources */,
 				46B405FC484C9C9A5509E8AC /* SpanDirection.swift in Sources */,
 				9E2F89530D1114DBFAB705F3 /* WiFiLensApp.swift in Sources */,
@@ -1245,14 +1201,6 @@
 				A10000000000000000000023 /* SecondaryToolbar.swift in Sources */,
 				A10000000000000000000024 /* SecondaryToolbarCapsule.swift in Sources */,
 				A1B2C3D4E5F6789012340001 /* WiFiPowerMonitor.swift in Sources */,
-				FB1E32702FC7316C009D1BDC /* ChartTimeFormatting.swift in Sources */,
-				FB9B7F4E2FC2D9650057B038 /* ChartTypes.swift in Sources */,
-				FB9B7F4F2FC2D9650057B038 /* ChartView.swift in Sources */,
-				FB9B7F522FC2D9650057B038 /* DetailOverviewChart.swift in Sources */,
-				FB1E32712FC7316C009D1BDC /* ChartGeometry.swift in Sources */,
-				FB1E32722FC7316C009D1BDC /* SplineInterpolation.swift in Sources */,
-				FB1E32732FC7316C009D1BDC /* RangeSelectorView.swift in Sources */,
-				FB1E32742FC7316C009D1BDC /* ChartRendering.swift in Sources */,
 				FB1E32752FC7316C009D1BDC /* OverviewView.swift in Sources */,
 				FB1E32762FC7316C009D1BDC /* SpanDirection.swift in Sources */,
 				FB1E32772FC7316C009D1BDC /* WiFiLensApp.swift in Sources */,
@@ -1860,6 +1808,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		FB85B8A72FE6526D00D2D391 /* XCLocalSwiftPackageReference "../ChartLens" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../ChartLens;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		FB0573B22FBBEAE4005F8214 /* XCRemoteSwiftPackageReference "swift-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -1928,6 +1883,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = FB1E32A62FC731CA009D1BDC /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
+		};
+		FB85B8A82FE6526D00D2D391 /* ChartLens */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ChartLens;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import ChartLens
 
 // MARK: - Chart Layout
 
