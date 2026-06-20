@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "WiFiLens/**"
+      - "ChartLens/**"
     branches:
       - master
     tags:
@@ -11,6 +12,7 @@ on:
   pull_request:
     paths:
       - "WiFiLens/**"
+      - "ChartLens/**"
   workflow_dispatch:
 
 env:
@@ -28,10 +30,12 @@ jobs:
         working-directory: WiFiLens
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Build
         run: |
-          xcodebuild -project WiFiLens.xcodeproj \
+          xcodebuild -workspace ../wifi-lens.xcworkspace \
             -scheme "WiFi Lens" \
             -configuration "$DEBUG_CONFIG" \
             -destination 'platform=macOS' \
@@ -40,7 +44,7 @@ jobs:
 
       - name: Test
         run: |
-          xcodebuild -project WiFiLens.xcodeproj \
+          xcodebuild -workspace ../wifi-lens.xcworkspace \
             -scheme "WiFi Lens" \
             -configuration "$DEBUG_CONFIG" \
             -destination 'platform=macOS' \
@@ -60,6 +64,8 @@ jobs:
         working-directory: WiFiLens
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Import Developer ID Certificate
         run: |
@@ -77,7 +83,7 @@ jobs:
 
       - name: Build Release (Signed)
         run: |
-          xcodebuild -project WiFiLens.xcodeproj \
+          xcodebuild -workspace ../wifi-lens.xcworkspace \
             -scheme "WiFi Lens" \
             -configuration "$RELEASE_CONFIG" \
             -derivedDataPath .build/DerivedData \
