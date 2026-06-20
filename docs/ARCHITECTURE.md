@@ -20,14 +20,14 @@ BLE — CoreBluetooth scan → BLEAdvertisementEvent → BLEDeviceTracker → BL
                                                                        ├── BLEScannerView
                                                                        └── BLETrendChartView (via Chart engine)
 
-Chart Engine (Charts/):
+Chart Engine (ChartLens package):
   Caller builds [ChartSeries] + ChartAxisConfig + ChartStyle
       → Chart<Overlay> → GeometryReader → ChartGeometry
       → Canvas: grid, axes, clip, draw series by interpolation mode
       → overlay(geo, series)
 
   DetailOverviewChart wraps two Charts + RangeSelector for linked zoom/overview.
-  See docs/CHARTS.md for full architecture.
+  See [ChartLens/README.md](../ChartLens/README.md) and docs/CHARTS.md for full architecture.
   See docs/BLE.md for BLE scan architecture.
   See docs/REGULATORY.md for regulatory pipeline.
   Pro features documented in Pro/docs/ARCHITECTURE.md (separate submodule).

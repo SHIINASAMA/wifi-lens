@@ -1,6 +1,6 @@
 # Chart Engine
 
-Universal, data-driven chart rendering engine introduced in the Spectrum refactoring. All chart views now build `[ChartSeries]` arrays and delegate rendering to the shared `Chart` component instead of drawing their own `Canvas`.
+Universal, data-driven chart rendering engine. Available as the standalone **[ChartLens](../ChartLens/README.md)** Swift Package. All chart views build `[ChartSeries]` arrays and delegate rendering to the shared `Chart` component instead of drawing their own `Canvas`.
 
 ## Architecture
 
