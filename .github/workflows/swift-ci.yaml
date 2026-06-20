@@ -30,8 +30,9 @@ jobs:
         working-directory: WiFiLens
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+
+      - name: Init ChartLens submodule
+        run: git submodule update --init ChartLens
 
       - name: Build
         run: |
@@ -64,8 +65,9 @@ jobs:
         working-directory: WiFiLens
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+
+      - name: Init ChartLens submodule
+        run: git submodule update --init ChartLens
 
       - name: Import Developer ID Certificate
         run: |
