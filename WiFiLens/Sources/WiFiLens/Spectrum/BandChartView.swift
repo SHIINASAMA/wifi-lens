@@ -55,7 +55,7 @@ struct WiFiBandChart: View {
 
     // MARK: - Chart Data
 
-    private func buildSeries() -> [ChartSeries] {
+    private func buildSeries() -> [ChartSeries<ChartPoint>] {
         visibleSeries.map { s in
             let halfWidth = Double(s.right - s.left) / 2.0
             let sigma = halfWidth / 4.0
@@ -67,7 +67,7 @@ struct WiFiBandChart: View {
                     ChartPoint(x: Double(s.left), y: s.displayRSSI),
                     ChartPoint(x: Double(s.right), y: s.displayRSSI),
                 ],
-                style: ChartSeries.ChartSeriesStyle(
+                style: ChartSeriesStyle(
                     color: s.color, lineWidth: st.strokeWidth,
                     areaOpacity: st.areaOpacity, strokeOpacity: st.strokeOpacity,
                     interpolation: .gaussian(sigma: sigma, baseline: baseline),

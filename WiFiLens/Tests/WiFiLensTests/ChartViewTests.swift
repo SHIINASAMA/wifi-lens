@@ -109,7 +109,7 @@ import ChartLens
             ChartPoint(x: 4, y: -40),
             ChartPoint(x: 8, y: -40),
         ]
-        let style = ChartSeries.ChartSeriesStyle(
+        let style = ChartSeriesStyle(
             color: .blue,
             lineWidth: 1.5,
             areaOpacity: 0.3,
@@ -117,7 +117,7 @@ import ChartLens
             interpolation: .gaussian(sigma: 1.0, baseline: -100),
             baseline: -100
         )
-        let series = ChartSeries(id: "test", points: points, style: style)
+        let series = ChartSeries<ChartPoint>(id: "test", points: points, style: style)
 
         #expect(series.style.interpolation == .gaussian(sigma: 1.0, baseline: -100))
         #expect(series.points.count == 2)

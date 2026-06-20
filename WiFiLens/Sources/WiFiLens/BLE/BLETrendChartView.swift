@@ -52,12 +52,12 @@ struct BLETrendChartView: View {
         return axis
     }
 
-    private func buildSeries() -> [ChartSeries] {
+    private func buildSeries() -> [ChartSeries<ChartPoint>] {
         // Smoothed line (thick, solid)
         let smoothPts: [ChartPoint] = samples.enumerated().map { i, s in
             ChartPoint(x: Double(i), y: s.smoothedRSSI)
         }
-        let smoothStyle = ChartSeries.ChartSeriesStyle(
+        let smoothStyle = ChartSeriesStyle(
             color: color, lineWidth: 1.5, areaOpacity: 0.08,
             pointRadius: 0, strokeOpacity: 1.0, interpolation: .linear
         )
@@ -66,7 +66,7 @@ struct BLETrendChartView: View {
         let rawPts: [ChartPoint] = samples.enumerated().map { i, s in
             ChartPoint(x: Double(i), y: Double(s.rawRSSI))
         }
-        let rawStyle = ChartSeries.ChartSeriesStyle(
+        let rawStyle = ChartSeriesStyle(
             color: color, lineWidth: 0.8, areaOpacity: 0,
             pointRadius: 0, strokeOpacity: 0.3, interpolation: .linear
         )

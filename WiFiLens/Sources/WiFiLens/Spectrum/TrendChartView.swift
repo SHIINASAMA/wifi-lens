@@ -53,11 +53,11 @@ struct TrendChartView: View {
         return axis
     }
 
-    private func buildSeries() -> [ChartSeries] {
+    private func buildSeries() -> [ChartSeries<ChartPoint>] {
         let points: [ChartPoint] = snapshots.enumerated().map { i, snap in
             ChartPoint(x: Double(i), y: Double(snap.rssi))
         }
-        let style = ChartSeries.ChartSeriesStyle(
+        let style = ChartSeriesStyle(
             color: color,
             lineWidth: 1.5,
             areaOpacity: 0.12,

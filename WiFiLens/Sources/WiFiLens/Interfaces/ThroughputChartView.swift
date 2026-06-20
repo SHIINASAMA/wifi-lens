@@ -79,12 +79,12 @@ struct ThroughputChartView: View {
         return axis
     }
 
-    private func buildSeries() -> [ChartSeries] {
+    private func buildSeries() -> [ChartSeries<ChartPoint>] {
         // Download: negative y below baseline (fills downward)
         let dlPts: [ChartPoint] = samples.enumerated().map { i, s in
             ChartPoint(x: Double(i), y: -s.rateIn)
         }
-        let dlStyle = ChartSeries.ChartSeriesStyle(
+        let dlStyle = ChartSeriesStyle(
             color: .green, lineWidth: 1.5, areaOpacity: 0.18,
             pointRadius: 0, strokeOpacity: 0.7,
             interpolation: .clampedCubic, baseline: 0
@@ -94,7 +94,7 @@ struct ThroughputChartView: View {
         let ulPts: [ChartPoint] = samples.enumerated().map { i, s in
             ChartPoint(x: Double(i), y: s.rateOut)
         }
-        let ulStyle = ChartSeries.ChartSeriesStyle(
+        let ulStyle = ChartSeriesStyle(
             color: .blue, lineWidth: 1.5, areaOpacity: 0.18,
             pointRadius: 0, strokeOpacity: 0.7,
             interpolation: .clampedCubic, baseline: 0
