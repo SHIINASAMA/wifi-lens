@@ -1,0 +1,63 @@
+name: Swift CI
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/swift-ci.yml"
+      - ".github/workflows/release.yml"
+      - ".gitmodules"
+      - "WiFiLens/**"
+      - "ChartLens/**"
+      - "wifi-lens.xcworkspace/**"
+      - "scripts/create-dmg.sh"
+      - "assets/**"
+  pull_request:
+    paths:
+      - ".github/workflows/swift-ci.yml"
+      - ".github/workflows/release.yml"
+      - ".gitmodules"
+      - "WiFiLens/**"
+      - "ChartLens/**"
+      - "wifi-lens.xcworkspace/**"
+      - "scripts/create-dmg.sh"
+      - "assets/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DEBUG_CONFIG: Debug
+
+jobs:
+  build-and-test:
+    runs-on: macos-26
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Init ChartLens submodule
+        run: git submodule update --init ChartLens
+
+      - name: Build
+        run: |
+          xcodebuild -workspace wifi-lens.xcworkspace \
+            -scheme "WiFi Lens" \
+            -configuration "$DEBUG_CONFIG" \
+            -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
+            build
+
+      - name: Test
+        run: |
+          xcodebuild -workspace wifi-lens.xcworkspace \
+            -scheme "WiFi Lens" \
+            -configuration "$DEBUG_CONFIG" \
+            -destination 'platform=macOS' \
+            -skipPackageUpdates \
+            -only-testing:WiFiLensTests \
+            CODE_SIGNING_ALLOWED=NO \
+            test

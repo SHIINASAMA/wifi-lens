@@ -1,68 +1,24 @@
-name: Build & Release
+name: Release
 
 on:
   push:
-    paths:
-      - "WiFiLens/**"
-      - "ChartLens/**"
-    branches:
-      - master
     tags:
       - "v*"
-  pull_request:
-    paths:
-      - "WiFiLens/**"
-      - "ChartLens/**"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 env:
-  DEBUG_CONFIG: Debug
   RELEASE_CONFIG: Release
   KEYCHAIN_PW: "ci-temporary-keychain-password"
 
 jobs:
-  build-and-test:
-    runs-on: macos-26
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-    defaults:
-      run:
-        working-directory: WiFiLens
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Init ChartLens submodule
-        run: git submodule update --init ChartLens
-
-      - name: Build
-        run: |
-          xcodebuild -workspace ../wifi-lens.xcworkspace \
-            -scheme "WiFi Lens" \
-            -configuration "$DEBUG_CONFIG" \
-            -destination 'platform=macOS' \
-            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
-            build
-
-      - name: Test
-        run: |
-          xcodebuild -workspace ../wifi-lens.xcworkspace \
-            -scheme "WiFi Lens" \
-            -configuration "$DEBUG_CONFIG" \
-            -destination 'platform=macOS' \
-            -skip-testing:WiFiLensUITests \
-            CODE_SIGNING_ALLOWED=NO \
-            test
-
   release:
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: build-and-test
     runs-on: macos-26
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       SPARKLE_VERSION: "2.9.2"
-    defaults:
-      run:
-        working-directory: WiFiLens
     steps:
       - uses: actions/checkout@v4
 
@@ -85,7 +41,7 @@ jobs:
 
       - name: Build Release (Signed)
         run: |
-          xcodebuild -workspace ../wifi-lens.xcworkspace \
+          xcodebuild -workspace wifi-lens.xcworkspace \
             -scheme "WiFi Lens" \
             -configuration "$RELEASE_CONFIG" \
             -derivedDataPath .build/DerivedData \
@@ -110,7 +66,7 @@ jobs:
 
       - name: Create DMG
         run: |
-          bash ../scripts/create-dmg.sh "$DMG_BASENAME.app" "$DMG_BASENAME.dmg"
+          bash scripts/create-dmg.sh "$DMG_BASENAME.app" "$DMG_BASENAME.dmg"
 
       - name: Sign DMG
         run: |
@@ -174,7 +130,7 @@ jobs:
         with:
           tag_name: v${{ env.VERSION }}
           files: |
-            WiFiLens/${{ env.DMG_BASENAME }}.dmg
-            WiFiLens/appcast.xml
+            ${{ env.DMG_BASENAME }}.dmg
+            appcast.xml
           draft: false
           generate_release_notes: true

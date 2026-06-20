@@ -3,4 +3,4 @@
 	url = git@github.com:SHIINASAMA/wifi-lens-pro.git
 [submodule "ChartLens"]
 	path = ChartLens
-	url = git@github.com:SHIINASAMA/chart-lens.git
+	url = https://github.com/SHIINASAMA/chart-lens.git

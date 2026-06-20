@@ -1,20 +1,11 @@
-name: Deploy to GitHub Pages
+name: Pages Deploy
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - 'web/src/**'
-      - 'web/public/**'
-      - 'web/index.html'
-      - 'web/package.json'
-      - 'web/pnpm-lock.yaml'
-      - 'web/vite.config.ts'
-      - 'web/tailwind.config.js'
-      - 'web/postcss.config.js'
-      - 'web/tsconfig.json'
-      - '.github/workflows/pages.yml'
+  workflow_run:
+    workflows:
+      - Web CI
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
@@ -28,12 +19,21 @@ concurrency:
 
 jobs:
   deploy:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_branch == 'master'
+      )
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - uses: pnpm/action-setup@v4
         with:
@@ -45,8 +45,9 @@ jobs:
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
 
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
         working-directory: web
+
       - run: pnpm build
         working-directory: web
 

@@ -1,0 +1,57 @@
+name: Web CI
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/web-ci.yml"
+      - ".github/workflows/pages-deploy.yml"
+      - "web/src/**"
+      - "web/public/**"
+      - "web/index.html"
+      - "web/package.json"
+      - "web/pnpm-lock.yaml"
+      - "web/vite.config.ts"
+      - "web/tailwind.config.js"
+      - "web/postcss.config.js"
+      - "web/tsconfig.json"
+  pull_request:
+    paths:
+      - ".github/workflows/web-ci.yml"
+      - ".github/workflows/pages-deploy.yml"
+      - "web/src/**"
+      - "web/public/**"
+      - "web/index.html"
+      - "web/package.json"
+      - "web/pnpm-lock.yaml"
+      - "web/vite.config.ts"
+      - "web/tailwind.config.js"
+      - "web/postcss.config.js"
+      - "web/tsconfig.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+        working-directory: web
+
+      - run: pnpm build
+        working-directory: web
