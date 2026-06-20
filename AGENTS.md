@@ -34,6 +34,14 @@ xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configurati
 xcodebuild -project WiFiLens/WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test -only-testing:WiFiLensTests
 xed WiFiLens/WiFiLens.xcodeproj                   # open in Xcode GUI
 
+# ChartLens library (standalone Swift Package)
+cd ChartLens && swift build                        # build
+cd ChartLens && swift test                         # test
+
+# ChartLens Demo app (Xcode project)
+xcodebuild -project ChartLensDemo/ChartLensDemo.xcodeproj -scheme "ChartLensDemo" -configuration Debug -destination 'platform=macOS' build
+xed ChartLensDemo/ChartLensDemo.xcodeproj
+
 # Website — Vite + Tailwind CSS, outputs to _site/
 cd web && npm ci && npm run dev              # dev server at localhost:5173/wifi-lens/
 cd web && npm run build                      # production build
