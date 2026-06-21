@@ -50,7 +50,7 @@ jobs:
             DEVELOPMENT_TEAM="ZMK8PL8T8J" \
             CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
             ENABLE_HARDENED_RUNTIME=YES \
-            OTHER_CODE_SIGN_FLAGS="--deep --timestamp --options=runtime" \
+            OTHER_CODE_SIGN_FLAGS="--timestamp" \
             build
 
       - name: Discover App
@@ -62,7 +62,7 @@ jobs:
 
       - name: Prepare App Bundle
         run: |
-          cp -R "$APP_PATH" "$DMG_BASENAME.app"
+          ditto "$APP_PATH" "$DMG_BASENAME.app"
 
       - name: Create DMG
         run: |
@@ -132,5 +132,5 @@ jobs:
           files: |
             ${{ env.DMG_BASENAME }}.dmg
             appcast.xml
-          draft: false
+          draft: true
           generate_release_notes: true
