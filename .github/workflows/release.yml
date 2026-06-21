@@ -5,6 +5,11 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to build (for example v1.4.2 or 1.4.2)"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -24,6 +29,23 @@ jobs:
       DMG_BASENAME: WiFiLens
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve Release Ref
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            RAW_TAG="${{ github.event.inputs.tag }}"
+            case "$RAW_TAG" in
+              v*) RELEASE_TAG="$RAW_TAG" ;;
+              *) RELEASE_TAG="v$RAW_TAG" ;;
+            esac
+            git checkout "refs/tags/$RELEASE_TAG"
+          else
+            RELEASE_TAG="${GITHUB_REF#refs/tags/}"
+          fi
+
+          echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
 
       - name: Init ChartLens submodule
         run: git submodule update --init ChartLens
@@ -101,39 +123,100 @@ jobs:
       - name: Verify Exported App Signatures
         run: |
           codesign --verify --deep --strict --verbose=4 "$APP_PATH"
-          spctl -a -vvv -t install "$APP_PATH"
 
       - name: Verify Sparkle Entitlements Isolation
         run: |
-          FORBIDDEN_PATTERNS=(
-            "com.apple.security.device.bluetooth"
-            "com.apple.security.personal-information.location"
-            "com.apple.security.files.user-selected.read-write"
-            "com.apple.security.network.server"
+          MAIN_ENTITLEMENTS_PATH="$RUNNER_TEMP/main-app.entitlements.plist"
+          SPARKLE_XPC_DIR="$APP_PATH/Contents/Frameworks/Sparkle.framework/Versions/Current/XPCServices"
+
+          if [ ! -d "$SPARKLE_XPC_DIR" ]; then
+            echo "Expected Sparkle XPC directory missing: $SPARKLE_XPC_DIR" >&2
+            exit 1
+          fi
+
+          codesign -d --entitlements :- "$APP_PATH" > "$MAIN_ENTITLEMENTS_PATH"
+          cat "$MAIN_ENTITLEMENTS_PATH"
+
+          export MAIN_ENTITLEMENTS_PATH
+          export SPARKLE_XPC_DIR
+          python3 <<'PY'
+          import glob
+          import os
+          import plistlib
+          import subprocess
+          import sys
+
+          main_path = os.environ["MAIN_ENTITLEMENTS_PATH"]
+          xpc_dir = os.environ["SPARKLE_XPC_DIR"]
+
+          explicit_forbidden = {
+              "com.apple.security.app-sandbox",
+              "com.apple.security.device.bluetooth",
+              "com.apple.security.files.user-selected.read-write",
+              "com.apple.security.inherit",
+              "com.apple.security.network.client",
+              "com.apple.security.network.server",
+              "com.apple.security.personal-information.location",
+          }
+          forbidden_prefixes = (
+              "com.apple.security.device.",
+              "com.apple.security.files.",
+              "com.apple.security.personal-information.",
           )
 
-          XPC_PATHS=(
-            "$APP_PATH/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc"
-            "$APP_PATH/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc"
-          )
+          def load_entitlements(path: str) -> dict:
+              with open(path, "rb") as fh:
+                  data = fh.read().strip()
+              return plistlib.loads(data) if data else {}
 
-          for XPC_PATH in "${XPC_PATHS[@]}"; do
-            if [ ! -d "$XPC_PATH" ]; then
-              echo "Expected Sparkle XPC missing: $XPC_PATH" >&2
-              exit 1
-            fi
+          def is_enabled(value) -> bool:
+              if isinstance(value, bool):
+                  return value
+              return value is not None
 
-            ENTITLEMENTS_PATH="$RUNNER_TEMP/$(basename "$XPC_PATH").entitlements.plist"
-            codesign -d --entitlements :- "$XPC_PATH" > "$ENTITLEMENTS_PATH"
-            cat "$ENTITLEMENTS_PATH"
+          main_entitlements = load_entitlements(main_path)
+          forbidden_keys = set(explicit_forbidden)
+          for key, value in main_entitlements.items():
+              if not key.startswith("com.apple.security."):
+                  continue
+              if key == "com.apple.security.temporary-exception.mach-lookup.global-name":
+                  continue
+              if is_enabled(value):
+                  forbidden_keys.add(key)
 
-            for PATTERN in "${FORBIDDEN_PATTERNS[@]}"; do
-              if grep -q "$PATTERN" "$ENTITLEMENTS_PATH"; then
-                echo "Forbidden entitlement $PATTERN found in $XPC_PATH" >&2
-                exit 1
-              fi
-            done
-          done
+          xpc_paths = sorted(glob.glob(os.path.join(xpc_dir, "*.xpc")))
+          if not xpc_paths:
+              print(f"No Sparkle XPC services found in {xpc_dir}", file=sys.stderr)
+              sys.exit(1)
+
+          violations = []
+          for xpc_path in xpc_paths:
+              entitlements_path = os.path.join(
+                  os.environ["RUNNER_TEMP"],
+                  f"{os.path.basename(xpc_path)}.entitlements.plist",
+              )
+              with open(entitlements_path, "wb") as fh:
+                  subprocess.run(
+                      ["codesign", "-d", "--entitlements", ":-", xpc_path],
+                      check=True,
+                      stdout=fh,
+                  )
+              entitlements = load_entitlements(entitlements_path)
+              print(f"--- {xpc_path} ---")
+              with open(entitlements_path, "r", encoding="utf-8", errors="ignore") as fh:
+                  sys.stdout.write(fh.read())
+
+              for key, value in entitlements.items():
+                  if not is_enabled(value):
+                      continue
+                  if key in forbidden_keys or key.startswith(forbidden_prefixes):
+                      violations.append((xpc_path, key))
+
+          if violations:
+              for xpc_path, key in violations:
+                  print(f"Forbidden entitlement {key} found in {xpc_path}", file=sys.stderr)
+              sys.exit(1)
+          PY
 
       - name: Prepare App Bundle
         run: |
@@ -171,11 +254,16 @@ jobs:
       - name: Staple Notarization Ticket
         run: |
           xcrun stapler staple "$DMG_BASENAME.dmg"
+          xcrun stapler validate "$DMG_BASENAME.dmg"
+
+      - name: Verify Notarized DMG
+        run: |
+          spctl -a -vvv -t install "$DMG_BASENAME.dmg"
 
       - name: Get Version
         run: |
-          TAG=${GITHUB_REF#refs/tags/v}
-          echo "VERSION=$TAG" >> "$GITHUB_ENV"
+          VERSION="${RELEASE_TAG#v}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Download Sparkle Tools
         run: |
