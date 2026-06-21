@@ -309,7 +309,7 @@ struct WiFiLensApp: App {
     @State private var crashLogText: String = ""
 
     var body: some Scene {
-        WindowGroup {
+        WindowGroup("WiFi Lens", id: "main") {
             AppRootView(
                 viewModel: viewModel,
                 roamingViewModel: roamingViewModel,
@@ -448,6 +448,9 @@ struct WiFiLensApp: App {
 
         }
 
+#if PRO
+        MenuBarScene()
+#endif
     }
 
     private var colorScheme: ColorScheme? {

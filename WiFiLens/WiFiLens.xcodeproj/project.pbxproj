@@ -234,6 +234,12 @@
 		FBD0A44F2FE5BEAC003658AD /* PRO.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = FBD0A43E2FE5BEAC003658AD /* PRO.xctestplan */; };
 		FBD0A4512FE5BF24003658AD /* WiFiLensPro-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FBD0A4502FE5BF24003658AD /* WiFiLensPro-Info.plist */; };
 		FBD0A4522FE5C05C003658AD /* RecordingModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4402FE5BEAC003658AD /* RecordingModeTests.swift */; };
+		FBD0A4592FE5C06000000006 /* MenuBarScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4572FE5C06000000004 /* MenuBarScene.swift */; };
+		FBD0A45A2FE5C06000000007 /* MenuBarScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4572FE5C06000000004 /* MenuBarScene.swift */; };
+		FBD0A45B2FE5C06000000008 /* MenuBarStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */; };
+		FBD0A45D2FE5C0600000000A /* MenuBarStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */; };
+		FBD0A45E2FE5C0600000000B /* MenuBarStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A45F2FE5C0600000000C /* MenuBarStatusView.swift */; };
+		FBD0A4602FE5C0600000000D /* MenuBarStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A45F2FE5C0600000000C /* MenuBarStatusView.swift */; };
 		FBD329502FC500000057B038 /* MetricKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD329512FC500000057B038 /* MetricKitManager.swift */; };
 		FBD7B3492FBAED57002C8F5A /* SparkleUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */; };
 		FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */; };
@@ -405,6 +411,9 @@
 		FBD0A4392FE5BEAC003658AD /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
 		FBD0A43B2FE5BEAC003658AD /* MarkdownExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownExportService.swift; sourceTree = "<group>"; };
 		FBD0A43C2FE5BEAC003658AD /* MarkdownReportExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownReportExporter.swift; sourceTree = "<group>"; };
+		FBD0A4572FE5C06000000004 /* MenuBarScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarScene.swift; sourceTree = "<group>"; };
+		FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarStatusViewModel.swift; sourceTree = "<group>"; };
+		FBD0A45F2FE5C0600000000C /* MenuBarStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarStatusView.swift; sourceTree = "<group>"; };
 		FBD0A43E2FE5BEAC003658AD /* PRO.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = PRO.xctestplan; path = ../../../Pro/Tests/TestPlans/PRO.xctestplan; sourceTree = "<group>"; };
 		FBD0A4402FE5BEAC003658AD /* RecordingModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingModeTests.swift; sourceTree = "<group>"; };
 		FBD0A4502FE5BF24003658AD /* WiFiLensPro-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "WiFiLensPro-Info.plist"; path = "../Pro/WiFiLensPro-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -773,6 +782,16 @@
 			path = SnapshotExport;
 			sourceTree = "<group>";
 		};
+		FBD0A4562FE5C06000000003 /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				FBD0A4572FE5C06000000004 /* MenuBarScene.swift */,
+				FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */,
+				FBD0A45F2FE5C0600000000C /* MenuBarStatusView.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
 		FBD0A4412FE5BEAC003658AD /* WiFiLensProUITests */ = {
 			isa = PBXGroup;
 			children = (
@@ -788,6 +807,7 @@
 				FBD0A4372FE5BEAC003658AD /* Recording */,
 				FBD0A43A2FE5BEAC003658AD /* Session */,
 				FBD0A43D2FE5BEAC003658AD /* SnapshotExport */,
+				FBD0A4562FE5C06000000003 /* MenuBar */,
 			);
 			name = Pro;
 			path = ../Pro;
@@ -1115,6 +1135,9 @@
 				3DC8FED8F49854F4CDFD4DD1 /* SnapshotToChartAdapter.swift in Sources */,
 				FB0573E32FBD0002005F9004 /* ExportService.swift in Sources */,
 				3DC8FED8F49854F4CDFD4DCC /* BandChartRenderModel.swift in Sources */,
+				FBD0A4592FE5C06000000006 /* MenuBarScene.swift in Sources */,
+				FBD0A45B2FE5C06000000008 /* MenuBarStatusViewModel.swift in Sources */,
+				FBD0A45E2FE5C0600000000B /* MenuBarStatusView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1246,6 +1269,9 @@
 				FB1E32942FC7316C009D1BDC /* HysteresisEMA.swift in Sources */,
 				FBC557F82FDBC43A0013FD7D /* ExportService.swift in Sources */,
 				3DC8FED8F49854F4CDFD4DDE /* BandChartRenderModel.swift in Sources */,
+				FBD0A45A2FE5C06000000007 /* MenuBarScene.swift in Sources */,
+				FBD0A45D2FE5C0600000000A /* MenuBarStatusViewModel.swift in Sources */,
+				FBD0A4602FE5C0600000000D /* MenuBarStatusView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
