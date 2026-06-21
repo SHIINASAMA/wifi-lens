@@ -285,11 +285,11 @@ struct SettingsView: View {
 
                         Divider()
 
-                        aboutLinkRow(icon: "bag.fill", title: String(localized: "settings.about.app_store", comment: "App Store link"), url: "https://apps.apple.com/app/wifi-lens-pro/id6744923864")
+                        aboutLinkRow(icon: "bag.fill", title: String(localized: "settings.about.app_store", comment: "App Store link"), url: "https://apps.apple.com/app/wifi-lens-pro/id6776590746")
                         aboutLinkRow(icon: "safari", title: String(localized: "settings.about.website", comment: "Product website link"), url: "https://shiinasama.github.io/wifi-lens/")
                         aboutLinkRow(icon: "chevron.left.forwardslash.chevron.right", title: String(localized: "settings.about.github", comment: "GitHub repository link"), url: "https://github.com/SHIINASAMA/wifi-lens")
-                        aboutLinkRow(icon: "bubble.left.and.bubble.right.fill", title: String(localized: "settings.about.x", comment: "X (formerly Twitter) account link"), url: "https://x.com/SHIINASAMA_")
-                        aboutLinkRow(icon: "person.fill.checkmark", title: String(localized: "settings.about.developer", comment: "Developer profile link"), url: "https://github.com/SHIINASAMA")
+                        aboutLinkRow(icon: "bubble.left.and.bubble.right.fill", title: String(localized: "settings.about.x", comment: "X (formerly Twitter) account link"), url: "https://x.com/WiFiLens")
+                        aboutLinkRow(icon: "person.fill.checkmark", title: String(localized: "settings.about.developer", comment: "Developer profile link"), url: "https://x.com/KAORU11843779")
 
                         Divider()
 
