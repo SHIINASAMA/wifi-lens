@@ -21,7 +21,6 @@ jobs:
       SPARKLE_VERSION: "2.9.2"
       ARCHIVE_PATH: ${{ github.workspace }}/build/WiFiLens.xcarchive
       EXPORT_PATH: ${{ github.workspace }}/build/export
-      EXPORT_OPTIONS_PLIST: ${{ runner.temp }}/ExportOptions.plist
       DMG_BASENAME: WiFiLens
     steps:
       - uses: actions/checkout@v4
@@ -45,6 +44,7 @@ jobs:
 
       - name: Create Export Options
         run: |
+          EXPORT_OPTIONS_PLIST="$RUNNER_TEMP/ExportOptions.plist"
           cat > "$EXPORT_OPTIONS_PLIST" <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -63,6 +63,7 @@ jobs:
           </dict>
           </plist>
           EOF
+          echo "EXPORT_OPTIONS_PLIST=$EXPORT_OPTIONS_PLIST" >> "$GITHUB_ENV"
 
       - name: Archive Release
         run: |
