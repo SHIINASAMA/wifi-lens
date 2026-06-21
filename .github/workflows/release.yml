@@ -19,6 +19,10 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       SPARKLE_VERSION: "2.9.2"
+      ARCHIVE_PATH: ${{ github.workspace }}/build/WiFiLens.xcarchive
+      EXPORT_PATH: ${{ github.workspace }}/build/export
+      EXPORT_OPTIONS_PLIST: ${{ runner.temp }}/ExportOptions.plist
+      DMG_BASENAME: WiFiLens
     steps:
       - uses: actions/checkout@v4
 
@@ -33,32 +37,102 @@ jobs:
           security create-keychain -p "$KEYCHAIN_PW" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "$KEYCHAIN_PW" build.keychain
-          security import "$CERT_PATH" -k build.keychain -P "${{ secrets.P12_PASSWORD }}" -T /usr/bin/codesign -T /usr/bin/security
+          security import "$CERT_PATH" -k build.keychain -P "${{ secrets.P12_PASSWORD }}" -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/xcodebuild
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PW" build.keychain
 
           IDENTITY=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application" | head -1 | sed 's/.*"\(.*\)"/\1/')
-          echo "SIGNING_IDENTITY=$IDENTITY" >> $GITHUB_ENV
+          echo "SIGNING_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
 
-      - name: Build Release (Signed)
+      - name: Create Export Options
         run: |
-          xcodebuild -workspace wifi-lens.xcworkspace \
+          cat > "$EXPORT_OPTIONS_PLIST" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>destination</key>
+            <string>export</string>
+            <key>method</key>
+            <string>developer-id</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>signingCertificate</key>
+            <string>Developer ID Application</string>
+            <key>teamID</key>
+            <string>${{ secrets.APPLE_TEAM_ID }}</string>
+          </dict>
+          </plist>
+          EOF
+
+      - name: Archive Release
+        run: |
+          rm -rf "$ARCHIVE_PATH" "$EXPORT_PATH"
+
+          xcodebuild archive \
+            -workspace wifi-lens.xcworkspace \
             -scheme "WiFi Lens" \
             -configuration "$RELEASE_CONFIG" \
-            -derivedDataPath .build/DerivedData \
+            -archivePath "$ARCHIVE_PATH" \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
-            DEVELOPMENT_TEAM="ZMK8PL8T8J" \
+            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
             CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
             ENABLE_HARDENED_RUNTIME=YES \
-            OTHER_CODE_SIGN_FLAGS="--timestamp" \
-            build
+            OTHER_CODE_SIGN_FLAGS="--timestamp"
 
-      - name: Discover App
+      - name: Export Archived App
         run: |
-          APP_PATH=$(find .build/DerivedData/Build/Products/"$RELEASE_CONFIG" -maxdepth 1 -name "*.app" | head -1)
-          DMG_BASENAME="WiFiLens"
-          echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
-          echo "DMG_BASENAME=$DMG_BASENAME" >> $GITHUB_ENV
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE_PATH" \
+            -exportPath "$EXPORT_PATH" \
+            -exportOptionsPlist "$EXPORT_OPTIONS_PLIST"
+
+      - name: Discover Exported App
+        run: |
+          APP_PATH=$(find "$EXPORT_PATH" -maxdepth 1 -name "*.app" | head -1)
+          if [ -z "$APP_PATH" ]; then
+            echo "Exported app not found in $EXPORT_PATH" >&2
+            exit 1
+          fi
+
+          echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
+
+      - name: Verify Exported App Signatures
+        run: |
+          codesign --verify --deep --strict --verbose=4 "$APP_PATH"
+          spctl -a -vvv -t install "$APP_PATH"
+
+      - name: Verify Sparkle Entitlements Isolation
+        run: |
+          FORBIDDEN_PATTERNS=(
+            "com.apple.security.device.bluetooth"
+            "com.apple.security.personal-information.location"
+            "com.apple.security.files.user-selected.read-write"
+            "com.apple.security.network.server"
+          )
+
+          XPC_PATHS=(
+            "$APP_PATH/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc"
+            "$APP_PATH/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc"
+          )
+
+          for XPC_PATH in "${XPC_PATHS[@]}"; do
+            if [ ! -d "$XPC_PATH" ]; then
+              echo "Expected Sparkle XPC missing: $XPC_PATH" >&2
+              exit 1
+            fi
+
+            ENTITLEMENTS_PATH="$RUNNER_TEMP/$(basename "$XPC_PATH").entitlements.plist"
+            codesign -d --entitlements :- "$XPC_PATH" > "$ENTITLEMENTS_PATH"
+            cat "$ENTITLEMENTS_PATH"
+
+            for PATTERN in "${FORBIDDEN_PATTERNS[@]}"; do
+              if grep -q "$PATTERN" "$ENTITLEMENTS_PATH"; then
+                echo "Forbidden entitlement $PATTERN found in $XPC_PATH" >&2
+                exit 1
+              fi
+            done
+          done
 
       - name: Prepare App Bundle
         run: |
@@ -100,7 +174,7 @@ jobs:
       - name: Get Version
         run: |
           TAG=${GITHUB_REF#refs/tags/v}
-          echo "VERSION=$TAG" >> $GITHUB_ENV
+          echo "VERSION=$TAG" >> "$GITHUB_ENV"
 
       - name: Download Sparkle Tools
         run: |
@@ -108,7 +182,7 @@ jobs:
             -o "$RUNNER_TEMP/sparkle.tar.xz"
           tar xf "$RUNNER_TEMP/sparkle.tar.xz" -C "$RUNNER_TEMP"
           SPARKLE_BIN_DIR=$(dirname "$(find "$RUNNER_TEMP" -name generate_appcast -type f | head -1)")
-          echo "$SPARKLE_BIN_DIR" >> $GITHUB_PATH
+          echo "$SPARKLE_BIN_DIR" >> "$GITHUB_PATH"
 
       - name: Generate Signed Appcast
         env:
