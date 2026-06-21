@@ -65,8 +65,23 @@ struct SecondaryToolbarCapsule: NSViewRepresentable {
         }
 
         for (index, item) in descriptor.items.enumerated() {
-            control.setLabel(item.title, forSegment: index)
-            control.setWidth(110, forSegment: index)
+            if item.isLocked {
+                let lockImage = NSImage(systemSymbolName: "lock.fill", accessibilityDescription: nil)?
+                    .withSymbolConfiguration(.init(pointSize: 11, weight: .medium))
+                lockImage?.isTemplate = false
+                if let lockImage {
+                    lockImage.lockFocus()
+                    NSColor.systemYellow.set()
+                    NSRect(origin: .zero, size: lockImage.size).fill(using: .sourceAtop)
+                    lockImage.unlockFocus()
+                }
+                control.setImage(lockImage, forSegment: index)
+                control.setLabel(item.title, forSegment: index)
+                control.setWidth(120, forSegment: index)
+            } else {
+                control.setLabel(item.title, forSegment: index)
+                control.setWidth(110, forSegment: index)
+            }
             control.setTag(index, forSegment: index)
         }
 

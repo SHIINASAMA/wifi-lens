@@ -106,6 +106,8 @@ struct ContentView: View {
 #if PRO
     let mode: SpectrumMode
     @Binding var recordingViewModel: RecordingViewModel?
+#else
+    let mode: SecondaryToolbarItemID
 #endif
 
     private var hiddenColumns: Binding<Set<String>> {
@@ -171,7 +173,15 @@ struct ContentView: View {
             }
         }
 #else
-        dashboardContent
+        if mode == .spectrumRecording {
+            ProFeaturePlaceholderView(
+                featureName: String(localized: "pro.recording.title", comment: "Pro recording feature title"),
+                featureDescription: String(localized: "pro.recording.description", comment: "Pro recording feature description"),
+                featureIcon: "record.circle"
+            )
+        } else {
+            dashboardContent
+        }
 #endif
     }
 

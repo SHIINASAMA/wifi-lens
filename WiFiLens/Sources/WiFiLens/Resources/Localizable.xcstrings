@@ -1474,438 +1474,6 @@
         }
       }
     },
-    "channels.recommendation_status.available.message" : {
-      "comment" : "Message when channel recommendations are available",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recommended channels are marked with a star and have passed regulatory and device checks."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Empfohlene Kanäle sind mit einem Stern markiert und haben regionale Vorschriften und Gerätechecks bestanden."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Los canales recomendados están marcados con una estrella y han superado las comprobaciones regulatorias y de compatibilidad de dispositivos."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "推奨チャンネルは★印が付いており、地域規制とデバイスチェックを通過しています。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "推荐信道标有星号，已通过地区法规和设备兼容性检查。"
-          }
-        }
-      }
-    },
-    "channels.recommendation_status.available.title" : {
-      "comment" : "Title when channel recommendations are available",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Channel recommendations available"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kanalempfehlungen verfügbar"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recomendaciones de canal disponibles"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "チャンネル推奨が利用可能です"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "信道推荐可用"
-          }
-        }
-      }
-    },
-    "channels.recommendation_status.current_good_enough.message" : {
-      "comment" : "Message when current channel is already good enough",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "After excluding your current AP, this channel is already clean enough, so WiFi Lens does not recommend switching."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nach Ausschluss Ihres aktuellen APs ist dieser Kanal bereits sauber genug, daher empfiehlt WiFi Lens keinen Wechsel."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tras excluir tu AP actual, este canal ya es lo suficientemente limpio, por lo que WiFi Lens no recomienda cambiar."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "現在のAPを除外した後、このチャンネルは十分にクリアであるため、WiFi Lensは切り替えを推奨しません。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "排除当前 AP 后，该信道已足够干净，WiFi Lens 不建议切换。"
-          }
-        }
-      }
-    },
-    "channels.recommendation_status.current_good_enough.title" : {
-      "comment" : "Title when current channel is already good enough",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Current channel is good enough"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktueller Kanal ist ausreichend"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El canal actual es suficiente"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "現在のチャンネルで十分です"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "当前信道已足够好"
-          }
-        }
-      }
-    },
-    "channels.recommendation_status.no_data.message" : {
-      "comment" : "Message when no channel data is available",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start a scan to evaluate channel quality and recommendations."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Starten Sie einen Scan, um die Kanalqualität und Empfehlungen zu bewerten."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inicia un escaneo para evaluar la calidad del canal y las recomendaciones."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "スキャンを開始して、チャンネルの品質と推奨を評価してください。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "开始扫描以评估信道质量和推荐。"
-          }
-        }
-      }
-    },
-    "channels.recommendation_status.no_data.title" : {
-      "comment" : "Title when no channel data is available",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No channel data yet"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch keine Kanaldaten"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aún no hay datos de canal"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "チャンネルデータがまだありません"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "暂无信道数据"
-          }
-        }
-      }
-    },
-    "channels.recommendation_status.no_significant_improvement.message" : {
-      "comment" : "Message when no channel is meaningfully better",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No allowed channel is at least 10 points better than the current channel under counterfactual scoring."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kein zulässiger Kanal ist unter gegenläufiger Bewertung mindestens 10 Punkte besser als der aktuelle Kanal."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ningún canal permitido es al menos 10 puntos mejor que el canal actual bajo la puntuación contrafactual."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "反事実スコアリングにおいて、許可されたチャンネルで現在のチャンネルより10点以上優れたものはありません。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "在反事实评分下，没有允许的信道比当前信道高出至少 10 分。"
-          }
-        }
-      }
-    },
-    "channels.recommendation_status.no_significant_improvement.title" : {
-      "comment" : "Title when no channel is meaningfully better",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No meaningfully better channel"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kein deutlich besserer Kanal"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No hay un canal significativamente mejor"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "有意に優れたチャンネルはありません"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "无显著更优的信道"
-          }
-        }
-      }
-    },
-    "channels.recommendation_status.regulatory_filtered.message" : {
-      "comment" : "Message when candidate channels were filtered",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "One or more counterfactual candidates were downgraded by regional rules or device compatibility checks."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein oder mehrere gegenläufige Kandidaten wurden durch regionale Vorschriften oder Gerätekompatibilitätsprüfungen herabgestuft."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Uno o más candidatos contrafactuales fueron degradados por normativas regionales o comprobaciones de compatibilidad de dispositivos."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "反事実候補の一部が、地域規制またはデバイス互換性チェックによりグレードダウンされました。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "一个或多个反事实候选信道因地区法规或设备兼容性检查而被降级。"
-          }
-        }
-      }
-    },
-    "channels.recommendation_status.regulatory_filtered.title" : {
-      "comment" : "Title when candidate channels were filtered",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Candidates filtered by rules"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kandidaten durch Vorschriften gefiltert"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Candidatos filtrados por normativa"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "規制により候補がフィルターされました"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "候选信道已被规则过滤"
-          }
-        }
-      }
-    },
-    "channels.recommendation_status.target_unknown.message" : {
-      "comment" : "Message when current AP identity is unavailable",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "WiFi Lens needs the current AP identity to exclude it from counterfactual scoring."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "WiFi Lens benötigt die Identität des aktuellen APs, um ihn aus der gegenläufigen Bewertung auszuschließen."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "WiFi Lens necesita la identidad del AP actual para excluirlo de la puntuación contrafactual."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "WiFi Lens は、反事実スコアリングから現在のAPを除外するために、そのAPの識別情報が必要です。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "WiFi Lens 需要当前 AP 的标识以将其从反事实评分中排除。"
-          }
-        }
-      }
-    },
-    "channels.recommendation_status.target_unknown.title" : {
-      "comment" : "Title when current AP identity is unavailable",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Current AP not identified"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktueller AP nicht erkannt"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AP actual no identificado"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "現在のAPが特定されていません"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "当前 AP 未识别"
-          }
-        }
-      }
-    },
     "channels.card.adj_label" : {
       "comment" : "Adjacent channel label on detail card",
       "extractionState" : "manual",
@@ -2982,6 +2550,438 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "偶尔受雷达信号影响"
+          }
+        }
+      }
+    },
+    "channels.recommendation_status.available.message" : {
+      "comment" : "Message when channel recommendations are available",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empfohlene Kanäle sind mit einem Stern markiert und haben regionale Vorschriften und Gerätechecks bestanden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recommended channels are marked with a star and have passed regulatory and device checks."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los canales recomendados están marcados con una estrella y han superado las comprobaciones regulatorias y de compatibilidad de dispositivos."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推奨チャンネルは★印が付いており、地域規制とデバイスチェックを通過しています。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推荐信道标有星号，已通过地区法规和设备兼容性检查。"
+          }
+        }
+      }
+    },
+    "channels.recommendation_status.available.title" : {
+      "comment" : "Title when channel recommendations are available",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kanalempfehlungen verfügbar"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Channel recommendations available"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recomendaciones de canal disponibles"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チャンネル推奨が利用可能です"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信道推荐可用"
+          }
+        }
+      }
+    },
+    "channels.recommendation_status.current_good_enough.message" : {
+      "comment" : "Message when current channel is already good enough",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Ausschluss Ihres aktuellen APs ist dieser Kanal bereits sauber genug, daher empfiehlt WiFi Lens keinen Wechsel."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After excluding your current AP, this channel is already clean enough, so WiFi Lens does not recommend switching."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tras excluir tu AP actual, este canal ya es lo suficientemente limpio, por lo que WiFi Lens no recomienda cambiar."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在のAPを除外した後、このチャンネルは十分にクリアであるため、WiFi Lensは切り替えを推奨しません。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "排除当前 AP 后，该信道已足够干净，WiFi Lens 不建议切换。"
+          }
+        }
+      }
+    },
+    "channels.recommendation_status.current_good_enough.title" : {
+      "comment" : "Title when current channel is already good enough",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktueller Kanal ist ausreichend"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current channel is good enough"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El canal actual es suficiente"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在のチャンネルで十分です"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前信道已足够好"
+          }
+        }
+      }
+    },
+    "channels.recommendation_status.no_data.message" : {
+      "comment" : "Message when no channel data is available",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starten Sie einen Scan, um die Kanalqualität und Empfehlungen zu bewerten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start a scan to evaluate channel quality and recommendations."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia un escaneo para evaluar la calidad del canal y las recomendaciones."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スキャンを開始して、チャンネルの品質と推奨を評価してください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始扫描以评估信道质量和推荐。"
+          }
+        }
+      }
+    },
+    "channels.recommendation_status.no_data.title" : {
+      "comment" : "Title when no channel data is available",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine Kanaldaten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No channel data yet"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no hay datos de canal"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チャンネルデータがまだありません"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无信道数据"
+          }
+        }
+      }
+    },
+    "channels.recommendation_status.no_significant_improvement.message" : {
+      "comment" : "Message when no channel is meaningfully better",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein zulässiger Kanal ist unter gegenläufiger Bewertung mindestens 10 Punkte besser als der aktuelle Kanal."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No allowed channel is at least 10 points better than the current channel under counterfactual scoring."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ningún canal permitido es al menos 10 puntos mejor que el canal actual bajo la puntuación contrafactual."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "反事実スコアリングにおいて、許可されたチャンネルで現在のチャンネルより10点以上優れたものはありません。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在反事实评分下，没有允许的信道比当前信道高出至少 10 分。"
+          }
+        }
+      }
+    },
+    "channels.recommendation_status.no_significant_improvement.title" : {
+      "comment" : "Title when no channel is meaningfully better",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein deutlich besserer Kanal"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No meaningfully better channel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay un canal significativamente mejor"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有意に優れたチャンネルはありません"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无显著更优的信道"
+          }
+        }
+      }
+    },
+    "channels.recommendation_status.regulatory_filtered.message" : {
+      "comment" : "Message when candidate channels were filtered",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein oder mehrere gegenläufige Kandidaten wurden durch regionale Vorschriften oder Gerätekompatibilitätsprüfungen herabgestuft."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One or more counterfactual candidates were downgraded by regional rules or device compatibility checks."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uno o más candidatos contrafactuales fueron degradados por normativas regionales o comprobaciones de compatibilidad de dispositivos."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "反事実候補の一部が、地域規制またはデバイス互換性チェックによりグレードダウンされました。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一个或多个反事实候选信道因地区法规或设备兼容性检查而被降级。"
+          }
+        }
+      }
+    },
+    "channels.recommendation_status.regulatory_filtered.title" : {
+      "comment" : "Title when candidate channels were filtered",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kandidaten durch Vorschriften gefiltert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Candidates filtered by rules"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Candidatos filtrados por normativa"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "規制により候補がフィルターされました"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "候选信道已被规则过滤"
+          }
+        }
+      }
+    },
+    "channels.recommendation_status.target_unknown.message" : {
+      "comment" : "Message when current AP identity is unavailable",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WiFi Lens benötigt die Identität des aktuellen APs, um ihn aus der gegenläufigen Bewertung auszuschließen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WiFi Lens needs the current AP identity to exclude it from counterfactual scoring."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WiFi Lens necesita la identidad del AP actual para excluirlo de la puntuación contrafactual."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WiFi Lens は、反事実スコアリングから現在のAPを除外するために、そのAPの識別情報が必要です。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WiFi Lens 需要当前 AP 的标识以将其从反事实评分中排除。"
+          }
+        }
+      }
+    },
+    "channels.recommendation_status.target_unknown.title" : {
+      "comment" : "Title when current AP identity is unavailable",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktueller AP nicht erkannt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current AP not identified"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AP actual no identificado"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在のAPが特定されていません"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前 AP 未识别"
           }
         }
       }
@@ -9494,6 +9494,32 @@
         }
       }
     },
+    "PRO" : {
+
+    },
+    "pro.accessibility.feature_fmt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (Pro Feature)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (Pro機能)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (Pro功能)"
+          }
+        }
+      }
+    },
     "pro.feature.recording" : {
       "comment" : "Session recording feature",
       "extractionState" : "manual",
@@ -9514,6 +9540,98 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Grabación de sesión"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション録画"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "会话录制"
+          }
+        }
+      }
+    },
+    "pro.learn_more" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learn More"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "詳細を見る"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "了解更多"
+          }
+        }
+      }
+    },
+    "pro.markdown.unavailable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Available in WiFi Lens Pro"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WiFi Lens Pro で利用可能"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WiFi Lens Pro 提供此功能"
+          }
+        }
+      }
+    },
+    "pro.recording.description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record and replay Wi-Fi sessions to analyze signal trends over time"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wi-Fiセッションを録画・再生して、時間経過に伴う信号のトレンドを分析"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录制和回放 Wi-Fi 会话，分析信号变化趋势"
+          }
+        }
+      }
+    },
+    "pro.recording.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Session Recording"
           }
         },
         "ja" : {

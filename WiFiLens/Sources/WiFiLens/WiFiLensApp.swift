@@ -108,13 +108,11 @@ private struct AppRootView: View {
                     descriptor: SecondaryToolbarDescriptor.forPage(.interfaces)!,
                     selection: $secondaryToolbarSelections.interfaces
                 )
-#if PRO
             case .spectrum:
                 SecondaryToolbarCapsule(
                     descriptor: SecondaryToolbarDescriptor.forPage(.spectrum)!,
                     selection: $secondaryToolbarSelections.spectrum
                 )
-#endif
             default:
                 EmptyView()
             }
@@ -146,7 +144,10 @@ private struct AppRootView: View {
                     )
                         .accessibilityIdentifier("page-spectrum")
 #else
-                    ContentView(viewModel: viewModel)
+                    ContentView(
+                        viewModel: viewModel,
+                        mode: secondaryToolbarSelections.spectrum
+                    )
                         .accessibilityIdentifier("page-spectrum")
 #endif
                 }
@@ -403,6 +404,10 @@ struct WiFiLensApp: App {
                         exportSnapshotMarkdown()
                     }
                     .keyboardShortcut("m", modifiers: [.command, .shift])
+#else
+                    Button(String(localized: "export.snapshot_markdown", comment: "Export as Markdown report")) { }
+                        .disabled(true)
+                        .help(String(localized: "pro.markdown.unavailable", comment: "Tooltip for unavailable Markdown export"))
 #endif
 
                     Divider()

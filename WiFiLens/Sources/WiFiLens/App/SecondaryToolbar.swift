@@ -6,15 +6,14 @@ enum SecondaryToolbarItemID: String, Hashable {
     case interfacesSimple = "interfaces-simple"
     case interfacesDetails = "interfaces-details"
     case interfacesMonitor = "interfaces-monitor"
-#if PRO
     case spectrumLive = "spectrum-live"
     case spectrumRecording = "spectrum-recording"
-#endif
 }
 
 struct SecondaryToolbarItem: Identifiable, Equatable {
     let id: SecondaryToolbarItemID
     let title: String
+    var isLocked: Bool = false
 }
 
 struct SecondaryToolbarDescriptor: Equatable {
@@ -28,7 +27,7 @@ struct SecondaryToolbarDescriptor: Equatable {
     static func forPage(_ page: SidebarPage) -> Self? {
         switch page {
         case .channels:
-            Self(
+            return Self(
                 items: [
                     SecondaryToolbarItem(
                         id: .channelsSimple,
@@ -42,7 +41,7 @@ struct SecondaryToolbarDescriptor: Equatable {
                 defaultSelection: .channelsSimple
             )
         case .interfaces:
-            Self(
+            return Self(
                 items: [
                     SecondaryToolbarItem(
                         id: .interfacesSimple,
@@ -59,9 +58,13 @@ struct SecondaryToolbarDescriptor: Equatable {
                 ],
                 defaultSelection: .interfacesSimple
             )
-#if PRO
         case .spectrum:
-            Self(
+#if PRO
+            let recordingLocked = false
+#else
+            let recordingLocked = true
+#endif
+            return Self(
                 items: [
                     SecondaryToolbarItem(
                         id: .spectrumLive,
@@ -69,14 +72,14 @@ struct SecondaryToolbarDescriptor: Equatable {
                     ),
                     SecondaryToolbarItem(
                         id: .spectrumRecording,
-                        title: String(localized: "spectrum.mode.recording_page", comment: "Recording page mode")
+                        title: String(localized: "spectrum.mode.recording_page", comment: "Recording page mode"),
+                        isLocked: recordingLocked
                     ),
                 ],
                 defaultSelection: .spectrumLive
             )
-#endif
         default:
-            nil
+            return nil
         }
     }
 }
@@ -84,9 +87,7 @@ struct SecondaryToolbarDescriptor: Equatable {
 struct SecondaryToolbarSelections: Equatable {
     var channels: SecondaryToolbarItemID = .channelsSimple
     var interfaces: SecondaryToolbarItemID = .interfacesSimple
-#if PRO
     var spectrum: SecondaryToolbarItemID = .spectrumLive
-#endif
 
     func selection(for page: SidebarPage) -> SecondaryToolbarItemID? {
         switch page {
@@ -94,10 +95,8 @@ struct SecondaryToolbarSelections: Equatable {
             channels
         case .interfaces:
             interfaces
-#if PRO
         case .spectrum:
             spectrum
-#endif
         default:
             nil
         }
@@ -109,10 +108,8 @@ struct SecondaryToolbarSelections: Equatable {
             channels = selection
         case .interfaces:
             interfaces = selection
-#if PRO
         case .spectrum:
             spectrum = selection
-#endif
         default:
             break
         }
