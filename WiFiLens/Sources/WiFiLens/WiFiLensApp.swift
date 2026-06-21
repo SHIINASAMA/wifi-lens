@@ -405,9 +405,17 @@ struct WiFiLensApp: App {
                     }
                     .keyboardShortcut("m", modifiers: [.command, .shift])
 #else
-                    Button(String(localized: "export.snapshot_markdown", comment: "Export as Markdown report")) { }
-                        .disabled(true)
-                        .help(String(localized: "pro.markdown.unavailable", comment: "Tooltip for unavailable Markdown export"))
+                    Button {
+                    } label: {
+                        Label {
+                            Text(String(localized: "export.snapshot_markdown", comment: "Export as Markdown report"))
+                        } icon: {
+                            Image(systemName: "lock.fill")
+                                .foregroundStyle(.yellow)
+                        }
+                    }
+                    .disabled(true)
+                    .help(String(localized: "pro.markdown.unavailable", comment: "Tooltip for unavailable Markdown export"))
 #endif
 
                     Divider()

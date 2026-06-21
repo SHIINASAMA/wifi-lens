@@ -265,6 +265,48 @@ struct SettingsView: View {
                 } header: {
                     Text(String(localized: "settings.privacy.header", comment: "Privacy settings section header"))
                 }
+
+                // MARK: - About
+
+                Section {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Image(systemName: "info.circle")
+                                .foregroundColor(.accentColor)
+                                .frame(width: 20)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(String(localized: "settings.about.title", comment: "App name in About section"))
+                                    .font(.headline)
+                                Text(String(format: String(localized: "settings.about.version_fmt", comment: "App version format string"), Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0", Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"))
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+
+                        Divider()
+
+                        aboutLinkRow(icon: "bag.fill", title: String(localized: "settings.about.app_store", comment: "App Store link"), url: "https://apps.apple.com/app/wifi-lens-pro/id6744923864")
+                        aboutLinkRow(icon: "safari", title: String(localized: "settings.about.website", comment: "Product website link"), url: "https://shiinasama.github.io/wifi-lens/")
+                        aboutLinkRow(icon: "chevron.left.forwardslash.chevron.right", title: String(localized: "settings.about.github", comment: "GitHub repository link"), url: "https://github.com/SHIINASAMA/wifi-lens")
+                        aboutLinkRow(icon: "bubble.left.and.bubble.right.fill", title: String(localized: "settings.about.x", comment: "X (formerly Twitter) account link"), url: "https://x.com/SHIINASAMA_")
+                        aboutLinkRow(icon: "person.fill.checkmark", title: String(localized: "settings.about.developer", comment: "Developer profile link"), url: "https://github.com/SHIINASAMA")
+
+                        Divider()
+
+                        Text(String(localized: "settings.about.dependencies_header", comment: "Core dependencies section header"))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+
+                        aboutLinkRow(icon: "chart.xyaxis.line", title: "ChartLens", url: "https://github.com/SHIINASAMA/chart-lens")
+                        aboutLinkRow(icon: "server.rack", title: "MCP Swift SDK", url: "https://github.com/nicklama/mcp-swift-sdk")
+#if OSS
+                        aboutLinkRow(icon: "sparkles", title: "Sparkle", url: "https://github.com/sparkle-project/Sparkle")
+#endif
+                    }
+                    .padding(.vertical, 4)
+                } header: {
+                    Text(String(localized: "settings.about.header", comment: "About section header"))
+                }
             }
             .formStyle(.grouped)
             .frame(maxWidth: 520)
@@ -287,6 +329,27 @@ struct SettingsView: View {
     private func refreshPermissionStatuses() {
         locationPermission.refreshStatus()
         bluetoothPermission?.refreshStatus()
+    }
+
+    private func aboutLinkRow(icon: String, title: String, url: String) -> some View {
+        Button {
+            if let url = URL(string: url) {
+                NSWorkspace.shared.open(url)
+            }
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .foregroundColor(.accentColor)
+                    .frame(width: 20)
+                Text(title)
+                    .foregroundColor(.primary)
+                Spacer()
+                Image(systemName: "arrow.up.right")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .buttonStyle(.plain)
     }
 }
 
