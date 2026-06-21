@@ -236,10 +236,18 @@
 		FBD0A4522FE5C05C003658AD /* RecordingModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4402FE5BEAC003658AD /* RecordingModeTests.swift */; };
 		FBD0A4592FE5C06000000006 /* MenuBarScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4572FE5C06000000004 /* MenuBarScene.swift */; };
 		FBD0A45A2FE5C06000000007 /* MenuBarScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4572FE5C06000000004 /* MenuBarScene.swift */; };
+		FBD0A46A2FE5C06000000017 /* SparklineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A46B2FE5C06000000018 /* SparklineView.swift */; };
+		FBD0A46C2FE5C06000000019 /* SparklineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A46B2FE5C06000000018 /* SparklineView.swift */; };
 		FBD0A45B2FE5C06000000008 /* MenuBarStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */; };
 		FBD0A45D2FE5C0600000000A /* MenuBarStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */; };
 		FBD0A45E2FE5C0600000000B /* MenuBarStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A45F2FE5C0600000000C /* MenuBarStatusView.swift */; };
 		FBD0A4602FE5C0600000000D /* MenuBarStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A45F2FE5C0600000000C /* MenuBarStatusView.swift */; };
+		FBD0A4612FE5C0600000000E /* ConnectionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4622FE5C0600000000F /* ConnectionRecord.swift */; };
+		FBD0A4632FE5C06000000010 /* ConnectionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4622FE5C0600000000F /* ConnectionRecord.swift */; };
+		FBD0A4642FE5C06000000011 /* ConnectionRecordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4652FE5C06000000012 /* ConnectionRecordStore.swift */; };
+		FBD0A4662FE5C06000000013 /* ConnectionRecordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4652FE5C06000000012 /* ConnectionRecordStore.swift */; };
+		FBD0A4672FE5C06000000014 /* ConnectionRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4682FE5C06000000015 /* ConnectionRecorder.swift */; };
+		FBD0A4692FE5C06000000016 /* ConnectionRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4682FE5C06000000015 /* ConnectionRecorder.swift */; };
 		FBD329502FC500000057B038 /* MetricKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD329512FC500000057B038 /* MetricKitManager.swift */; };
 		FBD7B3492FBAED57002C8F5A /* SparkleUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */; };
 		FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */; };
@@ -412,8 +420,12 @@
 		FBD0A43B2FE5BEAC003658AD /* MarkdownExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownExportService.swift; sourceTree = "<group>"; };
 		FBD0A43C2FE5BEAC003658AD /* MarkdownReportExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownReportExporter.swift; sourceTree = "<group>"; };
 		FBD0A4572FE5C06000000004 /* MenuBarScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarScene.swift; sourceTree = "<group>"; };
+		FBD0A46B2FE5C06000000018 /* SparklineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparklineView.swift; sourceTree = "<group>"; };
 		FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarStatusViewModel.swift; sourceTree = "<group>"; };
 		FBD0A45F2FE5C0600000000C /* MenuBarStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarStatusView.swift; sourceTree = "<group>"; };
+		FBD0A4622FE5C0600000000F /* ConnectionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionRecord.swift; sourceTree = "<group>"; };
+		FBD0A4652FE5C06000000012 /* ConnectionRecordStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionRecordStore.swift; sourceTree = "<group>"; };
+		FBD0A4682FE5C06000000015 /* ConnectionRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionRecorder.swift; sourceTree = "<group>"; };
 		FBD0A43E2FE5BEAC003658AD /* PRO.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = PRO.xctestplan; path = ../../../Pro/Tests/TestPlans/PRO.xctestplan; sourceTree = "<group>"; };
 		FBD0A4402FE5BEAC003658AD /* RecordingModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingModeTests.swift; sourceTree = "<group>"; };
 		FBD0A4502FE5BF24003658AD /* WiFiLensPro-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "WiFiLensPro-Info.plist"; path = "../Pro/WiFiLensPro-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -788,6 +800,10 @@
 				FBD0A4572FE5C06000000004 /* MenuBarScene.swift */,
 				FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */,
 				FBD0A45F2FE5C0600000000C /* MenuBarStatusView.swift */,
+				FBD0A4622FE5C0600000000F /* ConnectionRecord.swift */,
+				FBD0A4652FE5C06000000012 /* ConnectionRecordStore.swift */,
+				FBD0A4682FE5C06000000015 /* ConnectionRecorder.swift */,
+				FBD0A46B2FE5C06000000018 /* SparklineView.swift */,
 			);
 			path = MenuBar;
 			sourceTree = "<group>";
@@ -1138,6 +1154,10 @@
 				FBD0A4592FE5C06000000006 /* MenuBarScene.swift in Sources */,
 				FBD0A45B2FE5C06000000008 /* MenuBarStatusViewModel.swift in Sources */,
 				FBD0A45E2FE5C0600000000B /* MenuBarStatusView.swift in Sources */,
+				FBD0A4612FE5C0600000000E /* ConnectionRecord.swift in Sources */,
+				FBD0A4642FE5C06000000011 /* ConnectionRecordStore.swift in Sources */,
+				FBD0A4672FE5C06000000014 /* ConnectionRecorder.swift in Sources */,
+				FBD0A46A2FE5C06000000017 /* SparklineView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1272,6 +1292,10 @@
 				FBD0A45A2FE5C06000000007 /* MenuBarScene.swift in Sources */,
 				FBD0A45D2FE5C0600000000A /* MenuBarStatusViewModel.swift in Sources */,
 				FBD0A4602FE5C0600000000D /* MenuBarStatusView.swift in Sources */,
+				FBD0A4632FE5C06000000010 /* ConnectionRecord.swift in Sources */,
+				FBD0A4662FE5C06000000013 /* ConnectionRecordStore.swift in Sources */,
+				FBD0A4692FE5C06000000016 /* ConnectionRecorder.swift in Sources */,
+				FBD0A46C2FE5C06000000019 /* SparklineView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
