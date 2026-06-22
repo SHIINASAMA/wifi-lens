@@ -1,5 +1,16 @@
 import Foundation
 
+protocol DeviceCapabilitiesProviding: Sendable {
+    func supportedWLANChannelsRaw() async -> [(Int, Int)]
+    func devicePHYCapabilities() async -> DevicePHYCapabilities
+}
+
+struct WiFiDeviceCapabilitiesProvider: DeviceCapabilitiesProviding {
+    private let scanner = WiFiScanner()
+    func supportedWLANChannelsRaw() async -> [(Int, Int)] { await scanner.supportedWLANChannelsRaw() }
+    func devicePHYCapabilities() async -> DevicePHYCapabilities { await scanner.devicePHYCapabilities() }
+}
+
 protocol WiFiObservationPipelining: Sendable {
     func refreshCurrentConnection() async -> WiFiObservation
     func refreshEnvironmentScan() async -> WiFiObservation
@@ -10,15 +21,18 @@ struct WiFiObservationPipeline: WiFiObservationPipelining {
     let currentConnectionProvider: WiFiCurrentConnectionProviding
     let environmentScanProvider: WiFiEnvironmentScanProviding
     let gatewayLatencyProvider: GatewayLatencyProviding
+    let deviceCapabilitiesProvider: DeviceCapabilitiesProviding
 
     init(
         currentConnectionProvider: WiFiCurrentConnectionProviding = WiFiCurrentConnectionProvider(),
         environmentScanProvider: WiFiEnvironmentScanProviding = WiFiEnvironmentScanProvider(),
-        gatewayLatencyProvider: GatewayLatencyProviding = GatewayLatencyProvider()
+        gatewayLatencyProvider: GatewayLatencyProviding = GatewayLatencyProvider(),
+        deviceCapabilitiesProvider: DeviceCapabilitiesProviding = WiFiDeviceCapabilitiesProvider()
     ) {
         self.currentConnectionProvider = currentConnectionProvider
         self.environmentScanProvider = environmentScanProvider
         self.gatewayLatencyProvider = gatewayLatencyProvider
+        self.deviceCapabilitiesProvider = deviceCapabilitiesProvider
     }
 
     func refreshCurrentConnection() async -> WiFiObservation {
@@ -44,9 +58,8 @@ struct WiFiObservationPipeline: WiFiObservationPipelining {
             targetAP: nil
         )
 
-        let scanner = WiFiScanner()
-        let rawChannels = await scanner.supportedWLANChannelsRaw()
-        let deviceCapabilities = await scanner.devicePHYCapabilities()
+        let rawChannels = await deviceCapabilitiesProvider.supportedWLANChannelsRaw()
+        let deviceCapabilities = await deviceCapabilitiesProvider.devicePHYCapabilities()
         let deviceSupportedChannels = Set(rawChannels.map { "\($0.0)-\($0.1)" })
 
         let apCountryCodes: [String] = snapshot.networks.compactMap { $0.capabilities.countryCode }
@@ -84,6 +97,7 @@ struct WiFiObservationPipeline: WiFiObservationPipelining {
         var observation = current
         observation.environmentSnapshot = scan.environmentSnapshot
         observation.channelAnalysis = scan.channelAnalysis
+        observation.channelRecommendation = scan.channelRecommendation
         observation.errors.append(contentsOf: scan.errors)
         observation.diagnosis = DiagnosticEvaluator.evaluate(
             currentStatus: current.currentStatus ?? WiFiCurrentStatus(

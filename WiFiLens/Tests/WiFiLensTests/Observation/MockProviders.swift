@@ -16,6 +16,13 @@ struct MockGatewayLatencyProvider: GatewayLatencyProviding {
     func measure(routerIP: String?) async -> GatewayLatencyResult { result }
 }
 
+struct MockDeviceCapabilitiesProvider: DeviceCapabilitiesProviding {
+    var channelsRaw: [(Int, Int)] = []
+    var capabilities: DevicePHYCapabilities = .default
+    func supportedWLANChannelsRaw() async -> [(Int, Int)] { channelsRaw }
+    func devicePHYCapabilities() async -> DevicePHYCapabilities { capabilities }
+}
+
 struct MockPipeline: WiFiObservationPipelining {
     var currentObservation: WiFiObservation
     var environmentObservation: WiFiObservation
