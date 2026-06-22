@@ -10,7 +10,7 @@ enum ChannelOccupancyAnalyzer {
         var seen = [String: ChannelQualityCalculator.APInfo]()
         for obs in snapshot.networks {
             let key = "\(obs.bssid)-\(obs.channel.band.rawValue)"
-            let widthLabel = channelWidthLabel(obs.channel.channelWidthMHz)
+            let widthLabel = channelWidthLabel(obs.capabilities.channelWidth)
             let span = ChannelSpanCalculator.channelBlock(
                 primaryChannel: obs.channel.channelNumber,
                 widthMHz: obs.channel.channelWidthMHz,

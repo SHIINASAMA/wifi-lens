@@ -43,6 +43,28 @@ struct WiFiObservationPipeline: WiFiObservationPipelining {
             supportedBands: ["24", "5", "6"],
             targetAP: nil
         )
+
+        let scanner = WiFiScanner()
+        let rawChannels = await scanner.supportedWLANChannelsRaw()
+        let deviceCapabilities = await scanner.devicePHYCapabilities()
+        let deviceSupportedChannels = Set(rawChannels.map { "\($0.0)-\($0.1)" })
+
+        let apCountryCodes: [String] = snapshot.networks.compactMap { $0.capabilities.countryCode }
+        let inferredRegion = RegulatoryDomainResolver.resolve(
+            userOverride: nil,
+            userDefaultsOverride: nil,
+            supportedChannelsRaw: rawChannels,
+            apCountryCodes: apCountryCodes
+        )
+
+        let channelRecommendation = ChannelRecommendationEngine.recommend(
+            channelAnalysis: channelAnalysis,
+            snapshot: snapshot,
+            inferredRegion: inferredRegion,
+            deviceSupportedChannels: deviceSupportedChannels,
+            deviceCapabilities: deviceCapabilities
+        )
+
         var errors: [WiFiObservationError] = []
         if let snapshotError = snapshot.error {
             errors.append(snapshotError)
@@ -50,6 +72,7 @@ struct WiFiObservationPipeline: WiFiObservationPipelining {
         return WiFiObservation(
             environmentSnapshot: snapshot,
             channelAnalysis: channelAnalysis,
+            channelRecommendation: channelRecommendation,
             errors: errors
         )
     }
