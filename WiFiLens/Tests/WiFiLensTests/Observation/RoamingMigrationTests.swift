@@ -5,6 +5,15 @@ import Testing
 @Suite("Roaming Migration")
 @MainActor
 struct RoamingMigrationTests {
+    private func waitUntil(_ condition: @MainActor () -> Bool) async -> Bool {
+        for _ in 0..<50 {
+            if condition() {
+                return true
+            }
+            try? await Task.sleep(for: .milliseconds(20))
+        }
+        return condition()
+    }
 
     private func connectedStatus(
         ssid: String = "TestNet",
@@ -34,7 +43,7 @@ struct RoamingMigrationTests {
         let vm = RoamingTestViewModel(roamingProvider: provider)
 
         vm.checkReadiness()
-        try? await Task.sleep(for: .milliseconds(100))
+        #expect(await waitUntil { vm.state == .ready })
 
         #expect(vm.state == .ready)
         #expect(vm.currentSSID == "TestNet")
@@ -56,7 +65,7 @@ struct RoamingMigrationTests {
         let vm = RoamingTestViewModel(roamingProvider: provider)
 
         vm.checkReadiness()
-        try? await Task.sleep(for: .milliseconds(100))
+        #expect(await waitUntil { vm.errorMessage != nil })
 
         #expect(vm.state == .idle)
         #expect(vm.errorMessage != nil)
@@ -69,11 +78,11 @@ struct RoamingMigrationTests {
         let vm = RoamingTestViewModel(roamingProvider: provider)
 
         vm.checkReadiness()
-        try? await Task.sleep(for: .milliseconds(100))
+        #expect(await waitUntil { vm.state == .ready })
         #expect(vm.state == .ready)
 
         vm.startTest()
-        try? await Task.sleep(for: .milliseconds(100))
+        #expect(await waitUntil { vm.state == .running && vm.segments.count == 1 })
 
         #expect(vm.state == .running)
         #expect(vm.segments.count == 1)
@@ -97,11 +106,11 @@ struct RoamingMigrationTests {
         )
 
         vm.checkReadiness()
-        try? await Task.sleep(for: .milliseconds(100))
+        #expect(await waitUntil { vm.state == .ready })
         #expect(vm.state == .ready)
 
         vm.startTest()
-        try? await Task.sleep(for: .milliseconds(100))
+        #expect(await waitUntil { vm.state == .running })
         #expect(vm.state == .running)
         vm.stopTest()
     }

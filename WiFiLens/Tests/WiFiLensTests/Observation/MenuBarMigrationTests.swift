@@ -92,6 +92,36 @@ struct MenuBarMigrationTests {
         #expect(vm.isLoading == false)
     }
 
+    @Test("fetch with injected controller reads that controller store")
+    func fetchWithControllerOnlyUsesControllerStore() async {
+        let status = WiFiCurrentStatus(
+            timestamp: Date(),
+            interfaceName: "en0",
+            ssid: "ControllerNet",
+            bssid: "11:22:33:44:55:66",
+            channel: 149,
+            rssi: -52,
+            isConnected: true,
+            isWiFiPowerOn: true
+        )
+        let observation = WiFiObservation(currentStatus: status)
+        let mockPipeline = MockPipeline(
+            currentObservation: observation,
+            environmentObservation: WiFiObservation(),
+            fullObservation: observation
+        )
+        let store = WiFiObservationStore()
+        let controller = WiFiObservationController(pipeline: mockPipeline, store: store)
+        let vm = MenuBarStatusViewModel(controller: controller)
+
+        await vm.fetch()
+
+        #expect(vm.ssid == "ControllerNet")
+        #expect(vm.bssid == "11:22:33:44:55:66")
+        #expect(vm.channel == 149)
+        #expect(vm.errorMessage == nil)
+    }
+
     @Test("fetch sets error when disconnected")
     func fetchDisconnected() async {
         let status = WiFiCurrentStatus(

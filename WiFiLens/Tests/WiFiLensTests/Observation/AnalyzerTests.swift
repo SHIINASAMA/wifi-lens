@@ -77,4 +77,27 @@ struct AnalyzerTests {
         )
         #expect(result.severity == .excellent)
     }
+
+    @Test("DiagnosticEvaluator: congested message formats integer inputs")
+    func congestedDiagnosticFormatsIntegers() {
+        let status = WiFiCurrentStatus(
+            timestamp: Date(), ssid: "Net", bssid: "AA:BB", channel: 6,
+            rssi: -60, security: "WPA3", isConnected: true, isWiFiPowerOn: true
+        )
+        let ch = ChannelQuality(
+            channel: 6, band: "24", bandDisplay: "2.4 GHz",
+            qualityScore: 35, qualityLevel: .congested,
+            apCount: 8, coChannelCount: 5, adjacentCount: 3,
+            interferenceScore: 65, overlapLevel: .high,
+            strongestNeighborRSSI: -50, isCurrentChannel: true
+        )
+        let result = DiagnosticEvaluator.evaluate(
+            currentStatus: status, channelAnalysis: [ch], channelRecommendations: []
+        )
+        #expect(result.severity == .warning)
+        #expect(result.message.contains("6"))
+        #expect(result.message.contains("8"))
+        #expect(!result.message.contains("%1$"))
+        #expect(!result.message.contains("observation.diagnosis"))
+    }
 }
