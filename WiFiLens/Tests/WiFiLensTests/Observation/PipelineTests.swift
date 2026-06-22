@@ -1,11 +1,23 @@
+import Foundation
 import Testing
-@testable import WiFiLens
+@testable import WiFi_Lens
 
 @Suite("WiFiObservationPipeline")
 struct PipelineTests {
     @Test("refreshCurrentConnection returns currentStatus + quality, no environment")
     func currentConnectionOnly() async {
-        let pipeline = WiFiObservationPipeline()
+        let status = WiFiCurrentStatus(
+            timestamp: Date(), ssid: "Test", bssid: "AA:BB", channel: 36,
+            rssi: -50, isConnected: true, isWiFiPowerOn: true
+        )
+        let latency = GatewayLatencyResult(timestamp: Date(), latencyMs: 20)
+        let pipeline = WiFiObservationPipeline(
+            currentConnectionProvider: MockCurrentConnectionProvider(result: status),
+            environmentScanProvider: MockEnvironmentScanProvider(result: WiFiEnvironmentSnapshot(
+                timestamp: Date(), interfaceName: "en0", networks: []
+            )),
+            gatewayLatencyProvider: MockGatewayLatencyProvider(result: latency)
+        )
         let obs = await pipeline.refreshCurrentConnection()
         #expect(obs.currentStatus != nil)
         #expect(obs.quality != nil)
@@ -14,7 +26,18 @@ struct PipelineTests {
 
     @Test("refreshEnvironmentScan returns snapshot, no currentStatus")
     func environmentScanOnly() async {
-        let pipeline = WiFiObservationPipeline()
+        let snapshot = WiFiEnvironmentSnapshot(
+            timestamp: Date(), interfaceName: "en0", networks: []
+        )
+        let pipeline = WiFiObservationPipeline(
+            currentConnectionProvider: MockCurrentConnectionProvider(result: WiFiCurrentStatus(
+                timestamp: Date(), isConnected: false, isWiFiPowerOn: true
+            )),
+            environmentScanProvider: MockEnvironmentScanProvider(result: snapshot),
+            gatewayLatencyProvider: MockGatewayLatencyProvider(result: GatewayLatencyResult(
+                timestamp: Date()
+            ))
+        )
         let obs = await pipeline.refreshEnvironmentScan()
         #expect(obs.environmentSnapshot != nil)
         #expect(obs.currentStatus == nil)
@@ -22,7 +45,19 @@ struct PipelineTests {
 
     @Test("refreshFullObservation returns all fields")
     func fullObservation() async {
-        let pipeline = WiFiObservationPipeline()
+        let status = WiFiCurrentStatus(
+            timestamp: Date(), ssid: "Test", bssid: "AA:BB", channel: 36,
+            rssi: -50, isConnected: true, isWiFiPowerOn: true
+        )
+        let latency = GatewayLatencyResult(timestamp: Date(), latencyMs: 20)
+        let snapshot = WiFiEnvironmentSnapshot(
+            timestamp: Date(), interfaceName: "en0", networks: []
+        )
+        let pipeline = WiFiObservationPipeline(
+            currentConnectionProvider: MockCurrentConnectionProvider(result: status),
+            environmentScanProvider: MockEnvironmentScanProvider(result: snapshot),
+            gatewayLatencyProvider: MockGatewayLatencyProvider(result: latency)
+        )
         let obs = await pipeline.refreshFullObservation()
         #expect(obs.currentStatus != nil)
         #expect(obs.environmentSnapshot != nil)

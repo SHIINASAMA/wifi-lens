@@ -10,16 +10,36 @@ struct WiFiEnvironmentScanProvider: WiFiEnvironmentScanProviding {
     func scanEnvironment() async -> WiFiEnvironmentSnapshot {
         let startTime = Date()
         var networks: [WiFiNetwork] = []
+        var scanError: String?
 
         let scanStream = await scanner.startScanning(interval: .seconds(0))
+        defer { Task { await scanner.stopScanning() } }
+
+        let deadline = Date().addingTimeInterval(10)
         for await event in scanStream {
-            if case .networks(let nw) = event {
+            if Date() > deadline {
+                scanError = "Scan timed out after 10 seconds"
+                break
+            }
+            switch event {
+            case .networks(let nw):
                 networks = nw
+                break
+            case .failure(let msg):
+                scanError = msg
                 break
             }
         }
 
-        await scanner.stopScanning()
+        if let scanError {
+            return WiFiEnvironmentSnapshot(
+                timestamp: Date(),
+                interfaceName: nil,
+                networks: [],
+                scanDurationMs: Date().timeIntervalSince(startTime) * 1000,
+                error: WiFiObservationError.environmentScanFailed(scanError)
+            )
+        }
 
         let currentBSSID: String? = await MainActor.run {
             NetworkInfoService.fetchAll().first(where: { $0.ssid != nil })?.bssid

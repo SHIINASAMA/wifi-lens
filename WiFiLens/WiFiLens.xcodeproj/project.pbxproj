@@ -312,6 +312,7 @@
 		OB00000000000000000000A7 /* WiFiObservationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000092 /* WiFiObservationController.swift */; };
 		OB0000000000000000000098 /* PipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000093 /* PipelineTests.swift */; };
 		OB0000000000000000000099 /* ControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000094 /* ControllerTests.swift */; };
+		OB00000000000000000000A9 /* MockProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000A8 /* MockProviders.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -524,6 +525,7 @@
 		OB0000000000000000000092 /* WiFiObservationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationController.swift; sourceTree = "<group>"; };
 		OB0000000000000000000093 /* PipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineTests.swift; sourceTree = "<group>"; };
 		OB0000000000000000000094 /* ControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerTests.swift; sourceTree = "<group>"; };
+		OB00000000000000000000A8 /* MockProviders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockProviders.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1041,6 +1043,7 @@
 				OB0000000000000000000057 /* AnalyzerTests.swift */,
 				OB0000000000000000000093 /* PipelineTests.swift */,
 				OB0000000000000000000094 /* ControllerTests.swift */,
+				OB00000000000000000000A8 /* MockProviders.swift */,
 			);
 			path = Observation;
 			sourceTree = "<group>";
@@ -1419,6 +1422,7 @@
 				OB0000000000000000000081 /* AnalyzerTests.swift in Sources */,
 				OB0000000000000000000098 /* PipelineTests.swift in Sources */,
 				OB0000000000000000000099 /* ControllerTests.swift in Sources */,
+				OB00000000000000000000A9 /* MockProviders.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

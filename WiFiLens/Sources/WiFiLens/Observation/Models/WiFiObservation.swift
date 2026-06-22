@@ -46,6 +46,8 @@ struct WiFiObservation: Equatable, Sendable {
         lhs.events == rhs.events &&
         lhs.errors == rhs.errors &&
         (lhs.channelAnalysis?.count == rhs.channelAnalysis?.count) &&
-        (lhs.channelRecommendation?.count == rhs.channelRecommendation?.count)
+        (lhs.channelAnalysis?.first?.qualityScore == rhs.channelAnalysis?.first?.qualityScore) &&
+        (lhs.channelRecommendation?.count == rhs.channelRecommendation?.count) &&
+        (lhs.channelRecommendation?.first?.channel == rhs.channelRecommendation?.first?.channel)
     }
 }
