@@ -8,8 +8,8 @@ enum NetworkObservationAdapter {
     ) -> WiFiNetworkObservation {
         let ieData = network.ieData
         let capabilities = ieData.map { IEParser.parse(data: $0) }
-            .map { parseCapabilities($0) }
-            ?? .empty
+            .map { parseCapabilities($0, fallbackWidth: network.channel.channelWidthMHz) }
+            ?? WiFiNetworkCapabilities.emptyWithWidth(network.channel.channelWidthMHz)
 
         let isCurrent = isCurrentNetwork || network.bssid == currentBSSID
 
@@ -32,7 +32,7 @@ enum NetworkObservationAdapter {
         networks.map { adapt($0, currentBSSID: currentBSSID) }
     }
 
-    static func parseCapabilities(_ ie: IEData) -> WiFiNetworkCapabilities {
+    static func parseCapabilities(_ ie: IEData, fallbackWidth: Int = 20) -> WiFiNetworkCapabilities {
         let phyMode: String = {
             if ie.heSupported { return "ax" }
             if ie.vhtSupported { return "ac" }
@@ -44,7 +44,7 @@ enum NetworkObservationAdapter {
             if ie.supports160MHz { return 160 }
             if ie.supports80MHz { return 80 }
             if ie.supports40MHz { return 40 }
-            return 20
+            return fallbackWidth
         }()
 
         return WiFiNetworkCapabilities(

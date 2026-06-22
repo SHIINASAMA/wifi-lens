@@ -26,4 +26,10 @@ struct WiFiNetworkCapabilities: Equatable, Sendable {
         nss: nil,
         security: nil
     )
+
+    static func emptyWithWidth(_ width: Int) -> WiFiNetworkCapabilities {
+        var caps = WiFiNetworkCapabilities.empty
+        caps.channelWidth = width
+        return caps
+    }
 }
