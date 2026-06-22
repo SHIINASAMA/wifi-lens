@@ -269,6 +269,7 @@
 		OB0000000000000000000018 /* DiagnosticResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000008 /* DiagnosticResult.swift */; };
 		OB0000000000000000000019 /* WiFiObservationEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000009 /* WiFiObservationEvent.swift */; };
 		OB000000000000000000001A /* WiFiObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000A /* WiFiObservation.swift */; };
+		OB000000000000000000001B /* NetworkObservationAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000C /* NetworkObservationAdapter.swift */; };
 		OB0000000000000000000021 /* WiFiObservationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000001 /* WiFiObservationError.swift */; };
 		OB0000000000000000000022 /* WiFiCurrentStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000002 /* WiFiCurrentStatus.swift */; };
 		OB0000000000000000000023 /* WiFiNetworkCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000003 /* WiFiNetworkCapabilities.swift */; };
@@ -279,6 +280,7 @@
 		OB0000000000000000000028 /* DiagnosticResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000008 /* DiagnosticResult.swift */; };
 		OB0000000000000000000029 /* WiFiObservationEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000009 /* WiFiObservationEvent.swift */; };
 		OB000000000000000000002A /* WiFiObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000A /* WiFiObservation.swift */; };
+		OB000000000000000000002B /* NetworkObservationAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000C /* NetworkObservationAdapter.swift */; };
 		OB0000000000000000000031 /* ModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000B /* ModelsTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -473,6 +475,7 @@
 		OB0000000000000000000008 /* DiagnosticResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticResult.swift; sourceTree = "<group>"; };
 		OB0000000000000000000009 /* WiFiObservationEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEvent.swift; sourceTree = "<group>"; };
 		OB000000000000000000000A /* WiFiObservation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservation.swift; sourceTree = "<group>"; };
+		OB000000000000000000000C /* NetworkObservationAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkObservationAdapter.swift; sourceTree = "<group>"; };
 		OB000000000000000000000B /* ModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelsTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -941,8 +944,17 @@
 			isa = PBXGroup;
 			children = (
 				OB0000000000000000000041 /* Models */,
+				OB0000000000000000000044 /* Adapters */,
 			);
 			path = Observation;
+			sourceTree = "<group>";
+		};
+		OB0000000000000000000044 /* Adapters */ = {
+			isa = PBXGroup;
+			children = (
+				OB000000000000000000000C /* NetworkObservationAdapter.swift */,
+			);
+			path = Adapters;
 			sourceTree = "<group>";
 		};
 		OB0000000000000000000043 /* Observation */ = {
@@ -1250,6 +1262,7 @@
 				OB0000000000000000000018 /* DiagnosticResult.swift in Sources */,
 				OB0000000000000000000019 /* WiFiObservationEvent.swift in Sources */,
 				OB000000000000000000001A /* WiFiObservation.swift in Sources */,
+				OB000000000000000000001B /* NetworkObservationAdapter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1402,6 +1415,7 @@
 				OB0000000000000000000028 /* DiagnosticResult.swift in Sources */,
 				OB0000000000000000000029 /* WiFiObservationEvent.swift in Sources */,
 				OB000000000000000000002A /* WiFiObservation.swift in Sources */,
+				OB000000000000000000002B /* NetworkObservationAdapter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
