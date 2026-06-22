@@ -63,4 +63,31 @@ struct PipelineTests {
         #expect(obs.environmentSnapshot != nil)
         #expect(obs.diagnosis != nil)
     }
+
+    @Test("refreshFullObservation propagates scan errors")
+    func fullObservationScanError() async {
+        let status = WiFiCurrentStatus(
+            timestamp: Date(), ssid: "Test", bssid: "AA:BB", channel: 36,
+            rssi: -50, isConnected: true, isWiFiPowerOn: true
+        )
+        let latency = GatewayLatencyResult(timestamp: Date(), latencyMs: 20)
+        let errorSnapshot = WiFiEnvironmentSnapshot(
+            timestamp: Date(),
+            interfaceName: nil,
+            networks: [],
+            error: .environmentScanFailed("permission denied")
+        )
+        let pipeline = WiFiObservationPipeline(
+            currentConnectionProvider: MockCurrentConnectionProvider(result: status),
+            environmentScanProvider: MockEnvironmentScanProvider(result: errorSnapshot),
+            gatewayLatencyProvider: MockGatewayLatencyProvider(result: latency)
+        )
+        let obs = await pipeline.refreshFullObservation()
+        #expect(obs.errors.count == 1)
+        if case .environmentScanFailed(let msg) = obs.errors.first {
+            #expect(msg == "permission denied")
+        } else {
+            Issue.record("Expected environmentScanFailed error")
+        }
+    }
 }

@@ -61,6 +61,7 @@ struct WiFiObservationPipeline: WiFiObservationPipelining {
         var observation = current
         observation.environmentSnapshot = scan.environmentSnapshot
         observation.channelAnalysis = scan.channelAnalysis
+        observation.errors.append(contentsOf: scan.errors)
         observation.diagnosis = DiagnosticEvaluator.evaluate(
             currentStatus: current.currentStatus ?? WiFiCurrentStatus(
                 timestamp: Date(), isConnected: false, isWiFiPowerOn: true
