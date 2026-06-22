@@ -259,6 +259,27 @@
 		FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */; };
 		FCCEB24ABEECEAE7B03195AD /* BLEDeviceTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D296EB5CEF7484BA599C2F9 /* BLEDeviceTracker.swift */; };
 		FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6203A2551742DF77D61785FE /* WiFiChannel.swift */; };
+		OB0000000000000000000011 /* WiFiObservationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000001 /* WiFiObservationError.swift */; };
+		OB0000000000000000000012 /* WiFiCurrentStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000002 /* WiFiCurrentStatus.swift */; };
+		OB0000000000000000000013 /* WiFiNetworkCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000003 /* WiFiNetworkCapabilities.swift */; };
+		OB0000000000000000000014 /* WiFiNetworkObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000004 /* WiFiNetworkObservation.swift */; };
+		OB0000000000000000000015 /* WiFiEnvironmentSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000005 /* WiFiEnvironmentSnapshot.swift */; };
+		OB0000000000000000000016 /* GatewayLatencyResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000006 /* GatewayLatencyResult.swift */; };
+		OB0000000000000000000017 /* WiFiQualityResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000007 /* WiFiQualityResult.swift */; };
+		OB0000000000000000000018 /* DiagnosticResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000008 /* DiagnosticResult.swift */; };
+		OB0000000000000000000019 /* WiFiObservationEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000009 /* WiFiObservationEvent.swift */; };
+		OB000000000000000000001A /* WiFiObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000A /* WiFiObservation.swift */; };
+		OB0000000000000000000021 /* WiFiObservationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000001 /* WiFiObservationError.swift */; };
+		OB0000000000000000000022 /* WiFiCurrentStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000002 /* WiFiCurrentStatus.swift */; };
+		OB0000000000000000000023 /* WiFiNetworkCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000003 /* WiFiNetworkCapabilities.swift */; };
+		OB0000000000000000000024 /* WiFiNetworkObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000004 /* WiFiNetworkObservation.swift */; };
+		OB0000000000000000000025 /* WiFiEnvironmentSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000005 /* WiFiEnvironmentSnapshot.swift */; };
+		OB0000000000000000000026 /* GatewayLatencyResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000006 /* GatewayLatencyResult.swift */; };
+		OB0000000000000000000027 /* WiFiQualityResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000007 /* WiFiQualityResult.swift */; };
+		OB0000000000000000000028 /* DiagnosticResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000008 /* DiagnosticResult.swift */; };
+		OB0000000000000000000029 /* WiFiObservationEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000009 /* WiFiObservationEvent.swift */; };
+		OB000000000000000000002A /* WiFiObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000A /* WiFiObservation.swift */; };
+		OB0000000000000000000031 /* ModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000B /* ModelsTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -442,6 +463,17 @@
 		FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparkleUpdater.swift; sourceTree = "<group>"; };
 		FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		FC084FA8AE0EE5E703D922DA /* BandChartViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandChartViewModelTests.swift; sourceTree = "<group>"; };
+		OB0000000000000000000001 /* WiFiObservationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationError.swift; sourceTree = "<group>"; };
+		OB0000000000000000000002 /* WiFiCurrentStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiCurrentStatus.swift; sourceTree = "<group>"; };
+		OB0000000000000000000003 /* WiFiNetworkCapabilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiNetworkCapabilities.swift; sourceTree = "<group>"; };
+		OB0000000000000000000004 /* WiFiNetworkObservation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiNetworkObservation.swift; sourceTree = "<group>"; };
+		OB0000000000000000000005 /* WiFiEnvironmentSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiEnvironmentSnapshot.swift; sourceTree = "<group>"; };
+		OB0000000000000000000006 /* GatewayLatencyResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayLatencyResult.swift; sourceTree = "<group>"; };
+		OB0000000000000000000007 /* WiFiQualityResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiQualityResult.swift; sourceTree = "<group>"; };
+		OB0000000000000000000008 /* DiagnosticResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticResult.swift; sourceTree = "<group>"; };
+		OB0000000000000000000009 /* WiFiObservationEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEvent.swift; sourceTree = "<group>"; };
+		OB000000000000000000000A /* WiFiObservation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservation.swift; sourceTree = "<group>"; };
+		OB000000000000000000000B /* ModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelsTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -683,6 +715,7 @@
 				49FEC4F42675BFAD1316DDEC /* Debug */,
 				8FFEB5302BE8674E56110FAE /* Interfaces */,
 				786696F9D6046171197C0641 /* MCP */,
+				OB0000000000000000000042 /* Observation */,
 				FB6F41CB2FC4889B0009F29B /* Regulatory */,
 				FB8BB5FE2FBB039A00FD072E /* Resources */,
 				9F327AEB42954B939E2CC19F /* Roaming */,
@@ -857,6 +890,7 @@
 				39A94372ADF30D10E0F015CD /* IEParserTests.swift */,
 				A5024CBB8BFCAFF56FEF0756 /* MCPServerTests.swift */,
 				8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */,
+				OB0000000000000000000043 /* Observation */,
 				4AC04B2DAF7F8FB54DC3FFD2 /* RegionInferenceEngineTests.swift */,
 				D07A4C1B8DFCDFBA81A6DFFA /* RegulatoryDatabaseTests.swift */,
 				AE17427BAD036F393D712B6F /* RegulatoryFilterTests.swift */,
@@ -884,6 +918,39 @@
 				FBD0A4412FE5BEAC003658AD /* WiFiLensProUITests */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		OB0000000000000000000041 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				OB0000000000000000000001 /* WiFiObservationError.swift */,
+				OB0000000000000000000002 /* WiFiCurrentStatus.swift */,
+				OB0000000000000000000003 /* WiFiNetworkCapabilities.swift */,
+				OB0000000000000000000004 /* WiFiNetworkObservation.swift */,
+				OB0000000000000000000005 /* WiFiEnvironmentSnapshot.swift */,
+				OB0000000000000000000006 /* GatewayLatencyResult.swift */,
+				OB0000000000000000000007 /* WiFiQualityResult.swift */,
+				OB0000000000000000000008 /* DiagnosticResult.swift */,
+				OB0000000000000000000009 /* WiFiObservationEvent.swift */,
+				OB000000000000000000000A /* WiFiObservation.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		OB0000000000000000000042 /* Observation */ = {
+			isa = PBXGroup;
+			children = (
+				OB0000000000000000000041 /* Models */,
+			);
+			path = Observation;
+			sourceTree = "<group>";
+		};
+		OB0000000000000000000043 /* Observation */ = {
+			isa = PBXGroup;
+			children = (
+				OB000000000000000000000B /* ModelsTests.swift */,
+			);
+			path = Observation;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1173,6 +1240,16 @@
 				FBD0A46D2FE5C0600000001A /* ConnectionEvent.swift in Sources */,
 				FBD0A4702FE5C0600000001D /* EventStore.swift in Sources */,
 				FBD0A4732FE5C06000000020 /* EventDetector.swift in Sources */,
+				OB0000000000000000000011 /* WiFiObservationError.swift in Sources */,
+				OB0000000000000000000012 /* WiFiCurrentStatus.swift in Sources */,
+				OB0000000000000000000013 /* WiFiNetworkCapabilities.swift in Sources */,
+				OB0000000000000000000014 /* WiFiNetworkObservation.swift in Sources */,
+				OB0000000000000000000015 /* WiFiEnvironmentSnapshot.swift in Sources */,
+				OB0000000000000000000016 /* GatewayLatencyResult.swift in Sources */,
+				OB0000000000000000000017 /* WiFiQualityResult.swift in Sources */,
+				OB0000000000000000000018 /* DiagnosticResult.swift in Sources */,
+				OB0000000000000000000019 /* WiFiObservationEvent.swift in Sources */,
+				OB000000000000000000001A /* WiFiObservation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1207,6 +1284,7 @@
 				9E204E0C8B6D8E29583263B0 /* ScannerModelTests.swift in Sources */,
 				896F4371837628B3E6454853 /* SignalProcessingTests.swift in Sources */,
 				2B7B4CBC96F724AA4970AC7F /* SpectrumModelTests.swift in Sources */,
+				OB0000000000000000000031 /* ModelsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1314,6 +1392,16 @@
 				FBD0A46F2FE5C0600000001C /* ConnectionEvent.swift in Sources */,
 				FBD0A4722FE5C0600000001F /* EventStore.swift in Sources */,
 				FBD0A4752FE5C06000000022 /* EventDetector.swift in Sources */,
+				OB0000000000000000000021 /* WiFiObservationError.swift in Sources */,
+				OB0000000000000000000022 /* WiFiCurrentStatus.swift in Sources */,
+				OB0000000000000000000023 /* WiFiNetworkCapabilities.swift in Sources */,
+				OB0000000000000000000024 /* WiFiNetworkObservation.swift in Sources */,
+				OB0000000000000000000025 /* WiFiEnvironmentSnapshot.swift in Sources */,
+				OB0000000000000000000026 /* GatewayLatencyResult.swift in Sources */,
+				OB0000000000000000000027 /* WiFiQualityResult.swift in Sources */,
+				OB0000000000000000000028 /* DiagnosticResult.swift in Sources */,
+				OB0000000000000000000029 /* WiFiObservationEvent.swift in Sources */,
+				OB000000000000000000002A /* WiFiObservation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
