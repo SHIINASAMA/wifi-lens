@@ -304,6 +304,14 @@
 		OB0000000000000000000075 /* DiagnosticEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000055 /* DiagnosticEvaluator.swift */; };
 		OB0000000000000000000076 /* RoamingEventDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000056 /* RoamingEventDetector.swift */; };
 		OB0000000000000000000081 /* AnalyzerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000057 /* AnalyzerTests.swift */; };
+		OB0000000000000000000095 /* WiFiObservationPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000090 /* WiFiObservationPipeline.swift */; };
+		OB0000000000000000000096 /* WiFiObservationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000091 /* WiFiObservationStore.swift */; };
+		OB0000000000000000000097 /* WiFiObservationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000092 /* WiFiObservationController.swift */; };
+		OB00000000000000000000A5 /* WiFiObservationPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000090 /* WiFiObservationPipeline.swift */; };
+		OB00000000000000000000A6 /* WiFiObservationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000091 /* WiFiObservationStore.swift */; };
+		OB00000000000000000000A7 /* WiFiObservationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000092 /* WiFiObservationController.swift */; };
+		OB0000000000000000000098 /* PipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000093 /* PipelineTests.swift */; };
+		OB0000000000000000000099 /* ControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000094 /* ControllerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -511,6 +519,11 @@
 		OB0000000000000000000055 /* DiagnosticEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticEvaluator.swift; sourceTree = "<group>"; };
 		OB0000000000000000000056 /* RoamingEventDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingEventDetector.swift; sourceTree = "<group>"; };
 		OB0000000000000000000057 /* AnalyzerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyzerTests.swift; sourceTree = "<group>"; };
+		OB0000000000000000000090 /* WiFiObservationPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationPipeline.swift; sourceTree = "<group>"; };
+		OB0000000000000000000091 /* WiFiObservationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationStore.swift; sourceTree = "<group>"; };
+		OB0000000000000000000092 /* WiFiObservationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationController.swift; sourceTree = "<group>"; };
+		OB0000000000000000000093 /* PipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineTests.swift; sourceTree = "<group>"; };
+		OB0000000000000000000094 /* ControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -994,6 +1007,9 @@
 				OB0000000000000000000044 /* Adapters */,
 				OB0000000000000000000050 /* Analyzers */,
 				OB0000000000000000000045 /* Providers */,
+				OB00000000000000000000A0 /* Pipeline */,
+				OB00000000000000000000A1 /* Store */,
+				OB00000000000000000000A2 /* Controller */,
 			);
 			path = Observation;
 			sourceTree = "<group>";
@@ -1023,8 +1039,34 @@
 				OB000000000000000000000B /* ModelsTests.swift */,
 				OB0000000000000000000032 /* ProviderTests.swift */,
 				OB0000000000000000000057 /* AnalyzerTests.swift */,
+				OB0000000000000000000093 /* PipelineTests.swift */,
+				OB0000000000000000000094 /* ControllerTests.swift */,
 			);
 			path = Observation;
+			sourceTree = "<group>";
+		};
+		OB00000000000000000000A0 /* Pipeline */ = {
+			isa = PBXGroup;
+			children = (
+				OB0000000000000000000090 /* WiFiObservationPipeline.swift */,
+			);
+			path = Pipeline;
+			sourceTree = "<group>";
+		};
+		OB00000000000000000000A1 /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				OB0000000000000000000091 /* WiFiObservationStore.swift */,
+			);
+			path = Store;
+			sourceTree = "<group>";
+		};
+		OB00000000000000000000A2 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				OB0000000000000000000092 /* WiFiObservationController.swift */,
+			);
+			path = Controller;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1335,6 +1377,9 @@
 				OB0000000000000000000064 /* ChannelRecommendationEngine.swift in Sources */,
 				OB0000000000000000000065 /* DiagnosticEvaluator.swift in Sources */,
 				OB0000000000000000000066 /* RoamingEventDetector.swift in Sources */,
+				OB0000000000000000000095 /* WiFiObservationPipeline.swift in Sources */,
+				OB0000000000000000000096 /* WiFiObservationStore.swift in Sources */,
+				OB0000000000000000000097 /* WiFiObservationController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1372,6 +1417,8 @@
 				OB0000000000000000000031 /* ModelsTests.swift in Sources */,
 				OB0000000000000000000033 /* ProviderTests.swift in Sources */,
 				OB0000000000000000000081 /* AnalyzerTests.swift in Sources */,
+				OB0000000000000000000098 /* PipelineTests.swift in Sources */,
+				OB0000000000000000000099 /* ControllerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1500,6 +1547,9 @@
 				OB0000000000000000000074 /* ChannelRecommendationEngine.swift in Sources */,
 				OB0000000000000000000075 /* DiagnosticEvaluator.swift in Sources */,
 				OB0000000000000000000076 /* RoamingEventDetector.swift in Sources */,
+				OB00000000000000000000A5 /* WiFiObservationPipeline.swift in Sources */,
+				OB00000000000000000000A6 /* WiFiObservationStore.swift in Sources */,
+				OB00000000000000000000A7 /* WiFiObservationController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
