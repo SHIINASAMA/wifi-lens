@@ -16,4 +16,13 @@ struct DiagnosticResult: Equatable, Sendable {
 
 enum DiagnosticSeverity: String, Sendable, CaseIterable {
     case excellent, warning, critical, ok
+
+    var color: Color {
+        switch self {
+        case .excellent: return .green
+        case .warning: return .orange
+        case .critical: return .red
+        case .ok: return .mint
+        }
+    }
 }

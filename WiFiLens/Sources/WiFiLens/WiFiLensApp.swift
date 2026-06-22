@@ -130,7 +130,7 @@ private struct AppRootView: View {
             WiFiOffView()
         } else {
             ZStack {
-                OverviewView(viewModel: viewModel)
+                OverviewView(viewModel: viewModel, store: viewModel.store)
                     .opacity(selectedPage == .overview ? 1 : 0)
                     .allowsHitTesting(selectedPage == .overview)
                     .accessibilityIdentifier("page-overview")

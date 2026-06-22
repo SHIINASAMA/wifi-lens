@@ -314,6 +314,8 @@
 		OB0000000000000000000099 /* ControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000094 /* ControllerTests.swift */; };
 		OB00000000000000000000A9 /* MockProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000A8 /* MockProviders.swift */; };
 		OB00000000000000000000B1 /* MenuBarMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000B0 /* MenuBarMigrationTests.swift */; };
+		OB00000000000000000000B3 /* RoamingMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000B2 /* RoamingMigrationTests.swift */; };
+		OB00000000000000000000B5 /* DiagnosticMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000B4 /* DiagnosticMigrationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -528,6 +530,8 @@
 		OB0000000000000000000094 /* ControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerTests.swift; sourceTree = "<group>"; };
 		OB00000000000000000000A8 /* MockProviders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockProviders.swift; sourceTree = "<group>"; };
 		OB00000000000000000000B0 /* MenuBarMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarMigrationTests.swift; sourceTree = "<group>"; };
+		OB00000000000000000000B2 /* RoamingMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingMigrationTests.swift; sourceTree = "<group>"; };
+		OB00000000000000000000B4 /* DiagnosticMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticMigrationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1047,6 +1051,8 @@
 				OB0000000000000000000094 /* ControllerTests.swift */,
 				OB00000000000000000000A8 /* MockProviders.swift */,
 				OB00000000000000000000B0 /* MenuBarMigrationTests.swift */,
+				OB00000000000000000000B2 /* RoamingMigrationTests.swift */,
+				OB00000000000000000000B4 /* DiagnosticMigrationTests.swift */,
 			);
 			path = Observation;
 			sourceTree = "<group>";
@@ -1427,6 +1433,8 @@
 				OB0000000000000000000099 /* ControllerTests.swift in Sources */,
 				OB00000000000000000000A9 /* MockProviders.swift in Sources */,
 				OB00000000000000000000B1 /* MenuBarMigrationTests.swift in Sources */,
+				OB00000000000000000000B3 /* RoamingMigrationTests.swift in Sources */,
+				OB00000000000000000000B5 /* DiagnosticMigrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
