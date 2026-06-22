@@ -67,7 +67,15 @@ final class ScannerViewModel {
     private var startupTask: Task<Void, Never>?
     private var wifiMonitoringTask: Task<Void, Never>?
 
-    init() {
+    let controller: WiFiObservationController
+    let store: WiFiObservationStore
+
+    init(
+        controller: WiFiObservationController = WiFiObservationController(),
+        store: WiFiObservationStore = WiFiObservationStore()
+    ) {
+        self.controller = controller
+        self.store = store
         wifiPowerState = wifiPowerMonitor.currentState
         updateMCPDataProvider()
     }
@@ -300,8 +308,76 @@ final class ScannerViewModel {
                 case .networks(let networks):
                     applyNetworks(networks)
                     networkInfo = NetworkInfoService.fetchAll()
-                    channelQualities = computeChannelQualities()
-                    channelRecommendations = computeChannelRecommendations()
+
+                    let currentBSSID = networkInfo.first(where: { $0.bssid != nil })?.bssid
+                    let snapshot = WiFiEnvironmentSnapshot(
+                        timestamp: Date(),
+                        interfaceName: interfaceName,
+                        networks: NetworkObservationAdapter.adaptAll(networks, currentBSSID: currentBSSID)
+                    )
+                    let currentChannel = networkInfo.first(where: { $0.ssid != nil })?.channel
+                    let targetAP = ChannelQualityCalculator.TargetAP(
+                        bssid: networkInfo.first(where: { $0.ssid != nil })?.bssid,
+                        ssid: networkInfo.first(where: { $0.ssid != nil })?.ssid,
+                        channel: currentChannel
+                    )
+
+                    channelQualities = ChannelOccupancyAnalyzer.analyze(
+                        snapshot: snapshot,
+                        currentChannel: currentChannel,
+                        supportedBands: Set(supportedBands.map(\.id)),
+                        targetAP: targetAP
+                    )
+
+                    let apCountryCodes: [String] = networks.compactMap { nw in
+                        guard let ie = nw.ieData else { return nil }
+                        return IEParser.parse(data: ie).countryCode
+                    }
+                    let defaultsOverride: RegulatoryDomain? = {
+                        let raw = UserDefaults.standard.string(forKey: "regulatoryRegionOverride") ?? "auto"
+                        return raw == "auto" ? nil : RegulatoryDomain(rawValue: raw)
+                    }()
+                    let inferredRegion = RegionInferenceEngine.infer(
+                        systemLocale: .current,
+                        supportedChannels: regulatoryPipeline.cachedSupportedChannelsRaw,
+                        apCountryCodes: apCountryCodes,
+                        userOverride: userRegionOverride ?? defaultsOverride
+                    )
+                    regulatoryPipeline.inferredRegion = inferredRegion
+
+                    channelRecommendations = ChannelRecommendationEngine.recommend(
+                        channelAnalysis: channelQualities,
+                        snapshot: snapshot,
+                        inferredRegion: inferredRegion,
+                        deviceSupportedChannels: regulatoryPipeline.deviceSupportedChannels,
+                        deviceCapabilities: regulatoryPipeline.deviceCachedCapabilities
+                    )
+
+                    let currentNetworkInfo = networkInfo.first(where: { $0.ssid != nil })
+                    let currentStatus = WiFiCurrentStatus(
+                        timestamp: Date(),
+                        interfaceName: interfaceName,
+                        ssid: currentNetworkInfo?.ssid,
+                        bssid: currentNetworkInfo?.bssid,
+                        channel: currentNetworkInfo?.channel,
+                        rssi: currentNetworkInfo?.rssi,
+                        security: currentNetworkInfo?.security,
+                        isConnected: currentNetworkInfo != nil,
+                        isWiFiPowerOn: isWiFiAvailable
+                    )
+                    let diagnosis = DiagnosticEvaluator.evaluate(
+                        currentStatus: currentStatus,
+                        channelAnalysis: channelQualities,
+                        channelRecommendations: channelRecommendations
+                    )
+
+                    store.apply(WiFiObservation(
+                        currentStatus: currentStatus,
+                        environmentSnapshot: snapshot,
+                        channelAnalysis: channelQualities,
+                        channelRecommendation: channelRecommendations,
+                        diagnosis: diagnosis
+                    ))
                 }
             }
         }
@@ -436,71 +512,7 @@ final class ScannerViewModel {
         }
     }
 
-    private func computeChannelQualities() -> [ChannelQuality] {
-        let currentWiFi = networkInfo.first(where: { $0.ssid != nil || $0.bssid != nil })
-        let currentChannel = currentWiFi?.channel
-        let targetAP = ChannelQualityCalculator.TargetAP(
-            bssid: currentWiFi?.bssid,
-            ssid: currentWiFi?.ssid,
-            channel: currentChannel
-        )
 
-        // Deduplicate by BSSID+band: wide channels may report the same AP on
-        // multiple primary channel numbers; keep only the strongest RSSI per band.
-        var seen = [String: ChannelQualityCalculator.APInfo]()
-        for nw in lastNetworks {
-            let key = "\(nw.bssid)-\(nw.channel.band.rawValue)"
-            let ie = nw.ieData.map { IEParser.parse(data: $0) }
-            let width = ie.map { chanWidthLabel($0) } ?? "20"
-            let left = ChannelSpanCalculator.channelBlock(
-                primaryChannel: nw.channel.channelNumber,
-                widthMHz: nw.channel.channelWidthMHz,
-                band: nw.channel.band,
-                spanDirection: nw.channel.spanDirection
-            ).left
-            let right = ChannelSpanCalculator.channelBlock(
-                primaryChannel: nw.channel.channelNumber,
-                widthMHz: nw.channel.channelWidthMHz,
-                band: nw.channel.band,
-                spanDirection: nw.channel.spanDirection
-            ).right
-            let info = ChannelQualityCalculator.APInfo(
-                channel: nw.channel.channelNumber,
-                rssi: nw.rssi,
-                channelWidth: width,
-                band: nw.channel.band.id,
-                apex: Double(left + right) / 2.0,
-                bssid: nw.bssid,
-                ssid: nw.ssid
-            )
-            if let existing = seen[key] {
-                if info.rssi > existing.rssi { seen[key] = info }
-            } else {
-                seen[key] = info
-            }
-        }
-        let aps = Array(seen.values)
-        return ChannelQualityCalculator.compute(
-            aps: aps,
-            currentChannel: currentChannel,
-            supportedBands: Set(supportedBands.map(\.id)),
-            targetAP: targetAP
-        )
-    }
-
-    /// Run the regulatory-aware filtering pipeline on top of RF results.
-    private func computeChannelRecommendations() -> [ChannelRecommendation] {
-        let override: RegulatoryDomain? = {
-            let raw = UserDefaults.standard.string(forKey: "regulatoryRegionOverride") ?? "auto"
-            return raw == "auto" ? nil : RegulatoryDomain(rawValue: raw)
-        }()
-        let regulatoryResults = regulatoryPipeline.computeRecommendations(
-            from: channelQualities,
-            networks: lastNetworks,
-            userDefaultsOverride: override
-        )
-        return RecommendationReasonCalculator.compute(for: regulatoryResults)
-    }
 
     func toggleVisibility(bssid: String) {
         if hiddenBSSIDs.contains(bssid) {

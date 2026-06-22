@@ -5,7 +5,7 @@ import Foundation
 @MainActor
 @Observable
 final class RegulatoryPipeline {
-    private(set) var inferredRegion: RegionInferenceResult?
+    var inferredRegion: RegionInferenceResult?
     var userRegionOverride: RegulatoryDomain?
     var deviceSupportedChannels = Set<String>()
     var deviceCachedCapabilities: DevicePHYCapabilities = .default
