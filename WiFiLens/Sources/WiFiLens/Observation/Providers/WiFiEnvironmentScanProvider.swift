@@ -9,51 +9,55 @@ struct WiFiEnvironmentScanProvider: WiFiEnvironmentScanProviding {
 
     func scanEnvironment() async -> WiFiEnvironmentSnapshot {
         let startTime = Date()
-        var networks: [WiFiNetwork] = []
-        var scanError: String?
+        var result: WiFiEnvironmentSnapshot?
 
         let scanStream = await scanner.startScanning(interval: .seconds(0))
         defer { Task { await scanner.stopScanning() } }
 
         let deadline = Date().addingTimeInterval(10)
-        for await event in scanStream {
+        scanLoop: for await event in scanStream {
             if Date() > deadline {
-                scanError = "Scan timed out after 10 seconds"
-                break
+                result = WiFiEnvironmentSnapshot(
+                    timestamp: Date(),
+                    interfaceName: nil,
+                    networks: [],
+                    scanDurationMs: Date().timeIntervalSince(startTime) * 1000,
+                    error: .environmentScanFailed("Scan timed out after 10 seconds")
+                )
+                break scanLoop
             }
             switch event {
             case .networks(let nw):
-                networks = nw
-                break
+                let currentBSSID: String? = await MainActor.run {
+                    NetworkInfoService.fetchAll().first(where: { $0.ssid != nil })?.bssid
+                }
+                let observations = NetworkObservationAdapter.adaptAll(nw, currentBSSID: currentBSSID)
+                let interfaceName = await scanner.interfaceName()
+                result = WiFiEnvironmentSnapshot(
+                    timestamp: Date(),
+                    interfaceName: interfaceName,
+                    networks: observations,
+                    scanDurationMs: Date().timeIntervalSince(startTime) * 1000
+                )
+                break scanLoop
             case .failure(let msg):
-                scanError = msg
-                break
+                result = WiFiEnvironmentSnapshot(
+                    timestamp: Date(),
+                    interfaceName: nil,
+                    networks: [],
+                    scanDurationMs: Date().timeIntervalSince(startTime) * 1000,
+                    error: .environmentScanFailed(msg)
+                )
+                break scanLoop
             }
         }
 
-        if let scanError {
-            return WiFiEnvironmentSnapshot(
-                timestamp: Date(),
-                interfaceName: nil,
-                networks: [],
-                scanDurationMs: Date().timeIntervalSince(startTime) * 1000,
-                error: WiFiObservationError.environmentScanFailed(scanError)
-            )
-        }
-
-        let currentBSSID: String? = await MainActor.run {
-            NetworkInfoService.fetchAll().first(where: { $0.ssid != nil })?.bssid
-        }
-
-        let observations = NetworkObservationAdapter.adaptAll(networks, currentBSSID: currentBSSID)
-        let interfaceName = await scanner.interfaceName()
-        let duration = Date().timeIntervalSince(startTime) * 1000
-
-        return WiFiEnvironmentSnapshot(
+        return result ?? WiFiEnvironmentSnapshot(
             timestamp: Date(),
-            interfaceName: interfaceName,
-            networks: observations,
-            scanDurationMs: duration
+            interfaceName: nil,
+            networks: [],
+            scanDurationMs: Date().timeIntervalSince(startTime) * 1000,
+            error: .environmentScanFailed("Scan produced no results")
         )
     }
 }

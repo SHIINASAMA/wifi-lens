@@ -43,9 +43,14 @@ struct WiFiObservationPipeline: WiFiObservationPipelining {
             supportedBands: ["24", "5", "6"],
             targetAP: nil
         )
+        var errors: [WiFiObservationError] = []
+        if let snapshotError = snapshot.error {
+            errors.append(snapshotError)
+        }
         return WiFiObservation(
             environmentSnapshot: snapshot,
-            channelAnalysis: channelAnalysis
+            channelAnalysis: channelAnalysis,
+            errors: errors
         )
     }
 

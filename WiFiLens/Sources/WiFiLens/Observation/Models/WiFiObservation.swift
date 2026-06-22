@@ -45,9 +45,17 @@ struct WiFiObservation: Equatable, Sendable {
         lhs.diagnosis == rhs.diagnosis &&
         lhs.events == rhs.events &&
         lhs.errors == rhs.errors &&
-        (lhs.channelAnalysis?.count == rhs.channelAnalysis?.count) &&
-        (lhs.channelAnalysis?.first?.qualityScore == rhs.channelAnalysis?.first?.qualityScore) &&
-        (lhs.channelRecommendation?.count == rhs.channelRecommendation?.count) &&
-        (lhs.channelRecommendation?.first?.channel == rhs.channelRecommendation?.first?.channel)
+        channelQualityFingerprint(lhs.channelAnalysis) == channelQualityFingerprint(rhs.channelAnalysis) &&
+        channelRecommendationFingerprint(lhs.channelRecommendation) == channelRecommendationFingerprint(rhs.channelRecommendation)
+    }
+
+    private static func channelQualityFingerprint(_ q: [ChannelQuality]?) -> (count: Int, scores: [Int], channels: [Int]) {
+        guard let q else { return (0, [], []) }
+        return (q.count, q.map(\.qualityScore), q.map(\.channel))
+    }
+
+    private static func channelRecommendationFingerprint(_ r: [ChannelRecommendation]?) -> (count: Int, channels: [Int], rfScores: [Int], recScores: [Int]) {
+        guard let r else { return (0, [], [], []) }
+        return (r.count, r.map(\.channel), r.map(\.rfScore), r.map(\.recommendationScore))
     }
 }
