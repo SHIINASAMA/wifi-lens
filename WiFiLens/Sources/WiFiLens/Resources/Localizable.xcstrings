@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    " · %@" : {
+
+    },
     "—" : {
       "shouldTranslate" : false
     },
@@ -7766,6 +7769,174 @@
         }
       }
     },
+    "menubar.event.disconnected" : {
+      "comment" : "Disconnected event label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disconnected"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切断"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已断开"
+          }
+        }
+      }
+    },
+    "menubar.event.latency_spike" : {
+      "comment" : "Latency spike event label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Latency spike"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レイテンシ急上昇"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "延迟飙升"
+          }
+        }
+      }
+    },
+    "menubar.event.reconnected" : {
+      "comment" : "Reconnected event label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconnected"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再接続"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已重连"
+          }
+        }
+      }
+    },
+    "menubar.event.roaming" : {
+      "comment" : "Roaming event label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Roamed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ローミング"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "漫游"
+          }
+        }
+      }
+    },
+    "menubar.event.signal_drop" : {
+      "comment" : "Signal drop event label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signal dropped"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信号低下"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信号下降"
+          }
+        }
+      }
+    },
+    "menubar.events.none" : {
+      "comment" : "No events label in menu bar popover",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No events in the last hour"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "過去1時間のイベントなし"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近一小时无事件"
+          }
+        }
+      }
+    },
+    "menubar.events.title" : {
+      "comment" : "Recent events section title in menu bar popover",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recent Events"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近のイベント"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近事件"
+          }
+        }
+      }
+    },
     "menubar.field.channel" : {
       "comment" : "Channel field label in menu bar popover",
       "extractionState" : "manual",
@@ -8103,193 +8274,193 @@
       }
     },
     "menubar.trend.collecting" : {
-      "comment": "Collecting data label in sparkline",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Collecting data..."
+      "comment" : "Collecting data label in sparkline",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collecting data..."
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "データ収集中..."
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ収集中..."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "收集中..."
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "收集中..."
           }
         }
       }
     },
     "menubar.trend.degrading" : {
-      "comment": "Degrading trend label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Degrading"
+      "comment" : "Degrading trend label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Degrading"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "低下"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "低下"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "下降"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下降"
           }
         }
       }
     },
     "menubar.trend.high" : {
-      "comment": "High latency trend label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "High"
+      "comment" : "High latency trend label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "遅い"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "遅い"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "高延迟"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高延迟"
           }
         }
       }
     },
     "menubar.trend.improving" : {
-      "comment": "Improving trend label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Improving"
+      "comment" : "Improving trend label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Improving"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "向上"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "向上"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "改善"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "改善"
           }
         }
       }
     },
     "menubar.trend.latency" : {
-      "comment": "Latency trend section title",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Latency Trend"
+      "comment" : "Latency trend section title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Latency Trend"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "レイテンシ推移"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レイテンシ推移"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "延迟趋势"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "延迟趋势"
           }
         }
       }
     },
     "menubar.trend.normal" : {
-      "comment": "Normal latency trend label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Normal"
+      "comment" : "Normal latency trend label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normal"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正常"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正常"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正常"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正常"
           }
         }
       }
     },
     "menubar.trend.signal" : {
-      "comment": "Signal trend section title",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Signal Trend"
+      "comment" : "Signal trend section title",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signal Trend"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "信号推移"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信号推移"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "信号趋势"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信号趋势"
           }
         }
       }
     },
     "menubar.trend.stable" : {
-      "comment": "Stable trend label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stable"
+      "comment" : "Stable trend label",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stable"
           }
         },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "安定"
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安定"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "稳定"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "稳定"
           }
         }
       }
@@ -8725,6 +8896,12 @@
           }
         }
       }
+    },
+    "No events in the last hour" : {
+
+    },
+    "Open WiFi Lens" : {
+
     },
     "overview.accessibility.globe_label" : {
       "comment" : "3D visualization of Wi‑Fi networks around the globe",
@@ -10308,6 +10485,9 @@
         }
       }
     },
+    "Recent Events" : {
+
+    },
     "recording.chart.empty" : {
       "comment" : "Empty state when no data has been recorded yet for the timeline chart",
       "extractionState" : "manual",
@@ -10847,6 +11027,9 @@
           }
         }
       }
+    },
+    "Refresh Now" : {
+
     },
     "roaming.accessibility.latency_fmt" : {
       "comment" : "Latency accessibility label with value and quality",
@@ -13685,6 +13868,9 @@
           }
         }
       }
+    },
+    "Signal" : {
+
     },
     "spectrum.accessibility.chart_label_fmt" : {
       "comment" : "Chart accessibility label with network count",

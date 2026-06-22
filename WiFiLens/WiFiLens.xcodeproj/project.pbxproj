@@ -236,6 +236,12 @@
 		FBD0A4522FE5C05C003658AD /* RecordingModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4402FE5BEAC003658AD /* RecordingModeTests.swift */; };
 		FBD0A4592FE5C06000000006 /* MenuBarScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4572FE5C06000000004 /* MenuBarScene.swift */; };
 		FBD0A45A2FE5C06000000007 /* MenuBarScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4572FE5C06000000004 /* MenuBarScene.swift */; };
+		FBD0A46D2FE5C0600000001A /* ConnectionEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A46E2FE5C0600000001B /* ConnectionEvent.swift */; };
+		FBD0A46F2FE5C0600000001C /* ConnectionEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A46E2FE5C0600000001B /* ConnectionEvent.swift */; };
+		FBD0A4702FE5C0600000001D /* EventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4712FE5C0600000001E /* EventStore.swift */; };
+		FBD0A4722FE5C0600000001F /* EventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4712FE5C0600000001E /* EventStore.swift */; };
+		FBD0A4732FE5C06000000020 /* EventDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4742FE5C06000000021 /* EventDetector.swift */; };
+		FBD0A4752FE5C06000000022 /* EventDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4742FE5C06000000021 /* EventDetector.swift */; };
 		FBD0A46A2FE5C06000000017 /* SparklineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A46B2FE5C06000000018 /* SparklineView.swift */; };
 		FBD0A46C2FE5C06000000019 /* SparklineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A46B2FE5C06000000018 /* SparklineView.swift */; };
 		FBD0A45B2FE5C06000000008 /* MenuBarStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */; };
@@ -420,6 +426,9 @@
 		FBD0A43B2FE5BEAC003658AD /* MarkdownExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownExportService.swift; sourceTree = "<group>"; };
 		FBD0A43C2FE5BEAC003658AD /* MarkdownReportExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownReportExporter.swift; sourceTree = "<group>"; };
 		FBD0A4572FE5C06000000004 /* MenuBarScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarScene.swift; sourceTree = "<group>"; };
+		FBD0A46E2FE5C0600000001B /* ConnectionEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionEvent.swift; sourceTree = "<group>"; };
+		FBD0A4712FE5C0600000001E /* EventStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStore.swift; sourceTree = "<group>"; };
+		FBD0A4742FE5C06000000021 /* EventDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetector.swift; sourceTree = "<group>"; };
 		FBD0A46B2FE5C06000000018 /* SparklineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparklineView.swift; sourceTree = "<group>"; };
 		FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarStatusViewModel.swift; sourceTree = "<group>"; };
 		FBD0A45F2FE5C0600000000C /* MenuBarStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarStatusView.swift; sourceTree = "<group>"; };
@@ -804,6 +813,9 @@
 				FBD0A4652FE5C06000000012 /* ConnectionRecordStore.swift */,
 				FBD0A4682FE5C06000000015 /* ConnectionRecorder.swift */,
 				FBD0A46B2FE5C06000000018 /* SparklineView.swift */,
+				FBD0A46E2FE5C0600000001B /* ConnectionEvent.swift */,
+				FBD0A4712FE5C0600000001E /* EventStore.swift */,
+				FBD0A4742FE5C06000000021 /* EventDetector.swift */,
 			);
 			path = MenuBar;
 			sourceTree = "<group>";
@@ -1158,6 +1170,9 @@
 				FBD0A4642FE5C06000000011 /* ConnectionRecordStore.swift in Sources */,
 				FBD0A4672FE5C06000000014 /* ConnectionRecorder.swift in Sources */,
 				FBD0A46A2FE5C06000000017 /* SparklineView.swift in Sources */,
+				FBD0A46D2FE5C0600000001A /* ConnectionEvent.swift in Sources */,
+				FBD0A4702FE5C0600000001D /* EventStore.swift in Sources */,
+				FBD0A4732FE5C06000000020 /* EventDetector.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1296,6 +1311,9 @@
 				FBD0A4662FE5C06000000013 /* ConnectionRecordStore.swift in Sources */,
 				FBD0A4692FE5C06000000016 /* ConnectionRecorder.swift in Sources */,
 				FBD0A46C2FE5C06000000019 /* SparklineView.swift in Sources */,
+				FBD0A46F2FE5C0600000001C /* ConnectionEvent.swift in Sources */,
+				FBD0A4722FE5C0600000001F /* EventStore.swift in Sources */,
+				FBD0A4752FE5C06000000022 /* EventDetector.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
