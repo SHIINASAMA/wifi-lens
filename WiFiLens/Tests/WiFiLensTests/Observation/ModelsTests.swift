@@ -83,4 +83,17 @@ struct AdapterTests {
         #expect(observations[0].ssid == "A")
         #expect(observations[1].ssid == "B")
     }
+
+    @Test("Adapt uses channelWidthMHz fallback when IE lacks width support")
+    func adaptWidthFallback() {
+        var ie = IEData()
+        ie.supports40MHz = false
+        ie.supports80MHz = false
+        ie.supports160MHz = false
+        ie.htSupported = true
+
+        let caps = NetworkObservationAdapter.parseCapabilities(ie, fallbackWidth: 80)
+        #expect(caps.channelWidth == 80)
+        #expect(caps.phyMode == "n")
+    }
 }
