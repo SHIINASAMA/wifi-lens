@@ -16,7 +16,8 @@ struct PipelineTests {
             environmentScanProvider: MockEnvironmentScanProvider(result: WiFiEnvironmentSnapshot(
                 timestamp: Date(), interfaceName: "en0", networks: []
             )),
-            gatewayLatencyProvider: MockGatewayLatencyProvider(result: latency)
+            gatewayLatencyProvider: MockGatewayLatencyProvider(result: latency),
+            deviceCapabilitiesProvider: MockDeviceCapabilitiesProvider()
         )
         let obs = await pipeline.refreshCurrentConnection()
         #expect(obs.currentStatus != nil)
@@ -36,7 +37,8 @@ struct PipelineTests {
             environmentScanProvider: MockEnvironmentScanProvider(result: snapshot),
             gatewayLatencyProvider: MockGatewayLatencyProvider(result: GatewayLatencyResult(
                 timestamp: Date()
-            ))
+            )),
+            deviceCapabilitiesProvider: MockDeviceCapabilitiesProvider()
         )
         let obs = await pipeline.refreshEnvironmentScan()
         #expect(obs.environmentSnapshot != nil)
@@ -56,11 +58,13 @@ struct PipelineTests {
         let pipeline = WiFiObservationPipeline(
             currentConnectionProvider: MockCurrentConnectionProvider(result: status),
             environmentScanProvider: MockEnvironmentScanProvider(result: snapshot),
-            gatewayLatencyProvider: MockGatewayLatencyProvider(result: latency)
+            gatewayLatencyProvider: MockGatewayLatencyProvider(result: latency),
+            deviceCapabilitiesProvider: MockDeviceCapabilitiesProvider()
         )
         let obs = await pipeline.refreshFullObservation()
         #expect(obs.currentStatus != nil)
         #expect(obs.environmentSnapshot != nil)
+        #expect(obs.channelRecommendation != nil)
         #expect(obs.diagnosis != nil)
     }
 
@@ -80,7 +84,8 @@ struct PipelineTests {
         let pipeline = WiFiObservationPipeline(
             currentConnectionProvider: MockCurrentConnectionProvider(result: status),
             environmentScanProvider: MockEnvironmentScanProvider(result: errorSnapshot),
-            gatewayLatencyProvider: MockGatewayLatencyProvider(result: latency)
+            gatewayLatencyProvider: MockGatewayLatencyProvider(result: latency),
+            deviceCapabilitiesProvider: MockDeviceCapabilitiesProvider()
         )
         let obs = await pipeline.refreshFullObservation()
         #expect(obs.errors.count == 1)
