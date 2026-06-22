@@ -86,14 +86,13 @@ struct AdapterTests {
 
     @Test("Adapt uses channelWidthMHz fallback when IE lacks width support")
     func adaptWidthFallback() {
-        var ie = IEData()
-        ie.supports40MHz = false
-        ie.supports80MHz = false
-        ie.supports160MHz = false
-        ie.htSupported = true
-
-        let caps = NetworkObservationAdapter.parseCapabilities(ie, fallbackWidth: 80)
-        #expect(caps.channelWidth == 80)
-        #expect(caps.phyMode == "n")
+        // HT Capabilities (tag 45): 2 bytes, bit 1 clear = no 40MHz
+        // VHT Operation (tag 192): chWidth 0 = 20/40 only
+        let ieData = Data([45, 2, 0, 0, 192, 1, 0])
+        let ch = WiFiChannel(band: .band5GHz, channelNumber: 36, channelWidthMHz: 80)
+        let nw = WiFiNetwork(ssid: "WideNet", bssid: "AA:BB:CC:DD:EE:FF", rssi: -50, channel: ch, ieData: ieData)
+        let obs = NetworkObservationAdapter.adapt(nw)
+        #expect(obs.capabilities.channelWidth == 80)
+        #expect(obs.capabilities.phyMode == "n")
     }
 }
