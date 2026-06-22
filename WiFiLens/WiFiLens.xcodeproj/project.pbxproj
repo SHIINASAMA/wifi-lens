@@ -313,6 +313,7 @@
 		OB0000000000000000000098 /* PipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000093 /* PipelineTests.swift */; };
 		OB0000000000000000000099 /* ControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000094 /* ControllerTests.swift */; };
 		OB00000000000000000000A9 /* MockProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000A8 /* MockProviders.swift */; };
+		OB00000000000000000000B1 /* MenuBarMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000B0 /* MenuBarMigrationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -526,6 +527,7 @@
 		OB0000000000000000000093 /* PipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineTests.swift; sourceTree = "<group>"; };
 		OB0000000000000000000094 /* ControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerTests.swift; sourceTree = "<group>"; };
 		OB00000000000000000000A8 /* MockProviders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockProviders.swift; sourceTree = "<group>"; };
+		OB00000000000000000000B0 /* MenuBarMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarMigrationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1044,6 +1046,7 @@
 				OB0000000000000000000093 /* PipelineTests.swift */,
 				OB0000000000000000000094 /* ControllerTests.swift */,
 				OB00000000000000000000A8 /* MockProviders.swift */,
+				OB00000000000000000000B0 /* MenuBarMigrationTests.swift */,
 			);
 			path = Observation;
 			sourceTree = "<group>";
@@ -1423,6 +1426,7 @@
 				OB0000000000000000000098 /* PipelineTests.swift in Sources */,
 				OB0000000000000000000099 /* ControllerTests.swift in Sources */,
 				OB00000000000000000000A9 /* MockProviders.swift in Sources */,
+				OB00000000000000000000B1 /* MenuBarMigrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
