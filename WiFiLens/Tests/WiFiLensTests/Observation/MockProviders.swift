@@ -16,6 +16,11 @@ struct MockGatewayLatencyProvider: GatewayLatencyProviding {
     func measure(routerIP: String?) async -> GatewayLatencyResult { result }
 }
 
+struct MockRoamingProbeProvider: RoamingProbeProviding {
+    var result: WiFiCurrentStatus
+    func fetchCurrentProbe() async -> WiFiCurrentStatus { result }
+}
+
 struct MockDeviceCapabilitiesProvider: DeviceCapabilitiesProviding {
     var channelsRaw: [(Int, Int)] = []
     var capabilities: DevicePHYCapabilities = .default
