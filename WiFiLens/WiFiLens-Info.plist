@@ -8,5 +8,7 @@
 	<string>https://github.com/SHIINASAMA/wifi-lens/releases/latest/download/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>DUcvL7RzZrjRBNr+lIn15cbk0Uvm4SboSpvlz9H2z5g=</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
