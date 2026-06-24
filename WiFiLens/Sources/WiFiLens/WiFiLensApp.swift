@@ -186,15 +186,15 @@ private struct AppRootView: View {
                     .accessibilityIdentifier("page-settings")
 
 #if DEBUG
-                SpectrumDebugContainerView()
-                    .opacity(selectedPage == .spectrumDebugChart ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .spectrumDebugChart)
-                    .accessibilityIdentifier("page-spectrumDebugChart")
+                if selectedPage == .spectrumDebugChart {
+                    SpectrumDebugContainerView()
+                        .accessibilityIdentifier("page-spectrumDebugChart")
+                }
 
-                DebugContainerView()
-                    .opacity(selectedPage == .debugChart ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .debugChart)
-                    .accessibilityIdentifier("page-debugChart")
+                if selectedPage == .debugChart {
+                    DebugContainerView()
+                        .accessibilityIdentifier("page-debugChart")
+                }
 #endif
             }
         }
