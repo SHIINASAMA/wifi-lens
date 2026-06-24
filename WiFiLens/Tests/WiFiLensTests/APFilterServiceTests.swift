@@ -122,3 +122,222 @@ struct FilterParseErrorTests {
         }
     }
 }
+
+struct ParserTests {
+    var parser = APFilterQueryParser()
+
+    @Test func parseSimpleField() throws {
+        let cond = try parser.parse("band:5G")
+        if case .field(let filter) = cond {
+            #expect(filter.field == .band)
+            #expect(filter.comparator == .eq)
+            #expect(filter.value == .band(.band5GHz))
+        } else {
+            Issue.record("Expected .field case")
+        }
+    }
+
+    @Test func parseAND() throws {
+        let cond = try parser.parse("band:5G AND rssi:>-60")
+        if case .and(let children) = cond {
+            #expect(children.count == 2)
+        } else {
+            Issue.record("Expected .and case")
+        }
+    }
+
+    @Test func parseOR() throws {
+        let cond = try parser.parse("band:5G OR band:6G")
+        if case .or(let children) = cond {
+            #expect(children.count == 2)
+        } else {
+            Issue.record("Expected .or case")
+        }
+    }
+
+    @Test func parseNOT() throws {
+        let cond = try parser.parse("NOT ssid:guest")
+        if case .not(let inner) = cond {
+            if case .field(let filter) = inner {
+                #expect(filter.field == .ssid)
+            }
+        } else {
+            Issue.record("Expected .not case")
+        }
+    }
+
+    @Test func parseParentheses() throws {
+        let cond = try parser.parse("(band:5G OR band:6G) AND rssi:>-60")
+        if case .and(let children) = cond {
+            #expect(children.count == 2)
+            if case .or(let orChildren) = children[0] {
+                #expect(orChildren.count == 2)
+            }
+        } else {
+            Issue.record("Expected .and case")
+        }
+    }
+
+    @Test func parseGte() throws {
+        let cond = try parser.parse("rssi:>=-70")
+        if case .field(let filter) = cond {
+            #expect(filter.comparator == .gte)
+            #expect(filter.value == .integer(-70))
+        } else {
+            Issue.record("Expected .field case")
+        }
+    }
+
+    @Test func parseLte() throws {
+        let cond = try parser.parse("channel:<=100")
+        if case .field(let filter) = cond {
+            #expect(filter.comparator == .lte)
+            #expect(filter.value == .integer(100))
+        } else {
+            Issue.record("Expected .field case")
+        }
+    }
+
+    @Test func parseBand24G() throws {
+        let cond = try parser.parse("band:2.4G")
+        if case .field(let filter) = cond {
+            #expect(filter.value == .band(.band24GHz))
+        } else {
+            Issue.record("Expected .field case")
+        }
+    }
+
+    @Test func parseBandIDFormat() throws {
+        let cond = try parser.parse("band:5")
+        if case .field(let filter) = cond {
+            #expect(filter.value == .band(.band5GHz))
+        } else {
+            Issue.record("Expected .field case")
+        }
+    }
+
+    @Test func parseEmptyQueryThrows() {
+        #expect(throws: FilterParseError.emptyQuery) {
+            _ = try parser.parse("")
+        }
+    }
+
+    @Test func parseWhitespaceOnlyThrows() {
+        #expect(throws: FilterParseError.emptyQuery) {
+            _ = try parser.parse("   ")
+        }
+    }
+
+    @Test func parseComplexExpression() throws {
+        let cond = try parser.parse("(band:5G OR band:6G) AND rssi:>=-50 AND NOT ssid:Guest")
+        if case .and(let children) = cond {
+            #expect(children.count == 3)
+        } else {
+            Issue.record("Expected .and case with 3 children")
+        }
+    }
+}
+
+struct EvaluateTests {
+    let service = APFilterService(parser: APFilterQueryParser())
+
+    func makeAP(ssid: String = "TestNet", band: ChannelBand = .band5GHz, rssi: Int = -50, channel: Int = 36) -> WiFiNetwork {
+        WiFiNetwork(ssid: ssid, bssid: "00:11:22:33:44:55", rssi: rssi, channel: WiFiChannel(band: band, channelNumber: channel))
+    }
+
+    @Test func bandMatch() throws {
+        let ap = makeAP(band: .band5GHz)
+        let cond = try APFilterQueryParser().parse("band:5G")
+        #expect(service.evaluate(ap, condition: cond) == true)
+    }
+
+    @Test func bandMismatch() throws {
+        let ap = makeAP(band: .band24GHz)
+        let cond = try APFilterQueryParser().parse("band:5G")
+        #expect(service.evaluate(ap, condition: cond) == false)
+    }
+
+    @Test func rssiGreaterThan() throws {
+        let ap = makeAP(rssi: -55)
+        let cond = try APFilterQueryParser().parse("rssi:>-60")
+        #expect(service.evaluate(ap, condition: cond) == true)
+    }
+
+    @Test func rssiLessThanMatch() throws {
+        let ap = makeAP(rssi: -70)
+        let cond = try APFilterQueryParser().parse("rssi:>-60")
+        #expect(service.evaluate(ap, condition: cond) == false)
+    }
+
+    @Test func rssiEquals() throws {
+        let ap = makeAP(rssi: -50)
+        let cond = try APFilterQueryParser().parse("rssi:-50")
+        #expect(service.evaluate(ap, condition: cond) == true)
+    }
+
+    @Test func ssidSubstringMatch() throws {
+        let ap = makeAP(ssid: "Office-5G")
+        let cond = try APFilterQueryParser().parse("ssid:Office")
+        #expect(service.evaluate(ap, condition: cond) == true)
+    }
+
+    @Test func ssidSubstringMismatch() throws {
+        let ap = makeAP(ssid: "Office-5G")
+        let cond = try APFilterQueryParser().parse("ssid:Home")
+        #expect(service.evaluate(ap, condition: cond) == false)
+    }
+
+    @Test func channelEquals() throws {
+        let ap = makeAP(channel: 36)
+        let cond = try APFilterQueryParser().parse("channel:36")
+        #expect(service.evaluate(ap, condition: cond) == true)
+    }
+
+    @Test func channelGte() throws {
+        let ap = makeAP(channel: 100)
+        let cond = try APFilterQueryParser().parse("channel:>=100")
+        #expect(service.evaluate(ap, condition: cond) == true)
+    }
+
+    @Test func andBothTrue() throws {
+        let ap = makeAP(band: .band5GHz, rssi: -50)
+        let cond = try APFilterQueryParser().parse("band:5G AND rssi:>-60")
+        #expect(service.evaluate(ap, condition: cond) == true)
+    }
+
+    @Test func andOneFalse() throws {
+        let ap = makeAP(band: .band24GHz, rssi: -50)
+        let cond = try APFilterQueryParser().parse("band:5G AND rssi:>-60")
+        #expect(service.evaluate(ap, condition: cond) == false)
+    }
+
+    @Test func orOneTrue() throws {
+        let ap = makeAP(band: .band5GHz, rssi: -80)
+        let cond = try APFilterQueryParser().parse("band:5G OR rssi:>-60")
+        #expect(service.evaluate(ap, condition: cond) == true)
+    }
+
+    @Test func orBothFalse() throws {
+        let ap = makeAP(band: .band24GHz, rssi: -80)
+        let cond = try APFilterQueryParser().parse("band:5G OR rssi:>-60")
+        #expect(service.evaluate(ap, condition: cond) == false)
+    }
+
+    @Test func notInvertsMatch() throws {
+        let ap = makeAP(ssid: "Guest")
+        let cond = try APFilterQueryParser().parse("NOT ssid:Guest")
+        #expect(service.evaluate(ap, condition: cond) == false)
+    }
+
+    @Test func notInvertsMismatch() throws {
+        let ap = makeAP(ssid: "Office")
+        let cond = try APFilterQueryParser().parse("NOT ssid:Guest")
+        #expect(service.evaluate(ap, condition: cond) == true)
+    }
+
+    @Test func parenthesesPrecedence() throws {
+        let ap = makeAP(band: .band5GHz, rssi: -80)
+        let cond = try APFilterQueryParser().parse("(band:5G OR band:6G) AND rssi:>-60")
+        #expect(service.evaluate(ap, condition: cond) == false)
+    }
+}
