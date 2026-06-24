@@ -46,6 +46,7 @@ final class ScannerViewModel {
     let signalHistory = SignalHistoryStore()
     let mcpServer = MCPServer()
     let throughputMonitor = ThroughputMonitor()
+    let gatewayLatencyProvider: GatewayLatencyProviding
     var hiddenBSSIDs: Set<String> = []
     var hiddenBands: Set<String> = []       // band IDs ("24"/"5"/"6") to hide
     var hideHiddenSSIDs: Bool = false       // hide networks with empty SSID
@@ -72,11 +73,13 @@ final class ScannerViewModel {
     let store: WiFiObservationStore
 
     init(
-        controller: WiFiObservationController = WiFiObservationController(),
-        store: WiFiObservationStore = WiFiObservationStore()
+        controller: WiFiObservationController = WiFiObservationController(store: .shared),
+        store: WiFiObservationStore = .shared,
+        gatewayLatencyProvider: GatewayLatencyProviding = GatewayLatencyProvider()
     ) {
         self.controller = controller
         self.store = store
+        self.gatewayLatencyProvider = gatewayLatencyProvider
         wifiPowerState = wifiPowerMonitor.currentState
         updateMCPDataProvider()
     }
@@ -369,6 +372,13 @@ final class ScannerViewModel {
                         isConnected: currentNetworkInfo != nil,
                         isWiFiPowerOn: isWiFiAvailable
                     )
+
+                    let gatewayLatency = await gatewayLatencyProvider.measure(routerIP: currentNetworkInfo?.router)
+                    let quality = WiFiQualityEvaluator.evaluate(
+                        currentStatus: currentStatus,
+                        gatewayLatency: gatewayLatency
+                    )
+
                     let diagnosis = DiagnosticEvaluator.evaluate(
                         currentStatus: currentStatus,
                         channelAnalysis: channelQualities,
@@ -378,6 +388,8 @@ final class ScannerViewModel {
                     store.apply(WiFiObservation(
                         currentStatus: currentStatus,
                         environmentSnapshot: snapshot,
+                        gatewayLatency: gatewayLatency,
+                        quality: quality,
                         channelAnalysis: channelQualities,
                         channelRecommendation: channelRecommendations,
                         diagnosis: diagnosis

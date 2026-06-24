@@ -11,7 +11,7 @@ struct OverviewView: View {
     @State private var displayLevel: ChannelQuality.QualityLevel = .excellent
     @State private var displayScore: Int = 100
 
-    init(viewModel: ScannerViewModel, store: WiFiObservationStore = WiFiObservationStore()) {
+    init(viewModel: ScannerViewModel, store: WiFiObservationStore = .shared) {
         self.viewModel = viewModel
         self.store = store
     }

@@ -7,7 +7,7 @@ final class WiFiObservationController {
 
     init(
         pipeline: WiFiObservationPipelining = WiFiObservationPipeline(),
-        store: WiFiObservationStore = WiFiObservationStore()
+        store: WiFiObservationStore = .shared
     ) {
         self.pipeline = pipeline
         self.store = store

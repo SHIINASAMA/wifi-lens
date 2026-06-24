@@ -9476,9 +9476,6 @@
         }
       }
     },
-    "Open WiFi Lens" : {
-
-    },
     "overview.accessibility.globe_label" : {
       "comment" : "3D visualization of Wi‑Fi networks around the globe",
       "extractionState" : "manual",
@@ -11603,9 +11600,6 @@
           }
         }
       }
-    },
-    "Refresh Now" : {
-
     },
     "roaming.accessibility.latency_fmt" : {
       "comment" : "Latency accessibility label with value and quality",

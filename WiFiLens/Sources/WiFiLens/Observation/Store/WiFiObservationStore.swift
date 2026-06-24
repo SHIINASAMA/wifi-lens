@@ -2,6 +2,7 @@ import Foundation
 
 @MainActor
 final class WiFiObservationStore: ObservableObject {
+    static let shared = WiFiObservationStore()
     @Published var currentStatus: WiFiCurrentStatus?
     @Published var gatewayLatency: GatewayLatencyResult?
     @Published var quality: WiFiQualityResult?

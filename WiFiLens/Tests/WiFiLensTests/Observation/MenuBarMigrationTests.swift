@@ -9,20 +9,20 @@ struct MenuBarMigrationTests {
     @Test("qualityLevel reads from store quality result")
     func qualityFromStore() async {
         let store = WiFiObservationStore()
-        let controller = WiFiObservationController(store: store)
-        let vm = MenuBarStatusViewModel(controller: controller, store: store)
+        let vm = MenuBarStatusViewModel(store: store)
 
-        store.quality = WiFiQualityResult(
-            level: .good, signalLabel: "Strong", latencyLabel: "Normal", summary: "Good"
-        )
+        store.apply(WiFiObservation(
+            quality: WiFiQualityResult(
+                level: .good, signalLabel: "Strong", latencyLabel: "Normal", summary: "Good"
+            )
+        ))
         #expect(vm.qualityLevel == .good)
     }
 
     @Test("qualityLevel returns unknown when store has no quality")
     func qualityUnknownWhenNil() async {
         let store = WiFiObservationStore()
-        let controller = WiFiObservationController(store: store)
-        let vm = MenuBarStatusViewModel(controller: controller, store: store)
+        let vm = MenuBarStatusViewModel(store: store)
 
         #expect(vm.qualityLevel == .unknown)
     }
@@ -30,29 +30,31 @@ struct MenuBarMigrationTests {
     @Test("signalLabel reads from store quality result")
     func signalFromStore() async {
         let store = WiFiObservationStore()
-        let controller = WiFiObservationController(store: store)
-        let vm = MenuBarStatusViewModel(controller: controller, store: store)
+        let vm = MenuBarStatusViewModel(store: store)
 
-        store.quality = WiFiQualityResult(
-            level: .fair, signalLabel: "Moderate", latencyLabel: "Normal", summary: "Fair"
-        )
+        store.apply(WiFiObservation(
+            quality: WiFiQualityResult(
+                level: .fair, signalLabel: "Moderate", latencyLabel: "Normal", summary: "Fair"
+            )
+        ))
         #expect(vm.signalLabel == "Moderate")
     }
 
     @Test("latencyLabel reads from store quality result")
     func latencyFromStore() async {
         let store = WiFiObservationStore()
-        let controller = WiFiObservationController(store: store)
-        let vm = MenuBarStatusViewModel(controller: controller, store: store)
+        let vm = MenuBarStatusViewModel(store: store)
 
-        store.quality = WiFiQualityResult(
-            level: .poor, signalLabel: "Weak", latencyLabel: "High", summary: "Poor"
-        )
+        store.apply(WiFiObservation(
+            quality: WiFiQualityResult(
+                level: .poor, signalLabel: "Weak", latencyLabel: "High", summary: "Poor"
+            )
+        ))
         #expect(vm.latencyLabel == "High")
     }
 
-    @Test("fetch updates view model from store after controller refresh")
-    func fetchFromPipeline() async {
+    @Test("store update propagates to view model")
+    func storeUpdatePropagates() async {
         let status = WiFiCurrentStatus(
             timestamp: Date(),
             interfaceName: "en0",
@@ -67,21 +69,14 @@ struct MenuBarMigrationTests {
         let quality = WiFiQualityResult(
             level: .good, signalLabel: "Strong", latencyLabel: "Normal", summary: "Good"
         )
-        let observation = WiFiObservation(
+        let store = WiFiObservationStore()
+        let vm = MenuBarStatusViewModel(store: store)
+
+        store.apply(WiFiObservation(
             currentStatus: status,
             gatewayLatency: latency,
             quality: quality
-        )
-        let mockPipeline = MockPipeline(
-            currentObservation: observation,
-            environmentObservation: WiFiObservation(),
-            fullObservation: observation
-        )
-        let store = WiFiObservationStore()
-        let controller = WiFiObservationController(pipeline: mockPipeline, store: store)
-        let vm = MenuBarStatusViewModel(controller: controller, store: store)
-
-        await vm.fetch()
+        ))
 
         #expect(vm.ssid == "TestNet")
         #expect(vm.bssid == "AA:BB:CC:DD:EE:FF")
@@ -89,62 +84,46 @@ struct MenuBarMigrationTests {
         #expect(vm.rssi == -45)
         #expect(vm.gatewayLatency == 15)
         #expect(vm.qualityLevel == .good)
-        #expect(vm.isLoading == false)
     }
 
-    @Test("fetch with injected controller reads that controller store")
-    func fetchWithControllerOnlyUsesControllerStore() async {
-        let status = WiFiCurrentStatus(
-            timestamp: Date(),
-            interfaceName: "en0",
-            ssid: "ControllerNet",
-            bssid: "11:22:33:44:55:66",
-            channel: 149,
-            rssi: -52,
-            isConnected: true,
-            isWiFiPowerOn: true
-        )
-        let observation = WiFiObservation(currentStatus: status)
-        let mockPipeline = MockPipeline(
-            currentObservation: observation,
-            environmentObservation: WiFiObservation(),
-            fullObservation: observation
-        )
-        let store = WiFiObservationStore()
-        let controller = WiFiObservationController(pipeline: mockPipeline, store: store)
-        let vm = MenuBarStatusViewModel(controller: controller)
-
-        await vm.fetch()
-
-        #expect(vm.ssid == "ControllerNet")
-        #expect(vm.bssid == "11:22:33:44:55:66")
-        #expect(vm.channel == 149)
-        #expect(vm.errorMessage == nil)
-    }
-
-    @Test("fetch sets error when disconnected")
-    func fetchDisconnected() async {
+    @Test("disconnected status sets error message")
+    func disconnectedSetsError() async {
         let status = WiFiCurrentStatus(
             timestamp: Date(),
             interfaceName: "en0",
             isConnected: false,
             isWiFiPowerOn: true
         )
-        let observation = WiFiObservation(currentStatus: status)
-        let mockPipeline = MockPipeline(
-            currentObservation: observation,
-            environmentObservation: WiFiObservation(),
-            fullObservation: observation
-        )
         let store = WiFiObservationStore()
-        let controller = WiFiObservationController(pipeline: mockPipeline, store: store)
-        let vm = MenuBarStatusViewModel(controller: controller, store: store)
+        let vm = MenuBarStatusViewModel(store: store)
 
-        await vm.fetch()
+        store.apply(WiFiObservation(currentStatus: status))
 
         #expect(vm.ssid == nil)
         #expect(vm.errorMessage != nil)
-        #expect(vm.isLoading == false)
+    }
+
+    @Test("trend data updates in real-time from store")
+    func trendDataRealTime() async {
+        let store = WiFiObservationStore()
+        let vm = MenuBarStatusViewModel(store: store)
+
+        for rssi in [-50, -55, -60] {
+            store.apply(WiFiObservation(
+                currentStatus: WiFiCurrentStatus(
+                    timestamp: Date(),
+                    interfaceName: "en0",
+                    ssid: "TestNet",
+                    channel: 36,
+                    rssi: rssi,
+                    isConnected: true,
+                    isWiFiPowerOn: true
+                )
+            ))
+        }
+
+        #expect(vm.signalTrendData.count == 3)
+        #expect(vm.signalTrendData == [-50, -55, -60])
     }
 }
 #endif
