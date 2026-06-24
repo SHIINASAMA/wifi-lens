@@ -47,6 +47,56 @@ struct FilterConditionTests {
     }
 }
 
+struct TokenizerTests {
+    @Test func tokenizeSimpleQuery() {
+        let tokens = APFilterQueryParser.Tokenizer.tokenize("band:5G")
+        #expect(tokens == [.field("band"), .colon, .value("5G")])
+    }
+
+    @Test func tokenizeWithAND() {
+        let tokens = APFilterQueryParser.Tokenizer.tokenize("band:5G AND rssi:>-60")
+        #expect(tokens == [
+            .field("band"), .colon, .value("5G"),
+            .and,
+            .field("rssi"), .colon, .gt, .value("-60")
+        ])
+    }
+
+    @Test func tokenizeWithOR() {
+        let tokens = APFilterQueryParser.Tokenizer.tokenize("band:5G OR band:6G")
+        #expect(tokens == [
+            .field("band"), .colon, .value("5G"),
+            .or,
+            .field("band"), .colon, .value("6G")
+        ])
+    }
+
+    @Test func tokenizeWithNOT() {
+        let tokens = APFilterQueryParser.Tokenizer.tokenize("NOT ssid:guest")
+        #expect(tokens == [.not, .field("ssid"), .colon, .value("guest")])
+    }
+
+    @Test func tokenizeWithParentheses() {
+        let tokens = APFilterQueryParser.Tokenizer.tokenize("(band:5G)")
+        #expect(tokens == [.lparen, .field("band"), .colon, .value("5G"), .rparen])
+    }
+
+    @Test func tokenizeGte() {
+        let tokens = APFilterQueryParser.Tokenizer.tokenize("rssi:>=-60")
+        #expect(tokens == [.field("rssi"), .colon, .gte, .value("-60")])
+    }
+
+    @Test func tokenizeLte() {
+        let tokens = APFilterQueryParser.Tokenizer.tokenize("rssi:<=-60")
+        #expect(tokens == [.field("rssi"), .colon, .lte, .value("-60")])
+    }
+
+    @Test func tokenizeQuotedString() {
+        let tokens = APFilterQueryParser.Tokenizer.tokenize("ssid:\"Office Network\"")
+        #expect(tokens == [.field("ssid"), .colon, .value("Office Network")])
+    }
+}
+
 struct FilterParseErrorTests {
     @Test func errorEquality() {
         let a = FilterParseError.emptyQuery
