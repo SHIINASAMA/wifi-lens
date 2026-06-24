@@ -77,26 +77,29 @@ struct APFilterQueryParser {
                     tokens.append(.value(str))
                     i = end < input.endIndex ? input.index(after: end) : end
                 default:
-                    let start = i
-                    while i < input.endIndex && (input[i].isLetter || input[i].isNumber || input[i] == "." || input[i] == "_" || input[i] == "-") {
+                    if ch.isLetter || ch.isNumber || ch == "." || ch == "_" || ch == "-" {
+                        let start = i
+                        while i < input.endIndex && (input[i].isLetter || input[i].isNumber || input[i] == "." || input[i] == "_" || input[i] == "-") {
+                            i = input.index(after: i)
+                        }
+                        let word = String(input[start..<i])
+                        switch word {
+                        case "AND": tokens.append(.and)
+                        case "OR": tokens.append(.or)
+                        case "NOT": tokens.append(.not)
+                        default:
+                            var j = i
+                            while j < input.endIndex && input[j].isWhitespace {
+                                j = input.index(after: j)
+                            }
+                            if j < input.endIndex && input[j] == ":" {
+                                tokens.append(.field(word))
+                            } else {
+                                tokens.append(.value(word))
+                            }
+                        }
+                    } else {
                         i = input.index(after: i)
-                    }
-                    let word = String(input[start..<i])
-                    switch word {
-                    case "AND": tokens.append(.and)
-                    case "OR": tokens.append(.or)
-                    case "NOT": tokens.append(.not)
-                    default:
-                        // Peek ahead to check if followed by colon (field) or not (value)
-                        var j = i
-                        while j < input.endIndex && input[j].isWhitespace {
-                            j = input.index(after: j)
-                        }
-                        if j < input.endIndex && input[j] == ":" {
-                            tokens.append(.field(word))
-                        } else {
-                            tokens.append(.value(word))
-                        }
                     }
                 }
             }

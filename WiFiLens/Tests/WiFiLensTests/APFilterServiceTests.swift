@@ -341,3 +341,66 @@ struct EvaluateTests {
         #expect(service.evaluate(ap, condition: cond) == false)
     }
 }
+
+struct FilterIntegrationTests {
+    let service = APFilterService(parser: APFilterQueryParser())
+
+    func makeAP(ssid: String = "TestNet", band: ChannelBand = .band5GHz, rssi: Int = -50, channel: Int = 36, bssid: String = "00:11:22:33:44:55") -> WiFiNetwork {
+        WiFiNetwork(ssid: ssid, bssid: bssid, rssi: rssi, channel: WiFiChannel(band: band, channelNumber: channel))
+    }
+
+    @Test func filterReturnsMatchingAPs() throws {
+        let aps = [
+            makeAP(ssid: "Office", band: .band5GHz, rssi: -50, bssid: "aa:bb:cc:dd:ee:01"),
+            makeAP(ssid: "Home", band: .band24GHz, rssi: -70, bssid: "aa:bb:cc:dd:ee:02"),
+            makeAP(ssid: "Guest", band: .band5GHz, rssi: -45, bssid: "aa:bb:cc:dd:ee:03"),
+        ]
+        let result = try service.filter(aps: aps, query: "band:5G")
+        #expect(result.count == 2)
+    }
+
+    @Test func filterEmptyQueryReturnsAll() throws {
+        let aps = [
+            makeAP(ssid: "A", bssid: "aa:bb:cc:dd:ee:01"),
+            makeAP(ssid: "B", bssid: "aa:bb:cc:dd:ee:02"),
+        ]
+        let result = try service.filter(aps: aps, query: "")
+        #expect(result.count == 2)
+    }
+
+    @Test func filterNoMatchReturnsEmpty() throws {
+        let aps = [
+            makeAP(ssid: "Office", band: .band24GHz, bssid: "aa:bb:cc:dd:ee:01"),
+        ]
+        let result = try service.filter(aps: aps, query: "band:5G")
+        #expect(result.isEmpty)
+    }
+
+    @Test func filterComplexQuery() throws {
+        let aps = [
+            makeAP(ssid: "Office-5G", band: .band5GHz, rssi: -50, channel: 36, bssid: "aa:bb:cc:dd:ee:01"),
+            makeAP(ssid: "Office-5G", band: .band5GHz, rssi: -80, channel: 36, bssid: "aa:bb:cc:dd:ee:02"),
+            makeAP(ssid: "Home-24", band: .band24GHz, rssi: -40, channel: 6, bssid: "aa:bb:cc:dd:ee:03"),
+        ]
+        let result = try service.filter(aps: aps, query: "band:5G AND rssi:>-60")
+        #expect(result.count == 1)
+        #expect(result.first?.bssid == "aa:bb:cc:dd:ee:01")
+    }
+
+    @Test func filterWithOR() throws {
+        let aps = [
+            makeAP(ssid: "Office", band: .band5GHz, bssid: "aa:bb:cc:dd:ee:01"),
+            makeAP(ssid: "Home", band: .band24GHz, bssid: "aa:bb:cc:dd:ee:02"),
+            makeAP(ssid: "Guest", band: .band6GHz, bssid: "aa:bb:cc:dd:ee:03"),
+        ]
+        let result = try service.filter(aps: aps, query: "band:5G OR band:6G")
+        #expect(result.count == 2)
+    }
+
+    @Test func filterInvalidQueryThrows() {
+        let aps = [makeAP()]
+        #expect(throws: FilterParseError.self) {
+            _ = try service.filter(aps: aps, query: "???")
+        }
+    }
+}

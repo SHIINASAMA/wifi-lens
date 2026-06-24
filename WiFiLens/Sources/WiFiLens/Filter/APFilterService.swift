@@ -51,6 +51,17 @@ struct APFilterService: Sendable {
         }
     }
 
+    /// Filter an array of APs against a query string.
+    /// Returns only matching APs.
+    func filter(aps: [WiFiNetwork], query: String) throws -> [WiFiNetwork] {
+        let trimmed = query.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else {
+            return aps
+        }
+        let condition = try parser.parse(query)
+        return aps.filter { evaluate($0, condition: condition) }
+    }
+
     private func compare(_ lhs: Int, _ rhs: Int, comparator: Comparator) -> Bool {
         switch comparator {
         case .eq:  return lhs == rhs
