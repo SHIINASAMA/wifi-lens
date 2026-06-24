@@ -1,0 +1,48 @@
+import Testing
+@testable import WiFi_Lens
+
+struct FilterConditionTests {
+    @Test func fieldFilterCreation() {
+        let filter = FieldFilter(
+            field: .band,
+            comparator: .eq,
+            value: .band(.band5GHz)
+        )
+        #expect(filter.field == .band)
+        #expect(filter.comparator == .eq)
+    }
+
+    @Test func andConditionCreation() {
+        let a = FilterCondition.field(FieldFilter(field: .band, comparator: .eq, value: .band(.band5GHz)))
+        let b = FilterCondition.field(FieldFilter(field: .rssi, comparator: .gt, value: .integer(-60)))
+        let and = FilterCondition.and([a, b])
+        if case .and(let children) = and {
+            #expect(children.count == 2)
+        } else {
+            Issue.record("Expected .and case")
+        }
+    }
+
+    @Test func orConditionCreation() {
+        let a = FilterCondition.field(FieldFilter(field: .band, comparator: .eq, value: .band(.band5GHz)))
+        let b = FilterCondition.field(FieldFilter(field: .band, comparator: .eq, value: .band(.band6GHz)))
+        let or = FilterCondition.or([a, b])
+        if case .or(let children) = or {
+            #expect(children.count == 2)
+        } else {
+            Issue.record("Expected .or case")
+        }
+    }
+
+    @Test func notConditionCreation() {
+        let inner = FilterCondition.field(FieldFilter(field: .ssid, comparator: .eq, value: .string("guest")))
+        let not = FilterCondition.not(inner)
+        if case .not(let child) = not {
+            if case .field(let filter) = child {
+                #expect(filter.value == .string("guest"))
+            }
+        } else {
+            Issue.record("Expected .not case")
+        }
+    }
+}
