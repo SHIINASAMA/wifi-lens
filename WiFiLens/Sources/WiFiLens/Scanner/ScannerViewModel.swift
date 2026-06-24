@@ -64,6 +64,7 @@ final class ScannerViewModel {
     var isWiFiAvailable: Bool { wifiPowerState == .poweredOn }
 
     private var hasStarted = false
+    private var isStartingScan = false
     private var startupTask: Task<Void, Never>?
     private var wifiMonitoringTask: Task<Void, Never>?
 
@@ -194,8 +195,11 @@ final class ScannerViewModel {
     }
 
     private func startScanningAfterAuth() async {
+        guard !isStartingScan else { return }
         guard !isScanning else { return }
         guard wifiPowerState == .poweredOn else { return }
+        isStartingScan = true
+        defer { isStartingScan = false }
         supportedBands = await scanner.supportedBands()
         AppLogger.scanner.info("start() — supported bands = \(supportedBands.map { $0.id }.sorted())")
         // Fetch device capabilities once for the regulatory pipeline
