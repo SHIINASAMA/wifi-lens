@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C1D2E3F4A5B6123456789ABD /* FilterCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D2E3F4A5B6123456789ABC /* FilterCondition.swift */; };
+		C1D2E3F4A5B6123456789AC2 /* FilterParseError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D2E3F4A5B6123456789AC1 /* FilterParseError.swift */; };
 		C1D2E3F4A5B6123456789ABF /* APFilterServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D2E3F4A5B6123456789ABE /* APFilterServiceTests.swift */; };
 		01ABB72FF2349B86A426CC1D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B31CBEBC05DEA7ADB03FE01 /* ContentView.swift */; };
 		027A3CECC33E6608D9F53B53 /* LocationPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69959B95B194A96FA8D337C /* LocationPermissionManager.swift */; };
@@ -301,6 +302,7 @@
 		786042C29EF01CE698FEBBF8 /* SignalProcessingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalProcessingTests.swift; sourceTree = "<group>"; };
 		7B31CBEBC05DEA7ADB03FE01 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C1D2E3F4A5B6123456789ABC /* FilterCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCondition.swift; sourceTree = "<group>"; };
+		C1D2E3F4A5B6123456789AC1 /* FilterParseError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterParseError.swift; sourceTree = "<group>"; };
 		C1D2E3F4A5B6123456789ABE /* APFilterServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APFilterServiceTests.swift; sourceTree = "<group>"; };
 		7E044182AAA5DC5A000A0D69 /* ScannerModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerModelTests.swift; sourceTree = "<group>"; };
 		8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiScanner.swift; sourceTree = "<group>"; };
@@ -650,6 +652,7 @@
 			isa = PBXGroup;
 			children = (
 				C1D2E3F4A5B6123456789ABC /* FilterCondition.swift */,
+				C1D2E3F4A5B6123456789AC1 /* FilterParseError.swift */,
 			);
 			path = Filter;
 			sourceTree = "<group>";
@@ -1130,6 +1133,7 @@
 				FB0573E32FBD0002005F9004 /* ExportService.swift in Sources */,
 				3DC8FED8F49854F4CDFD4DCC /* BandChartRenderModel.swift in Sources */,
 				C1D2E3F4A5B6123456789ABD /* FilterCondition.swift in Sources */,
+				C1D2E3F4A5B6123456789AC2 /* FilterParseError.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

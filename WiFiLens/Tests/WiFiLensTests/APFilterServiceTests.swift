@@ -46,3 +46,29 @@ struct FilterConditionTests {
         }
     }
 }
+
+struct FilterParseErrorTests {
+    @Test func errorEquality() {
+        let a = FilterParseError.emptyQuery
+        let b = FilterParseError.emptyQuery
+        #expect(a == b)
+    }
+
+    @Test func errorPositionTracking() {
+        let error = FilterParseError.unexpectedToken("foo", position: 5)
+        if case .unexpectedToken(_, let pos) = error {
+            #expect(pos == 5)
+        } else {
+            Issue.record("Expected unexpectedToken case")
+        }
+    }
+
+    @Test func invalidBandError() {
+        let error = FilterParseError.invalidBand("7G", position: 0)
+        if case .invalidBand(let band, _) = error {
+            #expect(band == "7G")
+        } else {
+            Issue.record("Expected invalidBand case")
+        }
+    }
+}
