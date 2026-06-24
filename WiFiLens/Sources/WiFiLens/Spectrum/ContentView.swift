@@ -1,64 +1,5 @@
 import SwiftUI
 
-struct SpectrumSectionLayout {
-    static let headerHeight: CGFloat = 28
-
-    struct Section {
-        let kind: Kind
-        let isCollapsed: Bool
-    }
-
-    enum Kind {
-        case band
-        case trend
-        case table
-
-        var weight: CGFloat {
-            switch self {
-            case .band: return 1.0
-            case .trend: return 0.5
-            case .table: return 1.5
-            }
-        }
-
-        var minimumContentHeight: CGFloat {
-            switch self {
-            case .band: return 60
-            case .trend: return 100
-            case .table: return 60
-            }
-        }
-    }
-
-    static func computeContentHeights(sections: [Section], totalHeight: CGFloat) -> [CGFloat] {
-        let contentPool = max(0, totalHeight - CGFloat(sections.count) * headerHeight)
-        let expanded = sections.enumerated().filter { !$0.element.isCollapsed }
-        let minimumTotal = expanded.reduce(CGFloat.zero) { $0 + $1.element.kind.minimumContentHeight }
-
-        guard !expanded.isEmpty else {
-            return Array(repeating: 0, count: sections.count)
-        }
-
-        if contentPool <= minimumTotal {
-            let scale = minimumTotal > 0 ? contentPool / minimumTotal : 0
-            return sections.map { section in
-                section.isCollapsed ? 0 : section.kind.minimumContentHeight * scale
-            }
-        }
-
-        let extraPool = contentPool - minimumTotal
-        let totalWeight = expanded.reduce(CGFloat.zero) { $0 + $1.element.kind.weight }
-
-        return sections.map { section in
-            guard !section.isCollapsed else { return 0 }
-            let extra = totalWeight > 0 ? extraPool * section.kind.weight / totalWeight : 0
-            return section.kind.minimumContentHeight + extra
-        }
-    }
-}
-
-private let headerHeight: CGFloat = SpectrumSectionLayout.headerHeight
-
 #if PRO
 enum SpectrumMode {
     case live
@@ -92,15 +33,11 @@ enum SpectrumRecordingSessionResolver {
 #endif
 
 struct ContentView: View {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Bindable var viewModel: ScannerViewModel
 
     @State private var sortOrder: [NSSortDescriptor] = [NSSortDescriptor(key: "ssid", ascending: true)]
-    @State private var is2GHzCollapsed = false
-    @State private var is5GHzCollapsed = false
-    @State private var is6GHzCollapsed = false
-    @State private var isTableCollapsed = false
-    @State private var isTrendCollapsed = false
+    @State private var panel1ChartType: BandPanelSelection = .band24
+    @State private var panel2ChartType: BandPanelSelection = .band5
     @AppStorage("hiddenTableColumns") private var hiddenColumnsData: String = ""
 
 #if PRO
@@ -190,116 +127,43 @@ struct ContentView: View {
     private var dashboardContent: some View {
         GeometryReader { geometry in
             let totalH = geometry.size.height
-            let sections = visibleSections
-            let heights = computeHeights(sections: sections, totalH: totalH)
-
+            let panelHeight = totalH * 0.35
+            let tableHeight = totalH * 0.30
+            
             VStack(spacing: 0) {
                 if shouldShowEmptyState {
                     emptyState
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    ForEach(sections.indices, id: \.self) { idx in
-                        let section = sections[idx]
-
-                        if isCollapsed(section) {
-                            sectionHeader(section)
-                        } else {
-                            sectionHeader(section)
-                            sectionContent(section, height: heights[idx])
-                        }
-
-                        if idx < sections.count - 1 {
-                            Divider()
-                        }
+                    SpectrumPanelView(
+                        viewModel: viewModel,
+                        chartType: $panel1ChartType,
+                        selectedNetworkID: $viewModel.selectedNetworkID
+                    )
+                    .frame(height: panelHeight)
+                    
+                    Divider()
+                    
+                    SpectrumPanelView(
+                        viewModel: viewModel,
+                        chartType: $panel2ChartType,
+                        selectedNetworkID: $viewModel.selectedNetworkID
+                    )
+                    .frame(height: panelHeight)
+                    
+                    Divider()
+                    
+                    VStack(spacing: 0) {
+                        tableFilterBar
+                        bottomTable
                     }
+                    .frame(height: tableHeight)
                 }
             }
         }
     }
 
-    /// Compute proportional heights: charts weight 1, table weight 1.5
-    private func computeHeights(sections: [SectionInfo], totalH: CGFloat) -> [CGFloat] {
-        let layoutSections = sections.map {
-            let kind: SpectrumSectionLayout.Kind
-            switch $0.kind {
-            case .band: kind = .band
-            case .trend: kind = .trend
-            case .table: kind = .table
-            }
-            return SpectrumSectionLayout.Section(
-                kind: kind,
-                isCollapsed: isCollapsed($0)
-            )
-        }
-        return SpectrumSectionLayout.computeContentHeights(sections: layoutSections, totalHeight: totalH)
-    }
-
-    // MARK: - Section Header
-
-    private func sectionHeader(_ section: SectionInfo) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: isCollapsed(section) ? "chevron.right" : "chevron.down")
-                .font(.caption)
-                .frame(width: 12)
-
-            section.icon
-
-            Text(section.title)
-                .font(.callout.weight(.semibold))
-
-            Spacer()
-
-            Text(section.subtitle)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .padding(.horizontal, 10)
-        .frame(height: headerHeight)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            withAnimation(reduceMotion ? nil : .default) { toggleCollapse(section) }
-        }
-    }
-
-    // MARK: - Section Content
-
-    @ViewBuilder
-    private func sectionContent(_ section: SectionInfo, height: CGFloat) -> some View {
-        switch section.kind {
-        case .band(let bandVM):
-            WiFiBandChart(
-                model: bandVM.renderModel,
-                selectedNetworkID: $viewModel.selectedNetworkID,
-                onResetZoom: { bandVM.resetZoom() },
-                onToggleExpand: { bandVM.toggleExpand() },
-                onApplyZoom: { lo, hi in bandVM.applyZoom(lo: lo, hi: hi) }
-            )
-            .frame(height: height)
-            .background {
-                GeometryReader { geometry in
-                    Color.clear
-                        .onAppear {
-                            bandVM.chartSize = geometry.size
-                        }
-                        .onChange(of: geometry.size) { _, newSize in
-                            bandVM.chartSize = newSize
-                        }
-                }
-            }
-
-        case .trend(let snaps, let color):
-            TrendChartView(snapshots: snaps, color: color)
-                .frame(height: height)
-                .padding(.horizontal, 6)
-
-        case .table:
-            VStack(spacing: 0) {
-                tableFilterBar
-                bottomTable
-            }
-            .frame(height: height)
-        }
-    }
+    // MARK: - Table Filter Bar
 
     private var tableFilterBar: some View {
         HStack(spacing: 12) {
@@ -331,15 +195,6 @@ struct ContentView: View {
                 viewModel.hiddenBands.remove(bandID)
             } else {
                 viewModel.hiddenBands.insert(bandID)
-            }
-            // Collapse / expand matching chart section with animation
-            withAnimation(reduceMotion ? nil : .default) {
-                switch bandID {
-                case "24": is2GHzCollapsed = !show
-                case "5":  is5GHzCollapsed = !show
-                case "6":  is6GHzCollapsed = !show
-                default: break
-                }
             }
         })
         return Toggle(isOn: isOn) {
@@ -402,95 +257,6 @@ struct ContentView: View {
             hiddenColumns: hiddenColumns,
             onToggleVisibility: { bssid in viewModel.toggleVisibility(bssid: bssid) }
         )
-    }
-
-    // MARK: - Section Info
-
-    private struct SectionInfo {
-        enum Kind { case band(BandChartViewModel); case trend(snapshots: [NetworkSnapshot], color: Color); case table }
-        let kind: Kind
-        let title: String
-        let subtitle: String
-
-        @ViewBuilder
-        var icon: some View {
-            switch kind {
-            case .band(let vm):
-                Circle()
-                    .fill(vm.band == .band24GHz ? Color.blue.opacity(0.6)
-                          : vm.band == .band5GHz ? Color.green.opacity(0.6)
-                          : Color.purple.opacity(0.6))
-                    .frame(width: 8, height: 8)
-            case .trend:
-                Image(systemName: "chart.line.uptrend.xyaxis")
-                    .font(.caption)
-            case .table:
-                Image(systemName: "tablecells")
-                    .font(.caption)
-            }
-        }
-    }
-
-    private var visibleSections: [SectionInfo] {
-        var sections: [SectionInfo] = []
-        for vm in viewModel.bandViewModels {
-            sections.append(SectionInfo(
-                kind: .band(vm),
-                title: vm.band.displayName,
-                subtitle: String(format: String(localized: "spectrum.trend.network_count_fmt", comment: "Network count for trend chart"), vm.networkCount)
-            ))
-        }
-
-        // Shared trend section — shows signal history for selected network across any band
-        if let selID = viewModel.selectedNetworkID {
-            for vm in viewModel.bandViewModels {
-                if let snaps = vm.snapshots(for: selID),
-                   let series = vm.series(for: selID),
-                   snaps.count >= 2 {
-                    sections.append(SectionInfo(
-                        kind: .trend(snapshots: snaps, color: series.color),
-                        title: "\(series.displaySSID)  ·  \(vm.band.displayName)  ·  \(series.bssid)",
-                        subtitle: String(format: String(localized: "format.sample_count", comment: "Sample count with number"), snaps.count)
-                    ))
-                    break
-                }
-            }
-        }
-
-        sections.append(SectionInfo(
-            kind: .table,
-            title: String(localized: "spectrum.table.ap_label", comment: "Access Point abbreviation (singular)"),
-            subtitle: String(format: String(localized: "spectrum.table.ap_count_fmt", comment: "Access Point count with number"), tableRows.count)
-        ))
-        return sections
-    }
-
-    // MARK: - Collapse Helpers
-
-    private func isCollapsed(_ section: SectionInfo) -> Bool {
-        switch section.kind {
-        case .band(let vm):
-            switch vm.band {
-            case .band24GHz: return is2GHzCollapsed
-            case .band5GHz:  return is5GHzCollapsed
-            case .band6GHz:  return is6GHzCollapsed
-            }
-        case .trend: return isTrendCollapsed
-        case .table: return isTableCollapsed
-        }
-    }
-
-    private func toggleCollapse(_ section: SectionInfo) {
-        switch section.kind {
-        case .band(let vm):
-            switch vm.band {
-            case .band24GHz: is2GHzCollapsed.toggle()
-            case .band5GHz:  is5GHzCollapsed.toggle()
-            case .band6GHz:  is6GHzCollapsed.toggle()
-            }
-        case .trend: isTrendCollapsed.toggle()
-        case .table: isTableCollapsed.toggle()
-        }
     }
 
     // MARK: - Helpers
