@@ -130,10 +130,10 @@ private struct AppRootView: View {
             WiFiOffView()
         } else {
             ZStack {
-                OverviewView(viewModel: viewModel, store: viewModel.store)
-                    .opacity(selectedPage == .overview ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .overview)
-                    .accessibilityIdentifier("page-overview")
+                if selectedPage == .overview {
+                    OverviewView(viewModel: viewModel, store: viewModel.store)
+                        .accessibilityIdentifier("page-overview")
+                }
 
                 if selectedPage == .spectrum {
 #if PRO
@@ -152,13 +152,13 @@ private struct AppRootView: View {
 #endif
                 }
 
-                ChannelQualityView(
-                    channels: viewModel.channelRecommendations,
-                    mode: channelViewMode
-                )
-                    .opacity(selectedPage == .channels ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .channels)
-                    .accessibilityIdentifier("page-channels")
+                if selectedPage == .channels {
+                    ChannelQualityView(
+                        channels: viewModel.channelRecommendations,
+                        mode: channelViewMode
+                    )
+                        .accessibilityIdentifier("page-channels")
+                }
 
                 if selectedPage == .interfaces {
                     InterfacesView(
@@ -170,20 +170,20 @@ private struct AppRootView: View {
                         .accessibilityIdentifier("page-interfaces")
                 }
 
-                RoamingTestView(viewModel: roamingViewModel)
-                    .opacity(selectedPage == .roaming ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .roaming)
-                    .accessibilityIdentifier("page-roaming")
+                if selectedPage == .roaming {
+                    RoamingTestView(viewModel: roamingViewModel)
+                        .accessibilityIdentifier("page-roaming")
+                }
 
-                BLEScannerView(viewModel: bleViewModel, bleEnabled: bleEnabled)
-                    .opacity(selectedPage == .bleScanner ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .bleScanner)
-                    .accessibilityIdentifier("page-bleScanner")
+                if selectedPage == .bleScanner {
+                    BLEScannerView(viewModel: bleViewModel, bleEnabled: bleEnabled)
+                        .accessibilityIdentifier("page-bleScanner")
+                }
 
-                SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel?.bluetoothPermission, bleEnabled: $bleEnabled)
-                    .opacity(selectedPage == .settings ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .settings)
-                    .accessibilityIdentifier("page-settings")
+                if selectedPage == .settings {
+                    SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel?.bluetoothPermission, bleEnabled: $bleEnabled)
+                        .accessibilityIdentifier("page-settings")
+                }
 
 #if DEBUG
                 if selectedPage == .spectrumDebugChart {
