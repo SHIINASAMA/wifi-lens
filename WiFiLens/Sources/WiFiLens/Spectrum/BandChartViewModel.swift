@@ -219,6 +219,18 @@ extension BandChartViewModel {
         applyFilter("")
     }
 
+    func toggleVisibility(for seriesID: String) {
+        guard let index = allSeriesData.firstIndex(where: { $0.id == seriesID }) else { return }
+        allSeriesData[index].isVisible.toggle()
+        refreshRenderedState()
+    }
+
+    func toggleVisibilityLocked(for seriesID: String) {
+        guard let index = allSeriesData.firstIndex(where: { $0.id == seriesID }) else { return }
+        allSeriesData[index].visibilityLocked.toggle()
+        refreshRenderedState()
+    }
+
     func resetZoom() {
         zoomMin = nil
         zoomMax = nil
