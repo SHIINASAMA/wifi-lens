@@ -35,14 +35,23 @@ struct NativeTableView: NSViewRepresentable {
         dotColumn.isEditable = false
         tableView.addTableColumn(dotColumn)
 
-        // Checkbox column
-        let checkColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("check"))
-        checkColumn.title = String(localized: "table.column.focus", comment: "Focus column header for the checkbox toggle column in network table")
-        checkColumn.width = 42
-        checkColumn.minWidth = 38
-        checkColumn.maxWidth = 46
-        checkColumn.isEditable = false
-        tableView.addTableColumn(checkColumn)
+        // Visibility column (专注 -> 可见性)
+        let visibilityColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("visibility"))
+        visibilityColumn.title = String(localized: "table.column.visibility", comment: "Visibility column header in network table")
+        visibilityColumn.width = 42
+        visibilityColumn.minWidth = 38
+        visibilityColumn.maxWidth = 46
+        visibilityColumn.isEditable = false
+        tableView.addTableColumn(visibilityColumn)
+
+        // Lock column (锁定)
+        let lockColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("lock"))
+        lockColumn.title = String(localized: "table.column.lock", comment: "Lock column header in network table")
+        lockColumn.width = 28
+        lockColumn.minWidth = 24
+        lockColumn.maxWidth = 32
+        lockColumn.isEditable = false
+        tableView.addTableColumn(lockColumn)
 
         // Data columns with sort support
         addColumn(to: tableView, id: "SSID", title: String(localized: "table.column.ssid", comment: "SSID column header in network table"), width: 160, sortKey: "ssid", ascending: true)
@@ -185,8 +194,8 @@ struct NativeTableView: NSViewRepresentable {
             let network = rows[row]
             let opacity = rowOpacity(network)
 
-            if columnID == "check" {
-                let container = NSView(frame: NSRect(x: 0, y: 0, width: 32, height: 20))
+            if columnID == "visibility" {
+                let container = NSView(frame: NSRect(x: 0, y: 0, width: 22, height: 20))
                 let checkbox = NSButton(frame: NSRect(x: 3, y: 2, width: 16, height: 16))
                 checkbox.setButtonType(.switch)
                 checkbox.title = ""
@@ -198,14 +207,17 @@ struct NativeTableView: NSViewRepresentable {
                 checkbox.action = #selector(Coordinator.checkboxToggled(_:))
                 checkbox.setAccessibilityLabel(String(localized: "table.accessibility.toggle_visibility", comment: "Toggle network visibility checkbox"))
                 container.addSubview(checkbox)
-                
-                // 锁定按钮
-                let lockButton = NSButton(frame: NSRect(x: 20, y: 2, width: 12, height: 16))
+                return container
+            }
+
+            if columnID == "lock" {
+                let container = NSView(frame: NSRect(x: 0, y: 0, width: 22, height: 20))
+                let lockButton = NSButton(frame: NSRect(x: 3, y: 2, width: 16, height: 16))
                 lockButton.setButtonType(.momentaryChange)
                 lockButton.isBordered = false
                 let lockImageName = network.visibilityLocked ? "lock.fill" : "lock.open"
                 lockButton.image = NSImage(systemSymbolName: lockImageName, accessibilityDescription: nil)?
-                    .withSymbolConfiguration(.init(pointSize: 9, weight: .medium))
+                    .withSymbolConfiguration(.init(pointSize: 10, weight: .medium))
                 lockButton.contentTintColor = network.visibilityLocked ? .secondaryLabelColor : .tertiaryLabelColor
                 lockButton.alphaValue = opacity
                 lockButton.tag = row
@@ -213,7 +225,6 @@ struct NativeTableView: NSViewRepresentable {
                 lockButton.action = #selector(Coordinator.lockToggled(_:))
                 lockButton.setAccessibilityLabel(String(localized: "table.accessibility.toggle_lock", comment: "Toggle network lock checkbox"))
                 container.addSubview(lockButton)
-                
                 return container
             }
 
