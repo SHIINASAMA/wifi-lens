@@ -167,16 +167,6 @@ struct ContentView: View {
 
     private var tableFilterBar: some View {
         HStack(spacing: 12) {
-            Text(String(localized: "spectrum.filter.show_label", comment: "Label for band filter checkboxes"))
-                .font(.caption)
-                .foregroundColor(.secondary)
-            bandToggle(String(localized: "wifi.band.24ghz", comment: "2.4 GHz Wi-Fi band name"), bandID: "24")
-            bandToggle(String(localized: "wifi.band.5ghz", comment: "5 GHz Wi-Fi band name"), bandID: "5")
-            if viewModel.supportedBands.contains(.band6GHz) {
-                bandToggle(String(localized: "wifi.band.6ghz", comment: "6 GHz Wi-Fi band name"), bandID: "6")
-            }
-            Text("·")
-                .foregroundColor(.secondary)
             Toggle(isOn: $viewModel.hideHiddenSSIDs) {
                 Text(String(localized: "spectrum.filter.hide_hidden", comment: "Toggle to hide networks with hidden SSIDs")).font(.caption)
             }
@@ -186,21 +176,6 @@ struct ContentView: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 4)
         .background(.bar)
-    }
-
-    private func bandToggle(_ label: String, bandID: String) -> some View {
-        let isOn = Binding(get: { !viewModel.hiddenBands.contains(bandID) },
-                           set: { show in
-            if show {
-                viewModel.hiddenBands.remove(bandID)
-            } else {
-                viewModel.hiddenBands.insert(bandID)
-            }
-        })
-        return Toggle(isOn: isOn) {
-            Text(label).font(.caption)
-        }
-        .toggleStyle(.checkbox)
     }
 
     // MARK: - Bottom Table (shared)
