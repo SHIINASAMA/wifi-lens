@@ -1,5 +1,10 @@
 import Foundation
 
+enum SpectrumPanelID: String, CaseIterable, Hashable {
+    case primary
+    case secondary
+}
+
 enum BandPanelSelection: String, CaseIterable, Identifiable {
     case band24 = "24"
     case band5 = "5"

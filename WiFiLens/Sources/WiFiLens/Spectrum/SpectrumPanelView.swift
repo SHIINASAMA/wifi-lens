@@ -2,51 +2,27 @@ import SwiftUI
 
 struct SpectrumPanelView: View {
     let viewModel: ScannerViewModel
+    let panelID: SpectrumPanelID
     @Binding var chartType: BandPanelSelection
     @Binding var selectedNetworkID: String?
-
-    @State private var filterQuery: String = ""
 
     private var currentBandVM: BandChartViewModel {
         bandViewModel(for: chartType)
     }
 
-    private var localFilteredSeries: [ChartSeriesData] {
-        let needle = filterQuery.trimmingCharacters(in: .whitespaces).lowercased()
-        guard !needle.isEmpty else {
-            return currentBandVM.visibleSeriesData()
-        }
-        return currentBandVM.visibleSeriesData().filter { series in
-            series.ssid.lowercased().contains(needle)
-                || series.bssid.lowercased().contains(needle)
-        }
-    }
-
-    private var localRenderModel: BandChartRenderModel {
-        let vm = currentBandVM
-        let original = vm.renderModel
-        let filtered = localFilteredSeries
-        return BandChartRenderModel(
-            xDataMin: original.xDataMin,
-            xDataMax: original.xDataMax,
-            yMin: original.yMin,
-            visibleSeriesData: filtered,
-            displayedSeriesData: filtered,
-            strongestRSSI: Int(filtered.map(\.displayRSSI).max() ?? 0),
-            isEmpty: filtered.isEmpty,
-            zoomMin: original.zoomMin,
-            zoomMax: original.zoomMax,
-            isExpanded: original.isExpanded,
-            axisTickStartChannel: original.axisTickStartChannel
+    private var filterQueryBinding: Binding<String> {
+        Binding(
+            get: { viewModel.filterQuery(for: panelID) },
+            set: { viewModel.setFilterQuery($0, for: panelID) }
         )
     }
 
     private var totalCount: Int {
-        currentBandVM.visibleSeriesData().count
+        currentBandVM.networkCount
     }
 
     private var displayedCount: Int {
-        localFilteredSeries.count
+        currentBandVM.visibleSeriesData().count
     }
 
     private var hiddenCount: Int {
@@ -75,7 +51,7 @@ struct SpectrumPanelView: View {
             .pickerStyle(.menu)
             .frame(width: 180)
 
-            TextField(String(localized: "spectrum.panel.filter_placeholder", comment: "Filter input placeholder"), text: $filterQuery)
+            TextField(String(localized: "spectrum.panel.filter_placeholder", comment: "Filter input placeholder"), text: filterQueryBinding)
                 .textFieldStyle(.roundedBorder)
                 .frame(maxWidth: 300)
 
@@ -85,9 +61,9 @@ struct SpectrumPanelView: View {
                     .foregroundColor(.secondary)
             }
 
-            if !filterQuery.isEmpty {
+            if !filterQueryBinding.wrappedValue.isEmpty {
                 Button {
-                    filterQuery = ""
+                    filterQueryBinding.wrappedValue = ""
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundColor(.secondary)
@@ -117,7 +93,7 @@ struct SpectrumPanelView: View {
     private var spectrumChart: some View {
         let bandVM = bandViewModel(for: chartType)
         return WiFiBandChart(
-            model: localRenderModel,
+            model: bandVM.renderModel,
             selectedNetworkID: $selectedNetworkID,
             onResetZoom: { bandVM.resetZoom() },
             onToggleExpand: { bandVM.toggleExpand() },
@@ -167,16 +143,11 @@ struct SpectrumPanelView: View {
     }
 
     private func bandViewModel(for selection: BandPanelSelection) -> BandChartViewModel {
-        switch selection {
-        case .band24: return viewModel.band24
-        case .band5: return viewModel.band5
-        case .band6: return viewModel.band6
-        case .trend: return viewModel.band24 // fallback, won't be used
-        }
+        viewModel.bandViewModel(for: panelID, selection: selection)
     }
 
     private func selectedNetworkSnapshots(for networkID: String) -> [NetworkSnapshot]? {
-        for vm in viewModel.bandViewModels {
+        for vm in viewModel.panelBandViewModels(for: panelID) {
             if let snaps = vm.snapshots(for: networkID) {
                 return snaps
             }
@@ -185,7 +156,7 @@ struct SpectrumPanelView: View {
     }
 
     private func selectedNetworkSeries(for networkID: String) -> ChartSeriesData? {
-        for vm in viewModel.bandViewModels {
+        for vm in viewModel.panelBandViewModels(for: panelID) {
             if let series = vm.series(for: networkID) {
                 return series
             }

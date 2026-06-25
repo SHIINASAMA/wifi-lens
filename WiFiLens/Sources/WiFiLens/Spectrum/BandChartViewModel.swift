@@ -17,15 +17,11 @@ final class BandChartViewModel {
     private(set) var allSeriesData: [ChartSeriesData] = []
     private(set) var displayedSeriesData: [ChartSeriesData] = []
     private(set) var interfaceName: String = ""
-    private(set) var currentFilterQuery: String = ""
     private(set) var allSnapshots: [String: [NetworkSnapshot]] = [:]
     private(set) var channelOccupancy: [Int: Int] = [:]
-    private var currentHiddenBands: Set<String> = []
-    private var currentHideHiddenSSIDs: Bool = false
     private var animationTimer: Timer?
     var chartSize: CGSize = .zero
 
-    var hasFilter: Bool { !currentFilterQuery.trimmingCharacters(in: .whitespaces).isEmpty }
     var networkCount: Int { allSeriesData.count }
     var isEmpty: Bool { allSeriesData.isEmpty }
 
@@ -54,33 +50,8 @@ final class BandChartViewModel {
         self.band = band
     }
 
-    private func makeDisplayedSeriesData(from source: [ChartSeriesData], hiddenBands: Set<String>, hideHiddenSSIDs: Bool) -> [ChartSeriesData] {
-        let needle = currentFilterQuery.trimmingCharacters(in: .whitespaces).lowercased()
-        let bandHidden = hiddenBands.contains(band.id)
-        
-        return source.map { series in
-            var series = series
-            
-            guard !series.visibilityLocked else { return series }
-            
-            let textFilter = needle.isEmpty
-                || series.ssid.lowercased().contains(needle)
-                || series.bssid.lowercased().contains(needle)
-            let hiddenSSIDFilter = !hideHiddenSSIDs || !series.isHiddenSSID
-            let targetVisibility = !bandHidden && textFilter && hiddenSSIDFilter
-            
-            series.isVisible = targetVisibility
-            
-            return series
-        }
-    }
-
     private func refreshRenderedState() {
-        displayedSeriesData = makeDisplayedSeriesData(
-            from: allSeriesData,
-            hiddenBands: currentHiddenBands,
-            hideHiddenSSIDs: currentHideHiddenSSIDs
-        )
+        displayedSeriesData = allSeriesData
     }
 
     func validateSelection(_ selectedNetworkID: String?) -> Bool {
@@ -101,7 +72,7 @@ final class BandChartViewModel {
     }
 
     func visibleSeriesData() -> [ChartSeriesData] {
-        return displayedSeriesData.filter { $0.isVisible && !$0.isFilteredOut }
+        return displayedSeriesData.filter(\.isVisible)
     }
 
     func strongestRSSI() -> Int {
@@ -152,8 +123,8 @@ final class BandChartViewModel {
 
 extension BandChartViewModel {
 
-    func updateNetworks(_ networks: [WiFiNetwork], colorHasher: SSIDColorHasher, filterQuery: String, trends: [String: (direction: TrendDirection, delta: Int)] = [:], snapshots: [String: [NetworkSnapshot]] = [:], hiddenBSSIDs: Set<String> = [], hiddenBands: Set<String> = [], hideHiddenSSIDs: Bool = false) {
-        var dataArray = ChannelSpanCalculator.toSeriesData(networks, colorHasher: colorHasher, trends: trends, hiddenBSSIDs: hiddenBSSIDs)
+    func updateNetworks(_ networks: [WiFiNetwork], colorHasher: SSIDColorHasher, displayStatesByID: [String: APDisplayState] = [:], trends: [String: (direction: TrendDirection, delta: Int)] = [:], snapshots: [String: [NetworkSnapshot]] = [:]) {
+        var dataArray = ChannelSpanCalculator.toSeriesData(networks, colorHasher: colorHasher, trends: trends, displayStatesByID: displayStatesByID)
 
         let prevByID = Dictionary(uniqueKeysWithValues: allSeriesData.map { ($0.id, $0.displayRSSI) })
         for i in dataArray.indices {
@@ -175,9 +146,6 @@ extension BandChartViewModel {
         }
         allSeriesData = dataArray
         allSnapshots = snapshots
-        currentHiddenBands = hiddenBands
-        currentHideHiddenSSIDs = hideHiddenSSIDs
-        currentFilterQuery = filterQuery
         refreshRenderedState()
         startAnimation()
     }
@@ -200,23 +168,8 @@ extension BandChartViewModel {
         interfaceName = name
     }
 
-    func applyFilter(_ filterQuery: String? = nil,
-                      hiddenBands: Set<String> = [],
-                      hideHiddenSSIDs: Bool = false) {
-        if let filterQuery {
-            currentFilterQuery = filterQuery
-        }
-        currentHiddenBands = hiddenBands
-        currentHideHiddenSSIDs = hideHiddenSSIDs
-        refreshRenderedState()
-    }
-
     func toggleExpand() {
         isExpanded.toggle()
-    }
-
-    func clearFilter() {
-        applyFilter("")
     }
 
     func toggleVisibility(for seriesID: String) {

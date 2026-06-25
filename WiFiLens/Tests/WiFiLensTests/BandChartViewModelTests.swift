@@ -43,45 +43,62 @@ import ChartLens
         return ChartSeriesData(domain: domain, render: ChartSeriesRenderState(displayRSSI: Double(rssi)))
     }
 
+    private func makeNetwork(
+        ssid: String?,
+        bssid: String,
+        band: ChannelBand,
+        channel: Int,
+        rssi: Int = -50
+    ) -> WiFiNetwork {
+        WiFiNetwork(
+            ssid: ssid,
+            bssid: bssid,
+            rssi: rssi,
+            channel: WiFiChannel(band: band, channelNumber: channel)
+        )
+    }
+
     // MARK: - Filter
 
     @Test func filterByQueryHidesNonMatchingNetworks() {
-        let vm = BandChartViewModel(band: .band24GHz)
-        vm.debugInject(series: [
-            makeSeries(id: "1", ssid: "Alpha"),
-            makeSeries(id: "2", ssid: "Beta"),
-            makeSeries(id: "3", ssid: "Gamma"),
-        ])
+        let vm = ScannerViewModel()
+        let alpha = makeNetwork(ssid: "Alpha", bssid: "00:11:22:33:44:01", band: .band24GHz, channel: 1)
+        let beta = makeNetwork(ssid: "Beta", bssid: "00:11:22:33:44:02", band: .band24GHz, channel: 6)
+        let gamma = makeNetwork(ssid: "Gamma", bssid: "00:11:22:33:44:03", band: .band24GHz, channel: 11)
 
-        vm.applyFilter("Beta")
-        let visible = vm.visibleSeriesData()
-        #expect(visible.count == 1)
-        #expect(visible.first?.ssid == "Beta")
+        vm.debugApplyNetworksForTesting([alpha, beta, gamma], supportedBands: Set([ChannelBand.band24GHz]))
+        vm.setFilterQuery("Beta", for: .primary)
+
+        #expect(vm.combinedTableRows.count == 3)
+        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().map(\.ssid) == ["Beta"])
     }
 
     @Test func filterByHiddenBandsRemovesBand() {
-        let vm = BandChartViewModel(band: .band24GHz)
-        vm.debugInject(series: [
-            makeSeries(id: "1", ssid: "Net1"),
-            makeSeries(id: "2", ssid: "Net2"),
-        ])
+        let vm = ScannerViewModel()
+        let net1 = makeNetwork(ssid: "Net1", bssid: "00:11:22:33:44:01", band: .band24GHz, channel: 1)
+        let net2 = makeNetwork(ssid: "Net2", bssid: "00:11:22:33:44:02", band: .band24GHz, channel: 6)
 
-        vm.applyFilter(hiddenBands: ["24"])
-        let visible = vm.visibleSeriesData()
-        #expect(visible.isEmpty)
+        vm.debugApplyNetworksForTesting([net1, net2], supportedBands: Set([ChannelBand.band24GHz]))
+        vm.hiddenBands = ["24"]
+        vm.applyGlobalFilterToBands()
+
+        #expect(vm.combinedTableRows.count == 2)
+        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().isEmpty)
+        #expect(vm.combinedTableRows.allSatisfy { $0.isVisible == false })
     }
 
     @Test func filterByHiddenSSIDsExcludesEmptySSID() {
-        let vm = BandChartViewModel(band: .band24GHz)
-        vm.debugInject(series: [
-            makeSeries(id: "1", ssid: "Visible"),
-            makeSeries(id: "2", ssid: "", isHiddenSSID: true),
-        ])
+        let vm = ScannerViewModel()
+        let visible = makeNetwork(ssid: "Visible", bssid: "00:11:22:33:44:01", band: .band24GHz, channel: 1)
+        let hidden = makeNetwork(ssid: "", bssid: "00:11:22:33:44:02", band: .band24GHz, channel: 6)
 
-        vm.applyFilter(hideHiddenSSIDs: true)
-        let visible = vm.visibleSeriesData()
-        #expect(visible.count == 1)
-        #expect(visible.first?.ssid == "Visible")
+        vm.debugApplyNetworksForTesting([visible, hidden], supportedBands: Set([ChannelBand.band24GHz]))
+        vm.hideHiddenSSIDs = true
+        vm.applyGlobalFilterToBands()
+
+        #expect(vm.combinedTableRows.count == 2)
+        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().count == 1)
+        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().first?.ssid == "Visible")
     }
 
     @Test func debugInjectPreservesInjectedFilteredState() {
@@ -95,30 +112,46 @@ import ChartLens
 
         #expect(vm.displayedSeriesData.count == 2)
         #expect(vm.displayedSeriesData.first { $0.id == "2" }?.isFilteredOut == true)
-        #expect(vm.visibleSeriesData().map(\.id) == ["1"])
+        #expect(vm.visibleSeriesData().map(\.id) == ["1", "2"])
     }
 
     @Test func clearFilterRestoresAllVisible() {
-        let vm = BandChartViewModel(band: .band24GHz)
-        vm.debugInject(series: [
-            makeSeries(id: "1", ssid: "Alpha"),
-            makeSeries(id: "2", ssid: "Beta"),
-        ])
+        let vm = ScannerViewModel()
+        let alpha = makeNetwork(ssid: "Alpha", bssid: "00:11:22:33:44:01", band: .band24GHz, channel: 1)
+        let beta = makeNetwork(ssid: "Beta", bssid: "00:11:22:33:44:02", band: .band24GHz, channel: 6)
 
-        vm.applyFilter("Alpha")
-        #expect(vm.visibleSeriesData().count == 1)
+        vm.debugApplyNetworksForTesting([alpha, beta], supportedBands: Set([ChannelBand.band24GHz]))
+        vm.setFilterQuery("Alpha", for: .primary)
+        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().count == 1)
 
-        vm.clearFilter()
-        #expect(vm.visibleSeriesData().count == 2)
+        vm.setFilterQuery("", for: .primary)
+        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().count == 2)
     }
 
-    @Test func hasFilterReflectsFilterState() {
-        let vm = BandChartViewModel(band: .band24GHz)
-        #expect(!vm.hasFilter)
-        vm.applyFilter("test")
-        #expect(vm.hasFilter)
-        vm.clearFilter()
-        #expect(!vm.hasFilter)
+    @Test func panelFilterOnlyChangesPanelRenderStateNotTableRowPresence() {
+        let vm = ScannerViewModel()
+        let alpha = makeNetwork(ssid: "Alpha", bssid: "00:11:22:33:44:01", band: .band24GHz, channel: 1)
+        let beta = makeNetwork(ssid: "Beta", bssid: "00:11:22:33:44:02", band: .band24GHz, channel: 6)
+
+        vm.debugApplyNetworksForTesting([alpha, beta], supportedBands: Set([ChannelBand.band24GHz]))
+        vm.setFilterQuery("Alpha", for: .primary)
+
+        #expect(vm.combinedTableRows.map(\.id) == [alpha.id, beta.id])
+        #expect(vm.combinedTableRows.first(where: { $0.id == beta.id })?.isVisible == true)
+        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().map(\.id) == [alpha.id])
+    }
+
+    @Test func panelFiltersAreIndependentPerView() {
+        let vm = ScannerViewModel()
+        let alpha = makeNetwork(ssid: "Alpha", bssid: "00:11:22:33:44:01", band: .band24GHz, channel: 1)
+        let beta = makeNetwork(ssid: "Beta", bssid: "00:11:22:33:44:02", band: .band24GHz, channel: 6)
+
+        vm.debugApplyNetworksForTesting([alpha, beta], supportedBands: Set([ChannelBand.band24GHz]))
+        vm.setFilterQuery("Alpha", for: .primary)
+        vm.setFilterQuery("Beta", for: .secondary)
+
+        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().map(\.id) == [alpha.id])
+        #expect(vm.bandViewModel(for: .secondary, selection: .band24).visibleSeriesData().map(\.id) == [beta.id])
     }
 
     // MARK: - Validation
@@ -502,41 +535,36 @@ import ChartLens
     // MARK: - Visibility / VisibilityLocked
 
     @Test func lockedAPNotModifiedByFilter() {
-        let vm = BandChartViewModel(band: .band5GHz)
-        let series = ChartSeriesData(
-            id: "locked",
-            ssid: "Office",
-            bssid: "00:11:22:33:44:55",
-            channel: 36,
-            left: 36,
-            apex: 36.0,
-            right: 40,
-            rssi: -50,
-            isVisible: true,
-            visibilityLocked: true
-        )
-        vm.debugInject(series: [series])
-        vm.applyFilter("Home")
-        #expect(vm.visibleSeriesData().first?.id == "locked")
+        let vm = ScannerViewModel()
+        let office = makeNetwork(ssid: "Office", bssid: "00:11:22:33:44:55", band: .band5GHz, channel: 36)
+
+        vm.debugApplyNetworksForTesting([office], supportedBands: Set([ChannelBand.band5GHz]))
+        vm.toggleVisibilityLocked(seriesID: office.id)
+        vm.setFilterQuery("Home", for: .primary)
+
+        #expect(vm.bandViewModel(for: .primary, selection: .band5).visibleSeriesData().first?.id == office.id)
     }
 
     @Test func unlockedAPModifiedByFilter() {
-        let vm = BandChartViewModel(band: .band5GHz)
-        let series = ChartSeriesData(
-            id: "unlocked",
-            ssid: "Office",
-            bssid: "00:11:22:33:44:55",
-            channel: 36,
-            left: 36,
-            apex: 36.0,
-            right: 40,
-            rssi: -50,
-            isVisible: true,
-            visibilityLocked: false
-        )
-        vm.debugInject(series: [series])
-        vm.applyFilter("Home")
-        #expect(vm.visibleSeriesData().isEmpty)
+        let vm = ScannerViewModel()
+        let office = makeNetwork(ssid: "Office", bssid: "00:11:22:33:44:55", band: .band5GHz, channel: 36)
+
+        vm.debugApplyNetworksForTesting([office], supportedBands: Set([ChannelBand.band5GHz]))
+        vm.setFilterQuery("Home", for: .primary)
+
+        #expect(vm.bandViewModel(for: .primary, selection: .band5).visibleSeriesData().isEmpty)
+    }
+
+    @Test func lockedAPPreservedWhileOtherAPsUpdateForFilter() {
+        let vm = ScannerViewModel()
+        let locked = makeNetwork(ssid: "Office", bssid: "00:11:22:33:44:55", band: .band5GHz, channel: 36)
+        let unlocked = makeNetwork(ssid: "Home", bssid: "66:77:88:99:AA:BB", band: .band5GHz, channel: 40, rssi: -60)
+
+        vm.debugApplyNetworksForTesting([locked, unlocked], supportedBands: Set([ChannelBand.band5GHz]))
+        vm.toggleVisibilityLocked(seriesID: locked.id)
+        vm.setFilterQuery("Home", for: .primary)
+
+        #expect(vm.bandViewModel(for: .primary, selection: .band5).visibleSeriesData().map(\.id) == [locked.id, unlocked.id])
     }
 
     @Test func toggleVisibility() {
@@ -577,5 +605,67 @@ import ChartLens
         #expect(vm.allSeriesData.first?.visibilityLocked == true)
         vm.toggleVisibilityLocked(for: "test")
         #expect(vm.allSeriesData.first?.visibilityLocked == false)
+    }
+}
+
+@Suite @MainActor struct ScannerViewModelDisplayStateTests {
+
+    private func makeNetwork(
+        ssid: String?,
+        bssid: String,
+        band: ChannelBand,
+        channel: Int,
+        rssi: Int = -50
+    ) -> WiFiNetwork {
+        WiFiNetwork(
+            ssid: ssid,
+            bssid: bssid,
+            rssi: rssi,
+            channel: WiFiChannel(band: band, channelNumber: channel)
+        )
+    }
+
+    @Test func tableRowsRemainCompleteWhenAutoFilterHidesAPs() {
+        let vm = ScannerViewModel()
+        let office = makeNetwork(ssid: "Office", bssid: "00:11:22:33:44:55", band: .band5GHz, channel: 36)
+        let guest = makeNetwork(ssid: "Guest", bssid: "66:77:88:99:AA:BB", band: .band5GHz, channel: 40)
+
+        vm.debugApplyNetworksForTesting([office, guest], supportedBands: Set([ChannelBand.band5GHz]))
+        vm.setFilterQuery("Office", for: .primary)
+
+        #expect(vm.combinedTableRows.map(\.id) == [office.id, guest.id])
+        #expect(vm.combinedTableRows.first(where: { $0.id == office.id })?.isVisible == true)
+        #expect(vm.combinedTableRows.first(where: { $0.id == guest.id })?.isVisible == true)
+        #expect(vm.bandViewModel(for: .primary, selection: .band5).visibleSeriesData().map(\.id) == [office.id])
+    }
+
+    @Test func lockedHiddenAPIsPreservedWhileOtherAPsRecomputeVisibility() {
+        let vm = ScannerViewModel()
+        let office = makeNetwork(ssid: "Office", bssid: "00:11:22:33:44:55", band: .band5GHz, channel: 36)
+        let guest = makeNetwork(ssid: "Guest", bssid: "66:77:88:99:AA:BB", band: .band5GHz, channel: 40)
+
+        vm.debugApplyNetworksForTesting([office, guest], supportedBands: Set([ChannelBand.band5GHz]))
+        vm.toggleVisibility(seriesID: office.id)
+        vm.toggleVisibilityLocked(seriesID: office.id)
+        vm.setFilterQuery("Guest", for: .primary)
+
+        #expect(vm.combinedTableRows.map(\.id) == [office.id, guest.id])
+        #expect(vm.combinedTableRows.first(where: { $0.id == office.id })?.isVisible == false)
+        #expect(vm.combinedTableRows.first(where: { $0.id == office.id })?.visibilityLocked == true)
+        #expect(vm.combinedTableRows.first(where: { $0.id == guest.id })?.isVisible == true)
+        #expect(vm.bandViewModel(for: .primary, selection: .band5).visibleSeriesData().map(\.id) == [guest.id])
+    }
+
+    @Test func userVisibilityChangeOverridesLockProtection() {
+        let vm = ScannerViewModel()
+        let office = makeNetwork(ssid: "Office", bssid: "00:11:22:33:44:55", band: .band5GHz, channel: 36)
+
+        vm.debugApplyNetworksForTesting([office], supportedBands: Set([ChannelBand.band5GHz]))
+        vm.toggleVisibilityLocked(seriesID: office.id)
+        vm.toggleVisibility(seriesID: office.id)
+
+        #expect(vm.combinedTableRows.first?.isVisible == false)
+        #expect(vm.combinedTableRows.first?.visibilityLocked == true)
+        #expect(vm.bandViewModel(for: .primary, selection: .band5).visibleSeriesData().isEmpty)
     }
 }

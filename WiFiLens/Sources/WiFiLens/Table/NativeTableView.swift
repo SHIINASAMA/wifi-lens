@@ -195,37 +195,25 @@ struct NativeTableView: NSViewRepresentable {
             let opacity = rowOpacity(network)
 
             if columnID == "visibility" {
-                let container = NSView(frame: NSRect(x: 0, y: 0, width: 22, height: 20))
-                let checkbox = NSButton(frame: NSRect(x: 3, y: 2, width: 16, height: 16))
-                checkbox.setButtonType(.switch)
-                checkbox.title = ""
-                checkbox.state = network.isVisible ? .on : .off
-                checkbox.isEnabled = true
-                checkbox.alphaValue = opacity
-                checkbox.tag = row
-                checkbox.target = self
-                checkbox.action = #selector(Coordinator.checkboxToggled(_:))
-                checkbox.setAccessibilityLabel(String(localized: "table.accessibility.toggle_visibility", comment: "Toggle network visibility checkbox"))
-                container.addSubview(checkbox)
-                return container
+                return makeCenteredIconCell(
+                    symbolName: network.isVisible ? "eye.fill" : "eye.slash",
+                    tintColor: network.isVisible ? .secondaryLabelColor : .tertiaryLabelColor,
+                    opacity: opacity,
+                    row: row,
+                    action: #selector(Coordinator.visibilityToggled(_:)),
+                    accessibilityLabel: String(localized: "table.accessibility.toggle_visibility", comment: "Toggle network visibility checkbox")
+                )
             }
 
             if columnID == "lock" {
-                let container = NSView(frame: NSRect(x: 0, y: 0, width: 22, height: 20))
-                let lockButton = NSButton(frame: NSRect(x: 3, y: 2, width: 16, height: 16))
-                lockButton.setButtonType(.momentaryChange)
-                lockButton.isBordered = false
-                let lockImageName = network.visibilityLocked ? "lock.fill" : "lock.open"
-                lockButton.image = NSImage(systemSymbolName: lockImageName, accessibilityDescription: nil)?
-                    .withSymbolConfiguration(.init(pointSize: 10, weight: .medium))
-                lockButton.contentTintColor = network.visibilityLocked ? .secondaryLabelColor : .tertiaryLabelColor
-                lockButton.alphaValue = opacity
-                lockButton.tag = row
-                lockButton.target = self
-                lockButton.action = #selector(Coordinator.lockToggled(_:))
-                lockButton.setAccessibilityLabel(String(localized: "table.accessibility.toggle_lock", comment: "Toggle network lock checkbox"))
-                container.addSubview(lockButton)
-                return container
+                return makeCenteredIconCell(
+                    symbolName: network.visibilityLocked ? "lock.fill" : "lock.open",
+                    tintColor: network.visibilityLocked ? .secondaryLabelColor : .tertiaryLabelColor,
+                    opacity: opacity,
+                    row: row,
+                    action: #selector(Coordinator.lockToggled(_:)),
+                    accessibilityLabel: String(localized: "table.accessibility.toggle_lock", comment: "Toggle network lock checkbox")
+                )
             }
 
             if columnID == "dot" {
@@ -294,6 +282,43 @@ struct NativeTableView: NSViewRepresentable {
             return cellView
         }
 
+        @MainActor
+        private func makeCenteredIconCell(
+            symbolName: String,
+            tintColor: NSColor,
+            opacity: Double,
+            row: Int,
+            action: Selector,
+            accessibilityLabel: String
+        ) -> NSView {
+            let container = NSTableCellView()
+
+            let button = NSButton()
+            button.translatesAutoresizingMaskIntoConstraints = false
+            button.setButtonType(.momentaryChange)
+            button.isBordered = false
+            button.imagePosition = .imageOnly
+            button.imageScaling = .scaleProportionallyDown
+            button.image = NSImage(systemSymbolName: symbolName, accessibilityDescription: nil)?
+                .withSymbolConfiguration(.init(pointSize: 11, weight: .medium))
+            button.contentTintColor = tintColor
+            button.alphaValue = opacity
+            button.tag = row
+            button.target = self
+            button.action = action
+            button.setAccessibilityLabel(accessibilityLabel)
+            container.addSubview(button)
+
+            NSLayoutConstraint.activate([
+                button.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+                button.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+                button.widthAnchor.constraint(equalToConstant: 18),
+                button.heightAnchor.constraint(equalToConstant: 18)
+            ])
+
+            return container
+        }
+
         func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
             let newValue = tableView.sortDescriptors
             if newValue != sortOrder.wrappedValue {
@@ -310,16 +335,16 @@ struct NativeTableView: NSViewRepresentable {
             }
         }
 
-        @MainActor @objc func checkboxToggled(_ sender: NSButton) {
+        @MainActor @objc func visibilityToggled(_ sender: NSButton) {
             let row = sender.tag
             guard row < rows.count else { return }
-            onToggleVisibility?(rows[row].bssid)
+            onToggleVisibility?(rows[row].id)
         }
 
         @MainActor @objc func lockToggled(_ sender: NSButton) {
             let row = sender.tag
             guard row < rows.count else { return }
-            onToggleVisibilityLocked?(rows[row].bssid)
+            onToggleVisibilityLocked?(rows[row].id)
         }
 
         @MainActor @objc func toggleColumnVisibility(_ sender: NSMenuItem) {

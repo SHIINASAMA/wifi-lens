@@ -1,7 +1,9 @@
 import Testing
 import SwiftUI
+import AppKit
 @testable import WiFi_Lens
 
+@MainActor
 struct NetworkTableRowTests {
 
     private func makeRow(
@@ -105,5 +107,31 @@ struct NetworkTableRowTests {
         let rows1 = [makeRow(id: "id1"), makeRow(id: "id2")]
         let rows2 = [makeRow(id: "id1"), makeRow(id: "id2")]
         #expect(rows1 == rows2)
+    }
+
+    @Test func tableCoordinatorUsesStableRowIDForVisibilityCallbacks() {
+        let row = makeRow(id: "series-id-1")
+        var visibilityID: String?
+        var lockID: String?
+
+        let coordinator = NativeTableView.Coordinator(
+            rows: [row],
+            selectedID: .constant(nil),
+            sortOrder: .constant([]),
+            hiddenColumns: .constant([]),
+            onToggleVisibility: { visibilityID = $0 },
+            onToggleVisibilityLocked: { lockID = $0 }
+        )
+
+        let visibilityButton = NSButton()
+        visibilityButton.tag = 0
+        coordinator.visibilityToggled(visibilityButton)
+
+        let lockButton = NSButton()
+        lockButton.tag = 0
+        coordinator.lockToggled(lockButton)
+
+        #expect(visibilityID == row.id)
+        #expect(lockID == row.id)
     }
 }

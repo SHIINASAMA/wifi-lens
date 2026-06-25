@@ -137,6 +137,7 @@ struct ContentView: View {
                 } else {
                     SpectrumPanelView(
                         viewModel: viewModel,
+                        panelID: .primary,
                         chartType: $panel1ChartType,
                         selectedNetworkID: $viewModel.selectedNetworkID
                     )
@@ -146,6 +147,7 @@ struct ContentView: View {
                     
                     SpectrumPanelView(
                         viewModel: viewModel,
+                        panelID: .secondary,
                         chartType: $panel2ChartType,
                         selectedNetworkID: $viewModel.selectedNetworkID
                     )
@@ -181,11 +183,7 @@ struct ContentView: View {
     // MARK: - Bottom Table (shared)
 
     private var tableRows: [NetworkTableRow] {
-        viewModel.combinedTableRows.filter { row in
-            if viewModel.hiddenBands.contains(row.bandID) { return false }
-            if viewModel.hideHiddenSSIDs && row.isHiddenSSID { return false }
-            return true
-        }
+        viewModel.combinedTableRows
     }
 
     private var sortedRows: [NetworkTableRow] {
@@ -230,8 +228,8 @@ struct ContentView: View {
             selectedID: $viewModel.selectedNetworkID,
             sortOrder: $sortOrder,
             hiddenColumns: hiddenColumns,
-            onToggleVisibility: { bssid in viewModel.toggleVisibility(bssid: bssid) },
-            onToggleVisibilityLocked: { bssid in viewModel.toggleVisibilityLocked(bssid: bssid) }
+            onToggleVisibility: { seriesID in viewModel.toggleVisibility(seriesID: seriesID) },
+            onToggleVisibilityLocked: { seriesID in viewModel.toggleVisibilityLocked(seriesID: seriesID) }
         )
     }
 

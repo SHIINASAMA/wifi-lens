@@ -70,7 +70,7 @@ struct BandChartLayout {
         let hasSelection = selectedNetworkID != nil
 
         let candidates = seriesData
-            .filter { ($0.isVisible && !$0.isFilteredOut) || $0.id == selectedNetworkID }
+            .filter { $0.isVisible || $0.id == selectedNetworkID }
             .sorted { a, b in
                 if a.id == selectedNetworkID { return true }
                 if b.id == selectedNetworkID { return false }

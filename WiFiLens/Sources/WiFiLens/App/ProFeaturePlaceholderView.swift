@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum ProConstants {
-    static let appStoreURL = "https://apps.apple.com/app/wifi-lens-pro/idXXXXXXXXXX"
+    static let appStoreURL = "https://apps.apple.com/app/wifi-lens-pro/id6776590746"
 }
 
 struct ProFeaturePlaceholderView: View {
