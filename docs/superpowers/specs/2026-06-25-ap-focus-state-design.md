@@ -26,9 +26,9 @@
 
 ## 三条规则
 
-1. **可见性**：由表格控制，决定 AP 是否在图表中显示
-2. **筛选**：独立路径，用户自定义筛选 + 数量筛选
-3. **锁定**：合并筛选结果和可见性筛选的 APs
+1. **可见性**：UI 状态，由表格控制，决定 AP 是否在图表中显示
+2. **锁定**：UI 状态，由表格控制，锁定后的 AP 无法被筛选影响
+3. **筛选**：独立路径，筛选结果会更新 UI 可见性属性（除了已锁定的 APs）
 
 ## 数据模型变化
 
@@ -74,7 +74,7 @@ private func makeDisplayedSeriesData(from source: [ChartSeriesData], hiddenBands
         var series = series
         let sourceFilteredOut = series.isFilteredOut
         
-        // 锁定的 AP 绕过筛选
+        // 锁定的 AP 绕过筛选（筛选结果无法影响锁定的 AP）
         if series.isLocked {
             series.isFilteredOut = false
         } else {
@@ -101,9 +101,9 @@ func visibleSeriesData() -> [ChartSeriesData] {
     let filtered = displayedSeriesData.filter { $0.isVisible && !$0.isFilteredOut }
     let sorted = filtered.sorted { $0.rssi > $1.rssi }
     
-    // 路径 1：可见性筛选的 APs（isVisible = true）
-    // 路径 2：筛选结果（通过筛选的 APs）
-    // 合并：锁定的 AP 始终显示
+    // 合并两条路径：
+    // 1. 锁定的 AP 始终显示（筛选结果无法影响）
+    // 2. 可见性筛选的 APs（isVisible = true 且未被筛选排除）
     
     var result: [ChartSeriesData] = []
     var autoCount = 0
