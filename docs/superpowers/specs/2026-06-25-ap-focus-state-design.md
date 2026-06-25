@@ -2,26 +2,23 @@
 
 ## Overview
 
-Implement a hybrid focus state system where manually selected APs always display, while automatic selection (top 15 by RSSI) provides defaults that can be overridden by filters and count limits.
+Repurpose the existing visibility toggle to also control focus state. Manually checked APs always display, regardless of count limits or filters.
 
 ## Core Rule
 
-**手动选择的 AP 优先级最高**：用户手动点击专注的 AP，无论筛选条件如何、无论数量是否超过 15，都会显示。
+**手动勾选的 AP 始终显示**：用户勾选复选框的 AP，无论筛选条件如何、无论数量是否超过 15，都会显示。
 
-## Priority Order
+## Existing Behavior (Current)
 
-1. **手动选择** (最高优先级) - 用户手动点击的 AP，始终显示
-2. **自动选择** - 按 RSSI 排序，前 15 个为焦点
-3. **筛选** - 可以隐藏非手动选择的 AP
-4. **数量限制** - 可以隐藏非手动选择的 AP
+- 复选框勾选 → AP 可见
+- 复选框取消勾选 → AP 隐藏
+- 隐藏的 AP 从图表中移除
 
-## Goals
+## New Behavior
 
-- 用户手动选择的 AP 始终显示（最高优先级）
-- 自动选择前 15 个 AP 作为默认焦点
-- 筛选和数量限制只影响非手动选择的 AP
-- 图表只显示焦点 AP
-- 表格显示所有 AP
+- 复选框勾选 → AP 可见且为焦点（即使超过 15 个或被筛选）
+- 复选框取消勾选 → AP 隐藏
+- 焦点 AP 在图表中显示，非焦点 AP 在图表中不显示
 
 ## Data Model Changes
 
@@ -34,28 +31,14 @@ struct ChartSeriesRenderState {
     var displayRSSI: Double = 0.0
     var color: Color = .gray
     var isFilteredOut: Bool = false
-    var isVisible: Bool = true
-    var isFocused: Bool = false
-    var isManuallyFocused: Bool = false  // NEW: 手动选择标记
+    var isVisible: Bool = true  // 控制可见性和焦点状态
     var qualityScore: Int = 0
     var trendArrow: String = ""
     var trendDelta: Int = 0
 }
 ```
 
-### ChartSeriesData
-
-```swift
-var isFocused: Bool {
-    get { render.isFocused }
-    set { render.isFocused = newValue }
-}
-
-var isManuallyFocused: Bool {
-    get { render.isManuallyFocused }
-    set { render.isManuallyFocused = newValue }
-}
-```
+**不需要新增属性**，复用现有的 `isVisible`。
 
 ## Core Logic
 
@@ -68,42 +51,31 @@ func visibleSeriesData() -> [ChartSeriesData] {
     let filtered = displayedSeriesData.filter { $0.isVisible && !$0.isFilteredOut }
     let sorted = filtered.sorted { $0.rssi > $1.rssi }
     
-    // 手动选择的 AP 始终为焦点
-    for series in sorted {
-        if series.isManuallyFocused {
-            series.isFocused = true
-        }
-    }
-    
-    // 自动选择前 15 个（排除已手动选择的）
+    // 手动勾选的 AP（isVisible = true）始终显示
+    // 自动选择前 15 个（排除已手动勾选的）
+    var result: [ChartSeriesData] = []
     var autoCount = 0
+    
     for series in sorted {
-        if !series.isManuallyFocused {
-            if autoCount < Self.maxVisibleAPs {
-                series.isFocused = true
-                autoCount += 1
-            } else {
-                series.isFocused = false
-            }
+        if series.isVisible {
+            // 手动勾选的 AP 始终显示
+            result.append(series)
+        } else if autoCount < Self.maxVisibleAPs {
+            // 自动选择前 15 个
+            result.append(series)
+            autoCount += 1
         }
     }
     
-    return sorted
+    return result
 }
 ```
 
-### toggleFocus() - 用户手动切换焦点
+### toggleVisibility() - 修改现有方法
 
-**File:** `WiFiLens/Sources/WiFiLens/Spectrum/BandChartViewModel.swift`
+**File:** `WiFiLens/Sources/WiFiLens/Spectrum/ScannerViewModel.swift`
 
-```swift
-func toggleFocus(for seriesID: String) {
-    guard let series = allSeriesData.first(where: { $0.id == seriesID }) else { return }
-    series.isManuallyFocused.toggle()
-    series.isFocused = series.isManuallyFocused
-    refreshRenderedState()
-}
-```
+现有方法已经可以工作，无需修改。勾选复选框会设置 `isVisible = true`，取消勾选会设置 `isVisible = false`。
 
 ## Chart Rendering
 
@@ -111,26 +83,21 @@ func toggleFocus(for seriesID: String) {
 
 ```swift
 private func buildSeries() -> [ChartSeries<ChartPoint>] {
-    visibleSeries.filter { $0.isFocused }.map { s in
+    visibleSeries.map { s in
         // ... existing chart series building logic
     }
 }
 ```
 
+`visibleSeries` 已经是筛选后的结果，无需修改。
+
 ## Table Display
 
 **File:** `WiFiLens/Sources/WiFiLens/Spectrum/ContentView.swift`
 
-Table shows all APs with:
-
-- **行点击** → 显示趋势图（现有行为，不变）
-- **行复选框** → 切换焦点状态（新行为）
-
-```swift
-// 在 NativeTableView 中添加复选框列
-// 复选框状态绑定到 isManuallyFocused
-// 点击复选框调用 toggleFocus()
-```
+表格显示所有 AP。复选框控制 `isVisible` 状态：
+- 勾选 → `isVisible = true`
+- 取消勾选 → `isVisible = false`
 
 ## Toolbar Indicator
 
@@ -138,48 +105,32 @@ Table shows all APs with:
 
 ```swift
 private var displayedCount: Int {
-    localFilteredSeries.filter { $0.isFocused }.count
+    localFilteredSeries.filter { $0.isVisible }.count
 }
 
 private var manualCount: Int {
-    localFilteredSeries.filter { $0.isManuallyFocused }.count
+    localFilteredSeries.filter { $0.isVisible }.count  // 手动勾选的
 }
 ```
 
-## Multi-View Coordination
-
-**问题**：两个面板可能显示同一个频段（如都显示 5GHz），手动选择的 AP 应该在两个面板中都显示。
-
-**解决方案**：
-- `isManuallyFocused` 存储在 `ChartSeriesData` 中
-- 两个面板共享同一个 `BandChartViewModel`
-- 手动选择的状态在两个面板中同步
-
-**示例**：
-1. Panel A 显示 5GHz，用户手动选择 AP X
-2. Panel B 切换到 5GHz
-3. AP X 在 Panel B 中也显示为焦点（因为 `isManuallyFocused = true`）
-
 ## What Changes
 
-- `ChartSeriesRenderState` - add `isFocused` and `isManuallyFocused` properties
-- `ChartSeriesData` - add computed properties
-- `BandChartViewModel.visibleSeriesData()` - implement hybrid focus logic
-- `BandChartViewModel.toggleFocus()` - new method for manual toggle
-- `BandChartView.buildSeries()` - filter by `isFocused`
-- `NativeTableView` - add checkbox column for focus toggle
-- `SpectrumPanelView` - update toolbar indicator
+- `BandChartViewModel.visibleSeriesData()` - 实现混合焦点逻辑
+- `SpectrumPanelView.displayedCount` - 计算焦点 AP 数量
 
 ## What Stays Unchanged
 
-- `TrendChartView` - no changes
-- `NativeTableView` - no changes
-- Data pipeline - no changes
-- Filter engine - no changes
+- `ChartSeriesRenderState` - 不变
+- `ChartSeriesData` - 不变
+- `ScannerViewModel.toggleVisibility()` - 不变
+- `NativeTableView` - 不变
+- `BandChartView` - 不变
+- `TrendChartView` - 不变
+- Filter engine - 不变
 
 ## Testing
 
-- Unit test: 手动选择的 AP 始终显示（即使超过 15 个）
+- Unit test: 手动勾选的 AP 始终显示（即使超过 15 个）
 - Unit test: 自动选择前 15 个 AP
-- Unit test: 筛选只影响非手动选择的 AP
-- Unit test: toggleFocus() 正确切换状态
+- Unit test: 筛选只影响非手动勾选的 AP
+- Unit test: toggleVisibility() 正确切换状态
