@@ -58,14 +58,20 @@ final class BandChartViewModel {
     private func makeDisplayedSeriesData(from source: [ChartSeriesData], hiddenBands: Set<String>, hideHiddenSSIDs: Bool) -> [ChartSeriesData] {
         let needle = currentFilterQuery.trimmingCharacters(in: .whitespaces).lowercased()
         let bandHidden = hiddenBands.contains(band.id)
+        
         return source.map { series in
             var series = series
-            let sourceFilteredOut = series.isFilteredOut
+            
+            guard !series.visibilityLocked else { return series }
+            
             let textFilter = needle.isEmpty
                 || series.ssid.lowercased().contains(needle)
                 || series.bssid.lowercased().contains(needle)
             let hiddenSSIDFilter = !hideHiddenSSIDs || !series.isHiddenSSID
-            series.isFilteredOut = sourceFilteredOut || bandHidden || !textFilter || !hiddenSSIDFilter
+            let targetVisibility = !bandHidden && textFilter && hiddenSSIDFilter
+            
+            series.isVisible = targetVisibility
+            
             return series
         }
     }
