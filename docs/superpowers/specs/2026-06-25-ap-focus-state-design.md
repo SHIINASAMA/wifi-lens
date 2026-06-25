@@ -2,23 +2,29 @@
 
 ## Overview
 
-Repurpose the existing visibility toggle to also control focus state. Manually checked APs always display, regardless of count limits or filters.
+Implement a two-layer system: "锁定" (Lock) bypasses filters, "可见性" (Visibility) controls chart display.
 
-## Core Rule
+## Business Logic
 
-**手动勾选的 AP 始终显示**：用户勾选复选框的 AP，无论筛选条件如何、无论数量是否超过 15，都会显示。
+### Three Layers
 
-## Existing Behavior (Current)
+1. **筛选 (Filter)** → 决定哪些 AP 在结果集中
+2. **锁定 (Lock)** → 绕过筛选条件，始终出现在结果集中
+3. **可见性 (Visibility)** → 决定锁定的 AP 是否在图表中显示
 
-- 复选框勾选 → AP 可见
-- 复选框取消勾选 → AP 隐藏
-- 隐藏的 AP 从图表中移除
+### Priority
 
-## New Behavior
+- 锁定的 AP 始终在结果集中（忽略筛选）
+- 可见性只影响锁定的 AP 是否在图表中显示
+- 未锁定的 AP 正常受筛选影响
 
-- 复选框勾选 → AP 可见且为焦点（即使超过 15 个或被筛选）
-- 复选框取消勾选 → AP 隐藏
-- 焦点 AP 在图表中显示，非焦点 AP 在图表中不显示
+### Examples
+
+| AP | 锁定 | 可见性 | 筛选结果 | 图表显示 |
+|----|------|--------|----------|----------|
+| X | 否 | - | 通过筛选 | 显示 |
+| Y | 是 | 开 | 在结果集中 | 显示 |
+| Z | 是 | 关 | 在结果集中 | 不显示 |
 
 ## Data Model Changes
 
@@ -31,16 +37,54 @@ struct ChartSeriesRenderState {
     var displayRSSI: Double = 0.0
     var color: Color = .gray
     var isFilteredOut: Bool = false
-    var isVisible: Bool = true  // 控制可见性和焦点状态
+    var isVisible: Bool = true
+    var isLocked: Bool = false  // NEW: 锁定状态
     var qualityScore: Int = 0
     var trendArrow: String = ""
     var trendDelta: Int = 0
 }
 ```
 
-**不需要新增属性**，复用现有的 `isVisible`。
+### ChartSeriesData
+
+```swift
+var isLocked: Bool {
+    get { render.isLocked }
+    set { render.isLocked = newValue }
+}
+```
 
 ## Core Logic
+
+### Filter Behavior
+
+**File:** `WiFiLens/Sources/WiFiLens/Spectrum/BandChartViewModel.swift`
+
+修改 `makeDisplayedSeriesData()` 让锁定的 AP 绕过筛选：
+
+```swift
+private func makeDisplayedSeriesData(from source: [ChartSeriesData], hiddenBands: Set<String>, hideHiddenSSIDs: Bool) -> [ChartSeriesData] {
+    let needle = currentFilterQuery.trimmingCharacters(in: .whitespaces).lowercased()
+    let bandHidden = hiddenBands.contains(band.id)
+    return source.map { series in
+        var series = series
+        let sourceFilteredOut = series.isFilteredOut
+        
+        // 锁定的 AP 绕过筛选
+        if series.isLocked {
+            series.isFilteredOut = false
+        } else {
+            let textFilter = needle.isEmpty
+                || series.ssid.lowercased().contains(needle)
+                || series.bssid.lowercased().contains(needle)
+            let hiddenSSIDFilter = !hideHiddenSSIDs || !series.isHiddenSSID
+            series.isFilteredOut = sourceFilteredOut || bandHidden || !textFilter || !hiddenSSIDFilter
+        }
+        
+        return series
+    }
+}
+```
 
 ### visibleSeriesData()
 
@@ -51,17 +95,17 @@ func visibleSeriesData() -> [ChartSeriesData] {
     let filtered = displayedSeriesData.filter { $0.isVisible && !$0.isFilteredOut }
     let sorted = filtered.sorted { $0.rssi > $1.rssi }
     
-    // 手动勾选的 AP（isVisible = true）始终显示
-    // 自动选择前 15 个（排除已手动勾选的）
+    // 锁定的 AP 始终显示（如果可见性开启）
+    // 自动选择前 15 个（排除已锁定的）
     var result: [ChartSeriesData] = []
     var autoCount = 0
     
     for series in sorted {
-        if series.isVisible {
-            // 手动勾选的 AP 始终显示
+        if series.isLocked && series.isVisible {
+            // 锁定且可见的 AP 始终显示
             result.append(series)
-        } else if autoCount < Self.maxVisibleAPs {
-            // 自动选择前 15 个
+        } else if !series.isLocked && autoCount < Self.maxVisibleAPs {
+            // 未锁定的 AP 自动选择前 15 个
             result.append(series)
             autoCount += 1
         }
@@ -71,33 +115,31 @@ func visibleSeriesData() -> [ChartSeriesData] {
 }
 ```
 
-### toggleVisibility() - 修改现有方法
+### toggleLock() - 切换锁定状态
 
-**File:** `WiFiLens/Sources/WiFiLens/Spectrum/ScannerViewModel.swift`
-
-现有方法已经可以工作，无需修改。勾选复选框会设置 `isVisible = true`，取消勾选会设置 `isVisible = false`。
-
-## Chart Rendering
-
-**File:** `WiFiLens/Sources/WiFiLens/Spectrum/BandChartView.swift`
+**File:** `WiFiLens/Sources/WiFiLens/Spectrum/BandChartViewModel.swift`
 
 ```swift
-private func buildSeries() -> [ChartSeries<ChartPoint>] {
-    visibleSeries.map { s in
-        // ... existing chart series building logic
-    }
+func toggleLock(for seriesID: String) {
+    guard let series = allSeriesData.first(where: { $0.id == seriesID }) else { return }
+    series.isLocked.toggle()
+    refreshRenderedState()
 }
 ```
-
-`visibleSeries` 已经是筛选后的结果，无需修改。
 
 ## Table Display
 
 **File:** `WiFiLens/Sources/WiFiLens/Spectrum/ContentView.swift`
 
-表格显示所有 AP。复选框控制 `isVisible` 状态：
-- 勾选 → `isVisible = true`
-- 取消勾选 → `isVisible = false`
+表格显示所有 AP：
+- **行点击** → 显示趋势图（现有行为，不变）
+- **行复选框** → 切换锁定状态（新行为）
+
+```swift
+// 在 NativeTableView 中添加复选框列
+// 复选框状态绑定到 isLocked
+// 点击复选框调用 toggleLock()
+```
 
 ## Toolbar Indicator
 
@@ -105,32 +147,34 @@ private func buildSeries() -> [ChartSeries<ChartPoint>] {
 
 ```swift
 private var displayedCount: Int {
-    localFilteredSeries.filter { $0.isVisible }.count
+    localFilteredSeries.filter { $0.isVisible && !$0.isFilteredOut }.count
 }
 
-private var manualCount: Int {
-    localFilteredSeries.filter { $0.isVisible }.count  // 手动勾选的
+private var lockedCount: Int {
+    localFilteredSeries.filter { $0.isLocked }.count
 }
 ```
 
 ## What Changes
 
-- `BandChartViewModel.visibleSeriesData()` - 实现混合焦点逻辑
-- `SpectrumPanelView.displayedCount` - 计算焦点 AP 数量
+- `ChartSeriesRenderState` - add `isLocked` property
+- `ChartSeriesData` - add `isLocked` computed property
+- `BandChartViewModel.makeDisplayedSeriesData()` - locked APs bypass filters
+- `BandChartViewModel.visibleSeriesData()` - implement hybrid logic
+- `BandChartViewModel.toggleLock()` - new method
+- `NativeTableView` - checkbox controls lock state
+- `SpectrumPanelView` - update toolbar indicator
 
 ## What Stays Unchanged
 
-- `ChartSeriesRenderState` - 不变
-- `ChartSeriesData` - 不变
-- `ScannerViewModel.toggleVisibility()` - 不变
-- `NativeTableView` - 不变
-- `BandChartView` - 不变
-- `TrendChartView` - 不变
-- Filter engine - 不变
+- `BandChartView` - no changes
+- `TrendChartView` - no changes
+- Filter engine - no changes
+- Data pipeline - no changes
 
 ## Testing
 
-- Unit test: 手动勾选的 AP 始终显示（即使超过 15 个）
-- Unit test: 自动选择前 15 个 AP
-- Unit test: 筛选只影响非手动勾选的 AP
-- Unit test: toggleVisibility() 正确切换状态
+- Unit test: 锁定的 AP 绕过筛选
+- Unit test: 锁定且可见的 AP 始终显示
+- Unit test: 未锁定的 AP 自动选择前 15 个
+- Unit test: toggleLock() 正确切换状态
