@@ -121,9 +121,16 @@ private func buildSeries() -> [ChartSeries<ChartPoint>] {
 
 **File:** `WiFiLens/Sources/WiFiLens/Spectrum/ContentView.swift`
 
-Table shows all APs. The `isFocused` and `isManuallyFocused` properties are available for:
-- Visual distinction (e.g., manual focus APs could have a special icon)
-- Future UI enhancements
+Table shows all APs with:
+
+- **行点击** → 显示趋势图（现有行为，不变）
+- **行复选框** → 切换焦点状态（新行为）
+
+```swift
+// 在 NativeTableView 中添加复选框列
+// 复选框状态绑定到 isManuallyFocused
+// 点击复选框调用 toggleFocus()
+```
 
 ## Toolbar Indicator
 
@@ -139,6 +146,20 @@ private var manualCount: Int {
 }
 ```
 
+## Multi-View Coordination
+
+**问题**：两个面板可能显示同一个频段（如都显示 5GHz），手动选择的 AP 应该在两个面板中都显示。
+
+**解决方案**：
+- `isManuallyFocused` 存储在 `ChartSeriesData` 中
+- 两个面板共享同一个 `BandChartViewModel`
+- 手动选择的状态在两个面板中同步
+
+**示例**：
+1. Panel A 显示 5GHz，用户手动选择 AP X
+2. Panel B 切换到 5GHz
+3. AP X 在 Panel B 中也显示为焦点（因为 `isManuallyFocused = true`）
+
 ## What Changes
 
 - `ChartSeriesRenderState` - add `isFocused` and `isManuallyFocused` properties
@@ -146,7 +167,8 @@ private var manualCount: Int {
 - `BandChartViewModel.visibleSeriesData()` - implement hybrid focus logic
 - `BandChartViewModel.toggleFocus()` - new method for manual toggle
 - `BandChartView.buildSeries()` - filter by `isFocused`
-- `SpectrumPanelView` - update toolbar indicator, add toggle UI
+- `NativeTableView` - add checkbox column for focus toggle
+- `SpectrumPanelView` - update toolbar indicator
 
 ## What Stays Unchanged
 
