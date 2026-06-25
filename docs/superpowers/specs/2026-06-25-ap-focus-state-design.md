@@ -2,31 +2,35 @@
 
 ## Overview
 
-Implement a two-layer system: "锁定" (Lock) bypasses filters, "可见性" (Visibility) controls chart display.
+实现两条并行数据路径：筛选路径和可见性路径，最终合并为用户锁定的结果。
 
-## Business Logic
+## 数据流
 
-### Three Layers
+```
+数据 Pipeline → 原始 APs
+                ↓
+        ┌───────┴───────┐
+        ↓               ↓
+    用户自定义筛选      表
+        ↓               ↓
+    数量筛选          可见性
+        ↓               ↓
+    筛选结果      可见性筛选的 APs
+        ↓               ↓
+        └───────┬───────┘
+                ↓
+            用户锁定
+                ↓
+    可见性筛选的 APs + 用户锁定的 APs
+```
 
-1. **筛选 (Filter)** → 决定哪些 AP 在结果集中
-2. **锁定 (Lock)** → 绕过筛选条件，始终出现在结果集中
-3. **可见性 (Visibility)** → 决定锁定的 AP 是否在图表中显示
+## 三条规则
 
-### Priority
+1. **可见性**：由表格控制，决定 AP 是否在图表中显示
+2. **筛选**：独立路径，用户自定义筛选 + 数量筛选
+3. **锁定**：合并筛选结果和可见性筛选的 APs
 
-- 锁定的 AP 始终在结果集中（忽略筛选）
-- 可见性只影响锁定的 AP 是否在图表中显示
-- 未锁定的 AP 正常受筛选影响
-
-### Examples
-
-| AP | 锁定 | 可见性 | 筛选结果 | 图表显示 |
-|----|------|--------|----------|----------|
-| X | 否 | - | 通过筛选 | 显示 |
-| Y | 是 | 开 | 在结果集中 | 显示 |
-| Z | 是 | 关 | 在结果集中 | 不显示 |
-
-## Data Model Changes
+## 数据模型变化
 
 ### ChartSeriesRenderState
 
@@ -37,8 +41,8 @@ struct ChartSeriesRenderState {
     var displayRSSI: Double = 0.0
     var color: Color = .gray
     var isFilteredOut: Bool = false
-    var isVisible: Bool = true
-    var isLocked: Bool = false  // NEW: 锁定状态
+    var isVisible: Bool = true      // 可见性：表格控制
+    var isLocked: Bool = false      // 锁定：绕过筛选
     var qualityScore: Int = 0
     var trendArrow: String = ""
     var trendDelta: Int = 0
@@ -54,9 +58,9 @@ var isLocked: Bool {
 }
 ```
 
-## Core Logic
+## 核心逻辑
 
-### Filter Behavior
+### 筛选路径
 
 **File:** `WiFiLens/Sources/WiFiLens/Spectrum/BandChartViewModel.swift`
 
@@ -86,26 +90,33 @@ private func makeDisplayedSeriesData(from source: [ChartSeriesData], hiddenBands
 }
 ```
 
-### visibleSeriesData()
+### 可见性路径
 
 **File:** `WiFiLens/Sources/WiFiLens/Spectrum/BandChartViewModel.swift`
+
+修改 `visibleSeriesData()` 合并两条路径：
 
 ```swift
 func visibleSeriesData() -> [ChartSeriesData] {
     let filtered = displayedSeriesData.filter { $0.isVisible && !$0.isFilteredOut }
     let sorted = filtered.sorted { $0.rssi > $1.rssi }
     
-    // 锁定的 AP 始终显示（如果可见性开启）
-    // 自动选择前 15 个（排除已锁定的）
+    // 路径 1：可见性筛选的 APs（isVisible = true）
+    // 路径 2：筛选结果（通过筛选的 APs）
+    // 合并：锁定的 AP 始终显示
+    
     var result: [ChartSeriesData] = []
     var autoCount = 0
     
     for series in sorted {
-        if series.isLocked && series.isVisible {
-            // 锁定且可见的 AP 始终显示
+        if series.isLocked {
+            // 锁定的 AP 始终显示
             result.append(series)
-        } else if !series.isLocked && autoCount < Self.maxVisibleAPs {
-            // 未锁定的 AP 自动选择前 15 个
+        } else if series.isVisible {
+            // 可见性筛选的 APs
+            result.append(series)
+        } else if autoCount < Self.maxVisibleAPs {
+            // 自动选择前 15 个
             result.append(series)
             autoCount += 1
         }
@@ -115,7 +126,7 @@ func visibleSeriesData() -> [ChartSeriesData] {
 }
 ```
 
-### toggleLock() - 切换锁定状态
+### 用户锁定
 
 **File:** `WiFiLens/Sources/WiFiLens/Spectrum/BandChartViewModel.swift`
 
@@ -127,7 +138,7 @@ func toggleLock(for seriesID: String) {
 }
 ```
 
-## Table Display
+## 表格显示
 
 **File:** `WiFiLens/Sources/WiFiLens/Spectrum/ContentView.swift`
 
@@ -141,7 +152,7 @@ func toggleLock(for seriesID: String) {
 // 点击复选框调用 toggleLock()
 ```
 
-## Toolbar Indicator
+## 工具栏指示器
 
 **File:** `WiFiLens/Sources/WiFiLens/Spectrum/SpectrumPanelView.swift`
 
@@ -155,26 +166,26 @@ private var lockedCount: Int {
 }
 ```
 
-## What Changes
+## 变更内容
 
-- `ChartSeriesRenderState` - add `isLocked` property
-- `ChartSeriesData` - add `isLocked` computed property
-- `BandChartViewModel.makeDisplayedSeriesData()` - locked APs bypass filters
-- `BandChartViewModel.visibleSeriesData()` - implement hybrid logic
-- `BandChartViewModel.toggleLock()` - new method
-- `NativeTableView` - checkbox controls lock state
-- `SpectrumPanelView` - update toolbar indicator
+- `ChartSeriesRenderState` - 添加 `isLocked` 属性
+- `ChartSeriesData` - 添加 `isLocked` 计算属性
+- `BandChartViewModel.makeDisplayedSeriesData()` - 锁定的 AP 绕过筛选
+- `BandChartViewModel.visibleSeriesData()` - 合并两条路径
+- `BandChartViewModel.toggleLock()` - 新方法
+- `NativeTableView` - 复选框控制锁定状态
+- `SpectrumPanelView` - 更新工具栏指示器
 
-## What Stays Unchanged
+## 不变内容
 
-- `BandChartView` - no changes
-- `TrendChartView` - no changes
-- Filter engine - no changes
-- Data pipeline - no changes
+- `BandChartView` - 不变
+- `TrendChartView` - 不变
+- Filter engine - 不变
+- Data pipeline - 不变
 
-## Testing
+## 测试
 
-- Unit test: 锁定的 AP 绕过筛选
-- Unit test: 锁定且可见的 AP 始终显示
-- Unit test: 未锁定的 AP 自动选择前 15 个
-- Unit test: toggleLock() 正确切换状态
+- 单元测试：锁定的 AP 绕过筛选
+- 单元测试：锁定的 AP 始终显示
+- 单元测试：可见性筛选的 APs 正确显示
+- 单元测试：toggleLock() 正确切换状态
