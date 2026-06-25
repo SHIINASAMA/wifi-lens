@@ -44,14 +44,16 @@ struct NativeTableView: NSViewRepresentable {
         visibilityColumn.isEditable = false
         tableView.addTableColumn(visibilityColumn)
 
-        // Lock column (锁定)
-        let lockColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("lock"))
-        lockColumn.title = String(localized: "table.column.lock", comment: "Lock column header in network table")
-        lockColumn.width = 28
-        lockColumn.minWidth = 24
-        lockColumn.maxWidth = 32
-        lockColumn.isEditable = false
-        tableView.addTableColumn(lockColumn)
+        // Lock column (锁定) — only when lock callback is provided
+        if onToggleVisibilityLocked != nil {
+            let lockColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("lock"))
+            lockColumn.title = String(localized: "table.column.lock", comment: "Lock column header in network table")
+            lockColumn.width = 28
+            lockColumn.minWidth = 24
+            lockColumn.maxWidth = 32
+            lockColumn.isEditable = false
+            tableView.addTableColumn(lockColumn)
+        }
 
         // Data columns with sort support
         addColumn(to: tableView, id: "SSID", title: String(localized: "table.column.ssid", comment: "SSID column header in network table"), width: 160, sortKey: "ssid", ascending: true)
