@@ -2,15 +2,26 @@
 
 ## Overview
 
-Replace the current AP count limit behavior (truncating to 15) with a focus state system. Instead of hiding non-focused APs, mark them with `isFocused = false` so they can be displayed in the table but hidden in the chart.
+Implement a hybrid focus state system where manually selected APs always display, while automatic selection (top 15 by RSSI) provides defaults that can be overridden by filters and count limits.
+
+## Core Rule
+
+**手动选择的 AP 优先级最高**：用户手动点击专注的 AP，无论筛选条件如何、无论数量是否超过 15，都会显示。
+
+## Priority Order
+
+1. **手动选择** (最高优先级) - 用户手动点击的 AP，始终显示
+2. **自动选择** - 按 RSSI 排序，前 15 个为焦点
+3. **筛选** - 可以隐藏非手动选择的 AP
+4. **数量限制** - 可以隐藏非手动选择的 AP
 
 ## Goals
 
-- Mark top 15 APs by RSSI as "focused" (`isFocused = true`)
-- Mark remaining APs as "non-focused" (`isFocused = false`)
-- Chart only shows focused APs
-- Table shows all APs (focused and non-focused)
-- Clear data model for focus state
+- 用户手动选择的 AP 始终显示（最高优先级）
+- 自动选择前 15 个 AP 作为默认焦点
+- 筛选和数量限制只影响非手动选择的 AP
+- 图表只显示焦点 AP
+- 表格显示所有 AP
 
 ## Data Model Changes
 
@@ -18,15 +29,14 @@ Replace the current AP count limit behavior (truncating to 15) with a focus stat
 
 **File:** `WiFiLens/Sources/WiFiLens/Spectrum/ChartSeriesData.swift`
 
-Add `isFocused` property:
-
 ```swift
 struct ChartSeriesRenderState {
     var displayRSSI: Double = 0.0
     var color: Color = .gray
     var isFilteredOut: Bool = false
     var isVisible: Bool = true
-    var isFocused: Bool = true  // NEW
+    var isFocused: Bool = false
+    var isManuallyFocused: Bool = false  // NEW: 手动选择标记
     var qualityScore: Int = 0
     var trendArrow: String = ""
     var trendDelta: Int = 0
@@ -35,37 +45,69 @@ struct ChartSeriesRenderState {
 
 ### ChartSeriesData
 
-Add computed property:
-
 ```swift
 var isFocused: Bool {
     get { render.isFocused }
     set { render.isFocused = newValue }
 }
+
+var isManuallyFocused: Bool {
+    get { render.isManuallyFocused }
+    set { render.isManuallyFocused = newValue }
+}
 ```
 
-## Core Logic: visibleSeriesData()
+## Core Logic
+
+### visibleSeriesData()
 
 **File:** `WiFiLens/Sources/WiFiLens/Spectrum/BandChartViewModel.swift`
-
-Modify `visibleSeriesData()` to mark focus state instead of truncating:
 
 ```swift
 func visibleSeriesData() -> [ChartSeriesData] {
     let filtered = displayedSeriesData.filter { $0.isVisible && !$0.isFilteredOut }
     let sorted = filtered.sorted { $0.rssi > $1.rssi }
-    for (index, series) in sorted.enumerated() {
-        series.isFocused = index < Self.maxVisibleAPs
+    
+    // 手动选择的 AP 始终为焦点
+    for series in sorted {
+        if series.isManuallyFocused {
+            series.isFocused = true
+        }
     }
+    
+    // 自动选择前 15 个（排除已手动选择的）
+    var autoCount = 0
+    for series in sorted {
+        if !series.isManuallyFocused {
+            if autoCount < Self.maxVisibleAPs {
+                series.isFocused = true
+                autoCount += 1
+            } else {
+                series.isFocused = false
+            }
+        }
+    }
+    
     return sorted
+}
+```
+
+### toggleFocus() - 用户手动切换焦点
+
+**File:** `WiFiLens/Sources/WiFiLens/Spectrum/BandChartViewModel.swift`
+
+```swift
+func toggleFocus(for seriesID: String) {
+    guard let series = allSeriesData.first(where: { $0.id == seriesID }) else { return }
+    series.isManuallyFocused.toggle()
+    series.isFocused = series.isManuallyFocused
+    refreshRenderedState()
 }
 ```
 
 ## Chart Rendering
 
 **File:** `WiFiLens/Sources/WiFiLens/Spectrum/BandChartView.swift`
-
-Modify `buildSeries()` to only include focused APs:
 
 ```swift
 private func buildSeries() -> [ChartSeries<ChartPoint>] {
@@ -79,27 +121,32 @@ private func buildSeries() -> [ChartSeries<ChartPoint>] {
 
 **File:** `WiFiLens/Sources/WiFiLens/Spectrum/ContentView.swift`
 
-Table shows all APs (no change needed). The `isFocused` property is available for future use if needed.
+Table shows all APs. The `isFocused` and `isManuallyFocused` properties are available for:
+- Visual distinction (e.g., manual focus APs could have a special icon)
+- Future UI enhancements
 
 ## Toolbar Indicator
 
 **File:** `WiFiLens/Sources/WiFiLens/Spectrum/SpectrumPanelView.swift`
 
-Update `displayedCount` to count focused APs:
-
 ```swift
 private var displayedCount: Int {
     localFilteredSeries.filter { $0.isFocused }.count
+}
+
+private var manualCount: Int {
+    localFilteredSeries.filter { $0.isManuallyFocused }.count
 }
 ```
 
 ## What Changes
 
-- `ChartSeriesRenderState` - add `isFocused` property
-- `ChartSeriesData` - add `isFocused` computed property
-- `BandChartViewModel.visibleSeriesData()` - mark focus state instead of truncating
+- `ChartSeriesRenderState` - add `isFocused` and `isManuallyFocused` properties
+- `ChartSeriesData` - add computed properties
+- `BandChartViewModel.visibleSeriesData()` - implement hybrid focus logic
+- `BandChartViewModel.toggleFocus()` - new method for manual toggle
 - `BandChartView.buildSeries()` - filter by `isFocused`
-- `SpectrumPanelView.displayedCount` - count focused APs
+- `SpectrumPanelView` - update toolbar indicator, add toggle UI
 
 ## What Stays Unchanged
 
@@ -110,6 +157,7 @@ private var displayedCount: Int {
 
 ## Testing
 
-- Unit test: `visibleSeriesData()` marks top 15 as focused
-- Unit test: `visibleSeriesData()` marks remaining as non-focused
-- Unit test: chart only renders focused APs
+- Unit test: 手动选择的 AP 始终显示（即使超过 15 个）
+- Unit test: 自动选择前 15 个 AP
+- Unit test: 筛选只影响非手动选择的 AP
+- Unit test: toggleFocus() 正确切换状态
