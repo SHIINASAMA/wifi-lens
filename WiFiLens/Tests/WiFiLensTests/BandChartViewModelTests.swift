@@ -374,6 +374,68 @@ import ChartLens
         #expect(hit?.0.id == "hit")
     }
 
+    // MARK: - AP Count Limit
+
+    @Test func visibleSeriesDataLimitsToMax() {
+        let vm = BandChartViewModel(band: .band5GHz)
+        var series: [ChartSeriesData] = []
+        for i in 0..<20 {
+            series.append(ChartSeriesData(
+                id: "ap\(i)",
+                ssid: "Network\(i)",
+                bssid: "00:11:22:33:44:\(String(format: "%02x", i))",
+                channel: 36,
+                left: 36,
+                apex: 36.0,
+                right: 40,
+                rssi: -50 - i
+            ))
+        }
+        vm.debugInject(series: series)
+        #expect(vm.visibleSeriesData().count == BandChartViewModel.maxVisibleAPs)
+    }
+
+    @Test func visibleSeriesDataReturnsAllWhenUnderLimit() {
+        let vm = BandChartViewModel(band: .band5GHz)
+        var series: [ChartSeriesData] = []
+        for i in 0..<10 {
+            series.append(ChartSeriesData(
+                id: "ap\(i)",
+                ssid: "Network\(i)",
+                bssid: "00:11:22:33:44:\(String(format: "%02x", i))",
+                channel: 36,
+                left: 36,
+                apex: 36.0,
+                right: 40,
+                rssi: -50 - i
+            ))
+        }
+        vm.debugInject(series: series)
+        #expect(vm.visibleSeriesData().count == 10)
+    }
+
+    @Test func visibleSeriesDataSortsByRSSI() {
+        let vm = BandChartViewModel(band: .band5GHz)
+        var series: [ChartSeriesData] = []
+        series.append(ChartSeriesData(id: "strong", ssid: "Strong", bssid: "00:00:00:00:00:00", channel: 36, left: 36, apex: 36.0, right: 40, rssi: -30))
+        for i in 1..<20 {
+            series.append(ChartSeriesData(
+                id: "ap\(i)",
+                ssid: "Network\(i)",
+                bssid: "00:11:22:33:44:\(String(format: "%02x", i))",
+                channel: 36,
+                left: 36,
+                apex: 36.0,
+                right: 40,
+                rssi: -80 - i
+            ))
+        }
+        vm.debugInject(series: series)
+        let result = vm.visibleSeriesData()
+        #expect(result.count == BandChartViewModel.maxVisibleAPs)
+        #expect(result[0].id == "strong")
+    }
+
     // MARK: - SnapshotToChartAdapter
 
     @Test func channelWidthMHzParsesCorrectly() {

@@ -2,6 +2,7 @@
 
 ## Feature Depth
 
+- [ ] Integrate SpectrumPanelView filter with `APFilterQueryParser` (support structured queries like `band:5G AND rssi:>-60`) — target v1.5.x
 - [ ] RSSI threshold alert (notify when a monitored network drops below a configurable threshold)
 - [x] Fix BLEScanner delegate retain cycles — `onDiscover`/`onReady` closures strongly capture `del`, and `stopScanning()` never clears `delegate` or closure properties, leaking the delegate and `AsyncStream.Continuation` on each 30s scan restart
 - [x] Implement JP channel 14 bonus weighting in `RegionInferenceEngine.channelFingerprint()` — the `if domain == .JP && hardwareChannels.contains("1-14")` body is empty (`/* weighted */`), making JP inference fragile (relies on array iteration order instead of signal strength)

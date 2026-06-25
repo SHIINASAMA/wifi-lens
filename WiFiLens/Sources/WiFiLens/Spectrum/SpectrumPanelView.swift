@@ -7,21 +7,65 @@ struct SpectrumPanelView: View {
 
     @State private var filterQuery: String = ""
 
+    private var currentBandVM: BandChartViewModel {
+        bandViewModel(for: chartType)
+    }
+
+    private var localFilteredSeries: [ChartSeriesData] {
+        let needle = filterQuery.trimmingCharacters(in: .whitespaces).lowercased()
+        guard !needle.isEmpty else {
+            return currentBandVM.visibleSeriesData()
+        }
+        return currentBandVM.visibleSeriesData().filter { series in
+            series.ssid.lowercased().contains(needle)
+                || series.bssid.lowercased().contains(needle)
+        }
+    }
+
+    private var localRenderModel: BandChartRenderModel {
+        let vm = currentBandVM
+        let original = vm.renderModel
+        let filtered = localFilteredSeries
+        return BandChartRenderModel(
+            xDataMin: original.xDataMin,
+            xDataMax: original.xDataMax,
+            yMin: original.yMin,
+            visibleSeriesData: filtered,
+            displayedSeriesData: filtered,
+            strongestRSSI: Int(filtered.map(\.displayRSSI).max() ?? 0),
+            isEmpty: filtered.isEmpty,
+            zoomMin: original.zoomMin,
+            zoomMax: original.zoomMax,
+            isExpanded: original.isExpanded,
+            axisTickStartChannel: original.axisTickStartChannel
+        )
+    }
+
+    private var totalCount: Int {
+        currentBandVM.visibleSeriesData().count
+    }
+
+    private var displayedCount: Int {
+        localFilteredSeries.count
+    }
+
+    private var hiddenCount: Int {
+        totalCount - displayedCount
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             toolbar
             chartContent
         }
-        .onChange(of: filterQuery) { _, _ in
-            applyFilter()
-        }
+        .padding(.trailing, 8)
     }
 
     // MARK: - Toolbar
 
     private var toolbar: some View {
         HStack(spacing: 8) {
-            Picker("Chart Type", selection: $chartType) {
+            Picker(String(localized: "spectrum.panel.chart_type", comment: "Chart type picker label"), selection: $chartType) {
                 ForEach(supportedChartTypes) { type in
                     Text(type.displayName)
                         .lineLimit(1)
@@ -31,9 +75,15 @@ struct SpectrumPanelView: View {
             .pickerStyle(.menu)
             .frame(width: 180)
 
-            TextField("Filter...", text: $filterQuery)
+            TextField(String(localized: "spectrum.panel.filter_placeholder", comment: "Filter input placeholder"), text: $filterQuery)
                 .textFieldStyle(.roundedBorder)
                 .frame(maxWidth: 300)
+
+            if hiddenCount > 0 {
+                Text("\(displayedCount)/\(totalCount)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
 
             if !filterQuery.isEmpty {
                 Button {
@@ -67,7 +117,7 @@ struct SpectrumPanelView: View {
     private var spectrumChart: some View {
         let bandVM = bandViewModel(for: chartType)
         return WiFiBandChart(
-            model: bandVM.renderModel,
+            model: localRenderModel,
             selectedNetworkID: $selectedNetworkID,
             onResetZoom: { bandVM.resetZoom() },
             onToggleExpand: { bandVM.toggleExpand() },
@@ -96,7 +146,7 @@ struct SpectrumPanelView: View {
             } else {
                 VStack {
                     Spacer()
-                    Text("Select a network to view trend")
+                    Text(String(localized: "spectrum.panel.select_network_for_trend", comment: "Placeholder when no network is selected for trend chart"))
                         .foregroundColor(.secondary)
                         .font(.caption)
                     Spacer()
@@ -141,15 +191,5 @@ struct SpectrumPanelView: View {
             }
         }
         return nil
-    }
-
-    private func applyFilter() {
-        let trimmed = filterQuery.trimmingCharacters(in: .whitespaces)
-        let bandVM = bandViewModel(for: chartType)
-        bandVM.applyFilter(
-            trimmed.isEmpty ? nil : trimmed,
-            hiddenBands: viewModel.hiddenBands,
-            hideHiddenSSIDs: viewModel.hideHiddenSSIDs
-        )
     }
 }

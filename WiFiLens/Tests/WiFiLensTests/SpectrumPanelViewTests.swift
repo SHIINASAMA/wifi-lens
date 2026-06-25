@@ -5,13 +5,15 @@ import Testing
     @Test func bandPanelSelectionFromBand() {
         let selection = BandPanelSelection.band5
         #expect(selection.rawValue == "5")
-        #expect(selection.displayName == "5 GHz")
+        #expect(!selection.displayName.isEmpty)
+        #expect(selection.displayName != selection.rawValue)
     }
     
     @Test func bandPanelSelectionTrend() {
         let selection = BandPanelSelection.trend
         #expect(selection.rawValue == "trend")
-        #expect(selection.displayName == "Trend")
+        #expect(!selection.displayName.isEmpty)
+        #expect(selection.displayName != selection.rawValue)
     }
     
     @Test func bandPanelSelectionIconNames() {

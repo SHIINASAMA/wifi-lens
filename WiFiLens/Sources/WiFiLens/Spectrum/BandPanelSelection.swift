@@ -10,10 +10,10 @@ enum BandPanelSelection: String, CaseIterable, Identifiable {
     
     var displayName: String {
         switch self {
-        case .band24: return "2.4 GHz"
-        case .band5: return "5 GHz"
-        case .band6: return "6 GHz"
-        case .trend: return "Trend"
+        case .band24: return String(localized: "spectrum.panel.band.24ghz", comment: "2.4 GHz band label in spectrum panel")
+        case .band5: return String(localized: "spectrum.panel.band.5ghz", comment: "5 GHz band label in spectrum panel")
+        case .band6: return String(localized: "spectrum.panel.band.6ghz", comment: "6 GHz band label in spectrum panel")
+        case .trend: return String(localized: "spectrum.panel.trend", comment: "Trend chart label in spectrum panel")
         }
     }
     

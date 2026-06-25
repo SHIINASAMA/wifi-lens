@@ -24,6 +24,7 @@ final class BandChartViewModel {
     private var currentHideHiddenSSIDs: Bool = false
     private var animationTimer: Timer?
     var chartSize: CGSize = .zero
+    static let maxVisibleAPs = 15
 
     var hasFilter: Bool { !currentFilterQuery.trimmingCharacters(in: .whitespaces).isEmpty }
     var networkCount: Int { allSeriesData.count }
@@ -95,7 +96,9 @@ final class BandChartViewModel {
     }
 
     func visibleSeriesData() -> [ChartSeriesData] {
-        displayedSeriesData.filter { $0.isVisible && !$0.isFilteredOut }
+        let filtered = displayedSeriesData.filter { $0.isVisible && !$0.isFilteredOut }
+        guard filtered.count > Self.maxVisibleAPs else { return filtered }
+        return Array(filtered.sorted { $0.rssi > $1.rssi }.prefix(Self.maxVisibleAPs))
     }
 
     func strongestRSSI() -> Int {

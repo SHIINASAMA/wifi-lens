@@ -10,10 +10,10 @@ import Testing
     }
     
     @Test func displayNames() {
-        #expect(BandPanelSelection.band24.displayName == "2.4 GHz")
-        #expect(BandPanelSelection.band5.displayName == "5 GHz")
-        #expect(BandPanelSelection.band6.displayName == "6 GHz")
-        #expect(BandPanelSelection.trend.displayName == "Trend")
+        for selection in BandPanelSelection.allCases {
+            #expect(!selection.displayName.isEmpty)
+            #expect(selection.displayName != selection.rawValue)
+        }
     }
     
     @Test func allCasesCount() {
