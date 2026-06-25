@@ -33,6 +33,7 @@ struct NetworkTableRow: Identifiable, Hashable {
     let trendArrow: String
     let trendDelta: Int
     let isVisible: Bool
+    let visibilityLocked: Bool
     let qualityScore: Int
     let lastSeen: String
 }
@@ -132,6 +133,7 @@ final class ScannerViewModel {
                     trendArrow: series.trendArrow,
                     trendDelta: series.trendDelta,
                     isVisible: series.isVisible,
+                    visibilityLocked: series.visibilityLocked,
                     qualityScore: series.qualityScore,
                     lastSeen: ""
                 )
@@ -509,6 +511,13 @@ final class ScannerViewModel {
             hiddenBSSIDs.insert(bssid)
         }
         applyNetworks(lastNetworks)  // rebuild with updated hiddenBSSIDs
+    }
+
+    func toggleVisibilityLocked(bssid: String) {
+        for vm in bandViewModels {
+            vm.toggleVisibilityLocked(for: bssid)
+        }
+        applyNetworks(lastNetworks)  // rebuild with updated visibilityLocked
     }
 
     func stop() {

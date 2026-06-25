@@ -230,7 +230,8 @@ struct ContentView: View {
             selectedID: $viewModel.selectedNetworkID,
             sortOrder: $sortOrder,
             hiddenColumns: hiddenColumns,
-            onToggleVisibility: { bssid in viewModel.toggleVisibility(bssid: bssid) }
+            onToggleVisibility: { bssid in viewModel.toggleVisibility(bssid: bssid) },
+            onToggleVisibilityLocked: { bssid in viewModel.toggleVisibilityLocked(bssid: bssid) }
         )
     }
 

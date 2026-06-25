@@ -7,9 +7,10 @@ struct NativeTableView: NSViewRepresentable {
     @Binding var sortOrder: [NSSortDescriptor]
     @Binding var hiddenColumns: Set<String>
     var onToggleVisibility: ((String) -> Void)?
+    var onToggleVisibilityLocked: ((String) -> Void)?
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(rows: rows, selectedID: $selectedID, sortOrder: $sortOrder, hiddenColumns: $hiddenColumns, onToggleVisibility: onToggleVisibility)
+        Coordinator(rows: rows, selectedID: $selectedID, sortOrder: $sortOrder, hiddenColumns: $hiddenColumns, onToggleVisibility: onToggleVisibility, onToggleVisibilityLocked: onToggleVisibilityLocked)
     }
 
     func makeNSView(context: Context) -> NSScrollView {
@@ -161,15 +162,17 @@ struct NativeTableView: NSViewRepresentable {
         var sortOrder: Binding<[NSSortDescriptor]>
         var hiddenColumns: Binding<Set<String>>
         var onToggleVisibility: ((String) -> Void)?
+        var onToggleVisibilityLocked: ((String) -> Void)?
         weak var tableView: NSTableView?
         var previousSelectedID: String?
 
-        init(rows: [NetworkTableRow], selectedID: Binding<String?>, sortOrder: Binding<[NSSortDescriptor]>, hiddenColumns: Binding<Set<String>>, onToggleVisibility: ((String) -> Void)?) {
+        init(rows: [NetworkTableRow], selectedID: Binding<String?>, sortOrder: Binding<[NSSortDescriptor]>, hiddenColumns: Binding<Set<String>>, onToggleVisibility: ((String) -> Void)?, onToggleVisibilityLocked: ((String) -> Void)?) {
             self.rows = rows
             self.selectedID = selectedID
             self.sortOrder = sortOrder
             self.hiddenColumns = hiddenColumns
             self.onToggleVisibility = onToggleVisibility
+            self.onToggleVisibilityLocked = onToggleVisibilityLocked
             self.previousSelectedID = selectedID.wrappedValue
         }
 
@@ -183,7 +186,7 @@ struct NativeTableView: NSViewRepresentable {
             let opacity = rowOpacity(network)
 
             if columnID == "check" {
-                let container = NSView(frame: NSRect(x: 0, y: 0, width: 22, height: 20))
+                let container = NSView(frame: NSRect(x: 0, y: 0, width: 32, height: 20))
                 let checkbox = NSButton(frame: NSRect(x: 3, y: 2, width: 16, height: 16))
                 checkbox.setButtonType(.switch)
                 checkbox.title = ""
@@ -195,6 +198,22 @@ struct NativeTableView: NSViewRepresentable {
                 checkbox.action = #selector(Coordinator.checkboxToggled(_:))
                 checkbox.setAccessibilityLabel(String(localized: "table.accessibility.toggle_visibility", comment: "Toggle network visibility checkbox"))
                 container.addSubview(checkbox)
+                
+                // 锁定按钮
+                let lockButton = NSButton(frame: NSRect(x: 20, y: 2, width: 12, height: 16))
+                lockButton.setButtonType(.momentaryChange)
+                lockButton.isBordered = false
+                let lockImageName = network.visibilityLocked ? "lock.fill" : "lock.open"
+                lockButton.image = NSImage(systemSymbolName: lockImageName, accessibilityDescription: nil)?
+                    .withSymbolConfiguration(.init(pointSize: 9, weight: .medium))
+                lockButton.contentTintColor = network.visibilityLocked ? .secondaryLabelColor : .tertiaryLabelColor
+                lockButton.alphaValue = opacity
+                lockButton.tag = row
+                lockButton.target = self
+                lockButton.action = #selector(Coordinator.lockToggled(_:))
+                lockButton.setAccessibilityLabel(String(localized: "table.accessibility.toggle_lock", comment: "Toggle network lock checkbox"))
+                container.addSubview(lockButton)
+                
                 return container
             }
 
@@ -284,6 +303,12 @@ struct NativeTableView: NSViewRepresentable {
             let row = sender.tag
             guard row < rows.count else { return }
             onToggleVisibility?(rows[row].bssid)
+        }
+
+        @MainActor @objc func lockToggled(_ sender: NSButton) {
+            let row = sender.tag
+            guard row < rows.count else { return }
+            onToggleVisibilityLocked?(rows[row].bssid)
         }
 
         @MainActor @objc func toggleColumnVisibility(_ sender: NSMenuItem) {
