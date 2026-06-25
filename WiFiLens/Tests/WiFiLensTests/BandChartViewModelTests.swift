@@ -392,7 +392,7 @@ import ChartLens
             ))
         }
         vm.debugInject(series: series)
-        #expect(vm.visibleSeriesData().count == BandChartViewModel.maxVisibleAPs)
+        #expect(vm.visibleSeriesData().count == 20)
     }
 
     @Test func visibleSeriesDataReturnsAllWhenUnderLimit() {
@@ -432,7 +432,7 @@ import ChartLens
         }
         vm.debugInject(series: series)
         let result = vm.visibleSeriesData()
-        #expect(result.count == BandChartViewModel.maxVisibleAPs)
+        #expect(result.count == 20)
         #expect(result[0].id == "strong")
     }
 
@@ -497,5 +497,85 @@ import ChartLens
             colorHasher: SSIDColorHasher()
         )
         #expect(series.isEmpty)
+    }
+
+    // MARK: - Visibility / VisibilityLocked
+
+    @Test func lockedAPNotModifiedByFilter() {
+        let vm = BandChartViewModel(band: .band5GHz)
+        let series = ChartSeriesData(
+            id: "locked",
+            ssid: "Office",
+            bssid: "00:11:22:33:44:55",
+            channel: 36,
+            left: 36,
+            apex: 36.0,
+            right: 40,
+            rssi: -50,
+            isVisible: true,
+            visibilityLocked: true
+        )
+        vm.debugInject(series: [series])
+        vm.applyFilter("Home")
+        #expect(vm.visibleSeriesData().first?.id == "locked")
+    }
+
+    @Test func unlockedAPModifiedByFilter() {
+        let vm = BandChartViewModel(band: .band5GHz)
+        let series = ChartSeriesData(
+            id: "unlocked",
+            ssid: "Office",
+            bssid: "00:11:22:33:44:55",
+            channel: 36,
+            left: 36,
+            apex: 36.0,
+            right: 40,
+            rssi: -50,
+            isVisible: true,
+            visibilityLocked: false
+        )
+        vm.debugInject(series: [series])
+        vm.applyFilter("Home")
+        #expect(vm.visibleSeriesData().isEmpty)
+    }
+
+    @Test func toggleVisibility() {
+        let vm = BandChartViewModel(band: .band5GHz)
+        let series = ChartSeriesData(
+            id: "test",
+            ssid: "Test",
+            bssid: "00:11:22:33:44:55",
+            channel: 36,
+            left: 36,
+            apex: 36.0,
+            right: 40,
+            rssi: -50,
+            isVisible: true
+        )
+        vm.debugInject(series: [series])
+        vm.toggleVisibility(for: "test")
+        #expect(vm.allSeriesData.first?.isVisible == false)
+        vm.toggleVisibility(for: "test")
+        #expect(vm.allSeriesData.first?.isVisible == true)
+    }
+
+    @Test func toggleVisibilityLocked() {
+        let vm = BandChartViewModel(band: .band5GHz)
+        let series = ChartSeriesData(
+            id: "test",
+            ssid: "Test",
+            bssid: "00:11:22:33:44:55",
+            channel: 36,
+            left: 36,
+            apex: 36.0,
+            right: 40,
+            rssi: -50,
+            visibilityLocked: false
+        )
+        vm.debugInject(series: [series])
+        vm.toggleVisibilityLocked(for: "test")
+        #expect(vm.allSeriesData.first?.visibilityLocked == true)
+        vm.toggleVisibilityLocked(for: "test")
+        #expect(vm.allSeriesData.first?.visibilityLocked == false)
     }
 }
