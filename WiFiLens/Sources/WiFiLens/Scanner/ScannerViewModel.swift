@@ -69,15 +69,12 @@ final class ScannerViewModel {
     private var startupTask: Task<Void, Never>?
     private var wifiMonitoringTask: Task<Void, Never>?
 
-    let controller: WiFiObservationController
     let store: WiFiObservationStore
 
     init(
-        controller: WiFiObservationController = WiFiObservationController(store: .shared),
         store: WiFiObservationStore = .shared,
         gatewayLatencyProvider: GatewayLatencyProviding = GatewayLatencyProvider()
     ) {
-        self.controller = controller
         self.store = store
         self.gatewayLatencyProvider = gatewayLatencyProvider
         wifiPowerState = wifiPowerMonitor.currentState

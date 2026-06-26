@@ -104,7 +104,8 @@ struct WiFiObservationPipeline: WiFiObservationPipelining {
                 timestamp: Date(), isConnected: false, isWiFiPowerOn: true
             ),
             quality: current.quality,
-            channelAnalysis: scan.channelAnalysis
+            channelAnalysis: scan.channelAnalysis,
+            channelRecommendations: scan.channelRecommendation
         )
         return observation
     }

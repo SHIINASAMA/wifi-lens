@@ -100,4 +100,48 @@ struct AnalyzerTests {
         #expect(!result.message.contains("%1$"))
         #expect(!result.message.contains("observation.diagnosis"))
     }
+
+    @Test("DiagnosticEvaluator: congested message includes recommended channels")
+    func congestedDiagnosticIncludesRecommendations() {
+        let status = WiFiCurrentStatus(
+            timestamp: Date(), ssid: "Net", bssid: "AA:BB", channel: 6,
+            rssi: -60, security: "WPA3", isConnected: true, isWiFiPowerOn: true
+        )
+        let ch = ChannelQuality(
+            channel: 6, band: "24", bandDisplay: "2.4 GHz",
+            qualityScore: 35, qualityLevel: .congested,
+            apCount: 8, coChannelCount: 5, adjacentCount: 3,
+            interferenceScore: 65, overlapLevel: .high,
+            strongestNeighborRSSI: -50, isCurrentChannel: true
+        )
+        let recommendationAQuality = ChannelQuality(
+            channel: 1, band: "24", bandDisplay: "2.4 GHz",
+            qualityScore: 82, qualityLevel: .good,
+            apCount: 1, coChannelCount: 1, adjacentCount: 0,
+            interferenceScore: 12, overlapLevel: .low,
+            strongestNeighborRSSI: -72
+        )
+        let recommendationBQuality = ChannelQuality(
+            channel: 11, band: "24", bandDisplay: "2.4 GHz",
+            qualityScore: 79, qualityLevel: .good,
+            apCount: 2, coChannelCount: 1, adjacentCount: 1,
+            interferenceScore: 18, overlapLevel: .low,
+            strongestNeighborRSSI: -68
+        )
+        var recommendationA = ChannelRecommendation(from: recommendationAQuality)
+        recommendationA.scoreSelected = true
+        recommendationA.classification = .recommended
+        var recommendationB = ChannelRecommendation(from: recommendationBQuality)
+        recommendationB.scoreSelected = true
+        recommendationB.classification = .recommended
+
+        let result = DiagnosticEvaluator.evaluate(
+            currentStatus: status,
+            channelAnalysis: [ch],
+            channelRecommendations: [recommendationA, recommendationB]
+        )
+
+        #expect(result.severity == .warning)
+        #expect(result.message.contains("1 / 11"))
+    }
 }

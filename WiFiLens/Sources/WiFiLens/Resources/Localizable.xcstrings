@@ -7745,6 +7745,30 @@
         }
       }
     },
+    "menubar.action.view_all" : {
+      "comment" : "View all button label in menu bar popover",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて表示"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看全部"
+          }
+        }
+      }
+    },
     "menubar.error.no_connection" : {
       "comment" : "No Wi-Fi connection error in menu bar popover",
       "extractionState" : "manual",
@@ -8896,9 +8920,6 @@
           }
         }
       }
-    },
-    "No events in the last hour" : {
-
     },
     "observation.diagnosis.congested.message_fmt" : {
       "comment" : "Congested channel with details",
@@ -11057,9 +11078,6 @@
           }
         }
       }
-    },
-    "Recent Events" : {
-
     },
     "recording.chart.empty" : {
       "comment" : "Empty state when no data has been recorded yet for the timeline chart",
@@ -14438,9 +14456,6 @@
           }
         }
       }
-    },
-    "Signal" : {
-
     },
     "spectrum.accessibility.chart_label_fmt" : {
       "comment" : "Chart accessibility label with network count",

@@ -125,5 +125,22 @@ struct MenuBarMigrationTests {
         #expect(vm.signalTrendData.count == 3)
         #expect(vm.signalTrendData == [-50, -55, -60])
     }
+
+    @Test("status row icon styling stays fixed while value styling changes")
+    func statusRowIconStylingIsFixed() async {
+        let weakSignalStyle = MenuBarStatusRowStyle.signal(
+            rssi: -82,
+            trendLabel: "Degrading"
+        )
+        let strongSignalStyle = MenuBarStatusRowStyle.signal(
+            rssi: -48,
+            trendLabel: "Improving"
+        )
+
+        #expect(weakSignalStyle.icon == "cellularbars")
+        #expect(strongSignalStyle.icon == "cellularbars")
+        #expect(weakSignalStyle.iconColor == strongSignalStyle.iconColor)
+        #expect(weakSignalStyle.valueColor != strongSignalStyle.valueColor)
+    }
 }
 #endif
