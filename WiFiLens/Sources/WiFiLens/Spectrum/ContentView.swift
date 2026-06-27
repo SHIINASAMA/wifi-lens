@@ -32,6 +32,26 @@ enum SpectrumRecordingSessionResolver {
 }
 #endif
 
+struct SpectrumDashboardLayout {
+    static let primaryRatio: CGFloat = 0.35
+    static let secondaryRatio: CGFloat = 0.35
+    static let tableRatio: CGFloat = 0.30
+
+    let viewportHeight: CGFloat
+
+    var primaryHeight: CGFloat {
+        viewportHeight * Self.primaryRatio
+    }
+
+    var secondaryHeight: CGFloat {
+        viewportHeight * Self.secondaryRatio
+    }
+
+    var tableHeight: CGFloat {
+        viewportHeight * Self.tableRatio
+    }
+}
+
 struct ContentView: View {
     @Bindable var viewModel: ScannerViewModel
 
@@ -130,42 +150,44 @@ struct ContentView: View {
 
     private var dashboardContent: some View {
         GeometryReader { geometry in
-            let totalH = geometry.size.height
-            let panelHeight = totalH * 0.35
-            let tableHeight = totalH * 0.30
-            
+            let layout = SpectrumDashboardLayout(viewportHeight: geometry.size.height)
+
             VStack(spacing: 0) {
                 if shouldShowEmptyState {
                     emptyState
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
+                    // Keep Spectrum container-driven, similar to a three-row CSS grid
+                    // with fractional tracks. The parent owns the full viewport height
+                    // and each section consumes a fixed share of that space.
                     SpectrumPanelView(
                         viewModel: viewModel,
                         panelID: .primary,
                         chartType: $panel1ChartType,
                         selectedNetworkID: $viewModel.selectedNetworkID
                     )
-                    .frame(height: panelHeight)
-                    
+                    .frame(height: layout.primaryHeight)
+
                     Divider()
-                    
+
                     SpectrumPanelView(
                         viewModel: viewModel,
                         panelID: .secondary,
                         chartType: $panel2ChartType,
                         selectedNetworkID: $viewModel.selectedNetworkID
                     )
-                    .frame(height: panelHeight)
-                    
+                    .frame(height: layout.secondaryHeight)
+
                     Divider()
-                    
+
                     VStack(spacing: 0) {
                         tableFilterBar
                         bottomTable
                     }
-                    .frame(height: tableHeight)
+                    .frame(height: layout.tableHeight)
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
     }
 
