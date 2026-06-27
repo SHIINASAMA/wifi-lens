@@ -163,6 +163,8 @@ struct SidebarView: View {
         }
         .id(selectedPage)
         .background(.ultraThinMaterial)
+        .listStyle(.sidebar)
+        .safeAreaPadding(.top, 12)
         .frame(minWidth: 160, idealWidth: 180)
     }
 }

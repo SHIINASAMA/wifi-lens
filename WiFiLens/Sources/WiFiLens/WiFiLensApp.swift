@@ -251,6 +251,7 @@ private struct AppRootView: View {
                 Text(String(localized: "permission.location.services_required_message", comment: "Alert message explaining why Location Services is required"))
             }
         }
+        .listStyle(.sidebar)
         .toolbar {
             secondaryToolbarContent
         }
