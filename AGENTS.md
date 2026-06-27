@@ -21,6 +21,7 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/TODO.md` | Feature roadmap and checked-off items |
 | `docs/ISSUES.md` | Bugs, regressions, and deferred work with status |
 | `docs/LOCALIZATION_TERMS.md` | Standardized translation terminology for all languages |
+| `docs/WINDOWING.md` | Main window sizing/restoration policy, P0 incident record, and anti-regression rules |
 | `docs/superpowers/specs/2026-06-18-debug-multi-ap-chart-design.md` | Design spec for the DebugChartView multi-AP chart workbench |
 | `docs/superpowers/plans/2026-06-18-debug-multi-ap-chart.md` | Implementation plan for the DebugChartView multi-AP chart workbench |
 | `docs/superpowers/specs/2026-06-24-ap-filter-design.md` | Design spec for structured AP filter query parser and filter service |

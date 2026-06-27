@@ -13,6 +13,7 @@
 		122F4DD99EC9891A0BD9ECFE /* ChannelSpanCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B77C42448FC4F5A8180F9885 /* ChannelSpanCalculatorTests.swift */; };
 		13E648DDB1578ECF42926E36 /* MCPServerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5024CBB8BFCAFF56FEF0756 /* MCPServerTests.swift */; };
 		19134AC983FA95FB8033EB8F /* ChartUtilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E83547C1A36ADDD9E827B26A /* ChartUtilityTests.swift */; };
+		1B8B239E2A11401AB0C0D51B /* WindowFramePolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D92298452F334CDAAA9695D3 /* WindowFramePolicyTests.swift */; };
 		1E5141F704005BF06DB684A1 /* CoreWLAN.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1067F6AA96EC6320C6472F59 /* CoreWLAN.framework */; };
 		237EB0EBBBFBAC33EAE1380B /* BluetoothPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6CDF2DB455AB04A0A7C8BBF /* BluetoothPermissionManager.swift */; };
 		23F1AB88A28C6E035AA916AA /* BandChartViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58FF378E09090DEBAAFA77F6 /* BandChartViewModel.swift */; };
@@ -103,6 +104,7 @@
 		FB0573B42FBBEAE4005F8214 /* MCP in Frameworks */ = {isa = PBXBuildFile; productRef = FB0573B32FBBEAE4005F8214 /* MCP */; };
 		FB0573B62FBBEBB9005F8214 /* MCPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573B52FBBEBB9005F8214 /* MCPServer.swift */; };
 		FB0573BA2FBBFC31005F8214 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573B92FBBFC31005F8214 /* SidebarView.swift */; };
+		FB05A7A12FD1A0F100B5C801 /* WindowFramePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB05A7A02FD1A0F100B5C801 /* WindowFramePolicy.swift */; };
 		FB0573BE2FBC22C2005F8214 /* InterfacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573BD2FBC22C2005F8214 /* InterfacesView.swift */; };
 		FB0573C02FBC47CC005F8214 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573BF2FBC47CC005F8214 /* Logging.swift */; };
 		FB0573C12FBBFC31005F8215 /* ProFeaturePlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C02FBBFC31005F8215 /* ProFeaturePlaceholderView.swift */; };
@@ -164,6 +166,7 @@
 		FB1E327B2FC7316C009D1BDC /* BuildConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB2CA8B2FC0E14000FC2D2C /* BuildConfig.swift */; };
 		FB1E327C2FC7316C009D1BDC /* IEParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8BB6032FBB0BA600FD072E /* IEParser.swift */; };
 		FB1E327D2FC7316C009D1BDC /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573B92FBBFC31005F8214 /* SidebarView.swift */; };
+		FB1E328A2FD1A11100B5C801 /* WindowFramePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB05A7A02FD1A0F100B5C801 /* WindowFramePolicy.swift */; };
 		FB1E327E2FC7316C009D1BDC /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573BF2FBC47CC005F8214 /* Logging.swift */; };
 		FB1E327F2FC7316C009D1BDC /* RegulatoryDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C92FC4889B0009F29B /* RegulatoryDomain.swift */; };
 		FB1E32802FC7316C009D1BDC /* RegulatoryDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C82FC4889B0009F29B /* RegulatoryDatabase.swift */; };
@@ -353,6 +356,7 @@
 		D6180984B78D4363B6840C79 /* SignalSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalSmoothing.swift; sourceTree = "<group>"; };
 		D69959B95B194A96FA8D337C /* LocationPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermissionManager.swift; sourceTree = "<group>"; };
 		D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewModel.swift; sourceTree = "<group>"; };
+		D92298452F334CDAAA9695D3 /* WindowFramePolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowFramePolicyTests.swift; sourceTree = "<group>"; };
 		E4A2B3C4D5E6F708112233AA /* BandPanelSelectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandPanelSelectionTests.swift; sourceTree = "<group>"; };
 		E4A2B3C4D5E6F708112233AD /* BandPanelSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandPanelSelection.swift; sourceTree = "<group>"; };
 		E4A2B3C4D5E6F708112233AF /* SpectrumPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumPanelView.swift; sourceTree = "<group>"; };
@@ -367,6 +371,7 @@
 		FB0573B02FBB5BEE005F8214 /* TrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendChartView.swift; sourceTree = "<group>"; };
 		FB0573B52FBBEBB9005F8214 /* MCPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPServer.swift; sourceTree = "<group>"; };
 		FB0573B92FBBFC31005F8214 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		FB05A7A02FD1A0F100B5C801 /* WindowFramePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowFramePolicy.swift; sourceTree = "<group>"; };
 		FB0573BD2FBC22C2005F8214 /* InterfacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterfacesView.swift; sourceTree = "<group>"; };
 		FB0573BF2FBC47CC005F8214 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		FB0573C02FBBFC31005F8215 /* ProFeaturePlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProFeaturePlaceholderView.swift; sourceTree = "<group>"; };
@@ -708,6 +713,7 @@
 				BF472346A62545B9866DA8ED /* GatewayPinger.swift */,
 				9E84926DD82E4B90B6509CD8 /* GlassBackground.swift */,
 				51DDD97F3B94514DE0790B51 /* Constants.swift */,
+				FB05A7A02FD1A0F100B5C801 /* WindowFramePolicy.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -860,6 +866,7 @@
 				C1D2E3F4A5B6123456789ABE /* APFilterServiceTests.swift */,
 				E4A2B3C4D5E6F708112233AA /* BandPanelSelectionTests.swift */,
 				E4A2B3C4D5E6F708112233B0 /* SpectrumPanelViewTests.swift */,
+				D92298452F334CDAAA9695D3 /* WindowFramePolicyTests.swift */,
 			);
 			path = WiFiLensTests;
 			sourceTree = "<group>";
@@ -1119,6 +1126,7 @@
 				FB0573CA2FBCD25C005F8214 /* OverviewView.swift in Sources */,
 				46B405FC484C9C9A5509E8AC /* SpanDirection.swift in Sources */,
 				9E2F89530D1114DBFAB705F3 /* WiFiLensApp.swift in Sources */,
+				FB05A7A12FD1A0F100B5C801 /* WindowFramePolicy.swift in Sources */,
 				FE3BDA0DF2CCF2421CE49964 /* WiFiChannel.swift in Sources */,
 				28DCDBF118C838D48BD26773 /* WiFiNetwork.swift in Sources */,
 				FBB2CA8D2FC0E14000FC2D2C /* TitleBadge.swift in Sources */,
@@ -1195,6 +1203,7 @@
 				C1D2E3F4A5B6123456789ABF /* APFilterServiceTests.swift in Sources */,
 				E4A2B3C4D5E6F708112233AB /* BandPanelSelectionTests.swift in Sources */,
 				E4A2B3C4D5E6F708112233B1 /* SpectrumPanelViewTests.swift in Sources */,
+				1B8B239E2A11401AB0C0D51B /* WindowFramePolicyTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1258,6 +1267,7 @@
 				FB1E32752FC7316C009D1BDC /* OverviewView.swift in Sources */,
 				FB1E32762FC7316C009D1BDC /* SpanDirection.swift in Sources */,
 				FB1E32772FC7316C009D1BDC /* WiFiLensApp.swift in Sources */,
+				FB1E328A2FD1A11100B5C801 /* WindowFramePolicy.swift in Sources */,
 				FB1E32782FC7316C009D1BDC /* WiFiChannel.swift in Sources */,
 				FB1E32792FC7316C009D1BDC /* WiFiNetwork.swift in Sources */,
 				FB1E327A2FC7316C009D1BDC /* TitleBadge.swift in Sources */,

@@ -76,6 +76,7 @@ Pro features (Recording, Session, StoreKit) live in the `Pro/` submodule at the 
 - Pages that participate in the shared secondary toolbar consume root-owned mode state instead of rendering their own local segmented controls
 - **Toolbar selection state**: `SecondaryToolbarSelections` is a concrete `Equatable` struct with typed per-page properties (not a `[SidebarPage: ID]` dictionary). Each page's `SecondaryToolbarCapsule` binds directly to its typed property via `@ToolbarContentBuilder`. This lets SwiftUI compare old/new structs and skip `updateNSView` when nothing changed — critical because `WiFiLensApp.body` re-renders frequently due to `ScannerViewModel` observation
 - **@Observable observation chain**: `BandChartViewModel` animation timer modifies `displayedSeriesData` at 60fps. If any parent view reads these properties (e.g. `allSeriesData.count`), the observation chain propagates up to `WiFiLensApp.body`, causing unnecessary re-renders of the entire view hierarchy including the toolbar. Cache frequently-changing derived values (e.g. `cachedTotalNetworks`, `cachedBandSummary`) in `ScannerViewModel` and have child views read the cached values instead
+- **Main window policy**: The shipping app uses a standard resizable macOS main window. Do not use scene-level `.windowResizability(.contentSize)` on the app `WindowGroup`; page `idealWidth` / `idealHeight` values must stay local layout hints. Restored frames are normalized against the current screen `visibleFrame`. See `docs/WINDOWING.md`.
 
 ## Localization
 

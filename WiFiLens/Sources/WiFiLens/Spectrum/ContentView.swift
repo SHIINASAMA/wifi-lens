@@ -58,6 +58,10 @@ struct ContentView: View {
         VStack(spacing: 0) {
             contentArea
         }
+        // This view advertises a comfortable page layout size, but it must remain a
+        // local layout hint only. A previous P0 regression happened when top-level
+        // window sizing was changed to `.windowResizability(.contentSize)`, which
+        // promoted page ideal sizes like this into real NSWindow growth.
         .frame(minWidth: 700, idealWidth: 1000, minHeight: 600)
         .onChange(of: viewModel.hiddenBands) { _, _ in viewModel.applyGlobalFilterToBands() }
         .onChange(of: viewModel.hideHiddenSSIDs) { _, _ in viewModel.applyGlobalFilterToBands() }

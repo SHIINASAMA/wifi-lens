@@ -4,6 +4,16 @@ import Sparkle
 #endif
 
 private struct AppRootView: View {
+    // P0 windowing guardrail:
+    // Keep the app window on a standard macOS sizing model.
+    // Do not reintroduce scene-level content-driven sizing such as:
+    //   .windowResizability(.contentSize)
+    // The previous combination of content-size windowing + hidden pages kept alive
+    // in this ZStack let page ideal sizes expand the restored window beyond the
+    // current screen's visibleFrame, which matched the App Review failure.
+    private let mainWindowDefaultSize = CGSize(width: 900, height: 700)
+    private let mainWindowMinSize = CGSize(width: 820, height: 620)
+
     @Bindable var viewModel: ScannerViewModel
     @Bindable var roamingViewModel: RoamingTestViewModel
     var bleViewModel: BLEViewModel?
@@ -130,6 +140,9 @@ private struct AppRootView: View {
             WiFiOffView()
         } else {
             ZStack {
+                // These pages stay mounted to preserve page-local state. The detail
+                // container must therefore fill the available split-view space
+                // explicitly instead of letting hidden pages influence window sizing.
                 OverviewView(viewModel: viewModel)
                     .opacity(selectedPage == .overview ? 1 : 0)
                     .allowsHitTesting(selectedPage == .overview)
@@ -197,6 +210,7 @@ private struct AppRootView: View {
                     .accessibilityIdentifier("page-debugChart")
 #endif
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
     }
 
@@ -240,9 +254,7 @@ private struct AppRootView: View {
         .toolbar {
             secondaryToolbarContent
         }
-        .background(WindowAccessor { window in
-            window?.setFrameAutosaveName("WiFiLensMainWindow")
-        })
+        .background(WindowAccessor(defaultSize: mainWindowDefaultSize, minSize: mainWindowMinSize))
         .task {
             await viewModel.start()
             roamingViewModel.handleWiFiPowerStateChange(viewModel.wifiPowerState)
@@ -257,21 +269,59 @@ private struct AppRootView: View {
 }
 
 private struct WindowAccessor: NSViewRepresentable {
-    let onWindow: (NSWindow?) -> Void
+    let defaultSize: CGSize
+    let minSize: CGSize
 
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
         DispatchQueue.main.async {
-            let w = view.window
-            AppLogger.app.info("WindowAccessor: window=\(w != nil ? "\(w!)" : "nil")")
-            onWindow(w)
-            w?.titlebarAppearsTransparent = true
-            w?.titleVisibility = .visible
+            configure(view.window)
         }
         return view
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {}
+
+    private func configure(_ window: NSWindow?) {
+        guard let window else {
+            AppLogger.app.info("WindowAccessor: window=nil")
+            return
+        }
+
+        AppLogger.app.info("WindowAccessor: window=\(window)")
+        window.setFrameAutosaveName("WiFiLensMainWindow")
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .visible
+        window.minSize = minSize
+        window.contentMinSize = minSize
+
+        guard let visibleFrame = window.screen?.visibleFrame ?? NSScreen.main?.visibleFrame else {
+            return
+        }
+
+        // P0 regression guard:
+        // Restored NSWindow frames are not trusted blindly because App Review hit a
+        // case where a saved frame + content-driven sizing pushed the main window
+        // behind the Dock and broke full-screen transitions. We always normalize
+        // against the current screen's visibleFrame before the user sees the window.
+        guard WindowFramePolicy.shouldNormalizeLiveWindowFrame(
+            currentFrame: window.frame,
+            screenFrame: window.screen?.frame ?? NSScreen.main?.frame,
+            visibleFrame: visibleFrame,
+            isFullScreen: window.styleMask.contains(.fullScreen)
+        ) else {
+            return
+        }
+
+        let normalized = WindowFramePolicy.normalizedFrame(
+            restoredFrame: window.frame,
+            visibleFrame: visibleFrame,
+            defaultSize: defaultSize
+        )
+        if normalized != window.frame {
+            window.setFrame(normalized, display: true)
+        }
+    }
 }
 
 @main
@@ -323,7 +373,8 @@ struct WiFiLensApp: App {
             )
             .preferredColorScheme(colorScheme)
         }
-        .windowResizability(.contentSize)
+        // Keep a default launch size only. The app window must remain a normal
+        // resizable macOS window; do not add `.windowResizability(.contentSize)`.
         .defaultSize(width: 900, height: 700)
         .onChange(of: appearance) { _, newValue in
             let target: NSAppearance?
