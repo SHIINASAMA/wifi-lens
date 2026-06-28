@@ -42,7 +42,11 @@ struct WiFiObservationPipeline: WiFiObservationPipelining {
         return WiFiObservation(
             currentStatus: status,
             gatewayLatency: latency,
-            quality: quality
+            quality: quality,
+            errors: collectErrors(
+                currentStatusError: status.error,
+                gatewayLatencyError: latency.error
+            )
         )
     }
 
@@ -78,15 +82,13 @@ struct WiFiObservationPipeline: WiFiObservationPipelining {
             deviceCapabilities: deviceCapabilities
         )
 
-        var errors: [WiFiObservationError] = []
-        if let snapshotError = snapshot.error {
-            errors.append(snapshotError)
-        }
         return WiFiObservation(
             environmentSnapshot: snapshot,
             channelAnalysis: channelAnalysis,
             channelRecommendation: channelRecommendation,
-            errors: errors
+            errors: collectErrors(
+                environmentSnapshotError: snapshot.error
+            )
         )
     }
 
@@ -108,5 +110,17 @@ struct WiFiObservationPipeline: WiFiObservationPipelining {
             channelRecommendations: scan.channelRecommendation
         )
         return observation
+    }
+
+    private func collectErrors(
+        currentStatusError: WiFiObservationError? = nil,
+        gatewayLatencyError: WiFiObservationError? = nil,
+        environmentSnapshotError: WiFiObservationError? = nil
+    ) -> [WiFiObservationError] {
+        [
+            currentStatusError,
+            gatewayLatencyError,
+            environmentSnapshotError,
+        ].compactMap { $0 }
     }
 }

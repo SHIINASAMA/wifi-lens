@@ -28,6 +28,7 @@ struct ChartSeriesRenderState {
     var color: Color = .gray
     var isFilteredOut: Bool = false
     var isVisible: Bool = true
+    var visibilityLocked: Bool = false
     var qualityScore: Int = 0
     var trendArrow: String = ""
     var trendDelta: Int = 0
@@ -66,6 +67,7 @@ struct ChartSeriesData: Identifiable {
         nss: String = "",
         country: String = "",
         isVisible: Bool = true,
+        visibilityLocked: Bool = false,
         qualityScore: Int = 0,
         trendArrow: String = "",
         trendDelta: Int = 0
@@ -96,6 +98,7 @@ struct ChartSeriesData: Identifiable {
             color: color,
             isFilteredOut: isFilteredOut,
             isVisible: isVisible,
+            visibilityLocked: visibilityLocked,
             qualityScore: qualityScore,
             trendArrow: trendArrow,
             trendDelta: trendDelta
@@ -140,6 +143,11 @@ struct ChartSeriesData: Identifiable {
     var isVisible: Bool {
         get { render.isVisible }
         set { render.isVisible = newValue }
+    }
+
+    var visibilityLocked: Bool {
+        get { render.visibilityLocked }
+        set { render.visibilityLocked = newValue }
     }
 
     var qualityScore: Int {

@@ -40,6 +40,7 @@ struct NetworkTableRowTests {
             trendArrow: "▲",
             trendDelta: 3,
             isVisible: isVisible,
+            visibilityLocked: false,
             qualityScore: qualityScore,
             lastSeen: ""
         )

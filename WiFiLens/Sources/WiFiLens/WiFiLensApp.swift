@@ -4,6 +4,16 @@ import Sparkle
 #endif
 
 private struct AppRootView: View {
+    // P0 windowing guardrail:
+    // Keep the app window on a standard macOS sizing model.
+    // Do not reintroduce scene-level content-driven sizing such as:
+    //   .windowResizability(.contentSize)
+    // The previous combination of content-size windowing + hidden pages kept alive
+    // in this ZStack let page ideal sizes expand the restored window beyond the
+    // current screen's visibleFrame, which matched the App Review failure.
+    private let mainWindowDefaultSize = CGSize(width: 900, height: 700)
+    private let mainWindowMinSize = CGSize(width: 820, height: 620)
+
     @Bindable var viewModel: ScannerViewModel
     @Bindable var roamingViewModel: RoamingTestViewModel
     var bleViewModel: BLEViewModel?
@@ -130,10 +140,13 @@ private struct AppRootView: View {
             WiFiOffView()
         } else {
             ZStack {
-                if selectedPage == .overview {
-                    OverviewView(viewModel: viewModel, store: viewModel.store)
-                        .accessibilityIdentifier("page-overview")
-                }
+                // These pages stay mounted to preserve page-local state. The detail
+                // container must therefore fill the available split-view space
+                // explicitly instead of letting hidden pages influence window sizing.
+                OverviewView(viewModel: viewModel, store: viewModel.store)
+                    .opacity(selectedPage == .overview ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .overview)
+                    .accessibilityIdentifier("page-overview")
 
                 if selectedPage == .spectrum {
 #if PRO
@@ -152,13 +165,13 @@ private struct AppRootView: View {
 #endif
                 }
 
-                if selectedPage == .channels {
-                    ChannelQualityView(
-                        channels: viewModel.channelRecommendations,
-                        mode: channelViewMode
-                    )
-                        .accessibilityIdentifier("page-channels")
-                }
+                ChannelQualityView(
+                    channels: viewModel.channelRecommendations,
+                    mode: channelViewMode
+                )
+                    .opacity(selectedPage == .channels ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .channels)
+                    .accessibilityIdentifier("page-channels")
 
                 if selectedPage == .interfaces {
                     InterfacesView(
@@ -170,33 +183,34 @@ private struct AppRootView: View {
                         .accessibilityIdentifier("page-interfaces")
                 }
 
-                if selectedPage == .roaming {
-                    RoamingTestView(viewModel: roamingViewModel)
-                        .accessibilityIdentifier("page-roaming")
-                }
+                RoamingTestView(viewModel: roamingViewModel)
+                    .opacity(selectedPage == .roaming ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .roaming)
+                    .accessibilityIdentifier("page-roaming")
 
-                if selectedPage == .bleScanner {
-                    BLEScannerView(viewModel: bleViewModel, bleEnabled: bleEnabled)
-                        .accessibilityIdentifier("page-bleScanner")
-                }
+                BLEScannerView(viewModel: bleViewModel, bleEnabled: bleEnabled)
+                    .opacity(selectedPage == .bleScanner ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .bleScanner)
+                    .accessibilityIdentifier("page-bleScanner")
 
-                if selectedPage == .settings {
-                    SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel?.bluetoothPermission, bleEnabled: $bleEnabled)
-                        .accessibilityIdentifier("page-settings")
-                }
+                SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel?.bluetoothPermission, bleEnabled: $bleEnabled)
+                    .opacity(selectedPage == .settings ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .settings)
+                    .accessibilityIdentifier("page-settings")
 
 #if DEBUG
-                if selectedPage == .spectrumDebugChart {
-                    SpectrumDebugContainerView()
-                        .accessibilityIdentifier("page-spectrumDebugChart")
-                }
+                SpectrumDebugContainerView()
+                    .opacity(selectedPage == .spectrumDebugChart ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .spectrumDebugChart)
+                    .accessibilityIdentifier("page-spectrumDebugChart")
 
-                if selectedPage == .debugChart {
-                    DebugContainerView()
-                        .accessibilityIdentifier("page-debugChart")
-                }
+                DebugContainerView()
+                    .opacity(selectedPage == .debugChart ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .debugChart)
+                    .accessibilityIdentifier("page-debugChart")
 #endif
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
     }
 
@@ -237,12 +251,11 @@ private struct AppRootView: View {
                 Text(String(localized: "permission.location.services_required_message", comment: "Alert message explaining why Location Services is required"))
             }
         }
+        .listStyle(.sidebar)
         .toolbar {
             secondaryToolbarContent
         }
-        .background(WindowAccessor { window in
-            window?.setFrameAutosaveName("WiFiLensMainWindow")
-        })
+        .background(WindowAccessor(defaultSize: mainWindowDefaultSize, minSize: mainWindowMinSize))
         .task {
             await viewModel.start()
             roamingViewModel.handleWiFiPowerStateChange(viewModel.wifiPowerState)
@@ -257,21 +270,126 @@ private struct AppRootView: View {
 }
 
 private struct WindowAccessor: NSViewRepresentable {
-    let onWindow: (NSWindow?) -> Void
+    let defaultSize: CGSize
+    let minSize: CGSize
 
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
         DispatchQueue.main.async {
-            let w = view.window
-            AppLogger.app.info("WindowAccessor: window=\(w != nil ? "\(w!)" : "nil")")
-            onWindow(w)
-            w?.titlebarAppearsTransparent = true
-            w?.titleVisibility = .visible
+            configure(view.window)
         }
         return view
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {}
+
+    private func configure(_ window: NSWindow?) {
+        guard let window else {
+            AppLogger.app.info("WindowAccessor: window=nil")
+            return
+        }
+
+        AppLogger.app.info("WindowAccessor: window=\(window)")
+        window.setFrameAutosaveName("WiFiLensMainWindow")
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .visible
+        window.minSize = minSize
+        window.contentMinSize = minSize
+
+        guard let visibleFrame = window.screen?.visibleFrame ?? NSScreen.main?.visibleFrame else {
+            return
+        }
+
+        // P0 regression guard:
+        // Restored NSWindow frames are not trusted blindly because App Review hit a
+        // case where a saved frame + content-driven sizing pushed the main window
+        // behind the Dock and broke full-screen transitions. We always normalize
+        // against the current screen's visibleFrame before the user sees the window.
+        guard WindowFramePolicy.shouldNormalizeLiveWindowFrame(
+            currentFrame: window.frame,
+            screenFrame: window.screen?.frame ?? NSScreen.main?.frame,
+            visibleFrame: visibleFrame,
+            isFullScreen: window.styleMask.contains(.fullScreen)
+        ) else {
+            return
+        }
+
+        let normalized = WindowFramePolicy.normalizedFrame(
+            restoredFrame: window.frame,
+            visibleFrame: visibleFrame,
+            defaultSize: defaultSize
+        )
+        if normalized != window.frame {
+            window.setFrame(normalized, display: true)
+        }
+    }
+}
+
+private enum WindowFramePolicy {
+    static func shouldNormalizeLiveWindowFrame(
+        currentFrame: CGRect,
+        screenFrame: CGRect?,
+        visibleFrame: CGRect,
+        isFullScreen: Bool
+    ) -> Bool {
+        guard !isFullScreen else { return false }
+        guard let screenFrame else { return true }
+
+        let likelyFullScreenRestore =
+            abs(currentFrame.width - screenFrame.width) <= 1 &&
+            abs(currentFrame.height - screenFrame.height) <= 1 &&
+            (currentFrame.width > visibleFrame.width || currentFrame.height > visibleFrame.height)
+
+        return !likelyFullScreenRestore
+    }
+
+    static func normalizedFrame(
+        restoredFrame: CGRect?,
+        visibleFrame: CGRect,
+        defaultSize: CGSize
+    ) -> CGRect {
+        let fallback = centeredFrame(
+            size: clampedSize(defaultSize, toFit: visibleFrame.size),
+            in: visibleFrame
+        )
+
+        guard let restoredFrame, isUsable(restoredFrame) else {
+            return fallback
+        }
+
+        let adjustedSize = clampedSize(restoredFrame.size, toFit: visibleFrame.size)
+        let adjustedOrigin = CGPoint(
+            x: min(max(restoredFrame.minX, visibleFrame.minX), visibleFrame.maxX - adjustedSize.width),
+            y: min(max(restoredFrame.minY, visibleFrame.minY), visibleFrame.maxY - adjustedSize.height)
+        )
+
+        return CGRect(origin: adjustedOrigin, size: adjustedSize)
+    }
+
+    private static func isUsable(_ frame: CGRect) -> Bool {
+        frame.width >= 320 &&
+        frame.height >= 240 &&
+        frame.width.isFinite &&
+        frame.height.isFinite &&
+        frame.minX.isFinite &&
+        frame.minY.isFinite
+    }
+
+    private static func clampedSize(_ size: CGSize, toFit limit: CGSize) -> CGSize {
+        CGSize(
+            width: min(max(size.width, 1), limit.width),
+            height: min(max(size.height, 1), limit.height)
+        )
+    }
+
+    private static func centeredFrame(size: CGSize, in visibleFrame: CGRect) -> CGRect {
+        CGRect(
+            x: visibleFrame.midX - (size.width / 2),
+            y: visibleFrame.midY - (size.height / 2),
+            width: size.width,
+            height: size.height
+        )
+    }
 }
 
 @main
@@ -309,7 +427,7 @@ struct WiFiLensApp: App {
     @State private var crashLogText: String = ""
 
     var body: some Scene {
-        WindowGroup("WiFi Lens", id: "main") {
+        WindowGroup {
             AppRootView(
                 viewModel: viewModel,
                 roamingViewModel: roamingViewModel,
@@ -323,7 +441,8 @@ struct WiFiLensApp: App {
             )
             .preferredColorScheme(colorScheme)
         }
-        .windowResizability(.contentSize)
+        // Keep a default launch size only. The app window must remain a normal
+        // resizable macOS window; do not add `.windowResizability(.contentSize)`.
         .defaultSize(width: 900, height: 700)
         .onChange(of: appearance) { _, newValue in
             let target: NSAppearance?

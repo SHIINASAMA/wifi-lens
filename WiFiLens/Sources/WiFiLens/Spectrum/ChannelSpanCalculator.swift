@@ -92,6 +92,7 @@ enum ChannelSpanCalculator {
         _ networks: [WiFiNetwork],
         colorHasher: SSIDColorHasher,
         trends: [String: (direction: TrendDirection, delta: Int)] = [:],
+        displayStatesByID: [String: APDisplayState] = [:],
         hiddenBSSIDs: Set<String> = []
     ) -> [ChartSeriesData] {
         var series: [ChartSeriesData] = []
@@ -149,7 +150,8 @@ enum ChannelSpanCalculator {
             let render = ChartSeriesRenderState(
                 displayRSSI: Double(nw.rssi),
                 color: colorHasher.color(for: nw.ssid, bssid: nw.bssid),
-                isVisible: !hiddenBSSIDs.contains(nw.bssid),
+                isVisible: displayStatesByID[stableID]?.visibility ?? !hiddenBSSIDs.contains(nw.bssid),
+                visibilityLocked: displayStatesByID[stableID]?.visibilityLocked ?? false,
                 trendArrow: arrow,
                 trendDelta: trend?.delta ?? 0
             )

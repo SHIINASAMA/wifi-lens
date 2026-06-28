@@ -25,4 +25,13 @@ struct ProviderTests {
         let result2 = await provider.measure(routerIP: "127.0.0.1")
         #expect(result2.latencyMs != nil || result2.error != nil)
     }
+
+    @Test("GatewayLatencyProvider returns gatewayPingFailed when ping returns nil")
+    func gatewayLatencyProviderPingFailure() async {
+        let provider = GatewayLatencyProvider(pinger: MockGatewayPinger(result: nil))
+        let result = await provider.measure(routerIP: "192.0.2.1")
+
+        #expect(result.latencyMs == nil)
+        #expect(result.error == .gatewayPingFailed("192.0.2.1"))
+    }
 }

@@ -16,6 +16,11 @@ struct MockGatewayLatencyProvider: GatewayLatencyProviding {
     func measure(routerIP: String?) async -> GatewayLatencyResult { result }
 }
 
+struct MockGatewayPinger: GatewayPinging {
+    var result: Double?
+    func ping(host: String) async -> Double? { result }
+}
+
 struct MockRoamingProbeProvider: RoamingProbeProviding {
     var result: WiFiCurrentStatus
     func fetchCurrentProbe() async -> WiFiCurrentStatus { result }

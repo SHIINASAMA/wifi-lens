@@ -95,4 +95,67 @@ struct PipelineTests {
             Issue.record("Expected environmentScanFailed error")
         }
     }
+
+    @Test("refreshCurrentConnection propagates current-status and latency errors")
+    func currentConnectionAggregatesErrors() async {
+        let status = WiFiCurrentStatus(
+            timestamp: Date(),
+            isConnected: false,
+            isWiFiPowerOn: true,
+            error: .noWiFiConnection
+        )
+        let latency = GatewayLatencyResult(
+            timestamp: Date(),
+            routerIP: "192.0.2.1",
+            error: .gatewayPingFailed("192.0.2.1")
+        )
+        let pipeline = WiFiObservationPipeline(
+            currentConnectionProvider: MockCurrentConnectionProvider(result: status),
+            environmentScanProvider: MockEnvironmentScanProvider(result: WiFiEnvironmentSnapshot(
+                timestamp: Date(), interfaceName: "en0", networks: []
+            )),
+            gatewayLatencyProvider: MockGatewayLatencyProvider(result: latency),
+            deviceCapabilitiesProvider: MockDeviceCapabilitiesProvider()
+        )
+
+        let obs = await pipeline.refreshCurrentConnection()
+
+        #expect(obs.errors.count == 2)
+        #expect(obs.errors.contains(.noWiFiConnection))
+        #expect(obs.errors.contains(.gatewayPingFailed("192.0.2.1")))
+    }
+
+    @Test("refreshFullObservation aggregates current, latency, and scan errors")
+    func fullObservationAggregatesAllErrors() async {
+        let status = WiFiCurrentStatus(
+            timestamp: Date(),
+            isConnected: false,
+            isWiFiPowerOn: true,
+            error: .noWiFiConnection
+        )
+        let latency = GatewayLatencyResult(
+            timestamp: Date(),
+            routerIP: "192.0.2.1",
+            error: .gatewayPingFailed("192.0.2.1")
+        )
+        let snapshot = WiFiEnvironmentSnapshot(
+            timestamp: Date(),
+            interfaceName: nil,
+            networks: [],
+            error: .environmentScanFailed("permission denied")
+        )
+        let pipeline = WiFiObservationPipeline(
+            currentConnectionProvider: MockCurrentConnectionProvider(result: status),
+            environmentScanProvider: MockEnvironmentScanProvider(result: snapshot),
+            gatewayLatencyProvider: MockGatewayLatencyProvider(result: latency),
+            deviceCapabilitiesProvider: MockDeviceCapabilitiesProvider()
+        )
+
+        let obs = await pipeline.refreshFullObservation()
+
+        #expect(obs.errors.count == 3)
+        #expect(obs.errors.contains(.noWiFiConnection))
+        #expect(obs.errors.contains(.gatewayPingFailed("192.0.2.1")))
+        #expect(obs.errors.contains(.environmentScanFailed("permission denied")))
+    }
 }

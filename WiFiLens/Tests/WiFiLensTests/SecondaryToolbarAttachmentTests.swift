@@ -62,3 +62,64 @@ struct SecondaryToolbarAttachmentTests {
     }
     #endif
 }
+
+@Suite @MainActor
+struct SpectrumLegacyCompatibilityTests {
+
+    private func makeNetwork(
+        ssid: String,
+        bssid: String,
+        band: ChannelBand,
+        channel: Int,
+        rssi: Int
+    ) -> WiFiNetwork {
+        WiFiNetwork(
+            ssid: ssid,
+            bssid: bssid,
+            rssi: rssi,
+            channel: WiFiChannel(band: band, channelNumber: channel, channelWidthMHz: 20)
+        )
+    }
+
+    @Test func panelFiltersRemainIndependent() {
+        let viewModel = ScannerViewModel()
+        viewModel.debugApplyNetworksForTesting([
+            makeNetwork(ssid: "Alpha", bssid: "aa:aa:aa:aa:aa:aa", band: .band24GHz, channel: 1, rssi: -45),
+            makeNetwork(ssid: "Beta", bssid: "bb:bb:bb:bb:bb:bb", band: .band24GHz, channel: 6, rssi: -52)
+        ], supportedBands: [.band24GHz])
+
+        viewModel.setFilterQuery("Alpha", for: .primary)
+
+        let primaryVisible = viewModel
+            .bandViewModel(for: .primary, selection: .band24)
+            .visibleSeriesData()
+            .map(\.displaySSID)
+        let secondaryVisible = viewModel
+            .bandViewModel(for: .secondary, selection: .band24)
+            .visibleSeriesData()
+            .map(\.displaySSID)
+
+        #expect(primaryVisible == ["Alpha"])
+        #expect(Set(secondaryVisible) == ["Alpha", "Beta"])
+    }
+
+    @Test func visibilityLockSurvivesRefresh() {
+        let viewModel = ScannerViewModel()
+        let network = makeNetwork(
+            ssid: "Alpha",
+            bssid: "aa:aa:aa:aa:aa:aa",
+            band: .band5GHz,
+            channel: 44,
+            rssi: -48
+        )
+
+        viewModel.debugApplyNetworksForTesting([network], supportedBands: [.band5GHz])
+        viewModel.toggleVisibilityLocked(seriesID: network.id)
+        viewModel.toggleVisibility(seriesID: network.id)
+        viewModel.debugApplyNetworksForTesting([network], supportedBands: [.band5GHz])
+
+        let row = try? #require(viewModel.combinedTableRows.first)
+        #expect(row?.isVisible == false)
+        #expect(row?.visibilityLocked == true)
+    }
+}

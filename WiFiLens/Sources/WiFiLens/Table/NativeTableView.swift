@@ -7,9 +7,10 @@ struct NativeTableView: NSViewRepresentable {
     @Binding var sortOrder: [NSSortDescriptor]
     @Binding var hiddenColumns: Set<String>
     var onToggleVisibility: ((String) -> Void)?
+    var onToggleVisibilityLocked: ((String) -> Void)?
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(rows: rows, selectedID: $selectedID, sortOrder: $sortOrder, hiddenColumns: $hiddenColumns, onToggleVisibility: onToggleVisibility)
+        Coordinator(rows: rows, selectedID: $selectedID, sortOrder: $sortOrder, hiddenColumns: $hiddenColumns, onToggleVisibility: onToggleVisibility, onToggleVisibilityLocked: onToggleVisibilityLocked)
     }
 
     func makeNSView(context: Context) -> NSScrollView {
@@ -25,7 +26,6 @@ struct NativeTableView: NSViewRepresentable {
         tableView.allowsColumnResizing = true
         tableView.columnAutoresizingStyle = .noColumnAutoresizing
 
-        // Color dot column
         let dotColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("dot"))
         dotColumn.title = ""
         dotColumn.width = 24
@@ -34,16 +34,24 @@ struct NativeTableView: NSViewRepresentable {
         dotColumn.isEditable = false
         tableView.addTableColumn(dotColumn)
 
-        // Checkbox column
-        let checkColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("check"))
-        checkColumn.title = String(localized: "table.column.focus", comment: "Focus column header for the checkbox toggle column in network table")
-        checkColumn.width = 42
-        checkColumn.minWidth = 38
-        checkColumn.maxWidth = 46
-        checkColumn.isEditable = false
-        tableView.addTableColumn(checkColumn)
+        let visibilityColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("visibility"))
+        visibilityColumn.title = String(localized: "table.column.visibility", comment: "Visibility column header in network table")
+        visibilityColumn.width = 42
+        visibilityColumn.minWidth = 38
+        visibilityColumn.maxWidth = 46
+        visibilityColumn.isEditable = false
+        tableView.addTableColumn(visibilityColumn)
 
-        // Data columns with sort support
+        if onToggleVisibilityLocked != nil {
+            let lockColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("lock"))
+            lockColumn.title = String(localized: "table.column.lock", comment: "Lock column header in network table")
+            lockColumn.width = 28
+            lockColumn.minWidth = 24
+            lockColumn.maxWidth = 32
+            lockColumn.isEditable = false
+            tableView.addTableColumn(lockColumn)
+        }
+
         addColumn(to: tableView, id: "SSID", title: String(localized: "table.column.ssid", comment: "SSID column header in network table"), width: 160, sortKey: "ssid", ascending: true)
         addColumn(to: tableView, id: "Hidden", title: String(localized: "table.column.hidden", comment: "Hidden network indicator column header"), width: 20, sortKey: "isHiddenSSID", ascending: false)
         addColumn(to: tableView, id: "Band", title: String(localized: "channels.table.col.band", comment: "Band column header"), width: 80, sortKey: "bandLabel", ascending: true)
@@ -62,21 +70,19 @@ struct NativeTableView: NSViewRepresentable {
         addColumn(to: tableView, id: "NSS", title: String(localized: "table.column.nss", comment: "NSS (spatial streams) column header"), width: 36, sortKey: "nss", ascending: false)
         addColumn(to: tableView, id: "CC", title: String(localized: "table.column.country_code", comment: "Country code column header"), width: 36, sortKey: "country", ascending: true)
 
-        // Apply persisted hidden columns
         for column in tableView.tableColumns {
             if hiddenColumns.contains(column.identifier.rawValue) {
                 column.isHidden = true
             }
         }
 
-        // Custom header view for column context menu
         let headerView = ColumnMenuHeaderView()
         headerView.menuProvider = { [weak tableView] in
-            guard let tableView = tableView else { return nil }
+            guard let tableView else { return nil }
             let menu = NSMenu()
             for column in tableView.tableColumns {
                 let id = column.identifier.rawValue
-                if id == "dot" || id == "check" { continue }
+                if id == "dot" || id == "visibility" || id == "lock" { continue }
                 let item = NSMenuItem(title: column.title, action: nil, keyEquivalent: "")
                 item.state = column.isHidden ? .off : .on
                 item.representedObject = id
@@ -89,7 +95,6 @@ struct NativeTableView: NSViewRepresentable {
         tableView.headerView = headerView
         context.coordinator.tableView = tableView
 
-        // Apply stored sort descriptors
         let storedColumns = tableView.tableColumns
         for descriptor in sortOrder {
             if let key = descriptor.key,
@@ -131,7 +136,6 @@ struct NativeTableView: NSViewRepresentable {
             tableView.reloadData(forRowIndexes: rowIndexes, columnIndexes: colIndexes)
         }
 
-        // Restore selection only when state actually changed, not on every scan refresh.
         if needsRestore {
             if let selID = selectedID,
                let idx = rows.firstIndex(where: { $0.id == selID }),
@@ -153,23 +157,23 @@ struct NativeTableView: NSViewRepresentable {
         tableView.addTableColumn(column)
     }
 
-    // MARK: - Coordinator
-
     class Coordinator: NSObject, NSTableViewDelegate, NSTableViewDataSource {
         var rows: [NetworkTableRow]
         var selectedID: Binding<String?>
         var sortOrder: Binding<[NSSortDescriptor]>
         var hiddenColumns: Binding<Set<String>>
         var onToggleVisibility: ((String) -> Void)?
+        var onToggleVisibilityLocked: ((String) -> Void)?
         weak var tableView: NSTableView?
         var previousSelectedID: String?
 
-        init(rows: [NetworkTableRow], selectedID: Binding<String?>, sortOrder: Binding<[NSSortDescriptor]>, hiddenColumns: Binding<Set<String>>, onToggleVisibility: ((String) -> Void)?) {
+        init(rows: [NetworkTableRow], selectedID: Binding<String?>, sortOrder: Binding<[NSSortDescriptor]>, hiddenColumns: Binding<Set<String>>, onToggleVisibility: ((String) -> Void)?, onToggleVisibilityLocked: ((String) -> Void)?) {
             self.rows = rows
             self.selectedID = selectedID
             self.sortOrder = sortOrder
             self.hiddenColumns = hiddenColumns
             self.onToggleVisibility = onToggleVisibility
+            self.onToggleVisibilityLocked = onToggleVisibilityLocked
             self.previousSelectedID = selectedID.wrappedValue
         }
 
@@ -182,20 +186,26 @@ struct NativeTableView: NSViewRepresentable {
             let network = rows[row]
             let opacity = rowOpacity(network)
 
-            if columnID == "check" {
-                let container = NSView(frame: NSRect(x: 0, y: 0, width: 22, height: 20))
-                let checkbox = NSButton(frame: NSRect(x: 3, y: 2, width: 16, height: 16))
-                checkbox.setButtonType(.switch)
-                checkbox.title = ""
-                checkbox.state = network.isVisible ? .on : .off
-                checkbox.isEnabled = true
-                checkbox.alphaValue = opacity
-                checkbox.tag = row
-                checkbox.target = self
-                checkbox.action = #selector(Coordinator.checkboxToggled(_:))
-                checkbox.setAccessibilityLabel(String(localized: "table.accessibility.toggle_visibility", comment: "Toggle network visibility checkbox"))
-                container.addSubview(checkbox)
-                return container
+            if columnID == "visibility" {
+                return makeCenteredIconCell(
+                    symbolName: network.isVisible ? "eye.fill" : "eye.slash",
+                    tintColor: network.isVisible ? .secondaryLabelColor : .tertiaryLabelColor,
+                    opacity: opacity,
+                    row: row,
+                    action: #selector(Coordinator.visibilityToggled(_:)),
+                    accessibilityLabel: String(localized: "table.accessibility.toggle_visibility", comment: "Toggle network visibility checkbox")
+                )
+            }
+
+            if columnID == "lock" {
+                return makeCenteredIconCell(
+                    symbolName: network.visibilityLocked ? "lock.fill" : "lock.open",
+                    tintColor: network.visibilityLocked ? .secondaryLabelColor : .tertiaryLabelColor,
+                    opacity: opacity,
+                    row: row,
+                    action: #selector(Coordinator.lockToggled(_:)),
+                    accessibilityLabel: String(localized: "table.accessibility.toggle_lock", comment: "Toggle network lock checkbox")
+                )
             }
 
             if columnID == "dot" {
@@ -228,10 +238,14 @@ struct NativeTableView: NSViewRepresentable {
             cellView.textField = textField
 
             switch columnID {
-            case "Hidden": textField.stringValue = network.isHiddenSSID ? "H" : ""; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 9, weight: .medium); textField.textColor = NSColor.secondaryLabelColor.withAlphaComponent(opacity)
-            case "SSID":  textField.stringValue = network.ssid
-            case "Band":  textField.stringValue = network.bandLabel
-            case "Ch":    textField.stringValue = String(network.channel)
+            case "Hidden":
+                textField.stringValue = network.isHiddenSSID ? "H" : ""
+                textField.alignment = .center
+                textField.font = NSFont.systemFont(ofSize: 9, weight: .medium)
+                textField.textColor = NSColor.secondaryLabelColor.withAlphaComponent(opacity)
+            case "SSID": textField.stringValue = network.ssid
+            case "Band": textField.stringValue = network.bandLabel
+            case "Ch": textField.stringValue = String(network.channel)
             case "RSSI":
                 let deltaStr: String
                 if network.trendDelta != 0 {
@@ -242,26 +256,65 @@ struct NativeTableView: NSViewRepresentable {
                 } else {
                     deltaStr = ""
                 }
-                textField.stringValue = "\(network.rssi) dBm\(deltaStr)"
+                textField.stringValue = "\(network.rssi)\(deltaStr)"
             case "BSSID": textField.stringValue = network.bssid
-            case "Seen":  textField.stringValue = network.lastSeen; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
-            case "PHY":   textField.stringValue = network.phyMode; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
-            case "BW":    textField.stringValue = network.channelWidth; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
-            case "k":     textField.stringValue = network.supportsK ? "✓" : ""; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
-            case "r":     textField.stringValue = network.supportsR ? "✓" : ""; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
-            case "v":     textField.stringValue = network.supportsV ? "✓" : ""; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
-            case "Score":
-                textField.stringValue = "\(network.qualityScore)"
+            case "Seen": textField.stringValue = network.lastSeen
+            case "PHY": textField.stringValue = network.phyMode
+            case "BW": textField.stringValue = network.channelWidth
+            case "k":
+                textField.stringValue = network.supportsK ? "✓" : ""
                 textField.alignment = .center
-                textField.font = NSFont.systemFont(ofSize: 11, weight: .medium)
-                textField.textColor = scoreColor(network.qualityScore)
-            case "Sec":   textField.stringValue = network.security; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
-            case "MCS":   textField.stringValue = network.mcs; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
-            case "NSS":   textField.stringValue = network.nss; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
-            case "CC":    textField.stringValue = network.country; textField.alignment = .center; textField.font = NSFont.systemFont(ofSize: 10)
-            default: break
+            case "r":
+                textField.stringValue = network.supportsR ? "✓" : ""
+                textField.alignment = .center
+            case "v":
+                textField.stringValue = network.supportsV ? "✓" : ""
+                textField.alignment = .center
+            case "Score": textField.stringValue = String(network.qualityScore)
+            case "Sec": textField.stringValue = network.security
+            case "MCS": textField.stringValue = network.mcs
+            case "NSS": textField.stringValue = network.nss
+            case "CC": textField.stringValue = network.country
+            default: textField.stringValue = ""
             }
             return cellView
+        }
+
+        @MainActor
+        private func makeCenteredIconCell(
+            symbolName: String,
+            tintColor: NSColor,
+            opacity: Double,
+            row: Int,
+            action: Selector,
+            accessibilityLabel: String
+        ) -> NSView {
+            let container = NSTableCellView()
+
+            let button = NSButton()
+            button.translatesAutoresizingMaskIntoConstraints = false
+            button.setButtonType(.momentaryChange)
+            button.isBordered = false
+            button.imagePosition = .imageOnly
+            button.imageScaling = .scaleProportionallyDown
+            button.image = NSImage(systemSymbolName: symbolName, accessibilityDescription: nil)?
+                .withSymbolConfiguration(.init(pointSize: 11, weight: .medium))
+            button.contentTintColor = tintColor
+            button.alphaValue = opacity
+            button.tag = row
+            button.target = self
+            button.action = action
+            button.setAccessibilityLabel(accessibilityLabel)
+            container.addSubview(button)
+
+            NSLayoutConstraint.activate([
+                button.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+                button.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+                button.widthAnchor.constraint(equalToConstant: 18),
+                button.heightAnchor.constraint(equalToConstant: 18)
+            ])
+
+            return container
         }
 
         func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
@@ -274,93 +327,61 @@ struct NativeTableView: NSViewRepresentable {
         func tableViewSelectionDidChange(_ notification: Notification) {
             guard let tableView = notification.object as? NSTableView else { return }
             let selectedRow = tableView.selectedRow
-            let newID: String? = (selectedRow >= 0 && selectedRow < rows.count) ? rows[selectedRow].id : nil
-            if newID != selectedID.wrappedValue {
-                selectedID.wrappedValue = newID
+            if selectedRow >= 0, selectedRow < rows.count {
+                let newID = rows[selectedRow].id
+                if selectedID.wrappedValue != newID {
+                    selectedID.wrappedValue = newID
+                }
+            } else if selectedID.wrappedValue != nil {
+                selectedID.wrappedValue = nil
             }
         }
 
-        @MainActor @objc func checkboxToggled(_ sender: NSButton) {
+        @MainActor @objc func visibilityToggled(_ sender: NSButton) {
             let row = sender.tag
             guard row < rows.count else { return }
-            onToggleVisibility?(rows[row].bssid)
+            onToggleVisibility?(rows[row].id)
+        }
+
+        @MainActor @objc func lockToggled(_ sender: NSButton) {
+            let row = sender.tag
+            guard row < rows.count else { return }
+            onToggleVisibilityLocked?(rows[row].id)
         }
 
         @MainActor @objc func toggleColumnVisibility(_ sender: NSMenuItem) {
-            guard let columnID = sender.representedObject as? String,
-                  let column = tableView?.tableColumns.first(where: { $0.identifier.rawValue == columnID })
+            guard let id = sender.representedObject as? String,
+                  let tableView,
+                  let column = tableView.tableColumns.first(where: { $0.identifier.rawValue == id })
             else { return }
+
             column.isHidden.toggle()
-            var hidden = hiddenColumns.wrappedValue
-            if column.isHidden { hidden.insert(columnID) } else { hidden.remove(columnID) }
-            hiddenColumns.wrappedValue = hidden
+            if column.isHidden {
+                hiddenColumns.wrappedValue.insert(id)
+            } else {
+                hiddenColumns.wrappedValue.remove(id)
+            }
         }
 
-        @MainActor func autoSizeColumns() {
-            guard let tableView = tableView else { return }
-            for column in tableView.tableColumns {
-                let id = column.identifier.rawValue
-                if id == "dot" || id == "check" || column.isHidden { continue }
+        @MainActor
+        func autoSizeColumns() {
+            guard let tableView else { return }
+            for column in tableView.tableColumns where !column.isHidden {
+                let headerWidth = (column.headerCell.attributedStringValue.size().width.rounded(.up)) + 20
+                var maxWidth = max(column.minWidth, headerWidth)
 
-                let font = columnFont(for: id)
-                let attrs: [NSAttributedString.Key: Any] = [.font: font]
-
-                var maxW: CGFloat = (column.title as NSString).size(withAttributes: attrs).width + 20
-
-                for row in rows {
-                    let text = rowText(row, columnID: id)
-                    let w = (text as NSString).size(withAttributes: attrs).width + 14
-                    if w > maxW { maxW = w }
+                for row in rows.indices {
+                    guard let view = tableView.view(atColumn: tableView.column(withIdentifier: column.identifier), row: row, makeIfNecessary: true) else { continue }
+                    let fitting = view.fittingSize.width.rounded(.up)
+                    maxWidth = max(maxWidth, fitting + 12)
                 }
 
-                let minW = max(column.minWidth, 28)
-                column.width = min(max(minW, ceil(maxW)), 350)
+                column.width = min(maxWidth, 260)
             }
-        }
-
-        private func columnFont(for columnID: String) -> NSFont {
-            switch columnID {
-            case "BSSID": return .systemFont(ofSize: 11)
-            case "PHY", "BW", "k", "r", "v", "Score", "Sec", "MCS", "NSS", "CC", "Seen":
-                return .systemFont(ofSize: 10)
-            default: return .systemFont(ofSize: 12)
-            }
-        }
-
-        private func rowText(_ row: NetworkTableRow, columnID: String) -> String {
-            switch columnID {
-            case "SSID":  return row.ssid
-            case "Hidden": return row.isHiddenSSID ? "H" : ""
-            case "Band":  return row.bandLabel
-            case "Ch":    return String(row.channel)
-            case "RSSI":  return "\(row.rssi) dBm  ▲ +99"
-            case "BSSID": return row.bssid
-            case "Seen":  return row.lastSeen.isEmpty ? "0s" : row.lastSeen
-            case "PHY":   return row.phyMode
-            case "BW":    return row.channelWidth
-            case "k":     return row.supportsK ? "✓" : ""
-            case "r":     return row.supportsR ? "✓" : ""
-            case "v":     return row.supportsV ? "✓" : ""
-            case "Score": return String(row.qualityScore)
-            case "Sec":   return row.security
-            case "MCS":   return row.mcs
-            case "NSS":   return row.nss
-            case "CC":    return row.country
-            default: return ""
-            }
-        }
-
-        private func scoreColor(_ score: Int) -> NSColor {
-            if score >= 70 { return NSColor.systemGreen }
-            if score >= 40 { return NSColor.systemOrange }
-            return NSColor.systemRed
         }
 
         private func rowOpacity(_ row: NetworkTableRow) -> Double {
-            if let selID = selectedID.wrappedValue {
-                return row.id == selID ? 1.0 : 0.25
-            }
-            return row.isFilteredOut ? Constants.filteredOutOpacity : 1.0
+            row.isVisible ? 1.0 : 0.45
         }
     }
 }
@@ -369,6 +390,6 @@ private final class ColumnMenuHeaderView: NSTableHeaderView {
     var menuProvider: (() -> NSMenu?)?
 
     override func menu(for event: NSEvent) -> NSMenu? {
-        return menuProvider?()
+        menuProvider?()
     }
 }

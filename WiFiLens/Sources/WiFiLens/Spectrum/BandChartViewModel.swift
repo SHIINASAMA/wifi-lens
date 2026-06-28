@@ -146,6 +146,41 @@ final class BandChartViewModel {
 
 extension BandChartViewModel {
 
+    func updateNetworks(_ networks: [WiFiNetwork], colorHasher: SSIDColorHasher, displayStatesByID: [String: APDisplayState], trends: [String: (direction: TrendDirection, delta: Int)] = [:], snapshots: [String: [NetworkSnapshot]] = [:]) {
+        var dataArray = ChannelSpanCalculator.toSeriesData(
+            networks,
+            colorHasher: colorHasher,
+            trends: trends,
+            displayStatesByID: displayStatesByID
+        )
+
+        let prevByID = Dictionary(uniqueKeysWithValues: allSeriesData.map { ($0.id, $0.displayRSSI) })
+        for i in dataArray.indices {
+            dataArray[i].displayRSSI = prevByID[dataArray[i].id] ?? Double(dataArray[i].rssi)
+        }
+
+        var occ: [Int: Int] = [:]
+        for s in dataArray { occ[s.channel, default: 0] += 1 }
+        channelOccupancy = occ
+        for i in dataArray.indices {
+            dataArray[i].qualityScore = Self.computeScore(
+                rssi: dataArray[i].rssi,
+                channelCount: occ[dataArray[i].channel] ?? 1,
+                supportsK: dataArray[i].supportsK,
+                supportsR: dataArray[i].supportsR,
+                supportsV: dataArray[i].supportsV,
+                channelWidth: dataArray[i].channelWidth
+            )
+        }
+        allSeriesData = dataArray
+        allSnapshots = snapshots
+        currentHiddenBands = []
+        currentHideHiddenSSIDs = false
+        currentFilterQuery = ""
+        refreshRenderedState()
+        startAnimation()
+    }
+
     func updateNetworks(_ networks: [WiFiNetwork], colorHasher: SSIDColorHasher, filterQuery: String, trends: [String: (direction: TrendDirection, delta: Int)] = [:], snapshots: [String: [NetworkSnapshot]] = [:], hiddenBSSIDs: Set<String> = [], hiddenBands: Set<String> = [], hideHiddenSSIDs: Bool = false) {
         var dataArray = ChannelSpanCalculator.toSeriesData(networks, colorHasher: colorHasher, trends: trends, hiddenBSSIDs: hiddenBSSIDs)
 
