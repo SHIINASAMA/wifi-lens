@@ -1,5 +1,62 @@
 import SwiftUI
 
+struct SpectrumSectionLayout {
+    static let headerHeight: CGFloat = 28
+
+    struct Section {
+        let kind: Kind
+        let isCollapsed: Bool
+    }
+
+    enum Kind {
+        case band
+        case trend
+        case table
+
+        var weight: CGFloat {
+            switch self {
+            case .band: return 1.0
+            case .trend: return 0.5
+            case .table: return 1.5
+            }
+        }
+
+        var minimumContentHeight: CGFloat {
+            switch self {
+            case .band: return 60
+            case .trend: return 100
+            case .table: return 60
+            }
+        }
+    }
+
+    static func computeContentHeights(sections: [Section], totalHeight: CGFloat) -> [CGFloat] {
+        let contentPool = max(0, totalHeight - CGFloat(sections.count) * headerHeight)
+        let expanded = sections.enumerated().filter { !$0.element.isCollapsed }
+        let minimumTotal = expanded.reduce(CGFloat.zero) { $0 + $1.element.kind.minimumContentHeight }
+
+        guard !expanded.isEmpty else {
+            return Array(repeating: 0, count: sections.count)
+        }
+
+        if contentPool <= minimumTotal {
+            let scale = minimumTotal > 0 ? contentPool / minimumTotal : 0
+            return sections.map { section in
+                section.isCollapsed ? 0 : section.kind.minimumContentHeight * scale
+            }
+        }
+
+        let extraPool = contentPool - minimumTotal
+        let totalWeight = expanded.reduce(CGFloat.zero) { $0 + $1.element.kind.weight }
+
+        return sections.map { section in
+            guard !section.isCollapsed else { return 0 }
+            let extra = totalWeight > 0 ? extraPool * section.kind.weight / totalWeight : 0
+            return section.kind.minimumContentHeight + extra
+        }
+    }
+}
+
 #if PRO
 enum SpectrumMode {
     case live
@@ -78,10 +135,6 @@ struct ContentView: View {
         VStack(spacing: 0) {
             contentArea
         }
-        // This view advertises a comfortable page layout size, but it must remain a
-        // local layout hint only. A previous P0 regression happened when top-level
-        // window sizing was changed to `.windowResizability(.contentSize)`, which
-        // promoted page ideal sizes like this into real NSWindow growth.
         .frame(minWidth: 700, idealWidth: 1000, minHeight: 600)
         .onChange(of: viewModel.hiddenBands) { _, _ in viewModel.applyGlobalFilterToBands() }
         .onChange(of: viewModel.hideHiddenSSIDs) { _, _ in viewModel.applyGlobalFilterToBands() }
@@ -108,8 +161,6 @@ struct ContentView: View {
         }
 #endif
     }
-
-    // MARK: - Content area
 
     @ViewBuilder
     private var contentArea: some View {
@@ -146,8 +197,6 @@ struct ContentView: View {
 #endif
     }
 
-    // MARK: - Dashboard Content
-
     private var dashboardContent: some View {
         GeometryReader { geometry in
             let layout = SpectrumDashboardLayout(viewportHeight: geometry.size.height)
@@ -157,9 +206,6 @@ struct ContentView: View {
                     emptyState
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    // Keep Spectrum container-driven, similar to a three-row CSS grid
-                    // with fractional tracks. The parent owns the full viewport height
-                    // and each section consumes a fixed share of that space.
                     SpectrumPanelView(
                         viewModel: viewModel,
                         panelID: .primary,
@@ -191,8 +237,6 @@ struct ContentView: View {
         }
     }
 
-    // MARK: - Table Filter Bar
-
     private var tableFilterBar: some View {
         HStack(spacing: 12) {
             Toggle(isOn: $viewModel.hideHiddenSSIDs) {
@@ -205,8 +249,6 @@ struct ContentView: View {
         .padding(.vertical, 4)
         .background(.bar)
     }
-
-    // MARK: - Bottom Table (shared)
 
     private var tableRows: [NetworkTableRow] {
         viewModel.combinedTableRows
@@ -226,24 +268,24 @@ struct ContentView: View {
     private func compareRow(_ a: NetworkTableRow, _ b: NetworkTableRow, key: String, ascending: Bool) -> ComparisonResult {
         let cmp: ComparisonResult
         switch key {
-        case "ssid":       cmp = a.ssid.localizedCaseInsensitiveCompare(b.ssid)
-        case "bandLabel":  cmp = a.bandLabel.localizedCaseInsensitiveCompare(b.bandLabel)
-        case "channel":    cmp = a.channel < b.channel ? .orderedAscending : a.channel > b.channel ? .orderedDescending : .orderedSame
-        case "rssi":       cmp = a.rssi > b.rssi ? .orderedAscending : a.rssi < b.rssi ? .orderedDescending : .orderedSame
-        case "bssid":         cmp = a.bssid.localizedCaseInsensitiveCompare(b.bssid)
-        case "phyMode":       cmp = a.phyMode.localizedCaseInsensitiveCompare(b.phyMode)
-        case "channelWidth":  cmp = Int(a.channelWidth) ?? 0 < Int(b.channelWidth) ?? 0 ? .orderedAscending : Int(a.channelWidth) ?? 0 > Int(b.channelWidth) ?? 0 ? .orderedDescending : .orderedSame
-        case "supportsK":     cmp = a.supportsK == b.supportsK ? .orderedSame : a.supportsK ? .orderedDescending : .orderedAscending
-        case "supportsR":     cmp = a.supportsR == b.supportsR ? .orderedSame : a.supportsR ? .orderedDescending : .orderedAscending
-        case "supportsV":     cmp = a.supportsV == b.supportsV ? .orderedSame : a.supportsV ? .orderedDescending : .orderedAscending
-        case "isHiddenSSID":  cmp = a.isHiddenSSID == b.isHiddenSSID ? .orderedSame : a.isHiddenSSID ? .orderedDescending : .orderedAscending
-        case "qualityScore":  cmp = a.qualityScore > b.qualityScore ? .orderedAscending : a.qualityScore < b.qualityScore ? .orderedDescending : .orderedSame
-        case "security":      cmp = a.security.localizedCaseInsensitiveCompare(b.security)
-        case "mcs":           cmp = (Int(a.mcs) ?? 0) < (Int(b.mcs) ?? 0) ? .orderedAscending : (Int(a.mcs) ?? 0) > (Int(b.mcs) ?? 0) ? .orderedDescending : .orderedSame
-        case "nss":           cmp = (Int(a.nss) ?? 0) < (Int(b.nss) ?? 0) ? .orderedAscending : (Int(a.nss) ?? 0) > (Int(b.nss) ?? 0) ? .orderedDescending : .orderedSame
-        case "country":       cmp = a.country.localizedCaseInsensitiveCompare(b.country)
-        case "lastSeen":      cmp = a.lastSeen.localizedCaseInsensitiveCompare(b.lastSeen)
-        default:              cmp = .orderedSame
+        case "ssid": cmp = a.ssid.localizedCaseInsensitiveCompare(b.ssid)
+        case "bandLabel": cmp = a.bandLabel.localizedCaseInsensitiveCompare(b.bandLabel)
+        case "channel": cmp = a.channel < b.channel ? .orderedAscending : a.channel > b.channel ? .orderedDescending : .orderedSame
+        case "rssi": cmp = a.rssi > b.rssi ? .orderedAscending : a.rssi < b.rssi ? .orderedDescending : .orderedSame
+        case "bssid": cmp = a.bssid.localizedCaseInsensitiveCompare(b.bssid)
+        case "phyMode": cmp = a.phyMode.localizedCaseInsensitiveCompare(b.phyMode)
+        case "channelWidth": cmp = Int(a.channelWidth) ?? 0 < Int(b.channelWidth) ?? 0 ? .orderedAscending : Int(a.channelWidth) ?? 0 > Int(b.channelWidth) ?? 0 ? .orderedDescending : .orderedSame
+        case "supportsK": cmp = a.supportsK == b.supportsK ? .orderedSame : a.supportsK ? .orderedDescending : .orderedAscending
+        case "supportsR": cmp = a.supportsR == b.supportsR ? .orderedSame : a.supportsR ? .orderedDescending : .orderedAscending
+        case "supportsV": cmp = a.supportsV == b.supportsV ? .orderedSame : a.supportsV ? .orderedDescending : .orderedAscending
+        case "isHiddenSSID": cmp = a.isHiddenSSID == b.isHiddenSSID ? .orderedSame : a.isHiddenSSID ? .orderedDescending : .orderedAscending
+        case "qualityScore": cmp = a.qualityScore > b.qualityScore ? .orderedAscending : a.qualityScore < b.qualityScore ? .orderedDescending : .orderedSame
+        case "security": cmp = a.security.localizedCaseInsensitiveCompare(b.security)
+        case "mcs": cmp = (Int(a.mcs) ?? 0) < (Int(b.mcs) ?? 0) ? .orderedAscending : (Int(a.mcs) ?? 0) > (Int(b.mcs) ?? 0) ? .orderedDescending : .orderedSame
+        case "nss": cmp = (Int(a.nss) ?? 0) < (Int(b.nss) ?? 0) ? .orderedAscending : (Int(a.nss) ?? 0) > (Int(b.nss) ?? 0) ? .orderedDescending : .orderedSame
+        case "country": cmp = a.country.localizedCaseInsensitiveCompare(b.country)
+        case "lastSeen": cmp = a.lastSeen.localizedCaseInsensitiveCompare(b.lastSeen)
+        default: cmp = .orderedSame
         }
         return ascending ? cmp : (cmp == .orderedAscending ? .orderedDescending : cmp == .orderedDescending ? .orderedAscending : .orderedSame)
     }
@@ -258,8 +300,6 @@ struct ContentView: View {
             onToggleVisibilityLocked: { seriesID in viewModel.toggleVisibilityLocked(seriesID: seriesID) }
         )
     }
-
-    // MARK: - Helpers
 
     private var shouldShowEmptyState: Bool {
         switch viewModel.accessState {

@@ -143,7 +143,7 @@ private struct AppRootView: View {
                 // These pages stay mounted to preserve page-local state. The detail
                 // container must therefore fill the available split-view space
                 // explicitly instead of letting hidden pages influence window sizing.
-                OverviewView(viewModel: viewModel)
+                OverviewView(viewModel: viewModel, store: viewModel.store)
                     .opacity(selectedPage == .overview ? 1 : 0)
                     .allowsHitTesting(selectedPage == .overview)
                     .accessibilityIdentifier("page-overview")
@@ -500,6 +500,9 @@ struct WiFiLensApp: App {
 
         }
 
+#if PRO
+        MenuBarScene()
+#endif
     }
 
     private var colorScheme: ColorScheme? {

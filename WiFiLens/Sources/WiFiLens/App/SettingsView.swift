@@ -21,6 +21,7 @@ struct SettingsView: View {
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
     @AppStorage("appearance") private var appearance: String = "system"
     @AppStorage("hideTitleBadge") private var hideTitleBadge = true
+    @AppStorage("menuBarEnabled") private var menuBarEnabled = true
 
     init(updater: SparkleUpdater, locationPermission: LocationPermissionManager, bluetoothPermission: BluetoothPermissionManager?, bleEnabled: Binding<Bool>) {
         self.updater = updater
@@ -124,6 +125,46 @@ struct SettingsView: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding(.vertical, 4)
+
+#if PRO
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Image(systemName: "menubar.rectangle")
+                                .foregroundColor(.blue)
+                                .frame(width: 20)
+                            Text(String(localized: "settings.features.menubar_label", comment: "Menu bar icon feature toggle label"))
+                                .font(.body)
+                            Spacer()
+                            Toggle("", isOn: $menuBarEnabled)
+                                .labelsHidden()
+                                .accessibilityLabel(String(localized: "settings.features.menubar_label", comment: "Menu bar icon feature toggle label"))
+                                .accessibilityIdentifier("settings-menubar-toggle")
+                        }
+                        Text(String(localized: "settings.features.menubar_description", comment: "Description of menu bar icon feature"))
+                            .font(.callout)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.vertical, 4)
+#else
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Image(systemName: "menubar.rectangle")
+                                .foregroundColor(.blue)
+                                .frame(width: 20)
+                            Text(String(localized: "settings.features.menubar_label", comment: "Menu bar icon feature toggle label"))
+                                .font(.body)
+                            Spacer()
+                        }
+                        ProFeaturePlaceholderView(
+                            featureName: String(localized: "pro.menubar.name", comment: "Menu bar Pro feature name"),
+                            featureDescription: String(localized: "pro.menubar.description", comment: "Menu bar Pro feature description"),
+                            featureIcon: "menubar.rectangle"
+                        )
+                        .frame(height: 200)
+                    }
+                    .padding(.vertical, 4)
+#endif
                 } header: {
                     Text(String(localized: "settings.section.features", comment: "Features subsection header in settings"))
                 }

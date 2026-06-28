@@ -52,6 +52,8 @@ final class ScannerViewModel {
     let signalHistory = SignalHistoryStore()
     let mcpServer = MCPServer()
     let throughputMonitor = ThroughputMonitor()
+    let gatewayLatencyProvider: GatewayLatencyProviding
+    var hiddenBSSIDs: Set<String> = []
     var hiddenBands: Set<String> = []       // band IDs ("24"/"5"/"6") to hide
     var hideHiddenSSIDs: Bool = false       // hide networks with empty SSID
     private(set) var lastNetworks: [WiFiNetwork] = []  // cached for toggle rebuild + MCP
@@ -61,6 +63,9 @@ final class ScannerViewModel {
     let wifiPowerMonitor = WiFiPowerMonitor()
     var wifiPowerState: WiFiPowerState = .poweredOn
 
+    var band24 = BandChartViewModel(band: .band24GHz)
+    var band5 = BandChartViewModel(band: .band5GHz)
+    var band6 = BandChartViewModel(band: .band6GHz)
     private let primaryBand24 = BandChartViewModel(band: .band24GHz)
     private let primaryBand5 = BandChartViewModel(band: .band5GHz)
     private let primaryBand6 = BandChartViewModel(band: .band6GHz)
@@ -75,10 +80,18 @@ final class ScannerViewModel {
     var isWiFiAvailable: Bool { wifiPowerState == .poweredOn }
 
     private var hasStarted = false
+    private var isStartingScan = false
     private var startupTask: Task<Void, Never>?
     private var wifiMonitoringTask: Task<Void, Never>?
 
-    init() {
+    let store: WiFiObservationStore
+
+    init(
+        store: WiFiObservationStore = .shared,
+        gatewayLatencyProvider: GatewayLatencyProviding = GatewayLatencyProvider()
+    ) {
+        self.store = store
+        self.gatewayLatencyProvider = gatewayLatencyProvider
         wifiPowerState = wifiPowerMonitor.currentState
         updateMCPDataProvider()
     }
@@ -95,6 +108,9 @@ final class ScannerViewModel {
         }
     }
 
+    var globalFilterQuery: String = "" {
+        didSet { applyGlobalFilterToBands() }
+    }
     var selectedNetworkID: String?
     var networkInfo: [NetworkInterfaceInfo] = []
     var channelQualities: [ChannelQuality] = []
@@ -109,20 +125,11 @@ final class ScannerViewModel {
     }
 
     var bandViewModels: [BandChartViewModel] {
-        SpectrumPanelID.allCases.flatMap { panelID in
-            panelBandViewModels(for: panelID)
-        }
+        [band24, band5, band6].filter { supportedBands.contains($0.band) }
     }
 
     var allBandViewModels: [BandChartViewModel] {
-        [
-            primaryBand24,
-            primaryBand5,
-            primaryBand6,
-            secondaryBand24,
-            secondaryBand5,
-            secondaryBand6,
-        ]
+        [band24, band5, band6, primaryBand24, primaryBand5, primaryBand6, secondaryBand24, secondaryBand5, secondaryBand6]
     }
 
     func bandViewModel(for panelID: SpectrumPanelID, selection: BandPanelSelection) -> BandChartViewModel {
@@ -157,7 +164,7 @@ final class ScannerViewModel {
     }
 
     var combinedTableRows: [NetworkTableRow] {
-        let qualityScores = Dictionary(uniqueKeysWithValues: panelBandViewModels(for: .primary).flatMap { vm in
+        let qualityScores = Dictionary(uniqueKeysWithValues: bandViewModels.flatMap { vm in
             vm.allSeriesData.map { ($0.id, $0.qualityScore) }
         })
 
@@ -167,7 +174,7 @@ final class ScannerViewModel {
             let trend = signalHistory.trend(for: network.bssid)
             let isHiddenSSID = (ie?.isHiddenSSID ?? false) || (network.ssid ?? "").isEmpty
             let displayState = displayStatesByID[seriesID] ?? APDisplayState(
-                visibility: true,
+                visibility: automaticVisibility(for: network),
                 visibilityLocked: false
             )
 
@@ -248,8 +255,11 @@ final class ScannerViewModel {
     }
 
     private func startScanningAfterAuth() async {
+        guard !isStartingScan else { return }
         guard !isScanning else { return }
         guard wifiPowerState == .poweredOn else { return }
+        isStartingScan = true
+        defer { isStartingScan = false }
         supportedBands = await scanner.supportedBands()
         AppLogger.scanner.info("start() — supported bands = \(supportedBands.map { $0.id }.sorted())")
         // Fetch device capabilities once for the regulatory pipeline
@@ -362,26 +372,105 @@ final class ScannerViewModel {
                 case .networks(let networks):
                     applyNetworks(networks)
                     networkInfo = NetworkInfoService.fetchAll()
-                    channelQualities = computeChannelQualities()
-                    channelRecommendations = computeChannelRecommendations()
+
+                    let currentBSSID = networkInfo.first(where: { $0.bssid != nil })?.bssid
+                    let snapshot = WiFiEnvironmentSnapshot(
+                        timestamp: Date(),
+                        interfaceName: interfaceName,
+                        networks: NetworkObservationAdapter.adaptAll(networks, currentBSSID: currentBSSID)
+                    )
+                    let currentChannel = networkInfo.first(where: { $0.ssid != nil })?.channel
+                    let targetAP = ChannelQualityCalculator.TargetAP(
+                        bssid: networkInfo.first(where: { $0.ssid != nil })?.bssid,
+                        ssid: networkInfo.first(where: { $0.ssid != nil })?.ssid,
+                        channel: currentChannel
+                    )
+
+                    channelQualities = ChannelOccupancyAnalyzer.analyze(
+                        snapshot: snapshot,
+                        currentChannel: currentChannel,
+                        supportedBands: Set(supportedBands.map(\.id)),
+                        targetAP: targetAP
+                    )
+
+                    let apCountryCodes: [String] = networks.compactMap { nw in
+                        guard let ie = nw.ieData else { return nil }
+                        return IEParser.parse(data: ie).countryCode
+                    }
+                    let defaultsOverride: RegulatoryDomain? = {
+                        let raw = UserDefaults.standard.string(forKey: "regulatoryRegionOverride") ?? "auto"
+                        return raw == "auto" ? nil : RegulatoryDomain(rawValue: raw)
+                    }()
+                    let inferredRegion = RegionInferenceEngine.infer(
+                        systemLocale: .current,
+                        supportedChannels: regulatoryPipeline.cachedSupportedChannelsRaw,
+                        apCountryCodes: apCountryCodes,
+                        userOverride: userRegionOverride ?? defaultsOverride
+                    )
+                    regulatoryPipeline.inferredRegion = inferredRegion
+
+                    channelRecommendations = ChannelRecommendationEngine.recommend(
+                        channelAnalysis: channelQualities,
+                        snapshot: snapshot,
+                        inferredRegion: inferredRegion,
+                        deviceSupportedChannels: regulatoryPipeline.deviceSupportedChannels,
+                        deviceCapabilities: regulatoryPipeline.deviceCachedCapabilities
+                    )
+
+                    let currentNetworkInfo = networkInfo.first(where: { $0.ssid != nil })
+                    let currentStatus = WiFiCurrentStatus(
+                        timestamp: Date(),
+                        interfaceName: interfaceName,
+                        ssid: currentNetworkInfo?.ssid,
+                        bssid: currentNetworkInfo?.bssid,
+                        channel: currentNetworkInfo?.channel,
+                        rssi: currentNetworkInfo?.rssi,
+                        security: currentNetworkInfo?.security,
+                        isConnected: currentNetworkInfo != nil,
+                        isWiFiPowerOn: isWiFiAvailable
+                    )
+
+                    let gatewayLatency = await gatewayLatencyProvider.measure(routerIP: currentNetworkInfo?.router)
+                    let quality = WiFiQualityEvaluator.evaluate(
+                        currentStatus: currentStatus,
+                        gatewayLatency: gatewayLatency
+                    )
+
+                    let diagnosis = DiagnosticEvaluator.evaluate(
+                        currentStatus: currentStatus,
+                        channelAnalysis: channelQualities,
+                        channelRecommendations: channelRecommendations
+                    )
+
+                    store.apply(WiFiObservation(
+                        currentStatus: currentStatus,
+                        environmentSnapshot: snapshot,
+                        gatewayLatency: gatewayLatency,
+                        quality: quality,
+                        channelAnalysis: channelQualities,
+                        channelRecommendation: channelRecommendations,
+                        diagnosis: diagnosis
+                    ))
                 }
             }
         }
     }
 
     private func deduplicateNetworks(_ networks: [WiFiNetwork]) -> [WiFiNetwork] {
-        var seen = [String: WiFiNetwork]()
+        var seen: [String: Int] = [:]
+        var deduplicated: [WiFiNetwork] = []
         for nw in networks {
             let key = "\(nw.bssid)-\(nw.channel.channelNumber)-\(nw.channel.band.rawValue)"
-            if let existing = seen[key] {
-                if nw.rssi > existing.rssi {
-                    seen[key] = nw
+            if let index = seen[key] {
+                if nw.rssi > deduplicated[index].rssi {
+                    deduplicated[index] = nw
                 }
             } else {
-                seen[key] = nw
+                seen[key] = deduplicated.count
+                deduplicated.append(nw)
             }
         }
-        return Array(seen.values)
+        return deduplicated
     }
 
     private func makeSnapshot(for network: WiFiNetwork, timestamp: Date) -> NetworkSnapshot {
@@ -418,134 +507,6 @@ final class ScannerViewModel {
             supportsWPA3: supportsWPA3,
             isHiddenSSID: isHiddenSSID
         )
-    }
-
-
-    private func applyNetworks(_ networks: [WiFiNetwork]) {
-        lastNetworks = networks
-        let deduped = deduplicateNetworks(networks).sorted {
-            if $0.channel.band != $1.channel.band {
-                return $0.channel.band.rawValue < $1.channel.band.rawValue
-            }
-            if $0.channel.channelNumber != $1.channel.channelNumber {
-                return $0.channel.channelNumber < $1.channel.channelNumber
-            }
-            return $0.bssid < $1.bssid
-        }
-        deduplicatedNetworks = deduped
-
-        // Record RSSI history + snapshots, build trend/history/snapshot lookups
-        let now = Date()
-        for nw in deduped {
-            let snap = makeSnapshot(for: nw, timestamp: now)
-            signalHistory.record(bssid: nw.bssid, rssi: nw.rssi, snapshot: snap)
-        }
-        var trends: [String: (direction: TrendDirection, delta: Int)] = [:]
-        for nw in deduped {
-            if let t = signalHistory.trend(for: nw.bssid) {
-                trends[nw.bssid] = t
-            }
-        }
-        var snapshotDict: [String: [NetworkSnapshot]] = [:]
-        for nw in deduped {
-            if let snaps = signalHistory.snapshotHistory(for: nw.bssid) { snapshotDict[nw.bssid] = snaps }
-        }
-
-        displayStatesByID = recomputeDisplayStates(for: deduped)
-        refreshAllBandViewModels(with: deduped, trends: trends, snapshots: snapshotDict)
-        updateInterfaceName()
-
-        // Validate selected network still exists in the new scan
-        if let selectedID = selectedNetworkID {
-            let allIDs = deduped.map(\.id)
-            if !allIDs.contains(selectedID) {
-                selectedNetworkID = nil
-            }
-        }
-
-        let ssidCount = deduped.filter { ($0.ssid ?? "n/a") != "n/a" }.count
-        accessState = ssidCount > 0 ? .scanning : .grantedButSSIDUnavailable
-    }
-
-    func applyGlobalFilterToBands() {
-        displayStatesByID = recomputeDisplayStates(for: deduplicatedNetworks)
-        refreshAllBandViewModels(
-            with: deduplicatedNetworks,
-            trends: makeTrends(for: deduplicatedNetworks),
-            snapshots: makeSnapshots(for: deduplicatedNetworks)
-        )
-    }
-
-    private func refreshAllBandViewModels(
-        with networks: [WiFiNetwork],
-        trends: [String: (direction: TrendDirection, delta: Int)],
-        snapshots: [String: [NetworkSnapshot]]
-    ) {
-        for panelID in SpectrumPanelID.allCases {
-            refreshBandViewModels(
-                for: panelID,
-                with: networks,
-                trends: trends,
-                snapshots: snapshots
-            )
-        }
-    }
-
-    private func refreshPanelBandViewModels(_ panelID: SpectrumPanelID) {
-        refreshBandViewModels(
-            for: panelID,
-            with: deduplicatedNetworks,
-            trends: makeTrends(for: deduplicatedNetworks),
-            snapshots: makeSnapshots(for: deduplicatedNetworks)
-        )
-    }
-
-    private func refreshBandViewModels(
-        for panelID: SpectrumPanelID,
-        with networks: [WiFiNetwork],
-        trends: [String: (direction: TrendDirection, delta: Int)],
-        snapshots: [String: [NetworkSnapshot]]
-    ) {
-        let panelDisplayStates = recomputePanelDisplayStates(for: networks, panelID: panelID)
-
-        let sorted24 = networks
-            .filter { $0.channel.band == .band24GHz }
-            .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
-        if supportedBands.contains(.band24GHz) {
-            bandViewModel(for: panelID, selection: .band24).updateNetworks(
-                sorted24,
-                colorHasher: colorHasher,
-                displayStatesByID: panelDisplayStates,
-                trends: trends,
-                snapshots: snapshots
-            )
-        }
-
-        let sorted5 = networks
-            .filter { $0.channel.band == .band5GHz }
-            .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
-        if supportedBands.contains(.band5GHz) {
-            bandViewModel(for: panelID, selection: .band5).updateNetworks(
-                sorted5,
-                colorHasher: colorHasher,
-                displayStatesByID: panelDisplayStates,
-                trends: trends,
-                snapshots: snapshots
-            )
-        }
-
-        let sorted6 = networks
-            .filter { $0.channel.band == .band6GHz }
-            .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
-        if supportedBands.contains(.band6GHz) {
-            bandViewModel(for: panelID, selection: .band6).updateNetworks(
-                sorted6,
-                colorHasher: colorHasher,
-                displayStatesByID: panelDisplayStates,
-                trends: trends,
-                snapshots: snapshots
-            )
-        }
     }
 
     private func makeTrends(for networks: [WiFiNetwork]) -> [String: (direction: TrendDirection, delta: Int)] {
@@ -601,7 +562,10 @@ final class ScannerViewModel {
         var nextStates: [String: APDisplayState] = [:]
         for network in networks {
             let seriesID = network.id
-            let baseState = displayStatesByID[seriesID] ?? APDisplayState(visibility: true, visibilityLocked: false)
+            let baseState = displayStatesByID[seriesID] ?? APDisplayState(
+                visibility: automaticVisibility(for: network),
+                visibilityLocked: false
+            )
 
             if baseState.visibilityLocked {
                 nextStates[seriesID] = baseState
@@ -619,6 +583,63 @@ final class ScannerViewModel {
         return nextStates
     }
 
+    private func refreshBandViewModels(
+        for panelID: SpectrumPanelID,
+        with networks: [WiFiNetwork],
+        trends: [String: (direction: TrendDirection, delta: Int)],
+        snapshots: [String: [NetworkSnapshot]]
+    ) {
+        let panelDisplayStates = recomputePanelDisplayStates(for: networks, panelID: panelID)
+
+        let sorted24 = networks
+            .filter { $0.channel.band == .band24GHz }
+            .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
+        if supportedBands.contains(.band24GHz) {
+            bandViewModel(for: panelID, selection: .band24).updateNetworks(
+                sorted24,
+                colorHasher: colorHasher,
+                displayStatesByID: panelDisplayStates,
+                trends: trends,
+                snapshots: snapshots
+            )
+        }
+
+        let sorted5 = networks
+            .filter { $0.channel.band == .band5GHz }
+            .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
+        if supportedBands.contains(.band5GHz) {
+            bandViewModel(for: panelID, selection: .band5).updateNetworks(
+                sorted5,
+                colorHasher: colorHasher,
+                displayStatesByID: panelDisplayStates,
+                trends: trends,
+                snapshots: snapshots
+            )
+        }
+
+        let sorted6 = networks
+            .filter { $0.channel.band == .band6GHz }
+            .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
+        if supportedBands.contains(.band6GHz) {
+            bandViewModel(for: panelID, selection: .band6).updateNetworks(
+                sorted6,
+                colorHasher: colorHasher,
+                displayStatesByID: panelDisplayStates,
+                trends: trends,
+                snapshots: snapshots
+            )
+        }
+    }
+
+    private func refreshPanelBandViewModels(_ panelID: SpectrumPanelID) {
+        refreshBandViewModels(
+            for: panelID,
+            with: deduplicatedNetworks,
+            trends: makeTrends(for: deduplicatedNetworks),
+            snapshots: makeSnapshots(for: deduplicatedNetworks)
+        )
+    }
+
     private func automaticVisibility(for network: WiFiNetwork) -> Bool {
         if hiddenBands.contains(network.channel.band.id) {
             return false
@@ -629,7 +650,7 @@ final class ScannerViewModel {
         if hideHiddenSSIDs && isHiddenSSID {
             return false
         }
-        
+
         return true
     }
 
@@ -640,6 +661,78 @@ final class ScannerViewModel {
         case .stable: "●"
         case .none: ""
         }
+    }
+
+
+    private func applyNetworks(_ networks: [WiFiNetwork]) {
+        lastNetworks = networks
+        let deduped = deduplicateNetworks(networks)
+        deduplicatedNetworks = deduped
+
+        // Record RSSI history + snapshots, build trend/history/snapshot lookups
+        let now = Date()
+        for nw in deduped {
+            let snap = makeSnapshot(for: nw, timestamp: now)
+            signalHistory.record(bssid: nw.bssid, rssi: nw.rssi, snapshot: snap)
+        }
+        var trends: [String: (direction: TrendDirection, delta: Int)] = [:]
+        for nw in deduped {
+            if let t = signalHistory.trend(for: nw.bssid) {
+                trends[nw.bssid] = t
+            }
+        }
+        var snapshotDict: [String: [NetworkSnapshot]] = [:]
+        for nw in deduped {
+            if let snaps = signalHistory.snapshotHistory(for: nw.bssid) { snapshotDict[nw.bssid] = snaps }
+        }
+        displayStatesByID = recomputeDisplayStates(for: deduped)
+
+        let sorted24 = deduped
+            .filter { $0.channel.band == .band24GHz }
+            .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
+        if supportedBands.contains(.band24GHz) {
+            band24.updateNetworks(sorted24, colorHasher: colorHasher, filterQuery: globalFilterQuery, trends: trends, snapshots: snapshotDict, hiddenBSSIDs: hiddenBSSIDs, hiddenBands: hiddenBands, hideHiddenSSIDs: hideHiddenSSIDs)
+        }
+
+        let sorted5 = deduped
+            .filter { $0.channel.band == .band5GHz }
+            .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
+        if supportedBands.contains(.band5GHz) {
+            band5.updateNetworks(sorted5, colorHasher: colorHasher, filterQuery: globalFilterQuery, trends: trends, snapshots: snapshotDict, hiddenBSSIDs: hiddenBSSIDs, hiddenBands: hiddenBands, hideHiddenSSIDs: hideHiddenSSIDs)
+        }
+
+        let sorted6 = deduped
+            .filter { $0.channel.band == .band6GHz }
+            .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
+        if supportedBands.contains(.band6GHz) {
+            band6.updateNetworks(sorted6, colorHasher: colorHasher, filterQuery: globalFilterQuery, trends: trends, snapshots: snapshotDict, hiddenBSSIDs: hiddenBSSIDs, hiddenBands: hiddenBands, hideHiddenSSIDs: hideHiddenSSIDs)
+        }
+        refreshBandViewModels(for: .primary, with: deduped, trends: trends, snapshots: snapshotDict)
+        refreshBandViewModels(for: .secondary, with: deduped, trends: trends, snapshots: snapshotDict)
+
+        updateInterfaceName()
+
+        // Validate selected network still exists in the new scan
+        if let selectedID = selectedNetworkID {
+            let allIDs = bandViewModels.flatMap { $0.allSeriesData.map(\.id) }
+            if !allIDs.contains(selectedID) {
+                selectedNetworkID = nil
+            }
+        }
+
+        let ssidCount = bandViewModels.reduce(0) { count, vm in
+            count + vm.allSeriesData.filter { $0.ssid != "n/a" }.count
+        }
+        accessState = ssidCount > 0 ? .scanning : .grantedButSSIDUnavailable
+    }
+
+    func applyGlobalFilterToBands() {
+        band24.applyFilter(globalFilterQuery, hiddenBands: hiddenBands, hideHiddenSSIDs: hideHiddenSSIDs)
+        band5.applyFilter(globalFilterQuery, hiddenBands: hiddenBands, hideHiddenSSIDs: hideHiddenSSIDs)
+        band6.applyFilter(globalFilterQuery, hiddenBands: hiddenBands, hideHiddenSSIDs: hideHiddenSSIDs)
+        displayStatesByID = recomputeDisplayStates(for: deduplicatedNetworks)
+        refreshPanelBandViewModels(.primary)
+        refreshPanelBandViewModels(.secondary)
     }
 
     private func updateInterfaceName() {
@@ -654,84 +747,14 @@ final class ScannerViewModel {
             }
         }
     }
-
-    private func computeChannelQualities() -> [ChannelQuality] {
-        let currentWiFi = networkInfo.first(where: { $0.ssid != nil || $0.bssid != nil })
-        let currentChannel = currentWiFi?.channel
-        let targetAP = ChannelQualityCalculator.TargetAP(
-            bssid: currentWiFi?.bssid,
-            ssid: currentWiFi?.ssid,
-            channel: currentChannel
-        )
-
-        // Deduplicate by BSSID+band: wide channels may report the same AP on
-        // multiple primary channel numbers; keep only the strongest RSSI per band.
-        var seen = [String: ChannelQualityCalculator.APInfo]()
-        for nw in lastNetworks {
-            let key = "\(nw.bssid)-\(nw.channel.band.rawValue)"
-            let ie = nw.ieData.map { IEParser.parse(data: $0) }
-            let width = ie.map { chanWidthLabel($0) } ?? "20"
-            let left = ChannelSpanCalculator.channelBlock(
-                primaryChannel: nw.channel.channelNumber,
-                widthMHz: nw.channel.channelWidthMHz,
-                band: nw.channel.band,
-                spanDirection: nw.channel.spanDirection
-            ).left
-            let right = ChannelSpanCalculator.channelBlock(
-                primaryChannel: nw.channel.channelNumber,
-                widthMHz: nw.channel.channelWidthMHz,
-                band: nw.channel.band,
-                spanDirection: nw.channel.spanDirection
-            ).right
-            let info = ChannelQualityCalculator.APInfo(
-                channel: nw.channel.channelNumber,
-                rssi: nw.rssi,
-                channelWidth: width,
-                band: nw.channel.band.id,
-                apex: Double(left + right) / 2.0,
-                bssid: nw.bssid,
-                ssid: nw.ssid
-            )
-            if let existing = seen[key] {
-                if info.rssi > existing.rssi { seen[key] = info }
-            } else {
-                seen[key] = info
-            }
-        }
-        let aps = Array(seen.values)
-        return ChannelQualityCalculator.compute(
-            aps: aps,
-            currentChannel: currentChannel,
-            supportedBands: Set(supportedBands.map(\.id)),
-            targetAP: targetAP
-        )
-    }
-
-    /// Run the regulatory-aware filtering pipeline on top of RF results.
-    private func computeChannelRecommendations() -> [ChannelRecommendation] {
-        let override: RegulatoryDomain? = {
-            let raw = UserDefaults.standard.string(forKey: "regulatoryRegionOverride") ?? "auto"
-            return raw == "auto" ? nil : RegulatoryDomain(rawValue: raw)
-        }()
-        let regulatoryResults = regulatoryPipeline.computeRecommendations(
-            from: channelQualities,
-            networks: lastNetworks,
-            userDefaultsOverride: override
-        )
-        return RecommendationReasonCalculator.compute(for: regulatoryResults)
-    }
-
     func toggleVisibility(seriesID: String) {
         let current = displayStatesByID[seriesID] ?? APDisplayState(visibility: true, visibilityLocked: false)
         displayStatesByID[seriesID] = APDisplayState(
             visibility: !current.visibility,
             visibilityLocked: current.visibilityLocked
         )
-        refreshAllBandViewModels(
-            with: deduplicatedNetworks,
-            trends: makeTrends(for: deduplicatedNetworks),
-            snapshots: makeSnapshots(for: deduplicatedNetworks)
-        )
+        refreshPanelBandViewModels(.primary)
+        refreshPanelBandViewModels(.secondary)
     }
 
     func toggleVisibilityLocked(seriesID: String) {
@@ -740,11 +763,17 @@ final class ScannerViewModel {
             visibility: current.visibility,
             visibilityLocked: !current.visibilityLocked
         )
-        refreshAllBandViewModels(
-            with: deduplicatedNetworks,
-            trends: makeTrends(for: deduplicatedNetworks),
-            snapshots: makeSnapshots(for: deduplicatedNetworks)
-        )
+        refreshPanelBandViewModels(.primary)
+        refreshPanelBandViewModels(.secondary)
+    }
+
+    func toggleVisibility(bssid: String) {
+        if hiddenBSSIDs.contains(bssid) {
+            hiddenBSSIDs.remove(bssid)
+        } else {
+            hiddenBSSIDs.insert(bssid)
+        }
+        applyNetworks(lastNetworks)
     }
 
     func stop() {

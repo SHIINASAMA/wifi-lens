@@ -17,6 +17,16 @@ final class RoamingTestViewModel {
 
     let isPortable = DeviceCapabilities.isPortable
 
+    // MARK: - Init
+
+    init(
+        roamingProvider: RoamingProbeProviding = RoamingProbeProvider(),
+        latencyProvider: GatewayLatencyProviding = GatewayLatencyProvider()
+    ) {
+        self.roamingProvider = roamingProvider
+        self.latencyProvider = latencyProvider
+    }
+
     // MARK: - State
 
     var state: TestState = .idle
@@ -40,6 +50,11 @@ final class RoamingTestViewModel {
     var elapsedTime: TimeInterval = 0
     var totalSamples: Int { segments.reduce(0) { $0 + $1.samples.count } }
 
+    // MARK: - Providers
+
+    let roamingProvider: RoamingProbeProviding
+    let latencyProvider: GatewayLatencyProviding
+
     // MARK: - Private
 
     private var timer: Timer?
@@ -48,7 +63,7 @@ final class RoamingTestViewModel {
     private var lastRSSI: Int?
     private var lastChannel: Int?
     private var currentSegmentIndex: Int = -1
-    private let pinger = GatewayPinger()
+    private var previousProbe: WiFiCurrentStatus?
 
     // MARK: - Computed
 
@@ -66,20 +81,21 @@ final class RoamingTestViewModel {
         state = .idle
         errorMessage = nil
 
-        guard let iface = CWWiFiClient.shared().interface(),
-              let ssid = iface.ssid() else {
-            errorMessage = String(localized: "roaming.error.no_connection", comment: "Error when trying to start roaming test without Wi-Fi")
-            state = .idle
-            return
+        Task {
+            let status = await roamingProvider.fetchCurrentProbe()
+            guard status.isConnected, let ssid = status.ssid else {
+                errorMessage = String(localized: "roaming.error.no_connection", comment: "Error when trying to start roaming test without Wi-Fi")
+                return
+            }
+            currentSSID = ssid
+            currentBSSID = status.bssid
+            currentRSSI = status.rssi ?? 0
+            currentChannel = status.channel ?? 0
+            currentTxRate = status.txRate ?? 0
+            currentPhyMode = status.phyMode
+            previousProbe = status
+            state = .ready
         }
-
-        currentSSID = ssid
-        currentBSSID = iface.bssid()
-        currentRSSI = iface.rssiValue()
-        currentChannel = iface.wlanChannel()?.channelNumber ?? 0
-        currentTxRate = iface.transmitRate()
-        currentPhyMode = phyModeLabel(iface)
-        state = .ready
     }
 
     func handleWiFiPowerStateChange(_ powerState: WiFiPowerState) {
@@ -98,30 +114,33 @@ final class RoamingTestViewModel {
 
     func startTest() {
         guard canStart else { return }
-        guard let iface = CWWiFiClient.shared().interface(),
-              let bssid = iface.bssid() else { return }
 
-        segments = []
-        transitions = []
-        lastBSSID = bssid
-        lastRSSI = iface.rssiValue()
-        lastChannel = iface.wlanChannel()?.channelNumber ?? 0
-        startDate = Date()
-        elapsedTime = 0
-        errorMessage = nil
+        Task {
+            let status = await roamingProvider.fetchCurrentProbe()
+            guard let bssid = status.bssid else { return }
 
-        // Create first segment
-        let segment = RoamingSegment(bssid: bssid, startTime: Date())
-        segments = [segment]
-        currentSegmentIndex = 0
+            segments = []
+            transitions = []
+            lastBSSID = bssid
+            lastRSSI = status.rssi ?? 0
+            lastChannel = status.channel ?? 0
+            startDate = Date()
+            elapsedTime = 0
+            errorMessage = nil
 
-        refreshConnectionInfo()
-        appendSample()
+            let segment = RoamingSegment(bssid: bssid, startTime: Date())
+            segments = [segment]
+            currentSegmentIndex = 0
 
-        state = .running
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                self?.tick()
+            previousProbe = status
+            applyProbe(status)
+            appendSample()
+
+            state = .running
+            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+                Task { @MainActor [weak self] in
+                    self?.tick()
+                }
             }
         }
     }
@@ -143,77 +162,82 @@ final class RoamingTestViewModel {
 
     private func tick() {
         guard state == .running else { return }
-        guard let iface = CWWiFiClient.shared().interface() else { return }
 
-        let newBSSID = iface.bssid()
-        let newRSSI = iface.rssiValue()
-        let newChannel = iface.wlanChannel()?.channelNumber ?? 0
+        Task {
+            let status = await roamingProvider.fetchCurrentProbe()
 
-        // Ping gateway asynchronously
-        if let router = routerIP {
-            Task {
-                let latency = await pinger.ping(host: router)
-                await MainActor.run {
-                    gatewayLatency = latency
+            // Ping gateway asynchronously
+            if let router = routerIP {
+                let result = await latencyProvider.measure(routerIP: router)
+                gatewayLatency = result.latencyMs
+            }
+
+            let newBSSID = status.bssid
+            let newRSSI = status.rssi ?? 0
+            let newChannel = status.channel ?? 0
+
+            // Detect AP transition
+            if let newBSSID, let lastBSSID, newBSSID != lastBSSID {
+                let transitionTime = Date()
+
+                // Append final sample to old segment at the exact transition time
+                if currentSegmentIndex >= 0, currentSegmentIndex < segments.count {
+                    let finalSample = RoamingSample(
+                        timestamp: transitionTime,
+                        rssi: lastRSSI ?? 0,
+                        channel: lastChannel ?? 0,
+                        txRate: currentTxRate,
+                        gatewayLatency: gatewayLatency
+                    )
+                    segments[currentSegmentIndex].samples.append(finalSample)
+                    segments[currentSegmentIndex].endTime = transitionTime
                 }
-            }
-        }
 
-        // Detect AP transition
-        if let newBSSID, let lastBSSID, newBSSID != lastBSSID {
-            let transitionTime = Date()
-
-            // Append final sample to old segment at the exact transition time
-            if currentSegmentIndex >= 0, currentSegmentIndex < segments.count {
-                let finalSample = RoamingSample(
+                // Record transition
+                let event = APTransitionEvent(
                     timestamp: transitionTime,
-                    rssi: lastRSSI ?? 0,
-                    channel: lastChannel ?? 0,
-                    txRate: currentTxRate,
-                    gatewayLatency: gatewayLatency
+                    fromBSSID: lastBSSID,
+                    toBSSID: newBSSID,
+                    rssiBefore: lastRSSI ?? 0,
+                    rssiAfter: newRSSI,
+                    channelBefore: lastChannel ?? 0,
+                    channelAfter: newChannel
                 )
-                segments[currentSegmentIndex].samples.append(finalSample)
-                segments[currentSegmentIndex].endTime = transitionTime
+                transitions.append(event)
+
+                // Start new segment at the same timestamp
+                let segment = RoamingSegment(bssid: newBSSID, startTime: transitionTime)
+                segments.append(segment)
+                currentSegmentIndex = segments.count - 1
             }
 
-            // Record transition
-            let event = APTransitionEvent(
-                timestamp: transitionTime,
-                fromBSSID: lastBSSID,
-                toBSSID: newBSSID,
-                rssiBefore: lastRSSI ?? 0,
-                rssiAfter: newRSSI,
-                channelBefore: lastChannel ?? 0,
-                channelAfter: newChannel
-            )
-            transitions.append(event)
+            self.lastBSSID = newBSSID
+            self.lastRSSI = newRSSI
+            self.lastChannel = newChannel
 
-            // Start new segment at the same timestamp
-            let segment = RoamingSegment(bssid: newBSSID, startTime: transitionTime)
-            segments.append(segment)
-            currentSegmentIndex = segments.count - 1
+            applyProbe(status)
+            appendSample()
         }
-
-        self.lastBSSID = newBSSID
-        self.lastRSSI = newRSSI
-        self.lastChannel = newChannel
-
-        refreshConnectionInfo()
-        appendSample()
     }
 
     // MARK: - Helpers
 
     private func refreshConnectionInfo() {
-        guard let iface = CWWiFiClient.shared().interface() else { return }
-        currentSSID = iface.ssid()
-        currentBSSID = iface.bssid()
-        currentRSSI = iface.rssiValue()
-        currentChannel = iface.wlanChannel()?.channelNumber ?? 0
-        currentTxRate = iface.transmitRate()
-        currentPhyMode = phyModeLabel(iface)
+        Task {
+            let status = await roamingProvider.fetchCurrentProbe()
+            applyProbe(status)
+        }
+    }
+
+    private func applyProbe(_ status: WiFiCurrentStatus) {
+        currentSSID = status.ssid
+        currentBSSID = status.bssid
+        currentRSSI = status.rssi ?? 0
+        currentChannel = status.channel ?? 0
+        currentTxRate = status.txRate ?? 0
+        currentPhyMode = status.phyMode
         if routerIP == nil {
-            routerIP = NetworkInfoService.fetch()?.router
+            routerIP = status.routerIP ?? NetworkInfoService.fetch()?.router
         }
     }
 
@@ -235,19 +259,6 @@ final class RoamingTestViewModel {
 
         if let start = startDate {
             elapsedTime = Date().timeIntervalSince(start)
-        }
-    }
-
-    private func phyModeLabel(_ iface: CWInterface) -> String? {
-        switch iface.activePHYMode() {
-        case .mode11be: "802.11be"
-        case .mode11ax: "802.11ax"
-        case .mode11ac: "802.11ac"
-        case .mode11n:  "802.11n"
-        case .mode11a:  "802.11a"
-        case .mode11b:  "802.11b"
-        case .mode11g:  "802.11g"
-        default:        nil
         }
     }
 

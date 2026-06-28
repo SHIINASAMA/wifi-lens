@@ -5,9 +5,16 @@ struct OverviewView: View {
     @Bindable var viewModel: ScannerViewModel
     @Environment(\.colorScheme) private var colorScheme
 
+    let store: WiFiObservationStore
+
     @State private var stableScore = StableScore()
     @State private var displayLevel: ChannelQuality.QualityLevel = .excellent
     @State private var displayScore: Int = 100
+
+    init(viewModel: ScannerViewModel, store: WiFiObservationStore = .shared) {
+        self.viewModel = viewModel
+        self.store = store
+    }
 
     private var wifi: NetworkInterfaceInfo? {
         viewModel.networkInfo.first(where: { $0.ssid != nil })
@@ -192,12 +199,12 @@ struct OverviewView: View {
     // MARK: - Diagnostic Card
 
     private func diagnosticCard(_ wifi: NetworkInterfaceInfo) -> some View {
-        let diag = diagnose(wifi)
+        let diag = store.diagnosis ?? DiagnosticResult.unknown
 
         return HStack(spacing: 12) {
             Image(systemName: diag.icon)
                 .font(.largeTitle)
-                .foregroundColor(diag.color)
+                .foregroundColor(diag.severity.color)
                 .frame(width: 36)
                 .accessibilityHidden(true)
 
@@ -215,84 +222,7 @@ struct OverviewView: View {
         .glassBackground(.regular, in: RoundedRectangle(cornerRadius: 12))
     }
 
-    private struct Diagnosis {
-        let icon: String
-        let title: String
-        let message: String
-        let color: Color
-    }
 
-    private func diagnose(_ wifi: NetworkInterfaceInfo) -> Diagnosis {
-        let rssi = wifi.rssi ?? -100
-        let chScore = displayScore
-        let apCount = currentChannelQuality?.apCount ?? 0
-        let sec = wifi.security
-        let phy = wifi.phyMode ?? ""
-
-        if rssi >= -55 && chScore >= 70 && sec.contains("WPA3") {
-            return Diagnosis(
-                icon: "star.fill",
-                title: String(localized: "overview.diagnosis.great.title", comment: "Diagnosis title: excellent connection"),
-                message: String(localized: "overview.diagnosis.great.message", comment: "Diagnosis message: excellent connection"),
-                color: .green
-            )
-        }
-
-        if rssi < -75 {
-            return Diagnosis(
-                icon: "wifi.slash",
-                title: String(localized: "overview.diagnosis.weak_signal.title", comment: "Diagnosis title: weak signal"),
-                message: String(localized: "overview.diagnosis.weak_signal.message", comment: "Diagnosis message: weak signal advice"),
-                color: .red
-            )
-        }
-
-        if chScore < 50 {
-            let channelNum = wifi.channel ?? 0
-            let recList = recommendedChannels.prefix(2).map { "\($0.channel)" }.joined(separator: " / ")
-            return Diagnosis(
-                icon: "antenna.radiowaves.left.and.right",
-                title: String(localized: "overview.diagnosis.congested.title", comment: "Diagnosis title: congested channel"),
-                message: String(format: String(localized: "overview.diagnosis.congested.message_fmt", comment: "Congested channel diagnosis with channel number, AP count, and recommended channels"), channelNum, apCount, recList),
-                color: .orange
-            )
-        }
-
-        if chScore < 70 {
-            return Diagnosis(
-                icon: "antenna.radiowaves.left.and.right",
-                title: String(localized: "overview.diagnosis.medium_channel.title", comment: "Diagnosis title: mediocre channel"),
-                message: String(localized: "overview.diagnosis.medium_channel.message", comment: "Diagnosis message: channel improvement advice"),
-                color: .orange
-            )
-        }
-
-        if !sec.contains("WPA3") && sec != "—" && sec != String(localized: "common.label.none", comment: "Generic none/empty value label") {
-            return Diagnosis(
-                icon: "lock.open.fill",
-                title: String(localized: "overview.diagnosis.security.title", comment: "Diagnosis title: weak security"),
-                message: String(format: String(localized: "overview.diagnosis.security.message_fmt", comment: "Diagnosis message: security upgrade advice with current security type"), sec),
-                color: .orange
-            )
-        }
-
-        if phy == "n" || phy == "ac" {
-            let version = phy == "n" ? "4" : "5"
-            return Diagnosis(
-                icon: "speedometer",
-                title: String(localized: "overview.diagnosis.old_phy.title", comment: "Diagnosis title: older Wi-Fi generation"),
-                message: String(format: String(localized: "overview.diagnosis.old_phy.message_fmt", comment: "Diagnosis message: Wi-Fi generation upgrade advice"), version),
-                color: .orange
-            )
-        }
-
-        return Diagnosis(
-            icon: "checkmark.circle.fill",
-            title: String(localized: "overview.diagnosis.ok.title", comment: "Diagnosis title: acceptable connection"),
-            message: String(localized: "overview.diagnosis.ok.message", comment: "Diagnosis message: general improvement advice"),
-            color: .mint
-        )
-    }
 
     // MARK: - Channel Advice
 

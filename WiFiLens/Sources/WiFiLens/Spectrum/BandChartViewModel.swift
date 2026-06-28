@@ -17,11 +17,15 @@ final class BandChartViewModel {
     private(set) var allSeriesData: [ChartSeriesData] = []
     private(set) var displayedSeriesData: [ChartSeriesData] = []
     private(set) var interfaceName: String = ""
+    private(set) var currentFilterQuery: String = ""
     private(set) var allSnapshots: [String: [NetworkSnapshot]] = [:]
     private(set) var channelOccupancy: [Int: Int] = [:]
+    private var currentHiddenBands: Set<String> = []
+    private var currentHideHiddenSSIDs: Bool = false
     private var animationTimer: Timer?
     var chartSize: CGSize = .zero
 
+    var hasFilter: Bool { !currentFilterQuery.trimmingCharacters(in: .whitespaces).isEmpty }
     var networkCount: Int { allSeriesData.count }
     var isEmpty: Bool { allSeriesData.isEmpty }
 
@@ -50,8 +54,27 @@ final class BandChartViewModel {
         self.band = band
     }
 
+    private func makeDisplayedSeriesData(from source: [ChartSeriesData], hiddenBands: Set<String>, hideHiddenSSIDs: Bool) -> [ChartSeriesData] {
+        let needle = currentFilterQuery.trimmingCharacters(in: .whitespaces).lowercased()
+        let bandHidden = hiddenBands.contains(band.id)
+        return source.map { series in
+            var series = series
+            let sourceFilteredOut = series.isFilteredOut
+            let textFilter = needle.isEmpty
+                || series.ssid.lowercased().contains(needle)
+                || series.bssid.lowercased().contains(needle)
+            let hiddenSSIDFilter = !hideHiddenSSIDs || !series.isHiddenSSID
+            series.isFilteredOut = sourceFilteredOut || bandHidden || !textFilter || !hiddenSSIDFilter
+            return series
+        }
+    }
+
     private func refreshRenderedState() {
-        displayedSeriesData = allSeriesData
+        displayedSeriesData = makeDisplayedSeriesData(
+            from: allSeriesData,
+            hiddenBands: currentHiddenBands,
+            hideHiddenSSIDs: currentHideHiddenSSIDs
+        )
     }
 
     func validateSelection(_ selectedNetworkID: String?) -> Bool {
@@ -72,7 +95,7 @@ final class BandChartViewModel {
     }
 
     func visibleSeriesData() -> [ChartSeriesData] {
-        return displayedSeriesData.filter(\.isVisible)
+        displayedSeriesData.filter(\.isVisible)
     }
 
     func strongestRSSI() -> Int {
@@ -123,8 +146,13 @@ final class BandChartViewModel {
 
 extension BandChartViewModel {
 
-    func updateNetworks(_ networks: [WiFiNetwork], colorHasher: SSIDColorHasher, displayStatesByID: [String: APDisplayState] = [:], trends: [String: (direction: TrendDirection, delta: Int)] = [:], snapshots: [String: [NetworkSnapshot]] = [:]) {
-        var dataArray = ChannelSpanCalculator.toSeriesData(networks, colorHasher: colorHasher, trends: trends, displayStatesByID: displayStatesByID)
+    func updateNetworks(_ networks: [WiFiNetwork], colorHasher: SSIDColorHasher, displayStatesByID: [String: APDisplayState], trends: [String: (direction: TrendDirection, delta: Int)] = [:], snapshots: [String: [NetworkSnapshot]] = [:]) {
+        var dataArray = ChannelSpanCalculator.toSeriesData(
+            networks,
+            colorHasher: colorHasher,
+            trends: trends,
+            displayStatesByID: displayStatesByID
+        )
 
         let prevByID = Dictionary(uniqueKeysWithValues: allSeriesData.map { ($0.id, $0.displayRSSI) })
         for i in dataArray.indices {
@@ -146,6 +174,39 @@ extension BandChartViewModel {
         }
         allSeriesData = dataArray
         allSnapshots = snapshots
+        currentHiddenBands = []
+        currentHideHiddenSSIDs = false
+        currentFilterQuery = ""
+        refreshRenderedState()
+        startAnimation()
+    }
+
+    func updateNetworks(_ networks: [WiFiNetwork], colorHasher: SSIDColorHasher, filterQuery: String, trends: [String: (direction: TrendDirection, delta: Int)] = [:], snapshots: [String: [NetworkSnapshot]] = [:], hiddenBSSIDs: Set<String> = [], hiddenBands: Set<String> = [], hideHiddenSSIDs: Bool = false) {
+        var dataArray = ChannelSpanCalculator.toSeriesData(networks, colorHasher: colorHasher, trends: trends, hiddenBSSIDs: hiddenBSSIDs)
+
+        let prevByID = Dictionary(uniqueKeysWithValues: allSeriesData.map { ($0.id, $0.displayRSSI) })
+        for i in dataArray.indices {
+            dataArray[i].displayRSSI = prevByID[dataArray[i].id] ?? Double(dataArray[i].rssi)
+        }
+
+        var occ: [Int: Int] = [:]
+        for s in dataArray { occ[s.channel, default: 0] += 1 }
+        channelOccupancy = occ
+        for i in dataArray.indices {
+            dataArray[i].qualityScore = Self.computeScore(
+                rssi: dataArray[i].rssi,
+                channelCount: occ[dataArray[i].channel] ?? 1,
+                supportsK: dataArray[i].supportsK,
+                supportsR: dataArray[i].supportsR,
+                supportsV: dataArray[i].supportsV,
+                channelWidth: dataArray[i].channelWidth
+            )
+        }
+        allSeriesData = dataArray
+        allSnapshots = snapshots
+        currentHiddenBands = hiddenBands
+        currentHideHiddenSSIDs = hideHiddenSSIDs
+        currentFilterQuery = filterQuery
         refreshRenderedState()
         startAnimation()
     }
@@ -168,8 +229,23 @@ extension BandChartViewModel {
         interfaceName = name
     }
 
+    func applyFilter(_ filterQuery: String? = nil,
+                      hiddenBands: Set<String> = [],
+                      hideHiddenSSIDs: Bool = false) {
+        if let filterQuery {
+            currentFilterQuery = filterQuery
+        }
+        currentHiddenBands = hiddenBands
+        currentHideHiddenSSIDs = hideHiddenSSIDs
+        refreshRenderedState()
+    }
+
     func toggleExpand() {
         isExpanded.toggle()
+    }
+
+    func clearFilter() {
+        applyFilter("")
     }
 
     func toggleVisibility(for seriesID: String) {
@@ -178,10 +254,18 @@ extension BandChartViewModel {
         refreshRenderedState()
     }
 
+    func toggleVisibility(seriesID: String) {
+        toggleVisibility(for: seriesID)
+    }
+
     func toggleVisibilityLocked(for seriesID: String) {
         guard let index = allSeriesData.firstIndex(where: { $0.id == seriesID }) else { return }
         allSeriesData[index].visibilityLocked.toggle()
         refreshRenderedState()
+    }
+
+    func toggleVisibilityLocked(seriesID: String) {
+        toggleVisibilityLocked(for: seriesID)
     }
 
     func resetZoom() {

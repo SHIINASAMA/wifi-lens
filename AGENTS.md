@@ -24,6 +24,9 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/WINDOWING.md` | Main window sizing/restoration policy, P0 incident record, and anti-regression rules |
 | `docs/superpowers/specs/2026-06-18-debug-multi-ap-chart-design.md` | Design spec for the DebugChartView multi-AP chart workbench |
 | `docs/superpowers/plans/2026-06-18-debug-multi-ap-chart.md` | Implementation plan for the DebugChartView multi-AP chart workbench |
+| `docs/superpowers/specs/2026-06-22-unified-wifi-observation-pipeline-design.md` | Design spec for unified Wi-Fi observation pipeline (models, providers, analyzers, pipeline, store) |
+| `docs/superpowers/plans/2026-06-22-unified-wifi-observation-pipeline.md` | Implementation plan for unified Wi-Fi observation pipeline (Phases 1–5) |
+| `docs/superpowers/plans/2026-06-22-unified-wifi-observation-pipeline-migration.md` | Implementation plan for migrating UI consumers to observation pipeline (Phases 6–10) |
 | `docs/superpowers/specs/2026-06-24-ap-filter-design.md` | Design spec for structured AP filter query parser and filter service |
 | `docs/superpowers/plans/2026-06-24-ap-filter.md` | Implementation plan for AP filter query parser and filter service |
 | `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
