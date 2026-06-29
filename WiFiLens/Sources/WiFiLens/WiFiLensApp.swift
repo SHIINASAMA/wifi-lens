@@ -359,6 +359,11 @@ enum MainWindowActivationAction: Equatable {
     case switchToAccessory
 }
 
+enum ResolvedMainWindowFocusIntent: Equatable {
+    case noFollowUpFocus
+    case focusResolvedWindow
+}
+
 func routeIntent(for route: SidebarPage?) -> MainWindowRouteIntent {
     guard let route else { return .preserveCurrentPage }
     return .navigate(route)
@@ -371,6 +376,10 @@ func closeAction(menuBarEnabled: Bool) -> MainWindowActivationAction {
 func reopenAction(menuBarEnabled: Bool, currentPolicy: NSApplication.ActivationPolicy) -> MainWindowActivationAction {
     guard menuBarEnabled, currentPolicy == .accessory else { return .keepCurrentPolicy }
     return .switchToRegular
+}
+
+func resolvedWindowFocusIntent(hasExistingMainWindow: Bool) -> ResolvedMainWindowFocusIntent {
+    hasExistingMainWindow ? .noFollowUpFocus : .focusResolvedWindow
 }
 
 @main
@@ -388,6 +397,7 @@ struct WiFiLensApp: App {
     @State private var mainWindowCloseObserver: NSObjectProtocol?
     @State private var openMainWindowAction: (() -> Void)?
     @State private var pendingMainWindowRoute: SidebarPage?
+    @State private var pendingResolvedMainWindowFocus = false
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
     @AppStorage("appearance") private var appearance: String = "system"
@@ -607,6 +617,11 @@ struct WiFiLensApp: App {
             pendingMainWindowRoute = nil
         }
 
+        let hasExistingMainWindow = mainWindowReference.window != nil
+        pendingResolvedMainWindowFocus = (
+            resolvedWindowFocusIntent(hasExistingMainWindow: hasExistingMainWindow) == .focusResolvedWindow
+        )
+
         NSApp.activate(ignoringOtherApps: true)
 
         if let mainWindow = mainWindowReference.window {
@@ -631,6 +646,15 @@ struct WiFiLensApp: App {
             selectedPage = pendingRoute
             pendingMainWindowRoute = nil
         }
+
+        guard pendingResolvedMainWindowFocus else { return }
+
+        pendingResolvedMainWindowFocus = false
+        NSApp.activate(ignoringOtherApps: true)
+        if window.isMiniaturized {
+            window.deminiaturize(nil)
+        }
+        window.makeKeyAndOrderFront(nil)
     }
 
     @MainActor
@@ -639,6 +663,7 @@ struct WiFiLensApp: App {
 
         mainWindowReference.window = nil
         clearMainWindowCloseObserver()
+        pendingResolvedMainWindowFocus = false
 
         switch closeAction(menuBarEnabled: menuBarWindowManagementEnabled) {
         case .switchToAccessory:

@@ -31,6 +31,14 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/superpowers/plans/2026-06-24-ap-filter.md` | Implementation plan for AP filter query parser and filter service |
 | `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
 
+## Skills Directory
+
+Custom repository skills live under `.skills/`.
+
+| File | Purpose |
+|------|---------|
+| `.skills/i18n-completer/SKILL.md` | Scan `Localizable.xcstrings` for missing translations and fill them via the repository scripts while enforcing glossary terminology |
+
 ## Build & Test
 
 ```sh

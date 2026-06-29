@@ -26,4 +26,10 @@ struct MenuBarWindowBehaviorTests {
         #expect(reopenAction(menuBarEnabled: true, currentPolicy: .regular) == .keepCurrentPolicy)
         #expect(reopenAction(menuBarEnabled: false, currentPolicy: .accessory) == .keepCurrentPolicy)
     }
+
+    @Test("resolved window is focused only when reopening requires window creation")
+    func resolvedWindowFocusIntentDependsOnExistingWindow() {
+        #expect(resolvedWindowFocusIntent(hasExistingMainWindow: true) == .noFollowUpFocus)
+        #expect(resolvedWindowFocusIntent(hasExistingMainWindow: false) == .focusResolvedWindow)
+    }
 }
