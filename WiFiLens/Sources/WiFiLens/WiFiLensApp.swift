@@ -23,9 +23,12 @@ private struct AppRootView: View {
     @Binding var crashLogText: String
     let sparkleUpdater: SparkleUpdater
     let updateMCPServer: @MainActor () -> Void
+    let registerMainWindow: @MainActor (NSWindow?) -> Void
+    let registerOpenMainWindowAction: @MainActor (@escaping () -> Void) -> Void
 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.openWindow) private var openWindow
 
     @AppStorage("hideTitleBadge") private var hideTitleBadge = true
     @AppStorage("bleEnabled") private var bleEnabled: Bool = false
@@ -255,8 +258,17 @@ private struct AppRootView: View {
         .toolbar {
             secondaryToolbarContent
         }
-        .background(WindowAccessor(defaultSize: mainWindowDefaultSize, minSize: mainWindowMinSize))
+        .background(
+            WindowAccessor(
+                defaultSize: mainWindowDefaultSize,
+                minSize: mainWindowMinSize,
+                onResolveWindow: registerMainWindow
+            )
+        )
         .task {
+            registerOpenMainWindowAction {
+                openWindow(id: WiFiLensApp.mainWindowSceneID)
+            }
             await viewModel.start()
             roamingViewModel.handleWiFiPowerStateChange(viewModel.wifiPowerState)
             updateMCPServer()
@@ -272,16 +284,23 @@ private struct AppRootView: View {
 private struct WindowAccessor: NSViewRepresentable {
     let defaultSize: CGSize
     let minSize: CGSize
+    let onResolveWindow: (NSWindow?) -> Void
 
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
         DispatchQueue.main.async {
             configure(view.window)
+            onResolveWindow(view.window)
         }
         return view
     }
 
-    func updateNSView(_ nsView: NSView, context: Context) {}
+    func updateNSView(_ nsView: NSView, context: Context) {
+        DispatchQueue.main.async {
+            configure(nsView.window)
+            onResolveWindow(nsView.window)
+        }
+    }
 
     private func configure(_ window: NSWindow?) {
         guard let window else {
@@ -325,8 +344,39 @@ private struct WindowAccessor: NSViewRepresentable {
     }
 }
 
+private final class WeakMainWindowReference {
+    weak var window: NSWindow?
+}
+
+enum MainWindowRouteIntent: Equatable {
+    case preserveCurrentPage
+    case navigate(SidebarPage)
+}
+
+enum MainWindowActivationAction: Equatable {
+    case keepCurrentPolicy
+    case switchToRegular
+    case switchToAccessory
+}
+
+func routeIntent(for route: SidebarPage?) -> MainWindowRouteIntent {
+    guard let route else { return .preserveCurrentPage }
+    return .navigate(route)
+}
+
+func closeAction(menuBarEnabled: Bool) -> MainWindowActivationAction {
+    menuBarEnabled ? .switchToAccessory : .keepCurrentPolicy
+}
+
+func reopenAction(menuBarEnabled: Bool, currentPolicy: NSApplication.ActivationPolicy) -> MainWindowActivationAction {
+    guard menuBarEnabled, currentPolicy == .accessory else { return .keepCurrentPolicy }
+    return .switchToRegular
+}
+
 @main
 struct WiFiLensApp: App {
+    static let mainWindowSceneID = "WiFiLensMainWindowScene"
+
     @State private var viewModel = ScannerViewModel()
     @State private var roamingViewModel = RoamingTestViewModel()
     @State private var bleViewModel: BLEViewModel?
@@ -334,10 +384,15 @@ struct WiFiLensApp: App {
     @State private var sidebarVisibility = NavigationSplitViewVisibility.automatic
     @State private var selectedPage: SidebarPage = .overview
     @State private var showCrashLog: Bool = false
+    @State private var mainWindowReference = WeakMainWindowReference()
+    @State private var mainWindowCloseObserver: NSObjectProtocol?
+    @State private var openMainWindowAction: (() -> Void)?
+    @State private var pendingMainWindowRoute: SidebarPage?
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
     @AppStorage("appearance") private var appearance: String = "system"
     @AppStorage("bleEnabled") private var bleEnabled: Bool = false
+    @AppStorage("menuBarEnabled") private var menuBarEnabled: Bool = true
 
     init() {
         if UITestMode.isActive {
@@ -360,7 +415,7 @@ struct WiFiLensApp: App {
     @State private var crashLogText: String = ""
 
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(id: Self.mainWindowSceneID) {
             AppRootView(
                 viewModel: viewModel,
                 roamingViewModel: roamingViewModel,
@@ -370,7 +425,9 @@ struct WiFiLensApp: App {
                 showCrashLog: $showCrashLog,
                 crashLogText: $crashLogText,
                 sparkleUpdater: sparkleUpdater,
-                updateMCPServer: updateMCPServer
+                updateMCPServer: updateMCPServer,
+                registerMainWindow: registerMainWindow,
+                registerOpenMainWindowAction: registerOpenMainWindowAction
             )
             .preferredColorScheme(colorScheme)
         }
@@ -483,7 +540,7 @@ struct WiFiLensApp: App {
 
             CommandGroup(replacing: .appSettings) {
                 Button {
-                    selectedPage = .settings
+                    showMainWindow(route: .settings)
                 } label: {
                     Label(String(localized: "common.action.settings", comment: "Settings button or menu item"), systemImage: "gearshape")
                 }
@@ -501,7 +558,11 @@ struct WiFiLensApp: App {
         }
 
 #if PRO
-        MenuBarScene()
+        MenuBarScene(
+            onOpenMainWindow: { showMainWindow(route: nil) },
+            onOpenSettings: { showMainWindow(route: .settings) },
+            onQuit: { NSApp.terminate(nil) }
+        )
 #endif
     }
 
@@ -519,6 +580,98 @@ struct WiFiLensApp: App {
             return .dark
         }
         return .light
+    }
+
+    private var menuBarWindowManagementEnabled: Bool {
+#if PRO
+        menuBarEnabled
+#else
+        false
+#endif
+    }
+
+    @MainActor
+    private func showMainWindow(route: SidebarPage? = nil) {
+        switch reopenAction(menuBarEnabled: menuBarWindowManagementEnabled, currentPolicy: NSApp.activationPolicy()) {
+        case .switchToRegular:
+            NSApp.setActivationPolicy(.regular)
+        case .keepCurrentPolicy, .switchToAccessory:
+            break
+        }
+
+        switch routeIntent(for: route) {
+        case .navigate(let page):
+            selectedPage = page
+            pendingMainWindowRoute = page
+        case .preserveCurrentPage:
+            pendingMainWindowRoute = nil
+        }
+
+        NSApp.activate(ignoringOtherApps: true)
+
+        if let mainWindow = mainWindowReference.window {
+            if mainWindow.isMiniaturized {
+                mainWindow.deminiaturize(nil)
+            }
+            mainWindow.makeKeyAndOrderFront(nil)
+            return
+        }
+
+        openMainWindowAction?()
+    }
+
+    @MainActor
+    private func registerMainWindow(_ window: NSWindow?) {
+        guard let window else { return }
+
+        mainWindowReference.window = window
+        replaceMainWindowCloseObserver(for: window)
+
+        if let pendingRoute = pendingMainWindowRoute {
+            selectedPage = pendingRoute
+            pendingMainWindowRoute = nil
+        }
+    }
+
+    @MainActor
+    private func handleMainWindowWillClose(_ closingWindow: NSWindow) {
+        guard mainWindowReference.window === closingWindow else { return }
+
+        mainWindowReference.window = nil
+        clearMainWindowCloseObserver()
+
+        switch closeAction(menuBarEnabled: menuBarWindowManagementEnabled) {
+        case .switchToAccessory:
+            NSApp.setActivationPolicy(.accessory)
+        case .keepCurrentPolicy, .switchToRegular:
+            break
+        }
+    }
+
+    @MainActor
+    private func replaceMainWindowCloseObserver(for window: NSWindow) {
+        clearMainWindowCloseObserver()
+        mainWindowCloseObserver = NotificationCenter.default.addObserver(
+            forName: NSWindow.willCloseNotification,
+            object: window,
+            queue: .main
+        ) { _ in
+            MainActor.assumeIsolated {
+                handleMainWindowWillClose(window)
+            }
+        }
+    }
+
+    @MainActor
+    private func clearMainWindowCloseObserver() {
+        guard let mainWindowCloseObserver else { return }
+        NotificationCenter.default.removeObserver(mainWindowCloseObserver)
+        self.mainWindowCloseObserver = nil
+    }
+
+    @MainActor
+    private func registerOpenMainWindowAction(_ action: @escaping () -> Void) {
+        openMainWindowAction = action
     }
 
     @MainActor

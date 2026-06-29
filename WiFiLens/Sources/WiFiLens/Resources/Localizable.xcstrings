@@ -2,7 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     " · %@" : {
-
+      "shouldTranslate" : false
     },
     "—" : {
       "shouldTranslate" : false
@@ -165,6 +165,9 @@
       "shouldTranslate" : false
     },
     "•" : {
+      "shouldTranslate" : false
+    },
+    "⌘Q" : {
       "shouldTranslate" : false
     },
     "ble.accessibility.trend_chart_fmt" : {
