@@ -244,7 +244,6 @@
 		FBD0A44B2FE5BEAC003658AD /* MarkdownExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A43B2FE5BEAC003658AD /* MarkdownExportService.swift */; };
 		FBD0A44C2FE5BEAC003658AD /* RecordingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4362FE5BEAC003658AD /* RecordingViewModel.swift */; };
 		FBD0A44F2FE5BEAC003658AD /* PRO.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = FBD0A43E2FE5BEAC003658AD /* PRO.xctestplan */; };
-		FBD0A4512FE5BF24003658AD /* WiFiLensPro-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FBD0A4502FE5BF24003658AD /* WiFiLensPro-Info.plist */; };
 		FBD0A4522FE5C05C003658AD /* RecordingModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4402FE5BEAC003658AD /* RecordingModeTests.swift */; };
 		FBD0A45A2FE5C06000000007 /* MenuBarScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4572FE5C06000000004 /* MenuBarScene.swift */; };
 		FBD0A45D2FE5C0600000000A /* MenuBarStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */; };
@@ -1277,7 +1276,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				FBD0A44F2FE5BEAC003658AD /* PRO.xctestplan in Resources */,
-				FBD0A4512FE5BF24003658AD /* WiFiLensPro-Info.plist in Resources */,
 				FBBD169A2FD062F60093F940 /* PrivacyInfo.xcprivacy in Resources */,
 				FBBD169D2FD063630093F940 /* Assets.xcassets in Resources */,
 				FB1E329D2FC7316C009D1BDC /* Localizable.xcstrings in Resources */,
