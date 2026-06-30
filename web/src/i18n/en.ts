@@ -6,8 +6,8 @@ export const en = {
     selectLanguage: 'Select language',
   },
   meta: {
-    title: 'WiFi Lens — macOS Wi-Fi Spectrum Analyzer',
-    description: 'WiFi Lens — A native macOS Wi-Fi spectrum analyzer. Scan, diagnose, and roam with confidence.',
+    title: 'WiFi Lens — macOS Wi-Fi Analyzer | Free & Open Source',
+    description: 'Free macOS Wi-Fi analyzer — scan networks, check channel quality, test roaming, and integrate with AI tools. Open source, local-first, no tracking.',
   },
   nav: {
     features: 'Features',
