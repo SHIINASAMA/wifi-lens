@@ -196,6 +196,20 @@ private struct AppRootView: View {
                     .allowsHitTesting(selectedPage == .bleScanner)
                     .accessibilityIdentifier("page-bleScanner")
 
+                if selectedPage == .timeline {
+#if PRO
+                    TimelineView()
+                        .accessibilityIdentifier("page-timeline")
+#else
+                    ProFeaturePlaceholderView(
+                        featureName: String(localized: "pro.timeline.title", comment: "Pro timeline feature title"),
+                        featureDescription: String(localized: "pro.timeline.description", comment: "Pro timeline feature description"),
+                        featureIcon: SidebarPage.timeline.icon
+                    )
+                        .accessibilityIdentifier("page-timeline")
+#endif
+                }
+
                 SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel?.bluetoothPermission, bleEnabled: $bleEnabled)
                     .opacity(selectedPage == .settings ? 1 : 0)
                     .allowsHitTesting(selectedPage == .settings)
@@ -512,6 +526,11 @@ struct WiFiLensApp: App {
                     selectedPage = .bleScanner
                 }
                 .keyboardShortcut("6", modifiers: .command)
+
+                Button(String(localized: "nav.timeline", comment: "Navigate to Timeline page")) {
+                    selectedPage = .timeline
+                }
+                .keyboardShortcut("7", modifiers: .command)
             }
 
             CommandGroup(after: .toolbar) {
@@ -573,6 +592,7 @@ struct WiFiLensApp: App {
 #if PRO
         MenuBarScene(
             onOpenMainWindow: { showMainWindow(route: nil) },
+            onOpenTimeline: { showMainWindow(route: .timeline) },
             onOpenSettings: { showMainWindow(route: .settings) },
             onQuit: { NSApp.terminate(nil) }
         )

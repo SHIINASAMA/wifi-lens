@@ -7,6 +7,7 @@ enum SidebarPage: String, CaseIterable {
     case interfaces
     case roaming
     case bleScanner
+    case timeline
     case settings
 #if DEBUG
     case spectrumDebugChart
@@ -15,7 +16,7 @@ enum SidebarPage: String, CaseIterable {
 
     var requiresLocationAuthorization: Bool {
         switch self {
-        case .overview, .settings, .bleScanner:
+        case .overview, .settings, .bleScanner, .timeline:
             false
         case .spectrum, .channels, .interfaces, .roaming:
             true
@@ -28,7 +29,7 @@ enum SidebarPage: String, CaseIterable {
 
     var requiresWiFi: Bool {
         switch self {
-        case .overview, .settings, .bleScanner:
+        case .overview, .settings, .bleScanner, .timeline:
             false
         case .spectrum, .channels, .interfaces, .roaming:
             true
@@ -47,6 +48,7 @@ enum SidebarPage: String, CaseIterable {
         case .interfaces: String(localized: "nav.interfaces", comment: "Interfaces sidebar navigation item")
         case .roaming:   String(localized: "nav.roaming_test", comment: "Roaming Test sidebar navigation item")
         case .bleScanner: String(localized: "nav.ble_scanner", comment: "BLE Scanner sidebar navigation item")
+        case .timeline: String(localized: "nav.timeline", comment: "Timeline sidebar navigation item")
         case .settings:   String(localized: "common.action.settings", comment: "Settings button or menu item")
 #if DEBUG
         case .spectrumDebugChart: String(localized: "nav.spectrum_debug_chart", comment: "Spectrum Debug Chart sidebar navigation item (dev only)")
@@ -63,6 +65,7 @@ enum SidebarPage: String, CaseIterable {
         case .interfaces: "cable.connector"
         case .roaming:   "arrow.triangle.swap"
         case .bleScanner: "personalhotspot"
+        case .timeline: "clock.arrow.circlepath"
         case .settings:   "gearshape"
 #if DEBUG
         case .spectrumDebugChart: "antenna.radiowaves.left.and.right"
@@ -116,7 +119,7 @@ struct SidebarView: View {
             }
             Divider()
             Section {
-                ForEach([SidebarPage.spectrum, .channels, .interfaces, .roaming, .bleScanner], id: \.self) { page in
+                ForEach([SidebarPage.spectrum, .channels, .interfaces, .roaming, .bleScanner, .timeline], id: \.self) { page in
                     if page == .bleScanner {
                         Label(title: { Text(page.label) }, icon: {
                             BluetoothIconShape()

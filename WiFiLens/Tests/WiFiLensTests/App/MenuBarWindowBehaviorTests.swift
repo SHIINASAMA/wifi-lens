@@ -14,6 +14,18 @@ struct MenuBarWindowBehaviorTests {
         #expect(routeIntent(for: .settings) == .navigate(.settings))
     }
 
+    @Test("route intent navigates to timeline when route is provided")
+    func routeIntentNavigatesToTimeline() {
+        #expect(routeIntent(for: .timeline) == .navigate(.timeline))
+    }
+
+    @Test("timeline page remains browse-only")
+    func timelinePageDoesNotRequireLiveWiFiOrLocation() {
+        #expect(SidebarPage.timeline.icon == "clock.arrow.circlepath")
+        #expect(!SidebarPage.timeline.requiresLocationAuthorization)
+        #expect(!SidebarPage.timeline.requiresWiFi)
+    }
+
     @Test("close action switches to accessory only when menu bar is enabled")
     func closeActionDependsOnMenuBarFlag() {
         #expect(closeAction(menuBarEnabled: true) == .switchToAccessory)
