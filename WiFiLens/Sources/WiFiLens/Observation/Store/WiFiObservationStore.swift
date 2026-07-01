@@ -12,7 +12,6 @@ final class WiFiObservationStore: ObservableObject {
     @Published var channelRecommendation: [ChannelRecommendation]?
 
     @Published var diagnosis: DiagnosticResult?
-    @Published var recentEvents: [WiFiObservationEvent] = []
 
     @Published var isRefreshingCurrent = false
     @Published var isScanningEnvironment = false
@@ -40,14 +39,6 @@ final class WiFiObservationStore: ObservableObject {
         }
         if let diag = observation.diagnosis {
             diagnosis = diag
-        }
-        if !observation.events.isEmpty {
-            let existingIDs = Set(recentEvents.map(\.id))
-            let newEvents = observation.events.filter { !existingIDs.contains($0.id) }
-            recentEvents.append(contentsOf: newEvents)
-            if recentEvents.count > 50 {
-                recentEvents = Array(recentEvents.suffix(50))
-            }
         }
         if !observation.errors.isEmpty {
             errors.append(contentsOf: observation.errors)

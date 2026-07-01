@@ -9,7 +9,6 @@ struct WiFiObservation: Equatable, Sendable {
     var channelAnalysis: [ChannelQuality]?
     var channelRecommendation: [ChannelRecommendation]?
     var diagnosis: DiagnosticResult?
-    var events: [WiFiObservationEvent]
     var errors: [WiFiObservationError]
 
     init(
@@ -21,7 +20,6 @@ struct WiFiObservation: Equatable, Sendable {
         channelAnalysis: [ChannelQuality]? = nil,
         channelRecommendation: [ChannelRecommendation]? = nil,
         diagnosis: DiagnosticResult? = nil,
-        events: [WiFiObservationEvent] = [],
         errors: [WiFiObservationError] = []
     ) {
         self.timestamp = timestamp
@@ -32,7 +30,6 @@ struct WiFiObservation: Equatable, Sendable {
         self.channelAnalysis = channelAnalysis
         self.channelRecommendation = channelRecommendation
         self.diagnosis = diagnosis
-        self.events = events
         self.errors = errors
     }
 
@@ -43,7 +40,6 @@ struct WiFiObservation: Equatable, Sendable {
         lhs.gatewayLatency == rhs.gatewayLatency &&
         lhs.quality == rhs.quality &&
         lhs.diagnosis == rhs.diagnosis &&
-        lhs.events == rhs.events &&
         lhs.errors == rhs.errors &&
         channelQualityFingerprint(lhs.channelAnalysis) == channelQualityFingerprint(rhs.channelAnalysis) &&
         channelRecommendationFingerprint(lhs.channelRecommendation) == channelRecommendationFingerprint(rhs.channelRecommendation)

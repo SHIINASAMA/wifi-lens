@@ -25,40 +25,6 @@ struct AnalyzerTests {
         #expect(result.level == .poor)
     }
 
-    @Test("RoamingEventDetector: BSSID change produces event")
-    func bssidChangeEvent() {
-        let prev = WiFiCurrentStatus(
-            timestamp: Date(), ssid: "Net", bssid: "AA:BB:CC:DD:EE:01",
-            channel: 36, rssi: -50, isConnected: true, isWiFiPowerOn: true
-        )
-        let cur = WiFiCurrentStatus(
-            timestamp: Date(), ssid: "Net", bssid: "AA:BB:CC:DD:EE:02",
-            channel: 36, rssi: -55, isConnected: true, isWiFiPowerOn: true
-        )
-        let events = RoamingEventDetector.detect(previous: prev, current: cur)
-        #expect(events.count == 1)
-        if case .bssidChange(let from, let to) = events[0].type {
-            #expect(from == "AA:BB:CC:DD:EE:01")
-            #expect(to == "AA:BB:CC:DD:EE:02")
-        } else {
-            Issue.record("Expected bssidChange event")
-        }
-    }
-
-    @Test("RoamingEventDetector: signal drop > 20dBm produces event")
-    func signalDropEvent() {
-        let prev = WiFiCurrentStatus(
-            timestamp: Date(), ssid: "Net", bssid: "AA:BB",
-            channel: 6, rssi: -50, isConnected: true, isWiFiPowerOn: true
-        )
-        let cur = WiFiCurrentStatus(
-            timestamp: Date(), ssid: "Net", bssid: "AA:BB",
-            channel: 6, rssi: -75, isConnected: true, isWiFiPowerOn: true
-        )
-        let events = RoamingEventDetector.detect(previous: prev, current: cur)
-        #expect(events.contains { $0.type == .signalDrop(from: -50, to: -75) })
-    }
-
     @Test("DiagnosticEvaluator: excellent when strong + WPA3 + good channel")
     func excellentDiagnostic() {
         let status = WiFiCurrentStatus(

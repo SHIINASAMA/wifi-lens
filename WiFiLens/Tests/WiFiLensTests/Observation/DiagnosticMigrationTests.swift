@@ -36,13 +36,9 @@ struct DiagnosticMigrationTests {
         #expect(DiagnosticSeverity.ok.color == .mint)
     }
 
-    @Test("WiFiObservationStore apply updates recommendation slices and deduplicates events")
-    func storeApplyUpdatesSlicesAndDeduplicatesEvents() {
+    @Test("WiFiObservationStore apply updates recommendation slices and errors")
+    func storeApplyUpdatesSlicesAndErrors() {
         let store = WiFiObservationStore()
-        let event = WiFiObservationEvent(
-            id: UUID(uuidString: "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE")!,
-            type: .disconnection
-        )
         let analysis = ChannelQuality(
             channel: 11,
             band: "24",
@@ -64,18 +60,16 @@ struct DiagnosticMigrationTests {
         let first = WiFiObservation(
             channelAnalysis: [analysis],
             channelRecommendation: [recommendation],
-            events: [event],
             errors: [.environmentScanFailed("test error")]
         )
-        let second = WiFiObservation(events: [event])
+        let second = WiFiObservation(errors: [.environmentScanFailed("test error 2")])
 
         store.apply(first)
         store.apply(second)
 
         #expect(store.channelAnalysis?.count == 1)
         #expect(store.channelRecommendation?.count == 1)
-        #expect(store.recentEvents.count == 1)
-        #expect(store.errors.count == 1)
+        #expect(store.errors.count == 2)
         #expect(store.lastUpdated != nil)
     }
 }

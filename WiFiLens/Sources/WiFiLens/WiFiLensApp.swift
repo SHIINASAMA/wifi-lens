@@ -270,6 +270,9 @@ private struct AppRootView: View {
                 openWindow(id: WiFiLensApp.mainWindowSceneID)
             }
             await viewModel.start()
+#if PRO
+            ProObservationEventBootstrap.start(observationStore: viewModel.store)
+#endif
             roamingViewModel.handleWiFiPowerStateChange(viewModel.wifiPowerState)
             updateMCPServer()
         }

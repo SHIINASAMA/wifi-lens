@@ -32,7 +32,6 @@ struct ModelsTests {
     func observationDefaults() {
         let obs = WiFiObservation()
         #expect(obs.currentStatus == nil)
-        #expect(obs.events.isEmpty)
         #expect(obs.errors.isEmpty)
     }
 
