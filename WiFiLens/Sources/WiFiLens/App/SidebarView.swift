@@ -113,13 +113,14 @@ struct SidebarView: View {
     var body: some View {
         List(selection: $selectedPage) {
             Section {
+                sidebarGroupTitle("Overview")
                 Label(SidebarPage.overview.label, systemImage: SidebarPage.overview.icon)
                     .tag(SidebarPage.overview)
                     .accessibilityIdentifier("sidebar-overview")
             }
-            Divider()
             Section {
-                ForEach([SidebarPage.spectrum, .channels, .interfaces, .roaming, .bleScanner, .timeline], id: \.self) { page in
+                sidebarGroupTitle("Tools")
+                ForEach([SidebarPage.spectrum, .channels, .interfaces, .roaming, .bleScanner], id: \.self) { page in
                     if page == .bleScanner {
                         Label(title: { Text(page.label) }, icon: {
                             BluetoothIconShape()
@@ -135,7 +136,7 @@ struct SidebarView: View {
                                 : "")
                             .accessibilityIdentifier("sidebar-bleScanner")
                     } else {
-                        Label(page.label, systemImage: page.icon)
+                        sidebarRow(for: page)
                             .tag(page)
                             .disabled(!UITestMode.isActive && page.requiresWiFi && !isWiFiAvailable)
                             .opacity(!UITestMode.isActive && page.requiresWiFi && !isWiFiAvailable ? 0.4 : 1.0)
@@ -145,7 +146,16 @@ struct SidebarView: View {
                             .accessibilityIdentifier("sidebar-\(page.rawValue)")
                     }
                 }
+            }
+            Section {
+                sidebarGroupTitle("Insights")
+                sidebarRow(for: .timeline)
+                    .tag(SidebarPage.timeline)
+                    .accessibilityIdentifier("sidebar-\(SidebarPage.timeline.rawValue)")
+            }
 #if DEBUG
+            Section {
+                sidebarGroupTitle("Debug")
                 Label(SidebarPage.spectrumDebugChart.label, systemImage: SidebarPage.spectrumDebugChart.icon)
                     .tag(SidebarPage.spectrumDebugChart)
                     .accessibilityIdentifier("sidebar-spectrumDebugChart")
@@ -153,12 +163,10 @@ struct SidebarView: View {
                 Label(SidebarPage.debugChart.label, systemImage: SidebarPage.debugChart.icon)
                     .tag(SidebarPage.debugChart)
                     .accessibilityIdentifier("sidebar-debugChart")
-#endif
             }
-            Divider()
+#endif
             Section {
-//                Label(SidebarPage.help.label, systemImage: SidebarPage.help.icon)
-//                    .tag(SidebarPage.help)
+                sidebarGroupTitle("Settings")
                 Label(SidebarPage.settings.label, systemImage: SidebarPage.settings.icon)
                     .tag(SidebarPage.settings)
                     .accessibilityIdentifier("sidebar-settings")
@@ -169,5 +177,34 @@ struct SidebarView: View {
         .listStyle(.sidebar)
         .safeAreaPadding(.top, 12)
         .frame(minWidth: 160, idealWidth: 180)
+    }
+
+    @ViewBuilder
+    private func sidebarRow(for page: SidebarPage) -> some View {
+#if OSS
+        if page == .timeline {
+            HStack(spacing: 8) {
+                Label(page.label, systemImage: page.icon)
+                Spacer(minLength: 8)
+                Image(systemName: "lock.fill")
+                    .font(.caption)
+                    .foregroundStyle(.yellow)
+                    .accessibilityHidden(true)
+            }
+        } else {
+            Label(page.label, systemImage: page.icon)
+        }
+#else
+        Label(page.label, systemImage: page.icon)
+#endif
+    }
+
+    private func sidebarGroupTitle(_ title: String) -> some View {
+        Text(title)
+            .font(.system(size: 10, weight: .semibold))
+            .foregroundStyle(.secondary)
+            .textCase(nil)
+            .padding(.top, 6)
+            .padding(.bottom, 2)
     }
 }
