@@ -35,6 +35,7 @@ private struct AppRootView: View {
     @State private var secondaryToolbarSelections = SecondaryToolbarSelections()
 #if PRO
     @State private var spectrumRecordingViewModel: RecordingViewModel?
+    @State private var timelineSearchText = ""
 #endif
 
     private var hasLocationAuthorization: Bool {
@@ -74,6 +75,43 @@ private struct AppRootView: View {
     private var spectrumViewMode: SpectrumMode {
         SpectrumMode.fromToolbarSelection(
             secondaryToolbarSelections.spectrum
+        )
+    }
+
+    private var timelineRangeFilter: Binding<TimelineRangeFilter> {
+        Binding(
+            get: {
+                switch secondaryToolbarSelections.timeline {
+                case .timelineToday:
+                    .today
+                case .timelineYesterday:
+                    .yesterday
+                case .timelineThisWeek:
+                    .thisWeek
+                default:
+                    .all
+                }
+            },
+            set: { newValue in
+                let selection: SecondaryToolbarItemID = switch newValue {
+                case .today:
+                    .timelineToday
+                case .yesterday:
+                    .timelineYesterday
+                case .thisWeek:
+                    .timelineThisWeek
+                case .all:
+                    .timelineAll
+                }
+                secondaryToolbarSelections.timeline = selection
+            }
+        )
+    }
+
+    private var timelineSearchBinding: Binding<String> {
+        Binding(
+            get: { timelineSearchText },
+            set: { timelineSearchText = $0 }
         )
     }
 #endif
@@ -126,10 +164,26 @@ private struct AppRootView: View {
                     descriptor: SecondaryToolbarDescriptor.forPage(.spectrum)!,
                     selection: $secondaryToolbarSelections.spectrum
                 )
+            case .timeline:
+#if PRO
+                SecondaryToolbarCapsule(
+                    descriptor: SecondaryToolbarDescriptor.forPage(.timeline)!,
+                    selection: $secondaryToolbarSelections.timeline
+                )
+#else
+                EmptyView()
+#endif
             default:
                 EmptyView()
             }
         }
+#if PRO
+        ToolbarItem(placement: .primaryAction) {
+            if selectedPage == .timeline {
+                TimelineToolbarSearchField(text: timelineSearchBinding)
+            }
+        }
+#endif
     }
 
     @ViewBuilder
@@ -198,7 +252,10 @@ private struct AppRootView: View {
 
                 if selectedPage == .timeline {
 #if PRO
-                    TimelineView()
+                    TimelineView(
+                        selectedFilter: timelineRangeFilter,
+                        searchText: timelineSearchBinding
+                    )
                         .accessibilityIdentifier("page-timeline")
 #else
                     ProFeaturePlaceholderView(
@@ -297,6 +354,37 @@ private struct AppRootView: View {
         }
     }
 }
+
+#if PRO
+private struct TimelineToolbarSearchField: View {
+    @Binding var text: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.secondary)
+
+            TextField(
+                String(localized: "timeline.search.placeholder", comment: "Timeline search field placeholder"),
+                text: $text
+            )
+            .textFieldStyle(.plain)
+            .frame(width: 180)
+        }
+        .padding(.horizontal, 12)
+        .frame(height: 30)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.white.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                )
+        )
+    }
+}
+#endif
 
 private struct WindowAccessor: NSViewRepresentable {
     let defaultSize: CGSize

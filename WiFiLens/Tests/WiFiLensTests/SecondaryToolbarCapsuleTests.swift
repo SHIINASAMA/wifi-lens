@@ -58,4 +58,18 @@ struct SecondaryToolbarCapsuleTests {
             "secondary-toolbar-channels-table",
         ])
     }
+
+    #if PRO
+    @Test func timelinePageExposesDateRangeToolbarDescriptor() {
+        let descriptor = SecondaryToolbarDescriptor.forPage(.timeline)
+
+        #expect(descriptor?.defaultSelection == .timelineAll)
+        #expect(descriptor?.items.map(\.id) == [
+            .timelineAll,
+            .timelineToday,
+            .timelineYesterday,
+            .timelineThisWeek,
+        ])
+    }
+    #endif
 }

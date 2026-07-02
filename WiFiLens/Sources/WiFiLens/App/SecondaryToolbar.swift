@@ -8,6 +8,10 @@ enum SecondaryToolbarItemID: String, Hashable {
     case interfacesMonitor = "interfaces-monitor"
     case spectrumLive = "spectrum-live"
     case spectrumRecording = "spectrum-recording"
+    case timelineAll = "timeline-all"
+    case timelineToday = "timeline-today"
+    case timelineYesterday = "timeline-yesterday"
+    case timelineThisWeek = "timeline-this-week"
 }
 
 struct SecondaryToolbarItem: Identifiable, Equatable {
@@ -78,6 +82,32 @@ struct SecondaryToolbarDescriptor: Equatable {
                 ],
                 defaultSelection: .spectrumLive
             )
+        case .timeline:
+#if PRO
+            return Self(
+                items: [
+                    SecondaryToolbarItem(
+                        id: .timelineAll,
+                        title: String(localized: "timeline.filter.all", comment: "Timeline filter for all events")
+                    ),
+                    SecondaryToolbarItem(
+                        id: .timelineToday,
+                        title: String(localized: "timeline.filter.today", comment: "Timeline filter for today's events")
+                    ),
+                    SecondaryToolbarItem(
+                        id: .timelineYesterday,
+                        title: String(localized: "timeline.filter.yesterday", comment: "Timeline filter for yesterday's events")
+                    ),
+                    SecondaryToolbarItem(
+                        id: .timelineThisWeek,
+                        title: String(localized: "timeline.filter.this_week", comment: "Timeline filter for this week's events")
+                    ),
+                ],
+                defaultSelection: .timelineAll
+            )
+#else
+            return nil
+#endif
         default:
             return nil
         }
@@ -88,6 +118,7 @@ struct SecondaryToolbarSelections: Equatable {
     var channels: SecondaryToolbarItemID = .channelsSimple
     var interfaces: SecondaryToolbarItemID = .interfacesSimple
     var spectrum: SecondaryToolbarItemID = .spectrumLive
+    var timeline: SecondaryToolbarItemID = .timelineAll
 
     func selection(for page: SidebarPage) -> SecondaryToolbarItemID? {
         switch page {
@@ -97,6 +128,8 @@ struct SecondaryToolbarSelections: Equatable {
             interfaces
         case .spectrum:
             spectrum
+        case .timeline:
+            timeline
         default:
             nil
         }
@@ -110,6 +143,8 @@ struct SecondaryToolbarSelections: Equatable {
             interfaces = selection
         case .spectrum:
             spectrum = selection
+        case .timeline:
+            timeline = selection
         default:
             break
         }
