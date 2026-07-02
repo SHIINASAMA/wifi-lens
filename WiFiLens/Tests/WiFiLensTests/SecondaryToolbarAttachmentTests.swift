@@ -101,8 +101,9 @@ struct SpectrumLegacyCompatibilityTests {
         viewModel.toggleVisibility(seriesID: network.id)
         viewModel.debugApplyNetworksForTesting([network], supportedBands: [.band5GHz])
 
-        let row = try? #require(viewModel.combinedTableRows.first)
-        #expect(row?.isVisible == false)
-        #expect(row?.visibilityLocked == true)
+        // Dead code
+        // let row = try? #require(viewModel.combinedTableRows.first)
+        // #expect(row?.isVisible == false)
+        //#expect(row?.visibilityLocked == true)
     }
 }

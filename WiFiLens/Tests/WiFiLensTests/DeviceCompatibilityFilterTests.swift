@@ -56,7 +56,7 @@ import Testing
     @Test("DFS channel without DFS-capable device is incompatible")
     func dfsChannelWithoutDFSSupport() {
         let supported = makeChannels([(2, 52)]) // channel IS in supported set
-        var caps = DevicePHYCapabilities(
+        let caps = DevicePHYCapabilities(
             supportsAX: false,
             supportsAC: true,
             supportsN: true,
@@ -132,7 +132,7 @@ import Testing
     @Test("6 GHz channel without 6 GHz-capable device is incompatible")
     func sixGHzChannelWithout6GHzSupport() {
         let supported = makeChannels([(3, 5)])
-        var caps = DevicePHYCapabilities.default
+        let caps = DevicePHYCapabilities.default
         // default has supports6GHz = false
 
         let result = DeviceCompatibilityFilter.check(

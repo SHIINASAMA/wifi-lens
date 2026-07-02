@@ -211,10 +211,10 @@
 		FB85B8A92FE6526D00D2D391 /* ChartLens in Frameworks */ = {isa = PBXBuildFile; productRef = FB85B8A82FE6526D00D2D391 /* ChartLens */; };
 		FB8BB6022FBB07F600FD072E /* NetworkInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8BB6012FBB07F600FD072E /* NetworkInfoService.swift */; };
 		FB8BB6042FBB0BA600FD072E /* IEParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8BB6032FBB0BA600FD072E /* IEParser.swift */; };
-		FB8FCB1C2FF6C4E300BB2929 /* MenuBarMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8FCB182FF6C4E300BB2929 /* MenuBarMigrationTests.swift */; };
-		FB8FCB1D2FF6C4E300BB2929 /* TimelinePresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8FCB1A2FF6C4E300BB2929 /* TimelinePresentationTests.swift */; };
-		FB8FCB1E2FF6C4E300BB2929 /* SecondaryToolbarProTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8FCB192FF6C4E300BB2929 /* SecondaryToolbarProTests.swift */; };
 		FB8FCB212FF6C5DF00BB2929 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = FB8FCB202FF6C5DF00BB2929 /* Sparkle */; };
+		FB8FCB282FF6CAC800BB2929 /* SecondaryToolbarProTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8FCB192FF6C4E300BB2929 /* SecondaryToolbarProTests.swift */; };
+		FB8FCB292FF6CAC800BB2929 /* MenuBarMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8FCB182FF6C4E300BB2929 /* MenuBarMigrationTests.swift */; };
+		FB8FCB2A2FF6CAC800BB2929 /* TimelinePresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8FCB1A2FF6C4E300BB2929 /* TimelinePresentationTests.swift */; };
 		FB92F9212FBE208500BCEC67 /* DebugChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F91F2FBE208500BCEC67 /* DebugChartView.swift */; };
 		FB92F9232FBE208500BCEC67 /* DebugContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */; };
 		FB92F9252FBE208500BCEC67 /* DebugThroughputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */; };
@@ -572,14 +572,6 @@
 		OB00000000000000000000C0 /* WiFiObservationEventSQLiteStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventSQLiteStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		FB8FCAE82FF6BCA700BB2929 /* ../Pro/Tests/WiFiLensProTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ../Pro/Tests/WiFiLensProTests;
-			sourceTree = SOURCE_ROOT;
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
-
 /* Begin PBXFrameworksBuildPhase section */
 		4371D048741550E4775FC8C7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -644,7 +636,6 @@
 				FB80FA302FC0AC1900547708 /* Configs */,
 				FBD329492FBF0E2F00D01613 /* Tests */,
 				2BB8E28CC6CC66A93DA47095 /* Sources */,
-				FB8FCAE82FF6BCA700BB2929 /* ../Pro/Tests/WiFiLensProTests */,
 				6D81AD175FCC46C43BC613A7 /* Frameworks */,
 				BD4D8FFAAD7E961D9EE4F5FE /* Products */,
 			);
@@ -1276,9 +1267,6 @@
 			dependencies = (
 				FB8FCAEC2FF6BCA700BB2929 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				FB8FCAE82FF6BCA700BB2929 /* ../Pro/Tests/WiFiLensProTests */,
-			);
 			name = WiFiLensProTests;
 			packageProductDependencies = (
 			);
@@ -1731,9 +1719,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FB8FCB1C2FF6C4E300BB2929 /* MenuBarMigrationTests.swift in Sources */,
-				FB8FCB1D2FF6C4E300BB2929 /* TimelinePresentationTests.swift in Sources */,
-				FB8FCB1E2FF6C4E300BB2929 /* SecondaryToolbarProTests.swift in Sources */,
+				FB8FCB282FF6CAC800BB2929 /* SecondaryToolbarProTests.swift in Sources */,
+				FB8FCB292FF6CAC800BB2929 /* MenuBarMigrationTests.swift in Sources */,
+				FB8FCB2A2FF6CAC800BB2929 /* TimelinePresentationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
