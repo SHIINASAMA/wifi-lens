@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "2700"
+   LastUpgradeVersion = "2660"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -11,22 +11,17 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
-      <TestPlans>
-         <TestPlanReference
-            reference = "container:../Pro/Tests/TestPlans/PRO.xctestplan"
-            default = "YES">
-         </TestPlanReference>
-      </TestPlans>
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      shouldAutocreateTestPlan = "YES">
       <Testables>
          <TestableReference
             skipped = "NO"
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FBBD16792FCF39F50093F940"
-               BuildableName = "WiFiLensProUITests.xctest"
-               BlueprintName = "WiFiLensProUITests"
+               BlueprintIdentifier = "FB8FCAE62FF6BCA700BB2929"
+               BuildableName = "WiFiLensProTests.xctest"
+               BlueprintName = "WiFiLensProTests"
                ReferencedContainer = "container:WiFiLens.xcodeproj">
             </BuildableReference>
          </TestableReference>
