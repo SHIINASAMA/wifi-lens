@@ -226,22 +226,30 @@ struct TimelineSkeletonView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Section 1 header
-            sectionHeader
+        HStack(alignment: .top, spacing: 8) {
+            // Track line
+            Rectangle()
+                .fill(Color.primary.opacity(0.16))
+                .frame(width: 1)
+                .padding(.top, 44)
 
-            // Section 1 rows
-            timelineRow(titleWidth: 0.65, subtitleWidth: 0.48, markerOpacity: 0.20)
-            timelineRow(titleWidth: 0.55, subtitleWidth: 0.40, markerOpacity: 0.15, showBadge: true)
+            VStack(alignment: .leading, spacing: 0) {
+                // Section 1 header
+                sectionHeader
 
-            Spacer(minLength: 12)
+                // Section 1 rows
+                timelineRow(titleWidth: 0.65, subtitleWidth: 0.48, markerOpacity: 0.20)
+                timelineRow(titleWidth: 0.55, subtitleWidth: 0.40, markerOpacity: 0.15, showBadge: true)
 
-            // Section 2 header
-            sectionHeader
+                Spacer(minLength: 12)
 
-            // Section 2 rows
-            timelineRow(titleWidth: 0.70, subtitleWidth: 0.52, markerOpacity: 0.12)
-            timelineRow(titleWidth: 0.60, subtitleWidth: 0.44, markerOpacity: 0.20)
+                // Section 2 header
+                sectionHeader
+
+                // Section 2 rows
+                timelineRow(titleWidth: 0.70, subtitleWidth: 0.52, markerOpacity: 0.12)
+                timelineRow(titleWidth: 0.60, subtitleWidth: 0.44, markerOpacity: 0.20)
+            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
@@ -270,7 +278,7 @@ struct TimelineSkeletonView: View {
             // Time column
             RoundedRectangle(cornerRadius: 3)
                 .fill(Color.primary.opacity(0.12))
-                .frame(width: 52, height: 8)
+                .frame(width: 78, height: 8)
 
             // Track marker
             Circle()
