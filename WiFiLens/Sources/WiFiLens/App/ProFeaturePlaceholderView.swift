@@ -4,10 +4,11 @@ enum ProConstants {
     static let appStoreURL = "https://apps.apple.com/app/wifi-lens-pro/id6776590746"
 }
 
-struct ProFeaturePlaceholderView: View {
+struct ProFeaturePlaceholderView<CustomSkeleton: View>: View {
     let featureName: String
     let featureDescription: String
     let featureIcon: String
+    @ViewBuilder var customSkeleton: () -> CustomSkeleton
     @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
@@ -22,7 +23,7 @@ struct ProFeaturePlaceholderView: View {
                 .ignoresSafeArea()
                 
                 VStack(spacing: 18) {
-                    ProFeatureScreenshotPlaceholder(systemImage: featureIcon)
+                    customSkeleton()
                         .frame(height: 220)
                         .accessibilityHidden(true)
 
@@ -86,6 +87,15 @@ struct ProFeaturePlaceholderView: View {
     }
 }
 
+extension ProFeaturePlaceholderView where CustomSkeleton == ProFeatureScreenshotPlaceholder {
+    init(featureName: String, featureDescription: String, featureIcon: String) {
+        self.featureName = featureName
+        self.featureDescription = featureDescription
+        self.featureIcon = featureIcon
+        self.customSkeleton = { ProFeatureScreenshotPlaceholder(systemImage: featureIcon) }
+    }
+}
+
 struct ProLockedSettingPreviewRow: View {
     let title: String
     let description: String
@@ -136,7 +146,7 @@ struct ProLockedSettingPreviewRow: View {
     }
 }
 
-private struct ProFeatureScreenshotPlaceholder: View {
+struct ProFeatureScreenshotPlaceholder: View {
     let systemImage: String
     @Environment(\.colorScheme) private var colorScheme
 
