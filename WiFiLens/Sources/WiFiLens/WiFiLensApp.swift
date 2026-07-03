@@ -261,7 +261,8 @@ private struct AppRootView: View {
                     ProFeaturePlaceholderView(
                         featureName: String(localized: "pro.timeline.title", comment: "Pro timeline feature title"),
                         featureDescription: String(localized: "pro.timeline.description", comment: "Pro timeline feature description"),
-                        featureIcon: SidebarPage.timeline.icon
+                        featureIcon: SidebarPage.timeline.icon,
+                        customSkeleton: { TimelineSkeletonView() }
                     )
                         .accessibilityIdentifier("page-timeline")
 #endif

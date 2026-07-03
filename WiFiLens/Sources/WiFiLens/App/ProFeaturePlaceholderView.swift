@@ -222,7 +222,7 @@ struct ProFeatureScreenshotPlaceholder: View {
     }
 }
 
-private struct TimelineSkeletonView: View {
+struct TimelineSkeletonView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
