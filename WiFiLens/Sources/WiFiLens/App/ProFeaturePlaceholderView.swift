@@ -53,8 +53,9 @@ struct ProFeaturePlaceholderView<CustomSkeleton: View>: View {
                 
                 VStack(spacing: 18) {
                     customSkeleton()
-                        .frame(height: 220)
                         .accessibilityHidden(true)
+
+                    Spacer().frame(height: 24)
 
                     VStack(spacing: 8) {
                         Text(featureName)
@@ -248,38 +249,43 @@ struct TimelineSkeletonView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-
             VStack(alignment: .leading, spacing: 0) {
                 // Section 1 header
                 sectionHeader
                 
                 // Section 1 rows
-                timelineRow(titleWidth: 0.65, subtitleWidth: 0.48, markerOpacity: 0.20)
-                timelineRow(titleWidth: 0.55, subtitleWidth: 0.40, markerOpacity: 0.15, showBadge: true)
+                timelineRow(titleWidth: 0.65, subtitleWidth: 0.48, markerOpacity: 0.30)
+                timelineRow(titleWidth: 0.55, subtitleWidth: 0.40, markerOpacity: 0.22, showBadge: true)
                 
-                Spacer(minLength: 12)
-                
+                Spacer().frame(height: 12)
+
                 // Section 2 header
                 sectionHeader
                 
                 // Section 2 rows
-                timelineRow(titleWidth: 0.70, subtitleWidth: 0.52, markerOpacity: 0.12)
-                timelineRow(titleWidth: 0.60, subtitleWidth: 0.44, markerOpacity: 0.20)
+                timelineRow(titleWidth: 0.70, subtitleWidth: 0.52, markerOpacity: 0.18)
+                timelineRow(titleWidth: 0.60, subtitleWidth: 0.44, markerOpacity: 0.30)
             }
-            
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.primary.opacity(0.04))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                    )
+            )
     }
 
     private var sectionHeader: some View {
         HStack(spacing: 10) {
             RoundedRectangle(cornerRadius: 3)
-                .fill(Color.primary.opacity(0.12))
+                .fill(Color.primary.opacity(0.20))
                 .frame(width: 40, height: 8)
 
             Rectangle()
-                .fill(Color.primary.opacity(0.08))
+                .fill(Color.primary.opacity(0.14))
                 .frame(height: 1)
         }
         .padding(.bottom, 8)
@@ -294,7 +300,7 @@ struct TimelineSkeletonView: View {
         HStack(alignment: .center, spacing: 10) {
             // Time column
             RoundedRectangle(cornerRadius: 3)
-                .fill(Color.primary.opacity(0.12))
+                .fill(Color.primary.opacity(0.20))
                 .frame(width: 78, height: 8)
 
             // Track marker
@@ -305,14 +311,14 @@ struct TimelineSkeletonView: View {
             // Event card
             HStack(spacing: 12) {
                 RoundedRectangle(cornerRadius: 4)
-                    .fill(Color.primary.opacity(0.15))
+                    .fill(Color.primary.opacity(0.25))
                     .frame(width: 16, height: 16)
 
                 VStack(alignment: .leading, spacing: 5) {
                     GeometryReader { geo in
                         HStack(spacing: 0) {
                             RoundedRectangle(cornerRadius: 3)
-                                .fill(Color.primary.opacity(0.30))
+                                .fill(Color.primary.opacity(0.40))
                                 .frame(width: geo.size.width * titleWidth, height: 9)
                             Spacer(minLength: 0)
                         }
@@ -322,7 +328,7 @@ struct TimelineSkeletonView: View {
                     GeometryReader { geo in
                         HStack(spacing: 0) {
                             RoundedRectangle(cornerRadius: 3)
-                                .fill(Color.primary.opacity(0.14))
+                                .fill(Color.primary.opacity(0.22))
                                 .frame(width: geo.size.width * subtitleWidth, height: 7)
                             Spacer(minLength: 0)
                         }
@@ -334,11 +340,11 @@ struct TimelineSkeletonView: View {
 
                 if showBadge {
                     RoundedRectangle(cornerRadius: 6)
-                        .fill(Color.primary.opacity(0.06))
+                        .fill(Color.primary.opacity(0.10))
                         .frame(width: 56, height: 22)
                         .overlay(
                             RoundedRectangle(cornerRadius: 6)
-                                .stroke(Color.primary.opacity(0.04), lineWidth: 1)
+                                .stroke(Color.primary.opacity(0.08), lineWidth: 1)
                         )
                 }
 
@@ -351,15 +357,126 @@ struct TimelineSkeletonView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.primary.opacity(0.055))
+                    .fill(Color.primary.opacity(0.08))
                     .shadow(color: .black.opacity(colorScheme == .dark ? 0.06 : 0.035), radius: 6, y: 2)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.primary.opacity(0.035), lineWidth: 1)
+                            .stroke(Color.primary.opacity(0.06), lineWidth: 1)
                     )
             )
         }
         .frame(minHeight: 46, alignment: .top)
         .padding(.bottom, 6)
+    }
+}
+
+struct RecordingSkeletonView: View {
+    var body: some View {
+        VStack(spacing: 0) {
+            // Signal info card
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(Color.primary.opacity(0.30))
+                    .frame(width: 6, height: 6)
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(Color.primary.opacity(0.40))
+                    .frame(width: 52, height: 9)
+                Spacer()
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(Color.primary.opacity(0.18))
+                    .frame(width: 72, height: 7)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+
+            Divider()
+
+            // Status bar
+            HStack(spacing: 12) {
+                HStack(spacing: 4) {
+                    Image(systemName: "clock")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.secondary)
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color.primary.opacity(0.22))
+                        .frame(width: 28, height: 8)
+                }
+                HStack(spacing: 4) {
+                    Image(systemName: "chart.xyaxis.line")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.secondary)
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color.primary.opacity(0.22))
+                        .frame(width: 40, height: 8)
+                }
+                Spacer()
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.primary.opacity(0.18))
+                    .frame(width: 44, height: 20)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+
+            Divider()
+
+            // Chart area
+            GeometryReader { geo in
+                Path { path in
+                    let w = geo.size.width
+                    let h = geo.size.height
+                    path.move(to: CGPoint(x: 0, y: h * 0.5))
+                    path.addCurve(
+                        to: CGPoint(x: w * 0.5, y: h * 0.3),
+                        control1: CGPoint(x: w * 0.15, y: h * 0.2),
+                        control2: CGPoint(x: w * 0.35, y: h * 0.6)
+                    )
+                    path.addCurve(
+                        to: CGPoint(x: w, y: h * 0.4),
+                        control1: CGPoint(x: w * 0.65, y: h * 0.05),
+                        control2: CGPoint(x: w * 0.85, y: h * 0.55)
+                    )
+                }
+                .stroke(Color.primary.opacity(0.20), lineWidth: 1.5)
+            }
+            .frame(height: 80)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+
+            Divider()
+
+            // Table rows
+            VStack(spacing: 0) {
+                tableRow
+                Divider().padding(.leading, 16)
+                tableRow
+                Divider().padding(.leading, 16)
+                tableRow
+            }
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.primary.opacity(0.04))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                )
+        )
+    }
+
+    private var tableRow: some View {
+        HStack(spacing: 12) {
+            RoundedRectangle(cornerRadius: 3)
+                .fill(Color.primary.opacity(0.20))
+                .frame(width: 90, height: 8)
+            RoundedRectangle(cornerRadius: 3)
+                .fill(Color.primary.opacity(0.14))
+                .frame(width: 52, height: 8)
+            Spacer()
+            RoundedRectangle(cornerRadius: 3)
+                .fill(Color.primary.opacity(0.16))
+                .frame(width: 36, height: 8)
+        }
+        .padding(.horizontal, 16)
+        .frame(height: 28)
     }
 }
