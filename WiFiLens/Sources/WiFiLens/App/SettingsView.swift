@@ -147,23 +147,11 @@ struct SettingsView: View {
                     }
                     .padding(.vertical, 4)
 #else
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Image(systemName: "menubar.rectangle")
-                                .foregroundColor(.blue)
-                                .frame(width: 20)
-                            Text(String(localized: "settings.features.menubar_label", comment: "Menu bar icon feature toggle label"))
-                                .font(.body)
-                            Spacer()
-                        }
-                        ProFeaturePlaceholderView(
-                            featureName: String(localized: "pro.menubar.name", comment: "Menu bar Pro feature name"),
-                            featureDescription: String(localized: "pro.menubar.description", comment: "Menu bar Pro feature description"),
-                            featureIcon: "menubar.rectangle"
-                        )
-                        .frame(height: 200)
-                    }
-                    .padding(.vertical, 4)
+                    ProLockedSettingPreviewRow(
+                        title: String(localized: "settings.features.menubar_label", comment: "Menu bar icon feature toggle label"),
+                        description: String(localized: "settings.features.menubar_description", comment: "Description of menu bar icon feature"),
+                        systemImage: "menubar.rectangle"
+                    )
 #endif
                 } header: {
                     Text(String(localized: "settings.section.features", comment: "Features subsection header in settings"))

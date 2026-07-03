@@ -21,17 +21,11 @@ struct ProFeaturePlaceholderView: View {
                 )
                 .ignoresSafeArea()
                 
-                VStack(spacing: 20) {
-                    Image(systemName: featureIcon)
-                        .font(.system(size: 48))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [.accentColor, .accentColor.opacity(0.6)],
-                                startPoint: .top, endPoint: .bottom
-                            )
-                        )
+                VStack(spacing: 18) {
+                    ProFeatureScreenshotPlaceholder(systemImage: featureIcon)
+                        .frame(height: 220)
                         .accessibilityHidden(true)
-                    
+
                     VStack(spacing: 8) {
                         Text(featureName)
                             .font(.title2)
@@ -89,5 +83,131 @@ struct ProFeaturePlaceholderView: View {
         if let url = URL(string: ProConstants.appStoreURL) {
             NSWorkspace.shared.open(url)
         }
+    }
+}
+
+struct ProLockedSettingPreviewRow: View {
+    let title: String
+    let description: String
+    let systemImage: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: systemImage)
+                    .foregroundColor(.blue)
+                    .frame(width: 20)
+
+                Text(title)
+                    .font(.body)
+
+                Spacer()
+
+                Toggle("", isOn: .constant(false))
+                    .labelsHidden()
+                    .disabled(true)
+                    .accessibilityHidden(true)
+            }
+
+            Text(description)
+                .font(.callout)
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ProFeatureScreenshotPlaceholder(systemImage: systemImage)
+                .frame(height: 140)
+                .padding(.top, 2)
+
+            Button {
+                if let url = URL(string: ProConstants.appStoreURL) {
+                    NSWorkspace.shared.open(url)
+                }
+            } label: {
+                HStack(spacing: 6) {
+                    Text(String(localized: "pro.learn_more", comment: "Learn more button for Pro features"))
+                    Image(systemName: "arrow.up.right")
+                        .font(.caption)
+                }
+            }
+            .buttonStyle(.link)
+            .font(.callout)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+private struct ProFeatureScreenshotPlaceholder: View {
+    let systemImage: String
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 14)
+                .fill(backgroundColor)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(colorScheme == .dark ? 0.24 : 0.08), radius: 18, y: 8)
+
+            VStack(spacing: 14) {
+                HStack(spacing: 8) {
+                    Circle().fill(Color.red.opacity(0.75)).frame(width: 8, height: 8)
+                    Circle().fill(Color.yellow.opacity(0.75)).frame(width: 8, height: 8)
+                    Circle().fill(Color.green.opacity(0.75)).frame(width: 8, height: 8)
+                    Spacer()
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.primary.opacity(0.12))
+                        .frame(width: 72, height: 8)
+                }
+
+                HStack(spacing: 14) {
+                    Image(systemName: systemImage)
+                        .font(.system(size: 28, weight: .semibold))
+                        .foregroundStyle(.blue)
+                        .frame(width: 42, height: 42)
+                        .background(Circle().fill(Color.blue.opacity(0.12)))
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.primary.opacity(0.30))
+                            .frame(width: 138, height: 10)
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.primary.opacity(0.14))
+                            .frame(width: 192, height: 8)
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.primary.opacity(0.10))
+                            .frame(width: 154, height: 8)
+                    }
+
+                    Spacer()
+                }
+
+                VStack(spacing: 8) {
+                    previewLine(widthRatio: 0.92)
+                    previewLine(widthRatio: 0.78)
+                    previewLine(widthRatio: 0.86)
+                }
+            }
+            .padding(18)
+        }
+    }
+
+    private var backgroundColor: Color {
+        colorScheme == .dark
+            ? Color(red: 0.13, green: 0.14, blue: 0.16)
+            : Color(red: 0.96, green: 0.97, blue: 0.98)
+    }
+
+    private func previewLine(widthRatio: CGFloat) -> some View {
+        GeometryReader { geometry in
+            HStack(spacing: 10) {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.primary.opacity(0.10))
+                    .frame(width: geometry.size.width * widthRatio, height: 9)
+                Spacer(minLength: 0)
+            }
+        }
+        .frame(height: 9)
     }
 }

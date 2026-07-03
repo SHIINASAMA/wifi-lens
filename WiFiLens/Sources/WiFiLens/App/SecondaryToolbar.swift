@@ -103,7 +103,7 @@ struct SecondaryToolbarDescriptor: Equatable {
                         title: String(localized: "timeline.filter.this_week", comment: "Timeline filter for this week's events")
                     ),
                 ],
-                defaultSelection: .timelineAll
+                defaultSelection: .timelineToday
             )
 #else
             return nil
@@ -118,7 +118,7 @@ struct SecondaryToolbarSelections: Equatable {
     var channels: SecondaryToolbarItemID = .channelsSimple
     var interfaces: SecondaryToolbarItemID = .interfacesSimple
     var spectrum: SecondaryToolbarItemID = .spectrumLive
-    var timeline: SecondaryToolbarItemID = .timelineAll
+    var timeline: SecondaryToolbarItemID = .timelineToday
 
     func selection(for page: SidebarPage) -> SecondaryToolbarItemID? {
         switch page {

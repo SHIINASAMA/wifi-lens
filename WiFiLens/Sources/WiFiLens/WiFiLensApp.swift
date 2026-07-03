@@ -365,11 +365,10 @@ private struct TimelineToolbarSearchField: View {
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.secondary)
 
-            TextField(
-                String(localized: "timeline.search.placeholder", comment: "Timeline search field placeholder"),
-                text: $text
+            BorderlessSearchTextField(
+                text: $text,
+                placeholder: String(localized: "timeline.search.placeholder", comment: "Timeline search field placeholder")
             )
-            .textFieldStyle(.plain)
             .frame(width: 180)
         }
         .padding(.horizontal, 12)
@@ -377,11 +376,50 @@ private struct TimelineToolbarSearchField: View {
         .background(
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.white.opacity(0.08))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.primary.opacity(0.08), lineWidth: 1)
-                )
         )
+    }
+}
+
+private struct BorderlessSearchTextField: NSViewRepresentable {
+    @Binding var text: String
+    let placeholder: String
+
+    func makeNSView(context: Context) -> NSTextField {
+        let field = NSTextField()
+        field.delegate = context.coordinator
+        field.isBordered = false
+        field.isBezeled = false
+        field.drawsBackground = false
+        field.focusRingType = .none
+        field.placeholderString = placeholder
+        field.font = .systemFont(ofSize: NSFont.systemFontSize, weight: .regular)
+        field.textColor = .labelColor
+        field.lineBreakMode = .byTruncatingTail
+        return field
+    }
+
+    func updateNSView(_ field: NSTextField, context: Context) {
+        if field.stringValue != text {
+            field.stringValue = text
+        }
+        field.placeholderString = placeholder
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(text: $text)
+    }
+
+    final class Coordinator: NSObject, NSTextFieldDelegate {
+        @Binding var text: String
+
+        init(text: Binding<String>) {
+            _text = text
+        }
+
+        func controlTextDidChange(_ notification: Notification) {
+            guard let field = notification.object as? NSTextField else { return }
+            text = field.stringValue
+        }
     }
 }
 #endif
