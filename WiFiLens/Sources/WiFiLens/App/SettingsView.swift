@@ -147,11 +147,7 @@ struct SettingsView: View {
                     }
                     .padding(.vertical, 4)
 #else
-                    ProLockedSettingPreviewRow(
-                        title: String(localized: "settings.features.menubar_label", comment: "Menu bar icon feature toggle label"),
-                        description: String(localized: "settings.features.menubar_description", comment: "Description of menu bar icon feature"),
-                        systemImage: "menubar.rectangle"
-                    )
+                    MenuBarFeaturePreviewRow()
 #endif
                 } header: {
                     Text(String(localized: "settings.section.features", comment: "Features subsection header in settings"))

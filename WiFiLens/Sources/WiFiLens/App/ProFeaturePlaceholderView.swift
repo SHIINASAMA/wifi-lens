@@ -4,6 +4,35 @@ enum ProConstants {
     static let appStoreURL = "https://apps.apple.com/app/wifi-lens-pro/id6776590746"
 }
 
+struct ProBadge: View {
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 10, weight: .semibold))
+
+            Text("PRO")
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .tracking(0.4)
+        }
+        .foregroundStyle(Color(red: 0.92, green: 0.57, blue: 0.02))
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background {
+            Capsule()
+                .fill(Color(red: 1.0, green: 0.82, blue: 0.28).opacity(0.22))
+        }
+        .overlay {
+            Capsule()
+                .stroke(
+                    Color(red: 0.95, green: 0.62, blue: 0.08).opacity(0.28),
+                    lineWidth: 1
+                )
+        }
+        .fixedSize()
+        .accessibilityLabel("Pro feature")
+    }
+}
+
 struct ProFeaturePlaceholderView<CustomSkeleton: View>: View {
     let featureName: String
     let featureDescription: String
@@ -96,37 +125,30 @@ extension ProFeaturePlaceholderView where CustomSkeleton == ProFeatureScreenshot
     }
 }
 
-struct ProLockedSettingPreviewRow: View {
-    let title: String
-    let description: String
-    let systemImage: String
-
+struct MenuBarFeaturePreviewRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
-                Image(systemName: systemImage)
+                Image(systemName: "menubar.rectangle")
                     .foregroundColor(.blue)
                     .frame(width: 20)
 
-                Text(title)
+                Text(String(localized: "settings.features.menubar_label", comment: "Menu bar icon feature toggle label"))
                     .font(.body)
 
                 Spacer()
 
-                Toggle("", isOn: .constant(false))
-                    .labelsHidden()
-                    .disabled(true)
-                    .accessibilityHidden(true)
+                // Toggle("", isOn: .constant(false))
+                //    .labelsHidden()
+                //    .disabled(true)
+                //    .accessibilityHidden(true)
+                ProBadge()
             }
 
-            Text(description)
+            Text(String(localized: "settings.features.menubar_description", comment: "Description of menu bar icon feature"))
                 .font(.callout)
                 .foregroundColor(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-
-            ProFeatureScreenshotPlaceholder(systemImage: systemImage)
-                .frame(height: 140)
-                .padding(.top, 2)
 
             Button {
                 if let url = URL(string: ProConstants.appStoreURL) {
@@ -226,33 +248,28 @@ struct TimelineSkeletonView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        HStack(alignment: .top, spacing: 8) {
-            // Track line
-            Rectangle()
-                .fill(Color.primary.opacity(0.16))
-                .frame(width: 1)
-                .padding(.top, 44)
 
             VStack(alignment: .leading, spacing: 0) {
                 // Section 1 header
                 sectionHeader
-
+                
                 // Section 1 rows
                 timelineRow(titleWidth: 0.65, subtitleWidth: 0.48, markerOpacity: 0.20)
                 timelineRow(titleWidth: 0.55, subtitleWidth: 0.40, markerOpacity: 0.15, showBadge: true)
-
+                
                 Spacer(minLength: 12)
-
+                
                 // Section 2 header
                 sectionHeader
-
+                
                 // Section 2 rows
                 timelineRow(titleWidth: 0.70, subtitleWidth: 0.52, markerOpacity: 0.12)
                 timelineRow(titleWidth: 0.60, subtitleWidth: 0.44, markerOpacity: 0.20)
             }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
+            
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+
     }
 
     private var sectionHeader: some View {

@@ -742,19 +742,19 @@
 		AD735352E4FE8FE0803C143C /* App */ = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000007 /* SecondaryToolbar.swift */,
-				A10000000000000000000008 /* SecondaryToolbarCapsule.swift */,
-				FB0573B92FBBFC31005F8214 /* SidebarView.swift */,
-				FB0573C02FBBFC31005F8215 /* ProFeaturePlaceholderView.swift */,
 				FBB2CA8B2FC0E14000FC2D2C /* BuildConfig.swift */,
-				FBB2CA8C2FC0E14000FC2D2C /* TitleBadge.swift */,
-				FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */,
-				FB0573C82FBCD25C005F8214 /* OverviewView.swift */,
-				FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */,
 				FB0573C12FBC47F1005F8214 /* CrashReporter.swift */,
+				FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */,
 				FB0573BF2FBC47CC005F8214 /* Logging.swift */,
 				FBD329512FC500000057B038 /* MetricKitManager.swift */,
-				FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */,
+				FB0573C82FBCD25C005F8214 /* OverviewView.swift */,
+				FB0573C02FBBFC31005F8215 /* ProFeaturePlaceholderView.swift */,
+				A10000000000000000000007 /* SecondaryToolbar.swift */,
+				A10000000000000000000008 /* SecondaryToolbarCapsule.swift */,
+				FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */,
+				FB0573B92FBBFC31005F8214 /* SidebarView.swift */,
+				FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */,
+				FBB2CA8C2FC0E14000FC2D2C /* TitleBadge.swift */,
 				FBD000002FC4000000ABC001 /* WiFiOffView.swift */,
 			);
 			path = App;
