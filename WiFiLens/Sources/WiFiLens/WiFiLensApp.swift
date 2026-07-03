@@ -508,6 +508,11 @@ enum ResolvedMainWindowFocusIntent: Equatable {
     case focusResolvedWindow
 }
 
+enum MainWindowOpenSource: Equatable {
+    case app
+    case menuBar
+}
+
 func routeIntent(for route: SidebarPage?) -> MainWindowRouteIntent {
     guard let route else { return .preserveCurrentPage }
     return .navigate(route)
@@ -718,9 +723,9 @@ struct WiFiLensApp: App {
 
 #if PRO
         MenuBarScene(
-            onOpenMainWindow: { showMainWindow(route: nil) },
-            onOpenTimeline: { showMainWindow(route: .timeline) },
-            onOpenSettings: { showMainWindow(route: .settings) },
+            onOpenMainWindow: { showMainWindow(route: nil, source: .menuBar) },
+            onOpenTimeline: { showMainWindow(route: .timeline, source: .menuBar) },
+            onOpenSettings: { showMainWindow(route: .settings, source: .menuBar) },
             onQuit: { NSApp.terminate(nil) }
         )
 #endif
@@ -751,7 +756,21 @@ struct WiFiLensApp: App {
     }
 
     @MainActor
-    private func showMainWindow(route: SidebarPage? = nil) {
+    private func showMainWindow(route: SidebarPage? = nil, source: MainWindowOpenSource = .app) {
+        if source == .menuBar {
+            dismissTransientMenuBarWindowIfNeeded()
+            Task { @MainActor in
+                await Task.yield()
+                openMainWindow(route: route)
+            }
+            return
+        }
+
+        openMainWindow(route: route)
+    }
+
+    @MainActor
+    private func openMainWindow(route: SidebarPage? = nil) {
         switch reopenAction(menuBarEnabled: menuBarWindowManagementEnabled, currentPolicy: NSApp.activationPolicy()) {
         case .switchToRegular:
             NSApp.setActivationPolicy(.regular)
@@ -775,14 +794,18 @@ struct WiFiLensApp: App {
         NSApp.activate(ignoringOtherApps: true)
 
         if let mainWindow = mainWindowReference.window {
-            if mainWindow.isMiniaturized {
-                mainWindow.deminiaturize(nil)
-            }
-            mainWindow.makeKeyAndOrderFront(nil)
+            bringMainWindowToFront(mainWindow)
             return
         }
 
         openMainWindowAction?()
+    }
+
+    @MainActor
+    private func dismissTransientMenuBarWindowIfNeeded() {
+        guard let keyWindow = NSApp.keyWindow else { return }
+        guard keyWindow !== mainWindowReference.window else { return }
+        keyWindow.close()
     }
 
     @MainActor
@@ -800,10 +823,19 @@ struct WiFiLensApp: App {
         guard pendingResolvedMainWindowFocus else { return }
 
         pendingResolvedMainWindowFocus = false
+        bringMainWindowToFront(window)
+    }
+
+    @MainActor
+    private func bringMainWindowToFront(_ window: NSWindow) {
+        NSRunningApplication.current.activate(options: [.activateAllWindows])
         NSApp.activate(ignoringOtherApps: true)
         if window.isMiniaturized {
             window.deminiaturize(nil)
         }
+        window.orderFrontRegardless()
+        window.makeMain()
+        window.makeKey()
         window.makeKeyAndOrderFront(nil)
     }
 

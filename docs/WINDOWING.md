@@ -49,6 +49,43 @@ The bug was not a single bad height constant. It was the interaction of three be
 
 On a smaller review device with the Dock visible, that combination allowed the restored main window to exceed the visible screen area and produced unstable full-screen transitions.
 
+## Pro Incident: Menu Bar Reopen Left Main Window Inactive
+
+- Severity: `P1`
+- Report source: manual Pro build testing
+- Report date: July 3, 2026
+- Affected build: `WiFi Lens Pro` debug build with the Pro menu bar window enabled
+
+### User-visible symptoms
+
+- After closing the Pro main window, reopening it from the menu bar showed the main window but did not reliably bring it to the foreground.
+- In one broken state, the title-bar traffic-light controls only showed their colored state on hover, making the main window look inactive even though it was visible.
+- Earlier focus-only attempts could make the traffic-light state look correct but still left the window behind other apps.
+
+### Root cause
+
+The menu bar entry point was opening or focusing the main `WindowGroup` while the transient `MenuBarExtra` window was still the active key window. The main window and the menu bar window competed for key/main status in the same event turn.
+
+Strengthening the main-window focus call by itself was not sufficient. Calls such as `makeKeyAndOrderFront`, `makeMain`, `makeKey`, or delayed focus retries addressed symptoms but did not remove the transient menu bar window that was stealing or retaining activation state.
+
+### Fix
+
+Menu bar initiated main-window opens now use a source-aware path:
+
+1. Menu bar actions call `showMainWindow(route:source:)` with `source == .menuBar`.
+2. The app first closes the current non-main `NSApp.keyWindow` when it is a transient menu bar window.
+3. The main window open/focus work is deferred to the next main-actor turn.
+4. The resolved main window is then explicitly activated and brought forward with app/window-level activation calls.
+
+The key behavior is that the transient menu bar window is dismissed before the main window is reopened or focused. This is the part that prevents the stale key-window state from leaking into the restored main window.
+
+### Implementation notes
+
+- Keep menu bar initiated opens distinct from normal app menu opens. App-level commands should not close arbitrary key windows.
+- Do not solve this by only adding more `makeKeyAndOrderFront` calls. Those calls can be necessary after the transient window is dismissed, but they are not the root fix.
+- Avoid deprecated `NSRunningApplication.ActivationOptions.activateIgnoringOtherApps`; the project treats warnings as errors.
+- If the Pro menu bar implementation changes from `MenuBarExtra` to another AppKit window type, retest the close-main-window and reopen-from-menu-bar flow before removing the source-aware path.
+
 ## Shipping Policy
 
 The shipping app now follows these rules:
@@ -93,3 +130,4 @@ Audit date: June 27, 2026
 - Do not trust autosaved frames without checking the current screen's `visibleFrame`.
 - If a page needs a large layout, keep that requirement local to the page. Do not let it resize the top-level `NSWindow`.
 - If another state-preservation `ZStack` is introduced, explicitly constrain its container so hidden pages do not become a sizing policy.
+- For Pro menu bar actions that reopen the main window, dismiss transient menu bar windows before attempting to activate the main `NSWindow`.
