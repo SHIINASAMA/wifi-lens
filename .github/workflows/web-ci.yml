@@ -7,28 +7,12 @@ on:
     paths:
       - ".github/workflows/web-ci.yml"
       - ".github/workflows/pages-deploy.yml"
-      - "web/src/**"
-      - "web/public/**"
-      - "web/index.html"
-      - "web/package.json"
-      - "web/pnpm-lock.yaml"
-      - "web/vite.config.ts"
-      - "web/tailwind.config.js"
-      - "web/postcss.config.js"
-      - "web/tsconfig.json"
+      - "web/**"
   pull_request:
     paths:
       - ".github/workflows/web-ci.yml"
       - ".github/workflows/pages-deploy.yml"
-      - "web/src/**"
-      - "web/public/**"
-      - "web/index.html"
-      - "web/package.json"
-      - "web/pnpm-lock.yaml"
-      - "web/vite.config.ts"
-      - "web/tailwind.config.js"
-      - "web/postcss.config.js"
-      - "web/tsconfig.json"
+      - "web/**"
   workflow_dispatch:
 
 permissions:
@@ -42,7 +26,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: 11.9.0
 
       - uses: actions/setup-node@v4
         with:
@@ -50,8 +34,8 @@ jobs:
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --config.minimum-release-age=0
         working-directory: web
 
-      - run: pnpm build
+      - run: pnpm --config.minimum-release-age=0 build
         working-directory: web

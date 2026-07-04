@@ -10,9 +10,11 @@ export const zhHans = {
     description: 'WiFi Lens — 一款 macOS 原生 Wi‑Fi 频谱分析工具，扫描、诊断、自信漫游。',
   },
   nav: {
+    home: '首页',
     features: '功能',
     mcp: 'AI 工作流',
     download: '下载',
+    changelog: '更新日志',
     faq: '常见问题',
     privacy: '隐私说明',
     docs: '文档',
@@ -27,6 +29,7 @@ export const zhHans = {
       proSoon: 'Mac App Store 已上线',
     },
     hint: '本地优先  ·  开源  ·  无追踪',
+    tagline: 'macOS 原生 Wi‑Fi 可视化工具。',
   },
   stats: [
     { value: '全频段', label: '2.4/5/6 GHz' },
@@ -123,6 +126,7 @@ export const zhHans = {
   mcp: {
     title: '像聊天一样问 Wi‑Fi',
     subtitle: 'WiFi Lens 可以接入 MCP，让 Claude Desktop 等 AI 工具直接读取 Wi‑Fi 数据——数据不上传云端，全程在你电脑上完成。问问"哪个信道最不拥挤？"或"附近网络有什么值得注意的？"',
+    metaDescription: '通过 MCP 将 WiFi Lens 连接到 AI 工具。让 Claude Desktop 读取本地 Wi‑Fi 扫描数据，无需上传任何内容。',
     endpoints: {
       title: '三个 JSON 端点',
       networks: '浏览附近所有 Wi‑Fi 网络，包含信号强度、频段、信道、安全性等信息。',
@@ -140,18 +144,12 @@ export const zhHans = {
   },
   download: {
     title: '开始使用 WiFi Lens',
+    subtitle: '选择适合你的版本。两个版本共享相同的核心 Wi‑Fi 分析能力。',
+    metaDescription: '下载 WiFi Lens，支持 macOS 14+。GitHub 免费开源版或 Mac App Store Pro 版，含频谱录制功能。',
     oss: {
       title: 'WiFi Lens OSS',
       badge: '免费 & 开源',
       desc: '从 GitHub Releases 下载最新版本，开箱即用，支持 macOS 14 及以上版本。',
-      features: [
-        '实时三频频谱扫描',
-        '详细的网络表格和筛选',
-        '信道质量评分和推荐',
-        '漫游时间线分析',
-        '连接诊断仪表盘',
-        'AI 工作流本地 MCP 服务器',
-      ],
       cta: '从 GitHub 下载',
       url: 'https://github.com/SHIINASAMA/wifi-lens/releases/latest',
     },
@@ -159,20 +157,104 @@ export const zhHans = {
       title: '支持 WiFi Lens',
       badge: '赞助 & 体验升级',
       desc: 'WiFi Lens 是一个主要由个人开发维护的工具。通过 App Store 购买 Pro 版，既是支持我们继续改进，也解锁频谱会话录制等进阶功能。',
-      features: [
-        'WiFi Lens OSS 的全部功能',
-        '频谱会话录制与回放',
-        '跨时间段的频谱并排比较',
-        '导出录制数据用于离线分析',
-        '方便的安装与自动更新',
-        '支持独立开发者持续维护',
-      ],
       cta: '在 Mac App Store 下载',
       url: 'https://apps.apple.com/app/id6776590746',
     },
+    comparison: {
+      rows: [
+        { feature: '实时三频频谱扫描', oss: true, pro: true },
+        { feature: '详细的网络表格和筛选', oss: true, pro: true },
+        { feature: '信道质量评分和推荐', oss: true, pro: true },
+        { feature: '漫游时间线分析', oss: true, pro: true },
+        { feature: '连接诊断仪表盘', oss: true, pro: true },
+        { feature: 'AI 工作流本地 MCP 服务器', oss: true, pro: true },
+        { feature: '频谱会话录制与回放', oss: false, pro: true },
+        { feature: '跨时间段的频谱并排比较', oss: false, pro: true },
+        { feature: '导出录制数据用于离线分析', oss: false, pro: true },
+        { feature: '方便的安装与自动更新', oss: false, pro: true },
+        { feature: '支持独立开发者持续维护', oss: false, pro: true },
+      ],
+    },
+  },
+  changelog: {
+    title: '更新日志',
+    subtitle: 'WiFi Lens 的变更、改进与修复记录。',
+    metaDescription: 'WiFi Lens 版本历史——查看每个版本的新功能、改进和修复，包括 MCP 集成和频谱录制等。',
+    categories: {
+      added: '新增',
+      improved: '改进',
+      fixed: '修复',
+      changed: '变更',
+    },
+    releases: [
+      {
+        version: 'v1.4.3',
+        date: '2026-06-29',
+        sections: [
+          { type: 'improved' as const, items: ['OSS 版本与当前 App Store 版本对齐', 'UI 细节优化和行为调整'] },
+          { type: 'fixed' as const, items: ['若干小问题修复和稳定性改进'] },
+        ],
+      },
+      {
+        version: 'v1.4.2',
+        date: '2026-06-21',
+        sections: [
+          { type: 'added' as const, items: ['反事实信道推荐', '应用内 Mac App Store 链接'] },
+          { type: 'improved' as const, items: ['频谱调试图表拆分为独立导航', '辅助导航移至窗口工具栏'] },
+          { type: 'fixed' as const, items: ['图表注释渲染', '频谱段边界检测'] },
+        ],
+      },
+      {
+        version: 'v1.4.1',
+        date: '2026-06-14',
+        sections: [
+          { type: 'improved' as const, items: ['App Store 上架所需的无障碍改进'] },
+        ],
+      },
+      {
+        version: 'v1.4.0',
+        date: '2026-06-05',
+        sections: [
+          { type: 'added' as const, items: ['频谱会话录制与回放', '跨时间段的频谱并列对比'] },
+          { type: 'improved' as const, items: ['频谱分析器 UI 和操作'] },
+        ],
+      },
+      {
+        version: 'v1.3.0',
+        date: '2026-05-28',
+        sections: [
+          { type: 'added' as const, items: ['用于 AI 工具集成的 MCP 服务器', '网络数据、详情和占用率的本地 JSON 端点'] },
+          { type: 'improved' as const, items: ['信道质量评分算法'] },
+        ],
+      },
+      {
+        version: 'v1.2.0',
+        date: '2026-05-24',
+        sections: [
+          { type: 'added' as const, items: ['带时间线可视化的漫游测试', '漫游测试的会话保存与回放'] },
+          { type: 'improved' as const, items: ['网络表格排序和筛选'] },
+        ],
+      },
+      {
+        version: 'v1.1.0',
+        date: '2026-05-20',
+        sections: [
+          { type: 'added' as const, items: ['连接诊断仪表盘', '信道质量评分和推荐'] },
+          { type: 'improved' as const, items: ['三频频谱扫描器性能'] },
+        ],
+      },
+      {
+        version: 'v1.0.0',
+        date: '2026-05-18',
+        sections: [
+          { type: 'added' as const, items: ['三频频谱扫描（2.4 / 5 / 6 GHz）', '带筛选功能的详细网络表格', '高分辨率频谱截图导出', '网络数据 CSV 导出'] },
+        ],
+      },
+    ],
   },
   faq: {
     title: '常见问题',
+    metaDescription: 'WiFi Lens 常见问题——价格、macOS 要求、数据隐私、Pro 与 OSS 区别、6 GHz 支持等。',
     items: [
       { q: 'WiFi Lens 免费吗？', a: '当然。WiFi Lens OSS 是开源且完全免费的，你可以在 GitHub 上自由下载和使用。Pro 版通过 App Store 提供，是一次性的赞助方式，解锁了几个录播相关的进阶功能。核心 Wi‑Fi 分析能力在两个版本上是一致的。' },
       { q: 'Pro 版和 OSS 版功能差在哪？', a: 'OSS 版涵盖频谱扫描、网络表格、信道评分、漫游测试、MCP AI 集成等全部核心功能。Pro 版额外提供频谱会话录制（可以将一段时间内的频谱变化录下来并回放），以及跨时间段的频谱对比。不需要录制回放的话，OSS 版完全够用。' },
@@ -208,6 +290,21 @@ export const zhHans = {
     },
     lastUpdated: '最后更新：2026年5月27日',
     contact: '有问题？在 GitHub 提交 Issue 或发送邮件至 wifi-lens@outlook.com',
+  },
+  home: {
+    exploreFeatures: '探索功能',
+    featuresTitle: '更简洁的首页，更清晰的产品故事。',
+    featuresSub: '从产品本身开始，需要深入了解时再深入。',
+    exploreLabel: '探索',
+    exploreTitle: '从匹配你问题的页面开始',
+    exploreSub: '保持首页简短。需要具体内容时，去对应的详细页面。',
+    viewPage: '查看页面',
+  },
+  notFound: {
+    title: '404 — 页面未找到',
+    heading: '这个页面不存在。',
+    desc: '你要找的页面可能已被移动或不再存在。',
+    backHome: '返回首页',
   },
   footer: {
     copyright: '© 2026 WiFi Lens — 洞悉你的 Wi‑Fi。',

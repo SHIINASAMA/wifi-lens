@@ -56,10 +56,11 @@ cd ChartLens && swift test                         # test
 xcodebuild -project ChartLensDemo/ChartLensDemo.xcodeproj -scheme "ChartLensDemo" -configuration Debug -destination 'platform=macOS' build
 xed ChartLensDemo/ChartLensDemo.xcodeproj
 
-# Website — Vite + Tailwind CSS, outputs to _site/
-cd web && npm ci && npm run dev              # dev server at localhost:5173/wifi-lens/
-cd web && npm run build                      # production build
-cd web && npm run preview                    # preview production build
+# Website — Astro + pnpm, outputs to dist/
+cd web && pnpm install --frozen-lockfile --config.minimum-release-age=0
+cd web && pnpm dev                           # dev server at localhost:4321
+cd web && pnpm --config.minimum-release-age=0 build
+cd web && pnpm preview                       # preview production build
 ```
 
 The product name is `WiFi Lens.app` (with space). Unit tests use Swift Testing (`@Test`) with `TEST_HOST` — the test bundle is injected into the app process for `@testable import` symbol resolution. All test `.swift` files must be added to the WiFiLensTests target's Sources build phase (in `project.pbxproj`) for `xcodebuild test` to compile and run them. The `WiFiLensTests` scheme must reference the test bundle in both `<Testables>` and `<MacroExpansion>`.

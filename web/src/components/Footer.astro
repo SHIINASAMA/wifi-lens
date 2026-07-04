@@ -1,0 +1,172 @@
+---
+import {
+  getPagePath,
+  localeLabels,
+  localeOrder,
+  type PageKey,
+  type SupportedLocale,
+} from '../i18n/site'
+
+interface Props {
+  locale: SupportedLocale
+  page: PageKey
+  t: Astro.locals['t']
+}
+
+const { locale, page, t } = Astro.props
+const localePage = page === 'home' ? 'home' : page
+---
+
+<footer id="footer" class="site-footer">
+  <div class="finner">
+    <span>{t.footer.copyright}</span>
+    <div class="fr">
+      <a href="https://x.com/WiFiLens" aria-label="X (Twitter) — @WiFiLens">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+        </svg>
+        <span>{t.footer.x}</span>
+      </a>
+      <a href={`mailto:${t.footer.email}`}>{t.footer.email}</a>
+      <div class="lang-picker" data-lang-picker>
+        <button type="button" class="lang-trigger">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M2 12h20" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          </svg>
+          <span>{localeLabels[locale]}</span>
+        </button>
+        <div class="lang-menu">
+          {localeOrder.map((item) => (
+            <a class:list={{ active: item === locale }} href={getPagePath(item, localePage)}>
+              {localeLabels[item]}
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style is:global>
+  .site-footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+  }
+
+  .site-footer .finner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 0.75rem;
+    color: var(--dim);
+  }
+
+  .site-footer .fr {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .site-footer .fr > a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--muted);
+    padding: 0.5rem;
+    min-height: 44px;
+  }
+
+  .lang-picker {
+    position: relative;
+  }
+
+  .lang-trigger {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    color: var(--muted);
+    padding: 0.5rem 0.5rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: color 0.2s;
+  }
+
+  .lang-trigger:hover {
+    color: var(--fg);
+  }
+
+  .lang-trigger svg {
+    opacity: 0.6;
+    flex-shrink: 0;
+  }
+
+  .lang-menu {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    margin-bottom: 0.5rem;
+    display: none;
+    flex-direction: column;
+    min-width: 120px;
+    padding: 0.3rem;
+    background: rgba(28, 28, 32, 0.95);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    z-index: 50;
+  }
+
+  .lang-picker.open .lang-menu {
+    display: flex;
+  }
+
+  .lang-menu a {
+    display: block;
+    padding: 0.5rem 0.85rem;
+    font-size: 0.8125rem;
+    color: var(--dim);
+    border-radius: 8px;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .lang-menu a:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--fg);
+  }
+
+  .lang-menu a.active {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  @media (max-width: 560px) {
+    .site-footer .finner {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  const picker = document.querySelector('[data-lang-picker]')
+  const trigger = picker?.querySelector('.lang-trigger')
+  trigger?.addEventListener('click', (e) => {
+    e.stopPropagation()
+    picker?.classList.toggle('open')
+  })
+  document.addEventListener('click', (e) => {
+    if (!picker?.contains(e.target)) {
+      picker?.classList.remove('open')
+    }
+  })
+</script>

@@ -1,0 +1,108 @@
+---
+import { type SiteDictionary, type SupportedLocale } from '../i18n/site'
+
+interface Props {
+  locale: SupportedLocale
+  t: SiteDictionary
+  full?: boolean
+}
+
+const { locale, t, full = false } = Astro.props
+const privacyItems = full
+  ? [t.privacy.noCollection, t.privacy.permissions, t.privacy.localOnly, t.privacy.distribution, t.privacy.openSource]
+  : [t.privacy.noCollection, t.privacy.localOnly]
+const noCollectionHighlight = !full
+---
+
+<section id="privacy" class="sec-pad">
+  <div class="sec-narrow">
+    {noCollectionHighlight && (
+      <div class="priv-highlight">
+        <p>WiFi Lens 不收集任何数据。无后端、无追踪、无遥测。</p>
+      </div>
+    )}
+    <div class="priv-grid">
+      {privacyItems.map((item) => (
+        <div class="priv-item">
+          <h3>{item.heading}</h3>
+          {item.body.split('\n\n').map((paragraph) => <p>{paragraph.trim()}</p>)}
+        </div>
+      ))}
+    </div>
+    <div class="priv-foot">
+      <p>{t.privacy.lastUpdated}</p>
+      <p class="priv-contact">{t.privacy.contact}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .priv-grid {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .priv-grid h3 {
+    font-size: 1rem;
+    font-weight: 650;
+    margin: 0;
+  }
+
+  .priv-grid p {
+    font-size: 0.8125rem;
+    color: var(--dim);
+    line-height: 1.6;
+  }
+
+  .priv-grid p + p {
+    margin-top: 0.75rem;
+  }
+
+  .priv-item {
+    position: relative;
+    padding-left: 1.25rem;
+    border-left: 1px solid var(--border);
+  }
+
+  .priv-item::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 0.15rem;
+    width: 2px;
+    height: 1.5rem;
+    background: var(--accent);
+    opacity: 0.8;
+  }
+
+  .priv-foot {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.75rem;
+    color: var(--dim);
+  }
+
+  .priv-contact {
+    margin-top: 0.25rem;
+  }
+
+  .priv-highlight {
+    margin-top: 2.5rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--accent-dim);
+    border: 1px solid rgba(76, 201, 200, 0.15);
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .priv-highlight p {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: -0.01em;
+  }
+</style>

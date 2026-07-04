@@ -1,0 +1,154 @@
+/* MacBook Pro device frame — extracted from devices.css v0.2.0
+ * MIT License | github.com/picturepan2/devices.css */
+
+.device,
+.device::before,
+.device::after,
+.device *,
+.device *::before,
+.device *::after {
+  box-sizing: border-box;
+  display: block;
+}
+
+.device {
+  position: relative;
+  transform: scale(1);
+  z-index: 1;
+}
+
+.device .device-frame {
+  z-index: 1;
+}
+
+.device .device-screen {
+  background-color: #000;
+  background-position: center center;
+  background-size: cover;
+  object-fit: cover;
+  position: relative;
+}
+
+/* --- MacBook Pro --- */
+
+.device-macbook-pro {
+  height: 479px;
+  width: 740px;
+}
+
+.device-macbook-pro .device-frame {
+  background: #0d0d0d;
+  border-radius: 20px;
+  box-shadow: inset 0 0 0 2px #c8cacb;
+  height: 463px;
+  margin: 0 auto;
+  padding: 9px 9px 23px 9px;
+  position: relative;
+  width: 618px;
+}
+
+.device-macbook-pro .device-frame::after {
+  background: linear-gradient(to bottom, #272727, #0d0d0d);
+  border-radius: 0 0 20px 20px;
+  bottom: 2px;
+  content: "";
+  height: 24px;
+  left: 2px;
+  position: absolute;
+  width: 614px;
+}
+
+.device-macbook-pro .device-header {
+  background: #0d0d0d;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  height: 12px;
+  left: 50%;
+  margin-left: -32px;
+  position: absolute;
+  top: 11px;
+  width: 64px;
+  z-index: 2;
+}
+
+.device-macbook-pro .device-header::after,
+.device-macbook-pro .device-header::before {
+  content: "";
+  height: 4px;
+  position: absolute;
+  top: 0;
+  width: 4px;
+}
+
+.device-macbook-pro .device-header::after {
+  background: radial-gradient(circle at bottom left, transparent 0, transparent 75%, #0d0d0d 75%, #0d0d0d 100%);
+  left: -4px;
+}
+
+.device-macbook-pro .device-header::before {
+  background: radial-gradient(circle at bottom right, transparent 0, transparent 75%, #0d0d0d 75%, #0d0d0d 100%);
+  right: -4px;
+}
+
+.device-macbook-pro .device-screen {
+  border: 2px solid #121212;
+  border-radius: 10px 10px 0 0;
+  height: 420px;
+  width: 600px;
+}
+
+.device-macbook-pro .device-power {
+  background: radial-gradient(circle at center, #e2e3e4 85%, #c8cacb 100%);
+  border: solid #a0a3a7;
+  border-radius: 2px 2px 12px 12px;
+  border-width: 1px 2px 0 2px;
+  box-shadow: inset 0 -2px 8px 0 #6c7074;
+  height: 24px;
+  margin-top: -10px;
+  position: relative;
+  width: 740px;
+  z-index: 9;
+}
+
+.device-macbook-pro .device-power::after {
+  background: #e2e3e4;
+  border-radius: 0 0 10px 10px;
+  box-shadow: inset 0 0 4px 2px #babdbf;
+  content: "";
+  height: 10px;
+  left: 50%;
+  margin-left: -60px;
+  position: absolute;
+  top: 0;
+  width: 120px;
+}
+
+.device-macbook-pro .device-power::before {
+  background: transparent;
+  border-radius: 0 0 3px 3px;
+  bottom: -2px;
+  box-shadow: -300px 0 #272727, 300px 0 #272727;
+  content: "";
+  height: 2px;
+  left: 50%;
+  margin-left: -20px;
+  position: absolute;
+  width: 40px;
+}
+
+/* --- Space Gray variant --- */
+
+.device-macbook-pro.device-spacegray .device-frame {
+  box-shadow: inset 0 0 0 2px #767a7d;
+}
+
+.device-macbook-pro.device-spacegray .device-power {
+  background: radial-gradient(circle at center, #83878a 85%, #767a7d 100%);
+  border-color: #454749;
+  box-shadow: inset 0 -2px 8px 0 #202121;
+}
+
+.device-macbook-pro.device-spacegray .device-power::after {
+  background: #b7babc;
+  box-shadow: inset 0 0 4px 2px #6a6d70;
+}

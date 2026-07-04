@@ -10,9 +10,11 @@ export const ja = {
     description: 'WiFi Lens — macOS ネイティブの Wi‑Fi スペクトラムアナライザ。スキャン、診断、自信を持ってローミング。',
   },
   nav: {
+    home: 'ホーム',
     features: '機能',
     mcp: 'AIワークフロー',
     download: 'ダウンロード',
+    changelog: '変更履歴',
     faq: 'FAQ',
     privacy: 'プライバシー',
     docs: 'ドキュメント',
@@ -27,6 +29,7 @@ export const ja = {
       proSoon: 'Mac App Store で利用可能',
     },
     hint: 'ローカル優先  ·  オープンソース  ·  トラッキングなし',
+    tagline: 'macOS ネイティブの Wi‑Fi 可視化ツール。',
   },
   stats: [
     { value: '全帯域', label: '2.4/5/6 GHz' },
@@ -123,6 +126,7 @@ export const ja = {
   mcp: {
     title: 'Wi‑Fi についてチャット感覚で質問',
     subtitle: 'WiFi Lens は MCP 経由で Claude Desktop などのツールにライブスキャンデータを公開できるため、データをクラウドに送信することなく、近隣ネットワークやチャンネル使用状況について質問できます。',
+    metaDescription: 'WiFi Lens を MCP 経由で AI ツールに接続。Claude Desktop からローカルの Wi‑Fi スキャンデータを取得でき、アップロードは一切不要です。',
     endpoints: {
       title: '3つの JSON エンドポイント',
       networks: '信号、バンド、チャンネル、セキュリティ、ケイパビリティの詳細を含む近隣ネットワークを閲覧。',
@@ -140,18 +144,12 @@ export const ja = {
   },
   download: {
     title: 'WiFi Lens を使い始める',
+    subtitle: 'ニーズに合ったバージョンを選んでください。どちらも同じ基本的な Wi‑Fi 分析機能を共有しています。',
+    metaDescription: 'macOS 14 以降で WiFi Lens をダウンロード。GitHub から無料のオープンソース版、または Mac App Store からスペクトラム録画機能付きの Pro 版を入手。',
     oss: {
       title: 'WiFi Lens OSS',
       badge: '無料 & オープンソース',
       desc: 'GitHub Releases から最新バージョンをダウンロード。macOS 14 以降ですぐに使用できます。',
-      features: [
-        'ライブトライバンドスペクトラムスキャン',
-        '詳細なネットワークテーブルとフィルタリング',
-        'チャンネル品質スコアリングと推奨',
-        'ローミングタイムライン分析',
-        '接続診断ダッシュボード',
-        'AI ワークフロー向けローカル MCP サーバー',
-      ],
       cta: 'GitHub からダウンロード',
       url: 'https://github.com/SHIINASAMA/wifi-lens/releases/latest',
     },
@@ -159,20 +157,104 @@ export const ja = {
       title: 'WiFi Lens をサポート',
       badge: 'スポンサー & 体験アップグレード',
       desc: 'WiFi Lens は主に個人開発者によってメンテナンスされています。App Store で Pro 版を購入することで、継続的な開発を支援しつつ、スペクトラムセッション録画などの高度な機能を利用できます。',
-      features: [
-        'WiFi Lens OSS の全機能',
-        'スペクトラムセッションの録画と再生',
-        '期間をまたいだスペクトラムの並列比較',
-        '録画データをオフライン分析用にエクスポート',
-        '簡単インストールと自動更新',
-        '個人開発者の継続的なメンテナンスを支援',
-      ],
       cta: 'Mac App Store でダウンロード',
       url: 'https://apps.apple.com/app/id6776590746',
     },
+    comparison: {
+      rows: [
+        { feature: 'ライブトライバンドスペクトラムスキャン', oss: true, pro: true },
+        { feature: '詳細なネットワークテーブルとフィルタリング', oss: true, pro: true },
+        { feature: 'チャンネル品質スコアリングと推奨', oss: true, pro: true },
+        { feature: 'ローミングタイムライン分析', oss: true, pro: true },
+        { feature: '接続診断ダッシュボード', oss: true, pro: true },
+        { feature: 'AI ワークフロー向けローカル MCP サーバー', oss: true, pro: true },
+        { feature: 'スペクトラムセッションの録画と再生', oss: false, pro: true },
+        { feature: '期間をまたいだスペクトラムの並列比較', oss: false, pro: true },
+        { feature: '録画データをオフライン分析用にエクスポート', oss: false, pro: true },
+        { feature: '簡単インストールと自動更新', oss: false, pro: true },
+        { feature: '個人開発者の継続的なメンテナンスを支援', oss: false, pro: true },
+      ],
+    },
+  },
+  changelog: {
+    title: '変更履歴',
+    subtitle: 'WiFi Lens の変更、改善、修正の記録。',
+    metaDescription: 'WiFi Lens のバージョン履歴。MCP 統合やスペクトラム録画などの新機能、バグ修正の変更内容を確認できます。',
+    categories: {
+      added: '追加',
+      improved: '改善',
+      fixed: '修正',
+      changed: '変更',
+    },
+    releases: [
+      {
+        version: 'v1.4.3',
+        date: '2026-06-29',
+        sections: [
+          { type: 'improved' as const, items: ['App Store バージョンに合わせた OSS リリースの同期', 'UI の改善と動作の更新'] },
+          { type: 'fixed' as const, items: ['軽微なバグ修正と安定性の改善'] },
+        ],
+      },
+      {
+        version: 'v1.4.2',
+        date: '2026-06-21',
+        sections: [
+          { type: 'added' as const, items: ['カウンターファクチャル・チャンネル推奨', 'アプリ内に Mac App Store リンクを追加'] },
+          { type: 'improved' as const, items: ['スペクトラムデバッグチャートを別ナビゲーションに分割', 'セカンダリナビゲーションをウィンドウツールバーに移動'] },
+          { type: 'fixed' as const, items: ['チャート注釈のレンダリング', 'スペクトラムセクション境界の検出'] },
+        ],
+      },
+      {
+        version: 'v1.4.1',
+        date: '2026-06-14',
+        sections: [
+          { type: 'improved' as const, items: ['App Store 対応のためのアクセシビリティ改善'] },
+        ],
+      },
+      {
+        version: 'v1.4.0',
+        date: '2026-06-05',
+        sections: [
+          { type: 'added' as const, items: ['スペクトラムセッション録画と再生', '期間をまたいだスペクトラム並列比較'] },
+          { type: 'improved' as const, items: ['スペクトラムアナライザーの UI と操作'] },
+        ],
+      },
+      {
+        version: 'v1.3.0',
+        date: '2026-05-28',
+        sections: [
+          { type: 'added' as const, items: ['AI ツール統合のための MCP サーバー', 'ネットワークデータ、詳細、空き度のローカル JSON エンドポイント'] },
+          { type: 'improved' as const, items: ['チャンネル品質スコアリングアルゴリズム'] },
+        ],
+      },
+      {
+        version: 'v1.2.0',
+        date: '2026-05-24',
+        sections: [
+          { type: 'added' as const, items: ['タイムライン可視化付きローミングテスト', 'ローミングテストのセッション保存と再生'] },
+          { type: 'improved' as const, items: ['ネットワークテーブルのソートとフィルタリング'] },
+        ],
+      },
+      {
+        version: 'v1.1.0',
+        date: '2026-05-20',
+        sections: [
+          { type: 'added' as const, items: ['接続診断ダッシュボード', 'チャンネル品質スコアリングと推奨'] },
+          { type: 'improved' as const, items: ['トライバンドスペクトラムスキャナーのパフォーマンス'] },
+        ],
+      },
+      {
+        version: 'v1.0.0',
+        date: '2026-05-18',
+        sections: [
+          { type: 'added' as const, items: ['トライバンドスペクトラムスキャン（2.4 / 5 / 6 GHz）', 'フィルタリング付き詳細ネットワークテーブル', '高解像度スペクトラムスクリーンショットエクスポート', 'ネットワークデータの CSV エクスポート'] },
+        ],
+      },
+    ],
   },
   faq: {
     title: 'よくある質問',
+    metaDescription: 'WiFi Lens よくある質問 — 料金、macOS 要件、データプライバシー、Pro と OSS の違い、6 GHz 対応について。',
     items: [
       { q: 'WiFi Lens は無料ですか？', a: 'もちろんです。WiFi Lens OSS はオープンソースで完全に無料で、GitHub から制限なくダウンロードして使用できます。Pro 版は App Store を通じた一度限りのスポンサーシップで、録画関連の一部の高度な機能がアンロックされます。コアの Wi‑Fi 分析機能は両バージョンで同一です。' },
       { q: 'Pro と OSS の違いは何ですか？', a: 'OSS 版はスペクトラムスキャン、ネットワークテーブル、チャンネルスコアリング、ローミングテスト、MCP AI 統合などすべてのコア機能をカバーしています。Pro 版ではスペクトラムセッション録画（時間経過に伴うスペクトラム変化のキャプチャと再生）と期間をまたいだスペクトラムの並列比較が追加されます。録画と再生が必要なければ、OSS 版で十分です。' },
@@ -208,6 +290,21 @@ export const ja = {
     },
     lastUpdated: '最終更新日: 2026年5月27日',
     contact: 'ご質問は？GitHub Issueを作成するか、wifi-lens@outlook.com までご連絡ください。',
+  },
+  home: {
+    exploreFeatures: '機能を見る',
+    featuresTitle: 'すっきりしたトップページ。明確なプロダクトストーリー。',
+    featuresSub: 'まずはプロダクト自体から始め、必要なところだけ詳しく掘り下げましょう。',
+    exploreLabel: '探索',
+    exploreTitle: 'あなたの疑問に合うページから始めましょう',
+    exploreSub: 'トップページは短く。詳しいことは各ページで。',
+    viewPage: 'ページを見る',
+  },
+  notFound: {
+    title: '404 — ページが見つかりません',
+    heading: 'このページは存在しません。',
+    desc: 'お探しのページは移動されたか、すでに存在しない可能性があります。',
+    backHome: 'ホームに戻る',
   },
   footer: {
     copyright: '© 2026 WiFi Lens — Wi‑Fi を深く理解する。',

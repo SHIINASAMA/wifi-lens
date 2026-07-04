@@ -10,9 +10,11 @@ export const es = {
     description: 'WiFi Lens — Un analizador de espectro Wi‑Fi nativo para macOS. Escanea, diagnostica y navega con confianza.',
   },
   nav: {
+    home: 'Inicio',
     features: 'Funciones',
     mcp: 'AI Workflows',
     download: 'Descargar',
+    changelog: 'Registro de cambios',
     faq: 'FAQ',
     privacy: 'Privacidad',
     docs: 'Documentación',
@@ -27,6 +29,7 @@ export const es = {
       proSoon: 'Mac App Store ya disponible',
     },
     hint: 'Local-first · Open source · Sin tracking',
+    tagline: 'Visibilidad Wi‑Fi nativa para macOS.',
   },
   stats: [
     { value: 'Todas las bandas', label: '2.4/5/6 GHz' },
@@ -123,6 +126,7 @@ export const es = {
   mcp: {
     title: 'Pregunta sobre tu Wi‑Fi como en una charla',
     subtitle: 'WiFi Lens puede exponer datos de escaneo en vivo a herramientas como Claude Desktop sobre MCP, así puedes hacer preguntas sobre redes cercanas y uso de canales sin enviar datos a la nube.',
+    metaDescription: 'Conecta WiFi Lens a herramientas de IA mediante MCP. Claude Desktop lee datos de escaneo Wi‑Fi locales — redes, canales y ocupación — sin subir nada.',
     endpoints: {
       title: 'Tres endpoints JSON',
       networks: 'Navega por redes cercanas con señal, banda, canal, seguridad y detalles de capacidades.',
@@ -140,18 +144,12 @@ export const es = {
   },
   download: {
     title: 'Empieza con WiFi Lens',
+    subtitle: 'Elige la versión que se adapte a tus necesidades. Ambas comparten las mismas capacidades básicas de análisis Wi‑Fi.',
+    metaDescription: 'Descarga WiFi Lens para macOS 14+. Versión open-source gratis en GitHub o versión Pro en la Mac App Store con grabación de espectro.',
     oss: {
       title: 'WiFi Lens OSS',
       badge: 'Gratis & Open Source',
       desc: 'Descarga la última versión desde GitHub Releases, lista para ejecutar en macOS 14 o posterior.',
-      features: [
-        'Escaneo tri-band en espectro en vivo',
-        'Tabla de red detallada y filtrado',
-        'Puntuación de calidad del canal y recomendaciones',
-        'Análisis de línea temporal de roaming',
-        'Panel de diagnóstico de conexión',
-        'Servidor MCP local para flujos de trabajo con IA',
-      ],
       cta: 'Descargar desde GitHub',
       url: 'https://github.com/SHIINASAMA/wifi-lens/releases/latest',
     },
@@ -159,20 +157,104 @@ export const es = {
       title: 'Apoyar WiFi Lens',
       badge: 'Patrocinio & Actualización',
       desc: 'WiFi Lens es mantenido principalmente por un desarrollador independiente. Al comprar la versión Pro en la App Store, apoyas la mejora continua y desbloqueas funciones avanzadas como la grabación de sesiones de espectro.',
-      features: [
-        'Todo lo de WiFi Lens OSS',
-        'Grabación y reproducción de sesiones del espectro',
-        'Comparación lado a lado del espectro entre períodos',
-        'Exportar grabaciones para análisis sin conexión',
-        'Instalación sencilla con actualizaciones automáticas',
-        'Apoya el mantenimiento continuo del desarrollador independiente',
-      ],
       cta: 'Descargar en el Mac App Store',
       url: 'https://apps.apple.com/app/id6776590746',
     },
+    comparison: {
+      rows: [
+        { feature: 'Escaneo tri-band en espectro en vivo', oss: true, pro: true },
+        { feature: 'Tabla de red detallada y filtrado', oss: true, pro: true },
+        { feature: 'Puntuación de calidad del canal y recomendaciones', oss: true, pro: true },
+        { feature: 'Análisis de línea temporal de roaming', oss: true, pro: true },
+        { feature: 'Panel de diagnóstico de conexión', oss: true, pro: true },
+        { feature: 'Servidor MCP local para flujos de trabajo con IA', oss: true, pro: true },
+        { feature: 'Grabación y reproducción de sesiones del espectro', oss: false, pro: true },
+        { feature: 'Comparación lado a lado del espectro entre períodos', oss: false, pro: true },
+        { feature: 'Exportar grabaciones para análisis sin conexión', oss: false, pro: true },
+        { feature: 'Instalación sencilla con actualizaciones automáticas', oss: false, pro: true },
+        { feature: 'Apoya el mantenimiento continuo del desarrollador independiente', oss: false, pro: true },
+      ],
+    },
+  },
+  changelog: {
+    title: 'Registro de cambios',
+    subtitle: 'Un historial de cambios, mejoras y correcciones en WiFi Lens.',
+    metaDescription: 'Historial de versiones de WiFi Lens — nuevas funciones como integración MCP y grabación de espectro, correcciones y mejoras.',
+    categories: {
+      added: 'Añadido',
+      improved: 'Mejorado',
+      fixed: 'Corregido',
+      changed: 'Cambiado',
+    },
+    releases: [
+      {
+        version: 'v1.4.3',
+        date: '2026-06-29',
+        sections: [
+          { type: 'improved' as const, items: ['Versión OSS alineada con la versión actual de App Store', 'Refinamientos de UI y actualizaciones de comportamiento'] },
+          { type: 'fixed' as const, items: ['Correcciones menores y mejoras de estabilidad'] },
+        ],
+      },
+      {
+        version: 'v1.4.2',
+        date: '2026-06-21',
+        sections: [
+          { type: 'added' as const, items: ['Recomendación contrafactual de canal', 'Enlace al Mac App Store en la app'] },
+          { type: 'improved' as const, items: ['Gráfico de depuración de espectro dividido en navegación separada', 'Navegación secundaria movida a la barra de herramientas de la ventana'] },
+          { type: 'fixed' as const, items: ['Renderizado de anotaciones en gráficos', 'Detección de límites de secciones de espectro'] },
+        ],
+      },
+      {
+        version: 'v1.4.1',
+        date: '2026-06-14',
+        sections: [
+          { type: 'improved' as const, items: ['Mejoras de accesibilidad para preparación del App Store'] },
+        ],
+      },
+      {
+        version: 'v1.4.0',
+        date: '2026-06-05',
+        sections: [
+          { type: 'added' as const, items: ['Grabación y reproducción de sesiones de espectro', 'Comparación lado a lado del espectro entre períodos'] },
+          { type: 'improved' as const, items: ['UI y controles del analizador de espectro'] },
+        ],
+      },
+      {
+        version: 'v1.3.0',
+        date: '2026-05-28',
+        sections: [
+          { type: 'added' as const, items: ['Servidor MCP para integración con herramientas de IA', 'Endpoints JSON locales para datos de red, detalle y ocupación'] },
+          { type: 'improved' as const, items: ['Algoritmo de puntuación de calidad de canal'] },
+        ],
+      },
+      {
+        version: 'v1.2.0',
+        date: '2026-05-24',
+        sections: [
+          { type: 'added' as const, items: ['Prueba de roaming con visualización de línea de tiempo', 'Guardado y reproducción de sesiones de prueba de roaming'] },
+          { type: 'improved' as const, items: ['Ordenamiento y filtrado de la tabla de redes'] },
+        ],
+      },
+      {
+        version: 'v1.1.0',
+        date: '2026-05-20',
+        sections: [
+          { type: 'added' as const, items: ['Panel de diagnóstico de conexión', 'Puntuación y recomendaciones de calidad de canal'] },
+          { type: 'improved' as const, items: ['Rendimiento del escáner de espectro tri-band'] },
+        ],
+      },
+      {
+        version: 'v1.0.0',
+        date: '2026-05-18',
+        sections: [
+          { type: 'added' as const, items: ['Escaneo de espectro tri-band (2.4 / 5 / 6 GHz)', 'Tabla de redes detallada con filtrado', 'Exportación de capturas de espectro en alta resolución', 'Exportación CSV de datos de red'] },
+        ],
+      },
+    ],
   },
   faq: {
     title: 'Preguntas frecuentes',
+    metaDescription: 'Preguntas frecuentes sobre WiFi Lens — precios, requisitos de macOS, privacidad de datos, diferencias entre Pro y OSS, compatibilidad con 6 GHz.',
     items: [
       { q: '¿Es WiFi Lens gratis?', a: 'Absolutamente. WiFi Lens OSS es de código abierto y completamente gratuito — puedes descargarlo y usarlo desde GitHub sin restricciones. La versión Pro es un patrocinio único a través de la App Store que desbloquea algunas funciones avanzadas relacionadas con la grabación. Las capacidades principales de análisis Wi‑Fi son idénticas en ambas versiones.' },
       { q: '¿Cuál es la diferencia entre Pro y OSS?', a: 'La versión OSS cubre todas las funciones principales: escaneo de espectro, tabla de redes, puntuación de canales, pruebas de roaming e integración MCP con IA. La versión Pro añade grabación de sesiones de espectro (capturar y reproducir cambios en el espectro a lo largo del tiempo) y comparación lado a lado del espectro entre períodos. Si no necesitas grabación y reproducción, la versión OSS tiene todo lo que necesitas.' },
@@ -208,6 +290,21 @@ export const es = {
     },
     lastUpdated: 'Última actualización: 27 de mayo de 2026',
     contact: '¿Preguntas? Abre un GitHub Issue o contáctanos en wifi-lens@outlook.com',
+  },
+  home: {
+    exploreFeatures: 'Explorar funciones',
+    featuresTitle: 'Una página de inicio más limpia. Una historia de producto más clara.',
+    featuresSub: 'Empieza por el producto en sí, y profundiza solo donde lo necesites.',
+    exploreLabel: 'Explorar',
+    exploreTitle: 'Empieza en la página que responde tu pregunta',
+    exploreSub: 'Mantén la homepage corta. Usa las páginas profundas cuando necesites detalles.',
+    viewPage: 'Ver página',
+  },
+  notFound: {
+    title: '404 — Página no encontrada',
+    heading: 'Esta página no existe.',
+    desc: 'La página que buscas puede haber sido movida o ya no existe.',
+    backHome: 'Volver al inicio',
   },
   footer: {
     copyright: '© 2026 WiFi Lens — Comprende a fondo tu Wi‑Fi.',

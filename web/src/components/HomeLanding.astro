@@ -1,0 +1,739 @@
+---
+import '../styles/macbook-device.css'
+import { Image } from 'astro:assets'
+import { getPagePath, withBase, type SiteDictionary, type SupportedLocale } from '../i18n/site'
+import { getScreenshot } from '../assets/images'
+
+interface Props {
+  locale: SupportedLocale
+  t: SiteDictionary
+}
+
+const { locale, t } = Astro.props
+
+const highlights = [
+  {
+    eyebrow: t.features.overview.title,
+    title: t.demo.items[0].title,
+    desc: t.demo.items[0].desc,
+    image: t.demo.items[0].image,
+    alt: t.demo.items[0].alt,
+  },
+  {
+    eyebrow: t.features.scanning.title,
+    title: t.demo.items[1].title,
+    desc: t.demo.items[1].desc,
+    image: t.demo.items[1].image,
+    alt: t.demo.items[1].alt,
+  },
+]
+
+const gateways = [
+  {
+    label: t.nav.features,
+    title: t.features.title,
+    desc: t.demo.subtitle,
+    href: getPagePath(locale, 'features'),
+  },
+  {
+    label: t.nav.mcp,
+    title: t.mcp.title,
+    desc: t.mcp.subtitle,
+    href: getPagePath(locale, 'mcp'),
+  },
+  {
+    label: t.nav.download,
+    title: t.download.title,
+    desc: t.download.oss.desc,
+    href: getPagePath(locale, 'download'),
+  },
+  {
+    label: t.nav.privacy,
+    title: t.privacy.title,
+    desc: t.privacy.subtitle,
+    href: getPagePath(locale, 'privacy'),
+  },
+]
+---
+
+<section id="hero">
+  <canvas id="hero-canvas" aria-hidden="true"></canvas>
+  <div class="hero-shell">
+    <div class="hero-copy">
+      <span class="hero-badge">{t.hero.badge}</span>
+      <h1>{t.hero.title}:<span class="sub">{t.hero.tagline}</span></h1>
+      <p class="hero-subtitle">{t.hero.subtitle}</p>
+      <div class="hero-cta-row">
+        <a href={getPagePath(locale, 'features')} class="btn-primary">{t.home.exploreFeatures}</a>
+        <a href={getPagePath(locale, 'download')} class="btn-secondary">{t.nav.download}</a>
+      </div>
+      <div class="hero-microcopy">
+        <span>{t.stats[0].value} {t.stats[0].label}</span>
+        <span>{t.stats[2].value} {t.stats[2].label}</span>
+        <span>{t.stats[3].label}</span>
+      </div>
+    </div>
+    <div class="hero-visual">
+        <div class="device-wrap" id="device-wrap">
+          <div class="device device-macbook-pro device-spacegray">
+            <div class="device-frame">
+              <div class="device-header"></div>
+              <div class="device-screen">
+                <Image src={getScreenshot(t.demo.items[0].image)} alt={t.demo.items[0].alt} loading="eager" />
+              </div>
+            </div>
+            <div class="device-power"></div>
+          </div>
+        </div>
+      </div>
+  </div>
+</section>
+
+<section class="trust-strip">
+  <div class="trust-grid">
+    {t.stats.map((item) => (
+      <div class="trust-item">
+        <span class="trust-value">{item.value}</span>
+        <span class="trust-label">{item.label}</span>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section id="features" class="sec-pad">
+  <div class="sec-inner">
+    <span class="sec-label">{t.nav.features}</span>
+    <h2 class="sec-title home-section-title">{t.home.featuresTitle}</h2>
+    <p class="sec-sub home-section-sub">{t.home.featuresSub}</p>
+    <div class="highlight-stack">
+      {highlights.map((item, index) => (
+        <article class:list={['highlight-row', { reverse: index % 2 === 1 }]}>
+          <div class="highlight-copy">
+            <span class="gateway-label">{item.eyebrow}</span>
+            <h3>{item.title}</h3>
+            <p>{item.desc}</p>
+          </div>
+          <div class="highlight-image">
+            <Image src={getScreenshot(item.image)} alt={item.alt} loading={index === 0 ? 'eager' : 'lazy'} decoding="async" widths={[800]} />
+          </div>
+        </article>
+      ))}
+
+      <!-- MCP Chat Demo -->
+      <article class="highlight-row">
+        <div class="highlight-copy">
+          <span class="gateway-label">{t.nav.mcp}</span>
+          <h3>{t.mcp.title}</h3>
+          <p>{t.mcp.subtitle}</p>
+        </div>
+        <div class="mcp-demo">
+          <div class="mcp-window">
+            <div class="mcp-titlebar">
+              <span class="mcp-dot"></span>
+              <span class="mcp-dot"></span>
+              <span class="mcp-dot"></span>
+              <span class="mcp-title">Claude Desktop</span>
+            </div>
+            <div class="mcp-body">
+              <div class="mcp-msg mcp-msg--user">
+                <span class="mcp-avatar mcp-avatar--user">You</span>
+                <div class="mcp-bubble mcp-bubble--user">Which networks have the strongest signal right now?</div>
+              </div>
+              <div class="mcp-msg mcp-msg--ai">
+                <span class="mcp-avatar mcp-avatar--ai">AI</span>
+                <div class="mcp-bubble mcp-bubble--ai">
+                  <p>Here are the top 3 strongest networks from your current scan:</p>
+                  <div class="mcp-code">
+                    <code>MyWiFi&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-48 dBm&nbsp;&nbsp;ch 6&nbsp;&nbsp;2.4 GHz&nbsp;&nbsp;WPA3</code>
+                    <code>Office-5G&nbsp;&nbsp;-52 dBm&nbsp;&nbsp;ch 36&nbsp;&nbsp;5 GHz&nbsp;&nbsp;&nbsp;WPA3</code>
+                    <code>HomeNet&nbsp;&nbsp;&nbsp;-55 dBm&nbsp;&nbsp;ch 149&nbsp;&nbsp;5 GHz&nbsp;&nbsp;WPA2</code>
+                  </div>
+                  <p>All three are on separate channels with no overlap. MyWiFi has the cleanest signal at -48 dBm.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <a href={getPagePath(locale, 'features')} class="highlight-more">{t.nav.features} &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<section id="privacy" class="home-privacy">
+  <div class="sec-inner">
+    <div class="privacy-strip">
+      <div class="privacy-strip-text">
+        <h3>{t.privacy.title}</h3>
+        <p>{t.privacy.subtitle}</p>
+      </div>
+      <a href={getPagePath(locale, 'privacy')} class="btn-secondary">{t.nav.privacy}</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec-pad">
+  <div class="sec-inner">
+    <span class="sec-label">{t.home.exploreLabel}</span>
+    <h2 class="sec-title home-section-title">{t.home.exploreTitle}</h2>
+    <p class="sec-sub home-section-sub">{t.home.exploreSub}</p>
+    <div class="gateway-grid">
+      {gateways.map((item) => (
+        <a href={item.href} class="gateway-card">
+          <span class="gateway-label">{item.label}</span>
+          <h3>{item.title}</h3>
+          <p>{item.desc}</p>
+          <span class="gateway-arrow">{t.home.viewPage}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* === Hero === */
+  #hero {
+    box-sizing: border-box;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 60px 2rem 2rem;
+  }
+
+  #hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 50% 40% at 50% 30%, var(--accent-glow), transparent 65%);
+  }
+
+  #hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.9rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--accent);
+    border: 1px solid rgba(76, 201, 200, 0.18);
+    border-radius: 980px;
+    letter-spacing: 0.04em;
+  }
+
+  .hero-shell {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3rem;
+  }
+
+  .hero-copy {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+  }
+
+  #hero h1 {
+    position: relative;
+    font-family: var(--font-display);
+    font-size: clamp(3.6rem, 8vw, 7rem);
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: -0.035em;
+    color: var(--fg);
+    margin: 1.25rem 0 0;
+  }
+
+  #hero h1 .sub {
+    display: block;
+    font-size: 0.28em;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.01em;
+    margin-top: 0.5em;
+  }
+
+  .hero-subtitle {
+    max-width: 42rem;
+    margin: 1.25rem auto 0;
+    font-size: clamp(0.9375rem, 1.6vw, 1.125rem);
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .hero-cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .hero-microcopy {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem 1.5rem;
+    margin-top: 1.25rem;
+    color: var(--dim);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .hero-visual {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .device-wrap {
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    overflow: visible;
+    height: 360px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .device-wrap .device {
+    transform: scale(0.75);
+    transform-origin: center center;
+  }
+
+  .device-wrap .device-screen {
+    background: #0a0a0c;
+    overflow: hidden;
+  }
+
+  .device-wrap .device-screen img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* === Trust Strip === */
+  .trust-strip {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.015), rgba(255, 255, 255, 0));
+  }
+
+  .trust-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .trust-value {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3vw, 2.3rem);
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--accent);
+  }
+
+  .trust-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2rem 1rem;
+    text-align: center;
+    border-right: 1px solid var(--border);
+    transition: background 0.2s ease;
+  }
+
+  .trust-item:hover {
+    background: rgba(76, 201, 200, 0.03);
+  }
+
+  .trust-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* === Highlight Rows === */
+  .highlight-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    margin-top: 3rem;
+  }
+
+  .highlight-more {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.01em;
+    margin-top: 0.5rem;
+    transition: opacity 0.2s;
+  }
+
+  .highlight-more:hover {
+    opacity: 0.75;
+  }
+
+  .highlight-row {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .highlight-row.reverse {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  }
+
+  .highlight-row.reverse .highlight-copy {
+    order: 2;
+  }
+
+  .highlight-row.reverse .highlight-image {
+    order: 1;
+  }
+
+  .highlight-copy {
+    max-width: 28rem;
+  }
+
+  .highlight-copy h3 {
+    margin: 0.6rem 0 0.9rem;
+    font-size: clamp(2rem, 3.6vw, 3.1rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+  }
+
+  .highlight-copy p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.98rem;
+    line-height: 1.65;
+  }
+
+  .highlight-image {
+    border-radius: 22px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+    box-shadow: 0 30px 90px -35px rgba(0, 0, 0, 0.78);
+  }
+
+  .highlight-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* === MCP Demo === */
+  .mcp-demo {
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #1a1a1e;
+    box-shadow: 0 30px 90px -35px rgba(0, 0, 0, 0.78);
+  }
+
+  .mcp-window {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mcp-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.75rem 1rem;
+    background: #141416;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mcp-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .mcp-dot:first-child { background: #ff5f57; }
+  .mcp-dot:nth-child(2) { background: #febc2e; }
+  .mcp-dot:nth-child(3) { background: #28c840; }
+
+  .mcp-title {
+    margin-left: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--dim);
+    font-weight: 500;
+  }
+
+  .mcp-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .mcp-msg {
+    display: flex;
+    gap: 0.625rem;
+    align-items: flex-start;
+  }
+
+  .mcp-avatar {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .mcp-avatar--user {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--muted);
+  }
+
+  .mcp-avatar--ai {
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .mcp-bubble {
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    max-width: 90%;
+  }
+
+  .mcp-bubble p {
+    margin: 0 0 0.5rem;
+  }
+
+  .mcp-bubble p:last-child {
+    margin-bottom: 0;
+  }
+
+  .mcp-bubble--user {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--fg);
+    border-bottom-left-radius: 4px;
+  }
+
+  .mcp-bubble--ai {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--muted);
+    border-bottom-left-radius: 4px;
+  }
+
+  .mcp-code {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.625rem 0.75rem;
+    margin: 0.5rem 0;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.6875rem;
+    line-height: 1.7;
+    color: var(--accent);
+    overflow-x: auto;
+  }
+
+  .mcp-code code {
+    display: block;
+    white-space: pre;
+  }
+
+  /* === Privacy Strip === */
+  .home-privacy {
+    padding: 0 2rem;
+  }
+
+  .privacy-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 2rem 2.5rem;
+    background: linear-gradient(135deg, rgba(76, 201, 200, 0.06), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(76, 201, 200, 0.12);
+    border-radius: 16px;
+  }
+
+  .privacy-strip-text h3 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.375rem;
+    color: var(--fg);
+  }
+
+  .privacy-strip-text p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* === Gateway Cards === */
+  .gateway-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+    margin-top: 3rem;
+  }
+
+  .gateway-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    transition: border-color 0.2s, transform 0.2s, background 0.2s;
+  }
+
+  .gateway-card:hover {
+    border-color: rgba(76, 201, 200, 0.28);
+    background: linear-gradient(180deg, rgba(76, 201, 200, 0.08), rgba(255, 255, 255, 0.02));
+    transform: translateY(-2px);
+  }
+
+  .gateway-card h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.75rem;
+  }
+
+  .gateway-card p {
+    font-size: 0.8125rem;
+    color: var(--dim);
+    line-height: 1.6;
+  }
+
+  .gateway-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .gateway-arrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: auto;
+  }
+
+  /* === Responsive === */
+  @media (max-width: 768px) {
+    .trust-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .trust-item {
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .trust-item:nth-last-child(-n + 2) {
+      border-bottom: none;
+    }
+
+    .gateway-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .home-privacy {
+      padding: 0 1.25rem;
+    }
+
+    .privacy-strip {
+      flex-direction: column;
+      text-align: center;
+      padding: 1.5rem;
+      gap: 1.25rem;
+    }
+
+    #hero {
+      min-height: auto;
+      padding-top: 7rem;
+    }
+
+    .hero-shell {
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .trust-value {
+      font-size: 1.3rem;
+    }
+
+    .highlight-row,
+    .highlight-row.reverse {
+      grid-template-columns: 1fr;
+    }
+
+    .highlight-row.reverse .highlight-copy {
+      order: 0;
+    }
+
+    .highlight-row.reverse .highlight-image {
+      order: 0;
+    }
+
+    .mcp-bubble {
+      max-width: 100%;
+    }
+
+    .mcp-code {
+      font-size: 0.625rem;
+    }
+
+    .highlight-copy h3 {
+      font-size: 1.6rem;
+    }
+  }
+</style>

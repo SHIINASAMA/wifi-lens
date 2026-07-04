@@ -1,0 +1,33 @@
+---
+import HomeLanding from '../../components/HomeLanding.astro'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import HeroCanvas from '../../components/HeroCanvas.astro'
+import { getDictionary, isSupportedLocale, localeOrder } from '../../i18n/site'
+
+export function getStaticPaths() {
+  return localeOrder.filter((locale) => locale !== 'en').map((locale) => ({ params: { locale } }))
+}
+
+const localeParam = Astro.params.locale
+if (!localeParam || !isSupportedLocale(localeParam) || localeParam === 'en') {
+  throw new Error('Invalid locale route')
+}
+
+const locale = localeParam
+const t = getDictionary(locale)
+const softwareJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'WiFi Lens',
+  operatingSystem: 'macOS 14+',
+  applicationCategory: 'UtilitiesApplication',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  downloadUrl: 'https://github.com/SHIINASAMA/wifi-lens/releases/latest',
+  screenshot: 'https://shiinasama.github.io/wifi-lens/screenshots/overview.png',
+}
+---
+
+<BaseLayout locale={locale} page="home" title={t.meta.title} description={t.meta.description} structuredData={[softwareJsonLd]}>
+  <HomeLanding locale={locale} t={t} />
+  <HeroCanvas />
+</BaseLayout>

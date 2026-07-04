@@ -1,0 +1,84 @@
+<script is:inline>
+  const hero = document.getElementById('hero')
+  const canvas = document.getElementById('hero-canvas')
+  if (hero instanceof HTMLElement && canvas instanceof HTMLCanvasElement) {
+    const ctx = canvas.getContext('2d')
+    if (ctx) {
+      const BAR_COUNT = 80
+      const barHeights = new Float32Array(BAR_COUNT)
+      const barTargets = new Float32Array(BAR_COUNT)
+      let isVisible = true
+      let animating = false
+      const accentA = (a) => `rgba(76,201,200,${a})`
+      const accentB = (a) => `rgba(90,215,195,${a})`
+      const resize = () => {
+        const rect = hero.getBoundingClientRect()
+        const dpr = Math.min(window.devicePixelRatio || 1, 2)
+        canvas.width = rect.width * dpr
+        canvas.height = rect.height * dpr
+        canvas.style.width = `${rect.width}px`
+        canvas.style.height = `${rect.height}px`
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      }
+      const initBars = () => {
+        for (let i = 0; i < BAR_COUNT; i += 1) {
+          barHeights[i] = Math.random() * 0.2
+          barTargets[i] = Math.random() * 0.25
+        }
+      }
+      const draw = () => {
+        if (!isVisible) { animating = false; return }
+        const scale = Math.min(window.devicePixelRatio || 1, 2)
+        const w = canvas.width / scale
+        const h = canvas.height / scale
+        ctx.clearRect(0, 0, w, h)
+        const barAreaTop = h * 0.74
+        const barAreaH = h * 0.26
+        const barX0 = w * 0.02
+        const barAreaW = w * 0.96
+        const totalGap = barAreaW * 0.15
+        const barW = (barAreaW - totalGap) / BAR_COUNT
+        const barGap = totalGap / BAR_COUNT
+        const visibleStep = w < 500 ? 2 : 1
+        for (let i = 0; i < BAR_COUNT; i += 1) {
+          if (Math.random() < 0.05) barTargets[i] = Math.random() * 0.88 + 0.06
+          barHeights[i] += (barTargets[i] - barHeights[i]) * 0.08
+        }
+        for (let i = 0; i < BAR_COUNT; i += visibleStep) {
+          const bh = barHeights[i] * barAreaH
+          if (bh < 2) continue
+          const bx = barX0 + i * (barW + barGap)
+          const by = barAreaTop + barAreaH - bh
+          const band = Math.floor(i / (BAR_COUNT / 3))
+          const g = band === 0 ? accentA : band === 1 ? accentB : accentA
+          const alpha = Math.min((band === 2 ? 0.04 : 0.08) + barHeights[i] * 0.32, 0.4)
+          const grad = ctx.createLinearGradient(bx, by, bx, barAreaTop + barAreaH)
+          grad.addColorStop(0, g(alpha))
+          grad.addColorStop(1, g(0))
+          ctx.fillStyle = grad
+          ctx.fillRect(bx, by, barW, bh)
+        }
+        requestAnimationFrame(draw)
+      }
+      const startAnimation = () => {
+        if (animating) return
+        animating = true
+        requestAnimationFrame(draw)
+      }
+      resize()
+      initBars()
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (!prefersReduced) startAnimation()
+      new ResizeObserver(() => {
+        resize()
+        initBars()
+      }).observe(hero)
+      new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          isVisible = entry.isIntersecting
+          if (isVisible && !prefersReduced && !animating) startAnimation()
+        }
+      }, { threshold: 0 }).observe(hero)
+    }
+  }
+</script>

@@ -122,16 +122,6 @@ xed WiFiLens.xcodeproj
 
 ### Website
 
-ランディングページは Vite + Tailwind CSS で構築され、`_site/` に出力されます。
-
-```sh
-cd wifi-lens          # repo root
-npm ci
-npm run dev           # dev server at localhost:5173/wifi-lens/
-npm run build         # production build
-npm run preview       # preview production build
-```
-
 アーキテクチャ、テスト、ロードマップのドキュメントは [docs/](docs/) にあります。
 
 ---

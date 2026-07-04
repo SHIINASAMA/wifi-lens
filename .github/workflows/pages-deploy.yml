@@ -37,7 +37,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: 11.9.0
 
       - uses: actions/setup-node@v4
         with:
@@ -45,10 +45,10 @@ jobs:
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --config.minimum-release-age=0
         working-directory: web
 
-      - run: pnpm build
+      - run: pnpm --config.minimum-release-age=0 build
         working-directory: web
 
       - uses: actions/configure-pages@v4
@@ -57,7 +57,7 @@ jobs:
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: web/_site
+          path: web/dist
 
       - id: deployment
         uses: actions/deploy-pages@v4

@@ -122,18 +122,6 @@ xed WiFiLens.xcodeproj
 
 The product name is `WiFi Lens.app` (with space).
 
-### Website
-
-The landing page is built with Vite and Tailwind CSS, outputting to `_site/`.
-
-```sh
-cd wifi-lens          # repo root
-npm ci
-npm run dev           # dev server at localhost:5173/wifi-lens/
-npm run build         # production build
-npm run preview       # preview production build
-```
-
 Architecture, testing, and roadmap docs live in [docs/](docs/).
 
 ---

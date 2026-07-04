@@ -1,0 +1,214 @@
+---
+import { type SiteDictionary, type SupportedLocale } from '../i18n/site'
+
+interface Props {
+  locale: SupportedLocale
+  t: SiteDictionary
+}
+
+const { t } = Astro.props
+---
+
+<section id="changelog">
+  <div class="cl-container">
+    <div class="cl-timeline">
+      {t.changelog.releases.map((release) => (
+        <article class="cl-release">
+          <div class="cl-node" aria-hidden="true">
+            <span class="cl-dot"></span>
+            <span class="cl-line"></span>
+          </div>
+          <div class="cl-release-content">
+            <div class="cl-release-header">
+              <h3 class="cl-version">{release.version}</h3>
+              <time class="cl-date" datetime={release.date}>{release.date}</time>
+            </div>
+            <div class="cl-sections">
+              {release.sections.map((section) => (
+                <div class="cl-section">
+                  <span class={`cl-section-label cl-section-label--${section.type}`}>
+                    {t.changelog.categories[section.type]}
+                  </span>
+                  <ul class="cl-items">
+                    {section.items.map((item) => (
+                      <li>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  #changelog {
+    padding: 0 2rem 4rem;
+  }
+
+  .cl-container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  /* === Timeline === */
+  .cl-timeline {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cl-release {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 1.25rem;
+    position: relative;
+  }
+
+  .cl-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 0.375rem;
+  }
+
+  .cl-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    box-shadow: 0 0 0 3px var(--bg), 0 0 0 4px rgba(76, 201, 200, 0.25);
+  }
+
+  .cl-line {
+    width: 1px;
+    flex: 1;
+    background: linear-gradient(180deg, rgba(76, 201, 200, 0.2), rgba(255, 255, 255, 0.06));
+    margin-top: 0.5rem;
+  }
+
+  .cl-release:last-child .cl-line {
+    display: none;
+  }
+
+  /* === Release Content === */
+  .cl-release-content {
+    padding-bottom: 2.5rem;
+  }
+
+  .cl-release:last-child .cl-release-content {
+    padding-bottom: 0;
+  }
+
+  .cl-release-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .cl-version {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1;
+  }
+
+  .cl-date {
+    font-size: 0.8125rem;
+    color: var(--dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* === Sections === */
+  .cl-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .cl-section-label {
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.55rem;
+    border-radius: 4px;
+    margin-bottom: 0.375rem;
+    width: fit-content;
+  }
+
+  .cl-section-label--added {
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .cl-section-label--improved {
+    color: #a78bfa;
+    background: rgba(167, 139, 250, 0.12);
+  }
+
+  .cl-section-label--fixed {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.12);
+  }
+
+  .cl-section-label--changed {
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .cl-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .cl-items li {
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.55;
+    padding-left: 1rem;
+    position: relative;
+  }
+
+  .cl-items li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--border2);
+  }
+
+  /* === Mobile === */
+  @media (max-width: 640px) {
+    #changelog {
+      padding: 0 1.25rem 3rem;
+    }
+
+    .cl-release {
+      grid-template-columns: 18px 1fr;
+      gap: 1rem;
+    }
+
+    .cl-version {
+      font-size: 1.2rem;
+    }
+
+    .cl-release-content {
+      padding-bottom: 2rem;
+    }
+  }
+</style>

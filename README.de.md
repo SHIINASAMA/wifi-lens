@@ -119,16 +119,6 @@ Der Produktname ist `WiFi Lens.app` (mit Leerzeichen).
 
 ### Website
 
-Die Landingpage wurde mit Vite und Tailwind CSS gebaut, outputting zu `_site/`.
-
-```sh
-cd wifi-lens          # repo root
-npm ci
-npm run dev           # dev server at localhost:5173/wifi-lens/
-npm run build         # production build
-npm run preview       # preview production build
-```
-
 Architektur, Testing und Roadmap Docs leben in [docs/](docs/).
 
 ---

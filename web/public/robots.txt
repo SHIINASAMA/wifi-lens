@@ -5,4 +5,4 @@ User-agent: *
 Allow: /
 
 # Reference sitemap
-Sitemap: https://shiinasama.github.io/wifi-lens/sitemap.xml
+Sitemap: https://shiinasama.github.io/wifi-lens/sitemap-index.xml

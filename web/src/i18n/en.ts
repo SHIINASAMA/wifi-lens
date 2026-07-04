@@ -6,13 +6,15 @@ export const en = {
     selectLanguage: 'Select language',
   },
   meta: {
-    title: 'WiFi Lens — macOS Wi-Fi Analyzer | Free & Open Source',
-    description: 'Free macOS Wi-Fi analyzer — scan networks, check channel quality, test roaming, and integrate with AI tools. Open source, local-first, no tracking.',
+    title: 'WiFi Lens - WiFi Scanner and Analyzer for macOS',
+    description: 'WiFi Lens is a macOS WiFi scanner and analyzer that helps you inspect nearby networks, analyze channel congestion, and troubleshoot wireless problems.',
   },
   nav: {
+    home: 'Home',
     features: 'Features',
     mcp: 'AI Workflows',
     download: 'Download',
+    changelog: 'Changelog',
     faq: 'FAQ',
     privacy: 'Privacy',
     docs: 'Docs',
@@ -20,13 +22,14 @@ export const en = {
   hero: {
     badge: 'macOS 14+  ·  Native  ·  Local-first',
     title: 'WiFi Lens',
-    subtitle: 'A native Wi‑Fi analyzer for macOS that helps you find out where your Wi‑Fi is struggling, whether nearby channels are crowded, and if your devices roam smoothly.',
+    subtitle: 'A native macOS tool that scans nearby WiFi networks, analyzes channel congestion across 2.4, 5, and 6 GHz bands, and helps you troubleshoot wireless problems — all processed locally on your Mac.',
     cta: {
       oss: 'Download',
       secondary: 'AI Workflows',
       proSoon: 'Mac App Store available now',
     },
     hint: 'Local-first  ·  Open source  ·  No tracking',
+    tagline: 'WiFi Scanner and Analyzer for macOS',
   },
   stats: [
     { value: 'All bands', label: '2.4/5/6 GHz' },
@@ -123,6 +126,7 @@ export const en = {
   mcp: {
     title: 'Chat with your Wi‑Fi',
     subtitle: 'WiFi Lens can connect to MCP, letting AI tools like Claude Desktop read Wi‑Fi data directly — all processed on your machine, nothing uploaded to the cloud. Ask "which channel is least crowded?" or "what stands out in nearby networks?"',
+    metaDescription: 'Connect WiFi Lens to AI tools via MCP. Let Claude Desktop read your local Wi-Fi scan data — networks, channels, and occupancy — without uploading anything.',
     endpoints: {
       title: 'Three JSON endpoints',
       networks: 'Browse all nearby Wi‑Fi networks with signal strength, band, channel, security, and more.',
@@ -140,18 +144,12 @@ export const en = {
   },
   download: {
     title: 'Get started with WiFi Lens',
+    subtitle: 'Choose the version that fits your needs. Both share the same core Wi‑Fi analysis capabilities.',
+    metaDescription: 'Download WiFi Lens for macOS 14+. Free open-source version on GitHub or Pro version on the Mac App Store with spectrum recording.',
     oss: {
       title: 'WiFi Lens OSS',
       badge: 'Free & Open Source',
       desc: 'Download the latest version from GitHub Releases, ready to run on macOS 14 or later.',
-      features: [
-        'Live tri-band spectrum scanning',
-        'Detailed network table and filtering',
-        'Channel quality scoring and recommendations',
-        'Roaming timeline analysis',
-        'Connection diagnostics dashboard',
-        'Local MCP server for AI workflows',
-      ],
       cta: 'Download from GitHub',
       url: 'https://github.com/SHIINASAMA/wifi-lens/releases/latest',
     },
@@ -159,20 +157,104 @@ export const en = {
       title: 'Support WiFi Lens',
       badge: 'Sponsor & Upgrade',
       desc: 'WiFi Lens is primarily maintained by a solo developer. Buying Pro through the App Store supports ongoing development and unlocks advanced features like spectrum session recording.',
-      features: [
-        'Everything in WiFi Lens OSS',
-        'Spectrum session recording and playback',
-        'Side-by-side spectrum comparison across time periods',
-        'Export recordings for offline analysis',
-        'Easy install with automatic updates',
-        'Directly support the indie developer',
-      ],
       cta: 'Download on the Mac App Store',
       url: 'https://apps.apple.com/app/id6776590746',
     },
+    comparison: {
+      rows: [
+        { feature: 'Live tri-band spectrum scanning', oss: true, pro: true },
+        { feature: 'Detailed network table and filtering', oss: true, pro: true },
+        { feature: 'Channel quality scoring and recommendations', oss: true, pro: true },
+        { feature: 'Roaming timeline analysis', oss: true, pro: true },
+        { feature: 'Connection diagnostics dashboard', oss: true, pro: true },
+        { feature: 'Local MCP server for AI workflows', oss: true, pro: true },
+        { feature: 'Spectrum session recording and playback', oss: false, pro: true },
+        { feature: 'Side-by-side spectrum comparison across time periods', oss: false, pro: true },
+        { feature: 'Export recordings for offline analysis', oss: false, pro: true },
+        { feature: 'Easy install with automatic updates', oss: false, pro: true },
+        { feature: 'Directly support the indie developer', oss: false, pro: true },
+      ],
+    },
+  },
+  changelog: {
+    title: 'Changelog',
+    subtitle: 'A history of changes, improvements, and fixes in WiFi Lens.',
+    metaDescription: 'Version history for WiFi Lens — see what changed in each release, from new features like MCP integration and spectrum recording to bug fixes.',
+    categories: {
+      added: 'Added',
+      improved: 'Improved',
+      fixed: 'Fixed',
+      changed: 'Changed',
+    },
+    releases: [
+      {
+        version: 'v1.4.3',
+        date: '2026-06-29',
+        sections: [
+          { type: 'improved' as const, items: ['Aligned OSS release with the current App Store version', 'UI refinements and behavior updates'] },
+          { type: 'fixed' as const, items: ['Minor bug fixes and stability improvements'] },
+        ],
+      },
+      {
+        version: 'v1.4.2',
+        date: '2026-06-21',
+        sections: [
+          { type: 'added' as const, items: ['Counterfactual channel recommendation', 'Mac App Store link in the app'] },
+          { type: 'improved' as const, items: ['Spectrum debug chart split into separate navigation', 'Secondary navigation moved to window toolbar'] },
+          { type: 'fixed' as const, items: ['Chart annotation rendering', 'Spectrum section boundary detection'] },
+        ],
+      },
+      {
+        version: 'v1.4.1',
+        date: '2026-06-14',
+        sections: [
+          { type: 'improved' as const, items: ['Accessibility improvements for App Store readiness'] },
+        ],
+      },
+      {
+        version: 'v1.4.0',
+        date: '2026-06-05',
+        sections: [
+          { type: 'added' as const, items: ['Spectrum session recording and playback', 'Side-by-side spectrum comparison across time periods'] },
+          { type: 'improved' as const, items: ['Spectrum analyzer UI and controls'] },
+        ],
+      },
+      {
+        version: 'v1.3.0',
+        date: '2026-05-28',
+        sections: [
+          { type: 'added' as const, items: ['MCP server for AI tool integration', 'Local JSON endpoints for network data, detail, and occupancy'] },
+          { type: 'improved' as const, items: ['Channel quality scoring algorithm'] },
+        ],
+      },
+      {
+        version: 'v1.2.0',
+        date: '2026-05-24',
+        sections: [
+          { type: 'added' as const, items: ['Roaming test with timeline visualization', 'Session saving and replay for roaming tests'] },
+          { type: 'improved' as const, items: ['Network table sorting and filtering'] },
+        ],
+      },
+      {
+        version: 'v1.1.0',
+        date: '2026-05-20',
+        sections: [
+          { type: 'added' as const, items: ['Connection diagnostics dashboard', 'Channel quality scoring and recommendations'] },
+          { type: 'improved' as const, items: ['Tri-band spectrum scanner performance'] },
+        ],
+      },
+      {
+        version: 'v1.0.0',
+        date: '2026-05-18',
+        sections: [
+          { type: 'added' as const, items: ['Tri-band spectrum scanning (2.4 / 5 / 6 GHz)', 'Detailed network table with filtering', 'High-resolution spectrum screenshot export', 'CSV export for network data'] },
+        ],
+      },
+    ],
   },
   faq: {
     title: 'Frequently asked questions',
+    metaDescription: 'Answers to common questions about WiFi Lens — pricing, macOS requirements, data privacy, Pro vs OSS differences, and 6 GHz support.',
     items: [
       { q: 'Is WiFi Lens free?', a: 'Absolutely. WiFi Lens OSS is open source and completely free — you can download and use it from GitHub with no restrictions. The Pro version is a one-time sponsorship through the App Store that unlocks a few recording-related advanced features. The core Wi‑Fi analysis capabilities are identical between both versions.' },
       { q: 'What\'s the difference between Pro and OSS?', a: 'The OSS version covers all core features: spectrum scanning, network table, channel scoring, roaming tests, and MCP AI integration. The Pro version adds spectrum session recording (capture and replay spectrum changes over time) and side-by-side spectrum comparison across time periods. If you don\'t need recording and playback, the OSS version has everything you need.' },
@@ -208,6 +290,21 @@ export const en = {
     },
     lastUpdated: 'Last updated: May 27, 2026',
     contact: 'Questions? Open a GitHub Issue or reach us at wifi-lens@outlook.com',
+  },
+  home: {
+    exploreFeatures: 'Explore Features',
+    featuresTitle: 'A quieter homepage. A clearer product story.',
+    featuresSub: 'Start with the product itself, then go deeper only where you need it.',
+    exploreLabel: 'Explore',
+    exploreTitle: 'Start on the page that matches your question',
+    exploreSub: 'Keep the homepage short. Use the deeper pages when you need specifics.',
+    viewPage: 'View page',
+  },
+  notFound: {
+    title: '404 — Page Not Found',
+    heading: 'This page doesn\'t exist.',
+    desc: 'The page you\'re looking for might have been moved or doesn\'t exist anymore.',
+    backHome: 'Back to Homepage',
   },
   footer: {
     copyright: '© 2026 WiFi Lens — See through your Wi‑Fi.',
