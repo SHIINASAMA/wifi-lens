@@ -36,6 +36,11 @@ const navLinks = [
     </button>
   </div>
   <div class="links" data-menu-panel>
+    <div class="menu-panel-head">
+      <button class="menu-close" aria-label="Close menu" data-menu-close type="button">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
     {navLinks.map((link) => <a href={link.href}>{link.label}</a>)}
     <a href="https://github.com/SHIINASAMA/wifi-lens/tree/master/docs">{t.nav.docs}</a>
     <a href="https://github.com/SHIINASAMA/wifi-lens" aria-label="GitHub">
@@ -92,6 +97,11 @@ const navLinks = [
     display: flex;
     align-items: center;
     gap: 2rem;
+  }
+
+  .menu-panel-head,
+  .menu-close {
+    display: none;
   }
 
   #nav .links a {
@@ -163,7 +173,12 @@ const navLinks = [
     overflow: hidden;
   }
 
-  @media (max-width: 560px) {
+  @media (max-width: 900px) {
+    #nav {
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+    }
+
     .hamburger {
       display: flex;
     }
@@ -176,15 +191,75 @@ const navLinks = [
       right: 0;
       bottom: 0;
       flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 0;
+      padding: 1.25rem 1.25rem 2.5rem;
+      background: rgba(10, 10, 12, 0.98);
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .menu-panel-head {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 0.35rem;
+    }
+
+    .menu-close {
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 2rem;
-      background: var(--bg);
-      z-index: 100;
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--fg);
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .menu-close span {
+      font-size: 1.5rem;
+      line-height: 1;
+      transform: translateY(-1px);
+    }
+
+    #nav .links a {
+      display: flex;
+      align-items: center;
+      min-height: 48px;
+      padding: 0.85rem 0;
+      font-size: 0.98rem;
+      color: var(--fg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    #nav .links a:last-child {
+      border-bottom: none;
     }
 
     #nav.mobile-open .links {
       display: flex;
+    }
+  }
+
+  @media (max-width: 640px) {
+    #nav {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    #nav .logo {
+      font-size: 14px;
+      gap: 8px;
+    }
+
+    #nav .logo img {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
     }
   }
 </style>

@@ -82,6 +82,19 @@ const resolvedOgImage = ogImage
       const nav = document.getElementById('nav')
       const toggle = nav?.querySelector('[data-menu-toggle]')
       const panel = nav?.querySelector('[data-menu-panel]')
+      const closeButton = nav?.querySelector('[data-menu-close]')
+      let trapFocus = null
+
+      const closeMenu = () => {
+        nav?.classList.remove('mobile-open')
+        toggle?.classList.remove('open')
+        toggle?.setAttribute('aria-expanded', 'false')
+        document.body.classList.remove('menu-open')
+        if (trapFocus) {
+          nav?.removeEventListener('keydown', trapFocus)
+          trapFocus = null
+        }
+      }
 
       toggle?.addEventListener('click', () => {
         const open = nav.classList.toggle('mobile-open')
@@ -89,12 +102,9 @@ const resolvedOgImage = ogImage
         toggle.setAttribute('aria-expanded', String(open))
         document.body.classList.toggle('menu-open', open)
         if (open) {
-          const firstFocusable = toggle
-          const lastFocusable = panel?.querySelector('a:last-of-type') || toggle
-          nav?.addEventListener('keydown', trapFocus)
-          function trapFocus(e) {
+          trapFocus = function (e) {
             if (e.key === 'Escape') {
-              toggle?.click()
+              closeMenu()
               toggle?.focus()
               return
             }
@@ -110,17 +120,20 @@ const resolvedOgImage = ogImage
               first?.focus()
             }
           }
+          nav?.addEventListener('keydown', trapFocus)
         } else {
-          nav?.removeEventListener('keydown', trapFocus)
+          closeMenu()
         }
+      })
+
+      closeButton?.addEventListener('click', () => {
+        closeMenu()
+        toggle?.focus()
       })
 
       panel?.querySelectorAll('a').forEach((link) => {
         link.addEventListener('click', () => {
-          nav?.classList.remove('mobile-open')
-          toggle?.classList.remove('open')
-          toggle?.setAttribute('aria-expanded', 'false')
-          document.body.classList.remove('menu-open')
+          closeMenu()
         })
       })
 

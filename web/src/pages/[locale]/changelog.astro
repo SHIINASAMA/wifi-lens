@@ -145,14 +145,33 @@ const changelogJsonLd = {
     max-width: 30rem;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 900px) {
     .dl-hero {
-      padding: 5rem 1.25rem 2rem;
-      min-height: 320px;
+      padding: 5.5rem 1.5rem 2.5rem;
+      min-height: 340px;
+    }
+
+    .dl-hero-title {
+      font-size: clamp(2.5rem, 10vw, 4.2rem);
     }
 
     .dl-wave-arcs svg {
-      max-width: 500px;
+      max-width: 560px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .dl-hero {
+      padding: 5rem 1.25rem 2rem;
+      min-height: 300px;
+    }
+
+    .dl-hero-sub {
+      font-size: 0.95rem;
+    }
+
+    .dl-wave-arcs svg {
+      max-width: 460px;
     }
   }
 </style>

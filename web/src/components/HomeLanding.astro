@@ -195,7 +195,8 @@ const gateways = [
   /* === Hero === */
   #hero {
     box-sizing: border-box;
-    height: 100vh;
+    min-height: 100svh;
+    height: auto;
     display: flex;
     align-items: center;
     position: relative;
@@ -666,7 +667,29 @@ const gateways = [
   }
 
   /* === Responsive === */
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
+    #hero {
+      padding: 6.5rem 1.5rem 3rem;
+    }
+
+    .hero-shell {
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    .hero-subtitle {
+      max-width: 34rem;
+    }
+
+    .device-wrap {
+      max-width: 480px;
+      height: 300px;
+    }
+
+    .device-wrap .device {
+      transform: scale(0.62);
+    }
+
     .trust-grid {
       grid-template-columns: repeat(2, 1fr);
     }
@@ -680,48 +703,111 @@ const gateways = [
       border-bottom: none;
     }
 
+    .highlight-row,
+    .highlight-row.reverse {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    .highlight-row.reverse .highlight-copy,
+    .highlight-row.reverse .highlight-image {
+      order: 0;
+    }
+
+    .highlight-copy {
+      max-width: none;
+    }
+
+    .highlight-copy h3 {
+      font-size: clamp(1.85rem, 5vw, 2.5rem);
+    }
+
+    .privacy-strip {
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+      padding: 1.75rem;
+      gap: 1.25rem;
+    }
+
     .gateway-grid {
       grid-template-columns: 1fr;
     }
   }
 
-  @media (max-width: 560px) {
+  @media (max-width: 640px) {
     .home-privacy {
       padding: 0 1.25rem;
     }
 
-    .privacy-strip {
-      flex-direction: column;
-      text-align: center;
-      padding: 1.5rem;
-      gap: 1.25rem;
-    }
-
     #hero {
-      min-height: auto;
-      padding-top: 7rem;
+      padding: 6rem 1.25rem 2rem;
     }
 
-    .hero-shell {
+    #hero h1 {
+      font-size: clamp(2.65rem, 13vw, 4.1rem);
+      line-height: 0.94;
+    }
+
+    .hero-subtitle {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .hero-cta-row {
       flex-direction: column;
-      gap: 2rem;
+      align-items: stretch;
+    }
+
+    .hero-cta-row a {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .hero-microcopy {
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .device-wrap {
+      max-width: 340px;
+      height: 220px;
+    }
+
+    .device-wrap .device {
+      transform: scale(0.43);
+    }
+
+    .trust-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .trust-item {
+      padding: 1.35rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .trust-item:last-child {
+      border-bottom: none;
     }
 
     .trust-value {
       font-size: 1.3rem;
     }
 
-    .highlight-row,
-    .highlight-row.reverse {
-      grid-template-columns: 1fr;
+    .privacy-strip {
+      padding: 1.5rem;
+      text-align: center;
+      align-items: stretch;
     }
 
-    .highlight-row.reverse .highlight-copy {
-      order: 0;
+    .privacy-strip .btn-secondary {
+      width: 100%;
+      box-sizing: border-box;
     }
 
-    .highlight-row.reverse .highlight-image {
-      order: 0;
+    .mcp-body {
+      padding: 1rem;
     }
 
     .mcp-bubble {
@@ -732,8 +818,8 @@ const gateways = [
       font-size: 0.625rem;
     }
 
-    .highlight-copy h3 {
-      font-size: 1.6rem;
+    .gateway-card {
+      padding: 1.25rem;
     }
   }
 </style>
