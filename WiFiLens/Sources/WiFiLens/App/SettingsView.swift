@@ -4,8 +4,6 @@ import Sparkle
 #endif
 import AppKit
 
-private let privacyPolicyURL = "https://shiinasama.github.io/wifi-lens/#privacy"
-
 struct SettingsView: View {
     let updater: SparkleUpdater
     let locationPermission: LocationPermissionManager
@@ -280,9 +278,7 @@ struct SettingsView: View {
                 Section {
                     HStack {
                         Button(String(localized: "settings.privacy.view_policy", comment: "Button to view privacy policy")) {
-                            if let url = URL(string: privacyPolicyURL) {
-                                NSWorkspace.shared.open(url)
-                            }
+                            open(.privacyPolicy)
                         }
                         .accessibilityIdentifier("settings-privacy-policy-button")
                         Spacer()
@@ -310,11 +306,11 @@ struct SettingsView: View {
 
                         Divider()
 
-                        aboutLinkRow(icon: "bag.fill", title: String(localized: "settings.about.app_store", comment: "App Store link"), url: "https://apps.apple.com/app/wifi-lens-pro/id6776590746")
-                        aboutLinkRow(icon: "safari", title: String(localized: "settings.about.website", comment: "Product website link"), url: "https://shiinasama.github.io/wifi-lens/")
-                        aboutLinkRow(icon: "chevron.left.forwardslash.chevron.right", title: String(localized: "settings.about.github", comment: "GitHub repository link"), url: "https://github.com/SHIINASAMA/wifi-lens")
-                        aboutLinkRow(icon: "bubble.left.and.bubble.right.fill", title: String(localized: "settings.about.x", comment: "X (formerly Twitter) account link"), url: "https://x.com/WiFiLens")
-                        aboutLinkRow(icon: "person.fill.checkmark", title: String(localized: "settings.about.developer", comment: "Developer profile link"), url: "https://x.com/KAORU11843779")
+                        aboutLinkRow(icon: "bag.fill", title: String(localized: "settings.about.app_store", comment: "App Store link"), destination: .appStore)
+                        aboutLinkRow(icon: "safari", title: String(localized: "settings.about.website", comment: "Product website link"), destination: .website)
+                        aboutLinkRow(icon: "chevron.left.forwardslash.chevron.right", title: String(localized: "settings.about.github", comment: "GitHub repository link"), destination: .github)
+                        aboutLinkRow(icon: "bubble.left.and.bubble.right.fill", title: String(localized: "settings.about.x", comment: "X (formerly Twitter) account link"), destination: .xAccount)
+                        aboutLinkRow(icon: "person.fill.checkmark", title: String(localized: "settings.about.developer", comment: "Developer profile link"), destination: .developerProfile)
 
                         Divider()
 
@@ -322,10 +318,10 @@ struct SettingsView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
 
-                        aboutLinkRow(icon: "chart.xyaxis.line", title: "ChartLens", url: "https://github.com/SHIINASAMA/chart-lens")
-                        aboutLinkRow(icon: "server.rack", title: "MCP Swift SDK", url: "https://github.com/nicklama/mcp-swift-sdk")
+                        aboutLinkRow(icon: "chart.xyaxis.line", title: "ChartLens", destination: .chartLensRepository)
+                        aboutLinkRow(icon: "server.rack", title: "MCP Swift SDK", destination: .mcpSwiftSDKRepository)
 #if OSS
-                        aboutLinkRow(icon: "sparkles", title: "Sparkle", url: "https://github.com/sparkle-project/Sparkle")
+                        aboutLinkRow(icon: "sparkles", title: "Sparkle", destination: .sparkleRepository)
 #endif
                     }
                     .padding(.vertical, 4)
@@ -356,11 +352,9 @@ struct SettingsView: View {
         bluetoothPermission?.refreshStatus()
     }
 
-    private func aboutLinkRow(icon: String, title: String, url: String) -> some View {
+    private func aboutLinkRow(icon: String, title: String, destination: ExternalDestination) -> some View {
         Button {
-            if let url = URL(string: url) {
-                NSWorkspace.shared.open(url)
-            }
+            open(destination)
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: icon)
@@ -375,6 +369,11 @@ struct SettingsView: View {
             }
         }
         .buttonStyle(.plain)
+    }
+
+    private func open(_ destination: ExternalDestination) {
+        guard let url = ExternalLinks.url(for: destination) else { return }
+        NSWorkspace.shared.open(url)
     }
 }
 

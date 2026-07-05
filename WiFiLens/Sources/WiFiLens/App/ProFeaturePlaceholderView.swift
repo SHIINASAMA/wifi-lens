@@ -1,9 +1,5 @@
 import SwiftUI
 
-enum ProConstants {
-    static let appStoreURL = "https://apps.apple.com/app/wifi-lens-pro/id6776590746"
-}
-
 struct ProBadge: View {
     var body: some View {
         HStack(spacing: 4) {
@@ -111,9 +107,8 @@ struct ProFeaturePlaceholderView<CustomSkeleton: View>: View {
     }
     
     private func openAppStore() {
-        if let url = URL(string: ProConstants.appStoreURL) {
-            NSWorkspace.shared.open(url)
-        }
+        guard let url = ExternalLinks.url(for: .appStore) else { return }
+        NSWorkspace.shared.open(url)
     }
 }
 
@@ -152,9 +147,8 @@ struct MenuBarFeaturePreviewRow: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             Button {
-                if let url = URL(string: ProConstants.appStoreURL) {
-                    NSWorkspace.shared.open(url)
-                }
+                guard let url = ExternalLinks.url(for: .appStore) else { return }
+                NSWorkspace.shared.open(url)
             } label: {
                 HStack(spacing: 6) {
                     Text(String(localized: "pro.learn_more", comment: "Learn more button for Pro features"))

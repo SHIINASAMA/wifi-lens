@@ -51,6 +51,9 @@
 		896F4371837628B3E6454853 /* SignalProcessingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786042C29EF01CE698FEBBF8 /* SignalProcessingTests.swift */; };
 		8C78C6A4ACEDAD6EA5CCD90E /* BLETrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */; };
 		90CF4B22A68C668A58043390 /* RegulatoryDatabaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07A4C1B8DFCDFBA81A6DFFA /* RegulatoryDatabaseTests.swift */; };
+		90CF4B22A68C668A58043391 /* ExternalLinksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90CF4B22A68C668A58043392 /* ExternalLinksTests.swift */; };
+		90CF4B22A68C668A58043393 /* ExternalLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90CF4B22A68C668A58043395 /* ExternalLinks.swift */; };
+		90CF4B22A68C668A58043394 /* ExternalLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90CF4B22A68C668A58043395 /* ExternalLinks.swift */; };
 		9E204E0C8B6D8E29583263B0 /* ScannerModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E044182AAA5DC5A000A0D69 /* ScannerModelTests.swift */; };
 		9E2F89530D1114DBFAB705F3 /* WiFiLensApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831E90D5B9D07C478A35DD14 /* WiFiLensApp.swift */; };
 		9F1D29EF11E510D9D72BB7D1 /* CWChannel+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5DDCE8EACD706BD2BCEE4B /* CWChannel+Extensions.swift */; };
@@ -399,6 +402,8 @@
 		8A7A45AB88716DC3AC18610B /* ChartViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartViewTests.swift; sourceTree = "<group>"; };
 		8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTableRowTests.swift; sourceTree = "<group>"; };
 		8F405489976429A068F15F86 /* WiFiLensTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WiFiLensTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		90CF4B22A68C668A58043392 /* ExternalLinksTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalLinksTests.swift; sourceTree = "<group>"; };
+		90CF4B22A68C668A58043395 /* ExternalLinks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalLinks.swift; sourceTree = "<group>"; };
 		8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSIDColorHasher.swift; sourceTree = "<group>"; };
 		9C5DDCE8EACD706BD2BCEE4B /* CWChannel+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CWChannel+Extensions.swift"; sourceTree = "<group>"; };
 		9E84926DD82E4B90B6509CD8 /* GlassBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassBackground.swift; sourceTree = "<group>"; };
@@ -852,6 +857,7 @@
 			children = (
 				69F66DB715821EBD11B6D1AA /* Color+Extensions.swift */,
 				0470288A92AF41C793DAE70B /* DeviceCapabilities.swift */,
+				90CF4B22A68C668A58043395 /* ExternalLinks.swift */,
 				BF472346A62545B9866DA8ED /* GatewayPinger.swift */,
 				9E84926DD82E4B90B6509CD8 /* GlassBackground.swift */,
 				51DDD97F3B94514DE0790B51 /* Constants.swift */,
@@ -1041,6 +1047,7 @@
 				53CD49099277F06E8FB3E04D /* ColorExtensionTests.swift */,
 				ADB001000000000000000001 /* DebugMultiAPScenarioTests.swift */,
 				3053495094BB40125310557F /* DeviceCompatibilityFilterTests.swift */,
+				90CF4B22A68C668A58043392 /* ExternalLinksTests.swift */,
 				39A94372ADF30D10E0F015CD /* IEParserTests.swift */,
 				A5024CBB8BFCAFF56FEF0756 /* MCPServerTests.swift */,
 				8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */,
@@ -1485,6 +1492,7 @@
 				FB0573BE2FBC22C2005F8214 /* InterfacesView.swift in Sources */,
 				FBD7B34B2FBAED65002C8F5A /* SettingsView.swift in Sources */,
 				56818EA68B0747B083E0FDF8 /* DeviceCapabilities.swift in Sources */,
+				90CF4B22A68C668A58043393 /* ExternalLinks.swift in Sources */,
 				2FA3CB9C5DD2446AAA549779 /* GatewayPinger.swift in Sources */,
 				C7E5A90CB7E5498F80CDA217 /* GlassBackground.swift in Sources */,
 				847B77DBC638404081A7BFC2 /* RoamingRecord.swift in Sources */,
@@ -1542,6 +1550,7 @@
 				C1E94A4D89C952711DBDB34E /* ColorExtensionTests.swift in Sources */,
 				ADB001000000000000000002 /* DebugMultiAPScenarioTests.swift in Sources */,
 				FABE49BBA198BBD12DD618F2 /* DeviceCompatibilityFilterTests.swift in Sources */,
+				90CF4B22A68C668A58043391 /* ExternalLinksTests.swift in Sources */,
 				BAB34552BFD72F7A42CD918A /* IEParserTests.swift in Sources */,
 				13E648DDB1578ECF42926E36 /* MCPServerTests.swift in Sources */,
 				2ED34E17AE03E25A409037BD /* NetworkTableRowTests.swift in Sources */,
@@ -1660,6 +1669,7 @@
 				FB1E32892FC7316C009D1BDC /* InterfacesView.swift in Sources */,
 				FB1E328A2FC7316C009D1BDC /* SettingsView.swift in Sources */,
 				FB1E328B2FC7316C009D1BDC /* DeviceCapabilities.swift in Sources */,
+				90CF4B22A68C668A58043394 /* ExternalLinks.swift in Sources */,
 				FB1E328C2FC7316C009D1BDC /* GatewayPinger.swift in Sources */,
 				CA0AC8EDAF744A1CB744F092 /* GlassBackground.swift in Sources */,
 				FB1E328D2FC7316C009D1BDC /* RoamingRecord.swift in Sources */,
