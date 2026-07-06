@@ -56,8 +56,8 @@ cd ChartLens && swift test                         # test
 xcodebuild -project ChartLensDemo/ChartLensDemo.xcodeproj -scheme "ChartLensDemo" -configuration Debug -destination 'platform=macOS' build
 xed ChartLensDemo/ChartLensDemo.xcodeproj
 
-# Website — Astro + pnpm, outputs to dist/
-cd web && pnpm install --frozen-lockfile --config.minimum-release-age=0
+# Website — redirect page to wifi-lens.shiinalabs.com (Astro + pnpm, outputs to dist/)
+cd web && pnpm install --config.minimum-release-age=0
 cd web && pnpm dev                           # dev server at localhost:4321
 cd web && pnpm --config.minimum-release-age=0 build
 cd web && pnpm preview                       # preview production build

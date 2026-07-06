@@ -34,7 +34,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
 
-      - run: pnpm install --frozen-lockfile --config.minimum-release-age=0
+      - run: pnpm install --config.minimum-release-age=0
         working-directory: web
 
       - run: pnpm --config.minimum-release-age=0 build
