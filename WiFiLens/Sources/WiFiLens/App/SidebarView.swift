@@ -75,6 +75,33 @@ enum SidebarPage: String, CaseIterable {
     }
 }
 
+enum SidebarSection {
+    case overview
+    case tools
+    case insights
+    case debug
+    case settings
+
+    var localizationKey: String {
+        switch self {
+        case .overview:
+            "sidebar.section.overview"
+        case .tools:
+            "sidebar.section.tools"
+        case .insights:
+            "sidebar.section.insights"
+        case .debug:
+            "sidebar.section.debug"
+        case .settings:
+            "sidebar.section.settings"
+        }
+    }
+
+    var title: String {
+        String(localized: String.LocalizationValue(localizationKey), comment: "Sidebar section title")
+    }
+}
+
 private struct BluetoothIconShape: Shape {
     func path(in rect: CGRect) -> Path {
         let w = rect.width
@@ -113,13 +140,13 @@ struct SidebarView: View {
     var body: some View {
         List(selection: $selectedPage) {
             Section {
-                sidebarGroupTitle("Overview")
+                sidebarGroupTitle(.overview)
                 Label(SidebarPage.overview.label, systemImage: SidebarPage.overview.icon)
                     .tag(SidebarPage.overview)
                     .accessibilityIdentifier("sidebar-overview")
             }
             Section {
-                sidebarGroupTitle("Tools")
+                sidebarGroupTitle(.tools)
                 ForEach([SidebarPage.spectrum, .channels, .interfaces, .roaming, .bleScanner], id: \.self) { page in
                     if page == .bleScanner {
                         Label(title: { Text(page.label) }, icon: {
@@ -148,14 +175,14 @@ struct SidebarView: View {
                 }
             }
             Section {
-                sidebarGroupTitle("Insights")
+                sidebarGroupTitle(.insights)
                 sidebarRow(for: .timeline)
                     .tag(SidebarPage.timeline)
                     .accessibilityIdentifier("sidebar-\(SidebarPage.timeline.rawValue)")
             }
 #if DEBUG
             Section {
-                sidebarGroupTitle("Debug")
+                sidebarGroupTitle(.debug)
                 Label(SidebarPage.spectrumDebugChart.label, systemImage: SidebarPage.spectrumDebugChart.icon)
                     .tag(SidebarPage.spectrumDebugChart)
                     .accessibilityIdentifier("sidebar-spectrumDebugChart")
@@ -166,7 +193,7 @@ struct SidebarView: View {
             }
 #endif
             Section {
-                sidebarGroupTitle("Settings")
+                sidebarGroupTitle(.settings)
                 Label(SidebarPage.settings.label, systemImage: SidebarPage.settings.icon)
                     .tag(SidebarPage.settings)
                     .accessibilityIdentifier("sidebar-settings")
@@ -199,8 +226,8 @@ struct SidebarView: View {
 #endif
     }
 
-    private func sidebarGroupTitle(_ title: String) -> some View {
-        Text(title)
+    private func sidebarGroupTitle(_ section: SidebarSection) -> some View {
+        Text(section.title)
             .font(.system(size: 10, weight: .semibold))
             .foregroundStyle(.secondary)
             .textCase(nil)

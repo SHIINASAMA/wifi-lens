@@ -26,6 +26,15 @@ struct MenuBarWindowBehaviorTests {
         #expect(!SidebarPage.timeline.requiresWiFi)
     }
 
+    @Test("sidebar section titles use localized keys")
+    func sidebarSectionTitlesUseLocalizedKeys() {
+        #expect(SidebarSection.overview.localizationKey == "sidebar.section.overview")
+        #expect(SidebarSection.tools.localizationKey == "sidebar.section.tools")
+        #expect(SidebarSection.insights.localizationKey == "sidebar.section.insights")
+        #expect(SidebarSection.debug.localizationKey == "sidebar.section.debug")
+        #expect(SidebarSection.settings.localizationKey == "sidebar.section.settings")
+    }
+
     @Test("close action switches to accessory only when menu bar is enabled")
     func closeActionDependsOnMenuBarFlag() {
         #expect(closeAction(menuBarEnabled: true) == .switchToAccessory)
