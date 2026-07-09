@@ -5,7 +5,7 @@ import Testing
 struct ExternalLinksTests {
     @Test("privacy policy maps to the website privacy anchor")
     func privacyPolicyURL() {
-        #expect(ExternalLinks.url(for: .privacyPolicy)?.absoluteString == "https://shiinasama.github.io/wifi-lens/#privacy")
+        #expect(ExternalLinks.url(for: .privacyPolicy)?.absoluteString == "https://wifi-lens.shiinalabs.com/privacy")
     }
 
     @Test("app store maps to the Pro product page")

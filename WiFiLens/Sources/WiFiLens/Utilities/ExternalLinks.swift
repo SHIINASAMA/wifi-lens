@@ -16,11 +16,11 @@ enum ExternalLinks {
     static func url(for destination: ExternalDestination) -> URL? {
         let value = switch destination {
         case .privacyPolicy:
-            "https://shiinasama.github.io/wifi-lens/#privacy"
+            "https://wifi-lens.shiinalabs.com/privacy"
         case .appStore:
             "https://apps.apple.com/app/wifi-lens-pro/id6776590746"
         case .website:
-            "https://shiinasama.github.io/wifi-lens/"
+            "https://wifi-lens.shiinalabs.com"
         case .github:
             "https://github.com/SHIINASAMA/wifi-lens"
         case .xAccount:
