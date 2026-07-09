@@ -13,6 +13,9 @@ enum SidebarPage: String, CaseIterable {
     case spectrumDebugChart
     case debugChart
 #endif
+#if DEBUG && PRO
+    case debugTimeline
+#endif
 
     var requiresLocationAuthorization: Bool {
         switch self {
@@ -22,6 +25,10 @@ enum SidebarPage: String, CaseIterable {
             true
 #if DEBUG
         case .spectrumDebugChart, .debugChart:
+            true
+#endif
+#if DEBUG && PRO
+        case .debugTimeline:
             true
 #endif
         }
@@ -36,6 +43,10 @@ enum SidebarPage: String, CaseIterable {
 #if DEBUG
         case .spectrumDebugChart, .debugChart:
             true
+#endif
+#if DEBUG && PRO
+        case .debugTimeline:
+            false
 #endif
         }
     }
@@ -54,6 +65,9 @@ enum SidebarPage: String, CaseIterable {
         case .spectrumDebugChart: String(localized: "nav.spectrum_debug_chart", comment: "Spectrum Debug Chart sidebar navigation item (dev only)")
         case .debugChart: String(localized: "nav.debug_chart", comment: "Debug Chart sidebar navigation item (dev only)")
 #endif
+#if DEBUG && PRO
+        case .debugTimeline: "Debug Timeline"
+#endif
         }
     }
 
@@ -70,6 +84,9 @@ enum SidebarPage: String, CaseIterable {
 #if DEBUG
         case .spectrumDebugChart: "antenna.radiowaves.left.and.right"
         case .debugChart: "ladybug"
+#endif
+#if DEBUG && PRO
+        case .debugTimeline: "clock.arrow.circlepath"
 #endif
         }
     }
@@ -140,7 +157,6 @@ struct SidebarView: View {
     var body: some View {
         List(selection: $selectedPage) {
             Section {
-                sidebarGroupTitle(.overview)
                 Label(SidebarPage.overview.label, systemImage: SidebarPage.overview.icon)
                     .tag(SidebarPage.overview)
                     .accessibilityIdentifier("sidebar-overview")
@@ -190,6 +206,12 @@ struct SidebarView: View {
                 Label(SidebarPage.debugChart.label, systemImage: SidebarPage.debugChart.icon)
                     .tag(SidebarPage.debugChart)
                     .accessibilityIdentifier("sidebar-debugChart")
+
+#if DEBUG && PRO
+                Label(SidebarPage.debugTimeline.label, systemImage: SidebarPage.debugTimeline.icon)
+                    .tag(SidebarPage.debugTimeline)
+                    .accessibilityIdentifier("sidebar-debugTimeline")
+#endif
             }
 #endif
             Section {
