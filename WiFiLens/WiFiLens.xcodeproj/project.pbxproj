@@ -159,6 +159,8 @@
 		FB1E326A2FC7316C009D1BDC /* DebugContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */; };
 		FB1E326B2FC7316C009D1BDC /* DebugThroughputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */; };
 		FB1E326C2FC7316C009D1BDC /* DebugRoamingChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */; };
+		CC0000000000000000000002 /* DebugTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000001 /* DebugTimelineView.swift */; };
+
 		FB1E326D2FC7316C009D1BDC /* SSIDColorHasher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */; };
 		FB1E326E2FC7316C009D1BDC /* ScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */; };
 		FB1E32752FC7316C009D1BDC /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C82FBCD25C005F8214 /* OverviewView.swift */; };
@@ -218,10 +220,13 @@
 		FB8FCB282FF6CAC800BB2929 /* SecondaryToolbarProTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8FCB192FF6C4E300BB2929 /* SecondaryToolbarProTests.swift */; };
 		FB8FCB292FF6CAC800BB2929 /* MenuBarMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8FCB182FF6C4E300BB2929 /* MenuBarMigrationTests.swift */; };
 		FB8FCB2A2FF6CAC800BB2929 /* TimelinePresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8FCB1A2FF6C4E300BB2929 /* TimelinePresentationTests.swift */; };
+		FB8FCB302FF7A1B00BB2929 /* RoamingEventDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8FCB2F2FF7A1B00BB2929 /* RoamingEventDetectorTests.swift */; };
+		FB8FCB322FF7A1B100BB2929 /* WiFiEventRecorderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8FCB312FF7A1B100BB2929 /* WiFiEventRecorderTests.swift */; };
 		FB92F9212FBE208500BCEC67 /* DebugChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F91F2FBE208500BCEC67 /* DebugChartView.swift */; };
 		FB92F9232FBE208500BCEC67 /* DebugContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */; };
 		FB92F9252FBE208500BCEC67 /* DebugThroughputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */; };
 		FB92F9282FBE208500BCEC67 /* DebugRoamingChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */; };
+
 		FBA000010000000000000001 /* AppLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA000230000000000000023 /* AppLaunchTests.swift */; };
 		FBA000020000000000000002 /* WiFiLensUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA000050000000000000005 /* WiFiLensUITestsLaunchTests.swift */; };
 		FBA000200000000000000020 /* UITestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA000210000000000000021 /* UITestHelpers.swift */; };
@@ -402,9 +407,9 @@
 		8A7A45AB88716DC3AC18610B /* ChartViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartViewTests.swift; sourceTree = "<group>"; };
 		8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTableRowTests.swift; sourceTree = "<group>"; };
 		8F405489976429A068F15F86 /* WiFiLensTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WiFiLensTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSIDColorHasher.swift; sourceTree = "<group>"; };
 		90CF4B22A68C668A58043392 /* ExternalLinksTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalLinksTests.swift; sourceTree = "<group>"; };
 		90CF4B22A68C668A58043395 /* ExternalLinks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalLinks.swift; sourceTree = "<group>"; };
-		8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSIDColorHasher.swift; sourceTree = "<group>"; };
 		9C5DDCE8EACD706BD2BCEE4B /* CWChannel+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CWChannel+Extensions.swift"; sourceTree = "<group>"; };
 		9E84926DD82E4B90B6509CD8 /* GlassBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassBackground.swift; sourceTree = "<group>"; };
 		9F790DC6E08D43C5BD058D96 /* RoamingTestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingTestViewModel.swift; sourceTree = "<group>"; };
@@ -490,10 +495,14 @@
 		FB8FCB182FF6C4E300BB2929 /* MenuBarMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarMigrationTests.swift; sourceTree = "<group>"; };
 		FB8FCB192FF6C4E300BB2929 /* SecondaryToolbarProTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryToolbarProTests.swift; sourceTree = "<group>"; };
 		FB8FCB1A2FF6C4E300BB2929 /* TimelinePresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelinePresentationTests.swift; sourceTree = "<group>"; };
+		FB8FCB2F2FF7A1B00BB2929 /* RoamingEventDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingEventDetectorTests.swift; sourceTree = "<group>"; };
+		FB8FCB312FF7A1B100BB2929 /* WiFiEventRecorderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiEventRecorderTests.swift; sourceTree = "<group>"; };
 		FB92F91F2FBE208500BCEC67 /* DebugChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugChartView.swift; sourceTree = "<group>"; };
 		FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugContainerView.swift; sourceTree = "<group>"; };
 		FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugThroughputView.swift; sourceTree = "<group>"; };
 		FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugRoamingChartView.swift; sourceTree = "<group>"; };
+		CC0000000000000000000001 /* DebugTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DebugTimelineView.swift; path = ../Pro/Timeline/DebugTimelineView.swift; sourceTree = SOURCE_ROOT; };
+
 		FBA000030000000000000003 /* WiFiLensUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WiFiLensUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBA000050000000000000005 /* WiFiLensUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiLensUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		FBA000210000000000000021 /* UITestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestHelpers.swift; sourceTree = "<group>"; };
@@ -662,6 +671,7 @@
 				FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */,
 				FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */,
 				FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */,
+				CC0000000000000000000001 /* DebugTimelineView.swift */,
 			);
 			path = Debug;
 			sourceTree = "<group>";
@@ -914,6 +924,8 @@
 				FB8FCB182FF6C4E300BB2929 /* MenuBarMigrationTests.swift */,
 				FB8FCB192FF6C4E300BB2929 /* SecondaryToolbarProTests.swift */,
 				FB8FCB1A2FF6C4E300BB2929 /* TimelinePresentationTests.swift */,
+				FB8FCB2F2FF7A1B00BB2929 /* RoamingEventDetectorTests.swift */,
+				FB8FCB312FF7A1B100BB2929 /* WiFiEventRecorderTests.swift */,
 			);
 			name = WiFiLensProTests;
 			path = ../Pro/Tests/WiFiLensProTests;
@@ -1635,6 +1647,7 @@
 				FB1E326A2FC7316C009D1BDC /* DebugContainerView.swift in Sources */,
 				FB1E326B2FC7316C009D1BDC /* DebugThroughputView.swift in Sources */,
 				FB1E326C2FC7316C009D1BDC /* DebugRoamingChartView.swift in Sources */,
+				CC0000000000000000000002 /* DebugTimelineView.swift in Sources */,
 				FB1E326D2FC7316C009D1BDC /* SSIDColorHasher.swift in Sources */,
 				FB1E326E2FC7316C009D1BDC /* ScannerViewModel.swift in Sources */,
 				A10000000000000000000023 /* SecondaryToolbar.swift in Sources */,
@@ -1732,6 +1745,8 @@
 				FB8FCB282FF6CAC800BB2929 /* SecondaryToolbarProTests.swift in Sources */,
 				FB8FCB292FF6CAC800BB2929 /* MenuBarMigrationTests.swift in Sources */,
 				FB8FCB2A2FF6CAC800BB2929 /* TimelinePresentationTests.swift in Sources */,
+				FB8FCB302FF7A1B00BB2929 /* RoamingEventDetectorTests.swift in Sources */,
+				FB8FCB322FF7A1B100BB2929 /* WiFiEventRecorderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1881,6 +1896,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1946,6 +1962,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;

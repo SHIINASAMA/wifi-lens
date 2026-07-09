@@ -283,6 +283,13 @@ private struct AppRootView: View {
                     .opacity(selectedPage == .debugChart ? 1 : 0)
                     .allowsHitTesting(selectedPage == .debugChart)
                     .accessibilityIdentifier("page-debugChart")
+
+#if DEBUG && PRO
+                DebugTimelineContainerView()
+                    .opacity(selectedPage == .debugTimeline ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .debugTimeline)
+                    .accessibilityIdentifier("page-debugTimeline")
+#endif
 #endif
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)

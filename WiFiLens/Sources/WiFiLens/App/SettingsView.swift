@@ -151,6 +151,15 @@ struct SettingsView: View {
                     Text(String(localized: "settings.section.features", comment: "Features subsection header in settings"))
                 }
 
+#if PRO
+                // MARK: - Data
+                Section {
+                    ClearTimelineDataRow()
+                } header: {
+                    Text(String(localized: "settings.section.data", comment: "Data management subsection header in settings"))
+                }
+#endif
+
                 // MARK: - Permissions
 
                 Section {
@@ -424,3 +433,83 @@ private struct PermissionDescriptionText: View {
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
+
+#if PRO
+private struct ClearTimelineDataRow: View {
+    @State private var isConfirming = false
+    @State private var didClear = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Image(systemName: "trash")
+                    .foregroundColor(.red)
+                    .frame(width: 20)
+                Text(String(localized: "settings.data.clear_timeline", comment: "Clear timeline data button label"))
+                    .font(.body)
+                Spacer()
+                if didClear {
+                    Text(String(localized: "settings.data.clear_timeline_done", comment: "Timeline data cleared confirmation"))
+                        .font(.caption)
+                        .foregroundColor(.green)
+                        .transition(.opacity)
+                } else if isConfirming {
+                    HStack(spacing: 8) {
+                        Button(String(localized: "common.action.cancel", comment: "Cancel button")) {
+                            withAnimation { isConfirming = false }
+                        }
+                        .buttonStyle(.plain)
+                        .font(.caption)
+
+                        Button(String(localized: "settings.data.clear_timeline_confirm", comment: "Confirm clear timeline data button")) {
+                            Task {
+                                let succeeded = await clearTimelineData()
+                                withAnimation {
+                                    isConfirming = false
+                                    if succeeded {
+                                        didClear = true
+                                    }
+                                }
+                                if succeeded {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                        withAnimation { didClear = false }
+                                    }
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .font(.caption)
+                        .foregroundColor(.red)
+                    }
+                } else {
+                    Button {
+                        withAnimation { isConfirming = true }
+                    } label: {
+                        Text(String(localized: "settings.data.clear_timeline_button", comment: "Clear timeline data button"))
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            Text(String(localized: "settings.data.clear_timeline_description", comment: "Description of clearing timeline data"))
+                .font(.callout)
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.vertical, 4)
+    }
+
+    /// Clears the shared Pro event log + recent buffer (not a throwaway store instance).
+    @discardableResult
+    private func clearTimelineData() async -> Bool {
+        do {
+            try await ProObservationEventBootstrap.clearTimelineData()
+            return true
+        } catch {
+            AppLogger.scanner.error("failed to clear timeline data: \(error)")
+            return false
+        }
+    }
+}
+#endif
