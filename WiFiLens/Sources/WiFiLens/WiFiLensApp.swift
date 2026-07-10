@@ -21,6 +21,9 @@ private struct AppRootView: View {
     @Binding var selectedPage: SidebarPage
     @Binding var showCrashLog: Bool
     @Binding var crashLogText: String
+#if PRO
+    @Binding var timelineNavigationRequest: TimelineNavigationRequest?
+#endif
     let sparkleUpdater: SparkleUpdater
     let updateMCPServer: @MainActor () -> Void
     let registerMainWindow: @MainActor (NSWindow?) -> Void
@@ -36,6 +39,10 @@ private struct AppRootView: View {
 #if PRO
     @State private var spectrumRecordingViewModel: RecordingViewModel?
     @State private var timelineSearchText = ""
+    @State private var customStartDate: Date = Calendar.current.startOfDay(for: Date())
+    @State private var customEndDate: Date = Date()
+    @State private var timelineEnabledEventTypes: Set<EventFilterType> = Set(EventFilterType.allCases)
+    @State private var showTimelineInspector = false
 #endif
 
     private var hasLocationAuthorization: Bool {
@@ -88,6 +95,8 @@ private struct AppRootView: View {
                     .yesterday
                 case .timelineThisWeek:
                     .thisWeek
+                case .timelineCustom:
+                    .custom
                 default:
                     .all
                 }
@@ -100,6 +109,8 @@ private struct AppRootView: View {
                     .timelineYesterday
                 case .thisWeek:
                     .timelineThisWeek
+                case .custom:
+                    .timelineCustom
                 case .all:
                     .timelineAll
                 }
@@ -177,13 +188,6 @@ private struct AppRootView: View {
                 EmptyView()
             }
         }
-#if PRO
-        ToolbarItem(placement: .primaryAction) {
-            if selectedPage == .timeline {
-                TimelineToolbarSearchField(text: timelineSearchBinding)
-            }
-        }
-#endif
     }
 
     @ViewBuilder
@@ -254,9 +258,21 @@ private struct AppRootView: View {
 #if PRO
                     TimelineView(
                         selectedFilter: timelineRangeFilter,
-                        searchText: timelineSearchBinding
+                        searchText: timelineSearchBinding,
+                        customStartDate: $customStartDate,
+                        customEndDate: $customEndDate,
+                        enabledEventTypes: $timelineEnabledEventTypes,
+                        navigationRequest: $timelineNavigationRequest
                     )
-                        .accessibilityIdentifier("page-timeline")
+                    .inspector(isPresented: $showTimelineInspector) {
+                        TimelineFilterPanel(
+                            searchText: timelineSearchBinding,
+                            customStartDate: $customStartDate,
+                            customEndDate: $customEndDate,
+                            enabledEventTypes: $timelineEnabledEventTypes
+                        )
+                    }
+                    .accessibilityIdentifier("page-timeline")
 #else
                     ProFeaturePlaceholderView(
                         featureName: String(localized: "pro.timeline.title", comment: "Pro timeline feature title"),
@@ -317,6 +333,16 @@ private struct AppRootView: View {
             .onChange(of: viewModel.wifiPowerState) { _, newState in
                 roamingViewModel.handleWiFiPowerStateChange(newState)
             }
+#if PRO
+            .onChange(of: secondaryToolbarSelections.timeline) { _, newValue in
+                showTimelineInspector = (newValue == .timelineCustom)
+            }
+            .onChange(of: showTimelineInspector) { _, newValue in
+                if !newValue && secondaryToolbarSelections.timeline == .timelineCustom {
+                    secondaryToolbarSelections.timeline = .timelineToday
+                }
+            }
+#endif
             .alert(String(localized: "permission.crash_detected_title", comment: "Alert title when previous crash is detected on launch"), isPresented: $showCrashLog) {
                 Button(String(localized: "common.action.dismiss", comment: "Dismiss/close alert button"), role: .cancel) {}
             } message: {
@@ -554,6 +580,9 @@ struct WiFiLensApp: App {
     @State private var openMainWindowAction: (() -> Void)?
     @State private var pendingMainWindowRoute: SidebarPage?
     @State private var pendingResolvedMainWindowFocus = false
+#if PRO
+    @State private var timelineNavigationRequest: TimelineNavigationRequest?
+#endif
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
     @AppStorage("appearance") private var appearance: String = "system"
@@ -582,7 +611,24 @@ struct WiFiLensApp: App {
 
     var body: some Scene {
         WindowGroup(id: Self.mainWindowSceneID) {
-            AppRootView(
+            Group {
+#if PRO
+                AppRootView(
+                    viewModel: viewModel,
+                    roamingViewModel: roamingViewModel,
+                    bleViewModel: bleViewModel,
+                    sidebarVisibility: $sidebarVisibility,
+                    selectedPage: $selectedPage,
+                    showCrashLog: $showCrashLog,
+                    crashLogText: $crashLogText,
+                    timelineNavigationRequest: $timelineNavigationRequest,
+                    sparkleUpdater: sparkleUpdater,
+                    updateMCPServer: updateMCPServer,
+                    registerMainWindow: registerMainWindow,
+                    registerOpenMainWindowAction: registerOpenMainWindowAction
+                )
+#else
+                AppRootView(
                 viewModel: viewModel,
                 roamingViewModel: roamingViewModel,
                 bleViewModel: bleViewModel,
@@ -595,6 +641,8 @@ struct WiFiLensApp: App {
                 registerMainWindow: registerMainWindow,
                 registerOpenMainWindowAction: registerOpenMainWindowAction
             )
+#endif
+            }
             .preferredColorScheme(colorScheme)
         }
         // Keep a default launch size only. The app window must remain a normal
@@ -731,7 +779,10 @@ struct WiFiLensApp: App {
 #if PRO
         MenuBarScene(
             onOpenMainWindow: { showMainWindow(route: nil, source: .menuBar) },
-            onOpenTimeline: { showMainWindow(route: .timeline, source: .menuBar) },
+            onOpenTimeline: { eventID in
+                timelineNavigationRequest = TimelineNavigationRequest(eventID: eventID)
+                showMainWindow(route: .timeline, source: .menuBar)
+            },
             onOpenSettings: { showMainWindow(route: .settings, source: .menuBar) },
             onQuit: { NSApp.terminate(nil) }
         )

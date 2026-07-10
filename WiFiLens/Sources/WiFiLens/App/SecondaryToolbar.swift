@@ -12,6 +12,7 @@ enum SecondaryToolbarItemID: String, Hashable {
     case timelineToday = "timeline-today"
     case timelineYesterday = "timeline-yesterday"
     case timelineThisWeek = "timeline-this-week"
+    case timelineCustom = "timeline-custom"
 }
 
 struct SecondaryToolbarItem: Identifiable, Equatable {
@@ -101,6 +102,10 @@ struct SecondaryToolbarDescriptor: Equatable {
                     SecondaryToolbarItem(
                         id: .timelineThisWeek,
                         title: String(localized: "timeline.filter.this_week", comment: "Timeline filter for this week's events")
+                    ),
+                    SecondaryToolbarItem(
+                        id: .timelineCustom,
+                        title: String(localized: "timeline.filter.custom", comment: "Timeline filter for custom date range")
                     ),
                 ],
                 defaultSelection: .timelineToday

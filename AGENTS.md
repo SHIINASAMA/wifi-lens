@@ -30,6 +30,8 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/superpowers/specs/2026-06-24-ap-filter-design.md` | Design spec for structured AP filter query parser and filter service |
 | `docs/superpowers/plans/2026-06-24-ap-filter.md` | Implementation plan for AP filter query parser and filter service |
 | `docs/superpowers/specs/2026-07-05-external-links-centralization-design.md` | Design spec for centralizing app business external links into a single Swift source of truth |
+| `docs/superpowers/specs/2026-07-10-pro-unified-event-timeline-design.md` | Design spec for the Pro-only unified menu-bar and event timeline pipeline |
+| `docs/superpowers/plans/2026-07-10-pro-unified-event-timeline.md` | Implementation plan for the Pro-only unified menu-bar and event timeline pipeline |
 | `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
 
 ## Skills Directory

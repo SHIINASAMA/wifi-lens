@@ -160,6 +160,7 @@
 		FB1E326B2FC7316C009D1BDC /* DebugThroughputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */; };
 		FB1E326C2FC7316C009D1BDC /* DebugRoamingChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */; };
 		CC0000000000000000000002 /* DebugTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000001 /* DebugTimelineView.swift */; };
+		CC0000000000000000000011 /* TimelineFilterPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000000000000000000010 /* TimelineFilterPanel.swift */; };
 
 		FB1E326D2FC7316C009D1BDC /* SSIDColorHasher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */; };
 		FB1E326E2FC7316C009D1BDC /* ScannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */; };
@@ -260,13 +261,7 @@
 		FBD0A45A2FE5C06000000007 /* MenuBarScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4572FE5C06000000004 /* MenuBarScene.swift */; };
 		FBD0A45D2FE5C0600000000A /* MenuBarStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */; };
 		FBD0A4602FE5C0600000000D /* MenuBarStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A45F2FE5C0600000000C /* MenuBarStatusView.swift */; };
-		FBD0A4632FE5C06000000010 /* ConnectionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4622FE5C0600000000F /* ConnectionRecord.swift */; };
-		FBD0A4662FE5C06000000013 /* ConnectionRecordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4652FE5C06000000012 /* ConnectionRecordStore.swift */; };
-		FBD0A4692FE5C06000000016 /* ConnectionRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4682FE5C06000000015 /* ConnectionRecorder.swift */; };
 		FBD0A46C2FE5C06000000019 /* SparklineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A46B2FE5C06000000018 /* SparklineView.swift */; };
-		FBD0A46F2FE5C0600000001C /* ConnectionEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A46E2FE5C0600000001B /* ConnectionEvent.swift */; };
-		FBD0A4722FE5C0600000001F /* EventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4712FE5C0600000001E /* EventStore.swift */; };
-		FBD0A4752FE5C06000000022 /* EventDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4742FE5C06000000021 /* EventDetector.swift */; };
 		FBD0A47D2FE5C0600000002A /* WiFiObservationEventRecentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A47A2FE5C06000000027 /* WiFiObservationEventRecentStore.swift */; };
 		FBD0A47E2FE5C0600000002B /* WiFiObservationEventCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A47B2FE5C06000000028 /* WiFiObservationEventCoordinator.swift */; };
 		FBD0A47F2FE5C0600000002C /* ProObservationEventBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A47C2FE5C06000000029 /* ProObservationEventBootstrap.swift */; };
@@ -502,6 +497,7 @@
 		FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugThroughputView.swift; sourceTree = "<group>"; };
 		FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugRoamingChartView.swift; sourceTree = "<group>"; };
 		CC0000000000000000000001 /* DebugTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DebugTimelineView.swift; path = ../Pro/Timeline/DebugTimelineView.swift; sourceTree = SOURCE_ROOT; };
+		CC0000000000000000000010 /* TimelineFilterPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimelineFilterPanel.swift; path = ../Pro/Timeline/TimelineFilterPanel.swift; sourceTree = SOURCE_ROOT; };
 
 		FBA000030000000000000003 /* WiFiLensUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WiFiLensUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBA000050000000000000005 /* WiFiLensUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiLensUITestsLaunchTests.swift; sourceTree = "<group>"; };
@@ -535,13 +531,7 @@
 		FBD0A4572FE5C06000000004 /* MenuBarScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarScene.swift; sourceTree = "<group>"; };
 		FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarStatusViewModel.swift; sourceTree = "<group>"; };
 		FBD0A45F2FE5C0600000000C /* MenuBarStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarStatusView.swift; sourceTree = "<group>"; };
-		FBD0A4622FE5C0600000000F /* ConnectionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionRecord.swift; sourceTree = "<group>"; };
-		FBD0A4652FE5C06000000012 /* ConnectionRecordStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionRecordStore.swift; sourceTree = "<group>"; };
-		FBD0A4682FE5C06000000015 /* ConnectionRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionRecorder.swift; sourceTree = "<group>"; };
 		FBD0A46B2FE5C06000000018 /* SparklineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparklineView.swift; sourceTree = "<group>"; };
-		FBD0A46E2FE5C0600000001B /* ConnectionEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionEvent.swift; sourceTree = "<group>"; };
-		FBD0A4712FE5C0600000001E /* EventStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStore.swift; sourceTree = "<group>"; };
-		FBD0A4742FE5C06000000021 /* EventDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetector.swift; sourceTree = "<group>"; };
 		FBD0A47A2FE5C06000000027 /* WiFiObservationEventRecentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventRecentStore.swift; sourceTree = "<group>"; };
 		FBD0A47B2FE5C06000000028 /* WiFiObservationEventCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventCoordinator.swift; sourceTree = "<group>"; };
 		FBD0A47C2FE5C06000000029 /* ProObservationEventBootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProObservationEventBootstrap.swift; sourceTree = "<group>"; };
@@ -672,6 +662,7 @@
 				FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */,
 				FB92F9262FBE208500BCEC67 /* DebugRoamingChartView.swift */,
 				CC0000000000000000000001 /* DebugTimelineView.swift */,
+				CC0000000000000000000010 /* TimelineFilterPanel.swift */,
 			);
 			path = Debug;
 			sourceTree = "<group>";
@@ -1013,13 +1004,7 @@
 				FBD0A4572FE5C06000000004 /* MenuBarScene.swift */,
 				FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */,
 				FBD0A45F2FE5C0600000000C /* MenuBarStatusView.swift */,
-				FBD0A4622FE5C0600000000F /* ConnectionRecord.swift */,
-				FBD0A4652FE5C06000000012 /* ConnectionRecordStore.swift */,
-				FBD0A4682FE5C06000000015 /* ConnectionRecorder.swift */,
 				FBD0A46B2FE5C06000000018 /* SparklineView.swift */,
-				FBD0A46E2FE5C0600000001B /* ConnectionEvent.swift */,
-				FBD0A4712FE5C0600000001E /* EventStore.swift */,
-				FBD0A4742FE5C06000000021 /* EventDetector.swift */,
 			);
 			path = MenuBar;
 			sourceTree = "<group>";
@@ -1648,6 +1633,7 @@
 				FB1E326B2FC7316C009D1BDC /* DebugThroughputView.swift in Sources */,
 				FB1E326C2FC7316C009D1BDC /* DebugRoamingChartView.swift in Sources */,
 				CC0000000000000000000002 /* DebugTimelineView.swift in Sources */,
+				CC0000000000000000000011 /* TimelineFilterPanel.swift in Sources */,
 				FB1E326D2FC7316C009D1BDC /* SSIDColorHasher.swift in Sources */,
 				FB1E326E2FC7316C009D1BDC /* ScannerViewModel.swift in Sources */,
 				A10000000000000000000023 /* SecondaryToolbar.swift in Sources */,
@@ -1698,13 +1684,7 @@
 				FBD0A45A2FE5C06000000007 /* MenuBarScene.swift in Sources */,
 				FBD0A45D2FE5C0600000000A /* MenuBarStatusViewModel.swift in Sources */,
 				FBD0A4602FE5C0600000000D /* MenuBarStatusView.swift in Sources */,
-				FBD0A4632FE5C06000000010 /* ConnectionRecord.swift in Sources */,
-				FBD0A4662FE5C06000000013 /* ConnectionRecordStore.swift in Sources */,
-				FBD0A4692FE5C06000000016 /* ConnectionRecorder.swift in Sources */,
 				FBD0A46C2FE5C06000000019 /* SparklineView.swift in Sources */,
-				FBD0A46F2FE5C0600000001C /* ConnectionEvent.swift in Sources */,
-				FBD0A4722FE5C0600000001F /* EventStore.swift in Sources */,
-				FBD0A4752FE5C06000000022 /* EventDetector.swift in Sources */,
 				FBD0A47D2FE5C0600000002A /* WiFiObservationEventRecentStore.swift in Sources */,
 				FBD0A47E2FE5C0600000002B /* WiFiObservationEventCoordinator.swift in Sources */,
 				FBD0A47F2FE5C0600000002C /* ProObservationEventBootstrap.swift in Sources */,
