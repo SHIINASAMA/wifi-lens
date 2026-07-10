@@ -21,6 +21,9 @@ private struct AppRootView: View {
     @Binding var selectedPage: SidebarPage
     @Binding var showCrashLog: Bool
     @Binding var crashLogText: String
+#if PRO
+    @Binding var timelineNavigationRequest: TimelineNavigationRequest?
+#endif
     let sparkleUpdater: SparkleUpdater
     let updateMCPServer: @MainActor () -> Void
     let registerMainWindow: @MainActor (NSWindow?) -> Void
@@ -35,6 +38,11 @@ private struct AppRootView: View {
     @State private var secondaryToolbarSelections = SecondaryToolbarSelections()
 #if PRO
     @State private var spectrumRecordingViewModel: RecordingViewModel?
+    @State private var timelineSearchText = ""
+    @State private var customStartDate: Date = Calendar.current.startOfDay(for: Date())
+    @State private var customEndDate: Date = Date()
+    @State private var timelineEnabledEventTypes: Set<EventFilterType> = Set(EventFilterType.allCases)
+    @State private var showTimelineInspector = false
 #endif
 
     private var hasLocationAuthorization: Bool {
@@ -74,6 +82,47 @@ private struct AppRootView: View {
     private var spectrumViewMode: SpectrumMode {
         SpectrumMode.fromToolbarSelection(
             secondaryToolbarSelections.spectrum
+        )
+    }
+
+    private var timelineRangeFilter: Binding<TimelineRangeFilter> {
+        Binding(
+            get: {
+                switch secondaryToolbarSelections.timeline {
+                case .timelineToday:
+                    .today
+                case .timelineYesterday:
+                    .yesterday
+                case .timelineThisWeek:
+                    .thisWeek
+                case .timelineCustom:
+                    .custom
+                default:
+                    .all
+                }
+            },
+            set: { newValue in
+                let selection: SecondaryToolbarItemID = switch newValue {
+                case .today:
+                    .timelineToday
+                case .yesterday:
+                    .timelineYesterday
+                case .thisWeek:
+                    .timelineThisWeek
+                case .custom:
+                    .timelineCustom
+                case .all:
+                    .timelineAll
+                }
+                secondaryToolbarSelections.timeline = selection
+            }
+        )
+    }
+
+    private var timelineSearchBinding: Binding<String> {
+        Binding(
+            get: { timelineSearchText },
+            set: { timelineSearchText = $0 }
         )
     }
 #endif
@@ -126,6 +175,15 @@ private struct AppRootView: View {
                     descriptor: SecondaryToolbarDescriptor.forPage(.spectrum)!,
                     selection: $secondaryToolbarSelections.spectrum
                 )
+            case .timeline:
+#if PRO
+                SecondaryToolbarCapsule(
+                    descriptor: SecondaryToolbarDescriptor.forPage(.timeline)!,
+                    selection: $secondaryToolbarSelections.timeline
+                )
+#else
+                EmptyView()
+#endif
             default:
                 EmptyView()
             }
@@ -196,6 +254,36 @@ private struct AppRootView: View {
                     .allowsHitTesting(selectedPage == .bleScanner)
                     .accessibilityIdentifier("page-bleScanner")
 
+                if selectedPage == .timeline {
+#if PRO
+                    TimelineView(
+                        selectedFilter: timelineRangeFilter,
+                        searchText: timelineSearchBinding,
+                        customStartDate: $customStartDate,
+                        customEndDate: $customEndDate,
+                        enabledEventTypes: $timelineEnabledEventTypes,
+                        navigationRequest: $timelineNavigationRequest
+                    )
+                    .inspector(isPresented: $showTimelineInspector) {
+                        TimelineFilterPanel(
+                            searchText: timelineSearchBinding,
+                            customStartDate: $customStartDate,
+                            customEndDate: $customEndDate,
+                            enabledEventTypes: $timelineEnabledEventTypes
+                        )
+                    }
+                    .accessibilityIdentifier("page-timeline")
+#else
+                    ProFeaturePlaceholderView(
+                        featureName: String(localized: "pro.timeline.title", comment: "Pro timeline feature title"),
+                        featureDescription: String(localized: "pro.timeline.description", comment: "Pro timeline feature description"),
+                        featureIcon: SidebarPage.timeline.icon,
+                        customSkeleton: { TimelineSkeletonView() }
+                    )
+                        .accessibilityIdentifier("page-timeline")
+#endif
+                }
+
                 SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel?.bluetoothPermission, bleEnabled: $bleEnabled)
                     .opacity(selectedPage == .settings ? 1 : 0)
                     .allowsHitTesting(selectedPage == .settings)
@@ -211,6 +299,13 @@ private struct AppRootView: View {
                     .opacity(selectedPage == .debugChart ? 1 : 0)
                     .allowsHitTesting(selectedPage == .debugChart)
                     .accessibilityIdentifier("page-debugChart")
+
+#if DEBUG && PRO
+                DebugTimelineContainerView()
+                    .opacity(selectedPage == .debugTimeline ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .debugTimeline)
+                    .accessibilityIdentifier("page-debugTimeline")
+#endif
 #endif
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -238,6 +333,16 @@ private struct AppRootView: View {
             .onChange(of: viewModel.wifiPowerState) { _, newState in
                 roamingViewModel.handleWiFiPowerStateChange(newState)
             }
+#if PRO
+            .onChange(of: secondaryToolbarSelections.timeline) { _, newValue in
+                showTimelineInspector = (newValue == .timelineCustom)
+            }
+            .onChange(of: showTimelineInspector) { _, newValue in
+                if !newValue && secondaryToolbarSelections.timeline == .timelineCustom {
+                    secondaryToolbarSelections.timeline = .timelineToday
+                }
+            }
+#endif
             .alert(String(localized: "permission.crash_detected_title", comment: "Alert title when previous crash is detected on launch"), isPresented: $showCrashLog) {
                 Button(String(localized: "common.action.dismiss", comment: "Dismiss/close alert button"), role: .cancel) {}
             } message: {
@@ -270,6 +375,9 @@ private struct AppRootView: View {
                 openWindow(id: WiFiLensApp.mainWindowSceneID)
             }
             await viewModel.start()
+#if PRO
+            ProObservationEventBootstrap.start(observationStore: viewModel.store)
+#endif
             roamingViewModel.handleWiFiPowerStateChange(viewModel.wifiPowerState)
             updateMCPServer()
         }
@@ -280,6 +388,75 @@ private struct AppRootView: View {
         }
     }
 }
+
+#if PRO
+private struct TimelineToolbarSearchField: View {
+    @Binding var text: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.secondary)
+
+            BorderlessSearchTextField(
+                text: $text,
+                placeholder: String(localized: "timeline.search.placeholder", comment: "Timeline search field placeholder")
+            )
+            .frame(width: 180)
+        }
+        .padding(.horizontal, 12)
+        .frame(height: 30)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.white.opacity(0.08))
+        )
+    }
+}
+
+private struct BorderlessSearchTextField: NSViewRepresentable {
+    @Binding var text: String
+    let placeholder: String
+
+    func makeNSView(context: Context) -> NSTextField {
+        let field = NSTextField()
+        field.delegate = context.coordinator
+        field.isBordered = false
+        field.isBezeled = false
+        field.drawsBackground = false
+        field.focusRingType = .none
+        field.placeholderString = placeholder
+        field.font = .systemFont(ofSize: NSFont.systemFontSize, weight: .regular)
+        field.textColor = .labelColor
+        field.lineBreakMode = .byTruncatingTail
+        return field
+    }
+
+    func updateNSView(_ field: NSTextField, context: Context) {
+        if field.stringValue != text {
+            field.stringValue = text
+        }
+        field.placeholderString = placeholder
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(text: $text)
+    }
+
+    final class Coordinator: NSObject, NSTextFieldDelegate {
+        @Binding var text: String
+
+        init(text: Binding<String>) {
+            _text = text
+        }
+
+        func controlTextDidChange(_ notification: Notification) {
+            guard let field = notification.object as? NSTextField else { return }
+            text = field.stringValue
+        }
+    }
+}
+#endif
 
 private struct WindowAccessor: NSViewRepresentable {
     let defaultSize: CGSize
@@ -364,6 +541,11 @@ enum ResolvedMainWindowFocusIntent: Equatable {
     case focusResolvedWindow
 }
 
+enum MainWindowOpenSource: Equatable {
+    case app
+    case menuBar
+}
+
 func routeIntent(for route: SidebarPage?) -> MainWindowRouteIntent {
     guard let route else { return .preserveCurrentPage }
     return .navigate(route)
@@ -398,6 +580,9 @@ struct WiFiLensApp: App {
     @State private var openMainWindowAction: (() -> Void)?
     @State private var pendingMainWindowRoute: SidebarPage?
     @State private var pendingResolvedMainWindowFocus = false
+#if PRO
+    @State private var timelineNavigationRequest: TimelineNavigationRequest?
+#endif
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
     @AppStorage("appearance") private var appearance: String = "system"
@@ -426,7 +611,24 @@ struct WiFiLensApp: App {
 
     var body: some Scene {
         WindowGroup(id: Self.mainWindowSceneID) {
-            AppRootView(
+            Group {
+#if PRO
+                AppRootView(
+                    viewModel: viewModel,
+                    roamingViewModel: roamingViewModel,
+                    bleViewModel: bleViewModel,
+                    sidebarVisibility: $sidebarVisibility,
+                    selectedPage: $selectedPage,
+                    showCrashLog: $showCrashLog,
+                    crashLogText: $crashLogText,
+                    timelineNavigationRequest: $timelineNavigationRequest,
+                    sparkleUpdater: sparkleUpdater,
+                    updateMCPServer: updateMCPServer,
+                    registerMainWindow: registerMainWindow,
+                    registerOpenMainWindowAction: registerOpenMainWindowAction
+                )
+#else
+                AppRootView(
                 viewModel: viewModel,
                 roamingViewModel: roamingViewModel,
                 bleViewModel: bleViewModel,
@@ -439,6 +641,8 @@ struct WiFiLensApp: App {
                 registerMainWindow: registerMainWindow,
                 registerOpenMainWindowAction: registerOpenMainWindowAction
             )
+#endif
+            }
             .preferredColorScheme(colorScheme)
         }
         // Keep a default launch size only. The app window must remain a normal
@@ -509,6 +713,11 @@ struct WiFiLensApp: App {
                     selectedPage = .bleScanner
                 }
                 .keyboardShortcut("6", modifiers: .command)
+
+                Button(String(localized: "nav.timeline", comment: "Navigate to Timeline page")) {
+                    selectedPage = .timeline
+                }
+                .keyboardShortcut("7", modifiers: .command)
             }
 
             CommandGroup(after: .toolbar) {
@@ -569,8 +778,12 @@ struct WiFiLensApp: App {
 
 #if PRO
         MenuBarScene(
-            onOpenMainWindow: { showMainWindow(route: nil) },
-            onOpenSettings: { showMainWindow(route: .settings) },
+            onOpenMainWindow: { showMainWindow(route: nil, source: .menuBar) },
+            onOpenTimeline: { eventID in
+                timelineNavigationRequest = TimelineNavigationRequest(eventID: eventID)
+                showMainWindow(route: .timeline, source: .menuBar)
+            },
+            onOpenSettings: { showMainWindow(route: .settings, source: .menuBar) },
             onQuit: { NSApp.terminate(nil) }
         )
 #endif
@@ -601,7 +814,21 @@ struct WiFiLensApp: App {
     }
 
     @MainActor
-    private func showMainWindow(route: SidebarPage? = nil) {
+    private func showMainWindow(route: SidebarPage? = nil, source: MainWindowOpenSource = .app) {
+        if source == .menuBar {
+            dismissTransientMenuBarWindowIfNeeded()
+            Task { @MainActor in
+                await Task.yield()
+                openMainWindow(route: route)
+            }
+            return
+        }
+
+        openMainWindow(route: route)
+    }
+
+    @MainActor
+    private func openMainWindow(route: SidebarPage? = nil) {
         switch reopenAction(menuBarEnabled: menuBarWindowManagementEnabled, currentPolicy: NSApp.activationPolicy()) {
         case .switchToRegular:
             NSApp.setActivationPolicy(.regular)
@@ -625,14 +852,18 @@ struct WiFiLensApp: App {
         NSApp.activate(ignoringOtherApps: true)
 
         if let mainWindow = mainWindowReference.window {
-            if mainWindow.isMiniaturized {
-                mainWindow.deminiaturize(nil)
-            }
-            mainWindow.makeKeyAndOrderFront(nil)
+            bringMainWindowToFront(mainWindow)
             return
         }
 
         openMainWindowAction?()
+    }
+
+    @MainActor
+    private func dismissTransientMenuBarWindowIfNeeded() {
+        guard let keyWindow = NSApp.keyWindow else { return }
+        guard keyWindow !== mainWindowReference.window else { return }
+        keyWindow.close()
     }
 
     @MainActor
@@ -650,10 +881,19 @@ struct WiFiLensApp: App {
         guard pendingResolvedMainWindowFocus else { return }
 
         pendingResolvedMainWindowFocus = false
+        bringMainWindowToFront(window)
+    }
+
+    @MainActor
+    private func bringMainWindowToFront(_ window: NSWindow) {
+        NSRunningApplication.current.activate(options: [.activateAllWindows])
         NSApp.activate(ignoringOtherApps: true)
         if window.isMiniaturized {
             window.deminiaturize(nil)
         }
+        window.orderFrontRegardless()
+        window.makeMain()
+        window.makeKey()
         window.makeKeyAndOrderFront(nil)
     }
 

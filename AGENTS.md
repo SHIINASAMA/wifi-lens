@@ -29,6 +29,13 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/superpowers/plans/2026-06-22-unified-wifi-observation-pipeline-migration.md` | Implementation plan for migrating UI consumers to observation pipeline (Phases 6–10) |
 | `docs/superpowers/specs/2026-06-24-ap-filter-design.md` | Design spec for structured AP filter query parser and filter service |
 | `docs/superpowers/plans/2026-06-24-ap-filter.md` | Implementation plan for AP filter query parser and filter service |
+| `docs/superpowers/specs/2026-07-10-timeline-event-semantics-design.md` | Design spec for Pro timeline connection semantics, event snapshots, and detail layout |
+| `docs/superpowers/plans/2026-07-10-timeline-event-semantics.md` | Implementation plan for Pro timeline connection classification and visual fixes |
+| `docs/superpowers/specs/2026-07-05-external-links-centralization-design.md` | Design spec for centralizing app business external links into a single Swift source of truth |
+| `docs/superpowers/specs/2026-07-10-pro-unified-event-timeline-design.md` | Design spec for the Pro-only unified menu-bar and event timeline pipeline |
+| `docs/superpowers/specs/2026-07-10-timeline-date-range-normalization-design.md` | Design spec for normalizing inverted custom date ranges in the Pro timeline (P2 #1) |
+| `docs/superpowers/plans/2026-07-10-pro-unified-event-timeline.md` | Implementation plan for the Pro-only unified menu-bar and event timeline pipeline |
+| `docs/superpowers/plans/2026-07-10-pro-timeline-consistency-controller.md` | Implementation plan for the Pro timeline generation controller, clear barrier, and lifecycle-safe date synchronization |
 | `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
 
 ## Skills Directory

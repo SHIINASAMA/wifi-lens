@@ -89,7 +89,7 @@ final class RoamingTestViewModel {
             }
             currentSSID = ssid
             currentBSSID = status.bssid
-            currentRSSI = status.rssi ?? 0
+            currentRSSI = status.rssi ?? -100
             currentChannel = status.channel ?? 0
             currentTxRate = status.txRate ?? 0
             currentPhyMode = status.phyMode
@@ -122,7 +122,7 @@ final class RoamingTestViewModel {
             segments = []
             transitions = []
             lastBSSID = bssid
-            lastRSSI = status.rssi ?? 0
+            lastRSSI = status.rssi ?? -100
             lastChannel = status.channel ?? 0
             startDate = Date()
             elapsedTime = 0
@@ -137,9 +137,9 @@ final class RoamingTestViewModel {
             appendSample()
 
             state = .running
-            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-                Task { @MainActor [weak self] in
-                    self?.tick()
+            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+                Task { @MainActor in
+                    self.tick()
                 }
             }
         }
@@ -173,7 +173,7 @@ final class RoamingTestViewModel {
             }
 
             let newBSSID = status.bssid
-            let newRSSI = status.rssi ?? 0
+            let newRSSI = status.rssi ?? -100
             let newChannel = status.channel ?? 0
 
             // Detect AP transition
@@ -232,7 +232,7 @@ final class RoamingTestViewModel {
     private func applyProbe(_ status: WiFiCurrentStatus) {
         currentSSID = status.ssid
         currentBSSID = status.bssid
-        currentRSSI = status.rssi ?? 0
+        currentRSSI = status.rssi ?? -100
         currentChannel = status.channel ?? 0
         currentTxRate = status.txRate ?? 0
         currentPhyMode = status.phyMode
@@ -316,7 +316,7 @@ final class RoamingTestViewModel {
             currentBSSID = record.bssid
             currentPhyMode = record.phyMode
             currentChannel = record.channel
-            currentRSSI = record.segments.last?.samples.last?.rssi ?? 0
+            currentRSSI = record.segments.last?.samples.last?.rssi ?? -100
             currentTxRate = record.segments.last?.samples.last?.txRate ?? 0
             state = .stopped
             errorMessage = nil

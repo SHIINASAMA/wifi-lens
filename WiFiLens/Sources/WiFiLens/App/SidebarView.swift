@@ -7,20 +7,28 @@ enum SidebarPage: String, CaseIterable {
     case interfaces
     case roaming
     case bleScanner
+    case timeline
     case settings
 #if DEBUG
     case spectrumDebugChart
     case debugChart
 #endif
+#if DEBUG && PRO
+    case debugTimeline
+#endif
 
     var requiresLocationAuthorization: Bool {
         switch self {
-        case .overview, .settings, .bleScanner:
+        case .overview, .settings, .bleScanner, .timeline:
             false
         case .spectrum, .channels, .interfaces, .roaming:
             true
 #if DEBUG
         case .spectrumDebugChart, .debugChart:
+            true
+#endif
+#if DEBUG && PRO
+        case .debugTimeline:
             true
 #endif
         }
@@ -28,13 +36,17 @@ enum SidebarPage: String, CaseIterable {
 
     var requiresWiFi: Bool {
         switch self {
-        case .overview, .settings, .bleScanner:
+        case .overview, .settings, .bleScanner, .timeline:
             false
         case .spectrum, .channels, .interfaces, .roaming:
             true
 #if DEBUG
         case .spectrumDebugChart, .debugChart:
             true
+#endif
+#if DEBUG && PRO
+        case .debugTimeline:
+            false
 #endif
         }
     }
@@ -47,10 +59,14 @@ enum SidebarPage: String, CaseIterable {
         case .interfaces: String(localized: "nav.interfaces", comment: "Interfaces sidebar navigation item")
         case .roaming:   String(localized: "nav.roaming_test", comment: "Roaming Test sidebar navigation item")
         case .bleScanner: String(localized: "nav.ble_scanner", comment: "BLE Scanner sidebar navigation item")
+        case .timeline: String(localized: "nav.timeline", comment: "Timeline sidebar navigation item")
         case .settings:   String(localized: "common.action.settings", comment: "Settings button or menu item")
 #if DEBUG
         case .spectrumDebugChart: String(localized: "nav.spectrum_debug_chart", comment: "Spectrum Debug Chart sidebar navigation item (dev only)")
         case .debugChart: String(localized: "nav.debug_chart", comment: "Debug Chart sidebar navigation item (dev only)")
+#endif
+#if DEBUG && PRO
+        case .debugTimeline: "Debug Timeline"
 #endif
         }
     }
@@ -63,12 +79,43 @@ enum SidebarPage: String, CaseIterable {
         case .interfaces: "cable.connector"
         case .roaming:   "arrow.triangle.swap"
         case .bleScanner: "personalhotspot"
+        case .timeline: "clock.arrow.circlepath"
         case .settings:   "gearshape"
 #if DEBUG
         case .spectrumDebugChart: "antenna.radiowaves.left.and.right"
         case .debugChart: "ladybug"
 #endif
+#if DEBUG && PRO
+        case .debugTimeline: "clock.arrow.circlepath"
+#endif
         }
+    }
+}
+
+enum SidebarSection {
+    case overview
+    case tools
+    case insights
+    case debug
+    case settings
+
+    var localizationKey: String {
+        switch self {
+        case .overview:
+            "sidebar.section.overview"
+        case .tools:
+            "sidebar.section.tools"
+        case .insights:
+            "sidebar.section.insights"
+        case .debug:
+            "sidebar.section.debug"
+        case .settings:
+            "sidebar.section.settings"
+        }
+    }
+
+    var title: String {
+        String(localized: String.LocalizationValue(localizationKey), comment: "Sidebar section title")
     }
 }
 
@@ -114,8 +161,8 @@ struct SidebarView: View {
                     .tag(SidebarPage.overview)
                     .accessibilityIdentifier("sidebar-overview")
             }
-            Divider()
             Section {
+                sidebarGroupTitle(.tools)
                 ForEach([SidebarPage.spectrum, .channels, .interfaces, .roaming, .bleScanner], id: \.self) { page in
                     if page == .bleScanner {
                         Label(title: { Text(page.label) }, icon: {
@@ -132,7 +179,7 @@ struct SidebarView: View {
                                 : "")
                             .accessibilityIdentifier("sidebar-bleScanner")
                     } else {
-                        Label(page.label, systemImage: page.icon)
+                        sidebarRow(for: page)
                             .tag(page)
                             .disabled(!UITestMode.isActive && page.requiresWiFi && !isWiFiAvailable)
                             .opacity(!UITestMode.isActive && page.requiresWiFi && !isWiFiAvailable ? 0.4 : 1.0)
@@ -142,7 +189,16 @@ struct SidebarView: View {
                             .accessibilityIdentifier("sidebar-\(page.rawValue)")
                     }
                 }
+            }
+            Section {
+                sidebarGroupTitle(.insights)
+                sidebarRow(for: .timeline)
+                    .tag(SidebarPage.timeline)
+                    .accessibilityIdentifier("sidebar-\(SidebarPage.timeline.rawValue)")
+            }
 #if DEBUG
+            Section {
+                sidebarGroupTitle(.debug)
                 Label(SidebarPage.spectrumDebugChart.label, systemImage: SidebarPage.spectrumDebugChart.icon)
                     .tag(SidebarPage.spectrumDebugChart)
                     .accessibilityIdentifier("sidebar-spectrumDebugChart")
@@ -150,12 +206,16 @@ struct SidebarView: View {
                 Label(SidebarPage.debugChart.label, systemImage: SidebarPage.debugChart.icon)
                     .tag(SidebarPage.debugChart)
                     .accessibilityIdentifier("sidebar-debugChart")
+
+#if DEBUG && PRO
+                Label(SidebarPage.debugTimeline.label, systemImage: SidebarPage.debugTimeline.icon)
+                    .tag(SidebarPage.debugTimeline)
+                    .accessibilityIdentifier("sidebar-debugTimeline")
 #endif
             }
-            Divider()
+#endif
             Section {
-//                Label(SidebarPage.help.label, systemImage: SidebarPage.help.icon)
-//                    .tag(SidebarPage.help)
+                sidebarGroupTitle(.settings)
                 Label(SidebarPage.settings.label, systemImage: SidebarPage.settings.icon)
                     .tag(SidebarPage.settings)
                     .accessibilityIdentifier("sidebar-settings")
@@ -166,5 +226,34 @@ struct SidebarView: View {
         .listStyle(.sidebar)
         .safeAreaPadding(.top, 12)
         .frame(minWidth: 160, idealWidth: 180)
+    }
+
+    @ViewBuilder
+    private func sidebarRow(for page: SidebarPage) -> some View {
+#if OSS
+        if page == .timeline {
+            HStack(spacing: 8) {
+                Label(page.label, systemImage: page.icon)
+                Spacer(minLength: 8)
+                Image(systemName: "lock.fill")
+                    .font(.caption)
+                    .foregroundStyle(.yellow)
+                    .accessibilityHidden(true)
+            }
+        } else {
+            Label(page.label, systemImage: page.icon)
+        }
+#else
+        Label(page.label, systemImage: page.icon)
+#endif
+    }
+
+    private func sidebarGroupTitle(_ section: SidebarSection) -> some View {
+        Text(section.title)
+            .font(.system(size: 10, weight: .semibold))
+            .foregroundStyle(.secondary)
+            .textCase(nil)
+            .padding(.top, 6)
+            .padding(.bottom, 2)
     }
 }

@@ -30,7 +30,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:Pro/Tests/TestPlans/PRO.xctestplan"
+            reference = "container:../Pro/Tests/TestPlans/PRO.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>
@@ -43,6 +43,17 @@
                BlueprintIdentifier = "FBBD16792FCF39F50093F940"
                BuildableName = "WiFiLensProUITests.xctest"
                BlueprintName = "WiFiLensProUITests"
+               ReferencedContainer = "container:WiFiLens.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FB8FCAE62FF6BCA700BB2929"
+               BuildableName = "WiFiLensProTests.xctest"
+               BlueprintName = "WiFiLensProTests"
                ReferencedContainer = "container:WiFiLens.xcodeproj">
             </BuildableReference>
          </TestableReference>

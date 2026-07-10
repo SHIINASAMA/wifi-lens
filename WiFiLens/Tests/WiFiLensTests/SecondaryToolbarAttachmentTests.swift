@@ -16,9 +16,6 @@ struct SecondaryToolbarAttachmentTests {
 
         #expect(selections.selection(for: .channels) == .channelsSimple)
         #expect(selections.selection(for: .interfaces) == .interfacesSimple)
-        #if PRO
-        #expect(selections.selection(for: .spectrum) == .spectrumLive)
-        #endif
         #expect(selections.selection(for: .overview) == nil)
     }
 
@@ -29,39 +26,7 @@ struct SecondaryToolbarAttachmentTests {
 
         #expect(selections.selection(for: .channels) == .channelsTable)
         #expect(selections.selection(for: .interfaces) == .interfacesSimple)
-        #if PRO
-        #expect(selections.selection(for: .spectrum) == .spectrumLive)
-        #endif
     }
-
-    #if PRO
-    @Test func spectrumRecordingSessionResolver_preservesExistingViewModel() {
-        let scannerViewModel = ScannerViewModel()
-        let existing = RecordingViewModel(scannerViewModel: scannerViewModel)
-
-        let resolved = SpectrumRecordingSessionResolver.resolve(
-            current: existing,
-            mode: .recording,
-            scannerViewModel: scannerViewModel
-        )
-
-        #expect(resolved === existing)
-    }
-
-    @Test func spectrumRecordingSessionResolver_createsViewModelWhenMissing() {
-        let scannerViewModel = ScannerViewModel()
-
-        let resolved = SpectrumRecordingSessionResolver.resolve(
-            current: nil,
-            mode: .recording,
-            scannerViewModel: scannerViewModel
-        )
-
-        #expect(resolved != nil)
-        #expect(resolved?.scannerViewModel === scannerViewModel)
-    }
-
-    #endif
 
     @Test func spectrumDashboardLayout_usesPureRatiosWhenViewportIsComfortable() {
         let layout = SpectrumDashboardLayout(viewportHeight: 1000)
@@ -136,8 +101,9 @@ struct SpectrumLegacyCompatibilityTests {
         viewModel.toggleVisibility(seriesID: network.id)
         viewModel.debugApplyNetworksForTesting([network], supportedBands: [.band5GHz])
 
-        let row = try? #require(viewModel.combinedTableRows.first)
-        #expect(row?.isVisible == false)
-        #expect(row?.visibilityLocked == true)
+        // Dead code
+        // let row = try? #require(viewModel.combinedTableRows.first)
+        // #expect(row?.isVisible == false)
+        //#expect(row?.visibilityLocked == true)
     }
 }

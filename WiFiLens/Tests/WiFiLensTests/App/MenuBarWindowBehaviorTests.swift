@@ -14,6 +14,27 @@ struct MenuBarWindowBehaviorTests {
         #expect(routeIntent(for: .settings) == .navigate(.settings))
     }
 
+    @Test("route intent navigates to timeline when route is provided")
+    func routeIntentNavigatesToTimeline() {
+        #expect(routeIntent(for: .timeline) == .navigate(.timeline))
+    }
+
+    @Test("timeline page remains browse-only")
+    func timelinePageDoesNotRequireLiveWiFiOrLocation() {
+        #expect(SidebarPage.timeline.icon == "clock.arrow.circlepath")
+        #expect(!SidebarPage.timeline.requiresLocationAuthorization)
+        #expect(!SidebarPage.timeline.requiresWiFi)
+    }
+
+    @Test("sidebar section titles use localized keys")
+    func sidebarSectionTitlesUseLocalizedKeys() {
+        #expect(SidebarSection.overview.localizationKey == "sidebar.section.overview")
+        #expect(SidebarSection.tools.localizationKey == "sidebar.section.tools")
+        #expect(SidebarSection.insights.localizationKey == "sidebar.section.insights")
+        #expect(SidebarSection.debug.localizationKey == "sidebar.section.debug")
+        #expect(SidebarSection.settings.localizationKey == "sidebar.section.settings")
+    }
+
     @Test("close action switches to accessory only when menu bar is enabled")
     func closeActionDependsOnMenuBarFlag() {
         #expect(closeAction(menuBarEnabled: true) == .switchToAccessory)

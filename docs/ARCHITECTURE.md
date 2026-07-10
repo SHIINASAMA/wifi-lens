@@ -54,7 +54,7 @@ Chart Engine (ChartLens package):
 | `Utilities/` | Constants, Color extensions, BuildConfig, DeviceCapabilities, GatewayPinger |
 | `Resources/` | Localizable.xcstrings (String Catalog) |
 
-Pro features (Recording, Session, StoreKit) live in the `Pro/` submodule at the repo root — see `Pro/docs/ARCHITECTURE.md`.
+Pro features (Recording, Session, StoreKit, Timeline, and Wi-Fi observation event persistence) live in the `Pro/` submodule at the repo root — see `Pro/docs/ARCHITECTURE.md`.
 
 ## Key Patterns
 
@@ -67,6 +67,7 @@ Pro features (Recording, Session, StoreKit) live in the `Pro/` submodule at the 
 - `displayRSSI` animates toward `rssi` each tick for smooth Gaussian curve transitions
 - AP roaming transitions share a single timestamp between old and new segments, eliminating gaps on the timeline
 - Signal history (`SignalHistoryStore`) keeps 20 snapshots per BSSID in memory
+- Wi-Fi observation event recording, Timeline history, and SQLite-backed event persistence are Pro-only runtime features. OSS may keep navigation or upsell entry points, but the concrete event recorder, recent-event state, Timeline data flow, and SQLite storage implementation must stay inside the `Pro/` submodule.
 - `ScannerViewModel.scanIntervalSeconds` supports dynamic override — external code (e.g., recording feature in Pro submodule, see `Pro/docs/ARCHITECTURE.md`) can set it to a custom value and restore the UserDefaults-configured value on stop. The `didSet` automatically cancels and restarts the scan loop with the new interval when `isScanning` is true. This prevents chart domains driven by real-time `Date()` from pulling ahead of data points (gated by scan interval).
 - `StableScore` provides hysteresis for quality level boundaries (upgrade margin 2, downgrade margin 5)
 - `ChannelBand(id:)` failable initializer maps String band IDs ("24"/"5"/"6") to enum cases, used by `SnapshotToChartAdapter` for history playback
@@ -103,4 +104,4 @@ Pro features (Recording, Session, StoreKit) live in the `Pro/` submodule at the 
 - RSSI colors: green ≥ -55, yellow ≥ -70, orange ≥ -85, red below
 - Quality colors: hex strings from `QualityLevel.color`
 - Overlap badge on channel cards includes trailing "overlap" label for context
-- **Multi-target builds**: When adding new `.swift` source files, they must be added to both the `WiFiLens` and `WiFiLensPro` targets' `PBXSourcesBuildPhase` in `project.pbxproj`. The Pro target maintains its own independent build phase — omitting it causes "cannot find type in scope" errors in the `WiFi Lens Pro` scheme.
+- **Target membership**: Add new `.swift` source files only to the targets that should legally ship that code. Shared OSS runtime files must be added to both `WiFiLens` and `WiFiLensPro`; Pro-only implementations must be added only to `WiFiLensPro`. The Pro target maintains its own independent build phase, so missing membership there still causes "cannot find type in scope" errors in the `WiFi Lens Pro` scheme.

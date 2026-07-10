@@ -189,7 +189,8 @@ struct ContentView: View {
             ProFeaturePlaceholderView(
                 featureName: String(localized: "pro.recording.title", comment: "Pro recording feature title"),
                 featureDescription: String(localized: "pro.recording.description", comment: "Pro recording feature description"),
-                featureIcon: "record.circle"
+                featureIcon: "record.circle",
+                customSkeleton: { RecordingSkeletonView() }
             )
         } else {
             dashboardContent
