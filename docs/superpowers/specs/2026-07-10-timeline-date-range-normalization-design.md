@@ -1,7 +1,7 @@
 # Timeline Custom Date-Range Inversion Normalization
 
 - **Date:** 2026-07-10
-- **Status:** Design approved, pending implementation plan
+- **Status:** Superseded in part by the unified timeline consistency design
 - **Issue:** P2 #1
 - **Target:** `Pro` submodule (`Pro/Timeline/TimelineViewModel.swift`, `Pro/Timeline/TimelineView.swift`)
 - **Approach:** A — Minimal targeted fix (ViewModel silent normalization + write-back to binding)
@@ -80,36 +80,27 @@ is normalized.
 > triggers `customEndDate`'s `didSet`, but at that point `end == start`, so normalization is
 > a no-op and no infinite loop occurs.
 
-### §2 Write-back and loop guard — `TimelineView.swift`
+### §2 Write-back and loop guard — `TimelineView.swift` (superseded)
 
-The existing `.onChange(of: customStartDate/customEndDate)` handlers push binding → ViewModel.
-Add the symmetric reverse sync ViewModel → binding:
+> This section described the first implementation. The lifecycle-dependent
+> `onReceive` reverse synchronization is superseded by the explicit
+> binding-to-normalization-to-view-model flow in
+> `2026-07-10-pro-unified-event-timeline-design.md`.
 
-```swift
-.onReceive(viewModel.$customStartDate) { newValue in
-    if customStartDate != newValue { customStartDate = newValue }
-}
-.onReceive(viewModel.$customEndDate) { newValue in
-    if customEndDate != newValue { customEndDate = newValue }
-}
-```
-
-The `if != ` guard is the **loop terminator**: once the binding equals the ViewModel value,
-`onReceive` stops writing the binding, so the binding no longer triggers `.onChange`, and the
-chain halts. Even if the ViewModel's `@Published` re-publishes an equal value, the guard
-swallows it with no side effect.
-
-Effect: the panel (sharing the same `$customStartDate`/`$customEndDate`) always displays the
-normalized dates, consistent with the range used by `applyFilters()`.
+`TimelineView` now treats the app-root bindings as the source of truth. On
+appearance and on every later endpoint change, it normalizes the binding pair,
+writes back only a corrected endpoint, and then prepares the view model from
+that normalized pair. There is no reverse subscription to the view model's
+initial `@Published` values.
 
 ### §3 Data flow
 
 ```
-panel edits binding ──onChange──▶ VM setter (normalize) ──@Published──▶ onReceive ──▶ write back binding (if different)
-                                                                                    │
-                                              binding already equal → skip ──────────┘
+panel edits binding ──▶ normalize binding pair ──▶ write corrected endpoint
+                                                  │
+                                                  └──▶ prepare ViewModel
 
-VM.prepare(inverted) ──▶ setter normalizes ──▶ @Published ──▶ onReceive writes back binding
+TimelineView appears ──▶ read retained bindings ──▶ normalize ──▶ prepare ViewModel
 ```
 
 The deep-link path (`resolveNavigationRequest` → `prepare`) flows through the same path, so
@@ -125,14 +116,14 @@ normalization applies automatically.
   `customStartDate`; assert `customEndDate == customStartDate` (covers the "manual inversion
   empties the timeline" bug at the logic layer). Reverse case: assign `customStartDate` later
   than `customEndDate`; assert `customEndDate` is clamped up.
-- The ViewModel → binding write-back is View-layer interaction. Its logic is fully covered by
-  the pure-function and setter unit tests; full UI interaction / race tests belong to **P2 #2**
-  (separate item).
+- The binding synchronization is exposed through a deterministic helper so its
+  retained-date and inverted-range behavior can be unit tested without a UI
+  test bundle.
 
 ### §5 Boundaries / error handling
 
-- The `if != ` guard prevents feedback loops; normalization never produces a `nil` or empty
-  range.
+- Equality guards on binding writes prevent feedback loops; normalization never
+  produces a `nil` or empty range.
 - `TimelineFilterPanel` interaction is unchanged (per the chosen "ViewModel silent
   normalization" behavior).
 

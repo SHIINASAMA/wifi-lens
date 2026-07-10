@@ -265,6 +265,7 @@
 		FBD0A47D2FE5C0600000002A /* WiFiObservationEventRecentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A47A2FE5C06000000027 /* WiFiObservationEventRecentStore.swift */; };
 		FBD0A47E2FE5C0600000002B /* WiFiObservationEventCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A47B2FE5C06000000028 /* WiFiObservationEventCoordinator.swift */; };
 		FBD0A47F2FE5C0600000002C /* ProObservationEventBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A47C2FE5C06000000029 /* ProObservationEventBootstrap.swift */; };
+		A710C0010000000000000002 /* WiFiObservationEventTimelineController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A710C0010000000000000001 /* WiFiObservationEventTimelineController.swift */; };
 		FBD0A4802FE5C0600000002D /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4822FE5C0600000002F /* TimelineView.swift */; };
 		FBD0A4812FE5C0600000002E /* TimelineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4832FE5C06000000030 /* TimelineViewModel.swift */; };
 		FBD329502FC500000057B038 /* MetricKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD329512FC500000057B038 /* MetricKitManager.swift */; };
@@ -535,6 +536,7 @@
 		FBD0A47A2FE5C06000000027 /* WiFiObservationEventRecentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventRecentStore.swift; sourceTree = "<group>"; };
 		FBD0A47B2FE5C06000000028 /* WiFiObservationEventCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventCoordinator.swift; sourceTree = "<group>"; };
 		FBD0A47C2FE5C06000000029 /* ProObservationEventBootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProObservationEventBootstrap.swift; sourceTree = "<group>"; };
+		A710C0010000000000000001 /* WiFiObservationEventTimelineController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventTimelineController.swift; sourceTree = "<group>"; };
 		FBD0A4822FE5C0600000002F /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		FBD0A4832FE5C06000000030 /* TimelineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineViewModel.swift; sourceTree = "<group>"; };
 		FBD329512FC500000057B038 /* MetricKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricKitManager.swift; sourceTree = "<group>"; };
@@ -1017,6 +1019,7 @@
 				OB00000000000000000000C0 /* WiFiObservationEventSQLiteStore.swift */,
 				FBD0A47A2FE5C06000000027 /* WiFiObservationEventRecentStore.swift */,
 				FBD0A47B2FE5C06000000028 /* WiFiObservationEventCoordinator.swift */,
+				A710C0010000000000000001 /* WiFiObservationEventTimelineController.swift */,
 				FBD0A47C2FE5C06000000029 /* ProObservationEventBootstrap.swift */,
 			);
 			path = Events;
@@ -1687,6 +1690,7 @@
 				FBD0A46C2FE5C06000000019 /* SparklineView.swift in Sources */,
 				FBD0A47D2FE5C0600000002A /* WiFiObservationEventRecentStore.swift in Sources */,
 				FBD0A47E2FE5C0600000002B /* WiFiObservationEventCoordinator.swift in Sources */,
+				A710C0010000000000000002 /* WiFiObservationEventTimelineController.swift in Sources */,
 				FBD0A47F2FE5C0600000002C /* ProObservationEventBootstrap.swift in Sources */,
 				FBD0A4802FE5C0600000002D /* TimelineView.swift in Sources */,
 				FBD0A4812FE5C0600000002E /* TimelineViewModel.swift in Sources */,
