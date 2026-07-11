@@ -20,6 +20,7 @@ struct NetworkInterfaceInfo {
     let ssid: String?
     let bssid: String?
     let channel: Int?
+    let band: ChannelBand?
     let rssi: Int?
     let txRate: Double?
     let phyMode: String?
@@ -127,7 +128,7 @@ enum NetworkInfoService {
         var result: [NetworkInterfaceInfo] = []
         for (name, entry) in ifaces {
             let isWiFi = name == wifiName
-            let wiFiInfo: (ssid: String?, bssid: String?, channel: Int?, rssi: Int?, txRate: Double?, phyMode: String?, security: String)? = {
+            let wiFiInfo: (ssid: String?, bssid: String?, channel: Int?, band: ChannelBand?, rssi: Int?, txRate: Double?, phyMode: String?, security: String)? = {
                 guard isWiFi, let iface = wifiIface else { return nil }
                 return fetchWiFiDetails(iface)
             }()
@@ -167,6 +168,7 @@ enum NetworkInfoService {
                 ssid: wiFiInfo?.ssid,
                 bssid: wiFiInfo?.bssid,
                 channel: wiFiInfo?.channel,
+                band: wiFiInfo?.band,
                 rssi: wiFiInfo?.rssi,
                 txRate: wiFiInfo?.txRate,
                 phyMode: wiFiInfo?.phyMode,
@@ -189,7 +191,11 @@ enum NetworkInfoService {
         // Wi-Fi specifics from CoreWLAN
         let ssid = iface.ssid()
         let bssid = iface.bssid()
-        let channel = iface.wlanChannel()?.channelNumber
+        let wlanChannel = iface.wlanChannel()
+        let channel = wlanChannel?.channelNumber
+        let band = wlanChannel.flatMap {
+            channelBand(coreWLANRawValue: $0.channelBand.rawValue)
+        }
         let rssi = iface.rssiValue()
         let txRate = iface.transmitRate()
         let security: String = securityLabel(iface)
@@ -259,6 +265,7 @@ enum NetworkInfoService {
             ssid: ssid,
             bssid: bssid,
             channel: channel,
+            band: band,
             rssi: rssi,
             txRate: txRate,
             phyMode: phyMode,
@@ -277,6 +284,10 @@ enum NetworkInfoService {
 
     private static func fetchWiFiMAC() -> String? {
         CWWiFiClient.shared().interface()?.hardwareAddress()
+    }
+
+    static func channelBand(coreWLANRawValue: Int) -> ChannelBand? {
+        ChannelBand(rawValue: coreWLANRawValue)
     }
 
     private static func securityLabel(_ iface: CWInterface) -> String {
@@ -312,8 +323,18 @@ enum NetworkInfoService {
         }
     }
 
-    private static func fetchWiFiDetails(_ iface: CWInterface) -> (ssid: String?, bssid: String?, channel: Int?, rssi: Int?, txRate: Double?, phyMode: String?, security: String)? {
-        return (iface.ssid(), iface.bssid(), iface.wlanChannel()?.channelNumber, iface.rssiValue(), iface.transmitRate(), phyModeLabel(iface), securityLabel(iface))
+    private static func fetchWiFiDetails(_ iface: CWInterface) -> (ssid: String?, bssid: String?, channel: Int?, band: ChannelBand?, rssi: Int?, txRate: Double?, phyMode: String?, security: String)? {
+        let wlanChannel = iface.wlanChannel()
+        return (
+            iface.ssid(),
+            iface.bssid(),
+            wlanChannel?.channelNumber,
+            wlanChannel.flatMap { channelBand(coreWLANRawValue: $0.channelBand.rawValue) },
+            iface.rssiValue(),
+            iface.transmitRate(),
+            phyModeLabel(iface),
+            securityLabel(iface)
+        )
     }
 
 }

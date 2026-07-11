@@ -8,6 +8,7 @@ struct SettingsView: View {
     let updater: SparkleUpdater
     let locationPermission: LocationPermissionManager
     let bluetoothPermission: BluetoothPermissionManager?
+    let onRegulatoryRegionChange: (String) -> Void
     @Binding var bleEnabled: Bool
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -21,10 +22,17 @@ struct SettingsView: View {
     @AppStorage("hideTitleBadge") private var hideTitleBadge = true
     @AppStorage("menuBarEnabled") private var menuBarEnabled = true
 
-    init(updater: SparkleUpdater, locationPermission: LocationPermissionManager, bluetoothPermission: BluetoothPermissionManager?, bleEnabled: Binding<Bool>) {
+    init(
+        updater: SparkleUpdater,
+        locationPermission: LocationPermissionManager,
+        bluetoothPermission: BluetoothPermissionManager?,
+        bleEnabled: Binding<Bool>,
+        onRegulatoryRegionChange: @escaping (String) -> Void = { _ in }
+    ) {
         self.updater = updater
         self.locationPermission = locationPermission
         self.bluetoothPermission = bluetoothPermission
+        self.onRegulatoryRegionChange = onRegulatoryRegionChange
         _bleEnabled = bleEnabled
         _autoCheck = State(initialValue: updater.automaticallyChecksForUpdates)
     }
@@ -88,6 +96,9 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.menu)
                     .accessibilityIdentifier("settings-region-picker")
+                    .onChange(of: regionOverride) { _, newValue in
+                        onRegulatoryRegionChange(newValue)
+                    }
 
                     Text(String(localized: "settings.region.description", comment: "Description of how regional regulation filtering works"))
                         .font(.caption)

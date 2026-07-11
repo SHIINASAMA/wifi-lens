@@ -4,6 +4,43 @@ import Testing
 
 @Suite("Observation Providers")
 struct ProviderTests {
+    @Test("CoreWLAN channel band mapping preserves overlapping 6 GHz channels")
+    func coreWLANBandMapping() {
+        #expect(NetworkInfoService.channelBand(coreWLANRawValue: 1) == .band24GHz)
+        #expect(NetworkInfoService.channelBand(coreWLANRawValue: 2) == .band5GHz)
+        #expect(NetworkInfoService.channelBand(coreWLANRawValue: 3) == .band6GHz)
+        #expect(NetworkInfoService.channelBand(coreWLANRawValue: 99) == nil)
+    }
+
+    @Test("WiFiCurrentConnectionProvider copies the interface band without channel inference")
+    func currentConnectionProviderCopiesBand() {
+        let timestamp = Date(timeIntervalSince1970: 1_750_000_200)
+        let interface = NetworkInterfaceInfo(
+            interfaceName: "en0",
+            hardwareMAC: "00:11:22:33:44:55",
+            ipv4Addresses: ["192.0.2.2"],
+            subnetMasks: ["255.255.255.0"],
+            router: "192.0.2.1",
+            dnsServers: ["192.0.2.1"],
+            ssid: "Six",
+            bssid: "AA:BB:CC:DD:EE:FF",
+            channel: 5,
+            band: .band6GHz,
+            rssi: -50,
+            txRate: 1200,
+            phyMode: "ax",
+            security: "WPA3"
+        )
+
+        let status = WiFiCurrentConnectionProvider.makeStatus(
+            from: interface,
+            timestamp: timestamp
+        )
+
+        #expect(status.channel == 5)
+        #expect(status.band == .band6GHz)
+    }
+
     @Test("WiFiCurrentConnectionProvider returns status or error")
     func currentConnectionProvider() async {
         let provider = WiFiCurrentConnectionProvider()

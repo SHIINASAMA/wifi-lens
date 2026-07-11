@@ -321,15 +321,15 @@
 		OB0000000000000000000081 /* AnalyzerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000057 /* AnalyzerTests.swift */; };
 		OB0000000000000000000095 /* WiFiObservationPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000090 /* WiFiObservationPipeline.swift */; };
 		OB0000000000000000000096 /* WiFiObservationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000091 /* WiFiObservationStore.swift */; };
-		OB0000000000000000000097 /* WiFiObservationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000092 /* WiFiObservationController.swift */; };
 		OB0000000000000000000098 /* PipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000093 /* PipelineTests.swift */; };
-		OB0000000000000000000099 /* ControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000094 /* ControllerTests.swift */; };
 		OB00000000000000000000A5 /* WiFiObservationPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000090 /* WiFiObservationPipeline.swift */; };
 		OB00000000000000000000A6 /* WiFiObservationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000091 /* WiFiObservationStore.swift */; };
-		OB00000000000000000000A7 /* WiFiObservationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000092 /* WiFiObservationController.swift */; };
 		OB00000000000000000000A9 /* MockProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000A8 /* MockProviders.swift */; };
 		OB00000000000000000000B3 /* RoamingMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000B2 /* RoamingMigrationTests.swift */; };
 		OB00000000000000000000B5 /* DiagnosticMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000B4 /* DiagnosticMigrationTests.swift */; };
+		OB00000000000000000000D2 /* WiFiObservationRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000D0 /* WiFiObservationRuntime.swift */; };
+		OB00000000000000000000D3 /* WiFiObservationRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000D0 /* WiFiObservationRuntime.swift */; };
+		OB00000000000000000000D4 /* RuntimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000D1 /* RuntimeTests.swift */; };
 		OB00000000000000000000C2 /* WiFiObservationEventSQLiteStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000C0 /* WiFiObservationEventSQLiteStore.swift */; };
 /* End PBXBuildFile section */
 
@@ -571,12 +571,12 @@
 		OB0000000000000000000057 /* AnalyzerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyzerTests.swift; sourceTree = "<group>"; };
 		OB0000000000000000000090 /* WiFiObservationPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationPipeline.swift; sourceTree = "<group>"; };
 		OB0000000000000000000091 /* WiFiObservationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationStore.swift; sourceTree = "<group>"; };
-		OB0000000000000000000092 /* WiFiObservationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationController.swift; sourceTree = "<group>"; };
 		OB0000000000000000000093 /* PipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineTests.swift; sourceTree = "<group>"; };
-		OB0000000000000000000094 /* ControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerTests.swift; sourceTree = "<group>"; };
 		OB00000000000000000000A8 /* MockProviders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockProviders.swift; sourceTree = "<group>"; };
 		OB00000000000000000000B2 /* RoamingMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingMigrationTests.swift; sourceTree = "<group>"; };
 		OB00000000000000000000B4 /* DiagnosticMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticMigrationTests.swift; sourceTree = "<group>"; };
+		OB00000000000000000000D0 /* WiFiObservationRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationRuntime.swift; sourceTree = "<group>"; };
+		OB00000000000000000000D1 /* RuntimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeTests.swift; sourceTree = "<group>"; };
 		OB00000000000000000000C0 /* WiFiObservationEventSQLiteStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventSQLiteStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1116,7 +1116,7 @@
 				OB00000000000000000000C3 /* Persistence */,
 				OB00000000000000000000A0 /* Pipeline */,
 				OB00000000000000000000A1 /* Store */,
-				OB00000000000000000000A2 /* Controller */,
+				OB00000000000000000000D5 /* Runtime */,
 			);
 			path = Observation;
 			sourceTree = "<group>";
@@ -1128,10 +1128,10 @@
 				OB0000000000000000000032 /* ProviderTests.swift */,
 				OB0000000000000000000057 /* AnalyzerTests.swift */,
 				OB0000000000000000000093 /* PipelineTests.swift */,
-				OB0000000000000000000094 /* ControllerTests.swift */,
 				OB00000000000000000000A8 /* MockProviders.swift */,
 				OB00000000000000000000B2 /* RoamingMigrationTests.swift */,
 				OB00000000000000000000B4 /* DiagnosticMigrationTests.swift */,
+				OB00000000000000000000D1 /* RuntimeTests.swift */,
 			);
 			path = Observation;
 			sourceTree = "<group>";
@@ -1183,19 +1183,19 @@
 			path = Store;
 			sourceTree = "<group>";
 		};
-		OB00000000000000000000A2 /* Controller */ = {
-			isa = PBXGroup;
-			children = (
-				OB0000000000000000000092 /* WiFiObservationController.swift */,
-			);
-			path = Controller;
-			sourceTree = "<group>";
-		};
 		OB00000000000000000000C3 /* Persistence */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Persistence;
+			sourceTree = "<group>";
+		};
+		OB00000000000000000000D5 /* Runtime */ = {
+			isa = PBXGroup;
+			children = (
+				OB00000000000000000000D0 /* WiFiObservationRuntime.swift */,
+			);
+			path = Runtime;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1535,7 +1535,7 @@
 				OB0000000000000000000065 /* DiagnosticEvaluator.swift in Sources */,
 				OB0000000000000000000095 /* WiFiObservationPipeline.swift in Sources */,
 				OB0000000000000000000096 /* WiFiObservationStore.swift in Sources */,
-				OB0000000000000000000097 /* WiFiObservationController.swift in Sources */,
+				OB00000000000000000000D2 /* WiFiObservationRuntime.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1580,10 +1580,10 @@
 				OB0000000000000000000033 /* ProviderTests.swift in Sources */,
 				OB0000000000000000000081 /* AnalyzerTests.swift in Sources */,
 				OB0000000000000000000098 /* PipelineTests.swift in Sources */,
-				OB0000000000000000000099 /* ControllerTests.swift in Sources */,
 				OB00000000000000000000A9 /* MockProviders.swift in Sources */,
 				OB00000000000000000000B3 /* RoamingMigrationTests.swift in Sources */,
 				OB00000000000000000000B5 /* DiagnosticMigrationTests.swift in Sources */,
+				OB00000000000000000000D4 /* RuntimeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1721,8 +1721,8 @@
 				OB0000000000000000000076 /* RoamingEventDetector.swift in Sources */,
 				OB00000000000000000000A5 /* WiFiObservationPipeline.swift in Sources */,
 				OB00000000000000000000A6 /* WiFiObservationStore.swift in Sources */,
-				OB00000000000000000000A7 /* WiFiObservationController.swift in Sources */,
 				OB00000000000000000000C2 /* WiFiObservationEventSQLiteStore.swift in Sources */,
+				OB00000000000000000000D3 /* WiFiObservationRuntime.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

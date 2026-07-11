@@ -36,6 +36,9 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/superpowers/specs/2026-07-10-timeline-date-range-normalization-design.md` | Design spec for normalizing inverted custom date ranges in the Pro timeline (P2 #1) |
 | `docs/superpowers/plans/2026-07-10-pro-unified-event-timeline.md` | Implementation plan for the Pro-only unified menu-bar and event timeline pipeline |
 | `docs/superpowers/plans/2026-07-10-pro-timeline-consistency-controller.md` | Implementation plan for the Pro timeline generation controller, clear barrier, and lifecycle-safe date synchronization |
+| `docs/superpowers/specs/2026-07-11-observation-runtime-migration-design.md` | Design spec for immutable observation publication and migration to a single production observation runtime |
+| `docs/superpowers/plans/2026-07-11-immutable-observation-publication.md` | Implementation plan for ordered immutable observation publication and Pro event consumption |
+| `docs/superpowers/plans/2026-07-11-production-observation-runtime-migration.md` | Implementation plan for migrating production scan-cycle orchestration into the observation runtime |
 | `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
 
 ## Skills Directory

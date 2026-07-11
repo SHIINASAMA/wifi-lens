@@ -284,7 +284,13 @@ private struct AppRootView: View {
 #endif
                 }
 
-                SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel?.bluetoothPermission, bleEnabled: $bleEnabled)
+                SettingsView(
+                    updater: sparkleUpdater,
+                    locationPermission: viewModel.locationManager,
+                    bluetoothPermission: bleViewModel?.bluetoothPermission,
+                    bleEnabled: $bleEnabled,
+                    onRegulatoryRegionChange: viewModel.handleRegulatoryRegionOverrideChange
+                )
                     .opacity(selectedPage == .settings ? 1 : 0)
                     .allowsHitTesting(selectedPage == .settings)
                     .accessibilityIdentifier("page-settings")
@@ -374,10 +380,10 @@ private struct AppRootView: View {
             registerOpenMainWindowAction {
                 openWindow(id: WiFiLensApp.mainWindowSceneID)
             }
-            await viewModel.start()
 #if PRO
-            ProObservationEventBootstrap.start(observationStore: viewModel.store)
+            ProObservationEventBootstrap.start(observationRuntime: viewModel.observationRuntime)
 #endif
+            await viewModel.start()
             roamingViewModel.handleWiFiPowerStateChange(viewModel.wifiPowerState)
             updateMCPServer()
         }

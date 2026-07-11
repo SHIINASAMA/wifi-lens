@@ -46,13 +46,11 @@ struct NetworkTableRow: Identifiable, Hashable {
 @MainActor
 @Observable
 final class ScannerViewModel {
-    let scanner = WiFiScanner()
     var locationManager = LocationPermissionManager()
     let colorHasher = SSIDColorHasher()
     let signalHistory = SignalHistoryStore()
     let mcpServer = MCPServer()
     let throughputMonitor = ThroughputMonitor()
-    let gatewayLatencyProvider: GatewayLatencyProviding
     var hiddenBSSIDs: Set<String> = []
     var hiddenBands: Set<String> = []       // band IDs ("24"/"5"/"6") to hide
     var hideHiddenSSIDs: Bool = false       // hide networks with empty SSID
@@ -83,15 +81,40 @@ final class ScannerViewModel {
     private var isStartingScan = false
     private var startupTask: Task<Void, Never>?
     private var wifiMonitoringTask: Task<Void, Never>?
+    private var runtimeLifecycleTail: Task<Void, Never>?
+    private var activeProjectionGeneration: UUID?
 
     let store: WiFiObservationStore
+    let observationRuntime: WiFiObservationRuntime
+    private let authorizationRefresh: @MainActor (LocationPermissionManager) -> Void
+    private var userDefaultsRegionOverride: RegulatoryDomain?
 
     init(
         store: WiFiObservationStore = .shared,
-        gatewayLatencyProvider: GatewayLatencyProviding = GatewayLatencyProvider()
+        userDefaults: UserDefaults = .standard,
+        authorizationRefresh: @escaping @MainActor (LocationPermissionManager) -> Void = { $0.refreshStatus() }
     ) {
         self.store = store
-        self.gatewayLatencyProvider = gatewayLatencyProvider
+        self.observationRuntime = WiFiObservationRuntime(store: store)
+        self.authorizationRefresh = authorizationRefresh
+        self.userDefaultsRegionOverride = Self.regionOverride(
+            from: userDefaults.string(forKey: "regulatoryRegionOverride") ?? "auto"
+        )
+        wifiPowerState = wifiPowerMonitor.currentState
+        updateMCPDataProvider()
+    }
+
+    init(
+        observationRuntime: WiFiObservationRuntime,
+        userDefaults: UserDefaults = .standard,
+        authorizationRefresh: @escaping @MainActor (LocationPermissionManager) -> Void = { $0.refreshStatus() }
+    ) {
+        self.store = observationRuntime.store
+        self.observationRuntime = observationRuntime
+        self.authorizationRefresh = authorizationRefresh
+        self.userDefaultsRegionOverride = Self.regionOverride(
+            from: userDefaults.string(forKey: "regulatoryRegionOverride") ?? "auto"
+        )
         wifiPowerState = wifiPowerMonitor.currentState
         updateMCPDataProvider()
     }
@@ -208,8 +231,6 @@ final class ScannerViewModel {
         }
     }
 
-    private var scanTask: Task<Void, Never>?
-
     /// Current scan interval in seconds. Set to override the UserDefaults-configured
     /// interval (e.g. 1 s during recording). When changed while scanning, the scan
     /// loop is restarted with the new interval.
@@ -260,24 +281,14 @@ final class ScannerViewModel {
         guard wifiPowerState == .poweredOn else { return }
         isStartingScan = true
         defer { isStartingScan = false }
-        supportedBands = await scanner.supportedBands()
-        AppLogger.scanner.info("start() — supported bands = \(supportedBands.map { $0.id }.sorted())")
-        // Fetch device capabilities once for the regulatory pipeline
-        let rawChannels = await scanner.supportedChannels()
-        regulatoryPipeline.deviceSupportedChannels = Set(rawChannels.map { "\($0.0.rawValue)-\($0.1)" })
-        regulatoryPipeline.deviceCachedCapabilities = await scanner.devicePHYCapabilities()
-        regulatoryPipeline.cachedSupportedChannelsRaw = await scanner.supportedWLANChannelsRaw()
-        AppLogger.scanner.debug("device — supported \(rawChannels.count) channels, PHY=\(regulatoryPipeline.deviceCachedCapabilities.phySummary), DFS=\(regulatoryPipeline.deviceCachedCapabilities.supportsDFS), 6GHz=\(regulatoryPipeline.deviceCachedCapabilities.supports6GHz)")
-        updateInterfaceName()
         let stored = UserDefaults.standard.integer(forKey: "scanIntervalSeconds")
         scanIntervalSeconds = max(1, stored > 0 ? stored : 3)
-        startScanLoop()
+        await startScanLoop()
         hasStarted = true
     }
 
     func handleSceneDidBecomeActive() async {
         locationManager.refreshStatus()
-        updateInterfaceName()
         wifiPowerMonitor.refreshState()
         reconcileWiFiState(wifiPowerMonitor.currentState)
     }
@@ -325,135 +336,77 @@ final class ScannerViewModel {
     }
 
     private func restartScanLoop() {
-        scanTask?.cancel()
-        startScanLoop()
+        let configuration = runtimeConfiguration
+        enqueueRuntimeLifecycle { [weak self] in
+            await self?.observationRuntime.restartScanning(configuration: configuration)
+        }
     }
 
-    private func startScanLoop() {
+    private func startScanLoop() async {
         AppLogger.scanner.info("startScanLoop() — starting with interval \(scanIntervalSeconds)s")
-        scanTask?.cancel()
         isScanning = true
         accessState = .scanning
         throughputMonitor.start()
-
-        scanTask = Task {
-            let interval: Duration = .seconds(max(1, scanIntervalSeconds))
-            let stream = await scanner.startScanning(interval: interval)
-            for await event in stream {
-                guard !Task.isCancelled else { break }
-
-                // Guard: stop scanning immediately if WiFi was turned off.
-                // CoreWLAN callbacks handle the common case; this covers missed events.
-                wifiPowerMonitor.refreshState()
-                guard isWiFiAvailable else {
-                    AppLogger.scanner.info("startScanLoop() — WiFi unavailable, stopping")
-                    stop()
-                    break
+        let configuration = runtimeConfiguration
+        let generation = UUID()
+        activeProjectionGeneration = generation
+        let command = enqueueRuntimeLifecycle { [weak self] in
+            guard let self else { return }
+            await self.observationRuntime.startScanning(
+                configuration: configuration,
+                isPublicationEligible: { [weak self] in
+                    self?.isRuntimePublicationEligible(for: generation) ?? false
                 }
-
-                locationManager.refreshStatus()
-
-                if !locationManager.isAuthorizedForSSID {
-                    AppLogger.scanner.warning("startScanLoop() — lost authorization")
-                    stop()
-                    accessState = locationManager.authorizationStatus == .notDetermined
-                        ? .waitingForAuthorization
-                        : .denied
-                    break
-                }
-
-                switch event {
-                case .failure(let message):
-                    AppLogger.scanner.error("scan failure: \(message)")
-                    if isWiFiAvailable {
-                        accessState = .scanning
-                    }
-
-                case .networks(let networks):
-                    applyNetworks(networks)
-                    networkInfo = NetworkInfoService.fetchAll()
-
-                    let currentBSSID = networkInfo.first(where: { $0.bssid != nil })?.bssid
-                    let snapshot = WiFiEnvironmentSnapshot(
-                        timestamp: Date(),
-                        interfaceName: interfaceName,
-                        networks: NetworkObservationAdapter.adaptAll(networks, currentBSSID: currentBSSID)
-                    )
-                    let currentChannel = networkInfo.first(where: { $0.ssid != nil })?.channel
-                    let targetAP = ChannelQualityCalculator.TargetAP(
-                        bssid: networkInfo.first(where: { $0.ssid != nil })?.bssid,
-                        ssid: networkInfo.first(where: { $0.ssid != nil })?.ssid,
-                        channel: currentChannel
-                    )
-
-                    channelQualities = ChannelOccupancyAnalyzer.analyze(
-                        snapshot: snapshot,
-                        currentChannel: currentChannel,
-                        supportedBands: Set(supportedBands.map(\.id)),
-                        targetAP: targetAP
-                    )
-
-                    let apCountryCodes: [String] = networks.compactMap { nw in
-                        guard let ie = nw.ieData else { return nil }
-                        return IEParser.parse(data: ie).countryCode
-                    }
-                    let defaultsOverride: RegulatoryDomain? = {
-                        let raw = UserDefaults.standard.string(forKey: "regulatoryRegionOverride") ?? "auto"
-                        return raw == "auto" ? nil : RegulatoryDomain(rawValue: raw)
-                    }()
-                    let inferredRegion = RegionInferenceEngine.infer(
-                        systemLocale: .current,
-                        supportedChannels: regulatoryPipeline.cachedSupportedChannelsRaw,
-                        apCountryCodes: apCountryCodes,
-                        userOverride: userRegionOverride ?? defaultsOverride
-                    )
-                    regulatoryPipeline.inferredRegion = inferredRegion
-
-                    channelRecommendations = ChannelRecommendationEngine.recommend(
-                        channelAnalysis: channelQualities,
-                        snapshot: snapshot,
-                        inferredRegion: inferredRegion,
-                        deviceSupportedChannels: regulatoryPipeline.deviceSupportedChannels,
-                        deviceCapabilities: regulatoryPipeline.deviceCachedCapabilities
-                    )
-
-                    let currentNetworkInfo = networkInfo.first(where: { $0.ssid != nil })
-                    let currentStatus = WiFiCurrentStatus(
-                        timestamp: Date(),
-                        interfaceName: interfaceName,
-                        ssid: currentNetworkInfo?.ssid,
-                        bssid: currentNetworkInfo?.bssid,
-                        channel: currentNetworkInfo?.channel,
-                        rssi: currentNetworkInfo?.rssi,
-                        security: currentNetworkInfo?.security,
-                        isConnected: currentNetworkInfo != nil,
-                        isWiFiPowerOn: isWiFiAvailable
-                    )
-
-                    let gatewayLatency = await gatewayLatencyProvider.measure(routerIP: currentNetworkInfo?.router)
-                    let quality = WiFiQualityEvaluator.evaluate(
-                        currentStatus: currentStatus,
-                        gatewayLatency: gatewayLatency
-                    )
-
-                    let diagnosis = DiagnosticEvaluator.evaluate(
-                        currentStatus: currentStatus,
-                        channelAnalysis: channelQualities,
-                        channelRecommendations: channelRecommendations
-                    )
-
-                    store.apply(WiFiObservation(
-                        currentStatus: currentStatus,
-                        environmentSnapshot: snapshot,
-                        gatewayLatency: gatewayLatency,
-                        quality: quality,
-                        channelAnalysis: channelQualities,
-                        channelRecommendation: channelRecommendations,
-                        diagnosis: diagnosis
-                    ))
-                }
+            ) { [weak self] output in
+                self?.handleRuntimeOutput(output, generation: generation)
             }
         }
+        await command.value
+    }
+
+    private var runtimeConfiguration: WiFiObservationRuntimeConfiguration {
+        return WiFiObservationRuntimeConfiguration(
+            scanInterval: .seconds(max(1, scanIntervalSeconds)),
+            userRegionOverride: userRegionOverride,
+            userDefaultsRegionOverride: userDefaultsRegionOverride
+        )
+    }
+
+    func handleRegulatoryRegionOverrideChange(_ rawValue: String) {
+        let newOverride = Self.regionOverride(from: rawValue)
+        guard newOverride != userDefaultsRegionOverride else { return }
+        userDefaultsRegionOverride = newOverride
+        if isScanning {
+            restartScanLoop()
+        }
+    }
+
+    private static func regionOverride(from rawValue: String) -> RegulatoryDomain? {
+        rawValue == "auto" ? nil : RegulatoryDomain(rawValue: rawValue)
+    }
+
+    private func handleRuntimeOutput(_ output: WiFiObservationScanOutput, generation: UUID) {
+        guard activeProjectionGeneration == generation, isScanning else { return }
+        supportedBands = output.supportedBands
+        interfaceName = output.interfaceName ?? output.cycle.observation.currentStatus?.interfaceName ?? ""
+        for viewModel in allBandViewModels {
+            viewModel.updateInterfaceName(interfaceName)
+        }
+
+        if let error = output.cycle.observation.environmentSnapshot?.error {
+            AppLogger.scanner.error("scan failure: \(String(describing: error))")
+            accessState = .scanning
+            return
+        }
+
+        channelQualities = output.cycle.observation.channelAnalysis ?? []
+        channelRecommendations = output.cycle.observation.channelRecommendation ?? []
+        regulatoryPipeline.inferredRegion = output.cycle.inferredRegion
+
+        applyNetworks(output.rawNetworks)
+        // Interfaces presentation remains a separate system-interface projection;
+        // it does not construct or publish Wi-Fi observations.
+        networkInfo = NetworkInfoService.fetchAll()
     }
 
     private func deduplicateNetworks(_ networks: [WiFiNetwork]) -> [WiFiNetwork] {
@@ -710,8 +663,6 @@ final class ScannerViewModel {
         refreshBandViewModels(for: .primary, with: deduped, trends: trends, snapshots: snapshotDict)
         refreshBandViewModels(for: .secondary, with: deduped, trends: trends, snapshots: snapshotDict)
 
-        updateInterfaceName()
-
         // Validate selected network still exists in the new scan
         if let selectedID = selectedNetworkID {
             let allIDs = bandViewModels.flatMap { $0.allSeriesData.map(\.id) }
@@ -735,18 +686,6 @@ final class ScannerViewModel {
         refreshPanelBandViewModels(.secondary)
     }
 
-    private func updateInterfaceName() {
-        Task {
-            if let name = await scanner.interfaceName() {
-                await MainActor.run {
-                    self.interfaceName = name
-                    for vm in self.bandViewModels {
-                        vm.updateInterfaceName(name)
-                    }
-                }
-            }
-        }
-    }
     func toggleVisibility(seriesID: String) {
         let current = displayStatesByID[seriesID] ?? APDisplayState(visibility: true, visibilityLocked: false)
         displayStatesByID[seriesID] = APDisplayState(
@@ -777,11 +716,52 @@ final class ScannerViewModel {
     }
 
     func stop() {
-        scanTask?.cancel()
-        scanTask = nil
+        activeProjectionGeneration = nil
+        transitionToStoppedState()
+        enqueueRuntimeLifecycle { [weak self] in
+            await self?.observationRuntime.stopScanning()
+        }
+    }
+
+    private func isRuntimePublicationEligible(for generation: UUID) -> Bool {
+        guard activeProjectionGeneration == generation, isScanning else { return false }
+
+        wifiPowerMonitor.refreshState()
+        let currentPowerState = wifiPowerMonitor.currentState
+        if currentPowerState != .poweredOn {
+            wifiPowerState = currentPowerState
+            updateMCPDataProvider()
+            transitionToStoppedState()
+            return false
+        }
+
+        authorizationRefresh(locationManager)
+        guard locationManager.isAuthorizedForSSID else {
+            transitionToStoppedState()
+            accessState = locationManager.authorizationStatus == .notDetermined
+                ? .waitingForAuthorization
+                : .denied
+            return false
+        }
+        return true
+    }
+
+    private func transitionToStoppedState() {
         isScanning = false
         throughputMonitor.stop()
-        Task { await scanner.stopScanning() }
+    }
+
+    @discardableResult
+    private func enqueueRuntimeLifecycle(
+        _ operation: @escaping @MainActor () async -> Void
+    ) -> Task<Void, Never> {
+        let previous = runtimeLifecycleTail
+        let command = Task { @MainActor in
+            await previous?.value
+            await operation()
+        }
+        runtimeLifecycleTail = command
+        return command
     }
 
     private func phyLabel(_ ie: IEData) -> String {
@@ -804,6 +784,18 @@ extension ScannerViewModel {
     func debugApplyNetworksForTesting(_ networks: [WiFiNetwork], supportedBands: Set<ChannelBand>) {
         self.supportedBands = supportedBands
         applyNetworks(networks)
+    }
+
+    func debugStartScanLoopForTesting() async {
+        await startScanLoop()
+    }
+
+    func debugReconcileWiFiStateForTesting(_ state: WiFiPowerState) {
+        reconcileWiFiState(state)
+    }
+
+    func debugDrainRuntimeLifecycleForTesting() async {
+        await runtimeLifecycleTail?.value
     }
 }
 #endif

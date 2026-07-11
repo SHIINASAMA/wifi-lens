@@ -27,21 +27,28 @@ struct WiFiCurrentConnectionProvider: WiFiCurrentConnectionProviding {
                     error: .noWiFiConnection
                 )
             }
-            return WiFiCurrentStatus(
-                timestamp: Date(),
-                interfaceName: wifi.interfaceName,
-                ssid: wifi.ssid,
-                bssid: wifi.bssid,
-                channel: wifi.channel,
-                band: wifi.channel.flatMap { ChannelBand.from(channelNumber: $0) },
-                rssi: wifi.rssi,
-                txRate: wifi.txRate,
-                phyMode: wifi.phyMode,
-                security: wifi.security,
-                routerIP: wifi.router,
-                isConnected: true,
-                isWiFiPowerOn: true
-            )
+            return Self.makeStatus(from: wifi, timestamp: Date())
         }
+    }
+
+    static func makeStatus(
+        from wifi: NetworkInterfaceInfo,
+        timestamp: Date
+    ) -> WiFiCurrentStatus {
+        WiFiCurrentStatus(
+            timestamp: timestamp,
+            interfaceName: wifi.interfaceName,
+            ssid: wifi.ssid,
+            bssid: wifi.bssid,
+            channel: wifi.channel,
+            band: wifi.band,
+            rssi: wifi.rssi,
+            txRate: wifi.txRate,
+            phyMode: wifi.phyMode,
+            security: wifi.security,
+            routerIP: wifi.router,
+            isConnected: true,
+            isWiFiPowerOn: true
+        )
     }
 }

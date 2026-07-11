@@ -195,6 +195,7 @@ enum ChannelQualityCalculator {
     static func compute(
         aps: [APInfo],
         currentChannel: Int? = nil,
+        currentBand: String? = nil,
         supportedBands: Set<String> = ["24", "5", "6"],
         targetAP: TargetAP? = nil
     ) -> [ChannelQuality] {
@@ -202,6 +203,9 @@ enum ChannelQualityCalculator {
 
         for band in supportedBands.sorted() {
             let bandAPs = aps.filter { $0.band == band }
+            let bandCurrentChannel = currentBand == nil || currentBand == band
+                ? currentChannel
+                : nil
             let targetResolution = resolveTargetAP(targetAP, in: bandAPs)
             let recommendationAPs = targetResolution.confidence == .unknown
                 ? bandAPs
@@ -249,15 +253,19 @@ enum ChannelQualityCalculator {
                     overlapLevel: overlap,
                     strongestNeighborRSSI: strongest,
                     isRecommended: false,
-                    isCurrentChannel: ch == currentChannel,
-                    showInSimpleView: ch == currentChannel || overlapCount > 0,
+                    isCurrentChannel: ch == bandCurrentChannel,
+                    showInSimpleView: ch == bandCurrentChannel || overlapCount > 0,
                     recommendationScore: recommendation.score,
                     recommendationLevel: recommendationLevel,
                     recommendationConfidence: targetResolution.confidence,
                     recommendationState: targetResolution.confidence == .unknown ? .targetUnknown : .notCandidate
                 )
             }
-            applyCounterfactualSelection(to: &scored, currentChannel: currentChannel, confidence: targetResolution.confidence)
+            applyCounterfactualSelection(
+                to: &scored,
+                currentChannel: bandCurrentChannel,
+                confidence: targetResolution.confidence
+            )
             results += scored
         }
 

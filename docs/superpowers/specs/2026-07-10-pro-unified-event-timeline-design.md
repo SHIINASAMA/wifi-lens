@@ -1,5 +1,12 @@
 # Pro Unified Event Timeline Design
 
+> **Status: Superseded as an architecture input.** The historical design is
+> retained below, but its `WiFiObservationStore`-as-input architecture is
+> superseded by
+> `2026-07-11-observation-runtime-migration-design.md` and
+> `2026-07-11-production-observation-runtime-migration.md`. Pro event delivery
+> now consumes exact immutable observations from `WiFiObservationRuntime`.
+
 ## Goal
 
 Make the Pro menu bar and Pro timeline present, navigate to, and clear one

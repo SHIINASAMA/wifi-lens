@@ -6,7 +6,17 @@ enum WiFiScanEvent: Sendable {
     case failure(String)
 }
 
-actor WiFiScanner {
+protocol WiFiScanStreaming: Sendable {
+    func startScanning(interval: Duration) async -> AsyncStream<WiFiScanEvent>
+    func stopScanning() async
+    func interfaceName() async -> String?
+    func supportedBands() async -> Set<ChannelBand>
+    func supportedChannels() async -> [(ChannelBand, Int)]
+    func supportedWLANChannelsRaw() async -> [(Int, Int)]
+    func devicePHYCapabilities() async -> DevicePHYCapabilities
+}
+
+actor WiFiScanner: WiFiScanStreaming {
     private let client = CWWiFiClient.shared()
     private var shouldStop = false
 
