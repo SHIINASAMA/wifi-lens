@@ -10,6 +10,7 @@
 [![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![X](https://img.shields.io/badge/X-@WiFiLens-1d9bf0)](https://x.com/WiFiLens)
 [![Email](https://img.shields.io/badge/email-wifi--lens@outlook.com-0078d4)](mailto:wifi-lens@outlook.com)
+[![Website](https://img.shields.io/badge/website-wifi--lens.shiinalabs.com-2563eb)](https://wifi-lens.shiinalabs.com)
 
 **一款原生 macOS 工具，用于分析和优化你的 Wi-Fi 网络。**
 
@@ -76,21 +77,11 @@ WiFi Lens 是一款免费开源的 Wi-Fi 和蓝牙分析器，完全使用 macOS
 
 需要 macOS 14 (Sonoma) 或更高版本。兼容 Intel 和 Apple Silicon Mac。
 
+> 🌐 **官方网站:** [wifi-lens.shiinalabs.com](https://wifi-lens.shiinalabs.com) — 截图、完整功能导览、AI/MCP 工作流与常见问题。
+
 > [!IMPORTANT]
 > 在 macOS 14+ 上，**定位服务**必须启用才能读取 Wi-Fi SSID 名称。
 > 前往 **系统设置 → 隐私与安全性 → 定位服务**，在提示时启用 WiFi Lens。
-
-### Gatekeeper 解决方法
-
-该应用已完整签名并经过 Apple 公证。
-
-- **右键点击**应用 → **打开** → 在对话框中确认；或
-- 在终端运行：
-  ```sh
-  xattr -d com.apple.quarantine /Applications/WiFi\ Lens.app
-  ```
-
----
 
 ## 隐私
 

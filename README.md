@@ -10,6 +10,7 @@
 [![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![X](https://img.shields.io/badge/X-@WiFiLens-1d9bf0)](https://x.com/WiFiLens)
 [![Email](https://img.shields.io/badge/email-wifi--lens@outlook.com-0078d4)](mailto:wifi-lens@outlook.com)
+[![Website](https://img.shields.io/badge/website-wifi--lens.shiinalabs.com-2563eb)](https://wifi-lens.shiinalabs.com)
 
 🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
 
@@ -78,21 +79,11 @@ Unlike web-based scanners or cross-platform electron apps, WiFi Lens runs with z
 
 Requires macOS 14 (Sonoma) or later. Works on both Intel and Apple Silicon Macs.
 
+> 🌐 **Official website:** [wifi-lens.shiinalabs.com](https://wifi-lens.shiinalabs.com) — screenshots, full feature tour, AI/MCP workflows, and FAQ.
+
 > [!IMPORTANT]
 > On macOS 14+, **Location Services** must be enabled for the app to read Wi-Fi SSID names.
 > Go to **System Settings → Privacy & Security → Location Services** and enable WiFi Lens when prompted.
-
-### Gatekeeper workaround
-
-The app is fully signed and notarized by Apple.
-
-- **Right-click** the app → **Open** → confirm in the dialog; or
-- Run in Terminal:
-  ```sh
-  xattr -d com.apple.quarantine /Applications/WiFi\ Lens.app
-  ```
-
----
 
 ## Privacy
 

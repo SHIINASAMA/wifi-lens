@@ -10,6 +10,7 @@
 [![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![X](https://img.shields.io/badge/X-@WiFiLens-1d9bf0)](https://x.com/WiFiLens)
 [![Email](https://img.shields.io/badge/email-wifi--lens@outlook.com-0078d4)](mailto:wifi-lens@outlook.com)
+[![Website](https://img.shields.io/badge/website-wifi--lens.shiinalabs.com-2563eb)](https://wifi-lens.shiinalabs.com)
 
 **Wi-Fi ネットワークを分析・最適化するためのネイティブ macOS ツール。**
 
@@ -76,21 +77,11 @@ Web ベースのスキャナやクロスプラットフォームの Electron ア
 
 macOS 14 (Sonoma) 以降が必要。Intel および Apple Silicon Mac の両方で動作します。
 
+> 🌐 **公式サイト:** [wifi-lens.shiinalabs.com](https://wifi-lens.shiinalabs.com) — スクリーンショット、機能の詳細ツアー、AI/MCP ワークフロー、FAQ。
+
 > [!IMPORTANT]
 > macOS 14 以上では、Wi-Fi SSID を読み取るために**位置情報サービス**を有効にする必要があります。
 > **システム設定 → プライバシーとセキュリティ → 位置情報サービス** に移動し、プロンプトが表示されたら WiFi Lens を有効にします。
-
-### Gatekeeper の回避策
-
-このアプリは完全に署名され、Apple によって公証されています。
-
-- アプリを**右クリック** → **開く** → ダイアログで確認；または
-- ターミナルで実行：
-  ```sh
-  xattr -d com.apple.quarantine /Applications/WiFi\ Lens.app
-  ```
-
----
 
 ## プライバシー
 

@@ -10,6 +10,7 @@
 [![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![X](https://img.shields.io/badge/X-@WiFiLens-1d9bf0)](https://x.com/WiFiLens)
 [![Email](https://img.shields.io/badge/email-wifi--lens@outlook.com-0078d4)](mailto:wifi-lens@outlook.com)
+[![Website](https://img.shields.io/badge/website-wifi--lens.shiinalabs.com-2563eb)](https://wifi-lens.shiinalabs.com)
 
 **Ein natives macOS-Tool zur Analyse und Optimierung deiner Wi-Fi-Netzwerke.**
 
@@ -76,18 +77,11 @@ Im Gegensatz zu webbasierten Scannern oder plattformübergreifenden Electron-App
 
 Erfordert macOS 14 (Sonoma) oder später. Funktioniert auf Intel und Apple Silicon Macs.
 
+> 🌐 **Offizielle Website:** [wifi-lens.shiinalabs.com](https://wifi-lens.shiinalabs.com) — Screenshots, detaillierte Feature-Tour, KI/MCP-Workflows und FAQ.
+
 > [!IMPORTANT]
 > Auf macOS 14+ muss **Location Services** aktiviert sein, damit die App Wi-Fi SSID-Namen lesen kann.
 > Gehe zu **System Settings → Privacy & Security → Location Services** und aktiviere WiFi Lens wenn gefragt.
-
-### Gatekeeper-Arbeit
-
-Die App ist vollständig signiert und von Apple notarized.
-
-- Normalerweise direkt öffnbar; oder
-- Wenn ein Blocker erscheint: **Rechtsklick** auf die App → **Open** → im Dialog bestätigen
-
----
 
 ## Privatsphäre
 
