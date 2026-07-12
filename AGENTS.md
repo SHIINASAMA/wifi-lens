@@ -41,6 +41,7 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/superpowers/plans/2026-07-11-production-observation-runtime-migration.md` | Implementation plan for migrating production scan-cycle orchestration into the observation runtime |
 | `docs/superpowers/specs/2026-07-11-pro-event-journal-design.md` | Design spec for consolidating Pro event ingestion, recent publication, persistence, query, and clear consistency into one deep journal module |
 | `docs/superpowers/plans/2026-07-11-pro-event-journal.md` | Implementation plan for the Pro-only deep event journal and deletion of the shallow event lifecycle modules |
+| `docs/superpowers/specs/2026-07-12-structured-network-identity-design.md` | Design spec for making structured SSID/BSSID payloads the sole Pro connection-event identity and resetting the development schema |
 | `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
 
 ## Skills Directory
