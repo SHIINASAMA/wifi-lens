@@ -1,7 +1,7 @@
 # Structured Network Identity for Pro Events
 
 **Date:** 2026-07-12
-**Status:** Approved direction; implementation pending
+**Status:** Implemented
 **Scope:** Replace connection-event display strings with structured SSID/BSSID payloads, move all label generation to Pro presentation code, and reset the development SQLite event schema instead of retaining legacy decoding.
 
 ## Goal
