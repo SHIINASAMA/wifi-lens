@@ -223,6 +223,8 @@
 		FB8FCB2A2FF6CAC800BB2929 /* TimelinePresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8FCB1A2FF6C4E300BB2929 /* TimelinePresentationTests.swift */; };
 		FB8FCB302FF7A1B00BB2929 /* RoamingEventDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8FCB2F2FF7A1B00BB2929 /* RoamingEventDetectorTests.swift */; };
 		FB8FCB322FF7A1B100BB2929 /* WiFiEventRecorderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8FCB312FF7A1B100BB2929 /* WiFiEventRecorderTests.swift */; };
+		E10000000000000000000002 /* EventJournalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000001 /* EventJournalTests.swift */; };
+		E20000000000000000000002 /* WiFiObservationEventJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000001 /* WiFiObservationEventJournal.swift */; };
 		FB92F9212FBE208500BCEC67 /* DebugChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F91F2FBE208500BCEC67 /* DebugChartView.swift */; };
 		FB92F9232FBE208500BCEC67 /* DebugContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */; };
 		FB92F9252FBE208500BCEC67 /* DebugThroughputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */; };
@@ -262,10 +264,7 @@
 		FBD0A45D2FE5C0600000000A /* MenuBarStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */; };
 		FBD0A4602FE5C0600000000D /* MenuBarStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A45F2FE5C0600000000C /* MenuBarStatusView.swift */; };
 		FBD0A46C2FE5C06000000019 /* SparklineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A46B2FE5C06000000018 /* SparklineView.swift */; };
-		FBD0A47D2FE5C0600000002A /* WiFiObservationEventRecentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A47A2FE5C06000000027 /* WiFiObservationEventRecentStore.swift */; };
-		FBD0A47E2FE5C0600000002B /* WiFiObservationEventCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A47B2FE5C06000000028 /* WiFiObservationEventCoordinator.swift */; };
 		FBD0A47F2FE5C0600000002C /* ProObservationEventBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A47C2FE5C06000000029 /* ProObservationEventBootstrap.swift */; };
-		A710C0010000000000000002 /* WiFiObservationEventTimelineController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A710C0010000000000000001 /* WiFiObservationEventTimelineController.swift */; };
 		A720C0010000000000000002 /* WiFiConnectionTransitionClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A720C0010000000000000001 /* WiFiConnectionTransitionClassifier.swift */; };
 		FBD0A4802FE5C0600000002D /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4822FE5C0600000002F /* TimelineView.swift */; };
 		FBD0A4812FE5C0600000002E /* TimelineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD0A4832FE5C06000000030 /* TimelineViewModel.swift */; };
@@ -494,6 +493,8 @@
 		FB8FCB1A2FF6C4E300BB2929 /* TimelinePresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelinePresentationTests.swift; sourceTree = "<group>"; };
 		FB8FCB2F2FF7A1B00BB2929 /* RoamingEventDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingEventDetectorTests.swift; sourceTree = "<group>"; };
 		FB8FCB312FF7A1B100BB2929 /* WiFiEventRecorderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiEventRecorderTests.swift; sourceTree = "<group>"; };
+		E10000000000000000000001 /* EventJournalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventJournalTests.swift; sourceTree = "<group>"; };
+		E20000000000000000000001 /* WiFiObservationEventJournal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventJournal.swift; sourceTree = "<group>"; };
 		FB92F91F2FBE208500BCEC67 /* DebugChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugChartView.swift; sourceTree = "<group>"; };
 		FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugContainerView.swift; sourceTree = "<group>"; };
 		FB92F9242FBE208500BCEC67 /* DebugThroughputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugThroughputView.swift; sourceTree = "<group>"; };
@@ -534,10 +535,7 @@
 		FBD0A45C2FE5C06000000009 /* MenuBarStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarStatusViewModel.swift; sourceTree = "<group>"; };
 		FBD0A45F2FE5C0600000000C /* MenuBarStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarStatusView.swift; sourceTree = "<group>"; };
 		FBD0A46B2FE5C06000000018 /* SparklineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SparklineView.swift; sourceTree = "<group>"; };
-		FBD0A47A2FE5C06000000027 /* WiFiObservationEventRecentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventRecentStore.swift; sourceTree = "<group>"; };
-		FBD0A47B2FE5C06000000028 /* WiFiObservationEventCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventCoordinator.swift; sourceTree = "<group>"; };
 		FBD0A47C2FE5C06000000029 /* ProObservationEventBootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProObservationEventBootstrap.swift; sourceTree = "<group>"; };
-		A710C0010000000000000001 /* WiFiObservationEventTimelineController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventTimelineController.swift; sourceTree = "<group>"; };
 		A720C0010000000000000001 /* WiFiConnectionTransitionClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiConnectionTransitionClassifier.swift; sourceTree = "<group>"; };
 		FBD0A4822FE5C0600000002F /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		FBD0A4832FE5C06000000030 /* TimelineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineViewModel.swift; sourceTree = "<group>"; };
@@ -916,6 +914,7 @@
 		FB8FCB1B2FF6C4E300BB2929 /* WiFiLensProTests */ = {
 			isa = PBXGroup;
 			children = (
+				E10000000000000000000001 /* EventJournalTests.swift */,
 				FB8FCB182FF6C4E300BB2929 /* MenuBarMigrationTests.swift */,
 				FB8FCB192FF6C4E300BB2929 /* SecondaryToolbarProTests.swift */,
 				FB8FCB1A2FF6C4E300BB2929 /* TimelinePresentationTests.swift */,
@@ -1016,13 +1015,11 @@
 		FBD0A4762FE5C06000000023 /* Events */ = {
 			isa = PBXGroup;
 			children = (
+				E20000000000000000000001 /* WiFiObservationEventJournal.swift */,
 				OB0000000000000000000009 /* WiFiObservationEvent.swift */,
 				A720C0010000000000000001 /* WiFiConnectionTransitionClassifier.swift */,
 				OB0000000000000000000056 /* RoamingEventDetector.swift */,
 				OB00000000000000000000C0 /* WiFiObservationEventSQLiteStore.swift */,
-				FBD0A47A2FE5C06000000027 /* WiFiObservationEventRecentStore.swift */,
-				FBD0A47B2FE5C06000000028 /* WiFiObservationEventCoordinator.swift */,
-				A710C0010000000000000001 /* WiFiObservationEventTimelineController.swift */,
 				FBD0A47C2FE5C06000000029 /* ProObservationEventBootstrap.swift */,
 			);
 			path = Events;
@@ -1691,9 +1688,7 @@
 				FBD0A45D2FE5C0600000000A /* MenuBarStatusViewModel.swift in Sources */,
 				FBD0A4602FE5C0600000000D /* MenuBarStatusView.swift in Sources */,
 				FBD0A46C2FE5C06000000019 /* SparklineView.swift in Sources */,
-				FBD0A47D2FE5C0600000002A /* WiFiObservationEventRecentStore.swift in Sources */,
-				FBD0A47E2FE5C0600000002B /* WiFiObservationEventCoordinator.swift in Sources */,
-				A710C0010000000000000002 /* WiFiObservationEventTimelineController.swift in Sources */,
+				E20000000000000000000002 /* WiFiObservationEventJournal.swift in Sources */,
 				FBD0A47F2FE5C0600000002C /* ProObservationEventBootstrap.swift in Sources */,
 				FBD0A4802FE5C0600000002D /* TimelineView.swift in Sources */,
 				FBD0A4812FE5C0600000002E /* TimelineViewModel.swift in Sources */,
@@ -1730,6 +1725,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E10000000000000000000002 /* EventJournalTests.swift in Sources */,
 				FB8FCB282FF6CAC800BB2929 /* SecondaryToolbarProTests.swift in Sources */,
 				FB8FCB292FF6CAC800BB2929 /* MenuBarMigrationTests.swift in Sources */,
 				FB8FCB2A2FF6CAC800BB2929 /* TimelinePresentationTests.swift in Sources */,

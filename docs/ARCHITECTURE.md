@@ -15,6 +15,11 @@ WiFi — CoreWLAN scan source → WiFiObservationRuntime
                                └── publication gate
                                      ├── WiFiObservationStore UI projection
                                      └── ordered edition consumer (Pro only; none in OSS)
+                                           └── WiFiObservationEventJournal
+                                                 ├── optimistic recent publication
+                                                 ├── generation-safe query / clear
+                                                 └── WiFiObservationEventLogStoring
+                                                       └── SQLite
 
 Runtime output → ScannerViewModel presentation projection
                   ├── WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gaussian curves)
@@ -75,7 +80,8 @@ Pro features (Recording, Session, StoreKit, Timeline, and Wi-Fi observation even
 - **Immutable ordered publication**: the runtime applies the exact accepted `WiFiObservation` to `WiFiObservationStore` first, then enqueues that same value independently for each fixed edition-level consumer. Each consumer is serial and lossless in acceptance order; consumer latency or failure does not delay or invalidate Store projection. The runtime is a Wi-Fi observation boundary, not a general application event bus.
 - **Stop drain barrier**: a normal `WiFiObservationRuntime.stopScanning()` first stops the scan source and joins the active scan task so no further observation can be accepted, then drains every accepted consumer tail before returning. Internal source replacement for `restartScanning()` does not apply this drain barrier, so interval/configuration restarts remain independent of consumer latency.
 - **Scanner presentation boundary**: `ScannerViewModel` forwards lifecycle/configuration commands to the runtime and projects runtime output into raw-network caches, RSSI history, filters, AP visibility/lock state, charts, tables, selection, channel/recommendation UI, interface presentation, and the existing MCP data-provider surface. It does not scan directly, construct production observations, run the production analyzers, or publish to the Store.
-- **Edition composition**: the shared runtime and Store projection compile into both app targets. OSS registers no paid event consumer. Pro registers its observation-to-event adapter at app composition time; Pro event implementation files remain absent from the OSS Sources phase.
+- **Edition composition**: the shared runtime and Store projection compile into both app targets. OSS registers no paid event consumer. Pro registers one `WiFiObservationEventJournal` at app composition time; the Journal and every concrete Pro event implementation remain absent from the OSS Sources phase.
+- **Pro Event Journal boundary**: the Journal consumes each exact immutable runtime observation and privately owns event derivation, optimistic recent publication, hydration validation, generation-safe queries, clear coalescing, clear-time queueing, and persistence ordering. `WiFiObservationEventLogStoring` remains the persistence seam, with SQLite as the production adapter. Timeline and menu receive the same Journal instance and preserve its event IDs; the menu continues to read live connection metrics from `WiFiObservationStore`. Clear state is published directly through the Journal rather than a process-wide notification.
 - Selection flows bidirectionally: table row → `selectedNetworkID` → chart highlight; chart curve click → `selectedNetworkID` → table row highlight
 - `NativeTableView` uses `Coordinator` as `NSTableViewDelegate` + `NSTableViewDataSource`
 - **Chart Engine** — All chart views build `[ChartSeries]` arrays and delegate rendering to the universal `Chart<Overlay>` component. Domain-specific overlays (tooltips, heatmaps, data labels, transition markers) are injected via a `ViewBuilder` closure. See `docs/CHARTS.md`.
@@ -84,7 +90,7 @@ Pro features (Recording, Session, StoreKit, Timeline, and Wi-Fi observation even
 - `displayRSSI` animates toward `rssi` each tick for smooth Gaussian curve transitions
 - AP roaming transitions share a single timestamp between old and new segments, eliminating gaps on the timeline
 - Signal history (`SignalHistoryStore`) keeps 20 snapshots per BSSID in memory
-- Wi-Fi observation event recording, Timeline history, and SQLite-backed event persistence are Pro-only runtime features. OSS may keep navigation or upsell entry points, but the concrete event recorder, recent-event state, Timeline data flow, and SQLite storage implementation must stay inside the `Pro/` submodule.
+- Wi-Fi observation event derivation, Journal state, Timeline history, and SQLite-backed event persistence are Pro-only runtime features. OSS may keep navigation or upsell entry points, but the concrete event model, Journal, Timeline data flow, and SQLite storage implementation must stay inside the `Pro/` submodule.
 - `ScannerViewModel.scanIntervalSeconds` supports dynamic override — external code (e.g., recording in the Pro submodule) can set it to a custom value and restore the UserDefaults-configured value on stop. Its `didSet` forwards a serialized runtime restart when scanning. Recording continues to sample `ScannerViewModel.signalHistory`, and MCP continues to read the scanner's raw-network cache; neither public integration has been migrated directly to the observation stream.
 - `StableScore` provides hysteresis for quality level boundaries (upgrade margin 2, downgrade margin 5)
 - `ChannelBand(id:)` failable initializer maps String band IDs ("24"/"5"/"6") to enum cases, used by `SnapshotToChartAdapter` for history playback

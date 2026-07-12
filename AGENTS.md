@@ -39,6 +39,8 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/superpowers/specs/2026-07-11-observation-runtime-migration-design.md` | Design spec for immutable observation publication and migration to a single production observation runtime |
 | `docs/superpowers/plans/2026-07-11-immutable-observation-publication.md` | Implementation plan for ordered immutable observation publication and Pro event consumption |
 | `docs/superpowers/plans/2026-07-11-production-observation-runtime-migration.md` | Implementation plan for migrating production scan-cycle orchestration into the observation runtime |
+| `docs/superpowers/specs/2026-07-11-pro-event-journal-design.md` | Design spec for consolidating Pro event ingestion, recent publication, persistence, query, and clear consistency into one deep journal module |
+| `docs/superpowers/plans/2026-07-11-pro-event-journal.md` | Implementation plan for the Pro-only deep event journal and deletion of the shallow event lifecycle modules |
 | `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
 
 ## Skills Directory
