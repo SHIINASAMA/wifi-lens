@@ -57,38 +57,6 @@ struct SpectrumSectionLayout {
     }
 }
 
-#if PRO
-enum SpectrumMode {
-    case live
-    case recording
-
-    static func fromToolbarSelection(_ selection: SecondaryToolbarItemID) -> Self {
-        switch selection {
-        case .spectrumRecording:
-            .recording
-        default:
-            .live
-        }
-    }
-}
-
-@MainActor
-enum SpectrumRecordingSessionResolver {
-    static func resolve(
-        current: RecordingViewModel?,
-        mode: SpectrumMode,
-        scannerViewModel: ScannerViewModel
-    ) -> RecordingViewModel? {
-        switch mode {
-        case .live:
-            current
-        case .recording:
-            current ?? RecordingViewModel(scannerViewModel: scannerViewModel)
-        }
-    }
-}
-#endif
-
 struct SpectrumDashboardLayout {
     static let primaryRatio: CGFloat = 0.35
     static let secondaryRatio: CGFloat = 0.35
@@ -117,13 +85,6 @@ struct ContentView: View {
     @State private var panel2ChartType: BandPanelSelection = .band5
     @AppStorage("hiddenTableColumns") private var hiddenColumnsData: String = ""
 
-#if PRO
-    let mode: SpectrumMode
-    @Binding var recordingViewModel: RecordingViewModel?
-#else
-    let mode: SecondaryToolbarItemID
-#endif
-
     private var hiddenColumns: Binding<Set<String>> {
         Binding(
             get: { Set(hiddenColumnsData.split(separator: ",").map(String.init).filter { !$0.isEmpty }) },
@@ -138,64 +99,11 @@ struct ContentView: View {
         .frame(minWidth: 700, idealWidth: 1000, minHeight: 600)
         .onChange(of: viewModel.hiddenBands) { _, _ in viewModel.applyGlobalFilterToBands() }
         .onChange(of: viewModel.hideHiddenSSIDs) { _, _ in viewModel.applyGlobalFilterToBands() }
-#if PRO
-        .onChange(of: mode) { _, newMode in
-            recordingViewModel = SpectrumRecordingSessionResolver.resolve(
-                current: recordingViewModel,
-                mode: newMode,
-                scannerViewModel: viewModel
-            )
-            if newMode == .recording {
-                recordingViewModel?.checkReadiness()
-            }
-        }
-        .onAppear {
-            recordingViewModel = SpectrumRecordingSessionResolver.resolve(
-                current: recordingViewModel,
-                mode: mode,
-                scannerViewModel: viewModel
-            )
-            if mode == .recording {
-                recordingViewModel?.checkReadiness()
-            }
-        }
-#endif
     }
 
     @ViewBuilder
     private var contentArea: some View {
-#if PRO
-        switch mode {
-        case .live:
-            dashboardContent
-        case .recording:
-            if let rvm = recordingViewModel {
-                RecordingView(viewModel: rvm)
-            } else {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .task {
-                        recordingViewModel = SpectrumRecordingSessionResolver.resolve(
-                            current: recordingViewModel,
-                            mode: mode,
-                            scannerViewModel: viewModel
-                        )
-                        recordingViewModel?.checkReadiness()
-                    }
-            }
-        }
-#else
-        if mode == .spectrumRecording {
-            ProFeaturePlaceholderView(
-                featureName: String(localized: "pro.recording.title", comment: "Pro recording feature title"),
-                featureDescription: String(localized: "pro.recording.description", comment: "Pro recording feature description"),
-                featureIcon: "record.circle",
-                customSkeleton: { RecordingSkeletonView() }
-            )
-        } else {
-            dashboardContent
-        }
-#endif
+        dashboardContent
     }
 
     private var dashboardContent: some View {

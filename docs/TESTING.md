@@ -33,6 +33,10 @@ Swift Testing target injected into the app process via `TEST_HOST` for `@testabl
 
 Covered modules: `ChannelSpanCalculator`, `IEParser`, `SSIDColorHasher`, `ChannelQualityCalculator`, `NetworkTableRow`, `BandChartViewModel`, `BandChartLayout`, `SnapshotToChartAdapter`.
 
+### Edition Composition Registration
+
+Edition-composition tests verify the shared-shell contract while each target compiles exactly one edition adapter. Register shared test files in `WiFiLensTests`; register Pro-only composition tests in `WiFiLensProTests`. Keep `OSSEditionComposition.swift` out of the Pro Sources phase and `ProEditionComposition.swift` out of the OSS Sources phase. This preserves OSS Timeline and recording upsell surfaces without importing Pro domain code.
+
 ## UI Tests (WiFiLensUITests)
 
 ### Launch Arguments

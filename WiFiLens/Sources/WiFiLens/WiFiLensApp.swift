@@ -21,9 +21,6 @@ private struct AppRootView: View {
     @Binding var selectedPage: SidebarPage
     @Binding var showCrashLog: Bool
     @Binding var crashLogText: String
-#if PRO
-    @Binding var timelineNavigationRequest: TimelineNavigationRequest?
-#endif
     let sparkleUpdater: SparkleUpdater
     let updateMCPServer: @MainActor () -> Void
     let registerMainWindow: @MainActor (NSWindow?) -> Void
@@ -36,14 +33,6 @@ private struct AppRootView: View {
     @AppStorage("hideTitleBadge") private var hideTitleBadge = true
     @AppStorage("bleEnabled") private var bleEnabled: Bool = false
     @State private var secondaryToolbarSelections = SecondaryToolbarSelections()
-#if PRO
-    @State private var spectrumRecordingViewModel: RecordingViewModel?
-    @State private var timelineSearchText = ""
-    @State private var customStartDate: Date = Calendar.current.startOfDay(for: Date())
-    @State private var customEndDate: Date = Date()
-    @State private var timelineEnabledEventTypes: Set<EventFilterType> = Set(EventFilterType.allCases)
-    @State private var showTimelineInspector = false
-#endif
 
     private var hasLocationAuthorization: Bool {
         viewModel.locationManager.isAuthorizedForSSID
@@ -78,54 +67,6 @@ private struct AppRootView: View {
         )
     }
 
-#if PRO
-    private var spectrumViewMode: SpectrumMode {
-        SpectrumMode.fromToolbarSelection(
-            secondaryToolbarSelections.spectrum
-        )
-    }
-
-    private var timelineRangeFilter: Binding<TimelineRangeFilter> {
-        Binding(
-            get: {
-                switch secondaryToolbarSelections.timeline {
-                case .timelineToday:
-                    .today
-                case .timelineYesterday:
-                    .yesterday
-                case .timelineThisWeek:
-                    .thisWeek
-                case .timelineCustom:
-                    .custom
-                default:
-                    .all
-                }
-            },
-            set: { newValue in
-                let selection: SecondaryToolbarItemID = switch newValue {
-                case .today:
-                    .timelineToday
-                case .yesterday:
-                    .timelineYesterday
-                case .thisWeek:
-                    .timelineThisWeek
-                case .custom:
-                    .timelineCustom
-                case .all:
-                    .timelineAll
-                }
-                secondaryToolbarSelections.timeline = selection
-            }
-        )
-    }
-
-    private var timelineSearchBinding: Binding<String> {
-        Binding(
-            get: { timelineSearchText },
-            set: { timelineSearchText = $0 }
-        )
-    }
-#endif
 
     private var detailNavigationTitle: String {
         guard selectedPage != .overview else { return "" }
@@ -176,14 +117,12 @@ private struct AppRootView: View {
                     selection: $secondaryToolbarSelections.spectrum
                 )
             case .timeline:
-#if PRO
-                SecondaryToolbarCapsule(
-                    descriptor: SecondaryToolbarDescriptor.forPage(.timeline)!,
-                    selection: $secondaryToolbarSelections.timeline
-                )
-#else
-                EmptyView()
-#endif
+                if let descriptor = SecondaryToolbarDescriptor.forPage(.timeline) {
+                    SecondaryToolbarCapsule(
+                        descriptor: descriptor,
+                        selection: $secondaryToolbarSelections.timeline
+                    )
+                }
             default:
                 EmptyView()
             }
@@ -209,22 +148,13 @@ private struct AppRootView: View {
                     .allowsHitTesting(selectedPage == .overview)
                     .accessibilityIdentifier("page-overview")
 
-                if selectedPage == .spectrum {
-#if PRO
-                    ContentView(
-                        viewModel: viewModel,
-                        mode: spectrumViewMode,
-                        recordingViewModel: $spectrumRecordingViewModel
-                    )
-                        .accessibilityIdentifier("page-spectrum")
-#else
-                    ContentView(
-                        viewModel: viewModel,
-                        mode: secondaryToolbarSelections.spectrum
-                    )
-                        .accessibilityIdentifier("page-spectrum")
-#endif
-                }
+                EditionComposition.detailContribution(context: EditionCompositionContext(
+                    scannerViewModel: viewModel,
+                    selectedPage: $selectedPage,
+                    secondaryToolbarSelections: $secondaryToolbarSelections,
+                    bleEnabled: $bleEnabled,
+                    openMainWindow: { _ in }
+                ))
 
                 ChannelQualityView(
                     channels: viewModel.channelRecommendations,
@@ -253,36 +183,6 @@ private struct AppRootView: View {
                     .opacity(selectedPage == .bleScanner ? 1 : 0)
                     .allowsHitTesting(selectedPage == .bleScanner)
                     .accessibilityIdentifier("page-bleScanner")
-
-                if selectedPage == .timeline {
-#if PRO
-                    TimelineView(
-                        selectedFilter: timelineRangeFilter,
-                        searchText: timelineSearchBinding,
-                        customStartDate: $customStartDate,
-                        customEndDate: $customEndDate,
-                        enabledEventTypes: $timelineEnabledEventTypes,
-                        navigationRequest: $timelineNavigationRequest
-                    )
-                    .inspector(isPresented: $showTimelineInspector) {
-                        TimelineFilterPanel(
-                            searchText: timelineSearchBinding,
-                            customStartDate: $customStartDate,
-                            customEndDate: $customEndDate,
-                            enabledEventTypes: $timelineEnabledEventTypes
-                        )
-                    }
-                    .accessibilityIdentifier("page-timeline")
-#else
-                    ProFeaturePlaceholderView(
-                        featureName: String(localized: "pro.timeline.title", comment: "Pro timeline feature title"),
-                        featureDescription: String(localized: "pro.timeline.description", comment: "Pro timeline feature description"),
-                        featureIcon: SidebarPage.timeline.icon,
-                        customSkeleton: { TimelineSkeletonView() }
-                    )
-                        .accessibilityIdentifier("page-timeline")
-#endif
-                }
 
                 SettingsView(
                     updater: sparkleUpdater,
@@ -339,16 +239,6 @@ private struct AppRootView: View {
             .onChange(of: viewModel.wifiPowerState) { _, newState in
                 roamingViewModel.handleWiFiPowerStateChange(newState)
             }
-#if PRO
-            .onChange(of: secondaryToolbarSelections.timeline) { _, newValue in
-                showTimelineInspector = (newValue == .timelineCustom)
-            }
-            .onChange(of: showTimelineInspector) { _, newValue in
-                if !newValue && secondaryToolbarSelections.timeline == .timelineCustom {
-                    secondaryToolbarSelections.timeline = .timelineToday
-                }
-            }
-#endif
             .alert(String(localized: "permission.crash_detected_title", comment: "Alert title when previous crash is detected on launch"), isPresented: $showCrashLog) {
                 Button(String(localized: "common.action.dismiss", comment: "Dismiss/close alert button"), role: .cancel) {}
             } message: {
@@ -380,9 +270,7 @@ private struct AppRootView: View {
             registerOpenMainWindowAction {
                 openWindow(id: WiFiLensApp.mainWindowSceneID)
             }
-#if PRO
-            ProObservationEventBootstrap.start(observationRuntime: viewModel.observationRuntime)
-#endif
+            EditionComposition.startLifecycle(observationRuntime: viewModel.observationRuntime)
             await viewModel.start()
             roamingViewModel.handleWiFiPowerStateChange(viewModel.wifiPowerState)
             updateMCPServer()
@@ -395,74 +283,6 @@ private struct AppRootView: View {
     }
 }
 
-#if PRO
-private struct TimelineToolbarSearchField: View {
-    @Binding var text: String
-
-    var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.secondary)
-
-            BorderlessSearchTextField(
-                text: $text,
-                placeholder: String(localized: "timeline.search.placeholder", comment: "Timeline search field placeholder")
-            )
-            .frame(width: 180)
-        }
-        .padding(.horizontal, 12)
-        .frame(height: 30)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color.white.opacity(0.08))
-        )
-    }
-}
-
-private struct BorderlessSearchTextField: NSViewRepresentable {
-    @Binding var text: String
-    let placeholder: String
-
-    func makeNSView(context: Context) -> NSTextField {
-        let field = NSTextField()
-        field.delegate = context.coordinator
-        field.isBordered = false
-        field.isBezeled = false
-        field.drawsBackground = false
-        field.focusRingType = .none
-        field.placeholderString = placeholder
-        field.font = .systemFont(ofSize: NSFont.systemFontSize, weight: .regular)
-        field.textColor = .labelColor
-        field.lineBreakMode = .byTruncatingTail
-        return field
-    }
-
-    func updateNSView(_ field: NSTextField, context: Context) {
-        if field.stringValue != text {
-            field.stringValue = text
-        }
-        field.placeholderString = placeholder
-    }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(text: $text)
-    }
-
-    final class Coordinator: NSObject, NSTextFieldDelegate {
-        @Binding var text: String
-
-        init(text: Binding<String>) {
-            _text = text
-        }
-
-        func controlTextDidChange(_ notification: Notification) {
-            guard let field = notification.object as? NSTextField else { return }
-            text = field.stringValue
-        }
-    }
-}
-#endif
 
 private struct WindowAccessor: NSViewRepresentable {
     let defaultSize: CGSize
@@ -586,9 +406,6 @@ struct WiFiLensApp: App {
     @State private var openMainWindowAction: (() -> Void)?
     @State private var pendingMainWindowRoute: SidebarPage?
     @State private var pendingResolvedMainWindowFocus = false
-#if PRO
-    @State private var timelineNavigationRequest: TimelineNavigationRequest?
-#endif
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
     @AppStorage("appearance") private var appearance: String = "system"
@@ -618,7 +435,6 @@ struct WiFiLensApp: App {
     var body: some Scene {
         WindowGroup(id: Self.mainWindowSceneID) {
             Group {
-#if PRO
                 AppRootView(
                     viewModel: viewModel,
                     roamingViewModel: roamingViewModel,
@@ -627,27 +443,11 @@ struct WiFiLensApp: App {
                     selectedPage: $selectedPage,
                     showCrashLog: $showCrashLog,
                     crashLogText: $crashLogText,
-                    timelineNavigationRequest: $timelineNavigationRequest,
                     sparkleUpdater: sparkleUpdater,
                     updateMCPServer: updateMCPServer,
                     registerMainWindow: registerMainWindow,
                     registerOpenMainWindowAction: registerOpenMainWindowAction
                 )
-#else
-                AppRootView(
-                viewModel: viewModel,
-                roamingViewModel: roamingViewModel,
-                bleViewModel: bleViewModel,
-                sidebarVisibility: $sidebarVisibility,
-                selectedPage: $selectedPage,
-                showCrashLog: $showCrashLog,
-                crashLogText: $crashLogText,
-                sparkleUpdater: sparkleUpdater,
-                updateMCPServer: updateMCPServer,
-                registerMainWindow: registerMainWindow,
-                registerOpenMainWindowAction: registerOpenMainWindowAction
-            )
-#endif
             }
             .preferredColorScheme(colorScheme)
         }
@@ -782,17 +582,10 @@ struct WiFiLensApp: App {
 
         }
 
-#if PRO
-        MenuBarScene(
-            onOpenMainWindow: { showMainWindow(route: nil, source: .menuBar) },
-            onOpenTimeline: { eventID in
-                timelineNavigationRequest = TimelineNavigationRequest(eventID: eventID)
-                showMainWindow(route: .timeline, source: .menuBar)
-            },
-            onOpenSettings: { showMainWindow(route: .settings, source: .menuBar) },
-            onQuit: { NSApp.terminate(nil) }
+        EditionComposition.menuBarScene(
+            openMainWindow: { route in showMainWindow(route: route, source: .menuBar) },
+            terminate: { NSApp.terminate(nil) }
         )
-#endif
     }
 
     private var colorScheme: ColorScheme? {
@@ -812,11 +605,7 @@ struct WiFiLensApp: App {
     }
 
     private var menuBarWindowManagementEnabled: Bool {
-#if PRO
-        menuBarEnabled
-#else
-        false
-#endif
+        EditionComposition.menuBarWindowManagementEnabled && menuBarEnabled
     }
 
     @MainActor

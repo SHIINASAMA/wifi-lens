@@ -64,12 +64,16 @@ struct SecondaryToolbarDescriptor: Equatable {
                 defaultSelection: .interfacesSimple
             )
         case .spectrum:
-#if PRO
-            let recordingLocked = false
-#else
-            let recordingLocked = true
-#endif
-            return Self(
+            return EditionComposition.spectrumToolbarDescriptor
+        case .timeline:
+            return EditionComposition.timelineToolbarDescriptor
+        default:
+            return nil
+        }
+    }
+
+    static func spectrum(recordingLocked: Bool) -> Self {
+        Self(
                 items: [
                     SecondaryToolbarItem(
                         id: .spectrumLive,
@@ -83,39 +87,19 @@ struct SecondaryToolbarDescriptor: Equatable {
                 ],
                 defaultSelection: .spectrumLive
             )
-        case .timeline:
-#if PRO
-            return Self(
-                items: [
-                    SecondaryToolbarItem(
-                        id: .timelineAll,
-                        title: String(localized: "timeline.filter.all", comment: "Timeline filter for all events")
-                    ),
-                    SecondaryToolbarItem(
-                        id: .timelineToday,
-                        title: String(localized: "timeline.filter.today", comment: "Timeline filter for today's events")
-                    ),
-                    SecondaryToolbarItem(
-                        id: .timelineYesterday,
-                        title: String(localized: "timeline.filter.yesterday", comment: "Timeline filter for yesterday's events")
-                    ),
-                    SecondaryToolbarItem(
-                        id: .timelineThisWeek,
-                        title: String(localized: "timeline.filter.this_week", comment: "Timeline filter for this week's events")
-                    ),
-                    SecondaryToolbarItem(
-                        id: .timelineCustom,
-                        title: String(localized: "timeline.filter.custom", comment: "Timeline filter for custom date range")
-                    ),
-                ],
-                defaultSelection: .timelineToday
-            )
-#else
-            return nil
-#endif
-        default:
-            return nil
-        }
+    }
+
+    static func timeline(defaultSelection: SecondaryToolbarItemID) -> Self {
+        Self(
+            items: [
+                SecondaryToolbarItem(id: .timelineAll, title: String(localized: "timeline.filter.all", comment: "Timeline all-time range filter")),
+                SecondaryToolbarItem(id: .timelineToday, title: String(localized: "timeline.filter.today", comment: "Timeline today range filter")),
+                SecondaryToolbarItem(id: .timelineYesterday, title: String(localized: "timeline.filter.yesterday", comment: "Timeline yesterday range filter")),
+                SecondaryToolbarItem(id: .timelineThisWeek, title: String(localized: "timeline.filter.this_week", comment: "Timeline this-week range filter")),
+                SecondaryToolbarItem(id: .timelineCustom, title: String(localized: "timeline.filter.custom", comment: "Timeline custom range filter")),
+            ],
+            defaultSelection: defaultSelection
+        )
     }
 }
 

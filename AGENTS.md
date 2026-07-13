@@ -43,6 +43,8 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/superpowers/plans/2026-07-11-pro-event-journal.md` | Implementation plan for the Pro-only deep event journal and deletion of the shallow event lifecycle modules |
 | `docs/superpowers/specs/2026-07-12-structured-network-identity-design.md` | Design spec for making structured SSID/BSSID payloads the sole Pro connection-event identity and resetting the development schema |
 | `docs/superpowers/plans/2026-07-12-structured-network-identity.md` | Implementation plan for structured Pro connection-event identity, shared presentation formatting, and the destructive SQLite v2 upgrade |
+| `docs/superpowers/specs/2026-07-12-edition-composition-seam-design.md` | Design spec for target-selected OSS/Pro composition adapters with behavior-preserving lifecycle ownership |
+| `docs/superpowers/plans/2026-07-12-edition-composition-seam.md` | Implementation plan for behavior-preserving target-selected OSS/Pro composition adapters |
 | `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
 
 ## Skills Directory
