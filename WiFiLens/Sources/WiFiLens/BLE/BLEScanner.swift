@@ -24,81 +24,149 @@ enum BLEScanEvent: Sendable {
     case failure(String)
 }
 
+/// A single BLE scan generation. Its stop operation only terminates the
+/// stream paired with this session, so stale callers cannot stop a newer scan.
+struct BLEScanSession: Sendable {
+    let events: AsyncStream<BLEScanEvent>
+    private let stopOperation: @Sendable () async -> Void
+
+    init(
+        events: AsyncStream<BLEScanEvent>,
+        stop: @escaping @Sendable () async -> Void
+    ) {
+        self.events = events
+        self.stopOperation = stop
+    }
+
+    func stop() async {
+        await stopOperation()
+    }
+}
+
+protocol BLEScanning: Sendable {
+    func startScanning() async -> BLEScanSession
+}
+
+/// Creates the sole buffer between CoreBluetooth callbacks and the UI consumer.
+/// Two slots cover four seconds of the normal batched scan cadence. When the UI
+/// is stalled, newer observation snapshots replace stale ones; session finish
+/// remains an out-of-band continuation lifecycle signal and is never dropped.
+enum BLEScanEventStreamFactory {
+    static func make() -> (
+        events: AsyncStream<BLEScanEvent>,
+        continuation: AsyncStream<BLEScanEvent>.Continuation
+    ) {
+        let channel = AsyncStream<BLEScanEvent>.makeStream(
+            bufferingPolicy: .bufferingNewest(2)
+        )
+        return (channel.stream, channel.continuation)
+    }
+}
+
 // MARK: - Scanner actor
 
-actor BLEScanner {
+actor BLEScanner: BLEScanning {
     private var delegate: BLEScannerDelegate?
-    private var shouldStop = false
     private var currentState = BLEBluetoothState.unknown
+    private var activeSessionID: UUID?
+    private var activeContinuation: AsyncStream<BLEScanEvent>.Continuation?
 
     var bluetoothState: BLEBluetoothState { currentState }
 
-    func startScanning(batchInterval: Duration = .seconds(2)) -> AsyncStream<BLEScanEvent> {
-        shouldStop = false
+    func startScanning() async -> BLEScanSession {
+        await startScanning(batchInterval: .seconds(2))
+    }
+
+    private func startScanning(batchInterval: Duration) async -> BLEScanSession {
+        stopActiveSession()
+        let sessionID = UUID()
         let queue = DispatchQueue(label: "com.wifilens.blescanner", qos: .utility)
         let del = BLEScannerDelegate(queue: queue)
         delegate = del
 
-        return AsyncStream<BLEScanEvent> { continuation in
-            del.onStateChange = { [weak self] state in
-                Task { [weak self] in
-                    await self?.setState(state)
-                    continuation.yield(.bluetoothStateChanged(state))
+        let channel = BLEScanEventStreamFactory.make()
+        let continuation = channel.continuation
+        activeSessionID = sessionID
+        activeContinuation = continuation
+        del.onStateChange = { [weak self] state in
+            Task { [weak self] in
+                await self?.setState(state)
+                continuation.yield(.bluetoothStateChanged(state))
+            }
+        }
+
+        del.onDiscover = { [weak del] event in
+            del?.accumulate(event)
+        }
+
+        del.onReady = { [weak del] in
+            del?.startScan()
+            del?.beginActivity()
+        }
+
+        // Start the central manager (triggers onReady when powered on)
+        del.start()
+
+        // Batch flush + scan restart loop
+        let streamTask = Task {
+            let restartInterval: TimeInterval = 30
+            var lastRestart = Date()
+
+            while !Task.isCancelled {
+                try? await Task.sleep(for: batchInterval)
+
+                if Task.isCancelled { break }
+
+                // Restart scan every 30s to prevent macOS callback decay
+                if Date().timeIntervalSince(lastRestart) > restartInterval {
+                    del.restartScan()
+                    lastRestart = Date()
+                }
+
+                // Drain accumulated events and yield directly
+                let accum = del.drainAccumulator()
+                if !accum.isEmpty {
+                    continuation.yield(.deviceBatch(accum))
                 }
             }
+        }
 
-            del.onDiscover = { [weak del] event in
-                del?.accumulate(event)
+        continuation.onTermination = { _ in
+            streamTask.cancel()
+            del.onStateChange = nil
+            del.onDiscover = nil
+            del.onReady = nil
+            del.stopScan()
+            del.endActivity()
+            del.stop()
+            Task {
+                await self.clearSessionIfCurrent(sessionID)
             }
-
-            del.onReady = { [weak del] in
-                del?.startScan()
-                del?.beginActivity()
-            }
-
-            // Start the central manager (triggers onReady when powered on)
-            del.start()
-
-            // Batch flush + scan restart loop
-            let streamTask = Task {
-                let restartInterval: TimeInterval = 30
-                var lastRestart = Date()
-
-                while !shouldStop, !Task.isCancelled {
-                    try? await Task.sleep(for: batchInterval)
-
-                    if shouldStop || Task.isCancelled { break }
-
-                    // Restart scan every 30s to prevent macOS callback decay
-                    if Date().timeIntervalSince(lastRestart) > restartInterval {
-                        del.restartScan()
-                        lastRestart = Date()
-                    }
-
-                    // Drain accumulated events and yield directly
-                    let accum = del.drainAccumulator()
-                    if !accum.isEmpty {
-                        continuation.yield(.deviceBatch(accum))
-                    }
-                }
-            }
-
-            continuation.onTermination = { _ in
-                streamTask.cancel()
-                del.onStateChange = nil
-                del.onDiscover = nil
-                del.onReady = nil
-                del.stopScan()
-                del.endActivity()
-                del.stop()
-            }
+        }
+        return BLEScanSession(events: channel.events) { [weak self] in
+            await self?.stopScanning(sessionID: sessionID)
         }
     }
 
-    func stopScanning() {
-        shouldStop = true
+    private func stopScanning(sessionID: UUID) {
+        guard activeSessionID == sessionID else { return }
+        stopActiveSession()
+    }
+
+    private func stopActiveSession() {
+        let continuation = activeContinuation
+        activeContinuation = nil
+        activeSessionID = nil
         delegate?.stopScan()
         delegate?.endActivity()
+        delegate = nil
+        continuation?.finish()
+    }
+
+    private func clearSessionIfCurrent(_ sessionID: UUID) {
+        guard activeSessionID == sessionID else { return }
+        activeSessionID = nil
+        activeContinuation = nil
         delegate = nil
     }
 

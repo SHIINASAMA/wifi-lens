@@ -45,6 +45,8 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/superpowers/plans/2026-07-12-structured-network-identity.md` | Implementation plan for structured Pro connection-event identity, shared presentation formatting, and the destructive SQLite v2 upgrade |
 | `docs/superpowers/specs/2026-07-12-edition-composition-seam-design.md` | Design spec for target-selected OSS/Pro composition adapters with behavior-preserving lifecycle ownership |
 | `docs/superpowers/plans/2026-07-12-edition-composition-seam.md` | Implementation plan for behavior-preserving target-selected OSS/Pro composition adapters |
+| `docs/superpowers/specs/2026-07-13-runtime-backpressure-and-pro-state-design.md` | Design spec for Pro state preservation, single-snapshot scan cycles, and bounded latest-only runtime processing |
+| `docs/superpowers/plans/2026-07-13-runtime-backpressure-and-pro-state.md` | Implementation plan for per-window Pro state, single-snapshot scans, and bounded runtime delivery |
 | `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
 
 ## Skills Directory

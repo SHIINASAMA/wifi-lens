@@ -2,6 +2,7 @@ import Foundation
 
 struct WiFiObservationCycleContext: Sendable {
     let timestamp: Date
+    let interfaceSnapshot: NetworkInterfaceSnapshot
     let interfaceName: String?
     let supportedBands: Set<ChannelBand>
     let supportedChannelsRaw: [(Int, Int)]
@@ -40,7 +41,7 @@ struct WiFiObservationPipeline: WiFiObservationPipelining {
         networks: [WiFiNetwork],
         context: WiFiObservationCycleContext
     ) async -> WiFiObservationCycleResult {
-        let status = await currentConnectionProvider.fetchCurrentStatus()
+        let status = await currentConnectionProvider.fetchCurrentStatus(from: context.interfaceSnapshot)
         let latency = await gatewayLatencyProvider.measure(routerIP: status.routerIP)
         let adaptedNetworks = NetworkObservationAdapter.adaptAll(
             networks,

@@ -3,7 +3,7 @@ import Foundation
 
 struct MockCurrentConnectionProvider: WiFiCurrentConnectionProviding {
     var result: WiFiCurrentStatus
-    func fetchCurrentStatus() async -> WiFiCurrentStatus { result }
+    func fetchCurrentStatus(from snapshot: NetworkInterfaceSnapshot) async -> WiFiCurrentStatus { result }
 }
 
 struct MockGatewayLatencyProvider: GatewayLatencyProviding {
@@ -19,7 +19,7 @@ actor CountingCurrentConnectionProvider: WiFiCurrentConnectionProviding {
         self.result = result
     }
 
-    func fetchCurrentStatus() async -> WiFiCurrentStatus {
+    func fetchCurrentStatus(from snapshot: NetworkInterfaceSnapshot) async -> WiFiCurrentStatus {
         fetchCount += 1
         return result
     }

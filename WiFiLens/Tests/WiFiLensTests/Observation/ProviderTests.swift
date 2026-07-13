@@ -32,25 +32,66 @@ struct ProviderTests {
             security: "WPA3"
         )
 
+        let snapshot = NetworkInterfaceSnapshot(
+            cycleID: UUID(),
+            capturedAt: timestamp,
+            interfaces: [interface]
+        )
         let status = WiFiCurrentConnectionProvider.makeStatus(
             from: interface,
-            timestamp: timestamp
+            snapshot: snapshot
         )
 
         #expect(status.channel == 5)
         #expect(status.band == .band6GHz)
     }
 
-    @Test("WiFiCurrentConnectionProvider returns status or error")
+    @Test("WiFiCurrentConnectionProvider deterministically projects a connected snapshot")
     func currentConnectionProvider() async {
         let provider = WiFiCurrentConnectionProvider()
-        let status = await provider.fetchCurrentStatus()
-        if status.isConnected {
-            #expect(status.ssid != nil)
-            #expect(status.bssid != nil)
-        } else {
-            #expect(status.error != nil)
-        }
+        let snapshot = NetworkInterfaceSnapshot(
+            cycleID: UUID(),
+            capturedAt: Date(timeIntervalSince1970: 1_750_000_300),
+            interfaces: [NetworkInterfaceInfo(
+                interfaceName: "en0",
+                hardwareMAC: nil,
+                ipv4Addresses: ["192.0.2.2"],
+                subnetMasks: ["255.255.255.0"],
+                router: "192.0.2.1",
+                dnsServers: ["192.0.2.1"],
+                ssid: "Deterministic",
+                bssid: "AA:BB:CC:DD:EE:FF",
+                channel: 36,
+                band: .band5GHz,
+                rssi: -48,
+                txRate: 866,
+                phyMode: "ax",
+                security: "WPA3"
+            )]
+        )
+        let status = await provider.fetchCurrentStatus(from: snapshot)
+
+        #expect(status.isConnected)
+        #expect(status.ssid == "Deterministic")
+        #expect(status.bssid == "AA:BB:CC:DD:EE:FF")
+    }
+
+    @Test("empty interface snapshot preserves disconnected status provenance")
+    func emptyInterfaceSnapshotPreservesDisconnectedProvenance() async {
+        let cycleID = UUID()
+        let capturedAt = Date(timeIntervalSince1970: 1_752_000_456)
+        let snapshot = NetworkInterfaceSnapshot(
+            cycleID: cycleID,
+            capturedAt: capturedAt,
+            interfaces: []
+        )
+
+        let status = await WiFiCurrentConnectionProvider().fetchCurrentStatus(from: snapshot)
+
+        #expect(status.isConnected == false)
+        #expect(status.error == .noWiFiConnection)
+        #expect(status.interfaceSnapshotCycleID == cycleID)
+        #expect(status.timestamp == capturedAt)
     }
 
     @Test("GatewayLatencyProvider returns result with routerIP")

@@ -11,6 +11,12 @@ struct ObservationConsumerDiagnostics: Equatable, Sendable {
     let failureCount: Int
 }
 
+struct RawCycleDeliveryDiagnostics: Equatable, Sendable {
+    let replacementCount: UInt64
+    let hasInFlight: Bool
+    let hasPending: Bool
+}
+
 struct WiFiObservationRuntimeConfiguration: Sendable {
     var scanInterval: Duration
     var userRegionOverride: RegulatoryDomain?
@@ -20,6 +26,7 @@ struct WiFiObservationRuntimeConfiguration: Sendable {
 struct WiFiObservationScanOutput: Sendable {
     let rawNetworks: [WiFiNetwork]
     let cycle: WiFiObservationCycleResult
+    let interfaceSnapshot: NetworkInterfaceSnapshot
     let interfaceName: String?
     let supportedBands: Set<ChannelBand>
 }
@@ -28,7 +35,7 @@ struct WiFiObservationScanOutput: Sendable {
 final class WiFiObservationRuntime {
     let store: WiFiObservationStore
 
-    private struct CapabilityCache {
+    private struct CapabilityCache: Sendable {
         let interfaceName: String?
         let supportedBands: Set<ChannelBand>
         let supportedChannelsRaw: [(Int, Int)]
@@ -36,10 +43,20 @@ final class WiFiObservationRuntime {
         let deviceCapabilities: DevicePHYCapabilities
     }
 
+    private struct RawCycleAdmission: Sendable {
+        let event: WiFiScanEvent
+        let configuration: WiFiObservationRuntimeConfiguration
+        let cache: CapabilityCache
+        let generation: UUID
+    }
+
     private let pipeline: any WiFiObservationPipelining
     private let scanSource: any WiFiScanStreaming
+    private let interfaceSource: any NetworkInterfaceSnapshotSourcing
     private var workers: [ObjectIdentifier: ObservationConsumerWorker] = [:]
-    private var scanTask: Task<Void, Never>?
+    private var rawCycleTask: Task<Void, Never>?
+    private var pendingRawCycle: RawCycleAdmission?
+    private var rawCycleReplacementCount: UInt64 = 0
     private var activeScanGeneration: UUID?
     private var outputProjection: (@MainActor (WiFiObservationScanOutput) -> Void)?
     private var requestedOutputProjection: (@MainActor (WiFiObservationScanOutput) -> Void)?
@@ -55,11 +72,13 @@ final class WiFiObservationRuntime {
     init(
         store: WiFiObservationStore = .shared,
         pipeline: any WiFiObservationPipelining = WiFiObservationPipeline(),
-        scanSource: any WiFiScanStreaming = WiFiScanner()
+        scanSource: any WiFiScanStreaming = WiFiScanner(),
+        interfaceSource: any NetworkInterfaceSnapshotSourcing = SystemNetworkInterfaceSnapshotSource()
     ) {
         self.store = store
         self.pipeline = pipeline
         self.scanSource = scanSource
+        self.interfaceSource = interfaceSource
     }
 
     func addConsumer(_ consumer: any WiFiObservationConsuming) {
@@ -68,10 +87,10 @@ final class WiFiObservationRuntime {
         workers[identifier] = ObservationConsumerWorker(consumer: consumer)
     }
 
-    func accept(_ observation: WiFiObservation) {
+    func accept(_ observation: WiFiObservation) async {
         store.apply(observation)
         for worker in workers.values {
-            worker.enqueue(observation)
+            await worker.consume(observation)
         }
     }
 
@@ -79,14 +98,25 @@ final class WiFiObservationRuntime {
 #if DEBUG
         onConsumerDrainStartedForTesting?()
 #endif
-        let tails = workers.values.compactMap(\.tail)
-        for tail in tails {
-            await tail.value
+        for worker in workers.values {
+            await worker.drain()
         }
     }
 
     func diagnostics() -> [ObjectIdentifier: ObservationConsumerDiagnostics] {
         workers.mapValues(\.diagnostics)
+    }
+
+    func rawCycleDiagnostics() -> RawCycleDeliveryDiagnostics {
+        RawCycleDeliveryDiagnostics(
+            replacementCount: rawCycleReplacementCount,
+            hasInFlight: rawCycleTask != nil,
+            hasPending: pendingRawCycle != nil
+        )
+    }
+
+    func scanCadenceDiagnostics() async -> WiFiScanCadenceDiagnostics {
+        await scanSource.cadenceDiagnostics()
     }
 
     func startScanning(
@@ -169,49 +199,54 @@ final class WiFiObservationRuntime {
             deviceSupportedChannels: Set(supportedChannels.map { "\($0.0.rawValue)-\($0.1)" }),
             deviceCapabilities: deviceCapabilities
         )
-        let stream = await scanSource.startScanning(interval: configuration.scanInterval)
-        guard isLatestLifecycleRequest(requestID) else {
-            await scanSource.stopScanning()
-            return
-        }
         let generation = UUID()
         activeScanGeneration = generation
         outputProjection = onOutput
         publicationEligibility = isPublicationEligible
-        scanTask = Task { @MainActor [weak self] in
-            guard let self else { return }
-            await self.consumeScanStream(
-                stream,
+        await scanSource.startScanning(interval: configuration.scanInterval) { [weak self] event in
+            await self?.admitRawCycle(RawCycleAdmission(
+                event: event,
                 configuration: configuration,
                 cache: cache,
                 generation: generation
-            )
+            ))
+        }
+        guard isLatestLifecycleRequest(requestID) else {
+            await scanSource.stopScanning()
+            return
         }
     }
 
-    private func consumeScanStream(
-        _ stream: AsyncStream<WiFiScanEvent>,
-        configuration: WiFiObservationRuntimeConfiguration,
-        cache: CapabilityCache,
-        generation: UUID
-    ) async {
-        defer {
-            if activeScanGeneration == generation {
-                activeScanGeneration = nil
-                scanTask = nil
-                publicationEligibility = nil
+    private func admitRawCycle(_ admission: RawCycleAdmission) {
+        guard ownsScanLifecycle(admission.generation) else { return }
+        guard rawCycleTask == nil else {
+            if pendingRawCycle != nil {
+                rawCycleReplacementCount &+= 1
             }
+            pendingRawCycle = admission
+            return
         }
-        for await event in stream {
-            guard ownsScanLifecycle(generation) else { break }
+
+        rawCycleTask = Task { @MainActor [weak self] in
+            await self?.processAdmittedRawCycles(startingWith: admission)
+        }
+    }
+
+    private func processAdmittedRawCycles(startingWith first: RawCycleAdmission) async {
+        var current: RawCycleAdmission? = first
+        while let admission = current, ownsScanLifecycle(admission.generation) {
             let shouldContinue = await processScanEvent(
-                event,
-                configuration: configuration,
-                cache: cache,
-                generation: generation
+                admission.event,
+                configuration: admission.configuration,
+                cache: admission.cache,
+                generation: admission.generation
             )
-            if !shouldContinue { break }
+            guard shouldContinue, ownsScanLifecycle(admission.generation) else { break }
+            current = pendingRawCycle
+            pendingRawCycle = nil
         }
+        pendingRawCycle = nil
+        rawCycleTask = nil
     }
 
     private func processScanEvent(
@@ -231,10 +266,12 @@ final class WiFiObservationRuntime {
             environmentError = .environmentScanFailed(message)
         }
 
+        let interfaceSnapshot = await interfaceSource.capture(cycleID: UUID())
         let cycle = await pipeline.produceCycle(
             networks: networks,
             context: WiFiObservationCycleContext(
-                timestamp: Date(),
+                timestamp: interfaceSnapshot.capturedAt,
+                interfaceSnapshot: interfaceSnapshot,
                 interfaceName: cache.interfaceName,
                 supportedBands: cache.supportedBands,
                 supportedChannelsRaw: cache.supportedChannelsRaw,
@@ -251,13 +288,17 @@ final class WiFiObservationRuntime {
             await scanSource.stopScanning()
             return false
         }
-        accept(cycle.observation)
+        store.apply(cycle.observation)
         outputProjection?(WiFiObservationScanOutput(
             rawNetworks: networks,
             cycle: cycle,
+            interfaceSnapshot: interfaceSnapshot,
             interfaceName: cache.interfaceName,
             supportedBands: cache.supportedBands
         ))
+        for worker in workers.values {
+            await worker.consume(cycle.observation)
+        }
         return true
     }
 
@@ -269,8 +310,9 @@ final class WiFiObservationRuntime {
     }
 
     private func stopActiveScan(stopSource: Bool) async {
-        let task = scanTask
-        scanTask = nil
+        let task = rawCycleTask
+        rawCycleTask = nil
+        pendingRawCycle = nil
         activeScanGeneration = nil
         publicationEligibility = nil
         task?.cancel()
@@ -307,10 +349,10 @@ final class WiFiObservationRuntime {
 @MainActor
 private final class ObservationConsumerWorker {
     let consumer: any WiFiObservationConsuming
-    private(set) var tail: Task<Void, Never>?
 
     private var pendingTimestamps: [Date] = []
     private var failureCount = 0
+    private var drainWaiters: [CheckedContinuation<Void, Never>] = []
 
     init(consumer: any WiFiObservationConsuming) {
         self.consumer = consumer
@@ -324,20 +366,28 @@ private final class ObservationConsumerWorker {
         )
     }
 
-    func enqueue(_ observation: WiFiObservation) {
+    func consume(_ observation: WiFiObservation) async {
         pendingTimestamps.append(observation.timestamp)
-        let previousTail = tail
-        tail = Task { @MainActor in
-            await previousTail?.value
-            do {
-                try await consumer.consume(observation)
-            } catch {
-                failureCount += 1
-                AppLogger.general.error(
-                    "Observation consumer failed: \(String(describing: error))"
-                )
-            }
-            pendingTimestamps.removeFirst()
+        do {
+            try await consumer.consume(observation)
+        } catch {
+            failureCount += 1
+            AppLogger.general.error(
+                "Observation consumer failed: \(String(describing: error))"
+            )
         }
+        if let index = pendingTimestamps.firstIndex(of: observation.timestamp) {
+            pendingTimestamps.remove(at: index)
+        }
+        if pendingTimestamps.isEmpty {
+            let waiters = drainWaiters
+            drainWaiters.removeAll()
+            waiters.forEach { $0.resume() }
+        }
+    }
+
+    func drain() async {
+        guard !pendingTimestamps.isEmpty else { return }
+        await withCheckedContinuation { drainWaiters.append($0) }
     }
 }

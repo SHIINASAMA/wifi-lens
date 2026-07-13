@@ -29,8 +29,8 @@ struct RuntimeTests {
 
         let first = WiFiObservation(timestamp: Date(timeIntervalSince1970: 1))
         let second = WiFiObservation(timestamp: Date(timeIntervalSince1970: 2))
-        runtime.accept(first)
-        runtime.accept(second)
+        await runtime.accept(first)
+        await runtime.accept(second)
 
         #expect(store.lastUpdated != nil)
         await runtime.drainConsumers()
@@ -48,11 +48,14 @@ struct RuntimeTests {
             timestamp: Date(), ssid: "Office", bssid: "AA:BB",
             isConnected: true, isWiFiPowerOn: true
         )
-        runtime.accept(WiFiObservation(currentStatus: status))
+        let acceptance = Task { @MainActor in
+            await runtime.accept(WiFiObservation(currentStatus: status))
+        }
 
         await consumer.waitUntilEntered()
         #expect(store.currentStatus == status)
         consumer.resume()
+        await acceptance.value
         await runtime.drainConsumers()
     }
 
@@ -78,7 +81,7 @@ struct RuntimeTests {
             scanInterval: .seconds(4)
         )) { _ in }
         let observation = WiFiObservation(timestamp: Date(timeIntervalSince1970: 42))
-        runtime.accept(observation)
+        let acceptance = Task { @MainActor in await runtime.accept(observation) }
         await consumer.waitUntilEntered()
 
         let stopCompletion = AsyncCompletionProbe()
@@ -95,6 +98,7 @@ struct RuntimeTests {
         #expect(consumer.isSuspended)
         #expect(await stopCompletion.isCompleted == false)
         consumer.resume()
+        await acceptance.value
         await stopTask.value
 
         #expect(await stopCompletion.isCompleted)
@@ -106,8 +110,8 @@ struct RuntimeTests {
         let consumer = FailOnceObservationConsumer()
         let runtime = WiFiObservationRuntime(store: WiFiObservationStore())
         runtime.addConsumer(consumer)
-        runtime.accept(WiFiObservation(timestamp: Date(timeIntervalSince1970: 1)))
-        runtime.accept(WiFiObservation(timestamp: Date(timeIntervalSince1970: 2)))
+        await runtime.accept(WiFiObservation(timestamp: Date(timeIntervalSince1970: 1)))
+        await runtime.accept(WiFiObservation(timestamp: Date(timeIntervalSince1970: 2)))
 
         await runtime.drainConsumers()
         #expect(consumer.attemptedTimestamps == [
@@ -120,9 +124,23 @@ struct RuntimeTests {
         let store = WiFiObservationStore()
         let runtime = WiFiObservationRuntime(store: store)
         let status = WiFiCurrentStatus(timestamp: Date(), isConnected: false, isWiFiPowerOn: true)
-        runtime.accept(WiFiObservation(currentStatus: status))
+        await runtime.accept(WiFiObservation(currentStatus: status))
         await runtime.drainConsumers()
         #expect(store.currentStatus == status)
+    }
+
+    @Test("runtime exposes scan cadence energy diagnostics")
+    func scanCadenceDiagnosticsAreQueryable() async {
+        let source = ScriptedScanSource()
+        await source.setCadenceSkippedSlotCount(3)
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(),
+            scanSource: source
+        )
+
+        let diagnostics = await runtime.scanCadenceDiagnostics()
+
+        #expect(diagnostics.skippedSlotCount == 3)
     }
 
     @Test("start caches scanner capabilities once and publishes every network cycle")
@@ -174,33 +192,178 @@ struct RuntimeTests {
         await runtime.stopScanning()
     }
 
+    @Test("raw-cycle admission keeps one in-flight and only the latest pending cycle")
+    func rawCycleAdmissionReplacesStalePendingCycle() async {
+        let source = ScriptedScanSource()
+        let pipeline = SuspendingFirstCyclePipeline()
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(),
+            pipeline: pipeline,
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
+        )
+        let first = runtimeNetwork(bssid: "AA:A0", channel: 36)
+        let stale = runtimeNetwork(bssid: "AA:B0", channel: 40)
+        let latest = runtimeNetwork(bssid: "AA:C0", channel: 44)
+
+        await runtime.startScanning(configuration: .testDefault) { _ in }
+        await source.yield(.networks([first]))
+        await pipeline.waitUntilFirstCycleEntered()
+        await source.yield(.networks([stale]))
+        await source.yield(.networks([latest]))
+
+        let overloaded = runtime.rawCycleDiagnostics()
+        #expect(overloaded.hasInFlight)
+        #expect(overloaded.hasPending)
+        #expect(overloaded.replacementCount == 1)
+
+        await pipeline.releaseFirstCycle()
+        await waitUntil { await pipeline.completedBSSIDs.count == 2 }
+
+        #expect(await pipeline.completedBSSIDs == [first.bssid, latest.bssid])
+        #expect(runtime.rawCycleDiagnostics().replacementCount == 1)
+        await runtime.stopScanning()
+        #expect(runtime.rawCycleDiagnostics().hasInFlight == false)
+        #expect(runtime.rawCycleDiagnostics().hasPending == false)
+    }
+
+    @Test("runtime stop cancels in-flight work and discards its pending raw cycle")
+    func stopCancelsInFlightAndPendingRawCycles() async {
+        let source = ScriptedScanSource()
+        let pipeline = CancellationAwareFirstCyclePipeline()
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(),
+            pipeline: pipeline,
+            scanSource: source
+        )
+        let first = runtimeNetwork(bssid: "AA:D0", channel: 36)
+        let pending = runtimeNetwork(bssid: "AA:E0", channel: 40)
+
+        await runtime.startScanning(configuration: .testDefault) { _ in }
+        await source.yield(.networks([first]))
+        await pipeline.waitUntilFirstCycleEntered()
+        await source.yield(.networks([pending]))
+        #expect(runtime.rawCycleDiagnostics().hasPending)
+
+        await runtime.stopScanning()
+
+        #expect(await pipeline.wasCancelled)
+        #expect(await pipeline.receivedBSSIDs == [first.bssid])
+        #expect(runtime.rawCycleDiagnostics().hasInFlight == false)
+        #expect(runtime.rawCycleDiagnostics().hasPending == false)
+    }
+
+    @Test("one interface snapshot supplies status and Interfaces projection per cycle")
+    func oneInterfaceSnapshotSuppliesCycleProjections() async {
+        let source = ScriptedScanSource()
+        let capturedAt = Date(timeIntervalSince1970: 1_752_000_123)
+        let interface = runtimeInterfaceInfo(ssid: "Same snapshot")
+        let interfaceSource = CountingInterfaceSnapshotSource(
+            interfaces: [interface],
+            capturedAt: capturedAt
+        )
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(),
+            pipeline: WiFiObservationPipeline(
+                gatewayLatencyProvider: MockGatewayLatencyProvider(
+                    result: GatewayLatencyResult(timestamp: capturedAt)
+                )
+            ),
+            scanSource: source,
+            interfaceSource: interfaceSource
+        )
+        var output: WiFiObservationScanOutput?
+
+        await runtime.startScanning(configuration: .testDefault) { output = $0 }
+        await source.yield(.networks([runtimeNetwork(bssid: "AA:02", channel: 36)]))
+        await waitUntil { output != nil }
+
+        let snapshot = output?.interfaceSnapshot
+        #expect(interfaceSource.captureCount == 1)
+        #expect(snapshot?.interfaces.map(\.interfaceName) == [interface.interfaceName])
+        #expect(output?.cycle.observation.currentStatus?.interfaceSnapshotCycleID == snapshot?.cycleID)
+        #expect(output?.cycle.observation.currentStatus?.timestamp == snapshot?.capturedAt)
+
+        await runtime.stopScanning()
+    }
+
+    @Test("interface snapshot capture does not occupy the MainActor")
+    func interfaceSnapshotCaptureRunsOffMainActor() async {
+        let source = ScriptedScanSource()
+        let captureStarted = DispatchSemaphore(value: 0)
+        let releaseCapture = DispatchSemaphore(value: 0)
+        let interfaceSource = BlockingInterfaceSnapshotSource(
+            captureStarted: captureStarted,
+            releaseCapture: releaseCapture
+        )
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(),
+            pipeline: RecordingCyclePipeline(),
+            scanSource: source,
+            interfaceSource: interfaceSource
+        )
+        var mainActorAdvanced = false
+        var output: WiFiObservationScanOutput?
+
+        let releaser = Task {
+            await withCheckedContinuation { continuation in
+                DispatchQueue.global().async {
+                    captureStarted.wait()
+                    continuation.resume()
+                }
+            }
+            mainActorAdvanced = true
+            releaseCapture.signal()
+        }
+        await runtime.startScanning(configuration: .testDefault) { output = $0 }
+        await source.yield(.networks([runtimeNetwork(bssid: "AA:03", channel: 36)]))
+        await waitUntil { output != nil }
+        await releaser.value
+
+        #expect(mainActorAdvanced)
+        #expect(await interfaceSource.didTimeOut == false)
+        await runtime.stopScanning()
+    }
+
     @Test("scan failure produces a partial cycle that preserves current status")
     func scanFailureProducesPartialCycle() async {
         let source = ScriptedScanSource()
-        let preservedStatus = WiFiCurrentStatus(
-            timestamp: Date(timeIntervalSince1970: 42),
-            ssid: "Still connected",
-            bssid: "AA:BB:CC:DD:EE:FF",
-            isConnected: true,
-            isWiFiPowerOn: true
+        let capturedAt = Date(timeIntervalSince1970: 1_752_000_789)
+        let interfaceSource = CountingInterfaceSnapshotSource(
+            interfaces: [runtimeInterfaceInfo(ssid: "Still connected")],
+            capturedAt: capturedAt
         )
-        let pipeline = RecordingCyclePipeline(currentStatus: preservedStatus)
+        let pipeline = WiFiObservationPipeline(
+            gatewayLatencyProvider: MockGatewayLatencyProvider(
+                result: GatewayLatencyResult(timestamp: capturedAt)
+            )
+        )
         let store = WiFiObservationStore()
-        let runtime = WiFiObservationRuntime(store: store, pipeline: pipeline, scanSource: source)
+        let runtime = WiFiObservationRuntime(
+            store: store,
+            pipeline: pipeline,
+            scanSource: source,
+            interfaceSource: interfaceSource
+        )
         var output: WiFiObservationScanOutput?
 
         await runtime.startScanning(configuration: .testDefault) { output = $0 }
         await source.yield(.failure("permission changed"))
         await waitUntil { output != nil }
 
-        let call = await pipeline.calls.first
         let expectedError = WiFiObservationError.environmentScanFailed("permission changed")
-        #expect(call?.networks.isEmpty == true)
-        #expect(call?.context.environmentError == expectedError)
+        let snapshot = output?.interfaceSnapshot
+        let status = output?.cycle.observation.currentStatus
+        #expect(interfaceSource.captureCount == 1)
         #expect(output?.rawNetworks.isEmpty == true)
-        #expect(output?.cycle.observation.currentStatus == preservedStatus)
+        #expect(status?.ssid == "Still connected")
+        #expect(status?.interfaceSnapshotCycleID == snapshot?.cycleID)
+        #expect(status?.timestamp == snapshot?.capturedAt)
+        #expect(output?.cycle.observation.environmentSnapshot?.error == expectedError)
+        #expect(output?.cycle.observation.channelAnalysis == nil)
+        #expect(output?.cycle.observation.channelRecommendation == nil)
         #expect(output?.cycle.observation.errors.contains(expectedError) == true)
-        #expect(store.currentStatus == preservedStatus)
+        #expect(store.currentStatus == status)
 
         await runtime.stopScanning()
     }
@@ -240,7 +403,8 @@ struct RuntimeTests {
         let runtime = WiFiObservationRuntime(
             store: WiFiObservationStore(),
             pipeline: RecordingCyclePipeline(),
-            scanSource: source
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
         )
 
         await runtime.startScanning(
@@ -267,7 +431,8 @@ struct RuntimeTests {
         let runtime = WiFiObservationRuntime(
             store: WiFiObservationStore(),
             pipeline: RecordingCyclePipeline(),
-            scanSource: source
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
         )
 
         await runtime.startScanning(configuration: .testDefault) { _ in }
@@ -349,7 +514,8 @@ struct RuntimeTests {
         let runtime = WiFiObservationRuntime(
             store: WiFiObservationStore(),
             pipeline: RecordingCyclePipeline(),
-            scanSource: source
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
         )
 
         let firstStart = Task { @MainActor in
@@ -477,7 +643,7 @@ struct RuntimeTests {
     ) async {
         for _ in 0..<1_000 {
             if await condition() { return }
-            await Task.yield()
+            try? await Task.sleep(for: .milliseconds(1))
         }
         Issue.record("Timed out waiting for asynchronous runtime work")
     }
@@ -498,7 +664,8 @@ struct ScannerRuntimeMigrationTests {
         let runtime = WiFiObservationRuntime(
             store: WiFiObservationStore(),
             pipeline: pipeline,
-            scanSource: source
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
         )
         let scanner = ScannerViewModel(
             observationRuntime: runtime,
@@ -539,7 +706,8 @@ struct ScannerRuntimeMigrationTests {
         let runtime = WiFiObservationRuntime(
             store: WiFiObservationStore(),
             pipeline: RecordingCyclePipeline(),
-            scanSource: source
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
         )
         let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
 
@@ -551,6 +719,82 @@ struct ScannerRuntimeMigrationTests {
         scanner.stop()
     }
 
+    @Test("two interval leases keep runtime restarts at one second")
+    func twoIntervalLeasesKeepRuntimeRestartsAtOneSecond() async {
+        let suiteName = "ScannerRuntimeMigrationTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        defaults.set(7, forKey: "scanIntervalSeconds")
+        defaults.set("auto", forKey: "regulatoryRegionOverride")
+
+        let source = ScriptedScanSource()
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(),
+            pipeline: RecordingCyclePipeline(),
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
+        )
+        let scanner = ScannerViewModel(
+            observationRuntime: runtime,
+            userDefaults: defaults,
+            authorizationRefresh: { _ in }
+        )
+        let firstLease = scanner.acquireScanIntervalLease(seconds: 1)
+        let secondLease = scanner.acquireScanIntervalLease(seconds: 1)
+
+        await scanner.debugStartScanLoopForTesting()
+        scanner.scanIntervalSeconds = 7
+        scanner.handleRegulatoryRegionOverrideChange("JP")
+        await scanner.debugDrainRuntimeLifecycleForTesting()
+
+        #expect(scanner.activeScanIntervalLeaseCount == 2)
+        #expect(scanner.scanIntervalSeconds == 1)
+        #expect(await source.snapshot().requestedIntervals == [.seconds(1), .seconds(1)])
+
+        scanner.releaseScanIntervalLease(firstLease)
+        #expect(scanner.scanIntervalSeconds == 1)
+        scanner.releaseScanIntervalLease(secondLease)
+        #expect(scanner.scanIntervalSeconds == 7)
+        scanner.stop()
+    }
+
+    @Test("two interval leases survive scanner stop and start")
+    func twoIntervalLeasesSurviveScannerStopAndStart() async {
+        let suiteName = "ScannerRuntimeMigrationTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        defaults.set(7, forKey: "scanIntervalSeconds")
+
+        let source = ScriptedScanSource()
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(),
+            pipeline: RecordingCyclePipeline(),
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
+        )
+        let scanner = ScannerViewModel(
+            observationRuntime: runtime,
+            userDefaults: defaults,
+            authorizationRefresh: { _ in }
+        )
+        let firstLease = scanner.acquireScanIntervalLease(seconds: 1)
+        let secondLease = scanner.acquireScanIntervalLease(seconds: 1)
+
+        await scanner.debugStartScanLoopForTesting()
+        scanner.stop()
+        await scanner.debugStartScanLoopForTesting()
+        await scanner.debugDrainRuntimeLifecycleForTesting()
+
+        #expect(scanner.activeScanIntervalLeaseCount == 2)
+        #expect(scanner.scanIntervalSeconds == 1)
+        #expect(await source.snapshot().requestedIntervals == [.seconds(1), .seconds(1)])
+
+        scanner.releaseScanIntervalLease(firstLease)
+        scanner.releaseScanIntervalLease(secondLease)
+        #expect(scanner.scanIntervalSeconds == 7)
+        scanner.stop()
+    }
+
     @Test("Wi-Fi power off stops runtime scanning")
     func powerOffStopsRuntime() async {
         let source = ScriptedScanSource()
@@ -559,7 +803,8 @@ struct ScannerRuntimeMigrationTests {
         let runtime = WiFiObservationRuntime(
             store: store,
             pipeline: RecordingCyclePipeline(),
-            scanSource: source
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
         )
         runtime.addConsumer(consumer)
         let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
@@ -584,7 +829,8 @@ struct ScannerRuntimeMigrationTests {
         let runtime = WiFiObservationRuntime(
             store: store,
             pipeline: RecordingCyclePipeline(),
-            scanSource: source
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
         )
         runtime.addConsumer(consumer)
         let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
@@ -620,7 +866,8 @@ struct ScannerRuntimeMigrationTests {
         let runtime = WiFiObservationRuntime(
             store: WiFiObservationStore(),
             pipeline: pipeline,
-            scanSource: source
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
         )
         let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
         scanner.locationManager.authorizationStatus = .authorized
@@ -640,13 +887,50 @@ struct ScannerRuntimeMigrationTests {
         scanner.stop()
     }
 
+    @Test("runtime interface snapshot supplies ScannerViewModel Interfaces projection")
+    func interfaceSnapshotProjectsIntoScannerViewModel() async {
+        let source = ScriptedScanSource()
+        let capturedAt = Date(timeIntervalSince1970: 1_752_001_000)
+        let interfaces = [
+            runtimeInterfaceInfo(ssid: "Snapshot Wi-Fi"),
+            runtimeInterfaceInfo(interfaceName: "bridge0", ssid: nil),
+        ]
+        let interfaceSource = CountingInterfaceSnapshotSource(
+            interfaces: interfaces,
+            capturedAt: capturedAt
+        )
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(),
+            pipeline: WiFiObservationPipeline(
+                gatewayLatencyProvider: MockGatewayLatencyProvider(
+                    result: GatewayLatencyResult(timestamp: capturedAt)
+                )
+            ),
+            scanSource: source,
+            interfaceSource: interfaceSource
+        )
+        let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
+        scanner.locationManager.authorizationStatus = .authorized
+
+        await scanner.debugStartScanLoopForTesting()
+        await source.yield(.networks([runtimeNetwork(bssid: "AA:14", channel: 36)]))
+        await waitUntil { scanner.networkInfo.count == interfaces.count }
+
+        #expect(interfaceSource.captureCount == 1)
+        #expect(scanner.networkInfo.map(\.interfaceName) == interfaces.map(\.interfaceName))
+        #expect(scanner.networkInfo.map(\.ssid) == interfaces.map(\.ssid))
+        #expect(scanner.networkInfo.map(\.ipv4Addresses) == interfaces.map(\.ipv4Addresses))
+        scanner.stop()
+    }
+
     @Test("runtime outputs preserve filters and locked AP visibility")
     func outputPreservesPresentationState() async {
         let source = ScriptedScanSource()
         let runtime = WiFiObservationRuntime(
             store: WiFiObservationStore(),
             pipeline: RecordingCyclePipeline(),
-            scanSource: source
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
         )
         let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
         scanner.locationManager.authorizationStatus = .authorized
@@ -673,23 +957,31 @@ struct ScannerRuntimeMigrationTests {
     @Test("failed scan preserves the last valid presentation projection")
     func failedScanPreservesLastValidProjection() async {
         let source = ScriptedScanSource()
-        let quality = runtimeQuality(channel: 36)
-        let recommendation = ChannelRecommendation(from: quality)
-        let region = RegionInferenceResult(
-            domain: .JP,
-            confidence: .high,
-            contributions: [],
-            conflicts: []
+        let firstCapturedAt = Date(timeIntervalSince1970: 1_752_001_200)
+        let secondCapturedAt = Date(timeIntervalSince1970: 1_752_001_205)
+        let firstInterfaces = [runtimeInterfaceInfo(ssid: "Presentation")]
+        let secondInterfaces = [
+            runtimeInterfaceInfo(interfaceName: "en9", ssid: "Failure cycle"),
+            runtimeInterfaceInfo(interfaceName: "bridge9", ssid: nil),
+        ]
+        let interfaceSource = SequentialInterfaceSnapshotSource(
+            captures: [
+                (capturedAt: firstCapturedAt, interfaces: firstInterfaces),
+                (capturedAt: secondCapturedAt, interfaces: secondInterfaces),
+            ]
         )
-        let pipeline = ErrorAwareProjectionCyclePipeline(
-            channelQualities: [quality],
-            recommendations: [recommendation],
-            inferredRegion: region
+        let gatewayLatencyProvider = SuspendingSecondGatewayLatencyProvider(
+            result: GatewayLatencyResult(timestamp: firstCapturedAt)
         )
+        let pipeline = WiFiObservationPipeline(
+            gatewayLatencyProvider: gatewayLatencyProvider
+        )
+        let store = WiFiObservationStore()
         let runtime = WiFiObservationRuntime(
-            store: WiFiObservationStore(),
+            store: store,
             pipeline: pipeline,
-            scanSource: source
+            scanSource: source,
+            interfaceSource: interfaceSource
         )
         let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
         scanner.locationManager.authorizationStatus = .authorized
@@ -698,13 +990,35 @@ struct ScannerRuntimeMigrationTests {
         await scanner.debugStartScanLoopForTesting()
         await source.yield(.networks([network]))
         await waitUntil { scanner.lastNetworks.map(\.id) == [network.id] }
+        let qualityChannels = scanner.channelQualities.map(\.channel)
+        let qualityScores = scanner.channelQualities.map(\.qualityScore)
+        let recommendationChannels = scanner.channelRecommendations.map(\.channel)
+        let regionDomain = scanner.inferredRegion?.domain
+        let regionConfidence = scanner.inferredRegion?.confidence
+        let expectedError = WiFiObservationError.environmentScanFailed("temporary scan failure")
         await source.yield(.failure("temporary scan failure"))
-        await waitUntil { await pipeline.callCount == 2 }
+        await gatewayLatencyProvider.waitUntilSecondMeasurementEntered()
 
+        // Capturing is earlier than the pipeline await, so this proves captureCount
+        // cannot be used as a publication/projection completion signal.
+        #expect(interfaceSource.captureCount == 2)
+        #expect(store.latestEnvironmentSnapshot?.error == nil)
+
+        await gatewayLatencyProvider.releaseSecondMeasurement()
+        await waitUntil { store.latestEnvironmentSnapshot?.error == expectedError }
+
+        #expect(interfaceSource.captureCount == 2)
         #expect(scanner.lastNetworks.map(\.id) == [network.id])
-        #expect(scanner.channelQualities.map(\.channel) == [36])
-        #expect(scanner.channelRecommendations.map(\.channel) == [36])
-        #expect(scanner.inferredRegion?.domain == .JP)
+        #expect(scanner.channelQualities.map(\.channel) == qualityChannels)
+        #expect(scanner.channelQualities.map(\.qualityScore) == qualityScores)
+        #expect(scanner.channelRecommendations.map(\.channel) == recommendationChannels)
+        #expect(scanner.inferredRegion?.domain == regionDomain)
+        #expect(scanner.inferredRegion?.confidence == regionConfidence)
+        #expect(scanner.networkInfo.map(\.interfaceName) == secondInterfaces.map(\.interfaceName))
+        #expect(scanner.networkInfo.map(\.ssid) == secondInterfaces.map(\.ssid))
+        let failedCycleSnapshot = interfaceSource.capturedSnapshots[1]
+        #expect(store.currentStatus?.interfaceSnapshotCycleID == failedCycleSnapshot.cycleID)
+        #expect(store.currentStatus?.timestamp == failedCycleSnapshot.capturedAt)
         scanner.stop()
     }
 
@@ -714,7 +1028,8 @@ struct ScannerRuntimeMigrationTests {
         let runtime = WiFiObservationRuntime(
             store: WiFiObservationStore(),
             pipeline: RecordingCyclePipeline(),
-            scanSource: source
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
         )
         let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
 
@@ -732,13 +1047,98 @@ struct ScannerRuntimeMigrationTests {
         scanner.stop()
     }
 
+    @Test("termination gate rejects powered-on reconcile, restart, and later start")
+    func terminationGatePreventsRuntimeRevival() async {
+        let source = ScriptedScanSource()
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(),
+            pipeline: RecordingCyclePipeline(),
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
+        )
+        let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
+        scanner.locationManager.authorizationStatus = .authorized
+
+        await scanner.debugStartScanLoopForTesting()
+        await scanner.stopForTermination()
+        let stopped = await source.snapshot()
+
+        scanner.debugReconcileWiFiStateForTesting(.poweredOn)
+        scanner.scanIntervalSeconds = 1
+        await scanner.debugStartScanLoopForTesting()
+        await scanner.debugDrainRuntimeLifecycleForTesting()
+        await scanner.stopForTermination()
+
+        let final = await source.snapshot()
+        #expect(stopped.requestedIntervals == [.seconds(3)])
+        #expect(final.requestedIntervals == stopped.requestedIntervals)
+        #expect(final.stopCalls == stopped.stopCalls)
+        #expect(final.activeStreamCount == 0)
+        #expect(scanner.isScanning == false)
+    }
+
+    @Test("termination supersedes a runtime start suspended in capability lookup")
+    func terminationSupersedesSuspendedRuntimeStart() async {
+        let source = ScriptedScanSource()
+        await source.suspendNextCapabilityLookup()
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(),
+            pipeline: RecordingCyclePipeline(),
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
+        )
+        let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
+
+        let start = Task { @MainActor in
+            await scanner.debugStartScanLoopForTesting()
+        }
+        await source.waitUntilCapabilityLookupEntered()
+        let termination = Task { @MainActor in
+            await scanner.stopForTermination()
+        }
+        await Task.yield()
+        await source.releaseCapabilityLookup()
+        await start.value
+        await termination.value
+
+        let snapshot = await source.snapshot()
+        #expect(snapshot.requestedIntervals.isEmpty)
+        #expect(snapshot.activeStreamCount == 0)
+        #expect(scanner.isScanning == false)
+    }
+
+    @Test("termination stops Wi-Fi power monitoring and its event task")
+    func terminationStopsWiFiMonitoring() async {
+        let scanner = ScannerViewModel(
+            observationRuntime: WiFiObservationRuntime(
+                store: WiFiObservationStore(),
+                pipeline: RecordingCyclePipeline(),
+                scanSource: ScriptedScanSource(),
+                interfaceSource: ImmediateInterfaceSnapshotSource()
+            ),
+            authorizationRefresh: { _ in }
+        )
+
+        scanner.debugStartWiFiMonitoringForTesting()
+        #expect(scanner.debugHasActiveWiFiMonitoringForTesting)
+
+        await scanner.stopForTermination()
+
+        #expect(scanner.debugHasActiveWiFiMonitoringForTesting == false)
+    }
+
     @Test("a suspended old cycle cannot publish across scanner stop and start")
     func suspendedOldCycleIsRejectedAcrossStopStart() async {
         let source = ScriptedScanSource()
         let pipeline = SuspendingFirstCyclePipeline()
         let store = WiFiObservationStore()
         let consumer = CapturingObservationConsumer()
-        let runtime = WiFiObservationRuntime(store: store, pipeline: pipeline, scanSource: source)
+        let runtime = WiFiObservationRuntime(
+            store: store,
+            pipeline: pipeline,
+            scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource()
+        )
         runtime.addConsumer(consumer)
         let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
         scanner.locationManager.authorizationStatus = .authorized
@@ -777,6 +1177,63 @@ struct ScannerRuntimeMigrationTests {
             await Task.yield()
         }
         Issue.record("Timed out waiting for Scanner runtime work")
+    }
+}
+
+@Suite("Wi-Fi scan cadence")
+struct WiFiScanCadenceTests {
+    @Test("normal scans retain wall-clock cadence")
+    func normalCadence() async throws {
+        let clock = ManualWiFiScanClock()
+        var cadence = WiFiScanCadence(interval: .seconds(5), startedAt: .zero)
+
+        await clock.advance(by: .seconds(1))
+        let firstSkipped = try await cadence.waitForNextScan(using: clock)
+        await clock.advance(by: .seconds(1))
+        let secondSkipped = try await cadence.waitForNextScan(using: clock)
+
+        #expect(firstSkipped == 0)
+        #expect(secondSkipped == 0)
+        #expect(await clock.recordedSleeps == [.seconds(4), .seconds(4)])
+        #expect(await clock.now() == .seconds(10))
+    }
+
+    @Test("long scans skip missed slots and wait for the next future slot")
+    func skipsMissedSlotsWithoutCatchUpBurst() async throws {
+        let clock = ManualWiFiScanClock()
+        var cadence = WiFiScanCadence(interval: .seconds(5), startedAt: .zero)
+
+        await clock.advance(by: .seconds(12))
+        let skippedAfterDelay = try await cadence.waitForNextScan(using: clock)
+        await clock.advance(by: .seconds(1))
+        let skippedAfterRecovery = try await cadence.waitForNextScan(using: clock)
+
+        #expect(skippedAfterDelay == 2)
+        #expect(skippedAfterRecovery == 0)
+        #expect(await clock.recordedSleeps == [.seconds(3), .seconds(4)])
+        #expect(await clock.now() == .seconds(20))
+    }
+
+    @Test("cancelling a pending cadence wait completes without another scan")
+    func cancellationStopsPendingWait() async {
+        let clock = ManualWiFiScanClock(suspendsSleeps: true)
+        let task = Task {
+            var cadence = WiFiScanCadence(interval: .seconds(5), startedAt: .zero)
+            return try await cadence.waitForNextScan(using: clock)
+        }
+
+        await clock.waitUntilSleepEntered()
+        task.cancel()
+
+        do {
+            _ = try await task.value
+            Issue.record("Expected the pending cadence wait to be cancelled")
+        } catch is CancellationError {
+            // Expected cancellation path.
+        } catch {
+            Issue.record("Unexpected cadence cancellation error: \(error)")
+        }
+        #expect(await clock.recordedSleeps == [.seconds(5)])
     }
 }
 
@@ -835,7 +1292,7 @@ private actor ScriptedScanSource: WiFiScanStreaming {
 
     private var requestedIntervals: [Duration] = []
     private var stopCalls = 0
-    private var continuations: [UUID: AsyncStream<WiFiScanEvent>.Continuation] = [:]
+    private var handlers: [UUID: @Sendable (WiFiScanEvent) async -> Void] = [:]
     private var interfaceNameCalls = 0
     private var supportedBandsCalls = 0
     private var supportedChannelsCalls = 0
@@ -847,23 +1304,19 @@ private actor ScriptedScanSource: WiFiScanStreaming {
     private var capabilityLookupReleaseContinuation: CheckedContinuation<Void, Never>?
     private var hasCompletedStop = false
     private var stopCompletedContinuation: CheckedContinuation<Void, Never>?
+    private var cadenceSkippedSlotCount: UInt64 = 0
 
-    func startScanning(interval: Duration) async -> AsyncStream<WiFiScanEvent> {
+    func startScanning(
+        interval: Duration,
+        onEvent: @escaping @Sendable (WiFiScanEvent) async -> Void
+    ) async {
         requestedIntervals.append(interval)
-        let id = UUID()
-        let pair = AsyncStream<WiFiScanEvent>.makeStream()
-        pair.continuation.onTermination = { [weak self] _ in
-            Task { await self?.removeContinuation(id) }
-        }
-        continuations[id] = pair.continuation
-        return pair.stream
+        handlers[UUID()] = onEvent
     }
 
     func stopScanning() async {
         stopCalls += 1
-        let active = continuations.values
-        continuations.removeAll()
-        for continuation in active { continuation.finish() }
+        handlers.removeAll()
         hasCompletedStop = true
         stopCompletedContinuation?.resume()
         stopCompletedContinuation = nil
@@ -910,8 +1363,19 @@ private actor ScriptedScanSource: WiFiScanStreaming {
         return .default
     }
 
-    func yield(_ event: WiFiScanEvent) {
-        for continuation in continuations.values { continuation.yield(event) }
+    func cadenceDiagnostics() -> WiFiScanCadenceDiagnostics {
+        WiFiScanCadenceDiagnostics(skippedSlotCount: cadenceSkippedSlotCount)
+    }
+
+    func setCadenceSkippedSlotCount(_ count: UInt64) {
+        cadenceSkippedSlotCount = count
+    }
+
+    func yield(_ event: WiFiScanEvent) async {
+        let active = handlers.values
+        for handler in active {
+            await handler(event)
+        }
     }
 
     func suspendNextCapabilityLookup() {
@@ -935,7 +1399,7 @@ private actor ScriptedScanSource: WiFiScanStreaming {
         Snapshot(
             requestedIntervals: requestedIntervals,
             stopCalls: stopCalls,
-            activeStreamCount: continuations.count,
+            activeStreamCount: handlers.count,
             interfaceNameCalls: interfaceNameCalls,
             supportedBandsCalls: supportedBandsCalls,
             supportedChannelsCalls: supportedChannelsCalls,
@@ -944,8 +1408,42 @@ private actor ScriptedScanSource: WiFiScanStreaming {
         )
     }
 
-    private func removeContinuation(_ id: UUID) {
-        continuations[id] = nil
+}
+
+private actor ManualWiFiScanClock: WiFiScanClock {
+    private var instant: Duration = .zero
+    private let suspendsSleeps: Bool
+    private var sleepEntered = false
+    private var sleepEnteredContinuation: CheckedContinuation<Void, Never>?
+    private(set) var recordedSleeps: [Duration] = []
+
+    init(suspendsSleeps: Bool = false) {
+        self.suspendsSleeps = suspendsSleeps
+    }
+
+    func now() -> Duration { instant }
+
+    func sleep(for duration: Duration) async throws {
+        recordedSleeps.append(duration)
+        sleepEntered = true
+        sleepEnteredContinuation?.resume()
+        sleepEnteredContinuation = nil
+        if suspendsSleeps {
+            try await Task.sleep(for: .seconds(60))
+        } else {
+            instant += duration
+        }
+    }
+
+    func advance(by duration: Duration) {
+        instant += duration
+    }
+
+    func waitUntilSleepEntered() async {
+        guard !sleepEntered else { return }
+        await withCheckedContinuation { continuation in
+            sleepEnteredContinuation = continuation
+        }
     }
 }
 
@@ -993,6 +1491,142 @@ private actor RecordingCyclePipeline: WiFiObservationPipelining {
         )
     }
 
+}
+
+@MainActor
+private final class CountingInterfaceSnapshotSource: NetworkInterfaceSnapshotSourcing {
+    private let interfaces: [NetworkInterfaceInfo]
+    private let capturedAt: Date
+    private(set) var captureCount = 0
+
+    init(interfaces: [NetworkInterfaceInfo], capturedAt: Date) {
+        self.interfaces = interfaces
+        self.capturedAt = capturedAt
+    }
+
+    func capture(cycleID: UUID) async -> NetworkInterfaceSnapshot {
+        captureCount += 1
+        return NetworkInterfaceSnapshot(
+            cycleID: cycleID,
+            capturedAt: capturedAt,
+            interfaces: interfaces
+        )
+    }
+}
+
+private struct ImmediateInterfaceSnapshotSource: NetworkInterfaceSnapshotSourcing {
+    func capture(cycleID: UUID) async -> NetworkInterfaceSnapshot {
+        NetworkInterfaceSnapshot(
+            cycleID: cycleID,
+            capturedAt: Date(timeIntervalSince1970: 42),
+            interfaces: []
+        )
+    }
+}
+
+private actor BlockingInterfaceSnapshotSource: NetworkInterfaceSnapshotSourcing {
+    private let captureStarted: DispatchSemaphore
+    private let releaseCapture: DispatchSemaphore
+    private(set) var didTimeOut = false
+
+    init(captureStarted: DispatchSemaphore, releaseCapture: DispatchSemaphore) {
+        self.captureStarted = captureStarted
+        self.releaseCapture = releaseCapture
+    }
+
+    func capture(cycleID: UUID) -> NetworkInterfaceSnapshot {
+        captureStarted.signal()
+        didTimeOut = releaseCapture.wait(timeout: .now() + 0.1) == .timedOut
+        return NetworkInterfaceSnapshot(
+            cycleID: cycleID,
+            capturedAt: Date(timeIntervalSince1970: 42),
+            interfaces: []
+        )
+    }
+}
+
+@MainActor
+private final class SequentialInterfaceSnapshotSource: NetworkInterfaceSnapshotSourcing {
+    private let captures: [(capturedAt: Date, interfaces: [NetworkInterfaceInfo])]
+    private(set) var capturedSnapshots: [NetworkInterfaceSnapshot] = []
+
+    init(captures: [(capturedAt: Date, interfaces: [NetworkInterfaceInfo])]) {
+        precondition(!captures.isEmpty)
+        self.captures = captures
+    }
+
+    var captureCount: Int { capturedSnapshots.count }
+
+    func capture(cycleID: UUID) async -> NetworkInterfaceSnapshot {
+        let index = min(capturedSnapshots.count, captures.count - 1)
+        let capture = captures[index]
+        let snapshot = NetworkInterfaceSnapshot(
+            cycleID: cycleID,
+            capturedAt: capture.capturedAt,
+            interfaces: capture.interfaces
+        )
+        capturedSnapshots.append(snapshot)
+        return snapshot
+    }
+}
+
+private func runtimeInterfaceInfo(
+    interfaceName: String = "en0",
+    ssid: String?
+) -> NetworkInterfaceInfo {
+    NetworkInterfaceInfo(
+        interfaceName: interfaceName,
+        hardwareMAC: "00:11:22:33:44:55",
+        ipv4Addresses: ["192.0.2.2"],
+        subnetMasks: ["255.255.255.0"],
+        router: "192.0.2.1",
+        dnsServers: ["192.0.2.1"],
+        ssid: ssid,
+        bssid: "AA:BB:CC:DD:EE:FF",
+        channel: 36,
+        band: .band5GHz,
+        rssi: -48,
+        txRate: 1200,
+        phyMode: "ax",
+        security: "WPA3"
+    )
+}
+
+private actor SuspendingSecondGatewayLatencyProvider: GatewayLatencyProviding {
+    private let result: GatewayLatencyResult
+    private var measurementCount = 0
+    private var secondMeasurementEntered = false
+    private var enteredContinuation: CheckedContinuation<Void, Never>?
+    private var releaseContinuation: CheckedContinuation<Void, Never>?
+
+    init(result: GatewayLatencyResult) {
+        self.result = result
+    }
+
+    func measure(routerIP: String?) async -> GatewayLatencyResult {
+        measurementCount += 1
+        if measurementCount == 2 {
+            secondMeasurementEntered = true
+            enteredContinuation?.resume()
+            enteredContinuation = nil
+            await withCheckedContinuation { continuation in
+                releaseContinuation = continuation
+            }
+        }
+        return result
+    }
+
+    func waitUntilSecondMeasurementEntered() async {
+        guard !secondMeasurementEntered else { return }
+        await withCheckedContinuation { continuation in
+            enteredContinuation = continuation
+        }
+    }
+
+    func releaseSecondMeasurement() {
+        releaseContinuation?.resume()
+        releaseContinuation = nil
+    }
 }
 
 private actor ProjectionCyclePipeline: WiFiObservationPipelining {
@@ -1126,6 +1760,46 @@ private actor SuspendingFirstCyclePipeline: WiFiObservationPipelining {
         releaseContinuation = nil
     }
 
+}
+
+private actor CancellationAwareFirstCyclePipeline: WiFiObservationPipelining {
+    private var firstCycleEntered = false
+    private var enteredContinuation: CheckedContinuation<Void, Never>?
+    private(set) var receivedBSSIDs: [String] = []
+    private(set) var wasCancelled = false
+
+    func produceCycle(
+        networks: [WiFiNetwork],
+        context: WiFiObservationCycleContext
+    ) async -> WiFiObservationCycleResult {
+        if let bssid = networks.first?.bssid {
+            receivedBSSIDs.append(bssid)
+        }
+        if receivedBSSIDs.count == 1 {
+            firstCycleEntered = true
+            enteredContinuation?.resume()
+            enteredContinuation = nil
+            do {
+                try await Task.sleep(for: .seconds(60))
+            } catch {
+                wasCancelled = true
+            }
+        }
+        return WiFiObservationCycleResult(
+            observation: WiFiObservation(timestamp: context.timestamp),
+            inferredRegion: RegulatoryDomainResolver.resolve(
+                userOverride: nil,
+                userDefaultsOverride: nil,
+                supportedChannelsRaw: context.supportedChannelsRaw,
+                apCountryCodes: []
+            )
+        )
+    }
+
+    func waitUntilFirstCycleEntered() async {
+        guard !firstCycleEntered else { return }
+        await withCheckedContinuation { enteredContinuation = $0 }
+    }
 }
 
 @MainActor

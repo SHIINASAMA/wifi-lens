@@ -37,6 +37,17 @@ final class WiFiPowerMonitor: NSObject, CWEventDelegate {
         startPolling()
     }
 
+    func stopMonitoring() {
+        pollingTask?.cancel()
+        pollingTask = nil
+        continuation?.finish()
+        continuation = nil
+        guard isMonitoring else { return }
+        isMonitoring = false
+        CWWiFiClient.shared().delegate = nil
+        try? CWWiFiClient.shared().stopMonitoringEvent(with: .powerDidChange)
+    }
+
     func refreshState() {
         guard isMonitoring else { return }
         let previous = currentState
@@ -80,6 +91,12 @@ final class WiFiPowerMonitor: NSObject, CWEventDelegate {
         }
     }
 }
+
+#if DEBUG
+extension WiFiPowerMonitor {
+    var debugIsMonitoringForTesting: Bool { isMonitoring }
+}
+#endif
 
 private extension WiFiPowerState {
     var logLabel: String {

@@ -2,8 +2,8 @@ import Foundation
 import CoreWLAN
 import SystemConfiguration
 
-struct NetworkInterfaceInfo {
-    enum InterfaceType: String {
+struct NetworkInterfaceInfo: Sendable {
+    enum InterfaceType: String, Sendable {
         case wifi
         case ethernet
         case virtual
@@ -47,6 +47,26 @@ struct NetworkInterfaceInfo {
 
 
     var hasNetworkInfo: Bool { !ipv4Addresses.isEmpty || router != nil || !dnsServers.isEmpty }
+}
+
+struct NetworkInterfaceSnapshot: Sendable {
+    let cycleID: UUID
+    let capturedAt: Date
+    let interfaces: [NetworkInterfaceInfo]
+}
+
+protocol NetworkInterfaceSnapshotSourcing: Sendable {
+    func capture(cycleID: UUID) async -> NetworkInterfaceSnapshot
+}
+
+actor SystemNetworkInterfaceSnapshotSource: NetworkInterfaceSnapshotSourcing {
+    func capture(cycleID: UUID) -> NetworkInterfaceSnapshot {
+        NetworkInterfaceSnapshot(
+            cycleID: cycleID,
+            capturedAt: Date(),
+            interfaces: NetworkInfoService.fetchAll()
+        )
+    }
 }
 
 enum NetworkInfoService {
@@ -106,12 +126,15 @@ enum NetworkInfoService {
             ifaces[name] = entry
         }
 
-        // Merge IPv4 / router from SystemConfiguration where available
+        // Read each SystemConfiguration collection once per capture. The maps
+        // below are reused while enriching every discovered interface.
+        var interfaceIPv4ByName: [String: [String: Any]] = [:]
         if let store,
            let ipv4Keys = SCDynamicStoreCopyKeyList(store, "State:/Network/Interface/.*/IPv4" as CFString) as? [String] {
             for key in ipv4Keys {
                 let name = key.components(separatedBy: "/").dropLast().last ?? key
                 guard let dict = SCDynamicStoreCopyValue(store, key as CFString) as? [String: Any] else { continue }
+                interfaceIPv4ByName[name] = dict
                 if ifaces[name] == nil {
                     ifaces[name] = (ips: [], subnets: [], mac: nil)
                 }
@@ -120,6 +143,18 @@ enum NetworkInfoService {
                 }
                 if ifaces[name]?.subnets.isEmpty ?? true {
                     ifaces[name]?.subnets = dict["SubnetMasks"] as? [String] ?? []
+                }
+            }
+        }
+
+        var serviceIPv4ByInterface: [String: [String: Any]] = [:]
+        if let store,
+           let serviceKeys = SCDynamicStoreCopyKeyList(store, "State:/Network/Service/.*/IPv4" as CFString) as? [String] {
+            for key in serviceKeys {
+                guard let dictionary = SCDynamicStoreCopyValue(store, key as CFString) as? [String: Any],
+                      let interfaceName = dictionary["InterfaceName"] as? String else { continue }
+                if serviceIPv4ByInterface[interfaceName] == nil {
+                    serviceIPv4ByInterface[interfaceName] = dictionary
                 }
             }
         }
@@ -134,27 +169,17 @@ enum NetworkInfoService {
             }()
 
             // Router lookup from SystemConfiguration (Interface path)
-            var router: String? = nil
-            if let store,
-               let ipv4Dict = SCDynamicStoreCopyValue(store, "State:/Network/Interface/\(name)/IPv4" as CFString) as? [String: Any] {
+            var router: String?
+            if let ipv4Dict = interfaceIPv4ByName[name] {
                 if let r = ipv4Dict["Router"] as? String { router = r }
                 else if let arr = ipv4Dict["Router"] as? [String], let first = arr.first { router = first }
             }
 
-            // Fallback: try Service-based path for router
-            if router == nil, let store {
-                if let serviceKeys = SCDynamicStoreCopyKeyList(store, "State:/Network/Service/.*/IPv4" as CFString) as? [String] {
-                    for key in serviceKeys {
-                        if let svcDict = SCDynamicStoreCopyValue(store, key as CFString) as? [String: Any],
-                           let svcInterface = svcDict["InterfaceName"] as? String, svcInterface == name {
-                            if let r = svcDict["Router"] as? String {
-                                router = r
-                            } else if let arr = svcDict["Router"] as? [String], let first = arr.first {
-                                router = first
-                            }
-                            if router != nil { break }
-                        }
-                    }
+            if router == nil, let serviceIPv4 = serviceIPv4ByInterface[name] {
+                if let value = serviceIPv4["Router"] as? String {
+                    router = value
+                } else if let values = serviceIPv4["Router"] as? [String] {
+                    router = values.first
                 }
             }
 

@@ -82,11 +82,14 @@ final class ScannerViewModel {
     private var startupTask: Task<Void, Never>?
     private var wifiMonitoringTask: Task<Void, Never>?
     private var runtimeLifecycleTail: Task<Void, Never>?
+    private var terminationStopTask: Task<Void, Never>?
+    private var isTerminating = false
     private var activeProjectionGeneration: UUID?
 
     let store: WiFiObservationStore
     let observationRuntime: WiFiObservationRuntime
     private let authorizationRefresh: @MainActor (LocationPermissionManager) -> Void
+    private let userDefaults: UserDefaults
     private var userDefaultsRegionOverride: RegulatoryDomain?
 
     init(
@@ -97,6 +100,7 @@ final class ScannerViewModel {
         self.store = store
         self.observationRuntime = WiFiObservationRuntime(store: store)
         self.authorizationRefresh = authorizationRefresh
+        self.userDefaults = userDefaults
         self.userDefaultsRegionOverride = Self.regionOverride(
             from: userDefaults.string(forKey: "regulatoryRegionOverride") ?? "auto"
         )
@@ -112,6 +116,7 @@ final class ScannerViewModel {
         self.store = observationRuntime.store
         self.observationRuntime = observationRuntime
         self.authorizationRefresh = authorizationRefresh
+        self.userDefaults = userDefaults
         self.userDefaultsRegionOverride = Self.regionOverride(
             from: userDefaults.string(forKey: "regulatoryRegionOverride") ?? "auto"
         )
@@ -236,6 +241,13 @@ final class ScannerViewModel {
     /// loop is restarted with the new interval.
     var scanIntervalSeconds: Int = 3 {
         didSet {
+            if !scanIntervalLeases.isEmpty, scanIntervalSeconds != 1 {
+                isEnforcingLeasedScanInterval = true
+                scanIntervalSeconds = 1
+                isEnforcingLeasedScanInterval = false
+                return
+            }
+            guard !isEnforcingLeasedScanInterval else { return }
             guard oldValue != scanIntervalSeconds else { return }
             guard isScanning else { return }
             AppLogger.scanner.info("scanIntervalSeconds changed \(oldValue) → \(scanIntervalSeconds), restarting scan loop")
@@ -243,7 +255,36 @@ final class ScannerViewModel {
         }
     }
 
+    private var scanIntervalLeases: Set<UUID> = []
+    private var scanIntervalBeforeLeases: Int?
+    private var isEnforcingLeasedScanInterval = false
+
+    var activeScanIntervalLeaseCount: Int { scanIntervalLeases.count }
+
+    func acquireScanIntervalLease(seconds: Int) -> UUID {
+        let token = UUID()
+        if scanIntervalLeases.isEmpty {
+            let configuredInterval = userDefaults.integer(forKey: "scanIntervalSeconds")
+            scanIntervalBeforeLeases = configuredInterval > 0
+                ? configuredInterval
+                : scanIntervalSeconds
+        }
+        scanIntervalLeases.insert(token)
+        scanIntervalSeconds = min(scanIntervalSeconds, max(1, seconds))
+        return token
+    }
+
+    func releaseScanIntervalLease(_ token: UUID) {
+        guard scanIntervalLeases.remove(token) != nil else { return }
+        guard scanIntervalLeases.isEmpty else { return }
+        if let scanIntervalBeforeLeases {
+            scanIntervalSeconds = scanIntervalBeforeLeases
+        }
+        scanIntervalBeforeLeases = nil
+    }
+
     func start() async {
+        guard !isTerminating else { return }
         wifiPowerMonitor.startMonitoring()
         if let startupTask {
             await startupTask.value
@@ -253,6 +294,7 @@ final class ScannerViewModel {
 
         let task = Task { @MainActor [weak self] in
             guard let self else { return }
+            guard !isTerminating else { return }
             AppLogger.scanner.info("start() — begin")
 
             locationManager.onAuthorizationGranted = { [weak self] in
@@ -276,24 +318,27 @@ final class ScannerViewModel {
     }
 
     private func startScanningAfterAuth() async {
+        guard !isTerminating else { return }
         guard !isStartingScan else { return }
         guard !isScanning else { return }
         guard wifiPowerState == .poweredOn else { return }
         isStartingScan = true
         defer { isStartingScan = false }
-        let stored = UserDefaults.standard.integer(forKey: "scanIntervalSeconds")
-        scanIntervalSeconds = max(1, stored > 0 ? stored : 3)
+        let stored = userDefaults.integer(forKey: "scanIntervalSeconds")
+        scanIntervalSeconds = effectiveScanInterval(configured: stored > 0 ? stored : 3)
         await startScanLoop()
         hasStarted = true
     }
 
     func handleSceneDidBecomeActive() async {
+        guard !isTerminating else { return }
         locationManager.refreshStatus()
         wifiPowerMonitor.refreshState()
         reconcileWiFiState(wifiPowerMonitor.currentState)
     }
 
     private func startWiFiMonitoring() {
+        guard !isTerminating else { return }
         guard wifiMonitoringTask == nil else { return }
 
         wifiMonitoringTask = Task { [weak self] in
@@ -308,6 +353,7 @@ final class ScannerViewModel {
     private func reconcileWiFiState(_ state: WiFiPowerState) {
         wifiPowerState = state
         updateMCPDataProvider()
+        guard !isTerminating else { return }
 
         switch state {
         case .poweredOn:
@@ -336,6 +382,7 @@ final class ScannerViewModel {
     }
 
     private func restartScanLoop() {
+        guard !isTerminating else { return }
         let configuration = runtimeConfiguration
         enqueueRuntimeLifecycle { [weak self] in
             await self?.observationRuntime.restartScanning(configuration: configuration)
@@ -343,6 +390,7 @@ final class ScannerViewModel {
     }
 
     private func startScanLoop() async {
+        guard !isTerminating else { return }
         AppLogger.scanner.info("startScanLoop() — starting with interval \(scanIntervalSeconds)s")
         isScanning = true
         accessState = .scanning
@@ -366,10 +414,14 @@ final class ScannerViewModel {
 
     private var runtimeConfiguration: WiFiObservationRuntimeConfiguration {
         return WiFiObservationRuntimeConfiguration(
-            scanInterval: .seconds(max(1, scanIntervalSeconds)),
+            scanInterval: .seconds(effectiveScanInterval(configured: scanIntervalSeconds)),
             userRegionOverride: userRegionOverride,
             userDefaultsRegionOverride: userDefaultsRegionOverride
         )
+    }
+
+    private func effectiveScanInterval(configured: Int) -> Int {
+        scanIntervalLeases.isEmpty ? max(1, configured) : 1
     }
 
     func handleRegulatoryRegionOverrideChange(_ rawValue: String) {
@@ -392,6 +444,7 @@ final class ScannerViewModel {
         for viewModel in allBandViewModels {
             viewModel.updateInterfaceName(interfaceName)
         }
+        networkInfo = output.interfaceSnapshot.interfaces
 
         if let error = output.cycle.observation.environmentSnapshot?.error {
             AppLogger.scanner.error("scan failure: \(String(describing: error))")
@@ -404,9 +457,6 @@ final class ScannerViewModel {
         regulatoryPipeline.inferredRegion = output.cycle.inferredRegion
 
         applyNetworks(output.rawNetworks)
-        // Interfaces presentation remains a separate system-interface projection;
-        // it does not construct or publish Wi-Fi observations.
-        networkInfo = NetworkInfoService.fetchAll()
     }
 
     private func deduplicateNetworks(_ networks: [WiFiNetwork]) -> [WiFiNetwork] {
@@ -718,9 +768,35 @@ final class ScannerViewModel {
     func stop() {
         activeProjectionGeneration = nil
         transitionToStoppedState()
+        guard !isTerminating else { return }
         enqueueRuntimeLifecycle { [weak self] in
             await self?.observationRuntime.stopScanning()
         }
+    }
+
+    func stopForTermination() async {
+        if let terminationStopTask {
+            await terminationStopTask.value
+            return
+        }
+
+        isTerminating = true
+        startupTask?.cancel()
+        startupTask = nil
+        wifiMonitoringTask?.cancel()
+        wifiMonitoringTask = nil
+        wifiPowerMonitor.stopMonitoring()
+        runtimeLifecycleTail?.cancel()
+        activeProjectionGeneration = nil
+        transitionToStoppedState()
+
+        let runtime = observationRuntime
+        let stopTask = Task { @MainActor in
+            await runtime.stopScanning()
+        }
+        terminationStopTask = stopTask
+        runtimeLifecycleTail = stopTask
+        await stopTask.value
     }
 
     private func isRuntimePublicationEligible(for generation: UUID) -> Bool {
@@ -755,9 +831,11 @@ final class ScannerViewModel {
     private func enqueueRuntimeLifecycle(
         _ operation: @escaping @MainActor () async -> Void
     ) -> Task<Void, Never> {
+        guard !isTerminating else { return Task {} }
         let previous = runtimeLifecycleTail
-        let command = Task { @MainActor in
+        let command = Task { @MainActor [weak self] in
             await previous?.value
+            guard !Task.isCancelled, let self, !self.isTerminating else { return }
             await operation()
         }
         runtimeLifecycleTail = command
@@ -796,6 +874,15 @@ extension ScannerViewModel {
 
     func debugDrainRuntimeLifecycleForTesting() async {
         await runtimeLifecycleTail?.value
+    }
+
+    func debugStartWiFiMonitoringForTesting() {
+        wifiPowerMonitor.startMonitoring()
+        startWiFiMonitoring()
+    }
+
+    var debugHasActiveWiFiMonitoringForTesting: Bool {
+        wifiMonitoringTask != nil && wifiPowerMonitor.debugIsMonitoringForTesting
     }
 }
 #endif

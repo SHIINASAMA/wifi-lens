@@ -1,6 +1,20 @@
 import SwiftUI
 
 enum EditionComposition {
+    @MainActor
+    static var markdownExportCommandContribution: MarkdownExportCommandContribution {
+        .lockedPreview
+    }
+
+    @MainActor
+    static func makeMainWindowState() -> AnyObject { NSObject() }
+
+    @MainActor
+    static func registerMainWindowState(_ state: AnyObject, for windowID: UUID) -> Bool { true }
+
+    @MainActor
+    static func unregisterMainWindowState(_ state: AnyObject, for windowID: UUID) {}
+
     static let isTimelineLockedPreview = true
 
     static var timelineToolbarDescriptor: SecondaryToolbarDescriptor? { nil }
@@ -44,6 +58,15 @@ enum EditionComposition {
     }
 
     static func startLifecycle(observationRuntime: WiFiObservationRuntime) {}
+
+    @MainActor
+    static func prepareForTermination() async {}
+
+    @MainActor
+    static func mainWindowDidBecomeActive(_ windowID: UUID) {}
+
+    @MainActor
+    static func mainWindowWillClose(_ windowID: UUID) {}
 
     @SceneBuilder
     @MainActor

@@ -201,9 +201,9 @@ import ChartLens
 
     // MARK: - isViewVisible
 
-    @Test func isViewVisibleDefaultTrue() {
+    @Test func isViewVisibleDefaultsFalse() {
         let vm = BandChartViewModel(band: .band24GHz)
-        #expect(vm.isViewVisible)
+        #expect(!vm.isViewVisible)
     }
 
     // MARK: - BandChartLayout

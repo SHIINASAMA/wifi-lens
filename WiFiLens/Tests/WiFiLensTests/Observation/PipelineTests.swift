@@ -266,6 +266,11 @@ struct PipelineTests {
     ) -> WiFiObservationCycleContext {
         WiFiObservationCycleContext(
             timestamp: timestamp,
+            interfaceSnapshot: NetworkInterfaceSnapshot(
+                cycleID: UUID(),
+                capturedAt: timestamp,
+                interfaces: []
+            ),
             interfaceName: "en0",
             supportedBands: supportedBands,
             supportedChannelsRaw: [(2, 36), (2, 40)],

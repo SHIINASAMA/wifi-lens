@@ -1,6 +1,13 @@
 import SwiftUI
 
+enum MarkdownExportCommandContribution {
+    case available(@MainActor (ScannerViewModel) -> Void)
+    case lockedPreview
+}
+
 struct EditionCompositionContext {
+    let mainWindowID: UUID
+    let mainWindowState: AnyObject
     let scannerViewModel: ScannerViewModel
     let selectedPage: Binding<SidebarPage>
     let secondaryToolbarSelections: Binding<SecondaryToolbarSelections>

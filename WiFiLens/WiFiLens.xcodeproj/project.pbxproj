@@ -298,7 +298,6 @@
 		OB000000000000000000001A /* WiFiObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000A /* WiFiObservation.swift */; };
 		OB000000000000000000001B /* NetworkObservationAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000C /* NetworkObservationAdapter.swift */; };
 		OB000000000000000000001C /* WiFiCurrentConnectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000D /* WiFiCurrentConnectionProvider.swift */; };
-		OB000000000000000000001D /* WiFiEnvironmentScanProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000E /* WiFiEnvironmentScanProvider.swift */; };
 		OB000000000000000000001E /* GatewayLatencyProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000F /* GatewayLatencyProvider.swift */; };
 		OB000000000000000000001F /* RoamingProbeProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000010 /* RoamingProbeProvider.swift */; };
 		OB0000000000000000000021 /* WiFiObservationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000001 /* WiFiObservationError.swift */; };
@@ -313,7 +312,6 @@
 		OB000000000000000000002A /* WiFiObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000A /* WiFiObservation.swift */; };
 		OB000000000000000000002B /* NetworkObservationAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000C /* NetworkObservationAdapter.swift */; };
 		OB000000000000000000002C /* WiFiCurrentConnectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000D /* WiFiCurrentConnectionProvider.swift */; };
-		OB000000000000000000002D /* WiFiEnvironmentScanProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000E /* WiFiEnvironmentScanProvider.swift */; };
 		OB000000000000000000002E /* GatewayLatencyProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000F /* GatewayLatencyProvider.swift */; };
 		OB000000000000000000002F /* RoamingProbeProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB0000000000000000000010 /* RoamingProbeProvider.swift */; };
 		OB0000000000000000000031 /* ModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB000000000000000000000B /* ModelsTests.swift */; };
@@ -579,7 +577,6 @@
 		OB000000000000000000000B /* ModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelsTests.swift; sourceTree = "<group>"; };
 		OB000000000000000000000C /* NetworkObservationAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkObservationAdapter.swift; sourceTree = "<group>"; };
 		OB000000000000000000000D /* WiFiCurrentConnectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiCurrentConnectionProvider.swift; sourceTree = "<group>"; };
-		OB000000000000000000000E /* WiFiEnvironmentScanProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiEnvironmentScanProvider.swift; sourceTree = "<group>"; };
 		OB000000000000000000000F /* GatewayLatencyProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayLatencyProvider.swift; sourceTree = "<group>"; };
 		OB0000000000000000000010 /* RoamingProbeProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingProbeProvider.swift; sourceTree = "<group>"; };
 		OB0000000000000000000032 /* ProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderTests.swift; sourceTree = "<group>"; };
@@ -1195,7 +1192,6 @@
 			isa = PBXGroup;
 			children = (
 				OB000000000000000000000D /* WiFiCurrentConnectionProvider.swift */,
-				OB000000000000000000000E /* WiFiEnvironmentScanProvider.swift */,
 				OB000000000000000000000F /* GatewayLatencyProvider.swift */,
 				OB0000000000000000000010 /* RoamingProbeProvider.swift */,
 			);
@@ -1574,7 +1570,6 @@
 				OB000000000000000000001A /* WiFiObservation.swift in Sources */,
 				OB000000000000000000001B /* NetworkObservationAdapter.swift in Sources */,
 				OB000000000000000000001C /* WiFiCurrentConnectionProvider.swift in Sources */,
-				OB000000000000000000001D /* WiFiEnvironmentScanProvider.swift in Sources */,
 				OB000000000000000000001E /* GatewayLatencyProvider.swift in Sources */,
 				OB000000000000000000001F /* RoamingProbeProvider.swift in Sources */,
 				OB0000000000000000000061 /* WiFiQualityEvaluator.swift in Sources */,
@@ -1764,7 +1759,6 @@
 				OB000000000000000000002A /* WiFiObservation.swift in Sources */,
 				OB000000000000000000002B /* NetworkObservationAdapter.swift in Sources */,
 				OB000000000000000000002C /* WiFiCurrentConnectionProvider.swift in Sources */,
-				OB000000000000000000002D /* WiFiEnvironmentScanProvider.swift in Sources */,
 				OB000000000000000000002E /* GatewayLatencyProvider.swift in Sources */,
 				OB000000000000000000002F /* RoamingProbeProvider.swift in Sources */,
 				OB0000000000000000000071 /* WiFiQualityEvaluator.swift in Sources */,
