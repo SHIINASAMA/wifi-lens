@@ -2,6 +2,7 @@ import Foundation
 
 struct WiFiCurrentStatus: Equatable, Sendable {
     var timestamp: Date
+    var interfaceSnapshotCycleID: UUID? = nil
     var interfaceName: String?
     var ssid: String?
     var bssid: String?

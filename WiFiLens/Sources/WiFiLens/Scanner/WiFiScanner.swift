@@ -6,49 +6,125 @@ enum WiFiScanEvent: Sendable {
     case failure(String)
 }
 
-actor WiFiScanner {
+protocol WiFiScanStreaming: Sendable {
+    func startScanning(
+        interval: Duration,
+        onEvent: @escaping @Sendable (WiFiScanEvent) async -> Void
+    ) async
+    func stopScanning() async
+    func interfaceName() async -> String?
+    func supportedBands() async -> Set<ChannelBand>
+    func supportedChannels() async -> [(ChannelBand, Int)]
+    func supportedWLANChannelsRaw() async -> [(Int, Int)]
+    func devicePHYCapabilities() async -> DevicePHYCapabilities
+    func cadenceDiagnostics() async -> WiFiScanCadenceDiagnostics
+}
+
+extension WiFiScanStreaming {
+    func cadenceDiagnostics() async -> WiFiScanCadenceDiagnostics {
+        WiFiScanCadenceDiagnostics(skippedSlotCount: 0)
+    }
+}
+
+protocol WiFiScanClock: Sendable {
+    func now() async -> Duration
+    func sleep(for duration: Duration) async throws
+}
+
+struct SystemWiFiScanClock: WiFiScanClock {
+    private let clock = ContinuousClock()
+    private let origin: ContinuousClock.Instant
+
+    init() {
+        origin = clock.now
+    }
+
+    func now() -> Duration {
+        origin.duration(to: clock.now)
+    }
+
+    func sleep(for duration: Duration) async throws {
+        try await clock.sleep(for: duration)
+    }
+}
+
+struct WiFiScanCadence: Sendable {
+    let interval: Duration
+    private var nextTarget: Duration
+
+    init(interval: Duration, startedAt: Duration) {
+        precondition(interval > .zero)
+        self.interval = interval
+        nextTarget = startedAt + interval
+    }
+
+    mutating func waitForNextScan(using clock: any WiFiScanClock) async throws -> UInt64 {
+        let now = await clock.now()
+        var skippedSlotCount: UInt64 = 0
+        while nextTarget < now {
+            nextTarget += interval
+            skippedSlotCount &+= 1
+        }
+        let remaining = nextTarget - now
+        nextTarget += interval
+        if remaining > .zero {
+            try await clock.sleep(for: remaining)
+        }
+        return skippedSlotCount
+    }
+}
+
+struct WiFiScanCadenceDiagnostics: Equatable, Sendable {
+    let skippedSlotCount: UInt64
+}
+
+actor WiFiScanner: WiFiScanStreaming {
     private let client = CWWiFiClient.shared()
+    private let clock: any WiFiScanClock
     private var shouldStop = false
+    private var scanTask: Task<Void, Never>?
+    private var skippedSlotCount: UInt64 = 0
+
+    init(clock: any WiFiScanClock = SystemWiFiScanClock()) {
+        self.clock = clock
+    }
 
     /// Emits scan results or failures at the configured interval.
     /// Scans are scheduled at wall-clock intervals (every `interval` seconds from the
     /// first scan), so scan duration does not push the next scan later.
     /// On scan failure, retries up to 3 times with exponential backoff (1s → 2s → 4s).
-    func startScanning(interval: Duration = Constants.scanInterval) -> AsyncStream<WiFiScanEvent> {
+    func startScanning(
+        interval: Duration = Constants.scanInterval,
+        onEvent: @escaping @Sendable (WiFiScanEvent) async -> Void
+    ) {
         shouldStop = false
         AppLogger.scanner.debug("startScanning() — reset stop flag")
-        let intervalSec = Double(interval.components.seconds) + Double(interval.components.attoseconds) / 1e18
-        return AsyncStream { continuation in
-            let task = Task {
-                let startTime = Date()
-                var scanIndex = 0
-                while !shouldStop && !Task.isCancelled {
-                    let scanResult = await scanWithRetry()
-                    switch scanResult {
-                    case .success(let networks):
-                        continuation.yield(.networks(networks))
-                    case .failure(let error):
-                        let msg = String(describing: error)
-                        AppLogger.scanner.error("scan exhausted retries: \(msg)")
-                        continuation.yield(.failure(msg))
-                    }
-
-                    scanIndex += 1
-                    let nextTarget = startTime.addingTimeInterval(Double(scanIndex) * intervalSec)
-                    let remaining = nextTarget.timeIntervalSinceNow
-                    if remaining > 0.01 {
-                        do {
-                            try await Task.sleep(for: .seconds(remaining))
-                        } catch {
-                            break
-                        }
-                    }
+        scanTask?.cancel()
+        scanTask = Task {
+            let startedAt = await clock.now()
+            var cadence = WiFiScanCadence(interval: interval, startedAt: startedAt)
+            while !shouldStop && !Task.isCancelled {
+                let scanResult = await scanWithRetry()
+                switch scanResult {
+                case .success(let networks):
+                    await onEvent(.networks(networks))
+                case .failure(let error):
+                    let msg = String(describing: error)
+                    AppLogger.scanner.error("scan exhausted retries: \(msg)")
+                    await onEvent(.failure(msg))
                 }
-                continuation.finish()
-            }
 
-            continuation.onTermination = { _ in
-                task.cancel()
+                do {
+                    let skipped = try await cadence.waitForNextScan(using: clock)
+                    skippedSlotCount &+= skipped
+                    if skipped > 0 {
+                        AppLogger.scanner.warning(
+                            "scan cadence skipped \(skipped) missed wall-clock slot(s)"
+                        )
+                    }
+                } catch {
+                    break
+                }
             }
         }
     }
@@ -76,8 +152,16 @@ actor WiFiScanner {
         return .failure(.exhausted("unknown error"))
     }
 
-    func stopScanning() {
+    func stopScanning() async {
         shouldStop = true
+        let task = scanTask
+        scanTask = nil
+        task?.cancel()
+        await task?.value
+    }
+
+    func cadenceDiagnostics() async -> WiFiScanCadenceDiagnostics {
+        WiFiScanCadenceDiagnostics(skippedSlotCount: skippedSlotCount)
     }
 
     func interfaceName() -> String? {

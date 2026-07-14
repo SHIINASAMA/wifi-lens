@@ -4,6 +4,7 @@ enum ChannelOccupancyAnalyzer {
     static func analyze(
         snapshot: WiFiEnvironmentSnapshot,
         currentChannel: Int?,
+        currentBand: ChannelBand? = nil,
         supportedBands: Set<String>,
         targetAP: ChannelQualityCalculator.TargetAP?
     ) -> [ChannelQuality] {
@@ -35,6 +36,7 @@ enum ChannelOccupancyAnalyzer {
         return ChannelQualityCalculator.compute(
             aps: Array(seen.values),
             currentChannel: currentChannel,
+            currentBand: currentBand?.id,
             supportedBands: supportedBands,
             targetAP: targetAP
         )

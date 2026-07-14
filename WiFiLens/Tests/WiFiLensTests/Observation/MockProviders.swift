@@ -3,17 +3,40 @@ import Foundation
 
 struct MockCurrentConnectionProvider: WiFiCurrentConnectionProviding {
     var result: WiFiCurrentStatus
-    func fetchCurrentStatus() async -> WiFiCurrentStatus { result }
-}
-
-struct MockEnvironmentScanProvider: WiFiEnvironmentScanProviding {
-    var result: WiFiEnvironmentSnapshot
-    func scanEnvironment() async -> WiFiEnvironmentSnapshot { result }
+    func fetchCurrentStatus(from snapshot: NetworkInterfaceSnapshot) async -> WiFiCurrentStatus { result }
 }
 
 struct MockGatewayLatencyProvider: GatewayLatencyProviding {
     var result: GatewayLatencyResult
     func measure(routerIP: String?) async -> GatewayLatencyResult { result }
+}
+
+actor CountingCurrentConnectionProvider: WiFiCurrentConnectionProviding {
+    let result: WiFiCurrentStatus
+    private(set) var fetchCount = 0
+
+    init(result: WiFiCurrentStatus) {
+        self.result = result
+    }
+
+    func fetchCurrentStatus(from snapshot: NetworkInterfaceSnapshot) async -> WiFiCurrentStatus {
+        fetchCount += 1
+        return result
+    }
+}
+
+actor RecordingGatewayLatencyProvider: GatewayLatencyProviding {
+    let result: GatewayLatencyResult
+    private(set) var measuredRouterIPs: [String?] = []
+
+    init(result: GatewayLatencyResult) {
+        self.result = result
+    }
+
+    func measure(routerIP: String?) async -> GatewayLatencyResult {
+        measuredRouterIPs.append(routerIP)
+        return result
+    }
 }
 
 struct MockGatewayPinger: GatewayPinging {
@@ -24,21 +47,4 @@ struct MockGatewayPinger: GatewayPinging {
 struct MockRoamingProbeProvider: RoamingProbeProviding {
     var result: WiFiCurrentStatus
     func fetchCurrentProbe() async -> WiFiCurrentStatus { result }
-}
-
-struct MockDeviceCapabilitiesProvider: DeviceCapabilitiesProviding {
-    var channelsRaw: [(Int, Int)] = []
-    var capabilities: DevicePHYCapabilities = .default
-    func supportedWLANChannelsRaw() async -> [(Int, Int)] { channelsRaw }
-    func devicePHYCapabilities() async -> DevicePHYCapabilities { capabilities }
-}
-
-struct MockPipeline: WiFiObservationPipelining {
-    var currentObservation: WiFiObservation
-    var environmentObservation: WiFiObservation
-    var fullObservation: WiFiObservation
-
-    func refreshCurrentConnection() async -> WiFiObservation { currentObservation }
-    func refreshEnvironmentScan() async -> WiFiObservation { environmentObservation }
-    func refreshFullObservation() async -> WiFiObservation { fullObservation }
 }

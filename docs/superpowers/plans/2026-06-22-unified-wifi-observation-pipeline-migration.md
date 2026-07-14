@@ -1,5 +1,7 @@
 # Unified Wi-Fi Observation Pipeline — Migration Plan (Phases 6–10)
 
+> **Status: Superseded.** This proposed migration is retained for historical context and must not be treated as current implementation guidance. See [Observation Runtime Migration Design](../specs/2026-07-11-observation-runtime-migration-design.md) and [Production Observation Runtime Migration Plan](./2026-07-11-production-observation-runtime-migration.md). The final architecture places production scan orchestration in `WiFiObservationRuntime`, keeps `WiFiObservationPipeline` single-cycle, removes `WiFiObservationController`, and preserves Recording/MCP behind their existing `ScannerViewModel` presentation boundary.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Migrate all UI consumers to use the new observation pipeline, then remove old data paths.

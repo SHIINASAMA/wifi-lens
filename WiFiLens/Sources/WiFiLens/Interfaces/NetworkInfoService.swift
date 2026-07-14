@@ -2,8 +2,8 @@ import Foundation
 import CoreWLAN
 import SystemConfiguration
 
-struct NetworkInterfaceInfo {
-    enum InterfaceType: String {
+struct NetworkInterfaceInfo: Sendable {
+    enum InterfaceType: String, Sendable {
         case wifi
         case ethernet
         case virtual
@@ -20,6 +20,7 @@ struct NetworkInterfaceInfo {
     let ssid: String?
     let bssid: String?
     let channel: Int?
+    let band: ChannelBand?
     let rssi: Int?
     let txRate: Double?
     let phyMode: String?
@@ -46,6 +47,26 @@ struct NetworkInterfaceInfo {
 
 
     var hasNetworkInfo: Bool { !ipv4Addresses.isEmpty || router != nil || !dnsServers.isEmpty }
+}
+
+struct NetworkInterfaceSnapshot: Sendable {
+    let cycleID: UUID
+    let capturedAt: Date
+    let interfaces: [NetworkInterfaceInfo]
+}
+
+protocol NetworkInterfaceSnapshotSourcing: Sendable {
+    func capture(cycleID: UUID) async -> NetworkInterfaceSnapshot
+}
+
+actor SystemNetworkInterfaceSnapshotSource: NetworkInterfaceSnapshotSourcing {
+    func capture(cycleID: UUID) -> NetworkInterfaceSnapshot {
+        NetworkInterfaceSnapshot(
+            cycleID: cycleID,
+            capturedAt: Date(),
+            interfaces: NetworkInfoService.fetchAll()
+        )
+    }
 }
 
 enum NetworkInfoService {
@@ -105,12 +126,15 @@ enum NetworkInfoService {
             ifaces[name] = entry
         }
 
-        // Merge IPv4 / router from SystemConfiguration where available
+        // Read each SystemConfiguration collection once per capture. The maps
+        // below are reused while enriching every discovered interface.
+        var interfaceIPv4ByName: [String: [String: Any]] = [:]
         if let store,
            let ipv4Keys = SCDynamicStoreCopyKeyList(store, "State:/Network/Interface/.*/IPv4" as CFString) as? [String] {
             for key in ipv4Keys {
                 let name = key.components(separatedBy: "/").dropLast().last ?? key
                 guard let dict = SCDynamicStoreCopyValue(store, key as CFString) as? [String: Any] else { continue }
+                interfaceIPv4ByName[name] = dict
                 if ifaces[name] == nil {
                     ifaces[name] = (ips: [], subnets: [], mac: nil)
                 }
@@ -123,37 +147,39 @@ enum NetworkInfoService {
             }
         }
 
+        var serviceIPv4ByInterface: [String: [String: Any]] = [:]
+        if let store,
+           let serviceKeys = SCDynamicStoreCopyKeyList(store, "State:/Network/Service/.*/IPv4" as CFString) as? [String] {
+            for key in serviceKeys {
+                guard let dictionary = SCDynamicStoreCopyValue(store, key as CFString) as? [String: Any],
+                      let interfaceName = dictionary["InterfaceName"] as? String else { continue }
+                if serviceIPv4ByInterface[interfaceName] == nil {
+                    serviceIPv4ByInterface[interfaceName] = dictionary
+                }
+            }
+        }
+
         // Build result, enriching with Wi-Fi details where applicable
         var result: [NetworkInterfaceInfo] = []
         for (name, entry) in ifaces {
             let isWiFi = name == wifiName
-            let wiFiInfo: (ssid: String?, bssid: String?, channel: Int?, rssi: Int?, txRate: Double?, phyMode: String?, security: String)? = {
+            let wiFiInfo: (ssid: String?, bssid: String?, channel: Int?, band: ChannelBand?, rssi: Int?, txRate: Double?, phyMode: String?, security: String)? = {
                 guard isWiFi, let iface = wifiIface else { return nil }
                 return fetchWiFiDetails(iface)
             }()
 
             // Router lookup from SystemConfiguration (Interface path)
-            var router: String? = nil
-            if let store,
-               let ipv4Dict = SCDynamicStoreCopyValue(store, "State:/Network/Interface/\(name)/IPv4" as CFString) as? [String: Any] {
+            var router: String?
+            if let ipv4Dict = interfaceIPv4ByName[name] {
                 if let r = ipv4Dict["Router"] as? String { router = r }
                 else if let arr = ipv4Dict["Router"] as? [String], let first = arr.first { router = first }
             }
 
-            // Fallback: try Service-based path for router
-            if router == nil, let store {
-                if let serviceKeys = SCDynamicStoreCopyKeyList(store, "State:/Network/Service/.*/IPv4" as CFString) as? [String] {
-                    for key in serviceKeys {
-                        if let svcDict = SCDynamicStoreCopyValue(store, key as CFString) as? [String: Any],
-                           let svcInterface = svcDict["InterfaceName"] as? String, svcInterface == name {
-                            if let r = svcDict["Router"] as? String {
-                                router = r
-                            } else if let arr = svcDict["Router"] as? [String], let first = arr.first {
-                                router = first
-                            }
-                            if router != nil { break }
-                        }
-                    }
+            if router == nil, let serviceIPv4 = serviceIPv4ByInterface[name] {
+                if let value = serviceIPv4["Router"] as? String {
+                    router = value
+                } else if let values = serviceIPv4["Router"] as? [String] {
+                    router = values.first
                 }
             }
 
@@ -167,6 +193,7 @@ enum NetworkInfoService {
                 ssid: wiFiInfo?.ssid,
                 bssid: wiFiInfo?.bssid,
                 channel: wiFiInfo?.channel,
+                band: wiFiInfo?.band,
                 rssi: wiFiInfo?.rssi,
                 txRate: wiFiInfo?.txRate,
                 phyMode: wiFiInfo?.phyMode,
@@ -189,7 +216,11 @@ enum NetworkInfoService {
         // Wi-Fi specifics from CoreWLAN
         let ssid = iface.ssid()
         let bssid = iface.bssid()
-        let channel = iface.wlanChannel()?.channelNumber
+        let wlanChannel = iface.wlanChannel()
+        let channel = wlanChannel?.channelNumber
+        let band = wlanChannel.flatMap {
+            channelBand(coreWLANRawValue: $0.channelBand.rawValue)
+        }
         let rssi = iface.rssiValue()
         let txRate = iface.transmitRate()
         let security: String = securityLabel(iface)
@@ -259,6 +290,7 @@ enum NetworkInfoService {
             ssid: ssid,
             bssid: bssid,
             channel: channel,
+            band: band,
             rssi: rssi,
             txRate: txRate,
             phyMode: phyMode,
@@ -277,6 +309,10 @@ enum NetworkInfoService {
 
     private static func fetchWiFiMAC() -> String? {
         CWWiFiClient.shared().interface()?.hardwareAddress()
+    }
+
+    static func channelBand(coreWLANRawValue: Int) -> ChannelBand? {
+        ChannelBand(rawValue: coreWLANRawValue)
     }
 
     private static func securityLabel(_ iface: CWInterface) -> String {
@@ -312,8 +348,18 @@ enum NetworkInfoService {
         }
     }
 
-    private static func fetchWiFiDetails(_ iface: CWInterface) -> (ssid: String?, bssid: String?, channel: Int?, rssi: Int?, txRate: Double?, phyMode: String?, security: String)? {
-        return (iface.ssid(), iface.bssid(), iface.wlanChannel()?.channelNumber, iface.rssiValue(), iface.transmitRate(), phyModeLabel(iface), securityLabel(iface))
+    private static func fetchWiFiDetails(_ iface: CWInterface) -> (ssid: String?, bssid: String?, channel: Int?, band: ChannelBand?, rssi: Int?, txRate: Double?, phyMode: String?, security: String)? {
+        let wlanChannel = iface.wlanChannel()
+        return (
+            iface.ssid(),
+            iface.bssid(),
+            wlanChannel?.channelNumber,
+            wlanChannel.flatMap { channelBand(coreWLANRawValue: $0.channelBand.rawValue) },
+            iface.rssiValue(),
+            iface.transmitRate(),
+            phyModeLabel(iface),
+            securityLabel(iface)
+        )
     }
 
 }

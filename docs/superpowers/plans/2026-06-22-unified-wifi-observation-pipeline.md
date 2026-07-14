@@ -1,5 +1,7 @@
 # Unified Wi-Fi Observation Pipeline — Implementation Plan (Phases 1–5)
 
+> **Status: Superseded.** This plan is retained as implementation history. Its additive controller endpoint is no longer the production architecture. See [Observation Runtime Migration Design](../specs/2026-07-11-observation-runtime-migration-design.md), [Immutable Observation Publication Plan](./2026-07-11-immutable-observation-publication.md), and [Production Observation Runtime Migration Plan](./2026-07-11-production-observation-runtime-migration.md) for the authoritative design and migration.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add normalized observation models, providers, analyzers, pipeline, controller, and store — all additive, no existing code removed or changed.

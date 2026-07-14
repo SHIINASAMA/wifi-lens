@@ -8,6 +8,8 @@ struct SettingsView: View {
     let updater: SparkleUpdater
     let locationPermission: LocationPermissionManager
     let bluetoothPermission: BluetoothPermissionManager?
+    let onScanIntervalChange: (Int) -> Void
+    let onRegulatoryRegionChange: (String) -> Void
     @Binding var bleEnabled: Bool
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -21,10 +23,19 @@ struct SettingsView: View {
     @AppStorage("hideTitleBadge") private var hideTitleBadge = true
     @AppStorage("menuBarEnabled") private var menuBarEnabled = true
 
-    init(updater: SparkleUpdater, locationPermission: LocationPermissionManager, bluetoothPermission: BluetoothPermissionManager?, bleEnabled: Binding<Bool>) {
+    init(
+        updater: SparkleUpdater,
+        locationPermission: LocationPermissionManager,
+        bluetoothPermission: BluetoothPermissionManager?,
+        bleEnabled: Binding<Bool>,
+        onScanIntervalChange: @escaping (Int) -> Void = { _ in },
+        onRegulatoryRegionChange: @escaping (String) -> Void = { _ in }
+    ) {
         self.updater = updater
         self.locationPermission = locationPermission
         self.bluetoothPermission = bluetoothPermission
+        self.onScanIntervalChange = onScanIntervalChange
+        self.onRegulatoryRegionChange = onRegulatoryRegionChange
         _bleEnabled = bleEnabled
         _autoCheck = State(initialValue: updater.automaticallyChecksForUpdates)
     }
@@ -73,6 +84,9 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.menu)
                     .accessibilityIdentifier("settings-scan-interval-picker")
+                    .onChange(of: scanInterval) { _, newValue in
+                        onScanIntervalChange(newValue)
+                    }
 
                     Text(String(localized: "settings.scan.interval_description", comment: "Description clarifying the scan interval only affects the live spectrum view, not recording"))
                         .font(.caption)
@@ -88,6 +102,9 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.menu)
                     .accessibilityIdentifier("settings-region-picker")
+                    .onChange(of: regionOverride) { _, newValue in
+                        onRegulatoryRegionChange(newValue)
+                    }
 
                     Text(String(localized: "settings.region.description", comment: "Description of how regional regulation filtering works"))
                         .font(.caption)
@@ -95,70 +112,7 @@ struct SettingsView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                // MARK: - Features
-                Section {
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Image(systemName: "antenna.radiowaves.left.and.right")
-                                .foregroundColor(.blue)
-                                .frame(width: 20)
-                            Text(String(localized: "settings.features.ble_label", comment: "Bluetooth analysis feature toggle label"))
-                                .font(.body)
-                            Spacer()
-                            Toggle("", isOn: Binding(
-                                get: { bleEnabled },
-                                set: { newValue in
-                                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) {
-                                        bleEnabled = newValue
-                                    }
-                                }
-                            ))
-                                .labelsHidden()
-                                .accessibilityLabel(String(localized: "settings.features.ble_label", comment: "Bluetooth analysis feature toggle label"))
-                                .accessibilityIdentifier("settings-ble-toggle")
-                        }
-                        Text(String(localized: "settings.features.ble_description", comment: "Description of Bluetooth analysis feature"))
-                            .font(.callout)
-                            .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .padding(.vertical, 4)
-
-#if PRO
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Image(systemName: "menubar.rectangle")
-                                .foregroundColor(.blue)
-                                .frame(width: 20)
-                            Text(String(localized: "settings.features.menubar_label", comment: "Menu bar icon feature toggle label"))
-                                .font(.body)
-                            Spacer()
-                            Toggle("", isOn: $menuBarEnabled)
-                                .labelsHidden()
-                                .accessibilityLabel(String(localized: "settings.features.menubar_label", comment: "Menu bar icon feature toggle label"))
-                                .accessibilityIdentifier("settings-menubar-toggle")
-                        }
-                        Text(String(localized: "settings.features.menubar_description", comment: "Description of menu bar icon feature"))
-                            .font(.callout)
-                            .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .padding(.vertical, 4)
-#else
-                    MenuBarFeaturePreviewRow()
-#endif
-                } header: {
-                    Text(String(localized: "settings.section.features", comment: "Features subsection header in settings"))
-                }
-
-#if PRO
-                // MARK: - Data
-                Section {
-                    ClearTimelineDataRow()
-                } header: {
-                    Text(String(localized: "settings.section.data", comment: "Data management subsection header in settings"))
-                }
-#endif
+                EditionComposition.settingsContribution()
 
                 // MARK: - Permissions
 
@@ -434,82 +388,30 @@ private struct PermissionDescriptionText: View {
     }
 }
 
-#if PRO
-private struct ClearTimelineDataRow: View {
-    @State private var isConfirming = false
-    @State private var didClear = false
+
+struct BLEFeatureSettingsRow: View {
+    @AppStorage("bleEnabled") private var bleEnabled = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Image(systemName: "trash")
-                    .foregroundColor(.red)
-                    .frame(width: 20)
-                Text(String(localized: "settings.data.clear_timeline", comment: "Clear timeline data button label"))
-                    .font(.body)
+                Image(systemName: "antenna.radiowaves.left.and.right").foregroundColor(.blue).frame(width: 20)
+                Text(String(localized: "settings.features.ble_label", comment: "Bluetooth analysis feature toggle label")).font(.body)
                 Spacer()
-                if didClear {
-                    Text(String(localized: "settings.data.clear_timeline_done", comment: "Timeline data cleared confirmation"))
-                        .font(.caption)
-                        .foregroundColor(.green)
-                        .transition(.opacity)
-                } else if isConfirming {
-                    HStack(spacing: 8) {
-                        Button(String(localized: "common.action.cancel", comment: "Cancel button")) {
-                            withAnimation { isConfirming = false }
-                        }
-                        .buttonStyle(.plain)
-                        .font(.caption)
-
-                        Button(String(localized: "settings.data.clear_timeline_confirm", comment: "Confirm clear timeline data button")) {
-                            Task {
-                                let succeeded = await clearTimelineData()
-                                withAnimation {
-                                    isConfirming = false
-                                    if succeeded {
-                                        didClear = true
-                                    }
-                                }
-                                if succeeded {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                        withAnimation { didClear = false }
-                                    }
-                                }
-                            }
-                        }
-                        .buttonStyle(.plain)
-                        .font(.caption)
-                        .foregroundColor(.red)
+                Toggle("", isOn: Binding(
+                    get: { bleEnabled },
+                    set: { newValue in
+                        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) { bleEnabled = newValue }
                     }
-                } else {
-                    Button {
-                        withAnimation { isConfirming = true }
-                    } label: {
-                        Text(String(localized: "settings.data.clear_timeline_button", comment: "Clear timeline data button"))
-                            .font(.caption)
-                            .foregroundColor(.red)
-                    }
-                    .buttonStyle(.plain)
-                }
+                ))
+                .labelsHidden()
+                .accessibilityLabel(String(localized: "settings.features.ble_label", comment: "Bluetooth analysis feature toggle label"))
+                .accessibilityIdentifier("settings-ble-toggle")
             }
-            Text(String(localized: "settings.data.clear_timeline_description", comment: "Description of clearing timeline data"))
-                .font(.callout)
-                .foregroundColor(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+            Text(String(localized: "settings.features.ble_description", comment: "Description of Bluetooth analysis feature"))
+                .font(.callout).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
         }
         .padding(.vertical, 4)
     }
-
-    /// Clears the shared Pro event log + recent buffer (not a throwaway store instance).
-    @discardableResult
-    private func clearTimelineData() async -> Bool {
-        do {
-            try await ProObservationEventBootstrap.clearTimelineData()
-            return true
-        } catch {
-            AppLogger.scanner.error("failed to clear timeline data: \(error)")
-            return false
-        }
-    }
 }
-#endif

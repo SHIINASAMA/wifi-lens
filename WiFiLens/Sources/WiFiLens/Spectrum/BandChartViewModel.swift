@@ -104,7 +104,7 @@ final class BandChartViewModel {
 
     // MARK: - RSSI animation
 
-    var isViewVisible = true {
+    var isViewVisible = false {
         didSet {
             if isViewVisible {
                 if !allSeriesData.isEmpty { startAnimation() }

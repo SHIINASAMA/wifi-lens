@@ -9,7 +9,7 @@ final class BLEViewModel {
         case scanner = "scanner stream"
     }
 
-    let scanner = BLEScanner()
+    private let scanner: any BLEScanning
     let deviceTracker = BLEDeviceTracker()
     let bluetoothPermission = BluetoothPermissionManager()
     let bluetoothPowerMonitor = BLEPowerMonitor()
@@ -23,6 +23,10 @@ final class BLEViewModel {
     private var scanTask: Task<Void, Never>?
     private var bluetoothMonitoringTask: Task<Void, Never>?
     private var shouldResumeScanningAfterPowerRestore = false
+    private var scanGeneration: UInt64 = 0
+    private var scanSession: BLEScanSession?
+    private let authorizationOverride: Bool?
+    private let monitorsBluetoothPower: Bool
 
     var displayedDevices: [BLEDeviceSnapshot] {
         devices.sorted { $0.rssi > $1.rssi }
@@ -41,10 +45,19 @@ final class BLEViewModel {
 
     // MARK: - Actions
 
-    init() {
+    init(
+        scanner: any BLEScanning = BLEScanner(),
+        authorizationOverride: Bool? = nil,
+        monitorsBluetoothPower: Bool = true
+    ) {
+        self.scanner = scanner
+        self.authorizationOverride = authorizationOverride
+        self.monitorsBluetoothPower = monitorsBluetoothPower
         bluetoothState = bluetoothPowerMonitor.currentState
-        startBluetoothMonitoring()
-        bluetoothPowerMonitor.startMonitoring()
+        if monitorsBluetoothPower {
+            startBluetoothMonitoring()
+            bluetoothPowerMonitor.startMonitoring()
+        }
     }
 
     func requestPermission() {
@@ -54,9 +67,9 @@ final class BLEViewModel {
     func startScanning() async {
         guard !isScanning else { return }
 
-        bluetoothPowerMonitor.startMonitoring()
-        bluetoothPermission.refreshStatus()
-        guard bluetoothPermission.isAuthorized else {
+        if monitorsBluetoothPower { bluetoothPowerMonitor.startMonitoring() }
+        if authorizationOverride == nil { bluetoothPermission.refreshStatus() }
+        guard authorizationOverride ?? bluetoothPermission.isAuthorized else {
             shouldResumeScanningAfterPowerRestore = false
             if bluetoothPermission.authorizationStatus == .notDetermined {
                 bluetoothPermission.requestPermissionIfNeeded()
@@ -70,10 +83,18 @@ final class BLEViewModel {
         shouldResumeScanningAfterPowerRestore = true
         isScanning = true
         errorMessage = nil
+        scanGeneration &+= 1
+        let generation = scanGeneration
 
-        let stream = await scanner.startScanning()
-        scanTask = Task {
-            for await event in stream {
+        let session = await scanner.startScanning()
+        guard generation == scanGeneration, isScanning, !Task.isCancelled else {
+            await session.stop()
+            return
+        }
+        scanSession = session
+        scanTask = Task { [weak self] in
+            for await event in session.events {
+                guard let self, generation == self.scanGeneration, !Task.isCancelled else { break }
                 switch event {
                 case .deviceBatch(let eventsByDevice):
                     devices = deviceTracker.processBatch(eventsByDevice)
@@ -86,6 +107,10 @@ final class BLEViewModel {
                     AppLogger.ble.error("scan failure: \(message)")
                 }
             }
+            guard let self, generation == self.scanGeneration else { return }
+            self.scanTask = nil
+            self.scanSession = nil
+            self.isScanning = false
         }
     }
 
@@ -95,10 +120,13 @@ final class BLEViewModel {
     }
 
     private func stopScanning(preserveResumeIntent: Bool) {
+        scanGeneration &+= 1
         isScanning = false
         scanTask?.cancel()
         scanTask = nil
-        Task { await scanner.stopScanning() }
+        let session = scanSession
+        scanSession = nil
+        Task { await session?.stop() }
         if !preserveResumeIntent {
             shouldResumeScanningAfterPowerRestore = false
         }

@@ -1,5 +1,12 @@
 # Pro Unified Event Timeline Implementation Plan
 
+> **Status: Superseded as an architecture input.** This historical plan is
+> retained below, but its distributed coordinator and recent-store lifecycle is
+> superseded by `../specs/2026-07-11-pro-event-journal-design.md` and
+> `2026-07-11-pro-event-journal.md`. The Pro-only
+> `WiFiObservationEventJournal` now owns ingestion, recent publication, query,
+> clear consistency, and persistence ordering.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Make the Pro menu bar and timeline consume one Wi-Fi event stream, navigate to the exact selected event, and retain valid filters.

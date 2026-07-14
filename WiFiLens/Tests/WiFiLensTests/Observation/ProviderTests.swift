@@ -4,16 +4,94 @@ import Testing
 
 @Suite("Observation Providers")
 struct ProviderTests {
-    @Test("WiFiCurrentConnectionProvider returns status or error")
+    @Test("CoreWLAN channel band mapping preserves overlapping 6 GHz channels")
+    func coreWLANBandMapping() {
+        #expect(NetworkInfoService.channelBand(coreWLANRawValue: 1) == .band24GHz)
+        #expect(NetworkInfoService.channelBand(coreWLANRawValue: 2) == .band5GHz)
+        #expect(NetworkInfoService.channelBand(coreWLANRawValue: 3) == .band6GHz)
+        #expect(NetworkInfoService.channelBand(coreWLANRawValue: 99) == nil)
+    }
+
+    @Test("WiFiCurrentConnectionProvider copies the interface band without channel inference")
+    func currentConnectionProviderCopiesBand() {
+        let timestamp = Date(timeIntervalSince1970: 1_750_000_200)
+        let interface = NetworkInterfaceInfo(
+            interfaceName: "en0",
+            hardwareMAC: "00:11:22:33:44:55",
+            ipv4Addresses: ["192.0.2.2"],
+            subnetMasks: ["255.255.255.0"],
+            router: "192.0.2.1",
+            dnsServers: ["192.0.2.1"],
+            ssid: "Six",
+            bssid: "AA:BB:CC:DD:EE:FF",
+            channel: 5,
+            band: .band6GHz,
+            rssi: -50,
+            txRate: 1200,
+            phyMode: "ax",
+            security: "WPA3"
+        )
+
+        let snapshot = NetworkInterfaceSnapshot(
+            cycleID: UUID(),
+            capturedAt: timestamp,
+            interfaces: [interface]
+        )
+        let status = WiFiCurrentConnectionProvider.makeStatus(
+            from: interface,
+            snapshot: snapshot
+        )
+
+        #expect(status.channel == 5)
+        #expect(status.band == .band6GHz)
+    }
+
+    @Test("WiFiCurrentConnectionProvider deterministically projects a connected snapshot")
     func currentConnectionProvider() async {
         let provider = WiFiCurrentConnectionProvider()
-        let status = await provider.fetchCurrentStatus()
-        if status.isConnected {
-            #expect(status.ssid != nil)
-            #expect(status.bssid != nil)
-        } else {
-            #expect(status.error != nil)
-        }
+        let snapshot = NetworkInterfaceSnapshot(
+            cycleID: UUID(),
+            capturedAt: Date(timeIntervalSince1970: 1_750_000_300),
+            interfaces: [NetworkInterfaceInfo(
+                interfaceName: "en0",
+                hardwareMAC: nil,
+                ipv4Addresses: ["192.0.2.2"],
+                subnetMasks: ["255.255.255.0"],
+                router: "192.0.2.1",
+                dnsServers: ["192.0.2.1"],
+                ssid: "Deterministic",
+                bssid: "AA:BB:CC:DD:EE:FF",
+                channel: 36,
+                band: .band5GHz,
+                rssi: -48,
+                txRate: 866,
+                phyMode: "ax",
+                security: "WPA3"
+            )]
+        )
+        let status = await provider.fetchCurrentStatus(from: snapshot)
+
+        #expect(status.isConnected)
+        #expect(status.ssid == "Deterministic")
+        #expect(status.bssid == "AA:BB:CC:DD:EE:FF")
+    }
+
+    @Test("empty interface snapshot preserves disconnected status provenance")
+    func emptyInterfaceSnapshotPreservesDisconnectedProvenance() async {
+        let cycleID = UUID()
+        let capturedAt = Date(timeIntervalSince1970: 1_752_000_456)
+        let snapshot = NetworkInterfaceSnapshot(
+            cycleID: cycleID,
+            capturedAt: capturedAt,
+            interfaces: []
+        )
+
+        let status = await WiFiCurrentConnectionProvider().fetchCurrentStatus(from: snapshot)
+
+        #expect(status.isConnected == false)
+        #expect(status.error == .noWiFiConnection)
+        #expect(status.interfaceSnapshotCycleID == cycleID)
+        #expect(status.timestamp == capturedAt)
     }
 
     @Test("GatewayLatencyProvider returns result with routerIP")

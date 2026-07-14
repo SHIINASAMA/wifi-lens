@@ -1,8 +1,10 @@
 # Unified Wi-Fi Observation Pipeline — Design Spec
 
 **Date:** 2026-06-22
-**Status:** Draft
+**Status:** Superseded (historical design; not the production architecture)
 **Scope:** Data layer refactoring — models, providers, analyzers, pipeline, store
+
+> **Superseded:** The additive controller architecture described below is retained for historical context. The production architecture is defined by [Observation Runtime Migration Design](./2026-07-11-observation-runtime-migration-design.md) and implemented through the linked 2026-07-11 runtime migration plans. In particular, `WiFiObservationController` has been removed, `WiFiObservationRuntime` owns the production scan lifecycle, and `WiFiObservationPipeline` is a single-cycle producer.
 
 ---
 

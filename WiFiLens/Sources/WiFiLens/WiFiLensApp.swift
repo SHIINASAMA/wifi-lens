@@ -17,17 +17,13 @@ private struct AppRootView: View {
     @Bindable var viewModel: ScannerViewModel
     @Bindable var roamingViewModel: RoamingTestViewModel
     var bleViewModel: BLEViewModel?
-    @Binding var sidebarVisibility: NavigationSplitViewVisibility
-    @Binding var selectedPage: SidebarPage
     @Binding var showCrashLog: Bool
     @Binding var crashLogText: String
-#if PRO
-    @Binding var timelineNavigationRequest: TimelineNavigationRequest?
-#endif
     let sparkleUpdater: SparkleUpdater
     let updateMCPServer: @MainActor () -> Void
-    let registerMainWindow: @MainActor (NSWindow?) -> Void
-    let registerOpenMainWindowAction: @MainActor (@escaping () -> Void) -> Void
+    let installMainWindowOpenAction: (@escaping () -> Void) -> Void
+    let registerMainWindow: @MainActor (NSWindow?, MainWindowSceneState) -> Void
+    let updateMainWindowRoute: @MainActor (UUID, SidebarPage) -> Void
 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -35,15 +31,11 @@ private struct AppRootView: View {
 
     @AppStorage("hideTitleBadge") private var hideTitleBadge = true
     @AppStorage("bleEnabled") private var bleEnabled: Bool = false
+    @State private var sceneState = MainWindowSceneState()
+    @State private var sidebarVisibility = NavigationSplitViewVisibility.automatic
     @State private var secondaryToolbarSelections = SecondaryToolbarSelections()
-#if PRO
-    @State private var spectrumRecordingViewModel: RecordingViewModel?
-    @State private var timelineSearchText = ""
-    @State private var customStartDate: Date = Calendar.current.startOfDay(for: Date())
-    @State private var customEndDate: Date = Date()
-    @State private var timelineEnabledEventTypes: Set<EventFilterType> = Set(EventFilterType.allCases)
-    @State private var showTimelineInspector = false
-#endif
+
+    private var selectedPage: SidebarPage { sceneState.selectedPage }
 
     private var hasLocationAuthorization: Bool {
         viewModel.locationManager.isAuthorizedForSSID
@@ -78,54 +70,6 @@ private struct AppRootView: View {
         )
     }
 
-#if PRO
-    private var spectrumViewMode: SpectrumMode {
-        SpectrumMode.fromToolbarSelection(
-            secondaryToolbarSelections.spectrum
-        )
-    }
-
-    private var timelineRangeFilter: Binding<TimelineRangeFilter> {
-        Binding(
-            get: {
-                switch secondaryToolbarSelections.timeline {
-                case .timelineToday:
-                    .today
-                case .timelineYesterday:
-                    .yesterday
-                case .timelineThisWeek:
-                    .thisWeek
-                case .timelineCustom:
-                    .custom
-                default:
-                    .all
-                }
-            },
-            set: { newValue in
-                let selection: SecondaryToolbarItemID = switch newValue {
-                case .today:
-                    .timelineToday
-                case .yesterday:
-                    .timelineYesterday
-                case .thisWeek:
-                    .timelineThisWeek
-                case .custom:
-                    .timelineCustom
-                case .all:
-                    .timelineAll
-                }
-                secondaryToolbarSelections.timeline = selection
-            }
-        )
-    }
-
-    private var timelineSearchBinding: Binding<String> {
-        Binding(
-            get: { timelineSearchText },
-            set: { timelineSearchText = $0 }
-        )
-    }
-#endif
 
     private var detailNavigationTitle: String {
         guard selectedPage != .overview else { return "" }
@@ -133,19 +77,7 @@ private struct AppRootView: View {
     }
 
     private func handleSelectedPageChange(_ newPage: SidebarPage) {
-        let spectrumVisible = newPage == .spectrum
-        for vm in viewModel.allBandViewModels {
-            vm.isViewVisible = spectrumVisible
-        }
-
-        guard let vm = bleViewModel else { return }
-        if newPage == .bleScanner {
-            if !vm.isScanning {
-                Task { await vm.startScanning() }
-            }
-        } else if vm.isScanning {
-            vm.stopScanning()
-        }
+        updateMainWindowRoute(sceneState.id, newPage)
     }
 
 
@@ -176,14 +108,12 @@ private struct AppRootView: View {
                     selection: $secondaryToolbarSelections.spectrum
                 )
             case .timeline:
-#if PRO
-                SecondaryToolbarCapsule(
-                    descriptor: SecondaryToolbarDescriptor.forPage(.timeline)!,
-                    selection: $secondaryToolbarSelections.timeline
-                )
-#else
-                EmptyView()
-#endif
+                if let descriptor = SecondaryToolbarDescriptor.forPage(.timeline) {
+                    SecondaryToolbarCapsule(
+                        descriptor: descriptor,
+                        selection: $secondaryToolbarSelections.timeline
+                    )
+                }
             default:
                 EmptyView()
             }
@@ -209,22 +139,18 @@ private struct AppRootView: View {
                     .allowsHitTesting(selectedPage == .overview)
                     .accessibilityIdentifier("page-overview")
 
-                if selectedPage == .spectrum {
-#if PRO
-                    ContentView(
-                        viewModel: viewModel,
-                        mode: spectrumViewMode,
-                        recordingViewModel: $spectrumRecordingViewModel
-                    )
-                        .accessibilityIdentifier("page-spectrum")
-#else
-                    ContentView(
-                        viewModel: viewModel,
-                        mode: secondaryToolbarSelections.spectrum
-                    )
-                        .accessibilityIdentifier("page-spectrum")
-#endif
-                }
+                EditionComposition.detailContribution(context: EditionCompositionContext(
+                    mainWindowID: sceneState.id,
+                    mainWindowState: sceneState.editionWindowState,
+                    scannerViewModel: viewModel,
+                    selectedPage: Binding(
+                        get: { sceneState.selectedPage },
+                        set: { sceneState.selectedPage = $0 }
+                    ),
+                    secondaryToolbarSelections: $secondaryToolbarSelections,
+                    bleEnabled: $bleEnabled,
+                    openMainWindow: { _ in }
+                ))
 
                 ChannelQualityView(
                     channels: viewModel.channelRecommendations,
@@ -254,37 +180,14 @@ private struct AppRootView: View {
                     .allowsHitTesting(selectedPage == .bleScanner)
                     .accessibilityIdentifier("page-bleScanner")
 
-                if selectedPage == .timeline {
-#if PRO
-                    TimelineView(
-                        selectedFilter: timelineRangeFilter,
-                        searchText: timelineSearchBinding,
-                        customStartDate: $customStartDate,
-                        customEndDate: $customEndDate,
-                        enabledEventTypes: $timelineEnabledEventTypes,
-                        navigationRequest: $timelineNavigationRequest
-                    )
-                    .inspector(isPresented: $showTimelineInspector) {
-                        TimelineFilterPanel(
-                            searchText: timelineSearchBinding,
-                            customStartDate: $customStartDate,
-                            customEndDate: $customEndDate,
-                            enabledEventTypes: $timelineEnabledEventTypes
-                        )
-                    }
-                    .accessibilityIdentifier("page-timeline")
-#else
-                    ProFeaturePlaceholderView(
-                        featureName: String(localized: "pro.timeline.title", comment: "Pro timeline feature title"),
-                        featureDescription: String(localized: "pro.timeline.description", comment: "Pro timeline feature description"),
-                        featureIcon: SidebarPage.timeline.icon,
-                        customSkeleton: { TimelineSkeletonView() }
-                    )
-                        .accessibilityIdentifier("page-timeline")
-#endif
-                }
-
-                SettingsView(updater: sparkleUpdater, locationPermission: viewModel.locationManager, bluetoothPermission: bleViewModel?.bluetoothPermission, bleEnabled: $bleEnabled)
+                SettingsView(
+                    updater: sparkleUpdater,
+                    locationPermission: viewModel.locationManager,
+                    bluetoothPermission: bleViewModel?.bluetoothPermission,
+                    bleEnabled: $bleEnabled,
+                    onScanIntervalChange: { viewModel.scanIntervalSeconds = $0 },
+                    onRegulatoryRegionChange: viewModel.handleRegulatoryRegionOverrideChange
+                )
                     .opacity(selectedPage == .settings ? 1 : 0)
                     .allowsHitTesting(selectedPage == .settings)
                     .accessibilityIdentifier("page-settings")
@@ -314,7 +217,15 @@ private struct AppRootView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: $sidebarVisibility) {
-            SidebarView(selectedPage: $selectedPage, locationManager: viewModel.locationManager, isWiFiAvailable: viewModel.isWiFiAvailable, bleEnabled: bleEnabled)
+            SidebarView(
+                selectedPage: Binding(
+                    get: { sceneState.selectedPage },
+                    set: { sceneState.selectedPage = $0 }
+                ),
+                locationManager: viewModel.locationManager,
+                isWiFiAvailable: viewModel.isWiFiAvailable,
+                bleEnabled: bleEnabled
+            )
                 .navigationSplitViewColumnWidth(min: 160, ideal: 180)
                 .background(
                     GeometryReader { _ in
@@ -333,16 +244,6 @@ private struct AppRootView: View {
             .onChange(of: viewModel.wifiPowerState) { _, newState in
                 roamingViewModel.handleWiFiPowerStateChange(newState)
             }
-#if PRO
-            .onChange(of: secondaryToolbarSelections.timeline) { _, newValue in
-                showTimelineInspector = (newValue == .timelineCustom)
-            }
-            .onChange(of: showTimelineInspector) { _, newValue in
-                if !newValue && secondaryToolbarSelections.timeline == .timelineCustom {
-                    secondaryToolbarSelections.timeline = .timelineToday
-                }
-            }
-#endif
             .alert(String(localized: "permission.crash_detected_title", comment: "Alert title when previous crash is detected on launch"), isPresented: $showCrashLog) {
                 Button(String(localized: "common.action.dismiss", comment: "Dismiss/close alert button"), role: .cancel) {}
             } message: {
@@ -367,17 +268,17 @@ private struct AppRootView: View {
             WindowAccessor(
                 defaultSize: mainWindowDefaultSize,
                 minSize: mainWindowMinSize,
-                onResolveWindow: registerMainWindow
+                onResolveWindow: { window in
+                    registerMainWindow(window, sceneState)
+                }
             )
         )
         .task {
-            registerOpenMainWindowAction {
+            installMainWindowOpenAction {
                 openWindow(id: WiFiLensApp.mainWindowSceneID)
             }
+            EditionComposition.startLifecycle(observationRuntime: viewModel.observationRuntime)
             await viewModel.start()
-#if PRO
-            ProObservationEventBootstrap.start(observationStore: viewModel.store)
-#endif
             roamingViewModel.handleWiFiPowerStateChange(viewModel.wifiPowerState)
             updateMCPServer()
         }
@@ -389,74 +290,6 @@ private struct AppRootView: View {
     }
 }
 
-#if PRO
-private struct TimelineToolbarSearchField: View {
-    @Binding var text: String
-
-    var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.secondary)
-
-            BorderlessSearchTextField(
-                text: $text,
-                placeholder: String(localized: "timeline.search.placeholder", comment: "Timeline search field placeholder")
-            )
-            .frame(width: 180)
-        }
-        .padding(.horizontal, 12)
-        .frame(height: 30)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color.white.opacity(0.08))
-        )
-    }
-}
-
-private struct BorderlessSearchTextField: NSViewRepresentable {
-    @Binding var text: String
-    let placeholder: String
-
-    func makeNSView(context: Context) -> NSTextField {
-        let field = NSTextField()
-        field.delegate = context.coordinator
-        field.isBordered = false
-        field.isBezeled = false
-        field.drawsBackground = false
-        field.focusRingType = .none
-        field.placeholderString = placeholder
-        field.font = .systemFont(ofSize: NSFont.systemFontSize, weight: .regular)
-        field.textColor = .labelColor
-        field.lineBreakMode = .byTruncatingTail
-        return field
-    }
-
-    func updateNSView(_ field: NSTextField, context: Context) {
-        if field.stringValue != text {
-            field.stringValue = text
-        }
-        field.placeholderString = placeholder
-    }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(text: $text)
-    }
-
-    final class Coordinator: NSObject, NSTextFieldDelegate {
-        @Binding var text: String
-
-        init(text: Binding<String>) {
-            _text = text
-        }
-
-        func controlTextDidChange(_ notification: Notification) {
-            guard let field = notification.object as? NSTextField else { return }
-            text = field.stringValue
-        }
-    }
-}
-#endif
 
 private struct WindowAccessor: NSViewRepresentable {
     let defaultSize: CGSize
@@ -521,8 +354,387 @@ private struct WindowAccessor: NSViewRepresentable {
     }
 }
 
-private final class WeakMainWindowReference {
-    weak var window: NSWindow?
+@MainActor
+@Observable
+final class MainWindowSceneState {
+    let id: UUID
+    let editionWindowState: AnyObject
+    var selectedPage: SidebarPage
+
+    init(
+        id: UUID = UUID(),
+        editionWindowState: AnyObject? = nil,
+        selectedPage: SidebarPage = .overview
+    ) {
+        self.id = id
+        self.editionWindowState = editionWindowState ?? EditionComposition.makeMainWindowState()
+        self.selectedPage = selectedPage
+    }
+
+    func route(to page: SidebarPage) {
+        selectedPage = page
+    }
+}
+
+struct MainWindowRegistrationClaim {
+    fileprivate enum Outcome: Equatable {
+        case new
+        case existing
+        case rejected
+    }
+
+    fileprivate let key: ObjectIdentifier?
+    fileprivate let registrationID: UUID?
+    fileprivate let outcome: Outcome
+
+    var isNewRegistration: Bool { outcome == .new }
+    var isExistingRegistration: Bool { outcome == .existing }
+    var isRejected: Bool { outcome == .rejected }
+}
+
+enum MainWindowRegistrationResult: Equatable {
+    case registered
+    case alreadyRegistered
+    case rejected
+    case editionRejected
+    case completionRejected
+
+    var isAccepted: Bool {
+        self == .registered || self == .alreadyRegistered
+    }
+}
+
+@MainActor
+final class MainWindowLifecycleCoordinator {
+    private final class Registration {
+        weak var window: NSWindow?
+        weak var sceneState: MainWindowSceneState?
+        let sceneID: UUID
+        let registrationID = UUID()
+        let onActivate: @MainActor @Sendable (UUID) -> Void
+        let onClose: @MainActor @Sendable (UUID) -> Void
+        var observers: [NSObjectProtocol] = []
+        var isCommitted = false
+        var activationPending = false
+
+        init(
+            window: NSWindow,
+            sceneState: MainWindowSceneState?,
+            sceneID: UUID,
+            onActivate: @escaping @MainActor @Sendable (UUID) -> Void,
+            onClose: @escaping @MainActor @Sendable (UUID) -> Void
+        ) {
+            self.window = window
+            self.sceneState = sceneState
+            self.sceneID = sceneID
+            self.onActivate = onActivate
+            self.onClose = onClose
+        }
+    }
+
+    private var registrations: [ObjectIdentifier: Registration] = [:]
+    private(set) weak var activeWindow: NSWindow?
+    private var openSceneAction: (() -> Void)?
+    private var pendingRoute: SidebarPage?
+    private let isActiveAtRegistration: @MainActor (NSWindow) -> Bool
+
+    var hasWindows: Bool { !registrations.isEmpty }
+
+    init(
+        isActiveAtRegistration: @escaping @MainActor (NSWindow) -> Bool = {
+            $0.isKeyWindow || $0.isMainWindow
+        }
+    ) {
+        self.isActiveAtRegistration = isActiveAtRegistration
+    }
+
+    func installOpenSceneAction(_ action: @escaping () -> Void) {
+        openSceneAction = action
+    }
+
+    func claim(
+        _ window: NSWindow,
+        sceneState: MainWindowSceneState,
+        onActivate: @escaping @MainActor @Sendable (UUID) -> Void = { _ in },
+        onClose: @escaping @MainActor @Sendable (UUID) -> Void = { _ in }
+    ) -> MainWindowRegistrationClaim {
+        let key = ObjectIdentifier(window)
+        if let existing = registrations[key] {
+            guard existing.sceneState === sceneState else {
+                return MainWindowRegistrationClaim(
+                    key: nil,
+                    registrationID: nil,
+                    outcome: .rejected
+                )
+            }
+            return MainWindowRegistrationClaim(
+                key: key,
+                registrationID: existing.registrationID,
+                outcome: .existing
+            )
+        }
+
+        let registration = Registration(
+            window: window,
+            sceneState: sceneState,
+            sceneID: sceneState.id,
+            onActivate: onActivate,
+            onClose: onClose
+        )
+        registrations[key] = registration
+        installObservers(for: registration, key: key, window: window)
+        if isActiveAtRegistration(window) { registration.activationPending = true }
+        return MainWindowRegistrationClaim(
+            key: key,
+            registrationID: registration.registrationID,
+            outcome: .new
+        )
+    }
+
+    @discardableResult
+    func complete(_ claim: MainWindowRegistrationClaim) -> Bool {
+        guard claim.outcome != .rejected, let key = claim.key,
+              let registrationID = claim.registrationID,
+              let registration = registrations[key],
+              registration.registrationID == registrationID else { return false }
+        guard !registration.isCommitted else { return true }
+        if let route = pendingRoute, let sceneState = registration.sceneState {
+            pendingRoute = nil
+            sceneState.route(to: route)
+        }
+        registration.isCommitted = true
+        if registration.activationPending, let window = registration.window {
+            activateRegistration(for: key, window: window)
+        }
+        return true
+    }
+
+    func abort(_ claim: MainWindowRegistrationClaim) {
+        guard claim.outcome == .new, let key = claim.key,
+              let registrationID = claim.registrationID,
+              let registration = registrations[key],
+              registration.registrationID == registrationID,
+              !registration.isCommitted else { return }
+        removeRegistration(for: key)
+    }
+
+    @discardableResult
+    func register(
+        _ window: NSWindow,
+        sceneState: MainWindowSceneState,
+        registerEdition: () -> Bool,
+        rollbackEdition: () -> Void,
+        onActivate: @escaping @MainActor @Sendable (UUID) -> Void = { _ in },
+        onClose: @escaping @MainActor @Sendable (UUID) -> Void = { _ in }
+    ) -> MainWindowRegistrationResult {
+        let claim = claim(
+            window,
+            sceneState: sceneState,
+            onActivate: onActivate,
+            onClose: onClose
+        )
+        if claim.isRejected { return .rejected }
+        if claim.isExistingRegistration {
+            return complete(claim) ? .alreadyRegistered : .completionRejected
+        }
+
+        guard registerEdition() else {
+            abort(claim)
+            return .editionRejected
+        }
+        guard complete(claim) else {
+            rollbackEdition()
+            abort(claim)
+            return .completionRejected
+        }
+        return .registered
+    }
+
+    func routeActiveWindow(to page: SidebarPage) {
+        registration(for: activeWindow)?.sceneState?.route(to: page)
+    }
+
+    func requestMainWindow(route: SidebarPage?) {
+        if let registration = registration(for: activeWindow), let sceneState = registration.sceneState {
+            if let route { sceneState.route(to: route) }
+            return
+        }
+        pendingRoute = route
+        openSceneAction?()
+    }
+
+    func sceneState(for window: NSWindow) -> MainWindowSceneState? {
+        registrations[ObjectIdentifier(window)]?.sceneState
+    }
+
+    private func installObservers(for registration: Registration, key: ObjectIdentifier, window: NSWindow) {
+        let activate: @MainActor @Sendable () -> Void = { [weak self, weak window] in
+            guard let self, let window else { return }
+            self.activateRegistration(for: key, window: window)
+        }
+        registration.observers = [
+            NotificationCenter.default.addObserver(forName: NSWindow.didBecomeKeyNotification, object: window, queue: .main) { _ in
+                MainActor.assumeIsolated { activate() }
+            },
+            NotificationCenter.default.addObserver(forName: NSWindow.didBecomeMainNotification, object: window, queue: .main) { _ in
+                MainActor.assumeIsolated { activate() }
+            },
+            NotificationCenter.default.addObserver(forName: NSWindow.willCloseNotification, object: window, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.closeRegistration(for: key) }
+            }
+        ]
+    }
+
+    private func activateRegistration(for key: ObjectIdentifier, window: NSWindow) {
+        guard let registration = registrations[key] else { return }
+        guard registration.isCommitted else {
+            registration.activationPending = true
+            return
+        }
+        activeWindow = window
+        registration.activationPending = false
+        registration.onActivate(registration.sceneID)
+    }
+
+    private func closeRegistration(for key: ObjectIdentifier) {
+        guard let registration = registrations[key] else { return }
+        removeRegistration(for: key)
+        if registration.isCommitted {
+            registration.onClose(registration.sceneID)
+        }
+    }
+
+    private func registration(for window: NSWindow?) -> Registration? {
+        guard let window else { return nil }
+        return registrations[ObjectIdentifier(window)]
+    }
+
+    private func removeRegistration(for key: ObjectIdentifier) {
+        guard let registration = registrations.removeValue(forKey: key) else { return }
+        registration.observers.forEach(NotificationCenter.default.removeObserver)
+        if activeWindow === registration.window {
+            activeWindow = nil
+        }
+    }
+}
+
+/// Aggregates route visibility for process-shared scanners without owning any
+/// per-edition or per-window feature state.
+@MainActor
+final class MainWindowRouteResourceCoordinator {
+    private var routes: [UUID: SidebarPage] = [:]
+    private var setSpectrumActive: @MainActor (Bool) -> Void
+    private var startBLE: @MainActor () async -> Void
+    private var stopBLE: @MainActor () -> Void
+    private var bleStartTask: Task<Void, Never>?
+    private var spectrumResourceIDs: [ObjectIdentifier] = []
+    private var bleResourceID: ObjectIdentifier?
+
+    init(
+        setSpectrumActive: @escaping @MainActor (Bool) -> Void = { _ in },
+        setBLEActive: @escaping @MainActor (Bool) -> Void = { _ in }
+    ) {
+        self.setSpectrumActive = setSpectrumActive
+        self.startBLE = { setBLEActive(true) }
+        self.stopBLE = { setBLEActive(false) }
+    }
+
+    func bind(spectrumViewModels: [BandChartViewModel], bleViewModel: BLEViewModel?) {
+        let nextSpectrumIDs = spectrumViewModels.map(ObjectIdentifier.init)
+        if nextSpectrumIDs != spectrumResourceIDs {
+            if !spectrumResourceIDs.isEmpty { setSpectrumActive(false) }
+            spectrumResourceIDs = nextSpectrumIDs
+            setSpectrumActive = { [spectrumViewModels] active in
+                spectrumViewModels.forEach { $0.isViewVisible = active }
+            }
+            setSpectrumActive(hasSpectrumLease)
+        }
+
+        let nextBLEID = bleViewModel.map(ObjectIdentifier.init)
+        if nextBLEID != bleResourceID {
+            bleStartTask?.cancel()
+            bleStartTask = nil
+            if bleResourceID != nil { stopBLE() }
+            bleResourceID = nextBLEID
+            startBLE = { [weak bleViewModel] in
+                guard let bleViewModel, !bleViewModel.isScanning else { return }
+                await bleViewModel.startScanning()
+            }
+            stopBLE = { [weak bleViewModel] in
+                if bleViewModel?.isScanning == true {
+                    bleViewModel?.stopScanning()
+                }
+            }
+            publishBLEState(hasBLELease)
+        }
+    }
+
+    func register(windowID: UUID, route: SidebarPage) {
+        guard routes[windowID] == nil else { return }
+        transition(windowID: windowID, to: route)
+    }
+
+    func update(windowID: UUID, route: SidebarPage) {
+        guard routes[windowID] != nil else { return }
+        transition(windowID: windowID, to: route)
+    }
+
+    func release(windowID: UUID) {
+        guard routes[windowID] != nil else { return }
+        let hadSpectrumLease = hasSpectrumLease
+        let hadBLELease = hasBLELease
+        routes.removeValue(forKey: windowID)
+        publishEdges(hadSpectrumLease: hadSpectrumLease, hadBLELease: hadBLELease)
+    }
+
+    private func transition(windowID: UUID, to route: SidebarPage) {
+        let hadSpectrumLease = hasSpectrumLease
+        let hadBLELease = hasBLELease
+        routes[windowID] = route
+        publishEdges(hadSpectrumLease: hadSpectrumLease, hadBLELease: hadBLELease)
+    }
+
+    private func publishEdges(hadSpectrumLease: Bool, hadBLELease: Bool) {
+        if hadSpectrumLease != hasSpectrumLease {
+            setSpectrumActive(hasSpectrumLease)
+        }
+        if hadBLELease != hasBLELease {
+            publishBLEState(hasBLELease)
+        }
+    }
+
+    private func publishBLEState(_ isActive: Bool) {
+        bleStartTask?.cancel()
+        bleStartTask = nil
+        guard isActive else {
+            stopBLE()
+            return
+        }
+
+        let resourceID = bleResourceID
+        let startBLE = startBLE
+        let stopBLE = stopBLE
+        bleStartTask = Task { @MainActor [weak self] in
+            guard let self, !Task.isCancelled,
+                  self.hasBLELease,
+                  self.bleResourceID == resourceID else { return }
+            await startBLE()
+            guard !Task.isCancelled,
+                  self.hasBLELease,
+                  self.bleResourceID == resourceID else {
+                stopBLE()
+                return
+            }
+        }
+    }
+
+    private var hasSpectrumLease: Bool {
+        routes.values.contains(.spectrum)
+    }
+
+    private var hasBLELease: Bool {
+        routes.values.contains(.bleScanner)
+    }
 }
 
 enum MainWindowRouteIntent: Equatable {
@@ -564,25 +776,97 @@ func resolvedWindowFocusIntent(hasExistingMainWindow: Bool) -> ResolvedMainWindo
     hasExistingMainWindow ? .noFollowUpFocus : .focusResolvedWindow
 }
 
+@MainActor
+final class ApplicationTerminationCoordinator: NSObject, NSApplicationDelegate {
+    typealias TerminationStep = @MainActor () async -> Void
+
+    static let defaultTerminationDeadline: Duration = .seconds(3)
+
+    private var stopRuntime: TerminationStep = {}
+    private var terminateEdition: TerminationStep = {}
+    private let terminationDeadline: Duration
+    private let reply: @MainActor (Bool) -> Void
+    private var terminationTask: Task<Void, Never>?
+    private var deadlineTask: Task<Void, Never>?
+    private var hasReplied = false
+
+    override convenience init() {
+        self.init(
+            terminationDeadline: Self.defaultTerminationDeadline,
+            reply: { NSApp.reply(toApplicationShouldTerminate: $0) }
+        )
+    }
+
+    init(
+        terminationDeadline: Duration = defaultTerminationDeadline,
+        reply: @escaping @MainActor (Bool) -> Void
+    ) {
+        self.terminationDeadline = terminationDeadline
+        self.reply = reply
+        super.init()
+    }
+
+    func configure(
+        stopRuntime: @escaping TerminationStep,
+        terminateEdition: @escaping TerminationStep
+    ) {
+        guard terminationTask == nil, !hasReplied else { return }
+        self.stopRuntime = stopRuntime
+        self.terminateEdition = terminateEdition
+    }
+
+    func requestTermination() -> NSApplication.TerminateReply {
+        guard terminationTask == nil, !hasReplied else { return .terminateLater }
+        let stopRuntime = stopRuntime
+        let terminateEdition = terminateEdition
+        terminationTask = Task { @MainActor [weak self] in
+            await stopRuntime()
+            guard !Task.isCancelled else { return }
+            await terminateEdition()
+            self?.finishTermination(cancelOperation: false)
+        }
+        deadlineTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            do {
+                try await Task.sleep(for: terminationDeadline)
+            } catch {
+                return
+            }
+            finishTermination(cancelOperation: true)
+        }
+        return .terminateLater
+    }
+
+    private func finishTermination(cancelOperation: Bool) {
+        guard !hasReplied else { return }
+        hasReplied = true
+        if cancelOperation {
+            terminationTask?.cancel()
+        } else {
+            deadlineTask?.cancel()
+        }
+        reply(true)
+    }
+
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        requestTermination()
+    }
+}
+
 @main
 struct WiFiLensApp: App {
     static let mainWindowSceneID = "WiFiLensMainWindowScene"
 
+    @NSApplicationDelegateAdaptor(ApplicationTerminationCoordinator.self)
+    private var terminationCoordinator
     @State private var viewModel = ScannerViewModel()
     @State private var roamingViewModel = RoamingTestViewModel()
     @State private var bleViewModel: BLEViewModel?
     @State private var sparkleUpdater = SparkleUpdater()
-    @State private var sidebarVisibility = NavigationSplitViewVisibility.automatic
-    @State private var selectedPage: SidebarPage = .overview
     @State private var showCrashLog: Bool = false
-    @State private var mainWindowReference = WeakMainWindowReference()
-    @State private var mainWindowCloseObserver: NSObjectProtocol?
-    @State private var openMainWindowAction: (() -> Void)?
-    @State private var pendingMainWindowRoute: SidebarPage?
+    @State private var mainWindowLifecycle = MainWindowLifecycleCoordinator()
+    @State private var routeResources = MainWindowRouteResourceCoordinator()
     @State private var pendingResolvedMainWindowFocus = false
-#if PRO
-    @State private var timelineNavigationRequest: TimelineNavigationRequest?
-#endif
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
     @AppStorage("appearance") private var appearance: String = "system"
@@ -612,38 +896,28 @@ struct WiFiLensApp: App {
     var body: some Scene {
         WindowGroup(id: Self.mainWindowSceneID) {
             Group {
-#if PRO
                 AppRootView(
                     viewModel: viewModel,
                     roamingViewModel: roamingViewModel,
                     bleViewModel: bleViewModel,
-                    sidebarVisibility: $sidebarVisibility,
-                    selectedPage: $selectedPage,
                     showCrashLog: $showCrashLog,
                     crashLogText: $crashLogText,
-                    timelineNavigationRequest: $timelineNavigationRequest,
                     sparkleUpdater: sparkleUpdater,
                     updateMCPServer: updateMCPServer,
+                    installMainWindowOpenAction: mainWindowLifecycle.installOpenSceneAction,
                     registerMainWindow: registerMainWindow,
-                    registerOpenMainWindowAction: registerOpenMainWindowAction
+                    updateMainWindowRoute: { windowID, route in
+                        routeResources.update(windowID: windowID, route: route)
+                    }
                 )
-#else
-                AppRootView(
-                viewModel: viewModel,
-                roamingViewModel: roamingViewModel,
-                bleViewModel: bleViewModel,
-                sidebarVisibility: $sidebarVisibility,
-                selectedPage: $selectedPage,
-                showCrashLog: $showCrashLog,
-                crashLogText: $crashLogText,
-                sparkleUpdater: sparkleUpdater,
-                updateMCPServer: updateMCPServer,
-                registerMainWindow: registerMainWindow,
-                registerOpenMainWindowAction: registerOpenMainWindowAction
-            )
-#endif
             }
             .preferredColorScheme(colorScheme)
+            .task {
+                terminationCoordinator.configure(
+                    stopRuntime: { await viewModel.stopForTermination() },
+                    terminateEdition: { await EditionComposition.prepareForTermination() }
+                )
+            }
         }
         // Keep a default launch size only. The app window must remain a normal
         // resizable macOS window; do not add `.windowResizability(.contentSize)`.
@@ -675,6 +949,10 @@ struct WiFiLensApp: App {
                 bleViewModel?.stopScanning()
                 bleViewModel = nil
             }
+            routeResources.bind(
+                spectrumViewModels: viewModel.allBandViewModels,
+                bleViewModel: bleViewModel
+            )
         }
         .onChange(of: mcpEnabled) { _, enabled in
             updateMCPServer()
@@ -685,37 +963,37 @@ struct WiFiLensApp: App {
         .commands {
             CommandGroup(before: .toolbar) {
                 Button(String(localized: "nav.overview", comment: "Navigate to Overview page")) {
-                    selectedPage = .overview
+                    showMainWindow(route: .overview)
                 }
                 .keyboardShortcut("1", modifiers: .command)
 
                 Button(String(localized: "nav.spectrum", comment: "Navigate to Spectrum page")) {
-                    selectedPage = .spectrum
+                    showMainWindow(route: .spectrum)
                 }
                 .keyboardShortcut("2", modifiers: .command)
 
                 Button(String(localized: "nav.channels", comment: "Navigate to Channels page")) {
-                    selectedPage = .channels
+                    showMainWindow(route: .channels)
                 }
                 .keyboardShortcut("3", modifiers: .command)
 
                 Button(String(localized: "nav.interfaces", comment: "Navigate to Interfaces page")) {
-                    selectedPage = .interfaces
+                    showMainWindow(route: .interfaces)
                 }
                 .keyboardShortcut("4", modifiers: .command)
 
                 Button(String(localized: "nav.roaming_test", comment: "Navigate to Roaming page")) {
-                    selectedPage = .roaming
+                    showMainWindow(route: .roaming)
                 }
                 .keyboardShortcut("5", modifiers: .command)
 
                 Button(String(localized: "nav.ble_scanner", comment: "Navigate to BLE Scanner page")) {
-                    selectedPage = .bleScanner
+                    showMainWindow(route: .bleScanner)
                 }
                 .keyboardShortcut("6", modifiers: .command)
 
                 Button(String(localized: "nav.timeline", comment: "Navigate to Timeline page")) {
-                    selectedPage = .timeline
+                    showMainWindow(route: .timeline)
                 }
                 .keyboardShortcut("7", modifiers: .command)
             }
@@ -727,24 +1005,25 @@ struct WiFiLensApp: App {
                     }
                     .keyboardShortcut("e", modifiers: [.command, .shift])
 
-#if PRO
-                    Button(String(localized: "export.snapshot_markdown", comment: "Export as self-contained Markdown report")) {
-                        exportSnapshotMarkdown()
-                    }
-                    .keyboardShortcut("m", modifiers: [.command, .shift])
-#else
-                    Button {
-                    } label: {
-                        Label {
-                            Text(String(localized: "export.snapshot_markdown", comment: "Export as Markdown report"))
-                        } icon: {
-                            Image(systemName: "lock.fill")
-                                .foregroundStyle(.yellow)
+                    switch EditionComposition.markdownExportCommandContribution {
+                    case .available(let export):
+                        Button(String(localized: "export.snapshot_markdown", comment: "Export as self-contained Markdown report")) {
+                            export(viewModel)
                         }
+                        .keyboardShortcut("m", modifiers: [.command, .shift])
+                    case .lockedPreview:
+                        Button {
+                        } label: {
+                            Label {
+                                Text(String(localized: "export.snapshot_markdown", comment: "Export as Markdown report"))
+                            } icon: {
+                                Image(systemName: "lock.fill")
+                                    .foregroundStyle(.yellow)
+                            }
+                        }
+                        .disabled(true)
+                        .help(String(localized: "pro.markdown.unavailable", comment: "Tooltip for unavailable Markdown export"))
                     }
-                    .disabled(true)
-                    .help(String(localized: "pro.markdown.unavailable", comment: "Tooltip for unavailable Markdown export"))
-#endif
 
                     Divider()
 
@@ -776,17 +1055,10 @@ struct WiFiLensApp: App {
 
         }
 
-#if PRO
-        MenuBarScene(
-            onOpenMainWindow: { showMainWindow(route: nil, source: .menuBar) },
-            onOpenTimeline: { eventID in
-                timelineNavigationRequest = TimelineNavigationRequest(eventID: eventID)
-                showMainWindow(route: .timeline, source: .menuBar)
-            },
-            onOpenSettings: { showMainWindow(route: .settings, source: .menuBar) },
-            onQuit: { NSApp.terminate(nil) }
+        EditionComposition.menuBarScene(
+            openMainWindow: { route in showMainWindow(route: route, source: .menuBar) },
+            terminate: { NSApp.terminate(nil) }
         )
-#endif
     }
 
     private var colorScheme: ColorScheme? {
@@ -806,11 +1078,7 @@ struct WiFiLensApp: App {
     }
 
     private var menuBarWindowManagementEnabled: Bool {
-#if PRO
-        menuBarEnabled
-#else
-        false
-#endif
+        EditionComposition.menuBarWindowManagementEnabled && menuBarEnabled
     }
 
     @MainActor
@@ -836,47 +1104,71 @@ struct WiFiLensApp: App {
             break
         }
 
-        switch routeIntent(for: route) {
-        case .navigate(let page):
-            selectedPage = page
-            pendingMainWindowRoute = page
-        case .preserveCurrentPage:
-            pendingMainWindowRoute = nil
-        }
-
-        let hasExistingMainWindow = mainWindowReference.window != nil
+        let hasExistingMainWindow = mainWindowLifecycle.hasWindows
         pendingResolvedMainWindowFocus = (
             resolvedWindowFocusIntent(hasExistingMainWindow: hasExistingMainWindow) == .focusResolvedWindow
         )
 
         NSApp.activate(ignoringOtherApps: true)
 
-        if let mainWindow = mainWindowReference.window {
+        if let mainWindow = mainWindowLifecycle.activeWindow {
+            if let route {
+                mainWindowLifecycle.routeActiveWindow(to: route)
+            }
             bringMainWindowToFront(mainWindow)
             return
         }
 
-        openMainWindowAction?()
+        mainWindowLifecycle.requestMainWindow(route: route)
     }
 
     @MainActor
     private func dismissTransientMenuBarWindowIfNeeded() {
         guard let keyWindow = NSApp.keyWindow else { return }
-        guard keyWindow !== mainWindowReference.window else { return }
+        guard keyWindow !== mainWindowLifecycle.activeWindow else { return }
         keyWindow.close()
     }
 
     @MainActor
-    private func registerMainWindow(_ window: NSWindow?) {
+    private func registerMainWindow(_ window: NSWindow?, sceneState: MainWindowSceneState) {
         guard let window else { return }
 
-        mainWindowReference.window = window
-        replaceMainWindowCloseObserver(for: window)
+        routeResources.bind(
+            spectrumViewModels: viewModel.allBandViewModels,
+            bleViewModel: bleViewModel
+        )
 
-        if let pendingRoute = pendingMainWindowRoute {
-            selectedPage = pendingRoute
-            pendingMainWindowRoute = nil
-        }
+        let registration = mainWindowLifecycle.register(
+            window,
+            sceneState: sceneState,
+            registerEdition: {
+                routeResources.register(windowID: sceneState.id, route: sceneState.selectedPage)
+                guard EditionComposition.registerMainWindowState(
+                    sceneState.editionWindowState,
+                    for: sceneState.id
+                ) else {
+                    routeResources.release(windowID: sceneState.id)
+                    return false
+                }
+                return true
+            },
+            rollbackEdition: {
+                routeResources.release(windowID: sceneState.id)
+                EditionComposition.unregisterMainWindowState(
+                    sceneState.editionWindowState,
+                    for: sceneState.id
+                )
+            },
+            onActivate: { windowID in
+                EditionComposition.mainWindowDidBecomeActive(windowID)
+            },
+            onClose: { windowID in
+                routeResources.release(windowID: windowID)
+                EditionComposition.mainWindowWillClose(windowID)
+                handleMainWindowWillClose()
+            }
+        )
+        guard registration.isAccepted else { return }
 
         guard pendingResolvedMainWindowFocus else { return }
 
@@ -898,45 +1190,16 @@ struct WiFiLensApp: App {
     }
 
     @MainActor
-    private func handleMainWindowWillClose(_ closingWindow: NSWindow) {
-        guard mainWindowReference.window === closingWindow else { return }
-
-        mainWindowReference.window = nil
-        clearMainWindowCloseObserver()
+    private func handleMainWindowWillClose() {
         pendingResolvedMainWindowFocus = false
 
+        guard !mainWindowLifecycle.hasWindows else { return }
         switch closeAction(menuBarEnabled: menuBarWindowManagementEnabled) {
         case .switchToAccessory:
             NSApp.setActivationPolicy(.accessory)
         case .keepCurrentPolicy, .switchToRegular:
             break
         }
-    }
-
-    @MainActor
-    private func replaceMainWindowCloseObserver(for window: NSWindow) {
-        clearMainWindowCloseObserver()
-        mainWindowCloseObserver = NotificationCenter.default.addObserver(
-            forName: NSWindow.willCloseNotification,
-            object: window,
-            queue: .main
-        ) { _ in
-            MainActor.assumeIsolated {
-                handleMainWindowWillClose(window)
-            }
-        }
-    }
-
-    @MainActor
-    private func clearMainWindowCloseObserver() {
-        guard let mainWindowCloseObserver else { return }
-        NotificationCenter.default.removeObserver(mainWindowCloseObserver)
-        self.mainWindowCloseObserver = nil
-    }
-
-    @MainActor
-    private func registerOpenMainWindowAction(_ action: @escaping () -> Void) {
-        openMainWindowAction = action
     }
 
     @MainActor
@@ -957,13 +1220,6 @@ struct WiFiLensApp: App {
     private func exportSnapshotImage() {
         ExportService.exportImage(viewModel: viewModel)
     }
-
-#if PRO
-    @MainActor
-    private func exportSnapshotMarkdown() {
-        MarkdownExportService.export(viewModel: viewModel)
-    }
-#endif
 
     @MainActor
     private func exportCSV(for vm: BandChartViewModel) {

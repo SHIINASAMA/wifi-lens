@@ -12,36 +12,42 @@ extension ChannelBand {
 }
 
 protocol WiFiCurrentConnectionProviding: Sendable {
-    func fetchCurrentStatus() async -> WiFiCurrentStatus
+    func fetchCurrentStatus(from snapshot: NetworkInterfaceSnapshot) async -> WiFiCurrentStatus
 }
 
 struct WiFiCurrentConnectionProvider: WiFiCurrentConnectionProviding {
-    func fetchCurrentStatus() async -> WiFiCurrentStatus {
-        await MainActor.run {
-            let interfaces = NetworkInfoService.fetchAll()
-            guard let wifi = interfaces.first(where: { $0.ssid != nil }) else {
-                return WiFiCurrentStatus(
-                    timestamp: Date(),
-                    isConnected: false,
-                    isWiFiPowerOn: true,
-                    error: .noWiFiConnection
-                )
-            }
+    func fetchCurrentStatus(from snapshot: NetworkInterfaceSnapshot) async -> WiFiCurrentStatus {
+        guard let wifi = snapshot.interfaces.first(where: { $0.ssid != nil }) else {
             return WiFiCurrentStatus(
-                timestamp: Date(),
-                interfaceName: wifi.interfaceName,
-                ssid: wifi.ssid,
-                bssid: wifi.bssid,
-                channel: wifi.channel,
-                band: wifi.channel.flatMap { ChannelBand.from(channelNumber: $0) },
-                rssi: wifi.rssi,
-                txRate: wifi.txRate,
-                phyMode: wifi.phyMode,
-                security: wifi.security,
-                routerIP: wifi.router,
-                isConnected: true,
-                isWiFiPowerOn: true
+                timestamp: snapshot.capturedAt,
+                interfaceSnapshotCycleID: snapshot.cycleID,
+                isConnected: false,
+                isWiFiPowerOn: true,
+                error: .noWiFiConnection
             )
         }
+        return Self.makeStatus(from: wifi, snapshot: snapshot)
+    }
+
+    static func makeStatus(
+        from wifi: NetworkInterfaceInfo,
+        snapshot: NetworkInterfaceSnapshot
+    ) -> WiFiCurrentStatus {
+        WiFiCurrentStatus(
+            timestamp: snapshot.capturedAt,
+            interfaceSnapshotCycleID: snapshot.cycleID,
+            interfaceName: wifi.interfaceName,
+            ssid: wifi.ssid,
+            bssid: wifi.bssid,
+            channel: wifi.channel,
+            band: wifi.band,
+            rssi: wifi.rssi,
+            txRate: wifi.txRate,
+            phyMode: wifi.phyMode,
+            security: wifi.security,
+            routerIP: wifi.router,
+            isConnected: true,
+            isWiFiPowerOn: true
+        )
     }
 }

@@ -131,3 +131,4 @@ Audit date: June 27, 2026
 - If a page needs a large layout, keep that requirement local to the page. Do not let it resize the top-level `NSWindow`.
 - If another state-preservation `ZStack` is introduced, explicitly constrain its container so hidden pages do not become a sizing policy.
 - For Pro menu bar actions that reopen the main window, dismiss transient menu bar windows before attempting to activate the main `NSWindow`.
+- Keep the `openWindow` adapter and pending route in the app-owned lifecycle coordinator. A `MainWindowSceneState` must not be the sole owner of the action required to create its replacement after the final window closes.

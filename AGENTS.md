@@ -36,6 +36,19 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/superpowers/specs/2026-07-10-timeline-date-range-normalization-design.md` | Design spec for normalizing inverted custom date ranges in the Pro timeline (P2 #1) |
 | `docs/superpowers/plans/2026-07-10-pro-unified-event-timeline.md` | Implementation plan for the Pro-only unified menu-bar and event timeline pipeline |
 | `docs/superpowers/plans/2026-07-10-pro-timeline-consistency-controller.md` | Implementation plan for the Pro timeline generation controller, clear barrier, and lifecycle-safe date synchronization |
+| `docs/superpowers/specs/2026-07-11-observation-runtime-migration-design.md` | Design spec for immutable observation publication and migration to a single production observation runtime |
+| `docs/superpowers/plans/2026-07-11-immutable-observation-publication.md` | Implementation plan for ordered immutable observation publication and Pro event consumption |
+| `docs/superpowers/plans/2026-07-11-production-observation-runtime-migration.md` | Implementation plan for migrating production scan-cycle orchestration into the observation runtime |
+| `docs/superpowers/specs/2026-07-11-pro-event-journal-design.md` | Design spec for consolidating Pro event ingestion, recent publication, persistence, query, and clear consistency into one deep journal module |
+| `docs/superpowers/plans/2026-07-11-pro-event-journal.md` | Implementation plan for the Pro-only deep event journal and deletion of the shallow event lifecycle modules |
+| `docs/superpowers/specs/2026-07-12-structured-network-identity-design.md` | Design spec for making structured SSID/BSSID payloads the sole Pro connection-event identity and resetting the development schema |
+| `docs/superpowers/plans/2026-07-12-structured-network-identity.md` | Implementation plan for structured Pro connection-event identity, shared presentation formatting, and the destructive SQLite v2 upgrade |
+| `docs/superpowers/specs/2026-07-12-edition-composition-seam-design.md` | Design spec for target-selected OSS/Pro composition adapters with behavior-preserving lifecycle ownership |
+| `docs/superpowers/plans/2026-07-12-edition-composition-seam.md` | Implementation plan for behavior-preserving target-selected OSS/Pro composition adapters |
+| `docs/superpowers/specs/2026-07-13-runtime-backpressure-and-pro-state-design.md` | Design spec for Pro state preservation, single-snapshot scan cycles, and bounded latest-only runtime processing |
+| `docs/superpowers/plans/2026-07-13-runtime-backpressure-and-pro-state.md` | Implementation plan for per-window Pro state, single-snapshot scans, and bounded runtime delivery |
+| `docs/superpowers/specs/2026-07-14-pr-review-hardening-design.md` | Design spec for a shared Pro termination budget and idempotent event persistence after PR review |
+| `docs/superpowers/plans/2026-07-14-pr-review-hardening.md` | Implementation plan for shared Pro termination timing and idempotent SQLite event replay |
 | `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
 
 ## Skills Directory
