@@ -67,6 +67,12 @@ final class WiFiObservationRuntime {
 #if DEBUG
     var onActiveScanStoppedForTesting: (@MainActor () -> Void)?
     var onConsumerDrainStartedForTesting: (@MainActor () -> Void)?
+
+    func drainRawCyclesForTesting() async {
+        while let task = rawCycleTask {
+            await task.value
+        }
+    }
 #endif
 
     init(
