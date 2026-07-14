@@ -59,8 +59,9 @@ protocol NetworkInterfaceSnapshotSourcing: Sendable {
     func capture(cycleID: UUID) async -> NetworkInterfaceSnapshot
 }
 
-actor SystemNetworkInterfaceSnapshotSource: NetworkInterfaceSnapshotSourcing {
-    func capture(cycleID: UUID) -> NetworkInterfaceSnapshot {
+struct SystemNetworkInterfaceSnapshotSource: NetworkInterfaceSnapshotSourcing {
+    @concurrent
+    func capture(cycleID: UUID) async -> NetworkInterfaceSnapshot {
         NetworkInterfaceSnapshot(
             cycleID: cycleID,
             capturedAt: Date(),

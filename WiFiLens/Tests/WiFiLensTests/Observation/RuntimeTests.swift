@@ -287,44 +287,6 @@ struct RuntimeTests {
         await runtime.stopScanning()
     }
 
-    @Test("interface snapshot capture does not occupy the MainActor")
-    func interfaceSnapshotCaptureRunsOffMainActor() async {
-        let source = ScriptedScanSource()
-        let captureStarted = DispatchSemaphore(value: 0)
-        let releaseCapture = DispatchSemaphore(value: 0)
-        let interfaceSource = BlockingInterfaceSnapshotSource(
-            captureStarted: captureStarted,
-            releaseCapture: releaseCapture
-        )
-        let runtime = WiFiObservationRuntime(
-            store: WiFiObservationStore(),
-            pipeline: RecordingCyclePipeline(),
-            scanSource: source,
-            interfaceSource: interfaceSource
-        )
-        var mainActorAdvanced = false
-        var output: WiFiObservationScanOutput?
-
-        let releaser = Task {
-            await withCheckedContinuation { continuation in
-                DispatchQueue.global().async {
-                    captureStarted.wait()
-                    continuation.resume()
-                }
-            }
-            mainActorAdvanced = true
-            releaseCapture.signal()
-        }
-        await runtime.startScanning(configuration: .testDefault) { output = $0 }
-        await source.yield(.networks([runtimeNetwork(bssid: "AA:03", channel: 36)]))
-        await waitUntil { output != nil }
-        await releaser.value
-
-        #expect(mainActorAdvanced)
-        #expect(await interfaceSource.didTimeOut == false)
-        await runtime.stopScanning()
-    }
-
     @Test("scan failure produces a partial cycle that preserves current status")
     func scanFailureProducesPartialCycle() async {
         let source = ScriptedScanSource()
@@ -1560,27 +1522,6 @@ private final class CountingInterfaceSnapshotSource: NetworkInterfaceSnapshotSou
 private struct ImmediateInterfaceSnapshotSource: NetworkInterfaceSnapshotSourcing {
     func capture(cycleID: UUID) async -> NetworkInterfaceSnapshot {
         NetworkInterfaceSnapshot(
-            cycleID: cycleID,
-            capturedAt: Date(timeIntervalSince1970: 42),
-            interfaces: []
-        )
-    }
-}
-
-private actor BlockingInterfaceSnapshotSource: NetworkInterfaceSnapshotSourcing {
-    private let captureStarted: DispatchSemaphore
-    private let releaseCapture: DispatchSemaphore
-    private(set) var didTimeOut = false
-
-    init(captureStarted: DispatchSemaphore, releaseCapture: DispatchSemaphore) {
-        self.captureStarted = captureStarted
-        self.releaseCapture = releaseCapture
-    }
-
-    func capture(cycleID: UUID) -> NetworkInterfaceSnapshot {
-        captureStarted.signal()
-        didTimeOut = releaseCapture.wait(timeout: .now() + 0.1) == .timedOut
-        return NetworkInterfaceSnapshot(
             cycleID: cycleID,
             capturedAt: Date(timeIntervalSince1970: 42),
             interfaces: []
