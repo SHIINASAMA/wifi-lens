@@ -81,6 +81,48 @@ struct EditionCompositionTests {
     }
 
     @MainActor
+    @Test("closing the final main window preserves the app-owned scene opener and pending route")
+    func closingFinalMainWindowPreservesSceneOpenerAndRoute() {
+        let lifecycle = MainWindowLifecycleCoordinator(isActiveAtRegistration: { _ in false })
+        var openRequests = 0
+        lifecycle.installOpenSceneAction { openRequests += 1 }
+
+        let window = NSWindow(
+            contentRect: .init(x: 0, y: 0, width: 100, height: 100),
+            styleMask: [.titled],
+            backing: .buffered,
+            defer: false
+        )
+        let originalScene = MainWindowSceneState()
+        #expect(lifecycle.register(
+            window,
+            sceneState: originalScene,
+            registerEdition: { true },
+            rollbackEdition: {}
+        ) == .registered)
+
+        NotificationCenter.default.post(name: NSWindow.willCloseNotification, object: window)
+        lifecycle.requestMainWindow(route: .timeline)
+
+        #expect(openRequests == 1)
+
+        let replacementWindow = NSWindow(
+            contentRect: .init(x: 0, y: 0, width: 100, height: 100),
+            styleMask: [.titled],
+            backing: .buffered,
+            defer: false
+        )
+        let replacementScene = MainWindowSceneState()
+        #expect(lifecycle.register(
+            replacementWindow,
+            sceneState: replacementScene,
+            registerEdition: { true },
+            rollbackEdition: {}
+        ) == .registered)
+        #expect(replacementScene.selectedPage == .timeline)
+    }
+
+    @MainActor
     @Test("duplicate registration and unchanged routes do not repeat resource transitions")
     func sharedRouteResourceTransitionsAreEdgeTriggered() {
         var spectrumTransitions: [Bool] = []

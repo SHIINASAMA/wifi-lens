@@ -21,6 +21,7 @@ private struct AppRootView: View {
     @Binding var crashLogText: String
     let sparkleUpdater: SparkleUpdater
     let updateMCPServer: @MainActor () -> Void
+    let installMainWindowOpenAction: (@escaping () -> Void) -> Void
     let registerMainWindow: @MainActor (NSWindow?, MainWindowSceneState) -> Void
     let updateMainWindowRoute: @MainActor (UUID, SidebarPage) -> Void
 
@@ -184,6 +185,7 @@ private struct AppRootView: View {
                     locationPermission: viewModel.locationManager,
                     bluetoothPermission: bleViewModel?.bluetoothPermission,
                     bleEnabled: $bleEnabled,
+                    onScanIntervalChange: { viewModel.scanIntervalSeconds = $0 },
                     onRegulatoryRegionChange: viewModel.handleRegulatoryRegionOverrideChange
                 )
                     .opacity(selectedPage == .settings ? 1 : 0)
@@ -272,7 +274,7 @@ private struct AppRootView: View {
             )
         )
         .task {
-            sceneState.installOpenSceneAction {
+            installMainWindowOpenAction {
                 openWindow(id: WiFiLensApp.mainWindowSceneID)
             }
             EditionComposition.startLifecycle(observationRuntime: viewModel.observationRuntime)
@@ -359,9 +361,6 @@ final class MainWindowSceneState {
     let editionWindowState: AnyObject
     var selectedPage: SidebarPage
 
-    private(set) var pendingRoute: SidebarPage?
-    private var openSceneAction: (() -> Void)?
-
     init(
         id: UUID = UUID(),
         editionWindowState: AnyObject? = nil,
@@ -374,22 +373,6 @@ final class MainWindowSceneState {
 
     func route(to page: SidebarPage) {
         selectedPage = page
-        pendingRoute = nil
-    }
-
-    func installOpenSceneAction(_ action: @escaping () -> Void) {
-        openSceneAction = action
-    }
-
-    func requestNewScene(route: SidebarPage?) {
-        pendingRoute = route
-        openSceneAction?()
-    }
-
-    func consumePendingRoute(from source: MainWindowSceneState) {
-        guard let route = source.pendingRoute else { return }
-        source.pendingRoute = nil
-        self.route(to: route)
     }
 }
 
@@ -451,7 +434,8 @@ final class MainWindowLifecycleCoordinator {
 
     private var registrations: [ObjectIdentifier: Registration] = [:]
     private(set) weak var activeWindow: NSWindow?
-    private weak var sceneOpeningFallback: MainWindowSceneState?
+    private var openSceneAction: (() -> Void)?
+    private var pendingRoute: SidebarPage?
     private let isActiveAtRegistration: @MainActor (NSWindow) -> Bool
 
     var hasWindows: Bool { !registrations.isEmpty }
@@ -462,6 +446,10 @@ final class MainWindowLifecycleCoordinator {
         }
     ) {
         self.isActiveAtRegistration = isActiveAtRegistration
+    }
+
+    func installOpenSceneAction(_ action: @escaping () -> Void) {
+        openSceneAction = action
     }
 
     func claim(
@@ -510,11 +498,9 @@ final class MainWindowLifecycleCoordinator {
               let registration = registrations[key],
               registration.registrationID == registrationID else { return false }
         guard !registration.isCommitted else { return true }
-        if let sceneState = registration.sceneState {
-            if let fallback = sceneOpeningFallback, fallback !== sceneState {
-                sceneState.consumePendingRoute(from: fallback)
-            }
-            sceneOpeningFallback = sceneState
+        if let route = pendingRoute, let sceneState = registration.sceneState {
+            pendingRoute = nil
+            sceneState.route(to: route)
         }
         registration.isCommitted = true
         if registration.activationPending, let window = registration.window {
@@ -573,7 +559,8 @@ final class MainWindowLifecycleCoordinator {
             if let route { sceneState.route(to: route) }
             return
         }
-        sceneOpeningFallback?.requestNewScene(route: route)
+        pendingRoute = route
+        openSceneAction?()
     }
 
     func sceneState(for window: NSWindow) -> MainWindowSceneState? {
@@ -917,6 +904,7 @@ struct WiFiLensApp: App {
                     crashLogText: $crashLogText,
                     sparkleUpdater: sparkleUpdater,
                     updateMCPServer: updateMCPServer,
+                    installMainWindowOpenAction: mainWindowLifecycle.installOpenSceneAction,
                     registerMainWindow: registerMainWindow,
                     updateMainWindowRoute: { windowID, route in
                         routeResources.update(windowID: windowID, route: route)

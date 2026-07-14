@@ -758,6 +758,26 @@ struct ScannerRuntimeMigrationTests {
         scanner.stop()
     }
 
+    @Test("an interval requested during recording becomes effective after the final lease")
+    func intervalRequestedDuringRecordingWinsAfterFinalLease() {
+        let suiteName = "ScannerRuntimeMigrationTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        defaults.set(7, forKey: "scanIntervalSeconds")
+
+        let scanner = ScannerViewModel(
+            userDefaults: defaults,
+            authorizationRefresh: { _ in }
+        )
+        let lease = scanner.acquireScanIntervalLease(seconds: 1)
+
+        scanner.scanIntervalSeconds = 10
+        #expect(scanner.scanIntervalSeconds == 1)
+
+        scanner.releaseScanIntervalLease(lease)
+        #expect(scanner.scanIntervalSeconds == 10)
+    }
+
     @Test("two interval leases survive scanner stop and start")
     func twoIntervalLeasesSurviveScannerStopAndStart() async {
         let suiteName = "ScannerRuntimeMigrationTests.\(UUID().uuidString)"

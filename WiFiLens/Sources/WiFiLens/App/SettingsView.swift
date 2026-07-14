@@ -8,6 +8,7 @@ struct SettingsView: View {
     let updater: SparkleUpdater
     let locationPermission: LocationPermissionManager
     let bluetoothPermission: BluetoothPermissionManager?
+    let onScanIntervalChange: (Int) -> Void
     let onRegulatoryRegionChange: (String) -> Void
     @Binding var bleEnabled: Bool
     @Environment(\.scenePhase) private var scenePhase
@@ -27,11 +28,13 @@ struct SettingsView: View {
         locationPermission: LocationPermissionManager,
         bluetoothPermission: BluetoothPermissionManager?,
         bleEnabled: Binding<Bool>,
+        onScanIntervalChange: @escaping (Int) -> Void = { _ in },
         onRegulatoryRegionChange: @escaping (String) -> Void = { _ in }
     ) {
         self.updater = updater
         self.locationPermission = locationPermission
         self.bluetoothPermission = bluetoothPermission
+        self.onScanIntervalChange = onScanIntervalChange
         self.onRegulatoryRegionChange = onRegulatoryRegionChange
         _bleEnabled = bleEnabled
         _autoCheck = State(initialValue: updater.automaticallyChecksForUpdates)
@@ -81,6 +84,9 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.menu)
                     .accessibilityIdentifier("settings-scan-interval-picker")
+                    .onChange(of: scanInterval) { _, newValue in
+                        onScanIntervalChange(newValue)
+                    }
 
                     Text(String(localized: "settings.scan.interval_description", comment: "Description clarifying the scan interval only affects the live spectrum view, not recording"))
                         .font(.caption)

@@ -236,28 +236,19 @@ final class ScannerViewModel {
         }
     }
 
-    /// Current scan interval in seconds. Set to override the UserDefaults-configured
-    /// interval (e.g. 1 s during recording). When changed while scanning, the scan
-    /// loop is restarted with the new interval.
-    var scanIntervalSeconds: Int = 3 {
-        didSet {
-            if !scanIntervalLeases.isEmpty, scanIntervalSeconds != 1 {
-                isEnforcingLeasedScanInterval = true
-                scanIntervalSeconds = 1
-                isEnforcingLeasedScanInterval = false
-                return
-            }
-            guard !isEnforcingLeasedScanInterval else { return }
-            guard oldValue != scanIntervalSeconds else { return }
-            guard isScanning else { return }
-            AppLogger.scanner.info("scanIntervalSeconds changed \(oldValue) → \(scanIntervalSeconds), restarting scan loop")
-            restartScanLoop()
+    /// Effective scan interval in seconds. Writes update the user's requested
+    /// interval, while active leases may keep the effective value lower.
+    var scanIntervalSeconds: Int {
+        get { effectiveScanIntervalSeconds }
+        set {
+            requestedScanIntervalSeconds = max(1, newValue)
+            applyEffectiveScanInterval()
         }
     }
 
-    private var scanIntervalLeases: Set<UUID> = []
-    private var scanIntervalBeforeLeases: Int?
-    private var isEnforcingLeasedScanInterval = false
+    private var requestedScanIntervalSeconds = 3
+    private var effectiveScanIntervalSeconds = 3
+    private var scanIntervalLeases: [UUID: Int] = [:]
 
     var activeScanIntervalLeaseCount: Int { scanIntervalLeases.count }
 
@@ -265,22 +256,32 @@ final class ScannerViewModel {
         let token = UUID()
         if scanIntervalLeases.isEmpty {
             let configuredInterval = userDefaults.integer(forKey: "scanIntervalSeconds")
-            scanIntervalBeforeLeases = configuredInterval > 0
-                ? configuredInterval
-                : scanIntervalSeconds
+            if configuredInterval > 0 {
+                requestedScanIntervalSeconds = configuredInterval
+            }
         }
-        scanIntervalLeases.insert(token)
-        scanIntervalSeconds = min(scanIntervalSeconds, max(1, seconds))
+        scanIntervalLeases[token] = max(1, seconds)
+        applyEffectiveScanInterval()
         return token
     }
 
     func releaseScanIntervalLease(_ token: UUID) {
-        guard scanIntervalLeases.remove(token) != nil else { return }
-        guard scanIntervalLeases.isEmpty else { return }
-        if let scanIntervalBeforeLeases {
-            scanIntervalSeconds = scanIntervalBeforeLeases
-        }
-        scanIntervalBeforeLeases = nil
+        guard scanIntervalLeases.removeValue(forKey: token) != nil else { return }
+        applyEffectiveScanInterval()
+    }
+
+    private func applyEffectiveScanInterval() {
+        let leasedInterval = scanIntervalLeases.values.min()
+        let nextInterval = leasedInterval.map {
+            min(requestedScanIntervalSeconds, $0)
+        } ?? requestedScanIntervalSeconds
+        guard effectiveScanIntervalSeconds != nextInterval else { return }
+
+        let previousInterval = effectiveScanIntervalSeconds
+        effectiveScanIntervalSeconds = nextInterval
+        guard isScanning else { return }
+        AppLogger.scanner.info("scanIntervalSeconds changed \(previousInterval) → \(nextInterval), restarting scan loop")
+        restartScanLoop()
     }
 
     func start() async {
@@ -325,7 +326,7 @@ final class ScannerViewModel {
         isStartingScan = true
         defer { isStartingScan = false }
         let stored = userDefaults.integer(forKey: "scanIntervalSeconds")
-        scanIntervalSeconds = effectiveScanInterval(configured: stored > 0 ? stored : 3)
+        scanIntervalSeconds = stored > 0 ? stored : 3
         await startScanLoop()
         hasStarted = true
     }
@@ -421,7 +422,9 @@ final class ScannerViewModel {
     }
 
     private func effectiveScanInterval(configured: Int) -> Int {
-        scanIntervalLeases.isEmpty ? max(1, configured) : 1
+        let configured = max(1, configured)
+        guard let leasedInterval = scanIntervalLeases.values.min() else { return configured }
+        return min(configured, leasedInterval)
     }
 
     func handleRegulatoryRegionOverrideChange(_ rawValue: String) {
