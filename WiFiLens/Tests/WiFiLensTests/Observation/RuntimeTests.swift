@@ -670,7 +670,7 @@ struct ScannerRuntimeMigrationTests {
         let scanner = ScannerViewModel(
             observationRuntime: runtime,
             userDefaults: defaults,
-            authorizationRefresh: { _ in }
+            authorizationRefresh: { $0.authorizationStatus = .authorized }
         )
         scanner.locationManager.authorizationStatus = .authorized
         scanner.userRegionOverride = .US
@@ -889,7 +889,10 @@ struct ScannerRuntimeMigrationTests {
             scanSource: source,
             interfaceSource: ImmediateInterfaceSnapshotSource()
         )
-        let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
+        let scanner = ScannerViewModel(
+            observationRuntime: runtime,
+            authorizationRefresh: { $0.authorizationStatus = .authorized }
+        )
         scanner.locationManager.authorizationStatus = .authorized
         let network = runtimeNetwork(bssid: "AA:04", channel: 36)
 
@@ -929,7 +932,10 @@ struct ScannerRuntimeMigrationTests {
             scanSource: source,
             interfaceSource: interfaceSource
         )
-        let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
+        let scanner = ScannerViewModel(
+            observationRuntime: runtime,
+            authorizationRefresh: { $0.authorizationStatus = .authorized }
+        )
         scanner.locationManager.authorizationStatus = .authorized
 
         await scanner.debugStartScanLoopForTesting()
@@ -952,7 +958,10 @@ struct ScannerRuntimeMigrationTests {
             scanSource: source,
             interfaceSource: ImmediateInterfaceSnapshotSource()
         )
-        let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
+        let scanner = ScannerViewModel(
+            observationRuntime: runtime,
+            authorizationRefresh: { $0.authorizationStatus = .authorized }
+        )
         scanner.locationManager.authorizationStatus = .authorized
         let office = runtimeNetwork(ssid: "Office", bssid: "AA:05", channel: 36)
         let guest = runtimeNetwork(ssid: "Guest", bssid: "AA:06", channel: 40)
@@ -1003,7 +1012,10 @@ struct ScannerRuntimeMigrationTests {
             scanSource: source,
             interfaceSource: interfaceSource
         )
-        let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
+        let scanner = ScannerViewModel(
+            observationRuntime: runtime,
+            authorizationRefresh: { $0.authorizationStatus = .authorized }
+        )
         scanner.locationManager.authorizationStatus = .authorized
         let network = runtimeNetwork(bssid: "AA:0E", channel: 36)
 
@@ -1160,7 +1172,10 @@ struct ScannerRuntimeMigrationTests {
             interfaceSource: ImmediateInterfaceSnapshotSource()
         )
         runtime.addConsumer(consumer)
-        let scanner = ScannerViewModel(observationRuntime: runtime, authorizationRefresh: { _ in })
+        let scanner = ScannerViewModel(
+            observationRuntime: runtime,
+            authorizationRefresh: { $0.authorizationStatus = .authorized }
+        )
         scanner.locationManager.authorizationStatus = .authorized
         let oldNetwork = runtimeNetwork(bssid: "AA:11", channel: 36)
         let newNetwork = runtimeNetwork(bssid: "AA:12", channel: 40)
