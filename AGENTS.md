@@ -47,6 +47,8 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/superpowers/plans/2026-07-12-edition-composition-seam.md` | Implementation plan for behavior-preserving target-selected OSS/Pro composition adapters |
 | `docs/superpowers/specs/2026-07-13-runtime-backpressure-and-pro-state-design.md` | Design spec for Pro state preservation, single-snapshot scan cycles, and bounded latest-only runtime processing |
 | `docs/superpowers/plans/2026-07-13-runtime-backpressure-and-pro-state.md` | Implementation plan for per-window Pro state, single-snapshot scans, and bounded runtime delivery |
+| `docs/superpowers/specs/2026-07-14-pr-review-hardening-design.md` | Design spec for a shared Pro termination budget and idempotent event persistence after PR review |
+| `docs/superpowers/plans/2026-07-14-pr-review-hardening.md` | Implementation plan for shared Pro termination timing and idempotent SQLite event replay |
 | `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
 
 ## Skills Directory
