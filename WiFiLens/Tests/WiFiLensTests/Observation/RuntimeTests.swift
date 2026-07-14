@@ -649,11 +649,11 @@ struct RuntimeTests {
     }
 }
 
-@Suite("Scanner runtime migration")
+@Suite("Scanner runtime migration", .serialized)
 @MainActor
 struct ScannerRuntimeMigrationTests {
     @Test("changing the settings region while scanning restarts with the new override")
-    func settingsRegionChangeRestartsRuntime() async {
+    func settingsRegionChangeRestartsRuntime() async throws {
         let suiteName = "ScannerRuntimeMigrationTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         defer { defaults.removePersistentDomain(forName: suiteName) }
@@ -680,7 +680,7 @@ struct ScannerRuntimeMigrationTests {
         scanner.handleRegulatoryRegionOverrideChange("JP")
         await scanner.debugDrainRuntimeLifecycleForTesting()
         await source.yield(.networks([network]))
-        await waitUntil { await pipeline.calls.count == 1 }
+        try await waitUntil { await pipeline.calls.count == 1 }
 
         #expect(await source.snapshot().requestedIntervals == [.seconds(3), .seconds(3)])
         #expect(await pipeline.calls.last?.context.userRegionOverride == .US)
@@ -692,7 +692,7 @@ struct ScannerRuntimeMigrationTests {
         scanner.handleRegulatoryRegionOverrideChange("auto")
         await scanner.debugDrainRuntimeLifecycleForTesting()
         await source.yield(.networks([network]))
-        await waitUntil { await pipeline.calls.count == 2 }
+        try await waitUntil { await pipeline.calls.count == 2 }
 
         #expect(await pipeline.calls.last?.context.userDefaultsRegionOverride == nil)
         #expect(scanner.scanIntervalSeconds == 3)
@@ -701,7 +701,7 @@ struct ScannerRuntimeMigrationTests {
     }
 
     @Test("changing the interval while scanning restarts the runtime")
-    func intervalChangeRestartsRuntime() async {
+    func intervalChangeRestartsRuntime() async throws {
         let source = ScriptedScanSource()
         let runtime = WiFiObservationRuntime(
             store: WiFiObservationStore(),
@@ -713,7 +713,7 @@ struct ScannerRuntimeMigrationTests {
 
         await scanner.debugStartScanLoopForTesting()
         scanner.scanIntervalSeconds = 1
-        await waitUntil { await source.snapshot().requestedIntervals.count == 2 }
+        try await waitUntil { await source.snapshot().requestedIntervals.count == 2 }
 
         #expect(await source.snapshot().requestedIntervals == [.seconds(3), .seconds(1)])
         scanner.stop()
@@ -816,7 +816,7 @@ struct ScannerRuntimeMigrationTests {
     }
 
     @Test("Wi-Fi power off stops runtime scanning")
-    func powerOffStopsRuntime() async {
+    func powerOffStopsRuntime() async throws {
         let source = ScriptedScanSource()
         let store = WiFiObservationStore()
         let consumer = CapturingObservationConsumer()
@@ -831,7 +831,7 @@ struct ScannerRuntimeMigrationTests {
 
         await scanner.debugStartScanLoopForTesting()
         scanner.debugReconcileWiFiStateForTesting(.poweredOff)
-        await waitUntil { await source.snapshot().stopCalls == 1 }
+        try await waitUntil { await source.snapshot().stopCalls == 1 }
         await source.yield(.networks([runtimeNetwork(bssid: "AA:0D", channel: 36)]))
         await runtime.drainConsumers()
 
@@ -842,7 +842,7 @@ struct ScannerRuntimeMigrationTests {
     }
 
     @Test("authorization loss on a runtime output stops scanning")
-    func authorizationLossStopsRuntime() async {
+    func authorizationLossStopsRuntime() async throws {
         let source = ScriptedScanSource()
         let store = WiFiObservationStore()
         let consumer = CapturingObservationConsumer()
@@ -859,7 +859,7 @@ struct ScannerRuntimeMigrationTests {
         await scanner.debugStartScanLoopForTesting()
         scanner.locationManager.authorizationStatus = .denied
         await source.yield(.networks([runtimeNetwork(bssid: "AA:03", channel: 36)]))
-        await waitUntil { await source.snapshot().stopCalls == 1 }
+        try await waitUntil { await source.snapshot().stopCalls == 1 }
 
         #expect(scanner.isScanning == false)
         #expect(scanner.accessState == .denied)
@@ -868,7 +868,7 @@ struct ScannerRuntimeMigrationTests {
     }
 
     @Test("runtime output projects networks, analysis, region, and interface context")
-    func outputProjection() async {
+    func outputProjection() async throws {
         let source = ScriptedScanSource()
         let quality = runtimeQuality(channel: 36)
         var recommendation = ChannelRecommendation(from: quality)
@@ -895,7 +895,7 @@ struct ScannerRuntimeMigrationTests {
 
         await scanner.debugStartScanLoopForTesting()
         await source.yield(.networks([network]))
-        await waitUntil { scanner.lastNetworks.map(\.id) == [network.id] }
+        try await waitUntil { scanner.lastNetworks.map(\.id) == [network.id] }
 
         #expect(scanner.signalHistory.allHistory[network.bssid] == [-50])
         #expect(scanner.channelQualities.map(\.qualityScore) == [quality.qualityScore])
@@ -908,7 +908,7 @@ struct ScannerRuntimeMigrationTests {
     }
 
     @Test("runtime interface snapshot supplies ScannerViewModel Interfaces projection")
-    func interfaceSnapshotProjectsIntoScannerViewModel() async {
+    func interfaceSnapshotProjectsIntoScannerViewModel() async throws {
         let source = ScriptedScanSource()
         let capturedAt = Date(timeIntervalSince1970: 1_752_001_000)
         let interfaces = [
@@ -934,7 +934,7 @@ struct ScannerRuntimeMigrationTests {
 
         await scanner.debugStartScanLoopForTesting()
         await source.yield(.networks([runtimeNetwork(bssid: "AA:14", channel: 36)]))
-        await waitUntil { scanner.networkInfo.count == interfaces.count }
+        try await waitUntil { scanner.networkInfo.count == interfaces.count }
 
         #expect(interfaceSource.captureCount == 1)
         #expect(scanner.networkInfo.map(\.interfaceName) == interfaces.map(\.interfaceName))
@@ -944,7 +944,7 @@ struct ScannerRuntimeMigrationTests {
     }
 
     @Test("runtime outputs preserve filters and locked AP visibility")
-    func outputPreservesPresentationState() async {
+    func outputPreservesPresentationState() async throws {
         let source = ScriptedScanSource()
         let runtime = WiFiObservationRuntime(
             store: WiFiObservationStore(),
@@ -959,13 +959,13 @@ struct ScannerRuntimeMigrationTests {
 
         await scanner.debugStartScanLoopForTesting()
         await source.yield(.networks([office, guest]))
-        await waitUntil { scanner.lastNetworks.count == 2 }
+        try await waitUntil { scanner.lastNetworks.count == 2 }
         scanner.toggleVisibility(seriesID: office.id)
         scanner.toggleVisibilityLocked(seriesID: office.id)
         scanner.setFilterQuery("Guest", for: .primary)
 
         await source.yield(.networks([office, guest]))
-        await waitUntil { scanner.signalHistory.allHistory[office.bssid]?.count == 2 }
+        try await waitUntil { scanner.signalHistory.allHistory[office.bssid]?.count == 2 }
 
         #expect(scanner.filterQuery(for: .primary) == "Guest")
         #expect(scanner.combinedTableRows.first(where: { $0.id == office.id })?.isVisible == false)
@@ -975,7 +975,7 @@ struct ScannerRuntimeMigrationTests {
     }
 
     @Test("failed scan preserves the last valid presentation projection")
-    func failedScanPreservesLastValidProjection() async {
+    func failedScanPreservesLastValidProjection() async throws {
         let source = ScriptedScanSource()
         let firstCapturedAt = Date(timeIntervalSince1970: 1_752_001_200)
         let secondCapturedAt = Date(timeIntervalSince1970: 1_752_001_205)
@@ -1009,7 +1009,7 @@ struct ScannerRuntimeMigrationTests {
 
         await scanner.debugStartScanLoopForTesting()
         await source.yield(.networks([network]))
-        await waitUntil { scanner.lastNetworks.map(\.id) == [network.id] }
+        try await waitUntil { scanner.lastNetworks.map(\.id) == [network.id] }
         let qualityChannels = scanner.channelQualities.map(\.channel)
         let qualityScores = scanner.channelQualities.map(\.qualityScore)
         let recommendationChannels = scanner.channelRecommendations.map(\.channel)
@@ -1025,7 +1025,7 @@ struct ScannerRuntimeMigrationTests {
         #expect(store.latestEnvironmentSnapshot?.error == nil)
 
         await gatewayLatencyProvider.releaseSecondMeasurement()
-        await waitUntil { store.latestEnvironmentSnapshot?.error == expectedError }
+        try await waitUntil { store.latestEnvironmentSnapshot?.error == expectedError }
 
         #expect(interfaceSource.captureCount == 2)
         #expect(scanner.lastNetworks.map(\.id) == [network.id])
@@ -1148,7 +1148,7 @@ struct ScannerRuntimeMigrationTests {
     }
 
     @Test("a suspended old cycle cannot publish across scanner stop and start")
-    func suspendedOldCycleIsRejectedAcrossStopStart() async {
+    func suspendedOldCycleIsRejectedAcrossStopStart() async throws {
         let source = ScriptedScanSource()
         let pipeline = SuspendingFirstCyclePipeline()
         let store = WiFiObservationStore()
@@ -1173,11 +1173,11 @@ struct ScannerRuntimeMigrationTests {
         let freshStart = Task { @MainActor in
             await scanner.debugStartScanLoopForTesting()
         }
-        await waitUntil { await source.snapshot().stopCalls == 1 }
+        try await waitUntil { await source.snapshot().stopCalls == 1 }
         await pipeline.releaseFirstCycle()
         await freshStart.value
         await source.yield(.networks([newNetwork]))
-        await waitUntil { scanner.lastNetworks.map(\.id) == [newNetwork.id] }
+        try await waitUntil { scanner.lastNetworks.map(\.id) == [newNetwork.id] }
         await runtime.drainConsumers()
 
         #expect(store.currentStatus?.bssid == newNetwork.bssid)
@@ -1190,13 +1190,21 @@ struct ScannerRuntimeMigrationTests {
     }
 
     private func waitUntil(
+        timeout: Duration = .seconds(5),
         _ condition: @escaping @MainActor () async -> Bool
-    ) async {
-        for _ in 0..<1_000 {
+    ) async throws {
+        let clock = ContinuousClock()
+        let deadline = clock.now.advanced(by: timeout)
+
+        while clock.now < deadline {
             if await condition() { return }
-            await Task.yield()
+            try await clock.sleep(for: .milliseconds(1))
         }
-        Issue.record("Timed out waiting for Scanner runtime work")
+
+        try #require(
+            await condition(),
+            "Timed out waiting for Scanner runtime work"
+        )
     }
 }
 

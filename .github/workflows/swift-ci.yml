@@ -34,6 +34,7 @@ env:
 jobs:
   build-and-test:
     runs-on: macos-26
+    timeout-minutes: 20
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
