@@ -7,6 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ND0000000000000000000010 /* NetworkDiagnosticModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000020 /* NetworkDiagnosticModels.swift */; };
+		ND0000000000000000000011 /* DiagnosticRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000021 /* DiagnosticRunner.swift */; };
+		ND0000000000000000000012 /* NetworkDiagnosticModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000020 /* NetworkDiagnosticModels.swift */; };
+		ND0000000000000000000013 /* DiagnosticRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000021 /* DiagnosticRunner.swift */; };
+		ND0000000000000000000014 /* NetworkConnectivityCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000022 /* NetworkConnectivityCheck.swift */; };
+		ND0000000000000000000015 /* DNSResolutionCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000023 /* DNSResolutionCheck.swift */; };
+		ND0000000000000000000016 /* SystemProxyCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000024 /* SystemProxyCheck.swift */; };
+		ND0000000000000000000017 /* NetworkConnectivityCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000022 /* NetworkConnectivityCheck.swift */; };
+		ND0000000000000000000018 /* DNSResolutionCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000023 /* DNSResolutionCheck.swift */; };
+		ND0000000000000000000019 /* SystemProxyCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000024 /* SystemProxyCheck.swift */; };
+		ND0000000000000000000040 /* NetworkDiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000042 /* NetworkDiagnosticsViewModel.swift */; };
+		ND0000000000000000000041 /* NetworkDiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000042 /* NetworkDiagnosticsViewModel.swift */; };
+		ND0000000000000000000043 /* NetworkDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000045 /* NetworkDiagnosticsView.swift */; };
+		ND0000000000000000000044 /* NetworkDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000045 /* NetworkDiagnosticsView.swift */; };
+		ND0000000000000000000001 /* NetworkDiagnosticsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000002 /* NetworkDiagnosticsTests.swift */; };
 		01ABB72FF2349B86A426CC1D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B31CBEBC05DEA7ADB03FE01 /* ContentView.swift */; };
 		027A3CECC33E6608D9F53B53 /* LocationPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69959B95B194A96FA8D337C /* LocationPermissionManager.swift */; };
 		0898D535D9CCA525F89735FA /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51DDD97F3B94514DE0790B51 /* Constants.swift */; };
@@ -374,6 +389,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		ND0000000000000000000020 /* NetworkDiagnosticModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDiagnosticModels.swift; sourceTree = "<group>"; };
+		ND0000000000000000000021 /* DiagnosticRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticRunner.swift; sourceTree = "<group>"; };
+		ND0000000000000000000022 /* NetworkConnectivityCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkConnectivityCheck.swift; sourceTree = "<group>"; };
+		ND0000000000000000000023 /* DNSResolutionCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSResolutionCheck.swift; sourceTree = "<group>"; };
+		ND0000000000000000000024 /* SystemProxyCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemProxyCheck.swift; sourceTree = "<group>"; };
+		ND0000000000000000000042 /* NetworkDiagnosticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDiagnosticsViewModel.swift; sourceTree = "<group>"; };
+		ND0000000000000000000045 /* NetworkDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDiagnosticsView.swift; sourceTree = "<group>"; };
+		ND0000000000000000000002 /* NetworkDiagnosticsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDiagnosticsTests.swift; sourceTree = "<group>"; };
 		01A62377C8474773A0ACA7CD /* HysteresisEMA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HysteresisEMA.swift; sourceTree = "<group>"; };
 		0470288A92AF41C793DAE70B /* DeviceCapabilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCapabilities.swift; sourceTree = "<group>"; };
 		1067F6AA96EC6320C6472F59 /* CoreWLAN.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreWLAN.framework; path = System/Library/Frameworks/CoreWLAN.framework; sourceTree = SDKROOT; };
@@ -863,6 +886,7 @@
 				C1D2E3F4A5B6123456789AC0 /* Filter */,
 				8FFEB5302BE8674E56110FAE /* Interfaces */,
 				786696F9D6046171197C0641 /* MCP */,
+				ND0000000000000000000030 /* NetworkDiagnostics */,
 				OB0000000000000000000042 /* Observation */,
 				FB6F41CB2FC4889B0009F29B /* Regulatory */,
 				FB8BB5FE2FBB039A00FD072E /* Resources */,
@@ -875,6 +899,20 @@
 				DD6657406F0FB50F2D9B7FB4 /* Utilities */,
 			);
 			path = WiFiLens;
+			sourceTree = "<group>";
+		};
+		ND0000000000000000000030 /* NetworkDiagnostics */ = {
+			isa = PBXGroup;
+			children = (
+				ND0000000000000000000020 /* NetworkDiagnosticModels.swift */,
+				ND0000000000000000000021 /* DiagnosticRunner.swift */,
+				ND0000000000000000000022 /* NetworkConnectivityCheck.swift */,
+				ND0000000000000000000023 /* DNSResolutionCheck.swift */,
+				ND0000000000000000000024 /* SystemProxyCheck.swift */,
+				ND0000000000000000000042 /* NetworkDiagnosticsViewModel.swift */,
+				ND0000000000000000000045 /* NetworkDiagnosticsView.swift */,
+			);
+			path = NetworkDiagnostics;
 			sourceTree = "<group>";
 		};
 		DD6657406F0FB50F2D9B7FB4 /* Utilities */ = {
@@ -1083,6 +1121,7 @@
 		FBD329482FBF0E2F00D01613 /* WiFiLensTests */ = {
 			isa = PBXGroup;
 			children = (
+				ND0000000000000000000003 /* NetworkDiagnostics */,
 				B06040A5BF8B6FAF01FFB696 /* BLEModelTests.swift */,
 				FC084FA8AE0EE5E703D922DA /* BandChartViewModelTests.swift */,
 				A10000000000000000000006 /* ChannelQualityViewModeTests.swift */,
@@ -1120,6 +1159,14 @@
 				D92298452F334CDAAA9695D3 /* WindowFramePolicyTests.swift */,
 			);
 			path = WiFiLensTests;
+			sourceTree = "<group>";
+		};
+		ND0000000000000000000003 /* NetworkDiagnostics */ = {
+			isa = PBXGroup;
+			children = (
+				ND0000000000000000000002 /* NetworkDiagnosticsTests.swift */,
+			);
+			path = NetworkDiagnostics;
 			sourceTree = "<group>";
 		};
 		FBD329492FBF0E2F00D01613 /* Tests */ = {
@@ -1465,6 +1512,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ND0000000000000000000010 /* NetworkDiagnosticModels.swift in Sources */,
+				ND0000000000000000000011 /* DiagnosticRunner.swift in Sources */,
+				ND0000000000000000000014 /* NetworkConnectivityCheck.swift in Sources */,
+				ND0000000000000000000015 /* DNSResolutionCheck.swift in Sources */,
+				ND0000000000000000000016 /* SystemProxyCheck.swift in Sources */,
+				ND0000000000000000000040 /* NetworkDiagnosticsViewModel.swift in Sources */,
+				ND0000000000000000000043 /* NetworkDiagnosticsView.swift in Sources */,
 				237EB0EBBBFBAC33EAE1380B /* BluetoothPermissionManager.swift in Sources */,
 				5A390BC860BEB1F0D50DAC76 /* BLEChannel.swift in Sources */,
 				DE564B93CC7C550958EDF3D5 /* BLEAdvertisementEvent.swift in Sources */,
@@ -1587,6 +1641,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ND0000000000000000000001 /* NetworkDiagnosticsTests.swift in Sources */,
 				67B6475699ADED9C42E8F7CC /* BLEModelTests.swift in Sources */,
 				2A8E470AAD8FCE2CC1D14305 /* BandChartViewModelTests.swift in Sources */,
 				A10000000000000000000014 /* ChannelQualityViewModeTests.swift in Sources */,
@@ -1636,6 +1691,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ND0000000000000000000012 /* NetworkDiagnosticModels.swift in Sources */,
+				ND0000000000000000000013 /* DiagnosticRunner.swift in Sources */,
+				ND0000000000000000000017 /* NetworkConnectivityCheck.swift in Sources */,
+				ND0000000000000000000018 /* DNSResolutionCheck.swift in Sources */,
+				ND0000000000000000000019 /* SystemProxyCheck.swift in Sources */,
+				ND0000000000000000000041 /* NetworkDiagnosticsViewModel.swift in Sources */,
+				ND0000000000000000000044 /* NetworkDiagnosticsView.swift in Sources */,
 				EC20000000000000000000004 /* ProEditionComposition.swift in Sources */,
 				EC20000000000000000000006 /* ProTimelineCompositionView.swift in Sources */,
 				EC20000000000000000000008 /* ProSettingsComposition.swift in Sources */,

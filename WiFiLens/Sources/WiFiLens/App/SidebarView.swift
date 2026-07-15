@@ -5,6 +5,7 @@ enum SidebarPage: String, CaseIterable {
     case spectrum
     case channels
     case interfaces
+    case networkDiagnostics
     case roaming
     case bleScanner
     case timeline
@@ -19,7 +20,7 @@ enum SidebarPage: String, CaseIterable {
 
     var requiresLocationAuthorization: Bool {
         switch self {
-        case .overview, .settings, .bleScanner, .timeline:
+        case .overview, .settings, .bleScanner, .timeline, .networkDiagnostics:
             false
         case .spectrum, .channels, .interfaces, .roaming:
             true
@@ -36,7 +37,7 @@ enum SidebarPage: String, CaseIterable {
 
     var requiresWiFi: Bool {
         switch self {
-        case .overview, .settings, .bleScanner, .timeline:
+        case .overview, .settings, .bleScanner, .timeline, .networkDiagnostics:
             false
         case .spectrum, .channels, .interfaces, .roaming:
             true
@@ -57,6 +58,7 @@ enum SidebarPage: String, CaseIterable {
         case .spectrum:   String(localized: "nav.spectrum", comment: "Spectrum sidebar navigation item")
         case .channels:   String(localized: "nav.channels", comment: "Channels sidebar navigation item")
         case .interfaces: String(localized: "nav.interfaces", comment: "Interfaces sidebar navigation item")
+        case .networkDiagnostics: String(localized: "nav.network_diagnostics", comment: "Network Self-Check sidebar navigation item")
         case .roaming:   String(localized: "nav.roaming_test", comment: "Roaming Test sidebar navigation item")
         case .bleScanner: String(localized: "nav.ble_scanner", comment: "BLE Scanner sidebar navigation item")
         case .timeline: String(localized: "nav.timeline", comment: "Timeline sidebar navigation item")
@@ -77,6 +79,7 @@ enum SidebarPage: String, CaseIterable {
         case .spectrum:   "antenna.radiowaves.left.and.right"
         case .channels:   "chart.bar.fill"
         case .interfaces: "cable.connector"
+        case .networkDiagnostics: "stethoscope"
         case .roaming:   "arrow.triangle.swap"
         case .bleScanner: "personalhotspot"
         case .timeline: "clock.arrow.circlepath"
@@ -163,7 +166,7 @@ struct SidebarView: View {
             }
             Section {
                 sidebarGroupTitle(.tools)
-                ForEach([SidebarPage.spectrum, .channels, .interfaces, .roaming, .bleScanner], id: \.self) { page in
+                ForEach([SidebarPage.spectrum, .channels, .interfaces, .networkDiagnostics, .roaming, .bleScanner], id: \.self) { page in
                     if page == .bleScanner {
                         Label(title: { Text(page.label) }, icon: {
                             BluetoothIconShape()

@@ -34,6 +34,7 @@ private struct AppRootView: View {
     @State private var sceneState = MainWindowSceneState()
     @State private var sidebarVisibility = NavigationSplitViewVisibility.automatic
     @State private var secondaryToolbarSelections = SecondaryToolbarSelections()
+    @State private var networkDiagnosticsViewModel = NetworkDiagnosticsViewModel()
 
     private var selectedPage: SidebarPage { sceneState.selectedPage }
 
@@ -169,6 +170,11 @@ private struct AppRootView: View {
                     )
                         .accessibilityIdentifier("page-interfaces")
                 }
+
+                NetworkDiagnosticsView(viewModel: networkDiagnosticsViewModel)
+                    .opacity(selectedPage == .networkDiagnostics ? 1 : 0)
+                    .allowsHitTesting(selectedPage == .networkDiagnostics)
+                    .accessibilityIdentifier("page-networkDiagnostics")
 
                 RoamingTestView(viewModel: roamingViewModel)
                     .opacity(selectedPage == .roaming ? 1 : 0)
@@ -313,12 +319,7 @@ private struct WindowAccessor: NSViewRepresentable {
     }
 
     private func configure(_ window: NSWindow?) {
-        guard let window else {
-            AppLogger.app.info("WindowAccessor: window=nil")
-            return
-        }
-
-        AppLogger.app.info("WindowAccessor: window=\(window)")
+        guard let window else { return }
         window.setFrameAutosaveName("WiFiLensMainWindow")
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .visible
