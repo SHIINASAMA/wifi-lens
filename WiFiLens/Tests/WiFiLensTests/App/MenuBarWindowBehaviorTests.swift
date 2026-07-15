@@ -9,7 +9,10 @@ struct MenuBarWindowBehaviorTests {
         #expect(DebugConsoleLogPolicy.shouldWrite(.trace))
         #expect(DebugConsoleLogPolicy.shouldWrite(.debug))
         #expect(!DebugConsoleLogPolicy.shouldWrite(.info))
-        #expect(!DebugConsoleLogPolicy.shouldWrite(.error))
+        #expect(!DebugConsoleLogPolicy.shouldWrite(.notice))
+        #expect(DebugConsoleLogPolicy.shouldWrite(.warning))
+        #expect(DebugConsoleLogPolicy.shouldWrite(.error))
+        #expect(DebugConsoleLogPolicy.shouldWrite(.critical))
     }
 
     @Test("network diagnostics route is shared and permission independent")

@@ -121,19 +121,6 @@ final class NetworkDiagnosticsViewModel {
         return true
     }
 
-    func cancel() {
-        activeTask?.cancel()
-        activeTask = nil
-        if phase == .running {
-            phase = .idle
-            executionPhases = Dictionary(
-                uniqueKeysWithValues: NetworkDiagnosticCheckID.allCases.map { ($0, .waiting) }
-            )
-            results = [:]
-            conclusion = nil
-        }
-    }
-
     func waitForCompletion() async {
         let task = activeTask
         await task?.value

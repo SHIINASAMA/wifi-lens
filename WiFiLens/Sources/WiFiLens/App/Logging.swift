@@ -69,9 +69,9 @@ enum AppLogger {
 enum DebugConsoleLogPolicy {
     static func shouldWrite(_ level: Logging.Logger.Level) -> Bool {
         switch level {
-        case .trace, .debug:
+        case .trace, .debug, .warning, .error, .critical:
             true
-        case .info, .notice, .warning, .error, .critical:
+        case .info, .notice:
             false
         }
     }
