@@ -121,7 +121,7 @@ Architecture, testing, and roadmap docs live in [docs/](docs/).
 
 Bug reports and feature ideas are welcome — open an [issue](https://github.com/SHIINASAMA/wifi-lens/issues) or start a [discussion](https://github.com/SHIINASAMA/wifi-lens/discussions).
 
-Pull requests should follow the conventions in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and include test coverage where practical. See [docs/COLLABORATION_RULES.md](docs/COLLABORATION_RULES.md) for AI assistant guidelines if you use coding agents.
+Pull requests should follow the conventions in [.agents/references/project/ARCHITECTURE.md](.agents/references/project/ARCHITECTURE.md) and include test coverage where practical. See [.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md) for AI assistant guidelines if you use coding agents.
 
 ---
 

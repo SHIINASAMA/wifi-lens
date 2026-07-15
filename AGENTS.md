@@ -2,64 +2,47 @@
 
 This file provides guidance to AI coding agents (Codex, Copilot, Cursor, Windsurf, Claude Code, and others) when working in this repository.
 
-## Docs Directory
+## Documentation and Agent Assets
 
-All detailed documentation lives under `docs/`. When adding or updating documentation, always place it there. Never create standalone `.md` files at the repo root (except this file, `CLAUDE.md`, and `README.md`).
+Project documentation lives under `docs/`. Cross-agent workflows and behavior references live under `.agents/`; see `.agents/README.md` for the boundary. Never create standalone `.md` files at the repo root (except this file, `CLAUDE.md`, and `README.md`).
 
 | File | Purpose |
 |------|---------|
-| `docs/ARCHITECTURE.md` | Architecture, data flow, key patterns, design conventions |
-| `docs/CHARTS.md` | Universal Chart engine, types, rendering pipeline, WiFi spectrum integration |
-| `docs/BLE.md` | BLE scanner architecture, data flow, types, views |
-| `docs/ACCESSIBILITY.md` | Accessibility implementation status, App Store Connect categories, gaps, testing |
-| `docs/MCP.md` | MCP Streamable HTTP server (port, protocol, tools, data format, integration) |
-| `docs/REGULATORY.md` | Regulatory pipeline, region inference, channel recommendation |
-| `docs/superpowers/specs/2026-06-17-channel-recommendation-design.md` | Channel recommendation redesign for issue #3 |
-| `docs/superpowers/plans/2026-06-17-channel-recommendation.md` | Implementation plan for counterfactual channel recommendation |
-| `docs/TESTING.md` | Test architecture, UI test setup, launch arguments, Pro target setup, common issues |
-| `docs/COLLABORATION_RULES.md` | AI assistant behavior rules — enforced prohibitions and must-follows |
 | `docs/TODO.md` | Feature roadmap and checked-off items |
 | `docs/ISSUES.md` | Bugs, regressions, and deferred work with status |
-| `docs/LOCALIZATION_TERMS.md` | Standardized translation terminology for all languages |
-| `docs/WINDOWING.md` | Main window sizing/restoration policy, P0 incident record, and anti-regression rules |
-| `docs/superpowers/specs/2026-06-18-debug-multi-ap-chart-design.md` | Design spec for the DebugChartView multi-AP chart workbench |
-| `docs/superpowers/plans/2026-06-18-debug-multi-ap-chart.md` | Implementation plan for the DebugChartView multi-AP chart workbench |
-| `docs/superpowers/specs/2026-06-22-unified-wifi-observation-pipeline-design.md` | Design spec for unified Wi-Fi observation pipeline (models, providers, analyzers, pipeline, store) |
-| `docs/superpowers/plans/2026-06-22-unified-wifi-observation-pipeline.md` | Implementation plan for unified Wi-Fi observation pipeline (Phases 1–5) |
-| `docs/superpowers/plans/2026-06-22-unified-wifi-observation-pipeline-migration.md` | Implementation plan for migrating UI consumers to observation pipeline (Phases 6–10) |
-| `docs/superpowers/specs/2026-06-24-ap-filter-design.md` | Design spec for structured AP filter query parser and filter service |
-| `docs/superpowers/plans/2026-06-24-ap-filter.md` | Implementation plan for AP filter query parser and filter service |
-| `docs/superpowers/specs/2026-07-10-timeline-event-semantics-design.md` | Design spec for Pro timeline connection semantics, event snapshots, and detail layout |
-| `docs/superpowers/plans/2026-07-10-timeline-event-semantics.md` | Implementation plan for Pro timeline connection classification and visual fixes |
-| `docs/superpowers/specs/2026-07-05-external-links-centralization-design.md` | Design spec for centralizing app business external links into a single Swift source of truth |
-| `docs/superpowers/specs/2026-07-10-pro-unified-event-timeline-design.md` | Design spec for the Pro-only unified menu-bar and event timeline pipeline |
-| `docs/superpowers/specs/2026-07-10-timeline-date-range-normalization-design.md` | Design spec for normalizing inverted custom date ranges in the Pro timeline (P2 #1) |
-| `docs/superpowers/plans/2026-07-10-pro-unified-event-timeline.md` | Implementation plan for the Pro-only unified menu-bar and event timeline pipeline |
-| `docs/superpowers/plans/2026-07-10-pro-timeline-consistency-controller.md` | Implementation plan for the Pro timeline generation controller, clear barrier, and lifecycle-safe date synchronization |
-| `docs/superpowers/specs/2026-07-11-observation-runtime-migration-design.md` | Design spec for immutable observation publication and migration to a single production observation runtime |
-| `docs/superpowers/plans/2026-07-11-immutable-observation-publication.md` | Implementation plan for ordered immutable observation publication and Pro event consumption |
-| `docs/superpowers/plans/2026-07-11-production-observation-runtime-migration.md` | Implementation plan for migrating production scan-cycle orchestration into the observation runtime |
-| `docs/superpowers/specs/2026-07-11-pro-event-journal-design.md` | Design spec for consolidating Pro event ingestion, recent publication, persistence, query, and clear consistency into one deep journal module |
-| `docs/superpowers/plans/2026-07-11-pro-event-journal.md` | Implementation plan for the Pro-only deep event journal and deletion of the shallow event lifecycle modules |
-| `docs/superpowers/specs/2026-07-12-structured-network-identity-design.md` | Design spec for making structured SSID/BSSID payloads the sole Pro connection-event identity and resetting the development schema |
-| `docs/superpowers/plans/2026-07-12-structured-network-identity.md` | Implementation plan for structured Pro connection-event identity, shared presentation formatting, and the destructive SQLite v2 upgrade |
-| `docs/superpowers/specs/2026-07-12-edition-composition-seam-design.md` | Design spec for target-selected OSS/Pro composition adapters with behavior-preserving lifecycle ownership |
-| `docs/superpowers/plans/2026-07-12-edition-composition-seam.md` | Implementation plan for behavior-preserving target-selected OSS/Pro composition adapters |
-| `docs/superpowers/specs/2026-07-13-runtime-backpressure-and-pro-state-design.md` | Design spec for Pro state preservation, single-snapshot scan cycles, and bounded latest-only runtime processing |
-| `docs/superpowers/plans/2026-07-13-runtime-backpressure-and-pro-state.md` | Implementation plan for per-window Pro state, single-snapshot scans, and bounded runtime delivery |
-| `docs/superpowers/specs/2026-07-14-pr-review-hardening-design.md` | Design spec for a shared Pro termination budget and idempotent event persistence after PR review |
-| `docs/superpowers/plans/2026-07-14-pr-review-hardening.md` | Implementation plan for shared Pro termination timing and idempotent SQLite event replay |
-| `docs/superpowers/specs/2026-07-14-network-self-check-preview-design.md` | Design spec for the shared OSS/Pro manual network connectivity, DNS, and system proxy self-check preview |
-| `docs/superpowers/plans/2026-07-14-network-self-check-preview.md` | Implementation plan for the shared OSS/Pro manual network self-check preview |
-| `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
+| `Pro/docs/ARCHITECTURE.md` | Private Pro architecture index; read only for tasks explicitly scoped to Pro |
+| `Pro/docs/REVIEW-TIMELINE.md` | Private Pro roadmap; read only for tasks explicitly scoped to Pro |
 
-## Skills Directory
+## Agent Assets
 
-Custom repository skills live under `.skills/`.
+Shared repository skills live under `.agents/skills/`. This directory is the single source for Codex and OpenCode; Claude Code uses symlinks under `.claude/skills/`.
+
+Before acting on a repository task, read and follow `.agents/references/collaboration-rules.md`, then use `.agents/references/README.md` to load only task-relevant project knowledge. This explicit routing is required because shared references are not platform discovery entry points.
 
 | File | Purpose |
 |------|---------|
-| `.skills/i18n-completer/SKILL.md` | Scan `Localizable.xcstrings` for missing translations and fill them via the repository scripts while enforcing glossary terminology |
+| `.agents/skills/i18n-completer/SKILL.md` | Scan `Localizable.xcstrings` for missing translations and fill them via the repository scripts while enforcing glossary terminology |
+| `.agents/skills/protect-knowledge-boundary/SKILL.md` | Prevent private Pro implementation knowledge from entering public documentation and Agent assets |
+| `.agents/skills/verify-build/SKILL.md` | Run the canonical WiFi Lens build and unit-test verification workflow |
+| `.agents/references/README.md` | Route tasks to architecture, accessibility, BLE, chart, MCP, regulatory, testing, and windowing references |
+| `.agents/references/collaboration-rules.md` | AI assistant behavior rules, enforced prohibitions, and must-follows |
+
+## Edition Documentation Boundary
+
+- Public repository documentation may acknowledge the Pro edition and link to
+  documentation in the private `Pro/` submodule.
+- Do not copy, summarize, or mirror Pro implementation details into the root
+  repository or `.agents/`.
+- For work explicitly scoped to Pro, follow `Pro/AGENTS.md` and read the private
+  references it routes. Otherwise, do not load Pro documentation.
+
+Use `.agents/skills/protect-knowledge-boundary/` for every documentation or
+Agent-asset change that mentions Pro or crosses the root/submodule boundary.
+
+<!-- knowledge-boundary-gate:start -->
+Run `.agents/skills/protect-knowledge-boundary/scripts/check_public_knowledge.py` and `.agents/skills/protect-knowledge-boundary/scripts/verify_integrity.py` before completing knowledge-boundary changes.
+Integrity manifest SHA-256: `60ac28742140f664d2c4bd03163a5362f3dff933fdd35de68a6ef17536727bd4`
+<!-- knowledge-boundary-gate:end -->
 
 ## Build & Test
 
@@ -102,14 +85,15 @@ When adding new test files, ensure they are:
 - `ScannerViewModel` is `@Observable`, passed via `@Bindable`
 - Tests use Swift Testing (`@Test`, `#expect()`) with `@testable import WiFiLens`
 - Localization: `String(localized: "domain.component.element", comment: "Context for translators")` → `Resources/Localizable.xcstrings` (`en`, `ja`, `zh-Hans`)
-- Keys use hierarchical dot-notation (e.g., `settings.scan.interval_1s`, `overview.diagnosis.great.title`) — see `docs/ARCHITECTURE.md` for full convention
+- Keys use hierarchical dot-notation (e.g., `settings.scan.interval_1s`, `overview.diagnosis.great.title`) — see `.agents/references/project/ARCHITECTURE.md` for full convention
 - New strings must be manually added to `.xcstrings` with `"extractionState": "manual"` and explicit `en` localization — auto-extraction is off
 - Use `String(format: String(localized: "format.key"), args...)` for parameterized strings, not string interpolation in keys
 
 ## Rules
 
 - Never commit without explicit user instruction
+- Before every commit, ask `Run the checks relevant to this commit before committing?` and follow the consent protocol in `.agents/references/collaboration-rules.md`
 - Never push unless asked
 - **English is the primary language.** All docs, code comments, commit messages, and communication must be in English. Only `.xcstrings` localization files are exceptions.
-- **All `.md` docs go in `docs/`** — this AGENTS.md, CLAUDE.md, and README are the only exceptions
+- **Project `.md` docs go in `docs/`** — Agent Skills and Agent-only references belong under `.agents/`; this AGENTS.md, CLAUDE.md, and README are the only root exceptions
 - When creating new docs, update the table in this file

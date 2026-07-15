@@ -121,7 +121,7 @@ xed WiFiLens.xcodeproj
 
 バグレポートと機能アイデアを歓迎します — [issue](https://github.com/SHIINASAMA/wifi-lens/issues) を開くか [discussion](https://github.com/SHIINASAMA/wifi-lens/discussions) を開始してください。
 
-Pull request は [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) の規約に従い、可能な限りテストカバレッジを含めてください。コードエディタを使用する場合は [docs/COLLABORATION_RULES.md](docs/COLLABORATION_RULES.md) を参照してください。
+Pull request は [.agents/references/project/ARCHITECTURE.md](.agents/references/project/ARCHITECTURE.md) の規約に従い、可能な限りテストカバレッジを含めてください。コードエディタを使用する場合は [.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md) を参照してください。
 
 ---
 

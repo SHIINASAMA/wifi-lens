@@ -121,7 +121,7 @@ xed WiFiLens.xcodeproj
 
 欢迎提交 Bug 报告和功能建议 — 打开 [issue](https://github.com/SHIINASAMA/wifi-lens/issues) 或发起 [discussion](https://github.com/SHIINASAMA/wifi-lens/discussions)。
 
-Pull request 应遵循 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) 中的约定，并在可行时包含测试覆盖。如果使用代码助手，请查看 [docs/COLLABORATION_RULES.md](docs/COLLABORATION_RULES.md)。
+Pull request 应遵循 [.agents/references/project/ARCHITECTURE.md](.agents/references/project/ARCHITECTURE.md) 中的约定，并在可行时包含测试覆盖。如果使用代码助手，请查看 [.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md)。
 
 ---
 
