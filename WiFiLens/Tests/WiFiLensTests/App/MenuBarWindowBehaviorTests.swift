@@ -4,6 +4,24 @@ import Testing
 
 @Suite("MenuBar Main Window Behavior")
 struct MenuBarWindowBehaviorTests {
+    @Test("debug console does not duplicate OSLog levels")
+    func debugConsoleDoesNotDuplicateOSLogLevels() {
+        #expect(DebugConsoleLogPolicy.shouldWrite(.trace))
+        #expect(DebugConsoleLogPolicy.shouldWrite(.debug))
+        #expect(!DebugConsoleLogPolicy.shouldWrite(.info))
+        #expect(!DebugConsoleLogPolicy.shouldWrite(.notice))
+        #expect(DebugConsoleLogPolicy.shouldWrite(.warning))
+        #expect(DebugConsoleLogPolicy.shouldWrite(.error))
+        #expect(DebugConsoleLogPolicy.shouldWrite(.critical))
+    }
+
+    @Test("network diagnostics route is shared and permission independent")
+    func networkDiagnosticsRouteRequirements() {
+        #expect(SidebarPage.networkDiagnostics.requiresLocationAuthorization == false)
+        #expect(SidebarPage.networkDiagnostics.requiresWiFi == false)
+        #expect(SidebarPage.networkDiagnostics.icon == "stethoscope")
+    }
+
     @Test("route intent preserves current page when route is nil")
     func routeIntentPreservesCurrentPage() {
         #expect(routeIntent(for: nil) == .preserveCurrentPage)

@@ -17,6 +17,7 @@
 ## Engineering
 
 - [ ] UI / integration tests
+- [ ] Before the next Mac App Store submission, update `NSLocalNetworkUsageDescription` for both OSS and Pro targets to disclose that Network Self-Check may connect to a configured local proxy, in addition to the existing MCP server use case
 - [x] Update `docs/ARCHITECTURE.md` Source Layout table with `BLE/` and `Regulatory/` directories
 
 ## Out of Scope (for now)

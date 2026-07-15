@@ -66,6 +66,17 @@ enum AppLogger {
 
 // MARK: - ConsoleLogHandler
 
+enum DebugConsoleLogPolicy {
+    static func shouldWrite(_ level: Logging.Logger.Level) -> Bool {
+        switch level {
+        case .trace, .debug, .warning, .error, .critical:
+            true
+        case .info, .notice:
+            false
+        }
+    }
+}
+
 /// Writes to stdout with timestamps. Debug builds only.
 private struct ConsoleLogHandler: LogHandler {
     let label: String
@@ -78,6 +89,7 @@ private struct ConsoleLogHandler: LogHandler {
     }
 
     func log(event: LogEvent) {
+        guard DebugConsoleLogPolicy.shouldWrite(event.level) else { return }
         let ts = _timestampFormatter.string(from: Date())
         print("\(ts) [\(event.level.short)] [\(label)] \(event.message)")
     }

@@ -49,6 +49,8 @@ All detailed documentation lives under `docs/`. When adding or updating document
 | `docs/superpowers/plans/2026-07-13-runtime-backpressure-and-pro-state.md` | Implementation plan for per-window Pro state, single-snapshot scans, and bounded runtime delivery |
 | `docs/superpowers/specs/2026-07-14-pr-review-hardening-design.md` | Design spec for a shared Pro termination budget and idempotent event persistence after PR review |
 | `docs/superpowers/plans/2026-07-14-pr-review-hardening.md` | Implementation plan for shared Pro termination timing and idempotent SQLite event replay |
+| `docs/superpowers/specs/2026-07-14-network-self-check-preview-design.md` | Design spec for the shared OSS/Pro manual network connectivity, DNS, and system proxy self-check preview |
+| `docs/superpowers/plans/2026-07-14-network-self-check-preview.md` | Implementation plan for the shared OSS/Pro manual network self-check preview |
 | `Pro/docs/ARCHITECTURE.md` | Pro feature docs (Recording, Session, StoreKit) — in submodule |
 
 ## Skills Directory
