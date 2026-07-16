@@ -20,6 +20,35 @@ struct MenuBarWindowBehaviorTests {
         #expect(SidebarPage.networkDiagnostics.requiresLocationAuthorization == false)
         #expect(SidebarPage.networkDiagnostics.requiresWiFi == false)
         #expect(SidebarPage.networkDiagnostics.icon == "stethoscope")
+        #expect(SidebarPage.networkDiagnostics.badgeStyle == .preview)
+    }
+
+    @Test("Pro sidebar badge uses paid-feature semantics")
+    func proSidebarBadgeStyle() {
+        #expect(SidebarBadge.Style.pro.icon == "crown.fill")
+        #expect(SidebarBadge.Style.pro.localizationKey == "common.badge.pro")
+    }
+
+    @Test("Preview sidebar badge uses preview-feature semantics")
+    func previewSidebarBadgeStyle() {
+        #expect(SidebarBadge.Style.preview.icon == "sparkles")
+        #expect(SidebarBadge.Style.preview.localizationKey == "common.badge.preview")
+    }
+
+    @Test("Semantic sidebar badge palettes keep small text readable")
+    func semanticSidebarBadgePalettesMeetContrastTarget() {
+        for style in [SidebarBadge.Style.pro, .preview] {
+            #expect(style.palette.light.foreground.contrastRatio(to: style.palette.light.background) >= 4.5)
+            #expect(style.palette.dark.foreground.contrastRatio(to: style.palette.dark.background) >= 4.5)
+        }
+    }
+
+    @Test("Sidebar badge metrics remain legible beside navigation labels")
+    func sidebarBadgeMetrics() {
+        #expect(SidebarBadge.Metrics.textSize == 10)
+        #expect(SidebarBadge.Metrics.iconSize == 9)
+        #expect(SidebarBadge.Metrics.verticalPadding == 3)
+        #expect(SidebarBadge.Metrics.borderWidth == 1)
     }
 
     @Test("route intent preserves current page when route is nil")
@@ -42,6 +71,13 @@ struct MenuBarWindowBehaviorTests {
         #expect(SidebarPage.timeline.icon == "clock.arrow.circlepath")
         #expect(!SidebarPage.timeline.requiresLocationAuthorization)
         #expect(!SidebarPage.timeline.requiresWiFi)
+    }
+
+    @Test("Timeline badge reflects edition semantics")
+    func timelineBadgeReflectsEdition() {
+        #expect(SidebarPage.timelineBadgeStyle(for: .oss) == .pro)
+        #expect(SidebarPage.timelineBadgeStyle(for: .pro) == .preview)
+        #expect(SidebarPage.timeline.badgeStyle == SidebarPage.timelineBadgeStyle(for: .current))
     }
 
     @Test("sidebar section titles use localized keys")

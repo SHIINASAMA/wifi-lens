@@ -93,6 +93,26 @@ enum SidebarPage: String, CaseIterable {
 #endif
         }
     }
+
+    var badgeStyle: SidebarBadge.Style? {
+        switch self {
+        case .networkDiagnostics:
+            .preview
+        case .timeline:
+            Self.timelineBadgeStyle(for: .current)
+        default:
+            nil
+        }
+    }
+
+    static func timelineBadgeStyle(for config: BuildConfig) -> SidebarBadge.Style {
+        switch config {
+        case .oss:
+            .pro
+        case .pro:
+            .preview
+        }
+    }
 }
 
 enum SidebarSection {
@@ -233,22 +253,21 @@ struct SidebarView: View {
 
     @ViewBuilder
     private func sidebarRow(for page: SidebarPage) -> some View {
-#if OSS
-        if page == .timeline {
+        sidebarLabel(for: page)
+    }
+
+    @ViewBuilder
+    private func sidebarLabel(for page: SidebarPage) -> some View {
+        if let badgeStyle = page.badgeStyle {
             HStack(spacing: 8) {
                 Label(page.label, systemImage: page.icon)
+                    .lineLimit(1)
                 Spacer(minLength: 8)
-                Image(systemName: "lock.fill")
-                    .font(.caption)
-                    .foregroundStyle(.yellow)
-                    .accessibilityHidden(true)
+                SidebarBadge(style: badgeStyle)
             }
         } else {
             Label(page.label, systemImage: page.icon)
         }
-#else
-        Label(page.label, systemImage: page.icon)
-#endif
     }
 
     private func sidebarGroupTitle(_ section: SidebarSection) -> some View {

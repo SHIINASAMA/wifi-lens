@@ -127,6 +127,7 @@
 		FB0573B42FBBEAE4005F8214 /* MCP in Frameworks */ = {isa = PBXBuildFile; productRef = FB0573B32FBBEAE4005F8214 /* MCP */; };
 		FB0573B62FBBEBB9005F8214 /* MCPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573B52FBBEBB9005F8214 /* MCPServer.swift */; };
 		FB0573BA2FBBFC31005F8214 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573B92FBBFC31005F8214 /* SidebarView.swift */; };
+		SB0000000000000000000002 /* SidebarBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = SB0000000000000000000001 /* SidebarBadge.swift */; };
 		FB0573BE2FBC22C2005F8214 /* InterfacesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573BD2FBC22C2005F8214 /* InterfacesView.swift */; };
 		FB0573C02FBC47CC005F8214 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573BF2FBC47CC005F8214 /* Logging.swift */; };
 		FB0573C12FBBFC31005F8215 /* ProFeaturePlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573C02FBBFC31005F8215 /* ProFeaturePlaceholderView.swift */; };
@@ -192,6 +193,7 @@
 		FB1E327B2FC7316C009D1BDC /* BuildConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB2CA8B2FC0E14000FC2D2C /* BuildConfig.swift */; };
 		FB1E327C2FC7316C009D1BDC /* IEParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB8BB6032FBB0BA600FD072E /* IEParser.swift */; };
 		FB1E327D2FC7316C009D1BDC /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573B92FBBFC31005F8214 /* SidebarView.swift */; };
+		SB0000000000000000000003 /* SidebarBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = SB0000000000000000000001 /* SidebarBadge.swift */; };
 		FB1E327E2FC7316C009D1BDC /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573BF2FBC47CC005F8214 /* Logging.swift */; };
 		FB1E327F2FC7316C009D1BDC /* RegulatoryDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C92FC4889B0009F29B /* RegulatoryDomain.swift */; };
 		FB1E32802FC7316C009D1BDC /* RegulatoryDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6F41C82FC4889B0009F29B /* RegulatoryDatabase.swift */; };
@@ -494,6 +496,7 @@
 		FB0573B02FBB5BEE005F8214 /* TrendChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendChartView.swift; sourceTree = "<group>"; };
 		FB0573B52FBBEBB9005F8214 /* MCPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPServer.swift; sourceTree = "<group>"; };
 		FB0573B92FBBFC31005F8214 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		SB0000000000000000000001 /* SidebarBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarBadge.swift; sourceTree = "<group>"; };
 		FB0573BD2FBC22C2005F8214 /* InterfacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterfacesView.swift; sourceTree = "<group>"; };
 		FB0573BF2FBC47CC005F8214 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
 		FB0573C02FBBFC31005F8215 /* ProFeaturePlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProFeaturePlaceholderView.swift; sourceTree = "<group>"; };
@@ -806,6 +809,7 @@
 				A10000000000000000000008 /* SecondaryToolbarCapsule.swift */,
 				FBD7B34A2FBAED65002C8F5A /* SettingsView.swift */,
 				FB0573B92FBBFC31005F8214 /* SidebarView.swift */,
+				SB0000000000000000000001 /* SidebarBadge.swift */,
 				FBD7B3482FBAED57002C8F5A /* SparkleUpdater.swift */,
 				FBB2CA8C2FC0E14000FC2D2C /* TitleBadge.swift */,
 				FBD000002FC4000000ABC001 /* WiFiOffView.swift */,
@@ -1579,6 +1583,7 @@
 				FBB2CA8E2FC0E14000FC2D2C /* BuildConfig.swift in Sources */,
 				FB8BB6042FBB0BA600FD072E /* IEParser.swift in Sources */,
 				FB0573BA2FBBFC31005F8214 /* SidebarView.swift in Sources */,
+				SB0000000000000000000002 /* SidebarBadge.swift in Sources */,
 				FB0573C12FBBFC31005F8215 /* ProFeaturePlaceholderView.swift in Sources */,
 				FB0573C02FBC47CC005F8214 /* Logging.swift in Sources */,
 				FB6F41CC2FC4889B0009F29B /* RegulatoryDomain.swift in Sources */,
@@ -1770,6 +1775,7 @@
 				FB1E327C2FC7316C009D1BDC /* IEParser.swift in Sources */,
 				FBE45E242FEC556F001D563D /* BandPanelSelection.swift in Sources */,
 				FB1E327D2FC7316C009D1BDC /* SidebarView.swift in Sources */,
+				SB0000000000000000000003 /* SidebarBadge.swift in Sources */,
 				FB1E327E2FC7316C009D1BDC /* Logging.swift in Sources */,
 				FB1E327F2FC7316C009D1BDC /* RegulatoryDomain.swift in Sources */,
 				FB1E32802FC7316C009D1BDC /* RegulatoryDatabase.swift in Sources */,
