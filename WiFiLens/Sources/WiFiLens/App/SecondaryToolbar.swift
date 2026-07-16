@@ -94,7 +94,6 @@ struct SecondaryToolbarDescriptor: Equatable {
             items: [
                 SecondaryToolbarItem(id: .timelineAll, title: String(localized: "timeline.filter.all", comment: "Timeline all-time range filter")),
                 SecondaryToolbarItem(id: .timelineToday, title: String(localized: "timeline.filter.today", comment: "Timeline today range filter")),
-                SecondaryToolbarItem(id: .timelineYesterday, title: String(localized: "timeline.filter.yesterday", comment: "Timeline yesterday range filter")),
                 SecondaryToolbarItem(id: .timelineThisWeek, title: String(localized: "timeline.filter.this_week", comment: "Timeline this-week range filter")),
                 SecondaryToolbarItem(id: .timelineCustom, title: String(localized: "timeline.filter.custom", comment: "Timeline custom range filter")),
             ],
