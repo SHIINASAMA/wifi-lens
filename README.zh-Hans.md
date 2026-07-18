@@ -1,6 +1,6 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/screenshot-swiftui.png">
-  <img alt="WiFi Lens — macOS Wi-Fi spectrum analyzer" src="assets/screenshot-swiftui.png" width="800">
+  <img alt="WiFi Lens macOS Wi-Fi 频谱分析器" src="assets/screenshot-swiftui.png" width="800">
 </picture>
 
 # WiFi Lens
@@ -12,27 +12,30 @@
 [![Email](https://img.shields.io/badge/email-wifi--lens@outlook.com-0078d4)](mailto:wifi-lens@outlook.com)
 [![Website](https://img.shields.io/badge/website-wifi--lens.shiinalabs.com-2563eb)](https://wifi-lens.shiinalabs.com)
 
+🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
+
 **一款原生 macOS 工具，用于分析和优化你的 Wi-Fi 网络。**
 
 <p align="center">
-  <a href="https://apps.apple.com/app/id6776590746">
-    <img src="assets/appstore-badge-en.svg" alt="在 Mac App Store 下载" width="240">
+  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746">
+    <img src="assets/appstore-badge-en.svg" alt="在 Mac App Store 下载 WiFi Lens Pro" width="240">
   </a>
 </p>
 
 ---
 
-## WiFi Lens 是什么？
+## 关于 WiFi Lens
 
-WiFi Lens 是一款免费开源的 Wi-Fi 和蓝牙分析器，完全使用 macOS 原生框架（SwiftUI、CoreWLAN、CoreBluetooth）构建。它为周围每一个无线网络和 BLE 设备提供实时可视化地图，让你能够诊断连接问题、选择最空闲的信道，并验证跨接入点的漫游行为。
+WiFi Lens 是一款使用 SwiftUI、CoreWLAN 和 CoreBluetooth 开发的原生 macOS Wi-Fi 与蓝牙分析器。它实时呈现附近的无线网络和 BLE 设备，帮助你诊断连接问题、选择拥堵较少的信道，并验证接入点之间的漫游行为。
 
-与基于网页的扫描器或跨平台的 Electron 应用不同，WiFi Lens 零开销运行，尊重你的隐私，并且完美融入 macOS 生态。
+本仓库提供免费开源版。WiFi Lens Pro 是包含更多功能的独立付费版本。
 
 **典型使用场景：**
-- 🏠 **家庭网络调优** — 找出邻居占用了哪个信道，然后把路由器移到更安静的频道上。
-- 🏢 **办公室 Wi-Fi 审计** — 扫描全部三个频段（2.4、5 和 6 GHz），发现信号死角或配置错误的 AP。
-- 🚶 **漫游验证** — 穿过一栋建筑时记录每一次 AP 切换，用时间线图验证无缝过渡是否正常工作。
-- 🎧 **BLE 设备排障** — 追踪蓝牙外设的 RSSI 趋势，识别范围或干扰问题。
+
+- 🏠 **家庭网络调优：** 找出邻居占用的信道，然后将路由器切换到较空闲的信道。
+- 🏢 **办公室 Wi-Fi 审计：** 扫描 2.4、5 和 6 GHz 三个频段，发现信号死角或配置错误的 AP。
+- 🚶 **漫游验证：** 在建筑内移动时记录每次 AP 切换，通过时间线图验证漫游是否顺畅。
+- 🎧 **BLE 设备排障：** 追踪蓝牙外设的 RSSI 趋势，识别覆盖范围或干扰问题。
 
 ---
 
@@ -49,35 +52,37 @@ WiFi Lens 是一款免费开源的 Wi-Fi 和蓝牙分析器，完全使用 macOS
 | 🔄 **漫游测试** | AP 切换监控，含时间线图、范围选择器和会话保存/加载 |
 | 🗺️ **信道热力图** | 各频段占用热力图，瞬间发现拥堵模式 |
 | 🎧 **BLE 扫描器** | Bluetooth LE 设备发现、RSSI 分析、趋势图表和设备追踪 |
-| 🎨 **智能着色** | 基于 SSID 的确定性颜色分配 — 同一网络始终显示相同颜色 |
-| 🔒 **隐私优先** | 无遥测、无分析、无数据收集 — 所有数据保留在你的 Mac 上 |
+| 🎨 **智能着色** | 基于 SSID 确定颜色；同一网络始终保持相同颜色 |
+| 🔒 **隐私优先** | 无遥测或使用分析；Wi-Fi 扫描数据保留在你的 Mac 上 |
 | 🌐 **MCP 服务器** | 内嵌 HTTP API（`127.0.0.1:19840`），支持外部工具集成 |
-| 🔄 **自动更新** | 内置 Sparkle 更新支持，随时运行最新版本 |
+| 🔄 **自动更新** | GitHub 版本提供可选的 Sparkle 更新检查 |
 | 📤 **导出** | 保存各频段图表为 PNG 图片或 CSV 数据 |
-| 🌍 **本地化** | 完整支持英语、日本語和简体中文 |
+| 🌍 **本地化** | 英语、德语、西班牙语、日语和简体中文 |
 
 ---
 
-## 差异化亮点
+## 设计
 
-**原生性能，而非网页包装。** CoreWLAN 直接与 Wi-Fi 硬件对话 — 没有中间层、没有 JavaScript 桥接、不浪费 CPU 周期。在现代 Apple Silicon 上每秒扫描数百个网络毫无压力。
+**原生 macOS 界面。** CoreWLAN 直接与 Wi-Fi 硬件通信，SwiftUI 提供原生 Mac 控件和窗口行为。
 
-**内置法规智能。** 大多数工具只显示原始信道编号就完事了。WiFi Lens 从系统区域设置、硬件能力和附近 AP 的国家代码推断你的监管域，然后推荐你真正允许使用的信道 — 尊重 DFS、室内专用和 6 GHz AFC 规则。
+**结合地区法规的信道推荐。** WiFi Lens 根据系统地区、硬件能力和附近 AP 的国家代码推断监管域，并按照 DFS、室内使用和 6 GHz AFC 要求筛选推荐结果。
 
-**一切互联互通。** 点击表格中的网络，它在所有图表中高亮显示；悬停在钟形曲线上，SSID 立即弹出；冻结一个频段而其他频段继续扫描。它的设计像驾驶舱，而非仪表盘。
+**联动视图。** 在表格中选择网络后，各图表会同时高亮该网络。将指针悬停在钟形曲线上即可查看 SSID。
 
-**为高级用户预留空间。** 导出 PNG/CSV、运行带会话保存/加载的漫游测试，或通过内嵌 MCP HTTP 服务器与自己的工具集成 — 没有隐藏的付费墙。
+**开源版工具。** 导出 PNG 和 CSV 文件，或保存并加载漫游会话。本地 MCP 服务器可将 WiFi Lens 连接到你的工具。
 
 ---
 
 ## 下载
 
 [![下载最新版本](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest/)
-[![在 Mac App Store 下载](https://img.shields.io/badge/Download-Mac%20App%20Store-black?logo=apple)](https://apps.apple.com/app/id6776590746)
+[![在 Mac App Store 下载 WiFi Lens Pro](https://img.shields.io/badge/Download-Mac%20App%20Store-black?logo=apple)](https://apps.apple.com/app/wifi-lens-pro/id6776590746)
+
+GitHub Releases 提供开源版。WiFi Lens Pro 可在支持地区的 Mac App Store 下载。
 
 需要 macOS 14 (Sonoma) 或更高版本。兼容 Intel 和 Apple Silicon Mac。
 
-> 🌐 **官方网站:** [wifi-lens.shiinalabs.com](https://wifi-lens.shiinalabs.com) — 截图、完整功能导览、AI/MCP 工作流与常见问题。
+> 🌐 **官方网站：** [wifi-lens.shiinalabs.com](https://wifi-lens.shiinalabs.com) 提供截图、功能导览、AI/MCP 工作流和常见问题。
 
 > [!IMPORTANT]
 > 在 macOS 14+ 上，**定位服务**必须启用才能读取 Wi-Fi SSID 名称。
@@ -85,11 +90,13 @@ WiFi Lens 是一款免费开源的 Wi-Fi 和蓝牙分析器，完全使用 macOS
 
 ## 隐私
 
-WiFi Lens **什么都不收集**。无使用分析、无崩溃遥测、无外部服务器网络流量。
+WiFi Lens 不收集使用分析、崩溃遥测或 Wi-Fi 扫描数据。
 
-- **定位服务** — macOS 要求此权限以暴露 Wi-Fi SSID 名称。WiFi Lens 从不读取你的 GPS 位置。
-- **区域检测** — 使用系统区域设置、硬件报告的信道列表和附近 AP 国家代码。完全在设备上运行。
-- **MCP 服务器** — 仅绑定到 `127.0.0.1`。除非你明确将数据路由到其他地方，否则扫描数据不会离开你的机器。
+- **定位服务：** macOS 需要此权限才能提供 Wi-Fi SSID 名称。WiFi Lens 不会读取你的 GPS 位置。
+- **区域检测：** WiFi Lens 在设备上使用系统地区、硬件报告的信道列表和附近 AP 的国家代码。
+- **网络自检：** 运行自检时，WiFi Lens 会解析 `example.com`，并可能测试你配置的代理端点是否可达。
+- **MCP 服务器：** 可选服务器绑定到 `127.0.0.1`。只有在你启用后，本地工具才能访问扫描数据。
+- **更新检查：** 当你手动检查更新或启用自动检查时，GitHub 版本会连接 GitHub。
 
 ---
 
@@ -97,13 +104,15 @@ WiFi Lens **什么都不收集**。无使用分析、无崩溃遥测、无外部
 
 ```sh
 git clone https://github.com/SHIINASAMA/wifi-lens
-cd wifi-lens/WiFiLens
+cd wifi-lens
+git submodule update --init ChartLens
+cd WiFiLens
 
 # 构建
 xcodebuild -project WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' build
 
 # 运行测试
-xcodebuild -project WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' test
+xcodebuild -project WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test -only-testing:WiFiLensTests
 
 # 在 Xcode 中打开
 xed WiFiLens.xcodeproj
@@ -111,15 +120,13 @@ xed WiFiLens.xcodeproj
 
 产品名为 `WiFi Lens.app`（带空格）。
 
-### Website
-
 架构、测试和路线图文档位于 [docs/](docs/)。
 
 ---
 
 ## 贡献
 
-欢迎提交 Bug 报告和功能建议 — 打开 [issue](https://github.com/SHIINASAMA/wifi-lens/issues) 或发起 [discussion](https://github.com/SHIINASAMA/wifi-lens/discussions)。
+欢迎提交 Bug 报告和功能建议。你可以创建 [issue](https://github.com/SHIINASAMA/wifi-lens/issues) 或发起 [discussion](https://github.com/SHIINASAMA/wifi-lens/discussions)。
 
 Pull request 应遵循 [.agents/references/project/ARCHITECTURE.md](.agents/references/project/ARCHITECTURE.md) 中的约定，并在可行时包含测试覆盖。如果使用代码助手，请查看 [.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md)。
 
