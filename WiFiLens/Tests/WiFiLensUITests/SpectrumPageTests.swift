@@ -26,28 +26,13 @@ final class SpectrumPageTests: XCTestCase {
     // MARK: - Content
 
     func testSpectrumDashboardSectionsVisible() throws {
-        continueAfterFailure = true
+        guard navigateToPage("sidebar-spectrum", pageID: "page-spectrum", app: app) else { return }
 
-        let spectrumSidebar = app.descendants(matching: .any)["sidebar-spectrum"]
-        guard spectrumSidebar.waitForExistence(timeout: 5) else {
-            XCTFail("Spectrum sidebar not found")
-            return
-        }
-        spectrumSidebar.click()
+        let dashboard = app.descendants(matching: .any)["spectrum-dashboard"]
+        waitForElement(dashboard, message: "Spectrum dashboard content not found", app: app)
 
-        // In CI / no-permission environments, we may see a fallback view.
-        let spectrumPage = app.descendants(matching: .any)["page-spectrum"]
-        guard spectrumPage.waitForExistence(timeout: 5) else {
-            // Fallback views are acceptable — test what we can.
-            return
-        }
-
-        // Verify the page has content: band charts, trend chart, and an AP table.
-        // These appear once scan data arrives. Without real WiFi, they may be empty,
-        // but the table container should still render.
-        let hasCharts = !app.groups.matching(identifier: "chart").element.waitForExistence(timeout: 2)
-        // Fallback is UI test mode — chart container may differ.
-        // At minimum the page container exists.
-        XCTAssertTrue(true, "Spectrum page loaded")
+        let liveMode = app.radioButtons["secondary-toolbar-spectrum-live"]
+        waitForElement(liveMode, message: "Live spectrum toolbar mode not found", app: app)
+        XCTAssertEqual(liveMode.value as? Int, 1, "Live spectrum mode should be selected")
     }
 }

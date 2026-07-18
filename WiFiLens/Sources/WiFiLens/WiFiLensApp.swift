@@ -180,11 +180,13 @@ private struct AppRootView: View {
                     .opacity(selectedPage == .roaming ? 1 : 0)
                     .allowsHitTesting(selectedPage == .roaming)
                     .accessibilityIdentifier("page-roaming")
+                    .accessibilityElement(children: .contain)
 
                 BLEScannerView(viewModel: bleViewModel, bleEnabled: bleEnabled)
                     .opacity(selectedPage == .bleScanner ? 1 : 0)
                     .allowsHitTesting(selectedPage == .bleScanner)
                     .accessibilityIdentifier("page-bleScanner")
+                    .accessibilityElement(children: .contain)
 
                 SettingsView(
                     updater: sparkleUpdater,

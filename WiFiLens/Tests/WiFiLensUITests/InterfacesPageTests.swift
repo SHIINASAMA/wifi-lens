@@ -24,21 +24,22 @@ final class InterfacesPageTests: XCTestCase {
 
     // MARK: - Content
 
-    func testInterfacesModePickerExists() throws {
-        continueAfterFailure = true
+    func testInterfacesToolbarChangesMode() throws {
+        guard navigateToPage("sidebar-interfaces", pageID: "page-interfaces", app: app) else { return }
 
-        let sidebar = app.descendants(matching: .any)["sidebar-interfaces"]
-        guard sidebar.waitForExistence(timeout: 5) else { return }
-        sidebar.click()
+        let simple = app.radioButtons["secondary-toolbar-interfaces-simple"]
+        let details = app.radioButtons["secondary-toolbar-interfaces-details"]
+        let monitor = app.radioButtons["secondary-toolbar-interfaces-monitor"]
+        guard waitForElement(simple, message: "Simple interfaces mode not found", app: app),
+              waitForElement(details, message: "Details interfaces mode not found", app: app),
+              waitForElement(monitor, message: "Monitor interfaces mode not found", app: app) else { return }
 
-        let interfacesPage = app.descendants(matching: .any)["page-interfaces"]
-        guard interfacesPage.waitForExistence(timeout: 5) else { return }
-
-        // The interfaces mode picker (WiFi / Ethernet / Bluetooth) should exist.
-        let modePicker = app.popUpButtons["interfaces-mode-picker"]
-        if modePicker.waitForExistence(timeout: 3) {
-            XCTAssertGreaterThan(modePicker.menuItems.count, 0,
-                                 "Interfaces mode picker should have menu items")
-        }
+        XCTAssertEqual(simple.value as? Int, 1, "Simple mode should be selected by default")
+        details.click()
+        waitForValue(1, of: details, message: "Details mode did not become selected")
+        monitor.click()
+        waitForValue(1, of: monitor, message: "Monitor mode did not become selected")
+        simple.click()
+        waitForValue(1, of: simple, message: "Simple mode was not restored")
     }
 }

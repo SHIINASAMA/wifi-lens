@@ -18,18 +18,11 @@ final class BLEScannerPageTests: XCTestCase {
     // MARK: - Navigation
 
     func testNavigateToBLEScannerPage() throws {
-        continueAfterFailure = true
+        guard navigateToPage("sidebar-bleScanner", pageID: "page-bleScanner", app: app) else { return }
 
-        let sidebar = app.descendants(matching: .any)["sidebar-bleScanner"]
-        guard sidebar.waitForExistence(timeout: 5) else {
-            XCTFail("BLE sidebar not found")
-            return
-        }
-        sidebar.click()
-
-        let blePage = app.descendants(matching: .any)["page-bleScanner"]
-        let wifiOff = app.descendants(matching: .any)["wifi-off-view"]
-        XCTAssertTrue(blePage.waitForExistence(timeout: 3) || wifiOff.waitForExistence(timeout: 0),
-                      "BLE Scanner → expected page-bleScanner or wifi-off-view")
+        let disabledState = app.descendants(matching: .any)["ble-disabled-state"]
+        waitForElement(disabledState,
+                       message: "UI test mode should expose the deterministic BLE disabled state",
+                       app: app)
     }
 }

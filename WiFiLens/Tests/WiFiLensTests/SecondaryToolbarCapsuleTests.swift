@@ -57,5 +57,14 @@ struct SecondaryToolbarCapsuleTests {
             "secondary-toolbar-channels-simple",
             "secondary-toolbar-channels-table",
         ])
+        #expect(children?[0].accessibilityValue() as? Int == 1)
+        #expect(children?[1].accessibilityValue() as? Int == 0)
+
+        control.selectedSegment = 1
+        control.refreshAccessibilityChildren()
+
+        let updatedChildren = control.accessibilityChildren() as? [NSAccessibilityElement]
+        #expect(updatedChildren?[0].accessibilityValue() as? Int == 0)
+        #expect(updatedChildren?[1].accessibilityValue() as? Int == 1)
     }
 }

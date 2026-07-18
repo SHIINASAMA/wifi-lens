@@ -123,6 +123,8 @@ struct RoamingTestView: View {
             }
             Spacer()
         }
+        .accessibilityIdentifier("roaming-idle-state")
+        .accessibilityElement(children: .contain)
     }
 
     // MARK: - Running / Stopped content
@@ -134,6 +136,8 @@ struct RoamingTestView: View {
             trendChart
             transitionTable
         }
+        .accessibilityIdentifier("roaming-active-state")
+        .accessibilityElement(children: .contain)
     }
 
     // MARK: - Signal info card

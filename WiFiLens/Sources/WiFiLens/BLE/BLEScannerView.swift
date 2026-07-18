@@ -32,6 +32,8 @@ private struct BLEDisabledView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, 24)
+        .accessibilityIdentifier("ble-disabled-state")
+        .accessibilityElement(children: .contain)
     }
 }
 

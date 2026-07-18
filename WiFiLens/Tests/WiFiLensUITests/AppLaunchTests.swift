@@ -30,6 +30,42 @@ final class AppLaunchTests: XCTestCase {
                       "Sidebar should be visible at launch.\n\(app.debugDescription)")
     }
 
+    func testOnlySelectedPageIsExposedToAccessibility() throws {
+        let overviewPage = app.descendants(matching: .any)["page-overview"]
+        XCTAssertTrue(overviewPage.waitForExistence(timeout: 5),
+                      "Overview page should be exposed at launch.\n\(app.debugDescription)")
+
+        let hiddenPageIDs = [
+            "page-spectrum",
+            "page-channels",
+            "page-interfaces",
+            "page-roaming",
+            "page-bleScanner",
+            "page-settings",
+        ]
+        for id in hiddenPageIDs {
+            XCTAssertFalse(app.descendants(matching: .any)[id].exists,
+                           "Hidden page '\(id)' must not remain in the accessibility tree")
+        }
+    }
+
+    func testSidebarKeyboardShortcutTogglesVisibility() throws {
+        let overviewItem = app.descendants(matching: .any)["sidebar-overview"]
+        XCTAssertTrue(overviewItem.waitForExistence(timeout: 5), "Sidebar should start visible")
+
+        app.typeKey("s", modifierFlags: [.control, .command])
+        XCTAssertTrue(
+            overviewItem.waitForNonExistence(timeout: 3),
+            "Control-Command-S should hide the sidebar"
+        )
+
+        app.typeKey("s", modifierFlags: [.control, .command])
+        XCTAssertTrue(
+            overviewItem.waitForExistence(timeout: 3),
+            "Control-Command-S should restore the sidebar"
+        )
+    }
+
     // MARK: - Sidebar items
 
     func testAllSidebarItemsPresent() throws {

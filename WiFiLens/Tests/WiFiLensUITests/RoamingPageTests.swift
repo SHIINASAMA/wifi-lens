@@ -25,30 +25,17 @@ final class RoamingPageTests: XCTestCase {
     // MARK: - Controls
 
     func testRoamingControlsPresent() throws {
-        continueAfterFailure = true
+        guard navigateToPage("sidebar-roaming", pageID: "page-roaming", app: app) else { return }
 
-        let sidebar = app.descendants(matching: .any)["sidebar-roaming"]
-        guard sidebar.waitForExistence(timeout: 5) else { return }
-        sidebar.click()
-
-        let roamingPage = app.descendants(matching: .any)["page-roaming"]
-        guard roamingPage.waitForExistence(timeout: 5) else { return }
-
-        // The roaming page should have start, load, save, and stop buttons.
-        // Start button — should always be visible when not running.
-        let startButton = app.buttons["roaming-start-test-button"]
-        if startButton.waitForExistence(timeout: 3) {
-            XCTAssertTrue(startButton.isEnabled || !startButton.isEnabled,
-                          "Start button state check")
-        }
-
-        // Load button — always visible when not running.
-        let loadButton = app.buttons["roaming-load-session-button"]
-        if loadButton.waitForExistence(timeout: 2) {
-            XCTAssertTrue(loadButton.exists, "Load button should exist")
-        }
-
-        // Stop button — only visible during running, so may not be present.
-        // Save button — only visible in stopped state with data.
+        let idleState = app.descendants(matching: .any)["roaming-idle-state"]
+        let activeState = app.descendants(matching: .any)["roaming-active-state"]
+        guard waitForEither(
+            idleState,
+            activeState,
+            message: "Roaming page should expose either idle or active state",
+            app: app
+        ) else { return }
+        XCTAssertNotEqual(idleState.exists, activeState.exists,
+                          "Roaming page should expose exactly one state")
     }
 }

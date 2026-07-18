@@ -34,7 +34,7 @@ final class SettingsPageTests: XCTestCase {
     // MARK: - Appearance & Scan
 
     func testSettingsThemeAndScanControls() throws {
-        navigateToSettings(app)
+        guard navigateToSettings(app) else { return }
 
         // Theme picker — radio group with 3 options (system/light/dark).
         let themeGroup = app.radioGroups["settings-theme-picker"]
@@ -45,40 +45,47 @@ final class SettingsPageTests: XCTestCase {
         let themeButtons = themeGroup.radioButtons
         XCTAssertEqual(themeButtons.count, 3, "Expected 3 theme options (system/light/dark)")
 
-        // Click "Light" and verify selection changes.
-        themeButtons.element(boundBy: 1).click()
-        XCTAssertEqual(themeButtons.element(boundBy: 1).value as? Int, 1,
-                       "Light segment should be selected after click")
-        // Restore to System.
-        themeButtons.element(boundBy: 0).click()
+        let originalThemeIndex = (0..<themeButtons.count).first {
+            themeButtons.element(boundBy: $0).value as? Int == 1
+        }
+        let selectedThemeIndex = try XCTUnwrap(originalThemeIndex, "No selected theme option")
+        let alternateThemeIndex = (selectedThemeIndex + 1) % themeButtons.count
+        themeButtons.element(boundBy: alternateThemeIndex).click()
+        waitForValue(1,
+                     of: themeButtons.element(boundBy: alternateThemeIndex),
+                     message: "Alternate theme did not become selected")
+        themeButtons.element(boundBy: selectedThemeIndex).click()
+        waitForValue(1,
+                     of: themeButtons.element(boundBy: selectedThemeIndex),
+                     message: "Original theme was not restored")
 
         // Scan interval picker — pop-up button with menu items.
         let intervalPicker = app.popUpButtons["settings-scan-interval-picker"]
         XCTAssertTrue(intervalPicker.waitForExistence(timeout: 3),
                       "Scan interval picker not found")
         intervalPicker.click()
-        let intervalItem = intervalPicker.menuItems.element(boundBy: 3) // "5s"
-        if intervalItem.waitForExistence(timeout: 2) {
-            intervalItem.click()
-        }
-        intervalPicker.click() // dismiss menu
+        let intervalItem = intervalPicker.menuItems.firstMatch
+        XCTAssertTrue(intervalItem.waitForExistence(timeout: 2),
+                      "Scan interval menu did not open")
+        XCTAssertEqual(intervalPicker.menuItems.count, 5, "Expected 5 scan interval options")
+        app.typeKey(.escape, modifierFlags: [])
 
         // Region picker.
         let regionPicker = app.popUpButtons["settings-region-picker"]
         XCTAssertTrue(regionPicker.waitForExistence(timeout: 3),
                       "Region picker not found")
         regionPicker.click()
-        let regionItem = regionPicker.menuItems.element(boundBy: 1) // "US"
-        if regionItem.waitForExistence(timeout: 2) {
-            regionItem.click()
-        }
-        regionPicker.click()
+        let regionItem = regionPicker.menuItems.firstMatch
+        XCTAssertTrue(regionItem.waitForExistence(timeout: 2),
+                      "Region menu did not open")
+        XCTAssertEqual(regionPicker.menuItems.count, 5, "Expected 5 region options")
+        app.typeKey(.escape, modifierFlags: [])
     }
 
     // MARK: - Feature Toggles
 
     func testSettingsFeatureToggles() throws {
-        navigateToSettings(app)
+        guard navigateToSettings(app) else { return }
 
         // BLE toggle — renders as CheckBox on macOS.
         let bleToggle = app.checkBoxes["settings-ble-toggle"]
@@ -88,10 +95,9 @@ final class SettingsPageTests: XCTestCase {
         }
         let bleWasOn = (bleToggle.value as? Int) == 1
         bleToggle.click()
-        sleep(1)
-        let bleNowOn = (bleToggle.value as? Int) == 1
-        XCTAssertNotEqual(bleWasOn, bleNowOn, "BLE toggle did not change state")
-        bleToggle.click() // restore
+        waitForValue(bleWasOn ? 0 : 1, of: bleToggle, message: "BLE toggle did not change state")
+        bleToggle.click()
+        waitForValue(bleWasOn ? 1 : 0, of: bleToggle, message: "BLE toggle state was not restored")
 
         // MCP toggle and port field.
         let mcpToggle = app.switches["settings-mcp-toggle"]
@@ -104,7 +110,7 @@ final class SettingsPageTests: XCTestCase {
     // MARK: - Diagnostics & Permissions
 
     func testSettingsDiagnosticsAndPermissions() throws {
-        navigateToSettings(app)
+        guard navigateToSettings(app) else { return }
         scrollSettings(byDeltaY: 600)
 
         // Permission badges.

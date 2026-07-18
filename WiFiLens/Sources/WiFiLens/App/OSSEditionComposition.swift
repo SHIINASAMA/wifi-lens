@@ -44,6 +44,7 @@ enum EditionComposition {
                 selection: context.secondaryToolbarSelections.wrappedValue.spectrum
             )
             .accessibilityIdentifier("page-spectrum")
+            .accessibilityElement(children: .contain)
         case .timeline:
             ProFeaturePlaceholderView(
                 featureName: String(localized: "pro.timeline.title", comment: "Pro timeline feature title"),

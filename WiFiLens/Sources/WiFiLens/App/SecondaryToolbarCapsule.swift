@@ -118,19 +118,28 @@ struct SecondaryToolbarCapsule: NSViewRepresentable {
 final class SecondaryToolbarSegmentedControl: NSSegmentedControl {
     var segmentItemIDs: [SecondaryToolbarItemID] = []
 
+    override func layout() {
+        super.layout()
+        refreshAccessibilityChildren()
+    }
+
     func refreshAccessibilityChildren() {
         var childElements: [Any] = []
         var xOffset: CGFloat = 0
 
         for index in 0..<segmentCount {
             let width = self.width(forSegment: index)
-            let frame = NSRect(x: xOffset, y: 0, width: width, height: bounds.height)
+            let localFrame = NSRect(x: xOffset, y: 0, width: width, height: bounds.height)
+            let windowFrame = convert(localFrame, to: nil)
+            let screenFrame = window?.convertToScreen(windowFrame) ?? localFrame
             let label = self.label(forSegment: index) ?? ""
             let element = NSAccessibilityElement()
             element.setAccessibilityRole(.radioButton)
-            element.setAccessibilityFrame(frame)
+            element.setAccessibilityFrame(screenFrame)
             element.setAccessibilityLabel(label)
             element.setAccessibilityParent(self)
+            element.setAccessibilityEnabled(isEnabled)
+            element.setAccessibilityValue(index == selectedSegment ? 1 : 0)
             if segmentItemIDs.indices.contains(index) {
                 element.setAccessibilityIdentifier("secondary-toolbar-\(segmentItemIDs[index].rawValue)")
             }

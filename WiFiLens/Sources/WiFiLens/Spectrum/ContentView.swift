@@ -144,6 +144,8 @@ struct ContentView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
+        .accessibilityIdentifier("spectrum-dashboard")
+        .accessibilityElement(children: .contain)
     }
 
     private var tableFilterBar: some View {

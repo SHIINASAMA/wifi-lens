@@ -24,23 +24,18 @@ final class ChannelsPageTests: XCTestCase {
 
     // MARK: - Content
 
-    func testChannelsQualityModePicker() throws {
-        continueAfterFailure = true
+    func testChannelsToolbarChangesMode() throws {
+        guard navigateToPage("sidebar-channels", pageID: "page-channels", app: app) else { return }
 
-        let sidebar = app.descendants(matching: .any)["sidebar-channels"]
-        guard sidebar.waitForExistence(timeout: 5) else { return }
-        sidebar.click()
+        let simple = app.radioButtons["secondary-toolbar-channels-simple"]
+        let table = app.radioButtons["secondary-toolbar-channels-table"]
+        guard waitForElement(simple, message: "Simple channel mode not found", app: app),
+              waitForElement(table, message: "Table channel mode not found", app: app) else { return }
 
-        // Channels page may show wifi-off-view or location-permission-view in CI.
-        let channelsPage = app.descendants(matching: .any)["page-channels"]
-        guard channelsPage.waitForExistence(timeout: 5) else { return }
-
-        // The channel quality mode picker (Signal / Quality) should exist on the page.
-        let modePicker = app.popUpButtons["channel-quality-mode-picker"]
-        if modePicker.waitForExistence(timeout: 3) {
-            XCTAssertGreaterThan(modePicker.menuItems.count, 0,
-                                 "Quality mode picker should have menu items")
-        }
-        // If picker doesn't exist, the page may be in wifi-off or location-permission state — OK.
+        XCTAssertEqual(simple.value as? Int, 1, "Simple mode should be selected by default")
+        table.click()
+        waitForValue(1, of: table, message: "Table mode did not become selected")
+        simple.click()
+        waitForValue(1, of: simple, message: "Simple mode was not restored")
     }
 }
