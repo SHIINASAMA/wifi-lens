@@ -41,7 +41,7 @@ Agent-asset change that mentions Pro or crosses the root/submodule boundary.
 
 <!-- knowledge-boundary-gate:start -->
 Run `.agents/skills/protect-knowledge-boundary/scripts/check_public_knowledge.py` and `.agents/skills/protect-knowledge-boundary/scripts/verify_integrity.py` before completing knowledge-boundary changes.
-Integrity manifest SHA-256: `60ac28742140f664d2c4bd03163a5362f3dff933fdd35de68a6ef17536727bd4`
+Integrity manifest SHA-256: `d95689171c133bd39107c37363fa328a79ff3333ea6bb57e4cbb465c59d2f2fe`
 <!-- knowledge-boundary-gate:end -->
 
 ## Build & Test
@@ -94,6 +94,7 @@ When adding new test files, ensure they are:
 - Never commit without explicit user instruction
 - Before every commit, ask `Run the checks relevant to this commit before committing?` and follow the consent protocol in `.agents/references/collaboration-rules.md`
 - Never push unless asked
-- **English is the primary language.** All docs, code comments, commit messages, and communication must be in English. Only `.xcstrings` localization files are exceptions.
+- **English is the primary language for repository-facing artifacts.** Repository-facing artifacts must be written in English, including source code comments, documentation, commit messages, issue descriptions, pull request content, and other text committed to the repository. Only `.xcstrings` localization files are exceptions.
+- **Agent–developer communication follows the developer's language preference.** Communication between agents and developers may use the developer's preferred language unless explicitly requested otherwise.
 - **Project `.md` docs go in `docs/`** — Agent Skills and Agent-only references belong under `.agents/`; this AGENTS.md, CLAUDE.md, and README are the only root exceptions
 - When creating new docs, update the table in this file

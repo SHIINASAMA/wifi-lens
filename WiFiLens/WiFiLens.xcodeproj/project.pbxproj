@@ -2265,7 +2265,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.6;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "WiFi Lens can run an MCP server on localhost when you enable it in Settings, so local tools like Claude Desktop can read Wi-Fi scan data. The server is off by default. No data leaves this Mac.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "WiFi Lens uses local networking when you enable its MCP server and when Network Self-Check tests reachability of your configured network proxy. These checks do not collect or transmit your Wi-Fi scan data.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "macOS requires this permission for any app that reads Wi‑Fi network names (SSIDs). WiFi Lens never accesses your GPS coordinates and never logs your location.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (

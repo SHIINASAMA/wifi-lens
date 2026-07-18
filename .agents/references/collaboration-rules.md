@@ -11,7 +11,8 @@ The following rules are **hard constraints** and must be followed in all circums
 
 ## Project Language
 
-- **English is the primary language of this project.** All documentation, code comments, commit messages, and communication must be written in English. Localization strings (`.xcstrings`) are the only exception — they support `en`, `ja`, and `zh-Hans`.
+- **English is the primary language for repository-facing artifacts.** Repository-facing artifacts must be written in English, including source code comments, documentation, commit messages, issue descriptions, pull request content, and other text committed to the repository. Localization strings (`.xcstrings`) are the only exception — they support `en`, `ja`, and `zh-Hans`.
+- **Agent–developer communication follows the developer's language preference.** Communication between agents and developers may use the developer's preferred language unless explicitly requested otherwise.
 
 ## Prohibited Actions
 
