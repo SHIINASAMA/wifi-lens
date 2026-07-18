@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 import Testing
 @testable import WiFi_Lens
 
@@ -49,6 +50,37 @@ struct MenuBarWindowBehaviorTests {
         #expect(SidebarBadge.Metrics.iconSize == 9)
         #expect(SidebarBadge.Metrics.verticalPadding == 3)
         #expect(SidebarBadge.Metrics.borderWidth == 1)
+    }
+
+    @Test("Sidebar badges prefer full content before compact icon fallback")
+    func sidebarBadgeAdaptivePresentationOrder() {
+        #expect(SidebarBadge.Presentation.adaptiveOrder == [.full, .compact])
+        #expect(SidebarBadge.Presentation.full.showsText)
+        #expect(!SidebarBadge.Presentation.compact.showsText)
+    }
+
+    @MainActor
+    @Test("Sidebar badge row reserves one minimum gap between label and badge")
+    func sidebarBadgeRowUsesSingleMinimumGap() {
+        let label = NSHostingView(
+            rootView: Label("Network Check", systemImage: "stethoscope")
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+        )
+        let badge = NSHostingView(rootView: SidebarBadge(style: .preview))
+        let row = NSHostingView(
+            rootView: SidebarBadgeRowContent(
+                title: "Network Check",
+                icon: "stethoscope",
+                style: .preview,
+                presentation: .full
+            )
+        )
+        let expectedWidth = label.fittingSize.width
+            + SidebarBadgeRowContent.minimumGap
+            + badge.fittingSize.width
+
+        #expect(row.fittingSize.width <= expectedWidth + 1)
     }
 
     @Test("route intent preserves current page when route is nil")

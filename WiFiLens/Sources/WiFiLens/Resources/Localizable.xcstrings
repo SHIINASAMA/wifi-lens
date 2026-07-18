@@ -19782,13 +19782,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Network Self-Check"
+            "value": "Network Check"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ネットワーク自己診断"
+            "value": "ネットワーク診断"
           }
         },
         "zh-Hans": {
@@ -19800,13 +19800,13 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Netzwerk-Selbsttest"
+            "value": "Netzwerktest"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Autodiagnóstico de red"
+            "value": "Diagnóstico de red"
           }
         }
       }

@@ -3,6 +3,17 @@ import SwiftUI
 
 /// Compact metadata displayed at the trailing edge of a sidebar destination.
 struct SidebarBadge: View {
+    enum Presentation: Hashable {
+        case full
+        case compact
+
+        static let adaptiveOrder: [Self] = [.full, .compact]
+
+        var showsText: Bool {
+            self == .full
+        }
+    }
+
     struct Swatch: Equatable {
         let red: Double
         let green: Double
@@ -115,27 +126,35 @@ struct SidebarBadge: View {
 
     let icon: String
     let text: String
+    private let presentation: Presentation
     private let palette: Palette?
     private let tint: Color?
 
     @Environment(\.colorScheme) private var colorScheme
 
-    init(icon: String, text: String, tint: Color) {
+    init(icon: String, text: String, tint: Color, presentation: Presentation = .full) {
         self.icon = icon
         self.text = text
+        self.presentation = presentation
         palette = nil
         self.tint = tint
     }
 
-    init(icon: String, text: String, palette: Palette) {
+    init(icon: String, text: String, palette: Palette, presentation: Presentation = .full) {
         self.icon = icon
         self.text = text
+        self.presentation = presentation
         self.palette = palette
         tint = nil
     }
 
-    init(style: Style) {
-        self.init(icon: style.icon, text: style.text, palette: style.palette)
+    init(style: Style, presentation: Presentation = .full) {
+        self.init(
+            icon: style.icon,
+            text: style.text,
+            palette: style.palette,
+            presentation: presentation
+        )
     }
 
     var body: some View {
@@ -144,9 +163,11 @@ struct SidebarBadge: View {
                 .font(.system(size: Metrics.iconSize, weight: .semibold))
                 .accessibilityHidden(true)
 
-            Text(text)
-                .font(.system(size: Metrics.textSize, weight: .semibold))
-                .lineLimit(1)
+            if presentation.showsText {
+                Text(text)
+                    .font(.system(size: Metrics.textSize, weight: .semibold))
+                    .lineLimit(1)
+            }
         }
         .padding(.horizontal, Metrics.horizontalPadding)
         .padding(.vertical, Metrics.verticalPadding)
@@ -159,6 +180,7 @@ struct SidebarBadge: View {
         .fixedSize(horizontal: true, vertical: false)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(text)
+        .help(text)
         .allowsHitTesting(false)
     }
 

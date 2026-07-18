@@ -259,11 +259,19 @@ struct SidebarView: View {
     @ViewBuilder
     private func sidebarLabel(for page: SidebarPage) -> some View {
         if let badgeStyle = page.badgeStyle {
-            HStack(spacing: 8) {
-                Label(page.label, systemImage: page.icon)
-                    .lineLimit(1)
-                Spacer(minLength: 8)
-                SidebarBadge(style: badgeStyle)
+            ViewThatFits(in: .horizontal) {
+                SidebarBadgeRowContent(
+                    title: page.label,
+                    icon: page.icon,
+                    style: badgeStyle,
+                    presentation: .full
+                )
+                SidebarBadgeRowContent(
+                    title: page.label,
+                    icon: page.icon,
+                    style: badgeStyle,
+                    presentation: .compact
+                )
             }
         } else {
             Label(page.label, systemImage: page.icon)
@@ -277,5 +285,25 @@ struct SidebarView: View {
             .textCase(nil)
             .padding(.top, 6)
             .padding(.bottom, 2)
+    }
+}
+
+struct SidebarBadgeRowContent: View {
+    static let minimumGap: CGFloat = 8
+
+    let title: String
+    let icon: String
+    let style: SidebarBadge.Style
+    let presentation: SidebarBadge.Presentation
+
+    var body: some View {
+        HStack(spacing: 0) {
+            Label(title, systemImage: icon)
+                .lineLimit(1)
+                .fixedSize(horizontal: presentation == .full, vertical: false)
+                .layoutPriority(1)
+            Spacer(minLength: Self.minimumGap)
+            SidebarBadge(style: style, presentation: presentation)
+        }
     }
 }
