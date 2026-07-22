@@ -22,7 +22,7 @@ struct NetworkTableRow: Identifiable, Hashable {
     let channel: Int
     let rssi: Int
     let ssid: String
-    let vendor: String = "—"
+    var vendor: String = "—"
     let bssid: String
     let color: Color
     let isFilteredOut: Bool
