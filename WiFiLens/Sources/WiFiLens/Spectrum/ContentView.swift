@@ -180,6 +180,7 @@ struct ContentView: View {
         let cmp: ComparisonResult
         switch key {
         case "ssid": cmp = a.ssid.localizedCaseInsensitiveCompare(b.ssid)
+        case "vendor": cmp = a.vendor.localizedCaseInsensitiveCompare(b.vendor)
         case "bandLabel": cmp = a.bandLabel.localizedCaseInsensitiveCompare(b.bandLabel)
         case "channel": cmp = a.channel < b.channel ? .orderedAscending : a.channel > b.channel ? .orderedDescending : .orderedSame
         case "rssi": cmp = a.rssi > b.rssi ? .orderedAscending : a.rssi < b.rssi ? .orderedDescending : .orderedSame

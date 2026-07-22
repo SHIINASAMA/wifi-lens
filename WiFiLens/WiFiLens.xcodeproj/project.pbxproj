@@ -37,6 +37,11 @@
 		2B79435DB2D70F8EFE1DFDAA /* RegulatoryFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE17427BAD036F393D712B6F /* RegulatoryFilterTests.swift */; };
 		2B7B4CBC96F724AA4970AC7F /* SpectrumModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DD34695BFD8D4277DF0BDB0 /* SpectrumModelTests.swift */; };
 		2ED34E17AE03E25A409037BD /* NetworkTableRowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */; };
+		MV0000000000000000000001 /* MACVendorResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000002 /* MACVendorResolverTests.swift */; };
+		MV0000000000000000000003 /* MACVendorResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000005 /* MACVendorResolver.swift */; };
+		MV0000000000000000000004 /* MACVendorResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000005 /* MACVendorResolver.swift */; };
+		MV0000000000000000000006 /* MACVendors.json in Resources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000008 /* MACVendors.json */; };
+		MV0000000000000000000007 /* MACVendors.json in Resources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000008 /* MACVendors.json */; };
 		2FA3CB9C5DD2446AAA549779 /* GatewayPinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF472346A62545B9866DA8ED /* GatewayPinger.swift */; };
 		318908BC49D244B1EEE68A9A /* ChannelSpanCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */; };
 		3711656F0C3ECD58CA29D407 /* NativeTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3299502DE1A130760C8A7 /* NativeTableView.swift */; };
@@ -437,6 +442,9 @@
 		8367630A1EDF4515917A144A /* RoamingRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingRecord.swift; sourceTree = "<group>"; };
 		8A7A45AB88716DC3AC18610B /* ChartViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartViewTests.swift; sourceTree = "<group>"; };
 		8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTableRowTests.swift; sourceTree = "<group>"; };
+		MV0000000000000000000002 /* MACVendorResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorResolverTests.swift; sourceTree = "<group>"; };
+		MV0000000000000000000005 /* MACVendorResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorResolver.swift; sourceTree = "<group>"; };
+		MV0000000000000000000008 /* MACVendors.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = MACVendors.json; sourceTree = "<group>"; };
 		8F405489976429A068F15F86 /* WiFiLensTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WiFiLensTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSIDColorHasher.swift; sourceTree = "<group>"; };
 		90CF4B22A68C668A58043392 /* ExternalLinksTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalLinksTests.swift; sourceTree = "<group>"; };
@@ -768,6 +776,7 @@
 		93CBE45991F4573779019CBC /* Scanner */ = {
 			isa = PBXGroup;
 			children = (
+				MV0000000000000000000005 /* MACVendorResolver.swift */,
 				8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */,
 				E5A1B3C8D4F6123456780001 /* WiFiPowerMonitor.swift */,
 				D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */,
@@ -969,6 +978,7 @@
 			isa = PBXGroup;
 			children = (
 				FBBD169B2FD063630093F940 /* Assets.xcassets */,
+				MV0000000000000000000008 /* MACVendors.json */,
 				FBBD16982FD062F60093F940 /* PrivacyInfo.xcprivacy */,
 				FBB1F0AB2FC61E3D00E9D2C6 /* Localizable.xcstrings */,
 			);
@@ -1139,6 +1149,7 @@
 				90CF4B22A68C668A58043392 /* ExternalLinksTests.swift */,
 				39A94372ADF30D10E0F015CD /* IEParserTests.swift */,
 				A5024CBB8BFCAFF56FEF0756 /* MCPServerTests.swift */,
+				MV0000000000000000000002 /* MACVendorResolverTests.swift */,
 				8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */,
 				OB0000000000000000000043 /* Observation */,
 				4AC04B2DAF7F8FB54DC3FFD2 /* RegionInferenceEngineTests.swift */,
@@ -1479,6 +1490,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FBD0A44F2FE5BEAC003658AD /* PRO.xctestplan in Resources */,
+				MV0000000000000000000007 /* MACVendors.json in Resources */,
 				FBBD169A2FD062F60093F940 /* PrivacyInfo.xcprivacy in Resources */,
 				FBBD169D2FD063630093F940 /* Assets.xcassets in Resources */,
 				FB1E329D2FC7316C009D1BDC /* Localizable.xcstrings in Resources */,
@@ -1489,6 +1501,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				MV0000000000000000000006 /* MACVendors.json in Resources */,
 				FBBD16992FD062F60093F940 /* PrivacyInfo.xcprivacy in Resources */,
 				FBBD169C2FD063630093F940 /* Assets.xcassets in Resources */,
 				FBB1F0AC2FC61E3D00E9D2C6 /* Localizable.xcstrings in Resources */,
@@ -1516,6 +1529,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				MV0000000000000000000003 /* MACVendorResolver.swift in Sources */,
 				ND0000000000000000000010 /* NetworkDiagnosticModels.swift in Sources */,
 				ND0000000000000000000011 /* DiagnosticRunner.swift in Sources */,
 				ND0000000000000000000014 /* NetworkConnectivityCheck.swift in Sources */,
@@ -1660,6 +1674,7 @@
 				90CF4B22A68C668A58043391 /* ExternalLinksTests.swift in Sources */,
 				BAB34552BFD72F7A42CD918A /* IEParserTests.swift in Sources */,
 				13E648DDB1578ECF42926E36 /* MCPServerTests.swift in Sources */,
+				MV0000000000000000000001 /* MACVendorResolverTests.swift in Sources */,
 				2ED34E17AE03E25A409037BD /* NetworkTableRowTests.swift in Sources */,
 				3F19474AB44B5B07E9E5AF9E /* RegionInferenceEngineTests.swift in Sources */,
 				90CF4B22A68C668A58043390 /* RegulatoryDatabaseTests.swift in Sources */,
@@ -1696,6 +1711,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				MV0000000000000000000004 /* MACVendorResolver.swift in Sources */,
 				ND0000000000000000000012 /* NetworkDiagnosticModels.swift in Sources */,
 				ND0000000000000000000013 /* DiagnosticRunner.swift in Sources */,
 				ND0000000000000000000017 /* NetworkConnectivityCheck.swift in Sources */,
