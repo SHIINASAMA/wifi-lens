@@ -79,6 +79,7 @@ struct SpectrumDashboardLayout {
 
 struct ContentView: View {
     @Bindable var viewModel: ScannerViewModel
+    @Bindable var macVendorDatabaseManager: MACVendorDatabaseManager
 
     @State private var sortOrder: [NSSortDescriptor] = [NSSortDescriptor(key: "ssid", ascending: true)]
     @State private var panel1ChartType: BandPanelSelection = .band24
@@ -90,6 +91,10 @@ struct ContentView: View {
             get: { Set(hiddenColumnsData.split(separator: ",").map(String.init).filter { !$0.isEmpty }) },
             set: { hiddenColumnsData = $0.sorted().joined(separator: ",") }
         )
+    }
+
+    private var isVendorColumnAvailable: Bool {
+        macVendorDatabaseManager.availability.isVendorColumnAvailable
     }
 
     var body: some View {
@@ -208,6 +213,7 @@ struct ContentView: View {
             selectedID: $viewModel.selectedNetworkID,
             sortOrder: $sortOrder,
             hiddenColumns: hiddenColumns,
+            isVendorColumnAvailable: isVendorColumnAvailable,
             onToggleVisibility: { seriesID in viewModel.toggleVisibility(seriesID: seriesID) },
             onToggleVisibilityLocked: { seriesID in viewModel.toggleVisibilityLocked(seriesID: seriesID) }
         )

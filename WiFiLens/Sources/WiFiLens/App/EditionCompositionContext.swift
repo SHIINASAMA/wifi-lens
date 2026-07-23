@@ -9,6 +9,7 @@ struct EditionCompositionContext {
     let mainWindowID: UUID
     let mainWindowState: AnyObject
     let scannerViewModel: ScannerViewModel
+    let macVendorDatabaseManager: MACVendorDatabaseManager
     let selectedPage: Binding<SidebarPage>
     let secondaryToolbarSelections: Binding<SecondaryToolbarSelections>
     let bleEnabled: Binding<Bool>

@@ -8,6 +8,15 @@ enum MACVendorDatabaseAvailability: Equatable, Sendable {
     case unavailable(MACVendorDatabaseError)
 }
 
+extension MACVendorDatabaseAvailability {
+    var isVendorColumnAvailable: Bool {
+        if case .installed = self {
+            return true
+        }
+        return false
+    }
+}
+
 enum MACVendorDatabaseOperation: Equatable, Sendable {
     case idle
     case downloading(completed: Int, total: Int)

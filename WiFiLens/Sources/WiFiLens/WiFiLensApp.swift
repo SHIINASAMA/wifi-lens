@@ -166,6 +166,7 @@ private struct AppRootView: View {
                     mainWindowID: sceneState.id,
                     mainWindowState: sceneState.editionWindowState,
                     scannerViewModel: viewModel,
+                    macVendorDatabaseManager: macVendorDatabaseManager,
                     selectedPage: Binding(
                         get: { sceneState.selectedPage },
                         set: { sceneState.selectedPage = $0 }

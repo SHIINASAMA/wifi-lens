@@ -106,7 +106,7 @@ struct MACVendorResolverTests {
         #expect(viewModel.combinedTableRows.first?.vendor == "Example Networks")
     }
 
-    @Test func scannerUsesPlaceholderForNonRegisteredAddresses() {
+    @Test func scannerLeavesVendorBlankForNonRegisteredAddresses() {
         let viewModel = ScannerViewModel(vendorResolver: MACVendorResolver(entries: []))
         let unknown = WiFiNetwork(
             ssid: "Unknown",
@@ -117,7 +117,7 @@ struct MACVendorResolverTests {
 
         viewModel.debugApplyNetworksForTesting([unknown], supportedBands: [.band5GHz])
 
-        #expect(viewModel.combinedTableRows.first?.vendor == "—")
+        #expect(viewModel.combinedTableRows.first?.vendor == "")
     }
 
     @Test func scannerRefreshSeamReprojectsExistingRowsWithoutAnotherScan() async {
