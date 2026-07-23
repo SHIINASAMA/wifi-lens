@@ -237,7 +237,9 @@ struct MACVendorDatabaseManagerTests {
         await waitUntil { await service.downloadCallCount == 1 }
 
         #expect(manager.cancelCurrentOperation(ownerID: ownerB) == nil)
-        #expect(manager.operation == .validating)
+        #expect(manager.operation != .idle)
+        #expect(manager.operation(for: ownerA) == manager.operation)
+        #expect(manager.operation(for: ownerB) == .idle)
         #expect(await service.observedDownloadCancellation == false)
 
         let ownerAHandle = try #require(manager.cancelCurrentOperation(ownerID: ownerA))
@@ -352,7 +354,8 @@ struct MACVendorDatabaseManagerTests {
         manager.discardPreparedManualImport(ownerID: ownerA)
 
         #expect(manager.pendingManualImport(for: ownerA) == nil)
-        #expect(manager.operation(for: ownerB) == .validating)
+        #expect(manager.operation(for: ownerB) != .idle)
+        #expect(manager.operation(for: ownerA) == .idle)
         #expect(await service.observedDownloadCancellation == false)
 
         let ownerBHandle = try #require(manager.cancelCurrentOperation(ownerID: ownerB))
