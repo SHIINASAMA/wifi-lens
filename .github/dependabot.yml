@@ -1,0 +1,23 @@
+version: 2
+
+updates:
+  # Xcode / Swift Package Manager dependencies
+  - package-ecosystem: "swift"
+    directory: "/WiFiLens"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # Website dependencies managed by pnpm
+  - package-ecosystem: "npm"
+    directory: "/web"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
