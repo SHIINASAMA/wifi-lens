@@ -282,6 +282,82 @@ struct MACVendorCSVParserTests {
         }
     }
 
+    @Test func rejectsMoreThan250000RowsIncludingEmptyRows() {
+        var inputs = completeInputs()
+        let csv = "Registry,Assignment,Organization Name\n" + String(repeating: "\n", count: 250_000)
+        inputs[0] = MACVendorRegistryInput(displayName: "large.csv", data: Data(csv.utf8))
+
+        #expect(throws: MACVendorDatabaseError.malformedCSV(file: "large.csv")) {
+            try parser.parse(inputs: inputs, source: .manualImport, createdAt: .distantPast)
+        }
+    }
+
+    @Test func rejectsRowsWithMoreThan16Fields() {
+        var inputs = completeInputs()
+        let header = (["Registry", "Assignment", "Organization Name"]
+            + Array(repeating: "Unused", count: 14)).joined(separator: ",")
+        let csv = "\(header)\nMA-L,001122,Example\n"
+        inputs[0] = MACVendorRegistryInput(displayName: "large.csv", data: Data(csv.utf8))
+
+        #expect(throws: MACVendorDatabaseError.malformedCSV(file: "large.csv")) {
+            try parser.parse(inputs: inputs, source: .manualImport, createdAt: .distantPast)
+        }
+    }
+
+    @Test func rejectsMoreThan1000000Fields() {
+        var inputs = completeInputs()
+        let empty16FieldRow = String(repeating: ",", count: 15)
+        let csv = "Registry,Assignment,Organization Name\n"
+            + String(repeating: "\(empty16FieldRow)\n", count: 62_500)
+            + "MA-L,001122,Example"
+        inputs[0] = MACVendorRegistryInput(displayName: "large.csv", data: Data(csv.utf8))
+
+        #expect(throws: MACVendorDatabaseError.malformedCSV(file: "large.csv")) {
+            try parser.parse(inputs: inputs, source: .manualImport, createdAt: .distantPast)
+        }
+    }
+
+    @Test func acceptsRowsWithExactly16Fields() throws {
+        var inputs = completeInputs()
+        let header = (["Registry", "Assignment", "Organization Name"]
+            + Array(repeating: "Unused", count: 13)).joined(separator: ",")
+        let row = "MA-L,001122,Example" + String(repeating: ",", count: 13)
+        inputs[0] = MACVendorRegistryInput(
+            displayName: "large.csv",
+            data: Data("\(header)\n\(row)".utf8)
+        )
+
+        let database = try parser.parse(inputs: inputs, source: .manualImport, createdAt: .distantPast)
+        #expect(database.entries.contains { $0.prefix == "001122" && $0.prefixLength == 24 })
+    }
+
+    @Test func acceptsExactly1000000Fields() throws {
+        var inputs = completeInputs()
+        let header = (["Registry", "Assignment", "Organization Name"]
+            + Array(repeating: "Unused", count: 13)).joined(separator: ",")
+        let empty16FieldRow = String(repeating: ",", count: 15)
+        let valid16FieldRow = "MA-L,001122,Example" + String(repeating: ",", count: 13)
+        let csv = "\(header)\n"
+            + String(repeating: "\(empty16FieldRow)\n", count: 62_498)
+            + valid16FieldRow
+        inputs[0] = MACVendorRegistryInput(displayName: "large.csv", data: Data(csv.utf8))
+
+        let database = try parser.parse(inputs: inputs, source: .manualImport, createdAt: .distantPast)
+        #expect(database.entries.contains { $0.prefix == "001122" && $0.prefixLength == 24 })
+    }
+
+    @Test func acceptsExactly250000Rows() throws {
+        var inputs = completeInputs()
+        let emptyRow = ""
+        let csv = "Registry,Assignment,Organization Name\n"
+            + String(repeating: "\(emptyRow)\n", count: 249_998)
+            + "MA-L,001122,Example"
+        inputs[0] = MACVendorRegistryInput(displayName: "large.csv", data: Data(csv.utf8))
+
+        let database = try parser.parse(inputs: inputs, source: .manualImport, createdAt: .distantPast)
+        #expect(database.entries.contains { $0.prefix == "001122" && $0.prefixLength == 24 })
+    }
+
     @Test func rejectsTotalSizeBeforeParsing() {
         let inputs = completeInputs()
         let totalSizeLimitedParser = MACVendorCSVParser(

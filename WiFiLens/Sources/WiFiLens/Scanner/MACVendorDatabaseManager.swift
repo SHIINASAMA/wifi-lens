@@ -27,15 +27,22 @@ final class MACVendorDatabaseManager {
 
     private(set) var availability: MACVendorDatabaseAvailability = .loading
     private(set) var operation: MACVendorDatabaseOperation = .idle
-    private(set) var pendingManualImport: MACVendorDatabaseSummary?
+    private var pendingManualImport: MACVendorDatabaseSummary?
     private(set) var databaseRevision = 0
-    var presentedError: MACVendorDatabaseError?
+    private var processPresentedError: MACVendorDatabaseError?
+    private var ownerPresentedErrors: [UUID: MACVendorDatabaseError] = [:]
+
+    var presentedError: MACVendorDatabaseError? {
+        processPresentedError
+    }
 
     private let resolver: MACVendorResolver
     private let service: any MACVendorDatabaseServicing
     private var preparedManualDatabase: MACVendorDatabase?
+    private var preparedManualImportOwnerID: UUID?
     private var currentTask: Task<Void, Never>?
     private var currentOperationID: UUID?
+    private var currentOperationOwnerID: UUID?
 
     init(
         resolver: MACVendorResolver,
@@ -52,50 +59,74 @@ final class MACVendorDatabaseManager {
         }
     }
 
-    func downloadAndInstall() async {
+    func downloadAndInstall(ownerID: UUID? = nil) async {
         await run(
-            operation: .downloading(completed: 0, total: MACVendorRegistry.allCases.count)
+            operation: .downloading(completed: 0, total: MACVendorRegistry.allCases.count),
+            ownerID: ownerID
         ) { [weak self] in
             await self?.performDownloadAndInstall()
         }
     }
 
-    func prepareManualImport(urls: [URL]) async {
+    func prepareManualImport(urls: [URL], ownerID: UUID? = nil) async {
         guard currentTask == nil else { return }
+        guard preparedManualImportOwnerID == nil || preparedManualImportOwnerID == ownerID else { return }
         preparedManualDatabase = nil
         pendingManualImport = nil
-        presentedError = nil
-        await run(operation: .readingFiles) { [weak self] in
-            await self?.performManualPreparation(urls: urls)
+        preparedManualImportOwnerID = nil
+        setPresentedError(nil, ownerID: ownerID)
+        await run(operation: .readingFiles, ownerID: ownerID) { [weak self] in
+            await self?.performManualPreparation(urls: urls, ownerID: ownerID)
         }
     }
 
-    func confirmManualImport() async {
+    func confirmManualImport(ownerID: UUID? = nil) async {
         guard currentTask == nil else { return }
+        guard preparedManualImportOwnerID == ownerID else { return }
         guard let preparedManualDatabase else {
-            presentedError = .noPreparedImport
+            setPresentedError(.noPreparedImport, ownerID: ownerID)
             return
         }
 
-        await run(operation: .installing) { [weak self] in
+        await run(operation: .installing, ownerID: ownerID) { [weak self] in
             await self?.performInstall(preparedManualDatabase, clearsPreparedImport: true)
         }
     }
 
-    func discardPreparedManualImport() {
-        guard currentTask == nil else { return }
+    func discardPreparedManualImport(ownerID: UUID? = nil) {
+        guard currentTask == nil || currentOperationOwnerID != ownerID else { return }
+        guard preparedManualImportOwnerID == ownerID else { return }
         preparedManualDatabase = nil
         pendingManualImport = nil
+        preparedManualImportOwnerID = nil
+    }
+
+    func operation(for ownerID: UUID) -> MACVendorDatabaseOperation {
+        guard currentOperationOwnerID == ownerID else { return .idle }
+        return operation
+    }
+
+    func pendingManualImport(for ownerID: UUID?) -> MACVendorDatabaseSummary? {
+        guard preparedManualImportOwnerID == ownerID else { return nil }
+        return pendingManualImport
+    }
+
+    func presentedError(for ownerID: UUID) -> MACVendorDatabaseError? {
+        ownerPresentedErrors[ownerID]
+    }
+
+    func dismissPresentedError(ownerID: UUID? = nil) {
+        setPresentedError(nil, ownerID: ownerID)
     }
 
     func clear() async {
-        await run(operation: .clearing) { [weak self] in
+        await run(operation: .clearing, ownerID: nil) { [weak self] in
             await self?.performClear()
         }
     }
 
     @discardableResult
-    func cancelCurrentOperation() -> CancellationHandle? {
+    func cancelCurrentOperation(ownerID: UUID? = nil) -> CancellationHandle? {
         switch operation {
         case .downloading, .readingFiles, .validating:
             break
@@ -103,7 +134,10 @@ final class MACVendorDatabaseManager {
             return nil
         }
 
-        guard let operationID = currentOperationID, let task = currentTask else {
+        guard currentOperationOwnerID == ownerID,
+              let operationID = currentOperationID,
+              let task = currentTask
+        else {
             return nil
         }
 
@@ -119,6 +153,7 @@ final class MACVendorDatabaseManager {
 
     private func run(
         operation initialOperation: MACVendorDatabaseOperation,
+        ownerID: UUID? = nil,
         body: @escaping @MainActor @Sendable () async -> Void
     ) async {
         guard currentTask == nil else { return }
@@ -129,6 +164,7 @@ final class MACVendorDatabaseManager {
             await body()
         }
         currentOperationID = operationID
+        currentOperationOwnerID = ownerID
         currentTask = task
 
         await task.value
@@ -139,6 +175,7 @@ final class MACVendorDatabaseManager {
         guard currentOperationID == operationID else { return }
         currentTask = nil
         currentOperationID = nil
+        currentOperationOwnerID = nil
         operation = .idle
     }
 
@@ -153,7 +190,7 @@ final class MACVendorDatabaseManager {
                 availability = .notInstalled
             }
             databaseRevision &+= 1
-            presentedError = nil
+            setPresentedError(nil, ownerID: nil)
         } catch is CancellationError {
             return
         } catch let error as MACVendorDatabaseError {
@@ -177,9 +214,9 @@ final class MACVendorDatabaseManager {
         } catch where Task.isCancelled {
             return
         } catch let error as MACVendorDatabaseError {
-            presentedError = error
+            setPresentedError(error, ownerID: currentOperationOwnerID)
         } catch {
-            presentedError = .downloadFailed(.maL)
+            setPresentedError(.downloadFailed(.maL), ownerID: currentOperationOwnerID)
         }
     }
 
@@ -192,21 +229,25 @@ final class MACVendorDatabaseManager {
         operation = .downloading(completed: max(0, completed), total: total)
     }
 
-    private func performManualPreparation(urls: [URL]) async {
+    private func performManualPreparation(urls: [URL], ownerID: UUID?) async {
         do {
             let database = try await service.prepareManualImport(urls: urls, createdAt: Date())
             try Task.checkCancellation()
             preparedManualDatabase = database
             pendingManualImport = database.summary
-            presentedError = nil
+            preparedManualImportOwnerID = ownerID
+            setPresentedError(nil, ownerID: ownerID)
         } catch is CancellationError {
             return
         } catch where Task.isCancelled {
             return
         } catch let error as MACVendorDatabaseError {
-            presentedError = error
+            setPresentedError(error, ownerID: ownerID)
         } catch {
-            presentedError = .fileReadFailed(urls.first?.lastPathComponent ?? "")
+            setPresentedError(
+                .fileReadFailed(urls.first?.lastPathComponent ?? ""),
+                ownerID: ownerID
+            )
         }
     }
 
@@ -218,9 +259,9 @@ final class MACVendorDatabaseManager {
             try await service.install(database)
             publishInstalled(database, clearsPreparedImport: clearsPreparedImport)
         } catch let error as MACVendorDatabaseError {
-            presentedError = error
+            setPresentedError(error, ownerID: currentOperationOwnerID)
         } catch {
-            presentedError = .persistenceFailure
+            setPresentedError(.persistenceFailure, ownerID: currentOperationOwnerID)
         }
     }
 
@@ -233,9 +274,10 @@ final class MACVendorDatabaseManager {
         if clearsPreparedImport {
             preparedManualDatabase = nil
             pendingManualImport = nil
+            preparedManualImportOwnerID = nil
         }
         databaseRevision &+= 1
-        presentedError = nil
+        setPresentedError(nil, ownerID: currentOperationOwnerID)
     }
 
     private func performClear() async {
@@ -245,12 +287,24 @@ final class MACVendorDatabaseManager {
             availability = .notInstalled
             preparedManualDatabase = nil
             pendingManualImport = nil
+            preparedManualImportOwnerID = nil
             databaseRevision &+= 1
-            presentedError = nil
+            setPresentedError(nil, ownerID: nil)
         } catch let error as MACVendorDatabaseError {
-            presentedError = error
+            setPresentedError(error, ownerID: nil)
         } catch {
-            presentedError = .persistenceFailure
+            setPresentedError(.persistenceFailure, ownerID: nil)
+        }
+    }
+
+    private func setPresentedError(
+        _ error: MACVendorDatabaseError?,
+        ownerID: UUID?
+    ) {
+        if let ownerID {
+            ownerPresentedErrors[ownerID] = error
+        } else {
+            processPresentedError = error
         }
     }
 }

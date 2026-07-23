@@ -24095,6 +24095,41 @@
         }
       },
       "comment": "MAC vendor database UI text. English: Do Not Ask Again"
+    },
+    "settings.mac_vendor.error.automatic_download_failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One or more IEEE registry files could not be downloaded. Try again."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1つ以上のIEEEレジストリファイルをダウンロードできませんでした。もう一度お試しください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一个或多个 IEEE 注册表文件无法下载，请重试。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mindestens eine IEEE-Registrierungsdatei konnte nicht heruntergeladen werden. Versuche es erneut."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudieron descargar uno o varios archivos de registro de IEEE. Inténtalo de nuevo."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

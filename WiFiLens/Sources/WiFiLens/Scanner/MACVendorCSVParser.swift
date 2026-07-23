@@ -367,6 +367,10 @@ private extension MACVendorCSVParser {
     }
 
     enum CSVReader {
+        private static let maximumRows = 250_000
+        private static let maximumFieldsPerRow = 16
+        private static let maximumTotalFields = 1_000_000
+
         static func parse(
             _ csv: String,
             file: String,
@@ -375,9 +379,30 @@ private extension MACVendorCSVParser {
             var rows: [[String]] = []
             var row: [String] = []
             var field = ""
+            var totalFields = 0
             var insideQuotes = false
             var afterClosingQuote = false
+            var endedWithRowTerminator = false
             var index = csv.startIndex
+
+            func appendField() throws {
+                guard row.count < maximumFieldsPerRow,
+                      totalFields < maximumTotalFields
+                else {
+                    throw MACVendorDatabaseError.malformedCSV(file: file)
+                }
+                row.append(field)
+                totalFields += 1
+                field = ""
+            }
+
+            func appendRow() throws {
+                guard rows.count < maximumRows else {
+                    throw MACVendorDatabaseError.malformedCSV(file: file)
+                }
+                rows.append(row)
+                row = []
+            }
 
             while index < csv.endIndex {
                 let character = csv[index]
@@ -387,6 +412,7 @@ private extension MACVendorCSVParser {
                     if character == "\"" {
                         if nextIndex < csv.endIndex, csv[nextIndex] == "\"" {
                             field.append("\"")
+                            endedWithRowTerminator = false
                             index = csv.index(after: nextIndex)
                             continue
                         }
@@ -395,6 +421,7 @@ private extension MACVendorCSVParser {
                     } else {
                         field.append(character)
                     }
+                    endedWithRowTerminator = false
                     index = nextIndex
                     continue
                 }
@@ -414,25 +441,26 @@ private extension MACVendorCSVParser {
                         throw MACVendorDatabaseError.malformedCSV(file: file)
                     }
                     insideQuotes = true
+                    endedWithRowTerminator = false
                 case ",":
-                    row.append(field)
-                    field = ""
+                    try appendField()
                     afterClosingQuote = false
+                    endedWithRowTerminator = false
                 case "\r", "\n", "\r\n":
-                    row.append(field)
-                    rows.append(row)
+                    try appendField()
+                    try appendRow()
                     if rows.count.isMultiple(of: 1_000) {
                         try cancellationCheck(.records(rows.count))
                     }
-                    row = []
-                    field = ""
                     afterClosingQuote = false
+                    endedWithRowTerminator = true
                     if character == "\r", nextIndex < csv.endIndex, csv[nextIndex] == "\n" {
                         index = csv.index(after: nextIndex)
                         continue
                     }
                 default:
                     field.append(character)
+                    endedWithRowTerminator = false
                 }
                 index = nextIndex
             }
@@ -440,8 +468,10 @@ private extension MACVendorCSVParser {
             guard !insideQuotes else {
                 throw MACVendorDatabaseError.malformedCSV(file: file)
             }
-            row.append(field)
-            rows.append(row)
+            if !endedWithRowTerminator {
+                try appendField()
+                try appendRow()
+            }
             return rows
         }
     }

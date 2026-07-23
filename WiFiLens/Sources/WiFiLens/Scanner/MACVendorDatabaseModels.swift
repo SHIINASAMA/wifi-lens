@@ -89,6 +89,7 @@ enum MACVendorDatabaseError: Error, Equatable, Sendable {
     case invalidHTTPStatus(registry: MACVendorRegistry, statusCode: Int)
     case disallowedRedirect(URL)
     case downloadFailed(MACVendorRegistry)
+    case automaticDownloadFailed
     case fileReadFailed(String)
     case unsupportedSchema(Int)
     case persistenceFailure

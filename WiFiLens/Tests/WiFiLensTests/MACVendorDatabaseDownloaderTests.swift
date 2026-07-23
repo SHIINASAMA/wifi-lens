@@ -74,19 +74,26 @@ struct MACVendorDatabaseDownloaderTests {
         #expect(await completions.registries.count == MACVendorRegistry.allCases.count)
     }
 
-    @Test func rejectsNonOKResponseAndCancelsTheDownloadGroup() async {
+    @Test func failureInLaterRegistryCancelsAllPeersWhenEarlierRegistryIsSuspended() async {
         let transport = FailingAndSuspendingMACVendorHTTPTransport()
         let downloader = MACVendorDatabaseDownloader(transport: transport)
         let clock = ContinuousClock()
         let startedAt = clock.now
+        let task = Task {
+            try await downloader.downloadAll { _ in }
+        }
+
+        await transport.waitUntilAllRequestsStart()
+        await transport.waitUntilPeersSuspend()
+        await transport.releaseFailure()
 
         do {
-            _ = try await downloader.downloadAll { _ in }
-            Issue.record("Expected status 503 to be rejected")
+            _ = try await task.value
+            Issue.record("Expected the automatic download batch to fail")
         } catch let error as MACVendorDatabaseError {
-            #expect(error == .invalidHTTPStatus(registry: .maL, statusCode: 503))
+            #expect(error == .automaticDownloadFailed)
         } catch {
-            Issue.record("Unexpected HTTP status error: \(error)")
+            Issue.record("Unexpected automatic download error: \(error)")
         }
 
         // Leave enough headroom for a loaded CI runner while still proving that
@@ -94,6 +101,34 @@ struct MACVendorDatabaseDownloaderTests {
         #expect(clock.now - startedAt < .seconds(5))
         #expect(await transport.startedCount == MACVendorRegistry.allCases.count)
         #expect(await transport.cancelledCount == MACVendorRegistry.allCases.count - 1)
+    }
+
+    @Test func parentCancellationWinsOverConcurrentRegistryFailure() async {
+        let transport = CancellationRacingFailureMACVendorHTTPTransport()
+        let downloader = MACVendorDatabaseDownloader(transport: transport)
+        let task = Task {
+            try await downloader.downloadAll { registry in
+                if registry == .maL {
+                    await transport.recordFirstCompletion()
+                }
+            }
+        }
+
+        await transport.waitUntilFirstCompletion()
+        task.cancel()
+        await transport.releaseFailure()
+        await transport.waitUntilFailureWillReturn()
+        await Task.yield()
+        await transport.releasePeers()
+
+        do {
+            _ = try await task.value
+            Issue.record("Expected parent cancellation to be preserved")
+        } catch is CancellationError {
+            // Expected cancellation path.
+        } catch {
+            Issue.record("Expected CancellationError, got: \(error)")
+        }
     }
 
     @Test func rejectsResponseOverPerFileLimit() async {
@@ -119,7 +154,7 @@ struct MACVendorDatabaseDownloaderTests {
             _ = try await downloader.downloadAll { _ in }
             Issue.record("Expected an oversized response to be rejected")
         } catch let error as MACVendorDatabaseError {
-            #expect(error == .fileTooLarge(file: "oui.csv", maximumBytes: 16))
+            #expect(error == .automaticDownloadFailed)
         } catch {
             Issue.record("Unexpected response-size error: \(error)")
         }
@@ -149,13 +184,13 @@ struct MACVendorDatabaseDownloaderTests {
             _ = try await downloader.downloadAll { _ in }
             Issue.record("Expected aggregate download size to be rejected")
         } catch let error as MACVendorDatabaseError {
-            #expect(error == .totalSizeExceeded(maximumBytes: 32))
+            #expect(error == .automaticDownloadFailed)
         } catch {
             Issue.record("Unexpected aggregate-size error: \(error)")
         }
     }
 
-    @Test func concurrentFailuresUseStableRegistryPriority() async {
+    @Test func concurrentFailuresUseStableAutomaticDownloadError() async {
         let transport = OrderedFailureMACVendorHTTPTransport()
         let downloader = MACVendorDatabaseDownloader(transport: transport)
 
@@ -163,7 +198,7 @@ struct MACVendorDatabaseDownloaderTests {
             _ = try await downloader.downloadAll { _ in }
             Issue.record("Expected registry download failures")
         } catch let error as MACVendorDatabaseError {
-            #expect(error == .invalidHTTPStatus(registry: .maL, statusCode: 503))
+            #expect(error == .automaticDownloadFailed)
         } catch {
             Issue.record("Unexpected concurrent failure: \(error)")
         }
@@ -183,7 +218,7 @@ struct MACVendorDatabaseDownloaderTests {
             _ = try await downloader.downloadAll { _ in }
             Issue.record("Expected a disallowed final host to be rejected")
         } catch let error as MACVendorDatabaseError {
-            #expect(error == .disallowedRedirect(URL(string: "https://example.com/oui.csv")!))
+            #expect(error == .automaticDownloadFailed)
         } catch {
             Issue.record("Unexpected redirect error: \(error)")
         }
@@ -422,6 +457,10 @@ private actor BlockingMACVendorHTTPTransport: MACVendorHTTPTransport {
 private actor FailingAndSuspendingMACVendorHTTPTransport: MACVendorHTTPTransport {
     private(set) var startedCount = 0
     private(set) var cancelledCount = 0
+    private var suspendedPeerCount = 0
+    private var allRequestsStartedContinuation: CheckedContinuation<Void, Never>?
+    private var peersSuspendedContinuation: CheckedContinuation<Void, Never>?
+    private var failureContinuation: CheckedContinuation<Void, Never>?
 
     func fetch(
         _ request: URLRequest,
@@ -431,8 +470,22 @@ private actor FailingAndSuspendingMACVendorHTTPTransport: MACVendorHTTPTransport
         startedCount += 1
         let url = try #require(request.url)
         let registry = try #require(MACVendorRegistry.allCases.first { $0.downloadURL == url })
-        if registry == .maL {
+        if registry == .maM {
+            allRequestsStartedContinuation?.resume()
+            allRequestsStartedContinuation = nil
+            await withCheckedContinuation { continuation in
+                failureContinuation = continuation
+            }
             return response(for: registry, statusCode: 503)
+        }
+        suspendedPeerCount += 1
+        if startedCount == MACVendorRegistry.allCases.count {
+            allRequestsStartedContinuation?.resume()
+            allRequestsStartedContinuation = nil
+        }
+        if suspendedPeerCount == MACVendorRegistry.allCases.count - 1 {
+            peersSuspendedContinuation?.resume()
+            peersSuspendedContinuation = nil
         }
         do {
             try await Task.sleep(for: .seconds(30))
@@ -440,6 +493,108 @@ private actor FailingAndSuspendingMACVendorHTTPTransport: MACVendorHTTPTransport
         } catch is CancellationError {
             cancelledCount += 1
             throw CancellationError()
+        }
+    }
+
+    func waitUntilAllRequestsStart() async {
+        guard startedCount < MACVendorRegistry.allCases.count else { return }
+        await withCheckedContinuation { continuation in
+            allRequestsStartedContinuation = continuation
+        }
+    }
+
+    func waitUntilPeersSuspend() async {
+        guard suspendedPeerCount < MACVendorRegistry.allCases.count - 1 else { return }
+        await withCheckedContinuation { continuation in
+            peersSuspendedContinuation = continuation
+        }
+    }
+
+    func releaseFailure() {
+        failureContinuation?.resume()
+        failureContinuation = nil
+    }
+}
+
+private actor CancellationRacingFailureMACVendorHTTPTransport: MACVendorHTTPTransport {
+    private var startedCount = 0
+    private var firstCompletionRecorded = false
+    private var allRequestsStartedContinuation: CheckedContinuation<Void, Never>?
+    private var failureContinuation: CheckedContinuation<Void, Never>?
+    private var failureWillReturn = false
+    private var failureWillReturnContinuation: CheckedContinuation<Void, Never>?
+    private var peerContinuations: [CheckedContinuation<Void, Never>] = []
+    private var firstCompletionContinuation: CheckedContinuation<Void, Never>?
+
+    func fetch(
+        _ request: URLRequest,
+        maximumBytes: Int,
+        byteBudget: MACVendorDownloadByteBudget
+    ) async throws -> MACVendorHTTPResponse {
+        let url = try #require(request.url)
+        let registry = try #require(MACVendorRegistry.allCases.first { $0.downloadURL == url })
+        startedCount += 1
+        if startedCount == MACVendorRegistry.allCases.count {
+            allRequestsStartedContinuation?.resume()
+            allRequestsStartedContinuation = nil
+        }
+
+        switch registry {
+        case .maL:
+            await waitUntilAllRequestsStart()
+            return response(for: registry)
+        case .maM:
+            await withCheckedContinuation { continuation in
+                failureContinuation = continuation
+            }
+            failureWillReturn = true
+            failureWillReturnContinuation?.resume()
+            failureWillReturnContinuation = nil
+            return response(for: registry, statusCode: 503)
+        case .maS, .iab:
+            await withCheckedContinuation { continuation in
+                peerContinuations.append(continuation)
+            }
+            return response(for: registry)
+        }
+    }
+
+    func recordFirstCompletion() {
+        firstCompletionRecorded = true
+        firstCompletionContinuation?.resume()
+        firstCompletionContinuation = nil
+    }
+
+    func waitUntilFirstCompletion() async {
+        guard !firstCompletionRecorded else { return }
+        await withCheckedContinuation { continuation in
+            firstCompletionContinuation = continuation
+        }
+    }
+
+    func releaseFailure() {
+        failureContinuation?.resume()
+        failureContinuation = nil
+    }
+
+    func waitUntilFailureWillReturn() async {
+        guard !failureWillReturn else { return }
+        await withCheckedContinuation { continuation in
+            failureWillReturnContinuation = continuation
+        }
+    }
+
+    func releasePeers() {
+        for continuation in peerContinuations {
+            continuation.resume()
+        }
+        peerContinuations.removeAll()
+    }
+
+    private func waitUntilAllRequestsStart() async {
+        guard startedCount < MACVendorRegistry.allCases.count else { return }
+        await withCheckedContinuation { continuation in
+            allRequestsStartedContinuation = continuation
         }
     }
 }

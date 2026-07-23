@@ -21,7 +21,7 @@ struct MACVendorDatabaseSettingsSection: View {
             get: { !showsUpdateSheet && manager.presentedError != nil },
             set: { isPresented in
                 if !isPresented {
-                    manager.presentedError = nil
+                    manager.dismissPresentedError()
                 }
             }
         )

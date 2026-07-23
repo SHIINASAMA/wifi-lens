@@ -139,7 +139,7 @@ struct MACVendorDatabaseManagerTests {
 
         await manager.prepareManualImport(urls: fourFixtureURLs())
 
-        #expect(manager.pendingManualImport == preparedDatabase.summary)
+        #expect(manager.pendingManualImport(for: nil) == preparedDatabase.summary)
         #expect(manager.availability == .installed(oldDatabase.summary))
         #expect(manager.databaseRevision == 1)
         #expect(resolver.resolve(testAddress) == .registered("Old Name"))
@@ -147,7 +147,7 @@ struct MACVendorDatabaseManagerTests {
 
         await manager.confirmManualImport()
 
-        #expect(manager.pendingManualImport == nil)
+        #expect(manager.pendingManualImport(for: nil) == nil)
         #expect(manager.availability == .installed(preparedDatabase.summary))
         #expect(manager.databaseRevision == 2)
         #expect(resolver.resolve(testAddress) == .registered("New Name"))
@@ -168,7 +168,7 @@ struct MACVendorDatabaseManagerTests {
 
         await manager.confirmManualImport()
 
-        #expect(manager.pendingManualImport == preparedDatabase.summary)
+        #expect(manager.pendingManualImport(for: nil) == preparedDatabase.summary)
         #expect(manager.availability == .installed(oldDatabase.summary))
         #expect(manager.presentedError == .persistenceFailure)
         #expect(manager.databaseRevision == 1)
@@ -183,12 +183,12 @@ struct MACVendorDatabaseManagerTests {
             service: service
         )
         await manager.prepareManualImport(urls: fourFixtureURLs())
-        #expect(manager.pendingManualImport == preparedDatabase.summary)
+        #expect(manager.pendingManualImport(for: nil) == preparedDatabase.summary)
 
         await service.setPreparationError(.malformedCSV(file: "oui.csv"))
         await manager.prepareManualImport(urls: fourFixtureURLs())
 
-        #expect(manager.pendingManualImport == nil)
+        #expect(manager.pendingManualImport(for: nil) == nil)
         #expect(manager.presentedError == .malformedCSV(file: "oui.csv"))
         await manager.confirmManualImport()
         #expect(manager.presentedError == .noPreparedImport)
@@ -219,9 +219,186 @@ struct MACVendorDatabaseManagerTests {
 
         manager.discardPreparedManualImport()
 
-        #expect(manager.pendingManualImport == nil)
+        #expect(manager.pendingManualImport(for: nil) == nil)
         #expect(manager.databaseRevision == 0)
         #expect(resolver.resolve(testAddress) == .registered("Old Name"))
+    }
+
+    @Test func onlyOperationOwnerCanCancelDownload() async throws {
+        let ownerA = UUID()
+        let ownerB = UUID()
+        let service = FakeMACVendorDatabaseService(suspendDownload: true)
+        let manager = MACVendorDatabaseManager(
+            resolver: MACVendorResolver(),
+            service: service
+        )
+
+        let downloadTask = Task { await manager.downloadAndInstall(ownerID: ownerA) }
+        await waitUntil { await service.downloadCallCount == 1 }
+
+        #expect(manager.cancelCurrentOperation(ownerID: ownerB) == nil)
+        #expect(manager.operation == .validating)
+        #expect(await service.observedDownloadCancellation == false)
+
+        let ownerAHandle = try #require(manager.cancelCurrentOperation(ownerID: ownerA))
+        await manager.waitForCancellation(ownerAHandle)
+        await downloadTask.value
+
+        #expect(manager.operation == .idle)
+        #expect(await service.observedDownloadCancellation)
+    }
+
+    @Test func onlyOperationOwnerCanObserveOrCancelManualPreparation() async throws {
+        let ownerA = UUID()
+        let ownerB = UUID()
+        let service = FakeMACVendorDatabaseService(suspendPreparation: true)
+        let manager = MACVendorDatabaseManager(
+            resolver: MACVendorResolver(),
+            service: service
+        )
+
+        let preparationTask = Task {
+            await manager.prepareManualImport(urls: fourFixtureURLs(), ownerID: ownerA)
+        }
+        await waitUntil { await service.prepareCallCount == 1 }
+
+        #expect(manager.operation(for: ownerA) == .readingFiles)
+        #expect(manager.operation(for: ownerB) == .idle)
+        #expect(manager.cancelCurrentOperation(ownerID: ownerB) == nil)
+        #expect(await service.observedPreparationCancellation == false)
+
+        let ownerAHandle = try #require(manager.cancelCurrentOperation(ownerID: ownerA))
+        await manager.waitForCancellation(ownerAHandle)
+        await preparationTask.value
+
+        #expect(manager.operation(for: ownerA) == .idle)
+        #expect(await service.observedPreparationCancellation)
+    }
+
+    @Test func onlyPreparedImportOwnerCanDiscardOrConfirmIt() async {
+        let ownerA = UUID()
+        let ownerB = UUID()
+        let oldDatabase = makeDatabase(organization: "Old Name")
+        let preparedDatabase = makeDatabase(organization: "Prepared Name")
+        let resolver = makeResolver(organization: "Old Name")
+        let service = FakeMACVendorDatabaseService(
+            loadedDatabase: oldDatabase,
+            preparedDatabase: preparedDatabase
+        )
+        let manager = MACVendorDatabaseManager(resolver: resolver, service: service)
+        await manager.loadInstalledDatabase()
+
+        await manager.prepareManualImport(urls: fourFixtureURLs(), ownerID: ownerA)
+
+        #expect(manager.pendingManualImport(for: ownerA) == preparedDatabase.summary)
+        #expect(manager.pendingManualImport(for: ownerB) == nil)
+
+        manager.discardPreparedManualImport(ownerID: ownerB)
+        await manager.confirmManualImport(ownerID: ownerB)
+
+        #expect(manager.pendingManualImport(for: ownerA) == preparedDatabase.summary)
+        #expect(manager.pendingManualImport(for: ownerB) == nil)
+        #expect(await service.installCallCount == 0)
+        #expect(manager.availability == .installed(oldDatabase.summary))
+
+        manager.discardPreparedManualImport(ownerID: ownerA)
+        #expect(manager.pendingManualImport(for: ownerA) == nil)
+
+        await manager.prepareManualImport(urls: fourFixtureURLs(), ownerID: ownerA)
+        await manager.confirmManualImport(ownerID: ownerA)
+
+        #expect(manager.pendingManualImport(for: ownerA) == nil)
+        #expect(manager.availability == .installed(preparedDatabase.summary))
+        #expect(await service.installCallCount == 1)
+        #expect(resolver.resolve(testAddress) == .registered("Prepared Name"))
+    }
+
+    @Test func otherOwnerCannotReplacePreparedManualImport() async {
+        let ownerA = UUID()
+        let ownerB = UUID()
+        let preparedDatabase = makeDatabase(organization: "Prepared Name")
+        let service = FakeMACVendorDatabaseService(preparedDatabase: preparedDatabase)
+        let manager = MACVendorDatabaseManager(
+            resolver: MACVendorResolver(),
+            service: service
+        )
+
+        await manager.prepareManualImport(urls: fourFixtureURLs(), ownerID: ownerA)
+        await manager.prepareManualImport(urls: fourFixtureURLs(), ownerID: ownerB)
+
+        #expect(manager.pendingManualImport(for: ownerA) == preparedDatabase.summary)
+        #expect(manager.pendingManualImport(for: ownerB) == nil)
+        #expect(await service.prepareCallCount == 1)
+    }
+
+    @Test func preparedImportOwnerCanDiscardDuringAnotherOwnersOperation() async throws {
+        let ownerA = UUID()
+        let ownerB = UUID()
+        let preparedDatabase = makeDatabase(organization: "Prepared Name")
+        let service = FakeMACVendorDatabaseService(
+            preparedDatabase: preparedDatabase,
+            suspendDownload: true
+        )
+        let manager = MACVendorDatabaseManager(
+            resolver: MACVendorResolver(),
+            service: service
+        )
+        await manager.prepareManualImport(urls: fourFixtureURLs(), ownerID: ownerA)
+
+        let downloadTask = Task { await manager.downloadAndInstall(ownerID: ownerB) }
+        await waitUntil { await service.downloadCallCount == 1 }
+
+        #expect(manager.cancelCurrentOperation(ownerID: ownerA) == nil)
+        manager.discardPreparedManualImport(ownerID: ownerA)
+
+        #expect(manager.pendingManualImport(for: ownerA) == nil)
+        #expect(manager.operation(for: ownerB) == .validating)
+        #expect(await service.observedDownloadCancellation == false)
+
+        let ownerBHandle = try #require(manager.cancelCurrentOperation(ownerID: ownerB))
+        await manager.waitForCancellation(ownerBHandle)
+        await downloadTask.value
+    }
+
+    @Test func operationErrorIsVisibleAndDismissibleOnlyByItsOwner() async {
+        let ownerA = UUID()
+        let ownerB = UUID()
+        let service = FakeMACVendorDatabaseService(downloadError: .downloadFailed(.maM))
+        let manager = MACVendorDatabaseManager(
+            resolver: MACVendorResolver(),
+            service: service
+        )
+
+        await manager.downloadAndInstall(ownerID: ownerA)
+
+        #expect(manager.presentedError(for: ownerA) == .downloadFailed(.maM))
+        #expect(manager.presentedError(for: ownerB) == nil)
+        #expect(manager.presentedError == nil)
+
+        manager.dismissPresentedError(ownerID: ownerB)
+        #expect(manager.presentedError(for: ownerA) == .downloadFailed(.maM))
+
+        manager.dismissPresentedError(ownerID: ownerA)
+        #expect(manager.presentedError(for: ownerA) == nil)
+    }
+
+    @Test func processErrorRemainsGlobalAndCannotBeDismissedBySheetOwner() async {
+        let owner = UUID()
+        let manager = MACVendorDatabaseManager(
+            resolver: MACVendorResolver(),
+            service: FakeMACVendorDatabaseService(clearError: .persistenceFailure)
+        )
+
+        await manager.clear()
+
+        #expect(manager.presentedError == .persistenceFailure)
+        #expect(manager.presentedError(for: owner) == nil)
+
+        manager.dismissPresentedError(ownerID: owner)
+        #expect(manager.presentedError == .persistenceFailure)
+
+        manager.dismissPresentedError()
+        #expect(manager.presentedError == nil)
     }
 
     @Test func clearEmptiesResolverCacheAndPublishesRevision() async {
@@ -235,7 +412,7 @@ struct MACVendorDatabaseManagerTests {
         await manager.clear()
 
         #expect(manager.availability == .notInstalled)
-        #expect(manager.pendingManualImport == nil)
+        #expect(manager.pendingManualImport(for: nil) == nil)
         #expect(manager.databaseRevision == 2)
         #expect(resolver.resolve(testAddress) == .unknown)
     }
@@ -297,7 +474,7 @@ struct MACVendorDatabaseManagerTests {
         await preparationTask.value
 
         #expect(manager.operation == .idle)
-        #expect(manager.pendingManualImport == nil)
+        #expect(manager.pendingManualImport(for: nil) == nil)
         #expect(manager.availability == .installed(database.summary))
         #expect(manager.presentedError == nil)
         #expect(await service.observedPreparationCancellation)

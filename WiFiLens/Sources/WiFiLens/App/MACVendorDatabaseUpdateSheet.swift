@@ -19,24 +19,31 @@ enum MACVendorUpdateSource: String, CaseIterable, Identifiable {
 
 struct MACVendorDatabaseUpdateSheet: View {
     @Bindable var manager: MACVendorDatabaseManager
+    @State private var ownerID: UUID
     @State private var source: MACVendorUpdateSource
     @State private var showsFileImporter = false
     @Environment(\.dismiss) private var dismiss
 
     init(
         manager: MACVendorDatabaseManager,
-        initialSource: MACVendorUpdateSource = .automatic
+        initialSource: MACVendorUpdateSource = .automatic,
+        ownerID: UUID = UUID()
     ) {
         self.manager = manager
         _source = State(initialValue: initialSource)
+        _ownerID = State(initialValue: ownerID)
     }
 
     private var isBusy: Bool {
         manager.operation != .idle
     }
 
+    private var ownedOperation: MACVendorDatabaseOperation {
+        manager.operation(for: ownerID)
+    }
+
     private var blocksDismissal: Bool {
-        switch manager.operation {
+        switch ownedOperation {
         case .installing, .clearing:
             true
         case .idle, .downloading, .readingFiles, .validating:
@@ -45,16 +52,24 @@ struct MACVendorDatabaseUpdateSheet: View {
     }
 
     private var canImport: Bool {
-        guard let counts = manager.pendingManualImport?.registryCounts else { return false }
+        guard let counts = pendingManualImport?.registryCounts else { return false }
         return MACVendorRegistry.allCases.allSatisfy { counts[$0] != nil }
+    }
+
+    private var pendingManualImport: MACVendorDatabaseSummary? {
+        manager.pendingManualImport(for: ownerID)
+    }
+
+    private var presentedError: MACVendorDatabaseError? {
+        manager.presentedError(for: ownerID)
     }
 
     private var errorIsPresented: Binding<Bool> {
         Binding(
-            get: { manager.presentedError != nil },
+            get: { presentedError != nil },
             set: { isPresented in
                 if !isPresented {
-                    manager.presentedError = nil
+                    manager.dismissPresentedError(ownerID: ownerID)
                 }
             }
         )
@@ -115,25 +130,25 @@ struct MACVendorDatabaseUpdateSheet: View {
             allowsMultipleSelection: true
         ) { result in
             guard case let .success(urls) = result else { return }
-            Task { await manager.prepareManualImport(urls: urls) }
+            Task { await manager.prepareManualImport(urls: urls, ownerID: ownerID) }
         }
         .alert(
-            manager.presentedError?.localizedTitle
+            presentedError?.localizedTitle
                 ?? String(localized: "settings.mac_vendor.error.title", comment: "Generic MAC vendor database error title"),
             isPresented: errorIsPresented,
-            presenting: manager.presentedError
+            presenting: presentedError
         ) { _ in
             Button(String(localized: "common.action.dismiss", comment: "Dismiss an error alert"), role: .cancel) {}
         } message: { error in
             Text(error.localizedMessage)
         }
         .onDisappear {
-            let handle = manager.cancelCurrentOperation()
+            let handle = manager.cancelCurrentOperation(ownerID: ownerID)
             Task {
                 if let handle {
                     await manager.waitForCancellation(handle)
                 }
-                manager.discardPreparedManualImport()
+                manager.discardPreparedManualImport(ownerID: ownerID)
             }
         }
     }
@@ -228,7 +243,7 @@ struct MACVendorDatabaseUpdateSheet: View {
                 }
             }
 
-            if canImport, let summary = manager.pendingManualImport {
+            if canImport, let summary = pendingManualImport {
                 Text(
                     String(
                         format: String(localized: "settings.mac_vendor.update.validation_ready", comment: "All four files are valid and ready to import; total record count argument"),
@@ -245,7 +260,7 @@ struct MACVendorDatabaseUpdateSheet: View {
     }
 
     private func validationRow(for registry: MACVendorRegistry) -> some View {
-        let count = manager.pendingManualImport?.registryCounts[registry]
+        let count = pendingManualImport?.registryCounts[registry]
         let statusText: String
         if let count {
             statusText = String(
@@ -332,7 +347,7 @@ struct MACVendorDatabaseUpdateSheet: View {
 
     @ViewBuilder
     private var operationProgress: some View {
-        switch manager.operation {
+        switch ownedOperation {
         case .idle:
             EmptyView()
         case let .downloading(completed, total):
@@ -395,7 +410,7 @@ struct MACVendorDatabaseUpdateSheet: View {
     }
 
     private var cancelAccessibilityHint: String {
-        switch manager.operation {
+        switch ownedOperation {
         case .downloading, .readingFiles, .validating:
             String(localized: "settings.mac_vendor.update.cancel_operation_hint", comment: "Cancel the current registry operation and close the sheet")
         case .idle, .installing, .clearing:
@@ -406,7 +421,7 @@ struct MACVendorDatabaseUpdateSheet: View {
     private func downloadAndInstall() {
         let startingRevision = manager.databaseRevision
         Task {
-            await manager.downloadAndInstall()
+            await manager.downloadAndInstall(ownerID: ownerID)
             if manager.databaseRevision != startingRevision {
                 dismiss()
             }
@@ -416,7 +431,7 @@ struct MACVendorDatabaseUpdateSheet: View {
     private func confirmManualImport() {
         let startingRevision = manager.databaseRevision
         Task {
-            await manager.confirmManualImport()
+            await manager.confirmManualImport(ownerID: ownerID)
             if manager.databaseRevision != startingRevision {
                 dismiss()
             }
@@ -427,7 +442,7 @@ struct MACVendorDatabaseUpdateSheet: View {
 extension MACVendorDatabaseError {
     var localizedTitle: String {
         switch self {
-        case .invalidHTTPStatus, .disallowedRedirect, .downloadFailed:
+        case .invalidHTTPStatus, .disallowedRedirect, .downloadFailed, .automaticDownloadFailed:
             String(localized: "settings.mac_vendor.error.download_title", comment: "IEEE registry download error title")
         case .fileReadFailed, .wrongFileCount, .fileTooLarge, .totalSizeExceeded, .invalidEncoding:
             String(localized: "settings.mac_vendor.error.files_title", comment: "Manual registry file selection or reading error title")
@@ -473,6 +488,8 @@ extension MACVendorDatabaseError {
             String(format: String(localized: "settings.mac_vendor.error.disallowed_redirect", comment: "IEEE registry download redirected to a disallowed address; URL argument"), url.absoluteString)
         case let .downloadFailed(registry):
             String(format: String(localized: "settings.mac_vendor.error.download_failed", comment: "IEEE registry download failed; registry name argument"), registry.rawValue)
+        case .automaticDownloadFailed:
+            String(localized: "settings.mac_vendor.error.automatic_download_failed", comment: "Automatic IEEE registry batch download failed")
         case let .fileReadFailed(file):
             String(format: String(localized: "settings.mac_vendor.error.file_read_failed", comment: "Selected registry CSV could not be read; file name argument"), file)
         case let .unsupportedSchema(version):
@@ -570,11 +587,16 @@ private actor MACVendorDatabasePreviewService: MACVendorDatabaseServicing {
 
 private struct MACVendorDatabaseUpdateSheetPreview: View {
     @State private var manager = MACVendorDatabasePreviewFactory.makeManager()
+    @State private var ownerID = UUID()
 
     var body: some View {
-        MACVendorDatabaseUpdateSheet(manager: manager, initialSource: .manual)
+        MACVendorDatabaseUpdateSheet(
+            manager: manager,
+            initialSource: .manual,
+            ownerID: ownerID
+        )
             .task {
-                await manager.prepareManualImport(urls: [])
+                await manager.prepareManualImport(urls: [], ownerID: ownerID)
             }
     }
 }
