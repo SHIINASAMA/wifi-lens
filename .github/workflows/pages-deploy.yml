@@ -51,7 +51,7 @@ jobs:
       - run: pnpm --config.minimum-release-age=0 build
         working-directory: web
 
-      - uses: actions/configure-pages@v4
+      - uses: actions/configure-pages@v6
         with:
           enablement: true
 
