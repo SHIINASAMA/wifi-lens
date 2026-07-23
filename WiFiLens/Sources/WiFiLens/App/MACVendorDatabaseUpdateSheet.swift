@@ -66,20 +66,25 @@ struct MACVendorDatabaseUpdateSheet: View {
                 Text(String(localized: "settings.mac_vendor.update.title", comment: "MAC vendor database update sheet title"))
                     .font(.title3.weight(.semibold))
 
-                Picker(
-                    String(localized: "settings.mac_vendor.update.source_label", comment: "MAC vendor database update source picker label"),
-                    selection: $source
-                ) {
-                    ForEach(MACVendorUpdateSource.allCases) { option in
-                        Text(option.localizedLabel).tag(option)
+                HStack {
+                    Spacer(minLength: 0)
+                    Picker(
+                        String(localized: "settings.mac_vendor.update.source_label", comment: "MAC vendor database update source picker label"),
+                        selection: $source
+                    ) {
+                        ForEach(MACVendorUpdateSource.allCases) { option in
+                            Text(option.localizedLabel).tag(option)
+                        }
                     }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                    .frame(width: 300)
+                    .disabled(isBusy)
+                    .accessibilityLabel(String(localized: "settings.mac_vendor.update.source_label", comment: "MAC vendor database update source picker label"))
+                    .accessibilityValue(source.localizedLabel)
+                    .accessibilityIdentifier("settings-mac-vendor-source-picker")
+                    Spacer(minLength: 0)
                 }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .disabled(isBusy)
-                .accessibilityLabel(String(localized: "settings.mac_vendor.update.source_label", comment: "MAC vendor database update source picker label"))
-                .accessibilityValue(source.localizedLabel)
-                .accessibilityIdentifier("settings-mac-vendor-source-picker")
             }
             .padding(20)
 

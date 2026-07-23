@@ -175,6 +175,26 @@ struct MACVendorDatabaseManagerTests {
         #expect(resolver.resolve(testAddress) == .registered("Old Name"))
     }
 
+    @Test func failedManualReselectionDiscardsPreviouslyPreparedDatabase() async {
+        let preparedDatabase = makeDatabase(organization: "Previously Prepared")
+        let service = FakeMACVendorDatabaseService(preparedDatabase: preparedDatabase)
+        let manager = MACVendorDatabaseManager(
+            resolver: MACVendorResolver(),
+            service: service
+        )
+        await manager.prepareManualImport(urls: fourFixtureURLs())
+        #expect(manager.pendingManualImport == preparedDatabase.summary)
+
+        await service.setPreparationError(.malformedCSV(file: "oui.csv"))
+        await manager.prepareManualImport(urls: fourFixtureURLs())
+
+        #expect(manager.pendingManualImport == nil)
+        #expect(manager.presentedError == .malformedCSV(file: "oui.csv"))
+        await manager.confirmManualImport()
+        #expect(manager.presentedError == .noPreparedImport)
+        #expect(await service.installCallCount == 0)
+    }
+
     @Test func confirmationWithoutPreparedImportPublishesTypedError() async {
         let manager = MACVendorDatabaseManager(
             resolver: MACVendorResolver(),
@@ -510,7 +530,7 @@ private actor FakeMACVendorDatabaseService: MACVendorDatabaseServicing {
     private let preparedDatabase: MACVendorDatabase
     private let loadError: MACVendorDatabaseError?
     private let downloadError: MACVendorDatabaseError?
-    private let preparationError: MACVendorDatabaseError?
+    private var preparationError: MACVendorDatabaseError?
     private let installError: MACVendorDatabaseError?
     private let clearError: MACVendorDatabaseError?
     private let suspendDownload: Bool
@@ -610,10 +630,18 @@ private actor FakeMACVendorDatabaseService: MACVendorDatabaseServicing {
     func releaseInstall() {
         installReleased = true
     }
+
+    func setPreparationError(_ error: MACVendorDatabaseError?) {
+        preparationError = error
+    }
 }
 
 private actor FixtureMACVendorHTTPTransport: MACVendorHTTPTransport {
-    func fetch(_ request: URLRequest, maximumBytes: Int) async throws -> MACVendorHTTPResponse {
+    func fetch(
+        _ request: URLRequest,
+        maximumBytes: Int,
+        byteBudget: MACVendorDownloadByteBudget
+    ) async throws -> MACVendorHTTPResponse {
         let url = try #require(request.url)
         let registry = try #require(MACVendorRegistry.allCases.first { $0.downloadURL == url })
         let assignment: String
@@ -626,6 +654,7 @@ private actor FixtureMACVendorHTTPTransport: MACVendorHTTPTransport {
         let data = Data(
             "Registry,Assignment,Organization Name\n\(registry.rawValue),\(assignment),Example\n".utf8
         )
+        try byteBudget.consume(data.count)
         return MACVendorHTTPResponse(data: data, statusCode: 200, finalURL: url)
     }
 }

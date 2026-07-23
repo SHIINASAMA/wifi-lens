@@ -61,6 +61,10 @@ final class MACVendorDatabaseManager {
     }
 
     func prepareManualImport(urls: [URL]) async {
+        guard currentTask == nil else { return }
+        preparedManualDatabase = nil
+        pendingManualImport = nil
+        presentedError = nil
         await run(operation: .readingFiles) { [weak self] in
             await self?.performManualPreparation(urls: urls)
         }

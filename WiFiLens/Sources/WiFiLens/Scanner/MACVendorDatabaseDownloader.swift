@@ -7,14 +7,43 @@ struct MACVendorHTTPResponse: Sendable {
 }
 
 protocol MACVendorHTTPTransport: Sendable {
-    func fetch(_ request: URLRequest, maximumBytes: Int) async throws -> MACVendorHTTPResponse
+    func fetch(
+        _ request: URLRequest,
+        maximumBytes: Int,
+        byteBudget: MACVendorDownloadByteBudget
+    ) async throws -> MACVendorHTTPResponse
+}
+
+final class MACVendorDownloadByteBudget: @unchecked Sendable {
+    private let lock = NSLock()
+    private let maximumBytes: Int
+    private var consumedBytes = 0
+
+    init(maximumBytes: Int) {
+        self.maximumBytes = maximumBytes
+    }
+
+    func consume(_ byteCount: Int) throws {
+        try lock.withLock {
+            guard byteCount >= 0,
+                  byteCount <= maximumBytes - consumedBytes
+            else {
+                throw MACVendorHTTPTransportError.totalBytesExceeded(maximumBytes)
+            }
+            consumedBytes += byteCount
+        }
+    }
 }
 
 final class URLSessionMACVendorHTTPTransport: Sendable {
     private let session: URLSession
 
-    init() {
-        session = URLSession(configuration: Self.makeConfiguration())
+    convenience init() {
+        self.init(configuration: URLSessionMACVendorHTTPTransport.makeConfiguration())
+    }
+
+    init(configuration: URLSessionConfiguration) {
+        session = URLSession(configuration: configuration)
     }
 
     static func makeConfiguration() -> URLSessionConfiguration {
@@ -32,48 +61,41 @@ final class URLSessionMACVendorHTTPTransport: Sendable {
     static func isAllowedIEEEURL(_ url: URL) -> Bool {
         url.scheme?.lowercased() == "https"
             && url.host?.lowercased() == "standards-oui.ieee.org"
+            && url.user == nil
+            && url.password == nil
+            && (url.port == nil || url.port == 443)
     }
 }
 
 extension URLSessionMACVendorHTTPTransport: MACVendorHTTPTransport {
-    func fetch(_ request: URLRequest, maximumBytes: Int) async throws -> MACVendorHTTPResponse {
-        let redirectDelegate = MACVendorRedirectDelegate()
+    func fetch(
+        _ request: URLRequest,
+        maximumBytes: Int,
+        byteBudget: MACVendorDownloadByteBudget
+    ) async throws -> MACVendorHTTPResponse {
+        let delegate = MACVendorDownloadDelegate(
+            maximumFileBytes: maximumBytes,
+            byteBudget: byteBudget
+        )
 
         do {
-            let (bytes, response) = try await session.bytes(for: request, delegate: redirectDelegate)
-
-            if let rejectedURL = redirectDelegate.rejectedURL {
-                bytes.task.cancel()
-                throw MACVendorDatabaseError.disallowedRedirect(rejectedURL)
-            }
-
-            if response.expectedContentLength > Int64(maximumBytes) {
-                bytes.task.cancel()
-                throw MACVendorHTTPTransportError.maximumBytesExceeded
-            }
-
-            var data = Data()
-            if response.expectedContentLength > 0 {
-                data.reserveCapacity(min(Int(response.expectedContentLength), maximumBytes))
-            }
-
-            for try await byte in bytes {
-                try Task.checkCancellation()
-                guard data.count < maximumBytes else {
-                    bytes.task.cancel()
-                    throw MACVendorHTTPTransportError.maximumBytesExceeded
-                }
-                data.append(byte)
-            }
-
-            if let rejectedURL = redirectDelegate.rejectedURL {
-                throw MACVendorDatabaseError.disallowedRedirect(rejectedURL)
-            }
+            let (temporaryURL, response) = try await session.download(
+                for: request,
+                delegate: delegate
+            )
+            try Task.checkCancellation()
+            if let rejection = delegate.rejection { throw rejection }
 
             let finalURL = response.url ?? request.url
             guard let finalURL else {
                 throw MACVendorHTTPTransportError.missingFinalURL
             }
+            let attributes = try FileManager.default.attributesOfItem(
+                atPath: temporaryURL.path
+            )
+            let fileByteCount = (attributes[.size] as? NSNumber)?.intValue ?? 0
+            try delegate.validateCompletedFile(byteCount: fileByteCount)
+            let data = try Data(contentsOf: temporaryURL, options: .mappedIfSafe)
 
             return MACVendorHTTPResponse(
                 data: data,
@@ -81,9 +103,7 @@ extension URLSessionMACVendorHTTPTransport: MACVendorHTTPTransport {
                 finalURL: finalURL
             )
         } catch {
-            if let rejectedURL = redirectDelegate.rejectedURL {
-                throw MACVendorDatabaseError.disallowedRedirect(rejectedURL)
-            }
+            if let rejection = delegate.rejection { throw rejection }
             throw error
         }
     }
@@ -92,45 +112,80 @@ extension URLSessionMACVendorHTTPTransport: MACVendorHTTPTransport {
 struct MACVendorDatabaseDownloader: Sendable {
     let transport: any MACVendorHTTPTransport
     let maximumFileBytes: Int
+    let maximumTotalBytes: Int
 
     init(
         transport: any MACVendorHTTPTransport = URLSessionMACVendorHTTPTransport(),
-        maximumFileBytes: Int = 16 * 1_024 * 1_024
+        maximumFileBytes: Int = 16 * 1_024 * 1_024,
+        maximumTotalBytes: Int = 32 * 1_024 * 1_024
     ) {
         self.transport = transport
         self.maximumFileBytes = maximumFileBytes
+        self.maximumTotalBytes = maximumTotalBytes
     }
 
     func downloadAll(
         onCompleted: @Sendable (MACVendorRegistry) async -> Void
     ) async throws -> [MACVendorRegistryInput] {
-        try await withThrowingTaskGroup(of: DownloadResult.self) { group in
+        let byteBudget = MACVendorDownloadByteBudget(maximumBytes: maximumTotalBytes)
+        return try await withThrowingTaskGroup(of: DownloadOutcome.self) { group in
             for registry in MACVendorRegistry.allCases {
                 group.addTask {
-                    DownloadResult(
-                        registry: registry,
-                        input: try await download(registry)
-                    )
+                    do {
+                        return .success(
+                            registry,
+                            try await download(registry, byteBudget: byteBudget)
+                        )
+                    } catch is CancellationError {
+                        return .cancelled(registry)
+                    } catch let error as MACVendorDatabaseError {
+                        return .failure(registry, error)
+                    } catch {
+                        return .failure(registry, .downloadFailed(registry))
+                    }
                 }
             }
 
             var inputsByRegistry: [MACVendorRegistry: MACVendorRegistryInput] = [:]
-            for try await result in group {
-                inputsByRegistry[result.registry] = result.input
-                await onCompleted(result.registry)
+            var failuresByRegistry: [MACVendorRegistry: MACVendorDatabaseError] = [:]
+            var sawCancellation = false
+            for try await outcome in group {
+                switch outcome {
+                case let .success(registry, input):
+                    inputsByRegistry[registry] = input
+                    await onCompleted(registry)
+                case let .failure(registry, error):
+                    failuresByRegistry[registry] = error
+                case .cancelled:
+                    sawCancellation = true
+                }
             }
 
+            try Task.checkCancellation()
+            if let registry = MACVendorRegistry.allCases.first(where: {
+                failuresByRegistry[$0] != nil
+            }), let error = failuresByRegistry[registry] {
+                throw error
+            }
+            if sawCancellation { throw CancellationError() }
             return MACVendorRegistry.allCases.compactMap { inputsByRegistry[$0] }
         }
     }
 
-    private func download(_ registry: MACVendorRegistry) async throws -> MACVendorRegistryInput {
+    private func download(
+        _ registry: MACVendorRegistry,
+        byteBudget: MACVendorDownloadByteBudget
+    ) async throws -> MACVendorRegistryInput {
         try Task.checkCancellation()
         let request = makeRequest(for: registry)
         let response: MACVendorHTTPResponse
 
         do {
-            response = try await transport.fetch(request, maximumBytes: maximumFileBytes)
+            response = try await transport.fetch(
+                request,
+                maximumBytes: maximumFileBytes,
+                byteBudget: byteBudget
+            )
         } catch is CancellationError {
             throw CancellationError()
         } catch where Task.isCancelled {
@@ -140,6 +195,10 @@ struct MACVendorDatabaseDownloader: Sendable {
                 file: registry.downloadURL.lastPathComponent,
                 maximumBytes: maximumFileBytes
             )
+        } catch let MACVendorHTTPTransportError.totalBytesExceeded(maximumBytes) {
+            throw MACVendorDatabaseError.totalSizeExceeded(maximumBytes: maximumBytes)
+        } catch let MACVendorHTTPTransportError.disallowedRedirect(url) {
+            throw MACVendorDatabaseError.disallowedRedirect(url)
         } catch let error as MACVendorDatabaseError {
             throw error
         } catch {
@@ -184,18 +243,30 @@ struct MACVendorDatabaseDownloader: Sendable {
         return "WiFiLens/\(version) (+https://github.com/SHIINASAMA/wifi-lens)"
     }()
 
-    private struct DownloadResult: Sendable {
-        let registry: MACVendorRegistry
-        let input: MACVendorRegistryInput
+    private enum DownloadOutcome: Sendable {
+        case success(MACVendorRegistry, MACVendorRegistryInput)
+        case failure(MACVendorRegistry, MACVendorDatabaseError)
+        case cancelled(MACVendorRegistry)
     }
 }
 
-private final class MACVendorRedirectDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+private final class MACVendorDownloadDelegate: NSObject,
+    URLSessionDownloadDelegate,
+    @unchecked Sendable
+{
     private let lock = NSLock()
-    private var storedRejectedURL: URL?
+    private let maximumFileBytes: Int
+    private let byteBudget: MACVendorDownloadByteBudget
+    private var storedRejection: MACVendorHTTPTransportError?
+    private var accountedBytes = 0
 
-    var rejectedURL: URL? {
-        lock.withLock { storedRejectedURL }
+    init(maximumFileBytes: Int, byteBudget: MACVendorDownloadByteBudget) {
+        self.maximumFileBytes = maximumFileBytes
+        self.byteBudget = byteBudget
+    }
+
+    var rejection: MACVendorHTTPTransportError? {
+        lock.withLock { storedRejection }
     }
 
     func urlSession(
@@ -206,17 +277,68 @@ private final class MACVendorRedirectDelegate: NSObject, URLSessionTaskDelegate,
         completionHandler: @escaping (URLRequest?) -> Void
     ) {
         guard let url = request.url, URLSessionMACVendorHTTPTransport.isAllowedIEEEURL(url) else {
-            lock.withLock {
-                storedRejectedURL = request.url
+            if let url = request.url {
+                storeRejection(.disallowedRedirect(url))
+            } else {
+                storeRejection(.missingFinalURL)
             }
             completionHandler(nil)
             return
         }
         completionHandler(request)
     }
+
+    func urlSession(
+        _ session: URLSession,
+        downloadTask: URLSessionDownloadTask,
+        didWriteData bytesWritten: Int64,
+        totalBytesWritten: Int64,
+        totalBytesExpectedToWrite: Int64
+    ) {
+        guard rejection == nil else {
+            downloadTask.cancel()
+            return
+        }
+        do {
+            guard totalBytesWritten <= Int64(maximumFileBytes) else {
+                throw MACVendorHTTPTransportError.maximumBytesExceeded
+            }
+            try byteBudget.consume(Int(bytesWritten))
+            lock.withLock { accountedBytes += Int(bytesWritten) }
+        } catch let error as MACVendorHTTPTransportError {
+            storeRejection(error)
+            downloadTask.cancel()
+        } catch {
+            storeRejection(.totalBytesExceeded(0))
+            downloadTask.cancel()
+        }
+    }
+
+    func urlSession(
+        _ session: URLSession,
+        downloadTask: URLSessionDownloadTask,
+        didFinishDownloadingTo location: URL
+    ) {}
+
+    func validateCompletedFile(byteCount: Int) throws {
+        guard byteCount <= maximumFileBytes else {
+            throw MACVendorHTTPTransportError.maximumBytesExceeded
+        }
+        let unaccountedBytes = lock.withLock { max(0, byteCount - accountedBytes) }
+        try byteBudget.consume(unaccountedBytes)
+        lock.withLock { accountedBytes += unaccountedBytes }
+    }
+
+    private func storeRejection(_ error: MACVendorHTTPTransportError) {
+        lock.withLock {
+            if storedRejection == nil { storedRejection = error }
+        }
+    }
 }
 
-private enum MACVendorHTTPTransportError: Error {
+enum MACVendorHTTPTransportError: Error, Sendable {
     case maximumBytesExceeded
+    case totalBytesExceeded(Int)
     case missingFinalURL
+    case disallowedRedirect(URL)
 }
