@@ -249,7 +249,7 @@ final class ScannerViewModel {
         if case let .registered(organization) = vendorResolver.resolve(bssid) {
             return organization
         }
-        return "—"
+        return ""
     }
 
     func vendorDatabaseDidChange() {

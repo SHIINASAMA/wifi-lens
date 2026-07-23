@@ -6,6 +6,7 @@ struct NativeTableView: NSViewRepresentable {
     @Binding var selectedID: String?
     @Binding var sortOrder: [NSSortDescriptor]
     @Binding var hiddenColumns: Set<String>
+    let isVendorColumnAvailable: Bool
     var onToggleVisibility: ((String) -> Void)?
     var onToggleVisibilityLocked: ((String) -> Void)?
 
@@ -53,7 +54,9 @@ struct NativeTableView: NSViewRepresentable {
         }
 
         addColumn(to: tableView, id: "SSID", title: String(localized: "table.column.ssid", comment: "SSID column header in network table"), width: 160, sortKey: "ssid", ascending: true)
-        addColumn(to: tableView, id: "Vendor", title: String(localized: "table.column.vendor", comment: "MAC vendor column header in network table"), width: 140, sortKey: "vendor", ascending: true)
+        if isVendorColumnAvailable {
+            addVendorColumn(to: tableView)
+        }
         addColumn(to: tableView, id: "Hidden", title: String(localized: "table.column.hidden", comment: "Hidden network indicator column header"), width: 20, sortKey: "isHiddenSSID", ascending: false)
         addColumn(to: tableView, id: "Band", title: String(localized: "channels.table.col.band", comment: "Band column header"), width: 80, sortKey: "bandLabel", ascending: true)
         addColumn(to: tableView, id: "Ch", title: String(localized: "table.column.channel", comment: "Channel column header (abbreviated)"), width: 50, sortKey: "channel", ascending: true)
@@ -118,6 +121,8 @@ struct NativeTableView: NSViewRepresentable {
     func updateNSView(_ scrollView: NSScrollView, context: Context) {
         guard let tableView = scrollView.documentView as? NSTableView else { return }
 
+        let vendorColumnsChanged = updateVendorColumn(in: tableView)
+
         let rowsChanged = context.coordinator.rows != rows
         let selectionChanged = context.coordinator.previousSelectedID != selectedID
         context.coordinator.rows = rows
@@ -129,6 +134,8 @@ struct NativeTableView: NSViewRepresentable {
 
         if rowsChanged {
             tableView.reloadData()
+            context.coordinator.autoSizeColumns()
+        } else if vendorColumnsChanged {
             context.coordinator.autoSizeColumns()
         } else if selectionChanged {
             let visibleRange = tableView.rows(in: tableView.visibleRect)
@@ -156,6 +163,35 @@ struct NativeTableView: NSViewRepresentable {
         column.isEditable = false
         column.sortDescriptorPrototype = NSSortDescriptor(key: sortKey, ascending: ascending)
         tableView.addTableColumn(column)
+    }
+
+    private func addVendorColumn(to tableView: NSTableView) {
+        addColumn(
+            to: tableView,
+            id: "Vendor",
+            title: String(localized: "table.column.vendor", comment: "MAC vendor column header in network table"),
+            width: 140,
+            sortKey: "vendor",
+            ascending: true
+        )
+    }
+
+    private func updateVendorColumn(in tableView: NSTableView) -> Bool {
+        let vendorIdentifier = NSUserInterfaceItemIdentifier("Vendor")
+        let vendorColumn = tableView.tableColumns.first { $0.identifier == vendorIdentifier }
+
+        if isVendorColumnAvailable, vendorColumn == nil {
+            addVendorColumn(to: tableView)
+            if let vendorIndex = tableView.tableColumns.firstIndex(where: { $0.identifier == vendorIdentifier }),
+               let ssidIndex = tableView.tableColumns.firstIndex(where: { $0.identifier.rawValue == "SSID" }) {
+                tableView.moveColumn(vendorIndex, toColumn: ssidIndex + 1)
+            }
+            return true
+        } else if !isVendorColumnAvailable, let vendorColumn {
+            tableView.removeTableColumn(vendorColumn)
+            return true
+        }
+        return false
     }
 
     class Coordinator: NSObject, NSTableViewDelegate, NSTableViewDataSource {

@@ -40,4 +40,18 @@ struct MACVendorDatabaseReminderTests {
             )
         ).shouldRemindWhenEmpty)
     }
+
+    @Test func onlyInstalledDatabaseMakesVendorColumnAvailable() {
+        let summary = MACVendorDatabaseSummary(
+            source: .manualImport,
+            createdAt: .distantPast,
+            registryCounts: [:],
+            totalRecordCount: 0
+        )
+
+        #expect(!MACVendorDatabaseAvailability.loading.isVendorColumnAvailable)
+        #expect(!MACVendorDatabaseAvailability.notInstalled.isVendorColumnAvailable)
+        #expect(!MACVendorDatabaseAvailability.unavailable(.persistenceFailure).isVendorColumnAvailable)
+        #expect(MACVendorDatabaseAvailability.installed(summary).isVendorColumnAvailable)
+    }
 }
