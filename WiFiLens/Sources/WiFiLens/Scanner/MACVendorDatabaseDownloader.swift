@@ -128,48 +128,62 @@ struct MACVendorDatabaseDownloader: Sendable {
         onCompleted: @Sendable (MACVendorRegistry) async -> Void
     ) async throws -> [MACVendorRegistryInput] {
         let byteBudget = MACVendorDownloadByteBudget(maximumBytes: maximumTotalBytes)
-        return try await withThrowingTaskGroup(of: DownloadOutcome.self) { group in
-            for registry in MACVendorRegistry.allCases {
-                group.addTask {
-                    do {
-                        return .success(
-                            registry,
-                            try await download(registry, byteBudget: byteBudget)
-                        )
-                    } catch is CancellationError {
-                        return .cancelled(registry)
-                    } catch let error as MACVendorDatabaseError {
-                        return .failure(registry, error)
-                    } catch {
-                        return .failure(registry, .downloadFailed(registry))
-                    }
-                }
+        let tasks = MACVendorRegistry.allCases.map { registry in
+            Task {
+                await downloadOutcome(registry, byteBudget: byteBudget)
             }
+        }
 
+        return try await withTaskCancellationHandler {
             var inputsByRegistry: [MACVendorRegistry: MACVendorRegistryInput] = [:]
-            var failuresByRegistry: [MACVendorRegistry: MACVendorDatabaseError] = [:]
-            var sawCancellation = false
-            for try await outcome in group {
+            for (index, task) in tasks.enumerated() {
+                let outcome = await task.value
+                try Task.checkCancellation()
                 switch outcome {
                 case let .success(registry, input):
                     inputsByRegistry[registry] = input
                     await onCompleted(registry)
-                case let .failure(registry, error):
-                    failuresByRegistry[registry] = error
+                case let .failure(_, error):
+                    await cancelAndDrain(tasks: tasks, after: index)
+                    throw error
                 case .cancelled:
-                    sawCancellation = true
+                    await cancelAndDrain(tasks: tasks, after: index)
+                    throw CancellationError()
                 }
             }
 
             try Task.checkCancellation()
-            if let registry = MACVendorRegistry.allCases.first(where: {
-                failuresByRegistry[$0] != nil
-            }), let error = failuresByRegistry[registry] {
-                throw error
-            }
-            if sawCancellation { throw CancellationError() }
             return MACVendorRegistry.allCases.compactMap { inputsByRegistry[$0] }
+        } onCancel: {
+            for task in tasks { task.cancel() }
         }
+    }
+
+    private func downloadOutcome(
+        _ registry: MACVendorRegistry,
+        byteBudget: MACVendorDownloadByteBudget
+    ) async -> DownloadOutcome {
+        do {
+            return .success(
+                registry,
+                try await download(registry, byteBudget: byteBudget)
+            )
+        } catch is CancellationError {
+            return .cancelled(registry)
+        } catch let error as MACVendorDatabaseError {
+            return .failure(registry, error)
+        } catch {
+            return .failure(registry, .downloadFailed(registry))
+        }
+    }
+
+    private func cancelAndDrain(
+        tasks: [Task<DownloadOutcome, Never>],
+        after index: Int
+    ) async {
+        guard index + 1 < tasks.count else { return }
+        for task in tasks[(index + 1)...] { task.cancel() }
+        for task in tasks[(index + 1)...] { _ = await task.value }
     }
 
     private func download(

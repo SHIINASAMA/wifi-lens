@@ -16,6 +16,7 @@ private struct AppRootView: View {
 
     @Bindable var viewModel: ScannerViewModel
     @Bindable var macVendorDatabaseManager: MACVendorDatabaseManager
+    let macVendorReminderPolicy: MACVendorDatabaseReminderPolicy
     @Bindable var roamingViewModel: RoamingTestViewModel
     var bleViewModel: BLEViewModel?
     @Binding var showCrashLog: Bool
@@ -37,7 +38,6 @@ private struct AppRootView: View {
     @State private var sidebarVisibility = NavigationSplitViewVisibility.automatic
     @State private var secondaryToolbarSelections = SecondaryToolbarSelections()
     @State private var networkDiagnosticsViewModel = NetworkDiagnosticsViewModel()
-    @State private var macVendorReminderPolicy = MACVendorDatabaseReminderPolicy()
     @State private var showsMACVendorReminder = false
     @State private var showsMACVendorUpdateSheet = false
 
@@ -94,17 +94,9 @@ private struct AppRootView: View {
               !viewModel.locationManager.showDeniedAlert
         else { return }
 
-        let isDatabaseEmpty: Bool
-        switch macVendorDatabaseManager.availability {
-        case .notInstalled:
-            isDatabaseEmpty = true
-        case .loading, .installed, .unavailable:
-            isDatabaseEmpty = false
-        }
-
         if macVendorReminderPolicy.shouldPresent(
             isSpectrum: selectedPage == .spectrum,
-            isDatabaseEmpty: isDatabaseEmpty,
+            isDatabaseEmpty: macVendorDatabaseManager.availability.shouldRemindWhenEmpty,
             remindersEnabled: remindWhenVendorDatabaseEmpty
         ) {
             showsMACVendorReminder = true
@@ -926,6 +918,7 @@ struct WiFiLensApp: App {
     private var terminationCoordinator
     @State private var viewModel: ScannerViewModel
     @State private var macVendorDatabaseManager: MACVendorDatabaseManager
+    @State private var macVendorReminderPolicy = MACVendorDatabaseReminderPolicy()
     @State private var roamingViewModel = RoamingTestViewModel()
     @State private var bleViewModel: BLEViewModel?
     @State private var sparkleUpdater = SparkleUpdater()
@@ -974,6 +967,7 @@ struct WiFiLensApp: App {
                 AppRootView(
                     viewModel: viewModel,
                     macVendorDatabaseManager: macVendorDatabaseManager,
+                    macVendorReminderPolicy: macVendorReminderPolicy,
                     roamingViewModel: roamingViewModel,
                     bleViewModel: bleViewModel,
                     showCrashLog: $showCrashLog,

@@ -74,6 +74,12 @@ actor MACVendorDatabaseService: MACVendorDatabaseServicing {
     func prepareManualImport(urls: [URL], createdAt: Date) async throws -> MACVendorDatabase {
         do {
             try Task.checkCancellation()
+            guard urls.count == MACVendorRegistry.allCases.count else {
+                throw MACVendorDatabaseError.wrongFileCount(
+                    expected: MACVendorRegistry.allCases.count,
+                    actual: urls.count
+                )
+            }
             let inputs = try await store.readImportFiles(urls)
             try Task.checkCancellation()
             let database = try parser.parse(

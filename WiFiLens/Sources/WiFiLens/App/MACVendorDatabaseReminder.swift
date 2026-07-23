@@ -1,7 +1,7 @@
-struct MACVendorDatabaseReminderPolicy {
+final class MACVendorDatabaseReminderPolicy {
     private(set) var hasPresentedThisSession = false
 
-    mutating func shouldPresent(
+    func shouldPresent(
         isSpectrum: Bool,
         isDatabaseEmpty: Bool,
         remindersEnabled: Bool
@@ -14,5 +14,16 @@ struct MACVendorDatabaseReminderPolicy {
 
         hasPresentedThisSession = true
         return true
+    }
+}
+
+extension MACVendorDatabaseAvailability {
+    var shouldRemindWhenEmpty: Bool {
+        switch self {
+        case .notInstalled, .unavailable:
+            true
+        case .loading, .installed:
+            false
+        }
     }
 }

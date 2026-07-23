@@ -15,6 +15,10 @@ actor MACVendorDatabaseStore {
         baseDirectory.appending(path: "database-v1.json")
     }
 
+    private var pendingURL: URL {
+        databaseURL.appendingPathExtension("pending")
+    }
+
     init(
         baseDirectory: URL? = nil,
         fileManager: FileManager = .default,
@@ -63,8 +67,6 @@ actor MACVendorDatabaseStore {
     }
 
     func replace(with database: MACVendorDatabase) throws {
-        let pendingURL = databaseURL.appendingPathExtension("pending")
-
         do {
             try fileManager.createDirectory(
                 at: baseDirectory,
@@ -96,19 +98,26 @@ actor MACVendorDatabaseStore {
     }
 
     func clear() throws {
-        guard fileManager.fileExists(atPath: databaseURL.path) else {
-            return
-        }
         do {
-            try fileManager.removeItem(at: databaseURL)
+            if fileManager.fileExists(atPath: pendingURL.path) {
+                try fileManager.removeItem(at: pendingURL)
+            }
+            if fileManager.fileExists(atPath: databaseURL.path) {
+                try fileManager.removeItem(at: databaseURL)
+            }
         } catch {
             throw MACVendorDatabaseError.persistenceFailure
         }
     }
 
-    func readImportFiles(_ urls: [URL]) throws -> [MACVendorRegistryInput] {
+    func readImportFiles(
+        _ urls: [URL],
+        maximumFileBytes: Int = 16 * 1_024 * 1_024,
+        maximumTotalBytes: Int = 32 * 1_024 * 1_024
+    ) throws -> [MACVendorRegistryInput] {
         var inputs: [MACVendorRegistryInput] = []
         inputs.reserveCapacity(urls.count)
+        var totalBytes = 0
 
         for url in urls {
             try Task.checkCancellation()
@@ -121,9 +130,33 @@ actor MACVendorDatabaseStore {
 
             let data: Data
             do {
-                data = try Data(contentsOf: url, options: .mappedIfSafe)
+                let handle = try FileHandle(forReadingFrom: url)
+                defer { try? handle.close() }
+                var fileData = Data()
+                while true {
+                    try Task.checkCancellation()
+                    guard let chunk = try handle.read(upToCount: 64 * 1_024),
+                          !chunk.isEmpty
+                    else { break }
+                    guard chunk.count <= maximumFileBytes - fileData.count else {
+                        throw MACVendorDatabaseError.fileTooLarge(
+                            file: url.lastPathComponent,
+                            maximumBytes: maximumFileBytes
+                        )
+                    }
+                    guard chunk.count <= maximumTotalBytes - totalBytes else {
+                        throw MACVendorDatabaseError.totalSizeExceeded(
+                            maximumBytes: maximumTotalBytes
+                        )
+                    }
+                    fileData.append(chunk)
+                    totalBytes += chunk.count
+                }
+                data = fileData
             } catch is CancellationError {
                 throw CancellationError()
+            } catch let error as MACVendorDatabaseError {
+                throw error
             } catch {
                 throw MACVendorDatabaseError.fileReadFailed(url.lastPathComponent)
             }

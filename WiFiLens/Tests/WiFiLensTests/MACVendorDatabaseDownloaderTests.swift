@@ -75,26 +75,23 @@ struct MACVendorDatabaseDownloaderTests {
     }
 
     @Test func rejectsNonOKResponseAndCancelsTheDownloadGroup() async {
-        var responses = validResponses()
-        responses[MACVendorRegistry.maM.downloadURL] = response(
-            for: .maM,
-            statusCode: 503
-        )
-        let transport = RecordingMACVendorHTTPTransport(responses: responses)
+        let transport = FailingAndSuspendingMACVendorHTTPTransport()
         let downloader = MACVendorDatabaseDownloader(transport: transport)
+        let clock = ContinuousClock()
+        let startedAt = clock.now
 
         do {
             _ = try await downloader.downloadAll { _ in }
             Issue.record("Expected status 503 to be rejected")
         } catch let error as MACVendorDatabaseError {
-            #expect(error == .invalidHTTPStatus(registry: .maM, statusCode: 503))
+            #expect(error == .invalidHTTPStatus(registry: .maL, statusCode: 503))
         } catch {
             Issue.record("Unexpected HTTP status error: \(error)")
         }
 
-        #expect(Set(await transport.requestedURLs.compactMap { $0 }) == Set(
-            MACVendorRegistry.allCases.map(\.downloadURL)
-        ))
+        #expect(clock.now - startedAt < .milliseconds(300))
+        #expect(await transport.startedCount == MACVendorRegistry.allCases.count)
+        #expect(await transport.cancelledCount == MACVendorRegistry.allCases.count - 1)
     }
 
     @Test func rejectsResponseOverPerFileLimit() async {
@@ -417,6 +414,31 @@ private actor BlockingMACVendorHTTPTransport: MACVendorHTTPTransport {
         startedCount += 1
         try await Task.sleep(for: .seconds(60))
         throw RecordingTransportError.unexpectedResume
+    }
+}
+
+private actor FailingAndSuspendingMACVendorHTTPTransport: MACVendorHTTPTransport {
+    private(set) var startedCount = 0
+    private(set) var cancelledCount = 0
+
+    func fetch(
+        _ request: URLRequest,
+        maximumBytes: Int,
+        byteBudget: MACVendorDownloadByteBudget
+    ) async throws -> MACVendorHTTPResponse {
+        startedCount += 1
+        let url = try #require(request.url)
+        let registry = try #require(MACVendorRegistry.allCases.first { $0.downloadURL == url })
+        if registry == .maL {
+            return response(for: registry, statusCode: 503)
+        }
+        do {
+            try await Task.sleep(for: .seconds(1))
+            return response(for: registry)
+        } catch is CancellationError {
+            cancelledCount += 1
+            throw CancellationError()
+        }
     }
 }
 

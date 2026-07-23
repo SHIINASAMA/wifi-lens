@@ -47,6 +47,18 @@ struct MACVendorDatabaseStoreTests {
         #expect(try await store.load() == nil)
     }
 
+    @Test func clearRemovesPendingDatabaseWhenInstalledDatabaseIsMissing() async throws {
+        let root = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let pendingURL = root.appending(path: "database-v1.json.pending")
+        try Data("interrupted installation".utf8).write(to: pendingURL)
+        let store = MACVendorDatabaseStore(baseDirectory: root)
+
+        try await store.clear()
+
+        #expect(!FileManager.default.fileExists(atPath: pendingURL.path))
+    }
+
     @Test func corruptJSONFailsWithoutDeletingInstalledFile() async throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
@@ -188,6 +200,50 @@ struct MACVendorDatabaseStoreTests {
 
         #expect(inputs.map(\.displayName) == ["second.csv", "first.csv"])
         #expect(inputs.map(\.data) == [secondData, firstData])
+    }
+
+    @Test func importReadRejectsFileOverAcquisitionLimit() async throws {
+        let root = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let importURL = root.appending(path: "large.csv")
+        try Data(repeating: 0x41, count: 9).write(to: importURL)
+        let store = MACVendorDatabaseStore(baseDirectory: root.appending(path: "store"))
+
+        do {
+            _ = try await store.readImportFiles(
+                [importURL],
+                maximumFileBytes: 8,
+                maximumTotalBytes: 16
+            )
+            Issue.record("Expected the acquisition-time file limit to reject the import")
+        } catch let error as MACVendorDatabaseError {
+            #expect(error == .fileTooLarge(file: "large.csv", maximumBytes: 8))
+        } catch {
+            Issue.record("Unexpected import-size error: \(error)")
+        }
+    }
+
+    @Test func importReadRejectsAggregateSizeDuringAcquisition() async throws {
+        let root = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let firstURL = root.appending(path: "first.csv")
+        let secondURL = root.appending(path: "second.csv")
+        try Data(repeating: 0x41, count: 5).write(to: firstURL)
+        try Data(repeating: 0x42, count: 5).write(to: secondURL)
+        let store = MACVendorDatabaseStore(baseDirectory: root.appending(path: "store"))
+
+        do {
+            _ = try await store.readImportFiles(
+                [firstURL, secondURL],
+                maximumFileBytes: 8,
+                maximumTotalBytes: 9
+            )
+            Issue.record("Expected the acquisition-time total limit to reject the import")
+        } catch let error as MACVendorDatabaseError {
+            #expect(error == .totalSizeExceeded(maximumBytes: 9))
+        } catch {
+            Issue.record("Unexpected aggregate import-size error: \(error)")
+        }
     }
 
     @Test func importReadFailureUsesDisplayName() async throws {

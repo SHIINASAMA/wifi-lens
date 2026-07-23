@@ -448,7 +448,7 @@ struct MACVendorDatabaseServiceTests {
         #expect(try await service.load() == nil)
     }
 
-    @Test func manualReadFailurePreservesTypedFileName() async throws {
+    @Test func manualPreparationRejectsWrongFileCountBeforeReading() async throws {
         let root = try makeTemporaryDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
         let service = MACVendorDatabaseService(
@@ -462,9 +462,32 @@ struct MACVendorDatabaseServiceTests {
                 urls: [root.appending(path: "missing.csv")],
                 createdAt: fixtureDate
             )
+            Issue.record("Expected manual file count validation to fail")
+        } catch let error as MACVendorDatabaseError {
+            #expect(error == .wrongFileCount(expected: 4, actual: 1))
+        }
+    }
+
+    @Test func manualReadFailurePreservesTypedFileNameAfterCountValidation() async throws {
+        let root = try makeTemporaryDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let service = MACVendorDatabaseService(
+            parser: MACVendorCSVParser(minimumRecordCounts: oneRecordMinimums),
+            store: MACVendorDatabaseStore(baseDirectory: root),
+            downloader: MACVendorDatabaseDownloader(transport: FixtureMACVendorHTTPTransport())
+        )
+        let missingURLs = (0..<4).map { index in
+            root.appending(path: "missing-\(index).csv")
+        }
+
+        do {
+            _ = try await service.prepareManualImport(
+                urls: missingURLs,
+                createdAt: fixtureDate
+            )
             Issue.record("Expected manual file acquisition to fail")
         } catch let error as MACVendorDatabaseError {
-            #expect(error == .fileReadFailed("missing.csv"))
+            #expect(error == .fileReadFailed("missing-0.csv"))
         }
     }
 
