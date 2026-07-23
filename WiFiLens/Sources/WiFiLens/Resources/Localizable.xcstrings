@@ -21035,6 +21035,3066 @@
           }
         }
       }
+    },
+    "settings.mac_vendor.header": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MAC Vendor Database"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MACベンダーデータベース"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MAC 厂商数据库"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MAC-Herstellerdatenbank"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Base de datos de fabricantes MAC"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: MAC Vendor Database"
+    },
+    "settings.mac_vendor.footer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The database stays on this Mac and is updated only when you request it."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "データベースはこのMacに保存され、要求したときだけ更新されます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "数据库保存在这台 Mac 上，仅在你主动请求时更新。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Datenbank bleibt auf diesem Mac und wird nur auf Anforderung aktualisiert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La base de datos permanece en este Mac y solo se actualiza cuando lo solicitas."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: The database stays on this Mac and is updated only when you request it."
+    },
+    "settings.mac_vendor.status_label": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Status"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状態"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "状态"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Status"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estado"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Status"
+    },
+    "settings.mac_vendor.status_loading": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "読み込み中…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在加载…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird geladen…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cargando…"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Loading…"
+    },
+    "settings.mac_vendor.status_not_installed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not installed"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未インストール"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未安装"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht installiert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No instalada"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Not installed"
+    },
+    "settings.mac_vendor.status_installed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installed"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インストール済み"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已安装"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installiert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instalada"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Installed"
+    },
+    "settings.mac_vendor.status_unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unavailable"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "利用できません"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不可用"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht verfügbar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No disponible"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Unavailable"
+    },
+    "settings.mac_vendor.unavailable_reason": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unavailable reason"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "利用できない理由"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不可用原因"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grund für die Nichtverfügbarkeit"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Motivo de la indisponibilidad"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Unavailable reason"
+    },
+    "settings.mac_vendor.source_label": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Source"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ソース"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来源"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quelle"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Origen"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Source"
+    },
+    "settings.mac_vendor.source_ieee": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Downloaded from IEEE"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IEEEからダウンロード"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从 IEEE 下载"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Von IEEE geladen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descargada de IEEE"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Downloaded from IEEE"
+    },
+    "settings.mac_vendor.source_manual": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manually imported"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手動でインポート"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手动导入"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manuell importiert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importada manualmente"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Manually imported"
+    },
+    "settings.mac_vendor.updated_label": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Updated"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新日時"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新时间"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktualisiert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actualizada"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Updated"
+    },
+    "settings.mac_vendor.records_label": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Valid records"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有効なレコード"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有效记录"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gültige Einträge"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registros válidos"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Valid records"
+    },
+    "settings.mac_vendor.remind_when_empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remind me when the database is empty"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "データベースが空のときに通知"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "数据库为空时提醒我"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bei leerer Datenbank erinnern"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recordarme cuando la base de datos esté vacía"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Remind me when the database is empty"
+    },
+    "settings.mac_vendor.remind_when_empty_hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show a reminder when no local MAC vendor database is installed."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ローカルのMACベンダーデータベースがない場合に通知します。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未安装本地 MAC 厂商数据库时显示提醒。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeigt eine Erinnerung an, wenn keine lokale MAC-Herstellerdatenbank installiert ist."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muestra un recordatorio cuando no hay una base de datos local de fabricantes MAC instalada."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Show a reminder when no local MAC vendor database is installed."
+    },
+    "settings.mac_vendor.update_action": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktualisieren…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actualizar…"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Update…"
+    },
+    "settings.mac_vendor.update_action_hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose an IEEE download or a manual CSV import."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IEEEからのダウンロードまたはCSVの手動インポートを選択します。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择从 IEEE 下载或手动导入 CSV。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IEEE-Download oder manuellen CSV-Import auswählen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige una descarga de IEEE o una importación CSV manual."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Choose an IEEE download or a manual CSV import."
+    },
+    "settings.mac_vendor.clear_action": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "消去…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清空…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leeren…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borrar…"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Clear…"
+    },
+    "settings.mac_vendor.clear_action_hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove local vendor data without changing the reminder setting."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通知設定を変更せずにローカルのベンダーデータを削除します。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除本地厂商数据，但不更改提醒设置。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lokale Herstellerdaten entfernen, ohne die Erinnerungseinstellung zu ändern."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elimina los datos locales de fabricantes sin cambiar el ajuste de recordatorio."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Remove local vendor data without changing the reminder setting."
+    },
+    "settings.mac_vendor.clear_confirmation_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear MAC vendor database?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MACベンダーデータベースを消去しますか？"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清空 MAC 厂商数据库？"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MAC-Herstellerdatenbank leeren?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Borrar la base de datos de fabricantes MAC?"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Clear MAC vendor database?"
+    },
+    "settings.mac_vendor.clear_confirmation_message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vendor values will display as an em dash until you install another database."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "別のデータベースをインストールするまで、ベンダー欄にはダッシュが表示されます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安装其他数据库前，厂商值将显示为破折号。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bis zur Installation einer anderen Datenbank werden Herstellerwerte als Gedankenstrich angezeigt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los valores de fabricante se mostrarán como una raya hasta que instales otra base de datos."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Vendor values will display as an em dash until you install another database."
+    },
+    "settings.mac_vendor.clear_confirmation_action": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear Database"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "データベースを消去"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清空数据库"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datenbank leeren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borrar base de datos"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Clear Database"
+    },
+    "settings.mac_vendor.update.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update MAC Vendor Database"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MACベンダーデータベースを更新"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新 MAC 厂商数据库"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MAC-Herstellerdatenbank aktualisieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actualizar base de datos de fabricantes MAC"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Update MAC Vendor Database"
+    },
+    "settings.mac_vendor.update.source_label": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Source"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ソース"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来源"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quelle"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Origen"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Source"
+    },
+    "settings.mac_vendor.update.source_automatic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatisch"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automática"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Automatic"
+    },
+    "settings.mac_vendor.update.source_manual": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manual"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手動"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手动"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manuell"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manual"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Manual"
+    },
+    "settings.mac_vendor.update.automatic_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download from IEEE"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IEEEからダウンロード"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从 IEEE 下载"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Von IEEE laden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descargar de IEEE"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Download from IEEE"
+    },
+    "settings.mac_vendor.update.automatic_description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download the four public address registries directly from IEEE."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "4つの公開アドレスレジストリをIEEEから直接ダウンロードします。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直接从 IEEE 下载四个公开地址注册表。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die vier öffentlichen Adressregister direkt von IEEE laden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descarga los cuatro registros públicos de direcciones directamente de IEEE."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Download the four public address registries directly from IEEE."
+    },
+    "settings.mac_vendor.update.download_size": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Downloads about 5.6 MB."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "約5.6 MBをダウンロードします。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下载约 5.6 MB。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lädt etwa 5,6 MB."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descarga unos 5,6 MB."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Downloads about 5.6 MB."
+    },
+    "settings.mac_vendor.update.local_scan_privacy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BSSIDs, SSIDs, and Wi-Fi scan data stay on this Mac."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BSSID、SSID、Wi-FiスキャンデータはこのMacから送信されません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BSSID、SSID 和 Wi-Fi 扫描数据始终保留在这台 Mac 上。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BSSIDs, SSIDs und Wi-Fi-Scandaten bleiben auf diesem Mac."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los BSSID, SSID y datos de escaneo Wi-Fi permanecen en este Mac."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: BSSIDs, SSIDs, and Wi-Fi scan data stay on this Mac."
+    },
+    "settings.mac_vendor.update.ip_metadata": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IEEE receives ordinary connection metadata, including your IP address."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IEEEにはIPアドレスを含む通常の接続メタデータが送信されます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IEEE 会收到包括你的 IP 地址在内的常规连接元数据。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IEEE erhält übliche Verbindungsmetadaten einschließlich Ihrer IP-Adresse."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IEEE recibe metadatos de conexión habituales, incluida tu dirección IP."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: IEEE receives ordinary connection metadata, including your IP address."
+    },
+    "settings.mac_vendor.update.no_endorsement": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registry data identifies the address-block holder and may differ from the device brand. WiFi Lens is not affiliated with or endorsed by IEEE."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "レジストリデータはアドレスブロックの登録者を示すもので、デバイスのブランドとは異なる場合があります。WiFi LensはIEEEと提携しておらず、IEEEの承認も受けていません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注册表数据标识地址块注册主体，可能与设备品牌不同。WiFi Lens 与 IEEE 无关联，也未获其认可。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registerdaten nennen den Inhaber des Adressblocks und können von der Gerätemarke abweichen. WiFi Lens ist weder mit IEEE verbunden noch von IEEE empfohlen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los datos del registro identifican al titular del bloque de direcciones y pueden diferir de la marca del dispositivo. WiFi Lens no está afiliado ni respaldado por IEEE."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Registry data identifies the address-block holder and may differ from the device brand. WiFi Lens is not affiliated with or endorsed by IEEE."
+    },
+    "settings.mac_vendor.update.download": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download from IEEE"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IEEEからダウンロード"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从 IEEE 下载"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Von IEEE laden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descargar de IEEE"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Download from IEEE"
+    },
+    "settings.mac_vendor.update.manual_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import IEEE CSV Files"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IEEE CSVファイルをインポート"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入 IEEE CSV 文件"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IEEE-CSV-Dateien importieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar archivos CSV de IEEE"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Import IEEE CSV Files"
+    },
+    "settings.mac_vendor.update.manual_description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download all four official CSV files, then select them together."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "公式CSVファイルを4つすべてダウンロードし、まとめて選択してください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下载全部四个官方 CSV 文件，然后一起选择。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle vier offiziellen CSV-Dateien laden und anschließend gemeinsam auswählen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descarga los cuatro archivos CSV oficiales y selecciónalos juntos."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Download all four official CSV files, then select them together."
+    },
+    "settings.mac_vendor.update.registry_download_accessibility": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download %@ CSV"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ CSVをダウンロード"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下载 %@ CSV"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@-CSV laden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descargar CSV de %@"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Download %@ CSV"
+    },
+    "settings.mac_vendor.update.choose_files": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose Four CSV Files…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "4つのCSVファイルを選択…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择四个 CSV 文件…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vier CSV-Dateien auswählen…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elegir cuatro archivos CSV…"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Choose Four CSV Files…"
+    },
+    "settings.mac_vendor.update.choose_files_hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose the MA-L, MA-M, MA-S, and IAB CSV files together."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MA-L、MA-M、MA-S、IABのCSVファイルをまとめて選択します。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一起选择 MA-L、MA-M、MA-S 和 IAB CSV 文件。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die CSV-Dateien MA-L, MA-M, MA-S und IAB gemeinsam auswählen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige juntos los archivos CSV MA-L, MA-M, MA-S e IAB."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Choose the MA-L, MA-M, MA-S, and IAB CSV files together."
+    },
+    "settings.mac_vendor.update.validation_header": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File Validation"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルの検証"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文件校验"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateiprüfung"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Validación de archivos"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: File Validation"
+    },
+    "settings.mac_vendor.update.registry_waiting": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ — waiting for a valid file"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ — 有効なファイルを待機中"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ — 正在等待有效文件"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ — wartet auf eine gültige Datei"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ — esperando un archivo válido"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: %@ — waiting for a valid file"
+    },
+    "settings.mac_vendor.update.registry_waiting_value": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for validation"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "検証待ち"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待校验"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wartet auf Prüfung"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esperando validación"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Waiting for validation"
+    },
+    "settings.mac_vendor.update.registry_valid": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ — %@ valid records"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ — 有効なレコード%@件"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ — %@ 条有效记录"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ — %@ gültige Einträge"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ — %@ registros válidos"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: %@ — %@ valid records"
+    },
+    "settings.mac_vendor.update.registry_valid_value": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ valid records"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有効なレコード%@件"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 条有效记录"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ gültige Einträge"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ registros válidos"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: %@ valid records"
+    },
+    "settings.mac_vendor.update.validation_ready": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All four registries are valid (%@ records total)."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "4つのレジストリはすべて有効です（合計%@件）。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "四个注册表均有效（共 %@ 条记录）。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle vier Register sind gültig (insgesamt %@ Einträge)."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los cuatro registros son válidos (%@ registros en total)."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: All four registries are valid (%@ records total)."
+    },
+    "settings.mac_vendor.update.validation_ready_accessibility": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All four registry files are valid"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "4つのレジストリファイルはすべて有効です"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "四个注册表文件均有效"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle vier Registerdateien sind gültig"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los cuatro archivos de registro son válidos"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: All four registry files are valid"
+    },
+    "settings.mac_vendor.update.import": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インポート"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importieren"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importar"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Import"
+    },
+    "settings.mac_vendor.update.import_hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install the validated local registry database."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "検証済みのローカルレジストリデータベースをインストールします。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安装已校验的本地注册表数据库。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die geprüfte lokale Registerdatenbank installieren."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instala la base de datos local de registros validada."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Install the validated local registry database."
+    },
+    "settings.mac_vendor.update.downloading": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Downloading…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ダウンロード中…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在下载…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird geladen…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descargando…"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Downloading…"
+    },
+    "settings.mac_vendor.update.progress_count": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld of %lld files"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld / %lldファイル"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld/%lld 个文件"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld von %lld Dateien"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld de %lld archivos"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: %lld of %lld files"
+    },
+    "settings.mac_vendor.update.progress_accessibility_value": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld of %lld files complete"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld / %lldファイル完了"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已完成 %lld/%lld 个文件"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld von %lld Dateien abgeschlossen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld de %lld archivos completados"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: %lld of %lld files complete"
+    },
+    "settings.mac_vendor.update.reading_files": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading files…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルを読み込み中…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在读取文件…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateien werden gelesen…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leyendo archivos…"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Reading files…"
+    },
+    "settings.mac_vendor.update.validating": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Validating…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "検証中…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在校验…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird geprüft…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Validando…"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Validating…"
+    },
+    "settings.mac_vendor.update.installing": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installing…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インストール中…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在安装…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird installiert…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instalando…"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Installing…"
+    },
+    "settings.mac_vendor.update.clearing": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clearing…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "消去中…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在清空…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird geleert…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borrando…"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Clearing…"
+    },
+    "settings.mac_vendor.update.cancel_hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard the prepared import and close this sheet."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "準備済みのインポートを破棄して閉じます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "放弃已准备的导入并关闭此面板。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorbereiteten Import verwerfen und dieses Fenster schließen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descarta la importación preparada y cierra este panel."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Discard the prepared import and close this sheet."
+    },
+    "settings.mac_vendor.update.cancel_operation_hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel the current operation and close this sheet."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在の処理をキャンセルして閉じます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消当前操作并关闭此面板。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktuellen Vorgang abbrechen und dieses Fenster schließen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancela la operación actual y cierra este panel."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Cancel the current operation and close this sheet."
+    },
+    "settings.mac_vendor.error.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MAC Vendor Database Error"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MACベンダーデータベースエラー"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MAC 厂商数据库错误"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fehler der MAC-Herstellerdatenbank"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Error de la base de datos de fabricantes MAC"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: MAC Vendor Database Error"
+    },
+    "settings.mac_vendor.error.download_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download Failed"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ダウンロードに失敗しました"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下载失败"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download fehlgeschlagen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Error de descarga"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Download Failed"
+    },
+    "settings.mac_vendor.error.files_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Files Could Not Be Read"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルを読み込めませんでした"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法读取文件"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateien konnten nicht gelesen werden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudieron leer los archivos"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Files Could Not Be Read"
+    },
+    "settings.mac_vendor.error.validation_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Files Are Not Valid"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルが無効です"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文件无效"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dateien sind ungültig"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los archivos no son válidos"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Files Are Not Valid"
+    },
+    "settings.mac_vendor.error.database_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Database Error"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "データベースエラー"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "数据库错误"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datenbankfehler"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Error de base de datos"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Database Error"
+    },
+    "settings.mac_vendor.error.wrong_file_count": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select exactly %lld files. You selected %lld."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルを%lld個選択してください。現在は%lld個です。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请选择恰好 %lld 个文件。当前选择了 %lld 个。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wählen Sie genau %lld Dateien aus. Ausgewählt: %lld."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecciona exactamente %lld archivos. Has seleccionado %lld."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Select exactly %lld files. You selected %lld."
+    },
+    "settings.mac_vendor.error.file_too_large": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ exceeds the %@ file-size limit."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@はファイルサイズ上限（%@）を超えています。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 超过了 %@ 的文件大小限制。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ überschreitet die Dateigrößengrenze von %@."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ supera el límite de tamaño de archivo de %@."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: %@ exceeds the %@ file-size limit."
+    },
+    "settings.mac_vendor.error.total_size_exceeded": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The selected files exceed the %@ total-size limit."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選択したファイルは合計サイズ上限（%@）を超えています。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所选文件超过了 %@ 的总大小限制。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die ausgewählten Dateien überschreiten die Gesamtgrößengrenze von %@."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los archivos seleccionados superan el límite de tamaño total de %@."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: The selected files exceed the %@ total-size limit."
+    },
+    "settings.mac_vendor.error.invalid_encoding": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is not valid UTF-8 CSV data."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@は有効なUTF-8 CSVデータではありません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 不是有效的 UTF-8 CSV 数据。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ enthält keine gültigen UTF-8-CSV-Daten."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ no contiene datos CSV UTF-8 válidos."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: %@ is not valid UTF-8 CSV data."
+    },
+    "settings.mac_vendor.error.malformed_csv": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ contains malformed CSV data."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@のCSVデータが不正です。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 包含格式错误的 CSV 数据。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ enthält fehlerhafte CSV-Daten."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ contiene datos CSV mal formados."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: %@ contains malformed CSV data."
+    },
+    "settings.mac_vendor.error.missing_columns": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is missing required columns: %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@に必須列がありません：%@。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 缺少必需列：%@。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ fehlen erforderliche Spalten: %@."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A %@ le faltan columnas obligatorias: %@."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: %@ is missing required columns: %@."
+    },
+    "settings.mac_vendor.error.mixed_registries": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ contains more than one registry type."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@に複数のレジストリ種別が含まれています。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 包含多种注册表类型。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ enthält mehrere Registertypen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ contiene más de un tipo de registro."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: %@ contains more than one registry type."
+    },
+    "settings.mac_vendor.error.duplicate_registry": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More than one %@ file was selected."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ファイルが複数選択されています。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择了多个 %@ 文件。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr als eine %@-Datei wurde ausgewählt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se seleccionó más de un archivo %@."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: More than one %@ file was selected."
+    },
+    "settings.mac_vendor.error.missing_registry": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The %@ file is missing."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ファイルがありません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "缺少 %@ 文件。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die %@-Datei fehlt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falta el archivo %@."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: The %@ file is missing."
+    },
+    "settings.mac_vendor.error.invalid_assignment": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ contains an invalid %@ assignment: %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@に無効な%@割り当てがあります：%@。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 包含无效的 %@ 分配：%@。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ enthält eine ungültige %@-Zuweisung: %@."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ contiene una asignación %@ no válida: %@."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: %@ contains an invalid %@ assignment: %@."
+    },
+    "settings.mac_vendor.error.invalid_organization": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ contains an invalid organization name."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@に無効な組織名があります。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 包含无效的组织名称。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ enthält einen ungültigen Organisationsnamen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ contiene un nombre de organización no válido."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: %@ contains an invalid organization name."
+    },
+    "settings.mac_vendor.error.too_few_records": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ requires at least %lld valid records; %lld were found."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@には有効なレコードが%lld件以上必要ですが、%lld件しかありません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 至少需要 %lld 条有效记录，但只找到 %lld 条。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ benötigt mindestens %lld gültige Einträge; gefunden wurden %lld."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ requiere al menos %lld registros válidos; se encontraron %lld."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: %@ requires at least %lld valid records; %lld were found."
+    },
+    "settings.mac_vendor.error.conflicting_assignment": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The assignment %@/%lld has conflicting organizations."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "割り当て%@/%lldの組織が競合しています。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分配 %@/%lld 对应的组织存在冲突。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Zuweisung %@/%lld enthält widersprüchliche Organisationen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La asignación %@/%lld tiene organizaciones en conflicto."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: The assignment %@/%lld has conflicting organizations."
+    },
+    "settings.mac_vendor.error.http_status": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For %@, IEEE returned HTTP %lld."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@でIEEEがHTTP %lldを返しました。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IEEE 为 %@ 返回了 HTTP %lld。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Für %@ hat IEEE HTTP %lld zurückgegeben."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para %@, IEEE devolvió HTTP %lld."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: For %@, IEEE returned HTTP %lld."
+    },
+    "settings.mac_vendor.error.disallowed_redirect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The download redirected to a disallowed address: %@."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ダウンロードが許可されていないアドレスにリダイレクトされました：%@。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下载被重定向到不允许的地址：%@。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Download wurde an eine nicht zulässige Adresse umgeleitet: %@."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La descarga se redirigió a una dirección no permitida: %@."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: The download redirected to a disallowed address: %@."
+    },
+    "settings.mac_vendor.error.download_failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The %@ download failed. Try again or use manual import."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@のダウンロードに失敗しました。再試行するか、手動インポートを使用してください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 下载失败。请重试或使用手动导入。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der %@-Download ist fehlgeschlagen. Versuchen Sie es erneut oder verwenden Sie den manuellen Import."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La descarga de %@ falló. Inténtalo de nuevo o usa la importación manual."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: The %@ download failed. Try again or use manual import."
+    },
+    "settings.mac_vendor.error.file_read_failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ could not be read. Choose the four CSV files again."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@を読み込めませんでした。4つのCSVファイルを選び直してください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法读取 %@。请重新选择四个 CSV 文件。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ konnte nicht gelesen werden. Wählen Sie die vier CSV-Dateien erneut aus."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo leer %@. Vuelve a elegir los cuatro archivos CSV."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: %@ could not be read. Choose the four CSV files again."
+    },
+    "settings.mac_vendor.error.unsupported_schema": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Database format version %lld is not supported. Clear or update the database."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "データベース形式バージョン%lldには対応していません。消去または更新してください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不支持数据库格式版本 %lld。请清空或更新数据库。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datenbankformat Version %lld wird nicht unterstützt. Leeren oder aktualisieren Sie die Datenbank."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La versión %lld del formato de base de datos no es compatible. Borra o actualiza la base de datos."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Database format version %lld is not supported. Clear or update the database."
+    },
+    "settings.mac_vendor.error.persistence_failure": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The local database could not be saved, loaded, or removed."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ローカルデータベースを保存、読み込み、または削除できませんでした。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法保存、加载或移除本地数据库。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die lokale Datenbank konnte nicht gespeichert, geladen oder entfernt werden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo guardar, cargar o eliminar la base de datos local."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: The local database could not be saved, loaded, or removed."
+    },
+    "settings.mac_vendor.error.no_prepared_import": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Validate all four CSV files before importing."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インポートする前に4つのCSVファイルをすべて検証してください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入前请先校验全部四个 CSV 文件。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prüfen Sie vor dem Import alle vier CSV-Dateien."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Valida los cuatro archivos CSV antes de importarlos."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Validate all four CSV files before importing."
+    },
+    "settings.mac_vendor.reminder.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set Up MAC Vendor Information?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MACベンダー情報を設定しますか？"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置 MAC 厂商信息？"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MAC-Herstellerinformationen einrichten?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Configurar la información del fabricante MAC?"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Set Up MAC Vendor Information?"
+    },
+    "settings.mac_vendor.reminder.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install the public registry database to display registered organizations in the network table."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "公開レジストリデータベースをインストールすると、ネットワーク表に登録組織を表示できます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安装公开注册表数据库后，可在网络表格中显示注册组织。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installieren Sie die öffentliche Registerdatenbank, um registrierte Organisationen in der Netzwerktabelle anzuzeigen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instala la base de datos pública de registros para mostrar las organizaciones registradas en la tabla de redes."
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Install the public registry database to display registered organizations in the network table."
+    },
+    "settings.mac_vendor.reminder.later": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Later"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "後で"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "稍后"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Später"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más tarde"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Later"
+    },
+    "settings.mac_vendor.reminder.do_not_ask_again": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Do Not Ask Again"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今後は確認しない"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不再询问"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht erneut fragen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No volver a preguntar"
+          }
+        }
+      },
+      "comment": "MAC vendor database UI text. English: Do Not Ask Again"
     }
   },
   "version": "1.0"

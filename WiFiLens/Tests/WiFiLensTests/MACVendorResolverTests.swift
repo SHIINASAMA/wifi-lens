@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 import Testing
 @testable import WiFi_Lens
 
@@ -28,10 +29,35 @@ struct MACVendorResolverTests {
         #expect(resolver.resolve("001122334455") == .registered("Small Networks"))
     }
 
-    @Test func bundledDatabaseResolvesKnownRegistration() {
+    @Test func rejectsGroupAndNullAddressesBeforeLookup() {
+        let resolver = MACVendorResolver(entries: [
+            MACVendorEntry(prefix: "000000", prefixLength: 24, organization: "XEROX CORPORATION"),
+            MACVendorEntry(prefix: "011122", prefixLength: 24, organization: "Group Mapping"),
+            MACVendorEntry(prefix: "FFFFFF", prefixLength: 24, organization: "Broadcast Mapping"),
+        ])
+
+        #expect(resolver.resolve("00:00:00:00:00:00") == .invalid)
+        #expect(resolver.resolve("01:11:22:33:44:55") == .invalid)
+        #expect(resolver.resolve("ff:ff:ff:ff:ff:ff") == .invalid)
+    }
+
+    @Test func defaultResolverStartsEmpty() {
         let resolver = MACVendorResolver()
 
-        #expect(resolver.resolve("00:03:93:00:00:00") == .registered("Apple, Inc."))
+        #expect(resolver.resolve("00:03:93:00:00:00") == .unknown)
+    }
+
+    @Test func replacingEntriesClearsCachedResults() {
+        let resolver = MACVendorResolver(entries: [
+            MACVendorEntry(prefix: "001122", prefixLength: 24, organization: "Old Name"),
+        ])
+        #expect(resolver.resolve("00:11:22:33:44:55") == .registered("Old Name"))
+
+        resolver.replaceEntries([
+            MACVendorEntry(prefix: "001122", prefixLength: 24, organization: "New Name"),
+        ])
+
+        #expect(resolver.resolve("00:11:22:33:44:55") == .registered("New Name"))
     }
 
     @Test func locallyAdministeredAddressesDoNotUseRegistryMappings() {
@@ -55,7 +81,7 @@ struct MACVendorResolverTests {
     @Test func unsupportedDatabaseSchemaFallsBackToAnEmptyDatabase() throws {
         let data = try #require(
             """
-            {"schemaVersion":2,"entries":[{"prefix":"001122","prefixLength":24,"organization":"Example"}]}
+            {"schemaVersion":2,"createdAt":0,"source":"manualImport","registries":[],"entries":[{"prefix":"001122","prefixLength":24,"organization":"Example"}]}
             """.data(using: .utf8)
         )
         let resolver = MACVendorResolver(databaseData: data)
@@ -92,5 +118,36 @@ struct MACVendorResolverTests {
         viewModel.debugApplyNetworksForTesting([unknown], supportedBands: [.band5GHz])
 
         #expect(viewModel.combinedTableRows.first?.vendor == "—")
+    }
+
+    @Test func scannerRefreshSeamReprojectsExistingRowsWithoutAnotherScan() async {
+        let resolver = MACVendorResolver(entries: [
+            MACVendorEntry(prefix: "001122", prefixLength: 24, organization: "Old Name"),
+        ])
+        let viewModel = ScannerViewModel(vendorResolver: resolver)
+        let network = WiFiNetwork(
+            ssid: "TestWiFi",
+            bssid: "00:11:22:33:44:55",
+            rssi: -50,
+            channel: WiFiChannel(band: .band5GHz, channelNumber: 44)
+        )
+        viewModel.debugApplyNetworksForTesting([network], supportedBands: [.band5GHz])
+        let initialRevision = viewModel.vendorDatabaseRevision
+
+        await confirmation("Combined table rows invalidated", expectedCount: 1) { invalidated in
+            withObservationTracking {
+                _ = viewModel.combinedTableRows
+            } onChange: {
+                invalidated()
+            }
+
+            resolver.replaceEntries([
+                MACVendorEntry(prefix: "001122", prefixLength: 24, organization: "New Name"),
+            ])
+            viewModel.vendorDatabaseDidChange()
+        }
+
+        #expect(viewModel.vendorDatabaseRevision == initialRevision + 1)
+        #expect(viewModel.combinedTableRows.first?.vendor == "New Name")
     }
 }

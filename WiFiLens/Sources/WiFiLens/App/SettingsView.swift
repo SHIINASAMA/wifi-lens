@@ -5,6 +5,7 @@ import Sparkle
 import AppKit
 
 struct SettingsView: View {
+    @Bindable var macVendorDatabaseManager: MACVendorDatabaseManager
     let updater: SparkleUpdater
     let locationPermission: LocationPermissionManager
     let bluetoothPermission: BluetoothPermissionManager?
@@ -24,6 +25,7 @@ struct SettingsView: View {
     @AppStorage("menuBarEnabled") private var menuBarEnabled = true
 
     init(
+        macVendorDatabaseManager: MACVendorDatabaseManager,
         updater: SparkleUpdater,
         locationPermission: LocationPermissionManager,
         bluetoothPermission: BluetoothPermissionManager?,
@@ -31,6 +33,7 @@ struct SettingsView: View {
         onScanIntervalChange: @escaping (Int) -> Void = { _ in },
         onRegulatoryRegionChange: @escaping (String) -> Void = { _ in }
     ) {
+        self.macVendorDatabaseManager = macVendorDatabaseManager
         self.updater = updater
         self.locationPermission = locationPermission
         self.bluetoothPermission = bluetoothPermission
@@ -111,6 +114,8 @@ struct SettingsView: View {
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
+
+                MACVendorDatabaseSettingsSection(manager: macVendorDatabaseManager)
 
                 EditionComposition.settingsContribution()
 

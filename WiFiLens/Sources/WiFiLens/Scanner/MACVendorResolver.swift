@@ -7,12 +7,6 @@ enum MACVendorLookupResult: Equatable, Sendable {
     case invalid
 }
 
-struct MACVendorEntry: Codable, Equatable, Sendable {
-    let prefix: String
-    let prefixLength: Int
-    let organization: String
-}
-
 @MainActor
 protocol MACVendorResolving: AnyObject {
     func resolve(_ macAddress: String) -> MACVendorLookupResult
@@ -26,10 +20,8 @@ final class MACVendorResolver: MACVendorResolving {
     private var organizationsByPrefixLength: [Int: [UInt64: String]] = [:]
     private var cache: [String: MACVendorLookupResult] = [:]
 
-    convenience init(bundle: Bundle = .main) {
-        let data = bundle.url(forResource: "MACVendors", withExtension: "json")
-            .flatMap { try? Data(contentsOf: $0) }
-        self.init(databaseData: data)
+    convenience init() {
+        self.init(entries: [])
     }
 
     init(databaseData: Data?) {
@@ -56,6 +48,11 @@ final class MACVendorResolver: MACVendorResolving {
         install(entries)
     }
 
+    func replaceEntries(_ entries: [MACVendorEntry]) {
+        install(entries)
+        cache.removeAll(keepingCapacity: true)
+    }
+
     func resolve(_ macAddress: String) -> MACVendorLookupResult {
         guard let normalized = Self.normalize(macAddress),
               let numericAddress = UInt64(normalized, radix: 16)
@@ -63,11 +60,15 @@ final class MACVendorResolver: MACVendorResolving {
             return .invalid
         }
 
+        let firstOctet = UInt8(normalized.prefix(2), radix: 16) ?? 0
+        if numericAddress == 0 || firstOctet & 0x01 != 0 {
+            return .invalid
+        }
+
         if let cached = cache[normalized] {
             return cached
         }
 
-        let firstOctet = UInt8(normalized.prefix(2), radix: 16) ?? 0
         let result: MACVendorLookupResult
         if firstOctet & 0x02 != 0 {
             result = .locallyAdministered
@@ -125,9 +126,4 @@ final class MACVendorResolver: MACVendorResolving {
 
         return nil
     }
-}
-
-private struct MACVendorDatabase: Decodable {
-    let schemaVersion: Int
-    let entries: [MACVendorEntry]
 }

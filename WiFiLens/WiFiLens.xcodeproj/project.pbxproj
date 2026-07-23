@@ -40,8 +40,29 @@
 		MV0000000000000000000001 /* MACVendorResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000002 /* MACVendorResolverTests.swift */; };
 		MV0000000000000000000003 /* MACVendorResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000005 /* MACVendorResolver.swift */; };
 		MV0000000000000000000004 /* MACVendorResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000005 /* MACVendorResolver.swift */; };
-		MV0000000000000000000006 /* MACVendors.json in Resources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000008 /* MACVendors.json */; };
-		MV0000000000000000000007 /* MACVendors.json in Resources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000008 /* MACVendors.json */; };
+		MV0000000000000000000009 /* MACVendorCSVParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000010 /* MACVendorCSVParserTests.swift */; };
+		MV0000000000000000000013 /* MACVendorDatabaseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000011 /* MACVendorDatabaseModels.swift */; };
+		MV0000000000000000000014 /* MACVendorDatabaseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000011 /* MACVendorDatabaseModels.swift */; };
+		MV0000000000000000000015 /* MACVendorCSVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000012 /* MACVendorCSVParser.swift */; };
+		MV0000000000000000000016 /* MACVendorCSVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000012 /* MACVendorCSVParser.swift */; };
+		MV0000000000000000000017 /* MACVendorDatabaseStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000020 /* MACVendorDatabaseStoreTests.swift */; };
+		MV0000000000000000000018 /* MACVendorDatabaseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000021 /* MACVendorDatabaseStore.swift */; };
+		MV0000000000000000000019 /* MACVendorDatabaseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000021 /* MACVendorDatabaseStore.swift */; };
+		MV0000000000000000000022 /* MACVendorDatabaseDownloaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000023 /* MACVendorDatabaseDownloaderTests.swift */; };
+		MV0000000000000000000024 /* MACVendorDatabaseDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */; };
+		MV0000000000000000000025 /* MACVendorDatabaseDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */; };
+		MV0000000000000000000027 /* MACVendorDatabaseManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000028 /* MACVendorDatabaseManagerTests.swift */; };
+		MV0000000000000000000029 /* MACVendorDatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000031 /* MACVendorDatabaseService.swift */; };
+		MV0000000000000000000030 /* MACVendorDatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000031 /* MACVendorDatabaseService.swift */; };
+		MV0000000000000000000032 /* MACVendorDatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000034 /* MACVendorDatabaseManager.swift */; };
+		MV0000000000000000000033 /* MACVendorDatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000034 /* MACVendorDatabaseManager.swift */; };
+		MV0000000000000000000035 /* MACVendorDatabaseSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000039 /* MACVendorDatabaseSettingsSection.swift */; };
+		MV0000000000000000000036 /* MACVendorDatabaseSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000039 /* MACVendorDatabaseSettingsSection.swift */; };
+		MV0000000000000000000037 /* MACVendorDatabaseUpdateSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000040 /* MACVendorDatabaseUpdateSheet.swift */; };
+		MV0000000000000000000038 /* MACVendorDatabaseUpdateSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000040 /* MACVendorDatabaseUpdateSheet.swift */; };
+		MV0000000000000000000041 /* MACVendorDatabaseReminderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000042 /* MACVendorDatabaseReminderTests.swift */; };
+		MV0000000000000000000043 /* MACVendorDatabaseReminder.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000045 /* MACVendorDatabaseReminder.swift */; };
+		MV0000000000000000000044 /* MACVendorDatabaseReminder.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000045 /* MACVendorDatabaseReminder.swift */; };
 		2FA3CB9C5DD2446AAA549779 /* GatewayPinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF472346A62545B9866DA8ED /* GatewayPinger.swift */; };
 		318908BC49D244B1EEE68A9A /* ChannelSpanCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */; };
 		3711656F0C3ECD58CA29D407 /* NativeTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3299502DE1A130760C8A7 /* NativeTableView.swift */; };
@@ -444,7 +465,20 @@
 		8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTableRowTests.swift; sourceTree = "<group>"; };
 		MV0000000000000000000002 /* MACVendorResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorResolverTests.swift; sourceTree = "<group>"; };
 		MV0000000000000000000005 /* MACVendorResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorResolver.swift; sourceTree = "<group>"; };
-		MV0000000000000000000008 /* MACVendors.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = MACVendors.json; sourceTree = "<group>"; };
+		MV0000000000000000000010 /* MACVendorCSVParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorCSVParserTests.swift; sourceTree = "<group>"; };
+		MV0000000000000000000011 /* MACVendorDatabaseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseModels.swift; sourceTree = "<group>"; };
+		MV0000000000000000000012 /* MACVendorCSVParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorCSVParser.swift; sourceTree = "<group>"; };
+		MV0000000000000000000020 /* MACVendorDatabaseStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseStoreTests.swift; sourceTree = "<group>"; };
+		MV0000000000000000000021 /* MACVendorDatabaseStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseStore.swift; sourceTree = "<group>"; };
+		MV0000000000000000000023 /* MACVendorDatabaseDownloaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseDownloaderTests.swift; sourceTree = "<group>"; };
+		MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseDownloader.swift; sourceTree = "<group>"; };
+		MV0000000000000000000028 /* MACVendorDatabaseManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseManagerTests.swift; sourceTree = "<group>"; };
+		MV0000000000000000000031 /* MACVendorDatabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseService.swift; sourceTree = "<group>"; };
+		MV0000000000000000000034 /* MACVendorDatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseManager.swift; sourceTree = "<group>"; };
+		MV0000000000000000000039 /* MACVendorDatabaseSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseSettingsSection.swift; sourceTree = "<group>"; };
+		MV0000000000000000000040 /* MACVendorDatabaseUpdateSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseUpdateSheet.swift; sourceTree = "<group>"; };
+		MV0000000000000000000042 /* MACVendorDatabaseReminderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseReminderTests.swift; sourceTree = "<group>"; };
+		MV0000000000000000000045 /* MACVendorDatabaseReminder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseReminder.swift; sourceTree = "<group>"; };
 		8F405489976429A068F15F86 /* WiFiLensTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WiFiLensTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSIDColorHasher.swift; sourceTree = "<group>"; };
 		90CF4B22A68C668A58043392 /* ExternalLinksTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalLinksTests.swift; sourceTree = "<group>"; };
@@ -776,6 +810,12 @@
 		93CBE45991F4573779019CBC /* Scanner */ = {
 			isa = PBXGroup;
 			children = (
+				MV0000000000000000000034 /* MACVendorDatabaseManager.swift */,
+				MV0000000000000000000031 /* MACVendorDatabaseService.swift */,
+				MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */,
+				MV0000000000000000000012 /* MACVendorCSVParser.swift */,
+				MV0000000000000000000011 /* MACVendorDatabaseModels.swift */,
+				MV0000000000000000000021 /* MACVendorDatabaseStore.swift */,
 				MV0000000000000000000005 /* MACVendorResolver.swift */,
 				8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */,
 				E5A1B3C8D4F6123456780001 /* WiFiPowerMonitor.swift */,
@@ -811,6 +851,9 @@
 				FB0573C12FBC47F1005F8214 /* CrashReporter.swift */,
 				FBAD00002FC400000057B038 /* LocationPermissionRequiredView.swift */,
 				FB0573BF2FBC47CC005F8214 /* Logging.swift */,
+				MV0000000000000000000045 /* MACVendorDatabaseReminder.swift */,
+				MV0000000000000000000039 /* MACVendorDatabaseSettingsSection.swift */,
+				MV0000000000000000000040 /* MACVendorDatabaseUpdateSheet.swift */,
 				FBD329512FC500000057B038 /* MetricKitManager.swift */,
 				FB0573C82FBCD25C005F8214 /* OverviewView.swift */,
 				FB0573C02FBBFC31005F8215 /* ProFeaturePlaceholderView.swift */,
@@ -978,7 +1021,6 @@
 			isa = PBXGroup;
 			children = (
 				FBBD169B2FD063630093F940 /* Assets.xcassets */,
-				MV0000000000000000000008 /* MACVendors.json */,
 				FBBD16982FD062F60093F940 /* PrivacyInfo.xcprivacy */,
 				FBB1F0AB2FC61E3D00E9D2C6 /* Localizable.xcstrings */,
 			);
@@ -1149,6 +1191,11 @@
 				90CF4B22A68C668A58043392 /* ExternalLinksTests.swift */,
 				39A94372ADF30D10E0F015CD /* IEParserTests.swift */,
 				A5024CBB8BFCAFF56FEF0756 /* MCPServerTests.swift */,
+				MV0000000000000000000010 /* MACVendorCSVParserTests.swift */,
+				MV0000000000000000000020 /* MACVendorDatabaseStoreTests.swift */,
+				MV0000000000000000000023 /* MACVendorDatabaseDownloaderTests.swift */,
+				MV0000000000000000000028 /* MACVendorDatabaseManagerTests.swift */,
+				MV0000000000000000000042 /* MACVendorDatabaseReminderTests.swift */,
 				MV0000000000000000000002 /* MACVendorResolverTests.swift */,
 				8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */,
 				OB0000000000000000000043 /* Observation */,
@@ -1490,7 +1537,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				FBD0A44F2FE5BEAC003658AD /* PRO.xctestplan in Resources */,
-				MV0000000000000000000007 /* MACVendors.json in Resources */,
 				FBBD169A2FD062F60093F940 /* PrivacyInfo.xcprivacy in Resources */,
 				FBBD169D2FD063630093F940 /* Assets.xcassets in Resources */,
 				FB1E329D2FC7316C009D1BDC /* Localizable.xcstrings in Resources */,
@@ -1501,7 +1547,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				MV0000000000000000000006 /* MACVendors.json in Resources */,
 				FBBD16992FD062F60093F940 /* PrivacyInfo.xcprivacy in Resources */,
 				FBBD169C2FD063630093F940 /* Assets.xcassets in Resources */,
 				FBB1F0AC2FC61E3D00E9D2C6 /* Localizable.xcstrings in Resources */,
@@ -1529,6 +1574,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				MV0000000000000000000043 /* MACVendorDatabaseReminder.swift in Sources */,
+				MV0000000000000000000035 /* MACVendorDatabaseSettingsSection.swift in Sources */,
+				MV0000000000000000000037 /* MACVendorDatabaseUpdateSheet.swift in Sources */,
+				MV0000000000000000000032 /* MACVendorDatabaseManager.swift in Sources */,
+				MV0000000000000000000029 /* MACVendorDatabaseService.swift in Sources */,
+				MV0000000000000000000024 /* MACVendorDatabaseDownloader.swift in Sources */,
+				MV0000000000000000000018 /* MACVendorDatabaseStore.swift in Sources */,
+				MV0000000000000000000015 /* MACVendorCSVParser.swift in Sources */,
+				MV0000000000000000000013 /* MACVendorDatabaseModels.swift in Sources */,
 				MV0000000000000000000003 /* MACVendorResolver.swift in Sources */,
 				ND0000000000000000000010 /* NetworkDiagnosticModels.swift in Sources */,
 				ND0000000000000000000011 /* DiagnosticRunner.swift in Sources */,
@@ -1660,6 +1714,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				MV0000000000000000000022 /* MACVendorDatabaseDownloaderTests.swift in Sources */,
+				MV0000000000000000000027 /* MACVendorDatabaseManagerTests.swift in Sources */,
+				MV0000000000000000000041 /* MACVendorDatabaseReminderTests.swift in Sources */,
+				MV0000000000000000000017 /* MACVendorDatabaseStoreTests.swift in Sources */,
+				MV0000000000000000000009 /* MACVendorCSVParserTests.swift in Sources */,
 				ND0000000000000000000001 /* NetworkDiagnosticsTests.swift in Sources */,
 				67B6475699ADED9C42E8F7CC /* BLEModelTests.swift in Sources */,
 				2A8E470AAD8FCE2CC1D14305 /* BandChartViewModelTests.swift in Sources */,
@@ -1711,6 +1770,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				MV0000000000000000000044 /* MACVendorDatabaseReminder.swift in Sources */,
+				MV0000000000000000000036 /* MACVendorDatabaseSettingsSection.swift in Sources */,
+				MV0000000000000000000038 /* MACVendorDatabaseUpdateSheet.swift in Sources */,
+				MV0000000000000000000033 /* MACVendorDatabaseManager.swift in Sources */,
+				MV0000000000000000000030 /* MACVendorDatabaseService.swift in Sources */,
+				MV0000000000000000000025 /* MACVendorDatabaseDownloader.swift in Sources */,
+				MV0000000000000000000019 /* MACVendorDatabaseStore.swift in Sources */,
+				MV0000000000000000000016 /* MACVendorCSVParser.swift in Sources */,
+				MV0000000000000000000014 /* MACVendorDatabaseModels.swift in Sources */,
 				MV0000000000000000000004 /* MACVendorResolver.swift in Sources */,
 				ND0000000000000000000012 /* NetworkDiagnosticModels.swift in Sources */,
 				ND0000000000000000000013 /* DiagnosticRunner.swift in Sources */,

@@ -56,6 +56,7 @@ final class ScannerViewModel {
     var hiddenBands: Set<String> = []       // band IDs ("24"/"5"/"6") to hide
     var hideHiddenSSIDs: Bool = false       // hide networks with empty SSID
     private(set) var lastNetworks: [WiFiNetwork] = []  // cached for toggle rebuild + MCP
+    private(set) var vendorDatabaseRevision = 0
     private(set) var deduplicatedNetworks: [WiFiNetwork] = []
     private(set) var displayStatesByID: [String: APDisplayState] = [:]
     private(set) var panelFilterQueries: [SpectrumPanelID: String] = [:]
@@ -198,6 +199,7 @@ final class ScannerViewModel {
     }
 
     var combinedTableRows: [NetworkTableRow] {
+        _ = vendorDatabaseRevision
         let qualityScores = Dictionary(uniqueKeysWithValues: bandViewModels.flatMap { vm in
             vm.allSeriesData.map { ($0.id, $0.qualityScore) }
         })
@@ -248,6 +250,10 @@ final class ScannerViewModel {
             return organization
         }
         return "—"
+    }
+
+    func vendorDatabaseDidChange() {
+        vendorDatabaseRevision &+= 1
     }
 
     /// Effective scan interval in seconds. Writes update the user's requested
