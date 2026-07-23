@@ -10,6 +10,7 @@ struct NetworkTableRowTests {
         id: String = "aa:bb:cc:dd:ee:ff-6-1",
         rssi: Int = -50,
         ssid: String = "TestWiFi",
+        vendor: String = "Example Networks",
         qualityScore: Int = 80,
         phyMode: String = "ax",
         channelWidth: String = "80",
@@ -26,6 +27,7 @@ struct NetworkTableRowTests {
             channel: 44,
             rssi: rssi,
             ssid: ssid,
+            vendor: vendor,
             bssid: "aa:bb:cc:dd:ee:ff",
             color: .blue,
             isFilteredOut: isFilteredOut,
@@ -61,6 +63,10 @@ struct NetworkTableRowTests {
 
     @Test func differentSSIDNotEqual() async throws {
         #expect(makeRow(ssid: "WiFi-A") != makeRow(ssid: "WiFi-B"))
+    }
+
+    @Test func differentVendorNotEqual() async throws {
+        #expect(makeRow(vendor: "Vendor A") != makeRow(vendor: "Vendor B"))
     }
 
     @Test func differentQualityScoreNotEqual() async throws {

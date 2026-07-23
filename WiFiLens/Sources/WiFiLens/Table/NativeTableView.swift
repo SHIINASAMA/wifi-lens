@@ -53,6 +53,7 @@ struct NativeTableView: NSViewRepresentable {
         }
 
         addColumn(to: tableView, id: "SSID", title: String(localized: "table.column.ssid", comment: "SSID column header in network table"), width: 160, sortKey: "ssid", ascending: true)
+        addColumn(to: tableView, id: "Vendor", title: String(localized: "table.column.vendor", comment: "MAC vendor column header in network table"), width: 140, sortKey: "vendor", ascending: true)
         addColumn(to: tableView, id: "Hidden", title: String(localized: "table.column.hidden", comment: "Hidden network indicator column header"), width: 20, sortKey: "isHiddenSSID", ascending: false)
         addColumn(to: tableView, id: "Band", title: String(localized: "channels.table.col.band", comment: "Band column header"), width: 80, sortKey: "bandLabel", ascending: true)
         addColumn(to: tableView, id: "Ch", title: String(localized: "table.column.channel", comment: "Channel column header (abbreviated)"), width: 50, sortKey: "channel", ascending: true)
@@ -244,6 +245,7 @@ struct NativeTableView: NSViewRepresentable {
                 textField.font = NSFont.systemFont(ofSize: 9, weight: .medium)
                 textField.textColor = NSColor.secondaryLabelColor.withAlphaComponent(opacity)
             case "SSID": textField.stringValue = network.ssid
+            case "Vendor": textField.stringValue = network.vendor
             case "Band": textField.stringValue = network.bandLabel
             case "Ch": textField.stringValue = String(network.channel)
             case "RSSI":

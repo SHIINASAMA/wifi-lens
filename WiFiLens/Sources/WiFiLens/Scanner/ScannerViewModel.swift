@@ -22,6 +22,7 @@ struct NetworkTableRow: Identifiable, Hashable {
     let channel: Int
     let rssi: Int
     let ssid: String
+    var vendor: String = "—"
     let bssid: String
     let color: Color
     let isFilteredOut: Bool
@@ -55,6 +56,7 @@ final class ScannerViewModel {
     var hiddenBands: Set<String> = []       // band IDs ("24"/"5"/"6") to hide
     var hideHiddenSSIDs: Bool = false       // hide networks with empty SSID
     private(set) var lastNetworks: [WiFiNetwork] = []  // cached for toggle rebuild + MCP
+    private(set) var vendorDatabaseRevision = 0
     private(set) var deduplicatedNetworks: [WiFiNetwork] = []
     private(set) var displayStatesByID: [String: APDisplayState] = [:]
     private(set) var panelFilterQueries: [SpectrumPanelID: String] = [:]
@@ -90,17 +92,20 @@ final class ScannerViewModel {
     let observationRuntime: WiFiObservationRuntime
     private let authorizationRefresh: @MainActor (LocationPermissionManager) -> Void
     private let userDefaults: UserDefaults
+    private let vendorResolver: any MACVendorResolving
     private var userDefaultsRegionOverride: RegulatoryDomain?
 
     init(
         store: WiFiObservationStore = .shared,
         userDefaults: UserDefaults = .standard,
+        vendorResolver: any MACVendorResolving = MACVendorResolver(),
         authorizationRefresh: @escaping @MainActor (LocationPermissionManager) -> Void = { $0.refreshStatus() }
     ) {
         self.store = store
         self.observationRuntime = WiFiObservationRuntime(store: store)
         self.authorizationRefresh = authorizationRefresh
         self.userDefaults = userDefaults
+        self.vendorResolver = vendorResolver
         self.userDefaultsRegionOverride = Self.regionOverride(
             from: userDefaults.string(forKey: "regulatoryRegionOverride") ?? "auto"
         )
@@ -111,12 +116,14 @@ final class ScannerViewModel {
     init(
         observationRuntime: WiFiObservationRuntime,
         userDefaults: UserDefaults = .standard,
+        vendorResolver: any MACVendorResolving = MACVendorResolver(),
         authorizationRefresh: @escaping @MainActor (LocationPermissionManager) -> Void = { $0.refreshStatus() }
     ) {
         self.store = observationRuntime.store
         self.observationRuntime = observationRuntime
         self.authorizationRefresh = authorizationRefresh
         self.userDefaults = userDefaults
+        self.vendorResolver = vendorResolver
         self.userDefaultsRegionOverride = Self.regionOverride(
             from: userDefaults.string(forKey: "regulatoryRegionOverride") ?? "auto"
         )
@@ -192,6 +199,7 @@ final class ScannerViewModel {
     }
 
     var combinedTableRows: [NetworkTableRow] {
+        _ = vendorDatabaseRevision
         let qualityScores = Dictionary(uniqueKeysWithValues: bandViewModels.flatMap { vm in
             vm.allSeriesData.map { ($0.id, $0.qualityScore) }
         })
@@ -213,6 +221,7 @@ final class ScannerViewModel {
                 channel: network.channel.channelNumber,
                 rssi: network.rssi,
                 ssid: (network.ssid?.isEmpty == false ? network.ssid! : "n/a"),
+                vendor: vendorDisplayName(for: network.bssid),
                 bssid: network.bssid,
                 color: colorHasher.color(for: network.ssid, bssid: network.bssid),
                 isFilteredOut: false,
@@ -234,6 +243,17 @@ final class ScannerViewModel {
                 lastSeen: ""
             )
         }
+    }
+
+    private func vendorDisplayName(for bssid: String) -> String {
+        if case let .registered(organization) = vendorResolver.resolve(bssid) {
+            return organization
+        }
+        return "—"
+    }
+
+    func vendorDatabaseDidChange() {
+        vendorDatabaseRevision &+= 1
     }
 
     /// Effective scan interval in seconds. Writes update the user's requested
