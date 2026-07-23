@@ -89,7 +89,9 @@ struct MACVendorDatabaseDownloaderTests {
             Issue.record("Unexpected HTTP status error: \(error)")
         }
 
-        #expect(clock.now - startedAt < .milliseconds(300))
+        // Leave enough headroom for a loaded CI runner while still proving that
+        // the downloader does not wait for the suspended peer requests.
+        #expect(clock.now - startedAt < .seconds(5))
         #expect(await transport.startedCount == MACVendorRegistry.allCases.count)
         #expect(await transport.cancelledCount == MACVendorRegistry.allCases.count - 1)
     }
@@ -433,7 +435,7 @@ private actor FailingAndSuspendingMACVendorHTTPTransport: MACVendorHTTPTransport
             return response(for: registry, statusCode: 503)
         }
         do {
-            try await Task.sleep(for: .seconds(1))
+            try await Task.sleep(for: .seconds(30))
             return response(for: registry)
         } catch is CancellationError {
             cancelledCount += 1
