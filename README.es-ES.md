@@ -26,12 +26,12 @@ macOS 14+ · Intel y Apple Silicon · Sin telemetría
 | Edición de código abierto | WiFi Lens Pro |
 |---|---|
 | Gratuita y de código abierto — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) | Edición de pago de un solo pago en Mac App Store — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) |
-| Escaneo Wi-Fi de tres bandas y análisis de espectro | Incluye todas las funciones de código abierto |
+| Escaneo Wi-Fi de tres bandas y análisis de espectro | Flujos de trabajo de monitorización profesional sobre el mismo motor de análisis principal |
 | Calidad del canal, detalles de red, pruebas de roaming | Grabación de sesiones de espectro — captura y reproducción a lo largo del tiempo |
-| Autodiagnóstico de red, escáner BLE, servidor MCP | Comparación de espectro en paralelo entre períodos |
-| Exportar PNG/CSV · Actualizaciones Sparkle | Barra de menús persistente · Línea temporal y tendencias · Actualizaciones de Mac App Store |
+| Autodiagnóstico de red, escáner BLE, servidor MCP | Flujos de trabajo profesionales adicionales |
+| Exportar PNG/CSV · Actualizaciones Sparkle | Barra de menús persistente · Línea temporal de eventos · Actualizaciones de Mac App Store |
 
-> El análisis básico de Wi-Fi es idéntico en ambas ediciones. Pro añade grabación y comparación de espectro, barra de menús persistente y línea temporal para flujos de trabajo profesionales.
+> Ambas ediciones comparten las mismas capacidades de análisis principal de Wi-Fi. Pro añade grabación de espectro, barra de menús persistente y línea temporal de eventos para flujos de trabajo profesionales.
 
 🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
 
@@ -41,7 +41,7 @@ macOS 14+ · Intel y Apple Silicon · Sin telemetría
 
 WiFi Lens es un analizador nativo de Wi-Fi y Bluetooth para macOS, desarrollado con SwiftUI, CoreWLAN y CoreBluetooth. Muestra las redes inalámbricas y los dispositivos BLE cercanos en tiempo real para que puedas diagnosticar problemas de conectividad, elegir un canal menos congestionado y verificar el roaming entre puntos de acceso.
 
-Este repositorio contiene la edición gratuita y de código abierto. WiFi Lens Pro es una edición de pago independiente que añade grabación y comparación de espectro, barra de menús persistente y línea temporal.
+Este repositorio contiene la edición gratuita y de código abierto. WiFi Lens Pro es una edición de pago independiente que añade grabación de espectro, barra de menús persistente y línea temporal de eventos.
 
 **Casos de uso típicos:**
 
@@ -62,21 +62,20 @@ Este repositorio contiene la edición gratuita y de código abierto. WiFi Lens P
 | 🔍 **Detalles de Red** | Generación PHY, ancho de canal, roaming 802.11k/r/v, WPA3, SSID oculto | OSS & Pro |
 | 📶 **Información de Conexión** | IP, gateway, DNS, MAC, canal, tasa Tx y resumen de seguridad | OSS & Pro |
 | 🩺 **Autodiagnóstico de red** | Diagnóstico de conexión con un clic — ruta, DNS, HTTPS y accesibilidad del proxy, con conclusiones basadas en evidencia | OSS & Pro |
-| 📈 **Línea temporal y tendencias** | Historial de señal por red a lo largo del tiempo con intervalo de escaneo configurable | Solo Pro |
+| 📈 **Línea temporal de eventos** | Historial de eventos de conexión — roaming, cambios de canal, desconexiones y caídas de señal | Solo Pro |
 | 🔄 **Prueba de Roaming** | Monitoreo de transición AP con gráfico temporal, selector de rango y guardado/carga de sesión | OSS & Pro |
 | 🗺️ **Mapa de Calor del Canal** | Mapa de calor de ocupación por banda para identificar patrones de congestión al instante | OSS & Pro |
 | 🎬 **Grabación de espectro** | Captura y reproduce cambios del espectro a lo largo del tiempo | Solo Pro |
-| 🔭 **Comparación de espectro** | Comparación en paralelo del espectro entre períodos | Solo Pro |
 | 🎧 **Escáner BLE** | Descubrimiento de dispositivos Bluetooth LE, análisis RSSI, gráficos de tendencias y seguimiento de dispositivos | OSS & Pro |
 | 🎨 **Colores Inteligentes** | Asignación de color determinista basada en el SSID; la misma red conserva el mismo color | OSS & Pro |
 | 📍 **Barra de menús** | Vive en tu barra de menús — haz clic en el icono para abrir el analizador en cualquier momento | Solo Pro |
 | 🔒 **Privacidad Primero** | Sin telemetría ni analítica; los datos de escaneo Wi-Fi permanecen en tu Mac | OSS & Pro |
 | 🌐 **Servidor MCP** | API HTTP embebida en `127.0.0.1:19840` para integración con herramientas externas | OSS & Pro |
-| 🔄 **Actualizaciones Automáticas** | Comprobaciones opcionales mediante Sparkle en la edición de GitHub | OSS & Pro |
+| 🔄 **Actualizaciones Automáticas** | Actualizaciones Sparkle en la edición de GitHub; actualizaciones de Mac App Store en Pro | OSS & Pro |
 | 📤 **Exportar** | Guarda gráficos por banda como imágenes PNG o datos CSV | OSS & Pro |
 | 🌍 **Localizado** | Inglés, alemán, español, japonés y chino simplificado | OSS & Pro |
 
-Todas las funciones están incluidas en la edición de código abierto, salvo las marcadas **Solo Pro**. Pro incluye todas las funciones de código abierto más las herramientas de grabación, comparación, barra de menús y línea temporal.
+Todas las funciones están incluidas en la edición de código abierto, salvo las marcadas **Solo Pro**. Pro incluye todas las funciones de código abierto más las herramientas de grabación, barra de menús y línea temporal de eventos.
 
 ---
 

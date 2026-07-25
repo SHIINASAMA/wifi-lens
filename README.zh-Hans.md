@@ -26,12 +26,12 @@ macOS 14+ · Intel 与 Apple Silicon · 无遥测
 | 开源版 | WiFi Lens Pro |
 |---|---|
 | 免费、开源 — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) | 一次性付费 Mac App Store 版本 — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) |
-| 三频 Wi-Fi 扫描与频谱分析 | 包含全部开源版功能 |
+| 三频 Wi-Fi 扫描与频谱分析 | 基于同一核心分析引擎的专业监控工作流 |
 | 信道质量、网络详情、漫游测试 | 频谱会话录制——随时间捕获与回放 |
-| 网络自检、BLE 扫描器、MCP 服务器 | 跨时段频谱并排对比 |
-| 导出 PNG/CSV · Sparkle 更新 | 常驻菜单栏 · 时间线与趋势 · Mac App Store 更新 |
+| 网络自检、BLE 扫描器、MCP 服务器 | 更多专业工作流 |
+| 导出 PNG/CSV · Sparkle 更新 | 常驻菜单栏 · 事件时间线 · Mac App Store 更新 |
 
-> 两版的核心 Wi-Fi 分析功能完全一致。Pro 增加频谱录制、对比、常驻菜单栏与时间线，面向专业工作流。
+> 两版共享相同的核心 Wi-Fi 分析能力。Pro 增加频谱录制、常驻菜单栏与事件时间线，面向专业工作流。
 
 🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
 
@@ -41,7 +41,7 @@ macOS 14+ · Intel 与 Apple Silicon · 无遥测
 
 WiFi Lens 是一款使用 SwiftUI、CoreWLAN 和 CoreBluetooth 开发的原生 macOS Wi-Fi 与蓝牙分析器。它实时呈现附近的无线网络和 BLE 设备，帮助你诊断连接问题、选择拥堵较少的信道，并验证接入点之间的漫游行为。
 
-本仓库提供免费开源版。WiFi Lens Pro 是独立付费版，增加频谱录制、对比、常驻菜单栏与时间线功能。
+本仓库提供免费开源版。WiFi Lens Pro 是独立付费版，增加频谱录制、常驻菜单栏与事件时间线功能。
 
 **典型使用场景：**
 
@@ -62,21 +62,20 @@ WiFi Lens 是一款使用 SwiftUI、CoreWLAN 和 CoreBluetooth 开发的原生 m
 | 🔍 **网络详情** | PHY 代际、信道宽度、802.11k/r/v 漫游、WPA3、隐藏 SSID | OSS & Pro |
 | 📶 **连接信息** | IP、网关、DNS、MAC、信道、发送速率和安全摘要 | OSS & Pro |
 | 🩺 **网络自检** | 一键连接诊断——路径、DNS、HTTPS 与代理可达性，基于证据给出结论 | OSS & Pro |
-| 📈 **时间线与趋势** | 每网络信号历史随时间变化，支持可配置扫描间隔 | 仅 Pro |
+| 📈 **事件时间线** | 连接事件历史——漫游、信道变更、断连与信号下降 | 仅 Pro |
 | 🔄 **漫游测试** | AP 切换监控，含时间线图、范围选择器和会话保存/加载 | OSS & Pro |
 | 🗺️ **信道热力图** | 各频段占用热力图，瞬间发现拥堵模式 | OSS & Pro |
 | 🎬 **频谱录制** | 随时间捕获并回放频谱变化 | 仅 Pro |
-| 🔭 **频谱对比** | 跨时段频谱并排对比 | 仅 Pro |
 | 🎧 **BLE 扫描器** | Bluetooth LE 设备发现、RSSI 分析、趋势图表和设备追踪 | OSS & Pro |
 | 🎨 **智能着色** | 基于 SSID 确定颜色；同一网络始终保持相同颜色 | OSS & Pro |
 | 📍 **菜单栏** | 常驻菜单栏——点击图标即可随时打开分析器 | 仅 Pro |
 | 🔒 **隐私优先** | 无遥测或使用分析；Wi-Fi 扫描数据保留在你的 Mac 上 | OSS & Pro |
 | 🌐 **MCP 服务器** | 内嵌 HTTP API（`127.0.0.1:19840`），支持外部工具集成 | OSS & Pro |
-| 🔄 **自动更新** | GitHub 版本提供可选的 Sparkle 更新检查 | OSS & Pro |
+| 🔄 **自动更新** | GitHub 版使用 Sparkle 更新；Pro 使用 Mac App Store 更新 | OSS & Pro |
 | 📤 **导出** | 保存各频段图表为 PNG 图片或 CSV 数据 | OSS & Pro |
 | 🌍 **本地化** | 英语、德语、西班牙语、日语和简体中文 | OSS & Pro |
 
-除标注 **仅 Pro** 的功能外，其余功能均包含在开源版中。Pro 包含开源版的全部功能，并额外提供录制、对比、常驻菜单栏与时间线工具。
+除标注 **仅 Pro** 的功能外，其余功能均包含在开源版中。Pro 包含开源版的全部功能，并额外提供录制、常驻菜单栏与事件时间线工具。
 
 ---
 

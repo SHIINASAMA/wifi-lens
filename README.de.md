@@ -26,12 +26,12 @@ macOS 14+ · Intel & Apple Silicon · Keine Telemetrie
 | Open-Source-Edition | WiFi Lens Pro |
 |---|---|
 | Kostenlos und Open Source — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) | Einmalige kostenpflichtige Mac App Store-Edition — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) |
-| Tri-Band-Wi-Fi-Scan und Spektrumanalyse | Enthält alle Open-Source-Funktionen |
+| Tri-Band-Wi-Fi-Scan und Spektrumanalyse | Professionelle Monitoring-Workflows auf derselben Kernanalyse-Engine |
 | Kanalqualität, Netzwerkdetails, Roaming-Tests | Spektrum-Sitzungsaufzeichnung — Aufnahme und Wiedergabe über Zeit |
-| Netzwerk-Selbsttest, BLE-Scanner, MCP-Server | Direkter Spektrumsvergleich über Zeiträume |
-| PNG/CSV exportieren · Sparkle-Updates | Dauerhafte Menüleiste · Zeitachse & Trends · Mac App Store-Updates |
+| Netzwerk-Selbsttest, BLE-Scanner, MCP-Server | Zusätzliche professionelle Workflows |
+| PNG/CSV exportieren · Sparkle-Updates | Dauerhafte Menüleiste · Ereignis-Zeitachse · Mac App Store-Updates |
 
-> Die Wi-Fi-Kernanalyse ist in beiden Editionen identisch. Pro ergänzt Spektrumsaufzeichnung, -vergleich, dauerhafte Menüleiste und Zeitachse für professionelle Workflows.
+> Beide Editionen teilen sich dieselben Wi-Fi-Kernanalyse-Fähigkeiten. Pro ergänzt Spektrumsaufzeichnung, dauerhafte Menüleiste und Ereignis-Zeitachse für professionelle Workflows.
 
 🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
 
@@ -41,7 +41,7 @@ macOS 14+ · Intel & Apple Silicon · Keine Telemetrie
 
 WiFi Lens ist ein nativer Wi-Fi- und Bluetooth-Analysator für macOS, entwickelt mit SwiftUI, CoreWLAN und CoreBluetooth. Die App erfasst drahtlose Netzwerke und BLE-Geräte in deiner Umgebung in Echtzeit. So kannst du Verbindungsprobleme untersuchen, einen weniger ausgelasteten Kanal wählen und das Roaming zwischen Access Points prüfen.
 
-Dieses Repository enthält die kostenlose Open-Source-Edition. WiFi Lens Pro ist eine separate kostenpflichtige Edition, die Spektrumsaufzeichnung, -vergleich, dauerhafte Menüleiste und Zeitachse ergänzt.
+Dieses Repository enthält die kostenlose Open-Source-Edition. WiFi Lens Pro ist eine separate kostenpflichtige Edition, die Spektrumsaufzeichnung, dauerhafte Menüleiste und Ereignis-Zeitachse ergänzt.
 
 **Typische Anwendungsfälle:**
 
@@ -62,21 +62,20 @@ Dieses Repository enthält die kostenlose Open-Source-Edition. WiFi Lens Pro ist
 | 🔍 **Netzwerkdetails** | PHY-Generation, Kanalbreite, 802.11k/r/v-Roaming, WPA3, versteckte SSIDs | OSS & Pro |
 | 📶 **Verbindungsinformationen** | IP, Gateway, DNS, MAC, Kanal, Tx-Rate und Sicherheitszusammenfassung | OSS & Pro |
 | 🩺 **Netzwerk-Selbsttest** | Ein-Klick-Verbindungsdiagnose — Pfad, DNS, HTTPS und Proxy-Erreichbarkeit mit evidenzbasierten Schlussfolgerungen | OSS & Pro |
-| 📈 **Zeitachse & Trends** | Signalverlauf pro Netzwerk über die Zeit mit konfigurierbarem Scan-Intervall | Nur Pro |
+| 📈 **Ereignis-Zeitachse** | Verbindungsereignis-Verlauf — Roaming, Kanalwechsel, Verbindungsabbrüche und Signalabfälle | Nur Pro |
 | 🔄 **Roaming-Test** | Überwachung von AP-Wechseln mit Zeitdiagramm, Bereichsauswahl sowie Speichern und Laden von Sitzungen | OSS & Pro |
 | 🗺️ **Kanal-Heatmap** | Belegungsübersicht pro Band zur schnellen Erkennung von Überlastungsmustern | OSS & Pro |
 | 🎬 **Spektrum-Aufzeichnung** | Spektrumsänderungen über Zeit aufnehmen und wiedergeben | Nur Pro |
-| 🔭 **Spektrum-Vergleich** | Direkter Spektrumsvergleich über Zeiträume | Nur Pro |
 | 🎧 **BLE-Scanner** | Bluetooth LE-Geräte-Erkennung, RSSI-Analyse, Trend-Diagramme und Gerätetracking | OSS & Pro |
 | 🎨 **Intelligente Farbgebung** | Deterministische Farbzuordnung anhand der SSID; dasselbe Netzwerk behält dieselbe Farbe | OSS & Pro |
 | 📍 **Menüleiste** | Lebt in deiner Menüleiste — klicke das Symbol, um den Analysator jederzeit zu öffnen | Nur Pro |
 | 🔒 **Privatsphäre zuerst** | Keine Telemetrie oder Nutzungsanalyse; Wi-Fi-Scandaten bleiben auf deinem Mac | OSS & Pro |
 | 🌐 **MCP-Server** | Eingebettete HTTP-API auf `127.0.0.1:19840` für externe Tools | OSS & Pro |
-| 🔄 **Auto-Updates** | Optionale Sparkle-Updateprüfungen in der GitHub-Edition | OSS & Pro |
+| 🔄 **Auto-Updates** | Sparkle-Updates in der GitHub-Edition; Mac App Store-Updates in Pro | OSS & Pro |
 | 📤 **Exportieren** | Speichere Band-Diagramme als PNG-Bilder oder CSV-Daten | OSS & Pro |
 | 🌍 **Lokalisiert** | Englisch, Deutsch, Spanisch, Japanisch und vereinfachtes Chinesisch | OSS & Pro |
 
-Alle Funktionen sind in der Open-Source-Edition enthalten, sofern nicht **Nur Pro** markiert. Pro umfasst jede Open-Source-Funktion plus Aufzeichnungs-, Vergleichs-, Menüleisten- und Zeitachsenwerkzeuge.
+Alle Funktionen sind in der Open-Source-Edition enthalten, sofern nicht **Nur Pro** markiert. Pro umfasst jede Open-Source-Funktion plus Aufzeichnungs-, Menüleisten- und Ereignis-Zeitachsenwerkzeuge.
 
 ---
 

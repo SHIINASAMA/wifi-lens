@@ -26,12 +26,12 @@ macOS 14+ · Intel & Apple Silicon · No telemetry
 | Open-Source Edition | WiFi Lens Pro |
 |---|---|
 | Free, open source — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) | One-time paid Mac App Store edition — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) |
-| Tri-band Wi-Fi scanning & spectrum analysis | Includes all open-source features |
+| Tri-band Wi-Fi scanning & spectrum analysis | Professional monitoring workflows built on the same core analysis engine |
 | Channel quality, network details, roaming tests | Spectrum session recording — capture & replay over time |
-| Network Self-Check, BLE scanner, MCP server | Side-by-side spectrum comparison across time periods |
-| Export PNG/CSV · Sparkle updates | Persistent menu bar · Timeline & trends · Mac App Store updates |
+| Network Self-Check, BLE scanner, MCP server | Additional professional workflows |
+| Export PNG/CSV · Sparkle updates | Persistent menu bar · Event timeline · Mac App Store updates |
 
-> Core Wi-Fi analysis is identical in both editions. Pro adds spectrum recording, comparison, persistent menu bar, and timeline for professional workflows.
+> Both editions share the same core Wi-Fi analysis capabilities. Pro adds spectrum recording, persistent menu bar, and event timeline for professional workflows.
 
 🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
 
@@ -41,7 +41,7 @@ macOS 14+ · Intel & Apple Silicon · No telemetry
 
 WiFi Lens is a native macOS Wi-Fi and Bluetooth analyzer built with SwiftUI, CoreWLAN, and CoreBluetooth. It maps nearby wireless networks and BLE devices in real time, helping you diagnose connectivity problems, choose a less congested channel, and verify roaming behavior across access points.
 
-This repository contains the free, open-source edition. WiFi Lens Pro is a separate paid edition that adds spectrum recording, comparison, persistent menu bar, and timeline features.
+This repository contains the free, open-source edition. WiFi Lens Pro is a separate paid edition that adds spectrum recording, persistent menu bar, and event timeline features.
 
 **Typical use cases:**
 
@@ -62,21 +62,20 @@ This repository contains the free, open-source edition. WiFi Lens Pro is a separ
 | 🔍 **Network Details** | PHY generation, channel width, 802.11k/r/v roaming, WPA3, hidden SSID | OSS & Pro |
 | 📶 **Connection Info** | IP, gateway, DNS, MAC, channel, Tx rate, and security summary | OSS & Pro |
 | 🩺 **Network Self-Check** | One-click connection diagnostics — path, DNS, HTTPS, and proxy reachability, with evidence-based conclusions | OSS & Pro |
-| 📈 **Timeline & Trends** | Per-network signal history over time with a configurable scan interval | Pro only |
+| 📈 **Event Timeline** | Connection event history — roaming, channel changes, disconnections, and signal drops | Pro only |
 | 🔄 **Roaming Test** | AP handoff monitoring with a timeline chart, range selector, and session save/load | OSS & Pro |
 | 🗺️ **Channel Heatmap** | Per-band occupancy heatmap to spot congestion patterns instantly | OSS & Pro |
 | 🎬 **Spectrum Recording** | Capture and replay spectrum changes over time | Pro only |
-| 🔭 **Spectrum Comparison** | Side-by-side comparison of spectrum across time periods | Pro only |
 | 🎧 **BLE Scanner** | Bluetooth LE device discovery, RSSI analysis, trend charts, and device tracking | OSS & Pro |
 | 🎨 **Smart Coloring** | Deterministic SSID-based color assignment; the same network keeps the same color | OSS & Pro |
 | 📍 **Menu Bar** | Lives in your menu bar — click the icon to open the analyzer anytime | Pro only |
 | 🔒 **Privacy First** | No telemetry or analytics; Wi-Fi scan data stays on your Mac | OSS & Pro |
 | 🌐 **MCP Server** | Embedded HTTP API on `127.0.0.1:19840` for external tool integration | OSS & Pro |
-| 🔄 **Auto-Updates** | Optional Sparkle update checks in the GitHub edition | OSS & Pro |
+| 🔄 **Auto-Updates** | Sparkle updates in the GitHub edition; Mac App Store updates in Pro | OSS & Pro |
 | 📤 **Export** | Save per-band charts as PNG images or CSV data | OSS & Pro |
 | 🌍 **Localized** | English, German, Spanish, Japanese, and Simplified Chinese | OSS & Pro |
 
-All features are included in the open-source edition unless marked **Pro only**. Pro includes every open-source feature plus the recording, comparison, menu bar, and timeline tools.
+All features are included in the open-source edition unless marked **Pro only**. Pro includes every open-source feature plus the recording, menu bar, and event timeline tools.
 
 ---
 
