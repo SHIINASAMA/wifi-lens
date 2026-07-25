@@ -1,8 +1,40 @@
+import CFNetwork
+import Foundation
 import Testing
 @testable import WiFi_Lens
 
 @Suite("Network diagnostics models and runner")
 struct NetworkDiagnosticsTests {
+    @Test("diagnostic identifiers keep path and internet distinct in execution order")
+    func diagnosticIdentifierOrder() {
+        #expect(NetworkDiagnosticCheckID.allCases == [.path, .dns, .internet, .ipv6, .proxy])
+        #expect(NetworkDiagnosticCheckID.path != .internet)
+        #expect(Set(NetworkDiagnosticCheckID.allCases).count == 5)
+    }
+
+    @Test("blocked and skipped statuses have distinct presentations")
+    func blockedAndSkippedPresentation() {
+        #expect(NetworkDiagnosticStatus.blocked.presentation == .init(
+            labelKey: "network_diagnostics.status.blocked",
+            icon: "lock.fill",
+            tone: .informational
+        ))
+        #expect(NetworkDiagnosticStatus.skipped.presentation == .init(
+            labelKey: "network_diagnostics.status.skipped",
+            icon: "forward.fill",
+            tone: .muted
+        ))
+        #expect(NetworkDiagnosticStatus.blocked.presentation != NetworkDiagnosticStatus.indeterminate.presentation)
+        #expect(NetworkDiagnosticStatus.skipped.presentation != NetworkDiagnosticStatus.indeterminate.presentation)
+    }
+
+    @Test("a blocked probe does not become an independent network fault")
+    func blockedProbeIsNotAbnormal() {
+        let result = NetworkDiagnosticResult.blocked(id: .internet, summary: "DNS is unavailable")
+        #expect(result.status == .blocked)
+        #expect(result.detail == "DNS is unavailable")
+    }
+
     @Test("runner executes checks and publishes results in order")
     func runnerOrder() async {
         let invocations = DiagnosticTestRecorder()
@@ -27,8 +59,8 @@ struct NetworkDiagnosticsTests {
     @Test("runner keeps each check visible for its minimum presentation duration")
     func runnerMinimumPresentationDuration() async {
         let check = StubDiagnosticCheck(
-            id: .connectivity,
-            result: NetworkDiagnosticResult(id: .connectivity, status: .normal, summary: "ok"),
+            id: .path,
+            result: NetworkDiagnosticResult(id: .path, status: .normal, summary: "ok"),
             recorder: DiagnosticTestRecorder()
         )
         let clock = ContinuousClock()
@@ -48,37 +80,167 @@ struct NetworkDiagnosticsTests {
         #expect(NetworkDiagnosticsViewModel.defaultMinimumStepDuration == .milliseconds(800))
     }
 
-    @Test("network connectivity failure makes the network unavailable")
+    @Test("system path failure makes the network unavailable")
     func unavailableConclusion() {
-        let results = makeResults(connectivity: .abnormal, dns: .normal, proxy: .normal)
+        let results = makeResults(path: .abnormal, dns: .normal, internet: .normal, proxy: .normal)
         #expect(NetworkDiagnosticConclusion.evaluate(results) == .networkUnavailable)
     }
 
     @Test("DNS or proxy failure needs attention")
     func abnormalConclusion() {
         #expect(NetworkDiagnosticConclusion.evaluate(
-            makeResults(connectivity: .normal, dns: .abnormal, proxy: .normal)
+            makeResults(path: .normal, dns: .abnormal, internet: .normal, proxy: .normal)
         ) == .needsAttention)
         #expect(NetworkDiagnosticConclusion.evaluate(
-            makeResults(connectivity: .normal, dns: .normal, proxy: .abnormal)
+            makeResults(path: .normal, dns: .normal, internet: .normal, proxy: .abnormal)
         ) == .needsAttention)
+    }
+
+    @Test("failed base HTTPS suppresses proxy endpoint symptom")
+    func conclusionSuppressesProxySymptom() {
+        let results = makeResults(
+            path: .normal,
+            dns: .indeterminate,
+            internet: .abnormal,
+            proxy: .abnormal
+        )
+
+        #expect(NetworkDiagnosticConclusion.evaluate(results) == .networkUnavailable)
+    }
+
+    @Test("base HTTPS success and explicit proxy failure needs attention")
+    func proxyIsIndependentWhenBasePathWorks() {
+        let results = makeResults(
+            path: .normal,
+            dns: .normal,
+            internet: .normal,
+            proxy: .abnormal
+        )
+
+        #expect(NetworkDiagnosticConclusion.evaluate(results) == .needsAttention)
+    }
+
+    @Test("captive portal symptom after HTTPS success needs attention")
+    func captivePortalSymptomAfterHTTPSSuccess() {
+        let results = [
+            NetworkDiagnosticResult(id: .path, status: .normal, summary: "path"),
+            NetworkDiagnosticResult(id: .dns, status: .normal, summary: "dns"),
+            NetworkDiagnosticResult(
+                id: .internet,
+                status: .abnormal,
+                summary: "internet",
+                evidence: [
+                    .init(code: "https.available", value: "200"),
+                    .init(code: "captive-portal.suspected", value: nil),
+                ]
+            ),
+            NetworkDiagnosticResult(id: .ipv6, status: .skipped, summary: "ipv6"),
+            NetworkDiagnosticResult(id: .proxy, status: .normal, summary: "proxy"),
+        ]
+
+        #expect(NetworkDiagnosticConclusion.evaluate(results) == .needsAttention)
     }
 
     @Test("an indeterminate result needs attention")
     func indeterminateConclusion() {
-        let results = makeResults(connectivity: .normal, dns: .indeterminate, proxy: .normal)
+        let results = makeResults(path: .normal, dns: .indeterminate, internet: .normal, proxy: .normal)
         #expect(NetworkDiagnosticConclusion.evaluate(results) == .needsAttention)
     }
 
-    @Test("all normal results make the network normal")
-    func normalConclusion() {
-        let results = makeResults(connectivity: .normal, dns: .normal, proxy: .normal)
+    @Test("normal required results and skipped optional IPv6 make the network normal")
+    func fourResultNormalConclusion() {
+        let results = makeResults(path: .normal, dns: .normal, internet: .normal, proxy: .normal)
         #expect(NetworkDiagnosticConclusion.evaluate(results) == .networkNormal)
+    }
+
+    @Test("no global IPv6 address is skipped without changing a normal conclusion")
+    func ipv6SkippedIsConclusionNeutral() async {
+        let ipv6 = await IPv6ControlEndpointCheck(
+            loader: StubIPv6Loader(.noGlobalAddress)
+        ).run()
+
+        #expect(ipv6.id == .ipv6)
+        #expect(ipv6.status == .skipped)
+        #expect(NetworkDiagnosticConclusion.evaluate(
+            makeResults(
+                path: .normal,
+                dns: .normal,
+                internet: .normal,
+                ipv6: ipv6.status,
+                proxy: .normal
+            )
+        ) == .networkNormal)
+    }
+
+    @Test("IPv6 failure is advisory when base HTTPS succeeds")
+    func ipv6IsIndependent() async {
+        let ipv6 = await IPv6ControlEndpointCheck(loader: StubIPv6Loader(.failed)).run()
+
+        #expect(ipv6.status == .indeterminate)
+        #expect(ipv6.evidence.contains(.init(code: "ipv6.unavailable", value: nil)))
+        #expect(NetworkDiagnosticConclusion.evaluate(
+            makeResults(
+                path: .normal,
+                dns: .normal,
+                internet: .normal,
+                ipv6: ipv6.status,
+                proxy: .normal
+            )
+        ) == .needsAttention)
+    }
+
+    @Test("IPv6 control endpoint success is normal")
+    func ipv6Success() async {
+        let result = await IPv6ControlEndpointCheck(loader: StubIPv6Loader(.succeeded)).run()
+
+        #expect(result.status == .normal)
+        #expect(result.evidence.contains(.init(code: "ipv6.available", value: nil)))
+    }
+
+    @Test("system IPv6 loader connects only to a resolved IPv6 literal")
+    func ipv6LoaderForcesResolvedAddress() async {
+        let recorder = IPv6LoaderTestRecorder()
+        let loader = SystemIPv6ControlEndpointLoader(
+            addressSource: StubGlobalIPv6AddressSource(hasAddress: true),
+            resolver: StubIPv6AddressResolver(addresses: ["2001:db8::42"]),
+            connector: RecordingIPv6HTTPSConnector(succeeds: true, recorder: recorder)
+        )
+        let endpoint = URL(string: "https://control.example/health")!
+
+        let outcome = await loader.load(url: endpoint, timeout: .seconds(4))
+
+        #expect(outcome == .succeeded)
+        #expect(await recorder.requests == [
+            .init(
+                url: endpoint,
+                ipv6Address: "2001:db8::42",
+                serverName: "control.example",
+                timeout: .seconds(4)
+            ),
+        ])
+    }
+
+    @Test("system IPv6 loader skips resolution when no global address is present")
+    func ipv6LoaderSkipsWithoutGlobalAddress() async {
+        let resolver = RecordingIPv6AddressResolver(addresses: ["2001:db8::42"])
+        let loader = SystemIPv6ControlEndpointLoader(
+            addressSource: StubGlobalIPv6AddressSource(hasAddress: false),
+            resolver: resolver,
+            connector: StubIPv6HTTPSConnector(succeeds: true)
+        )
+
+        let outcome = await loader.load(
+            url: URL(string: "https://control.example/")!,
+            timeout: .seconds(4)
+        )
+
+        #expect(outcome == .noGlobalAddress)
+        #expect(await resolver.hosts.isEmpty)
     }
 
     @Test("an incomplete run has no conclusion")
     func incompleteConclusion() {
-        let result = NetworkDiagnosticResult(id: .connectivity, status: .normal, summary: "ok")
+        let result = NetworkDiagnosticResult(id: .path, status: .normal, summary: "ok")
         #expect(NetworkDiagnosticConclusion.evaluate([result]) == nil)
     }
 
@@ -98,13 +260,13 @@ struct NetworkDiagnosticsTests {
 
     @Test("workbench reveals completed and active rows but hides future checks")
     func workbenchRowVisibility() {
-        let connectivity = NetworkDiagnosticResult(
-            id: .connectivity,
+        let path = NetworkDiagnosticResult(
+            id: .path,
             status: .normal,
             summary: "connected"
         )
         let executionPhases: [NetworkDiagnosticCheckID: NetworkDiagnosticExecutionPhase] = [
-            .connectivity: .completed,
+            .path: .completed,
             .dns: .checking,
             .proxy: .waiting,
         ]
@@ -118,38 +280,265 @@ struct NetworkDiagnosticsTests {
         let runningRows = NetworkDiagnosticsPresentation.workbenchRows(
             pagePhase: .running,
             executionPhases: executionPhases,
-            results: [.connectivity: connectivity]
+            results: [.path: path],
+            checkIDs: [.path, .dns, .proxy]
         )
-        #expect(runningRows.map(\.id) == [.connectivity, .dns])
-        #expect(runningRows[0].result == connectivity)
+        #expect(runningRows.map(\.id) == [.path, .dns])
+        #expect(runningRows[0].result == path)
         #expect(runningRows[1].result == nil)
 
         let completedResults = Dictionary(uniqueKeysWithValues: makeResults(
-            connectivity: .normal,
+            path: .normal,
             dns: .abnormal,
+            internet: .normal,
             proxy: .indeterminate
         ).map { ($0.id, $0) })
         let completedRows = NetworkDiagnosticsPresentation.workbenchRows(
             pagePhase: .completed,
             executionPhases: executionPhases,
-            results: completedResults
+            results: completedResults,
+            checkIDs: [.path, .dns, .proxy]
         )
-        #expect(completedRows.map(\.id) == NetworkDiagnosticCheckID.allCases)
+        #expect(completedRows.map(\.id) == [.path, .dns, .proxy])
     }
 
-    @Test("connectivity check maps path states")
-    func connectivityMapping() async {
-        #expect(await NetworkConnectivityCheck(pathSource: StubPathSource(.satisfied)).run().status == .normal)
+    @Test("system path check maps path states")
+    func pathMapping() async {
+        let satisfied = await NetworkConnectivityCheck(pathSource: StubPathSource(.satisfied)).run()
+        #expect(satisfied.id == .path)
+        #expect(satisfied.status == .normal)
         #expect(await NetworkConnectivityCheck(pathSource: StubPathSource(.unsatisfied)).run().status == .abnormal)
         #expect(await NetworkConnectivityCheck(pathSource: StubPathSource(.requiresConnection)).run().status == .indeterminate)
         #expect(await NetworkConnectivityCheck(pathSource: StubPathSource(nil)).run().status == .indeterminate)
     }
 
-    @Test("DNS check maps resolver outcomes")
-    func dnsMapping() async {
-        #expect(await DNSResolutionCheck(resolver: StubDNSResolver(.resolved)).run().status == .normal)
-        #expect(await DNSResolutionCheck(resolver: StubDNSResolver(.failed)).run().status == .abnormal)
-        #expect(await DNSResolutionCheck(resolver: StubDNSResolver(.indeterminate)).run().status == .indeterminate)
+    @Test("a satisfied system path is not an internet-success result")
+    func pathCheckReportsPathOnly() async {
+        let result = await NetworkConnectivityCheck(pathSource: StubPathSource(.satisfied)).run()
+
+        #expect(result.id == .path)
+        #expect(result.id != .internet)
+        #expect(result.detail == String(
+            localized: "network_diagnostics.path.normal.summary",
+            comment: "Network self-check system path success detail"
+        ))
+    }
+
+    @Test("Microsoft captive-portal probe rejects a rewritten response")
+    func captivePortalProbeRejectsRewrittenResponse() async {
+        let check = HTTPSControlEndpointCheck(
+            loader: StubControlLoader(
+                httpsStatus: 204,
+                httpStatus: 200,
+                httpBody: "login"
+            )
+        )
+
+        let result = await check.run()
+
+        #expect(result.id == .internet)
+        #expect(result.evidence.contains(.init(code: "captive-portal.suspected", value: nil)))
+    }
+
+    @Test("control endpoint success verifies HTTPS and the documented Microsoft body")
+    func controlEndpointSuccess() async {
+        let check = HTTPSControlEndpointCheck(
+            loader: StubControlLoader(
+                httpsStatus: 200,
+                httpStatus: 200,
+                httpBody: "Microsoft Connect Test"
+            )
+        )
+
+        let result = await check.run()
+
+        #expect(result.status == .normal)
+        #expect(result.evidence.contains(.init(code: "https.available", value: "200")))
+        #expect(result.evidence.contains(.init(code: "captive-portal.clear", value: nil)))
+    }
+
+    @Test("Apple HTTPS success and Microsoft HTTP timeout is indeterminate")
+    func controlEndpointMicrosoftTimeoutIsIndeterminate() async {
+        let result = await HTTPSControlEndpointCheck(
+            loader: StubControlLoader(
+                httpsStatus: 200,
+                httpStatus: nil,
+                httpBody: nil,
+                httpErrorCode: String(URLError.timedOut.rawValue)
+            )
+        ).run()
+
+        #expect(result.status == .indeterminate)
+        #expect(result.evidence.contains(.init(code: "https.available", value: "200")))
+        #expect(result.evidence.contains(.init(
+            code: "captive-portal.transport-error",
+            value: String(URLError.timedOut.rawValue)
+        )))
+    }
+
+    @Test("Apple HTTPS success and Microsoft HTTP timeout needs attention")
+    func controlEndpointMicrosoftTimeoutConclusion() async {
+        let internet = await HTTPSControlEndpointCheck(
+            loader: StubControlLoader(
+                httpsStatus: 200,
+                httpStatus: nil,
+                httpBody: nil,
+                httpErrorCode: String(URLError.timedOut.rawValue)
+            )
+        ).run()
+
+        let conclusion = NetworkDiagnosticConclusion.evaluate([
+            NetworkDiagnosticResult(id: .path, status: .normal, summary: "path"),
+            NetworkDiagnosticResult(id: .dns, status: .normal, summary: "dns"),
+            internet,
+            NetworkDiagnosticResult(id: .ipv6, status: .skipped, summary: "ipv6"),
+            NetworkDiagnosticResult(id: .proxy, status: .normal, summary: "proxy"),
+        ])
+
+        #expect(conclusion == .needsAttention)
+        #expect(conclusion != .networkUnavailable)
+    }
+
+    @Test("control endpoint failures retain distinct evidence")
+    func controlEndpointFailureEvidence() async {
+        let transportFailure = await HTTPSControlEndpointCheck(
+            loader: StubControlLoader(
+                httpsStatus: nil,
+                httpsErrorCode: "-1200",
+                httpStatus: 200,
+                httpBody: "Microsoft Connect Test"
+            )
+        ).run()
+        let httpsStatusFailure = await HTTPSControlEndpointCheck(
+            loader: StubControlLoader(
+                httpsStatus: 503,
+                httpStatus: 200,
+                httpBody: "Microsoft Connect Test"
+            )
+        ).run()
+        let captivePortalRedirect = await HTTPSControlEndpointCheck(
+            loader: StubControlLoader(
+                httpsStatus: 200,
+                httpStatus: 302,
+                httpBody: nil
+            )
+        ).run()
+
+        #expect(transportFailure.evidence.contains(.init(code: "https.transport-error", value: "-1200")))
+        #expect(httpsStatusFailure.evidence.contains(.init(code: "https.http-status", value: "503")))
+        #expect(captivePortalRedirect.evidence.contains(.init(code: "captive-portal.redirect", value: "302")))
+    }
+
+    @Test("control check loads the approved endpoints with an explicit timeout")
+    func controlEndpointRequests() async {
+        let recorder = ControlEndpointTestRecorder()
+        let check = HTTPSControlEndpointCheck(
+            loader: StubControlLoader(
+                httpsStatus: 200,
+                httpStatus: 200,
+                httpBody: "Microsoft Connect Test",
+                recorder: recorder
+            )
+        )
+
+        _ = await check.run()
+
+        #expect(await recorder.urls == [
+            "https://www.apple.com/",
+            "http://www.msftconnecttest.com/connecttest.txt",
+        ])
+        #expect(await recorder.timeouts == [.seconds(5), .seconds(5)])
+    }
+
+    @Test("system control loader disables caching and connectivity waits")
+    func controlEndpointSessionConfiguration() {
+        let configuration = SystemControlEndpointLoader.configuration(timeout: .seconds(5))
+
+        #expect(configuration.requestCachePolicy == .reloadIgnoringLocalCacheData)
+        #expect(configuration.urlCache == nil)
+        #expect(!configuration.waitsForConnectivity)
+        #expect(configuration.timeoutIntervalForRequest == 5)
+        #expect(configuration.timeoutIntervalForResource == 5)
+    }
+
+    @Test("app permits temporary HTTP only for the Microsoft captive-portal endpoint")
+    func temporaryCaptivePortalATSException() {
+        let ats = Bundle.main.object(forInfoDictionaryKey: "NSAppTransportSecurity") as? [String: Any]
+        let domains = ats?["NSExceptionDomains"] as? [String: Any]
+        let exception = domains?["www.msftconnecttest.com"] as? [String: Any]
+
+        #expect(ats?.count == 1)
+        #expect(ats?["NSAllowsArbitraryLoads"] == nil)
+        #expect(domains?.count == 1)
+        #expect(exception?.count == 1)
+        #expect(exception?["NSExceptionAllowsInsecureHTTPLoads"] as? Bool == true)
+        #expect(exception?["NSIncludesSubdomains"] == nil)
+    }
+
+    @Test("production checks run path DNS HTTPS and proxy in dependency order")
+    @MainActor
+    func productionCheckOrder() {
+        #expect(NetworkDiagnosticsViewModel().checkIDs == [.path, .dns, .internet, .ipv6, .proxy])
+    }
+
+    @Test("all successful DNS samples are available")
+    func dnsAllSamplesResolved() async {
+        let result = await DNSResolutionCheck(resolver: StubDNSResolver(.resolved)).run()
+
+        #expect(result.status == .normal)
+        #expect(result.evidence.contains(.init(code: "dns.success-count", value: "3/3")))
+        #expect(result.evidence.contains(.init(code: "dns.failure-count", value: "0/3")))
+        #expect(result.evidence.contains(.init(code: "dns.indeterminate-count", value: "0/3")))
+    }
+
+    @Test("DNS uses the three temporary third-party probe targets")
+    func dnsProbeTargets() {
+        let check = DNSResolutionCheck(resolver: StubDNSResolver(.resolved))
+
+        #expect(check.probeTargets == [
+            "www.apple.com",
+            "www.microsoft.com",
+            "www.msftconnecttest.com",
+        ])
+    }
+
+    @Test("one failed lookup among successful samples is unstable, not unavailable")
+    func dnsQuorum() async {
+        let check = DNSResolutionCheck(
+            resolver: StubDNSResolver(outcomes: [.resolved, .failed, .resolved])
+        )
+
+        let result = await check.run()
+
+        #expect(result.status == .indeterminate)
+        #expect(result.evidence.contains(.init(code: "dns.success-count", value: "2/3")))
+        #expect(result.evidence.contains(.init(code: "dns.failure-count", value: "1/3")))
+    }
+
+    @Test("all failed DNS samples are unavailable")
+    func dnsAllSamplesFailed() async {
+        let result = await DNSResolutionCheck(resolver: StubDNSResolver(.failed)).run()
+
+        #expect(result.status == .abnormal)
+        #expect(result.evidence.contains(.init(code: "dns.success-count", value: "0/3")))
+        #expect(result.evidence.contains(.init(code: "dns.failure-count", value: "3/3")))
+    }
+
+    @Test("an indeterminate DNS sample is retried once")
+    func dnsIndeterminateSampleRetriesOnce() async {
+        let resolver = StubDNSResolver(outcomes: [.indeterminate, .resolved, .resolved, .resolved])
+        let result = await DNSResolutionCheck(resolver: resolver).run()
+
+        #expect(result.status == .normal)
+        #expect(await resolver.invocationCount == 4)
+    }
+
+    @Test("all indeterminate DNS samples cannot be determined")
+    func dnsAllSamplesIndeterminate() async {
+        let result = await DNSResolutionCheck(resolver: StubDNSResolver(.indeterminate)).run()
+
+        #expect(result.status == .indeterminate)
+        #expect(result.evidence.contains(.init(code: "dns.indeterminate-count", value: "3/3")))
     }
 
     @Test("DNS success result does not expose the test domain")
@@ -157,7 +546,7 @@ struct NetworkDiagnosticsTests {
         let testDomain = "example.com"
         let result = await DNSResolutionCheck(
             resolver: StubDNSResolver(.resolved),
-            host: testDomain
+            probeTargets: [testDomain, "example.net", "example.org"]
         ).run()
 
         #expect(!result.summary.localizedCaseInsensitiveContains(testDomain))
@@ -197,52 +586,170 @@ struct NetworkDiagnosticsTests {
         #expect(configuration.autoDiscoveryEnabled)
     }
 
-    @Test("proxy check treats disabled proxy as normal")
-    func proxyDisabled() async {
-        let check = SystemProxyCheck(
-            settingsReader: StubProxySettingsReader(.disabled),
-            connector: StubProxyConnector(reachable: true)
+    @Test("PAC result chooses DIRECT without probing a stale explicit endpoint")
+    func pacCanChooseDirect() async {
+        let controlURL = URL(string: "http://www.msftconnecttest.com/connecttest.txt")!
+        let pacURL = URL(string: "https://proxy.example/config.pac")!
+        let recorder = PACResolutionTestRecorder()
+        let resolver = SystemProxyResolver(
+            pacTimeout: .milliseconds(25),
+            configurationResolver: StubProxyConfigurationResolver(.pac(pacURL)),
+            pacResolver: StubPACResolver(.direct, recorder: recorder)
         )
-        #expect(await check.run().status == .normal)
+        let resolution = await resolver.resolve(for: controlURL)
+
+        #expect(resolution == .direct)
+        #expect(await recorder.requests == [
+            .init(pacURL: pacURL, targetURL: controlURL, timeout: .milliseconds(25)),
+        ])
     }
 
-    @Test("proxy check reports unreachable explicit endpoint")
-    func proxyUnreachable() async {
-        let configuration = SystemProxyConfiguration(
-            endpoints: [ProxyEndpoint(host: "proxy.example", port: 8080)]
-        )
-        let check = SystemProxyCheck(
-            settingsReader: StubProxySettingsReader(configuration),
-            connector: StubProxyConnector(reachable: false)
-        )
-        #expect(await check.run().status == .abnormal)
+    @Test("CFNetwork PAC DIRECT result maps to direct egress")
+    func pacDirectParsing() {
+        let result: NSDictionary = [
+            kCFProxyTypeKey as String: kCFProxyTypeNone,
+        ]
+
+        #expect(SystemProxyResolver.directive(from: result) == .direct)
     }
 
-    @Test("proxy check reports PAC and malformed explicit settings as indeterminate")
-    func proxyIndeterminate() async {
-        let pac = SystemProxyCheck(
-            settingsReader: StubProxySettingsReader(SystemProxyConfiguration(pacEnabled: true)),
-            connector: StubProxyConnector(reachable: true)
-        )
-        let malformed = SystemProxyCheck(
-            settingsReader: StubProxySettingsReader(SystemProxyConfiguration(hasInvalidExplicitProxy: true)),
-            connector: StubProxyConnector(reachable: true)
+    @Test("DIRECT does not probe a stale explicit endpoint or proxy egress")
+    func directSkipsStaleProxy() async {
+        let connectorRecorder = ProxyConnectorTestRecorder()
+        let egressRecorder = ProxyEgressTestRecorder()
+        let check = SystemProxyCheck(
+            resolver: StubProxyResolver(.direct),
+            connector: RecordingProxyConnector(reachable: false, recorder: connectorRecorder),
+            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "unexpected", recorder: egressRecorder)
         )
 
-        #expect(await pac.run().status == .indeterminate)
-        #expect(await malformed.run().status == .indeterminate)
+        let result = await check.run()
+
+        #expect(result.status == .normal)
+        #expect(await connectorRecorder.endpoints.isEmpty)
+        #expect(await egressRecorder.requests.isEmpty)
     }
 
-    @Test("proxy check reports reachable explicit endpoints as normal")
-    func proxyReachable() async {
-        let configuration = SystemProxyConfiguration(
-            endpoints: [ProxyEndpoint(host: "proxy.example", port: 8080)]
-        )
+    @Test("PAC timeout is reported as PAC unavailable")
+    func pacTimeout() async {
+        let pacURL = URL(string: "https://proxy.example/config.pac")!
         let check = SystemProxyCheck(
-            settingsReader: StubProxySettingsReader(configuration),
-            connector: StubProxyConnector(reachable: true)
+            resolver: SystemProxyResolver(
+                configurationResolver: StubProxyConfigurationResolver(.pac(pacURL)),
+                pacResolver: StubPACResolver(.unavailable("pac-timeout"))
+            ),
+            connector: StubProxyConnector(reachable: true),
+            egressLoader: StubProxyEgressLoader(statusCode: 200)
         )
-        #expect(await check.run().status == .normal)
+
+        let result = await check.run()
+
+        #expect(result.status == .indeterminate)
+        #expect(result.summary == String(
+            localized: "network_diagnostics.proxy.pac_unavailable.summary",
+            comment: "Network self-check PAC unavailable result summary"
+        ))
+        #expect(result.evidence.contains(.init(code: "proxy.pac-unavailable", value: "pac-timeout")))
+    }
+
+    @Test("selected proxy endpoint failure is distinct from egress failure")
+    func selectedProxyEndpointUnavailable() async {
+        let egressRecorder = ProxyEgressTestRecorder()
+        let proxy = EffectiveProxy.http(ProxyEndpoint(host: "proxy.example", port: 8080))
+        let check = SystemProxyCheck(
+            resolver: StubProxyResolver(proxy),
+            connector: StubProxyConnector(reachable: false),
+            egressLoader: StubProxyEgressLoader(statusCode: 200, recorder: egressRecorder)
+        )
+
+        let result = await check.run()
+
+        #expect(result.status == .abnormal)
+        #expect(result.summary == String(
+            localized: "network_diagnostics.proxy.endpoint_unavailable.summary",
+            comment: "Network self-check selected proxy endpoint unavailable result summary"
+        ))
+        #expect(result.evidence.contains(.init(code: "proxy.endpoint-unavailable", value: nil)))
+        #expect(await egressRecorder.requests.isEmpty)
+    }
+
+    @Test("HTTP 407 is proxy authentication required")
+    func proxyAuthenticationRequired() async {
+        let proxy = EffectiveProxy.http(ProxyEndpoint(host: "proxy.example", port: 8080))
+        let check = SystemProxyCheck(
+            resolver: StubProxyResolver(proxy),
+            connector: StubProxyConnector(reachable: true),
+            egressLoader: StubProxyEgressLoader(statusCode: 407)
+        )
+
+        let result = await check.run()
+
+        #expect(result.status == .abnormal)
+        #expect(result.summary == String(
+            localized: "network_diagnostics.proxy.authentication_required.summary",
+            comment: "Network self-check proxy authentication required result summary"
+        ))
+        #expect(result.evidence.contains(.init(code: "proxy.authentication-required", value: "407")))
+        #expect(!result.evidence.contains(where: { $0.code == "proxy.endpoint-unavailable" }))
+    }
+
+    @Test("URL loading authentication challenge remains a proxy 407 result")
+    func proxyAuthenticationChallenge() {
+        let response = SystemProxyEgressLoader.response(
+            for: URLError(.userAuthenticationRequired)
+        )
+
+        #expect(response == ProxyEgressResponse(statusCode: 407, errorCode: nil))
+    }
+
+    @Test("production egress configuration disables selected proxy failover")
+    func selectedProxyDoesNotFailOver() throws {
+        let proxy = EffectiveProxy.http(ProxyEndpoint(host: "proxy.example", port: 8080))
+        let configuration = try #require(
+            SystemProxyEgressLoader.configuration(for: proxy, timeout: .seconds(3))
+        )
+
+        #expect(configuration.proxyConfigurations.count == 1)
+        #expect(configuration.proxyConfigurations[0].allowFailover == false)
+        #expect(configuration.connectionProxyDictionary?.isEmpty != false)
+        #expect(configuration.urlCredentialStorage == nil)
+    }
+
+    @Test("selected proxy transport failure is egress unavailable")
+    func proxyEgressUnavailable() async {
+        let proxy = EffectiveProxy.http(ProxyEndpoint(host: "proxy.example", port: 8080))
+        let check = SystemProxyCheck(
+            resolver: StubProxyResolver(proxy),
+            connector: StubProxyConnector(reachable: true),
+            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "-1005")
+        )
+
+        let result = await check.run()
+
+        #expect(result.status == .abnormal)
+        #expect(result.summary == String(
+            localized: "network_diagnostics.proxy.egress_unavailable.summary",
+            comment: "Network self-check selected proxy egress unavailable result summary"
+        ))
+        #expect(result.evidence.contains(.init(code: "proxy.egress-unavailable", value: "-1005")))
+    }
+
+    @Test("selected HTTP proxy probes the same control URL once")
+    func selectedProxyEgressSuccess() async {
+        let controlURL = URL(string: "http://www.msftconnecttest.com/connecttest.txt")!
+        let proxy = EffectiveProxy.http(ProxyEndpoint(host: "proxy.example", port: 8080))
+        let recorder = ProxyEgressTestRecorder()
+        let check = SystemProxyCheck(
+            resolver: StubProxyResolver(proxy),
+            connector: StubProxyConnector(reachable: true),
+            egressLoader: StubProxyEgressLoader(statusCode: 200, recorder: recorder),
+            controlURL: controlURL
+        )
+
+        let result = await check.run()
+
+        #expect(result.status == .normal)
+        #expect(await recorder.requests == [.init(url: controlURL, proxy: proxy)])
     }
 
     @Test("view model starts idle and only runs after start")
@@ -251,7 +758,8 @@ struct NetworkDiagnosticsTests {
         let recorder = DiagnosticTestRecorder()
         let viewModel = NetworkDiagnosticsViewModel(
             checks: makeStubChecks(recorder: recorder),
-            minimumStepDuration: .zero
+            minimumStepDuration: .zero,
+            fingerprintMonitor: DisabledNetworkFingerprintMonitor()
         )
 
         #expect(viewModel.phase == .idle)
@@ -274,7 +782,8 @@ struct NetworkDiagnosticsTests {
         let recorder = DiagnosticTestRecorder()
         let viewModel = NetworkDiagnosticsViewModel(
             checks: makeStubChecks(recorder: recorder),
-            minimumStepDuration: .zero
+            minimumStepDuration: .zero,
+            fingerprintMonitor: DisabledNetworkFingerprintMonitor()
         )
 
         #expect(viewModel.start())
@@ -287,20 +796,108 @@ struct NetworkDiagnosticsTests {
         #expect(await recorder.values.count == 6)
     }
 
+    @Test("a changed fingerprint restarts network probes once and retains configuration results")
+    @MainActor
+    func fingerprintChangeRestartsOnce() async {
+        let initial = makeFingerprint(interfaceName: "en0", dnsHash: 1)
+        let fingerprintMonitor = ControlledNetworkFingerprintMonitor(initial: initial)
+        let configurationProbe = RestartableDiagnosticProbe()
+        let networkProbe = RestartableDiagnosticProbe(blockFirstInvocation: true)
+        let checks: [any DiagnosticCheck] = [
+            ProbeDiagnosticCheck(
+                id: .proxy,
+                result: .init(id: .proxy, status: .normal, summary: "configuration"),
+                rerunPolicy: .configurationOnly,
+                probe: configurationProbe
+            ),
+            ProbeDiagnosticCheck(
+                id: .path,
+                result: .init(id: .path, status: .normal, summary: "network"),
+                rerunPolicy: .networkSensitive,
+                probe: networkProbe
+            ),
+        ]
+        let viewModel = NetworkDiagnosticsViewModel(
+            checks: checks,
+            minimumStepDuration: .zero,
+            fingerprintMonitor: fingerprintMonitor
+        )
+
+        #expect(viewModel.start())
+        await networkProbe.waitForInvocationCount(1)
+        await fingerprintMonitor.send(makeFingerprint(interfaceName: "en1", dnsHash: 2))
+        await fingerprintMonitor.send(makeFingerprint(interfaceName: "en2", dnsHash: 3))
+        await viewModel.waitForCompletion()
+
+        #expect(viewModel.phase == .completed)
+        #expect(viewModel.conclusion == .networkNormal)
+        #expect(viewModel.automaticRestartCount == 1)
+        #expect(await configurationProbe.invocationCount == 1)
+        #expect(await networkProbe.invocationCount == 2)
+        #expect(viewModel.results[.proxy]?.summary == "configuration")
+        #expect(viewModel.results[.path]?.summary == "network")
+    }
+
+    @Test("an unchanged fingerprint does not restart an active probe")
+    @MainActor
+    func unchangedFingerprintDoesNotRestart() async {
+        let fingerprint = makeFingerprint(interfaceName: "en0", dnsHash: 1)
+        let fingerprintMonitor = ControlledNetworkFingerprintMonitor(initial: fingerprint)
+        let probe = RestartableDiagnosticProbe(blockFirstInvocation: true)
+        let viewModel = NetworkDiagnosticsViewModel(
+            checks: [
+                ProbeDiagnosticCheck(
+                    id: .path,
+                    result: .init(id: .path, status: .normal, summary: "network"),
+                    rerunPolicy: .networkSensitive,
+                    probe: probe
+                ),
+            ],
+            minimumStepDuration: .zero,
+            fingerprintMonitor: fingerprintMonitor
+        )
+
+        #expect(viewModel.start())
+        await probe.waitForInvocationCount(1)
+        await fingerprintMonitor.send(fingerprint)
+        await probe.releaseFirstInvocation()
+        await viewModel.waitForCompletion()
+
+        #expect(viewModel.automaticRestartCount == 0)
+        #expect(await probe.invocationCount == 1)
+    }
+
     private func makeResults(
-        connectivity: NetworkDiagnosticStatus,
+        path: NetworkDiagnosticStatus,
         dns: NetworkDiagnosticStatus,
+        internet: NetworkDiagnosticStatus,
+        ipv6: NetworkDiagnosticStatus = .skipped,
         proxy: NetworkDiagnosticStatus
     ) -> [NetworkDiagnosticResult] {
         [
-            NetworkDiagnosticResult(id: .connectivity, status: connectivity, summary: "connectivity"),
+            NetworkDiagnosticResult(id: .path, status: path, summary: "path"),
             NetworkDiagnosticResult(id: .dns, status: dns, summary: "dns"),
+            NetworkDiagnosticResult(id: .internet, status: internet, summary: "internet"),
+            NetworkDiagnosticResult(id: .ipv6, status: ipv6, summary: "ipv6"),
             NetworkDiagnosticResult(id: .proxy, status: proxy, summary: "proxy"),
         ]
     }
 
+    private func makeFingerprint(
+        interfaceName: String,
+        dnsHash: UInt64
+    ) -> NetworkFingerprint {
+        NetworkFingerprint(
+            interfaceType: "wifi",
+            interfaceName: interfaceName,
+            pathStatus: .satisfied,
+            dnsSettingsHash: dnsHash,
+            staticProxySettingsHash: 7
+        )
+    }
+
     private func makeStubChecks(recorder: DiagnosticTestRecorder) -> [any DiagnosticCheck] {
-        NetworkDiagnosticCheckID.allCases.map { id in
+        [.path, .dns, .proxy].map { id in
             StubDiagnosticCheck(
                 id: id,
                 result: NetworkDiagnosticResult(id: id, status: .normal, summary: id.rawValue),
@@ -322,27 +919,248 @@ private struct StubPathSource: NetworkPathChecking {
     }
 }
 
-private struct StubDNSResolver: DNSResolving {
-    let outcome: DNSResolutionOutcome
+private actor StubDNSResolver: DNSResolving {
+    private var outcomes: [DNSResolutionOutcome]
+    private var outcomeIndex = 0
+    private(set) var invocationCount = 0
 
     init(_ outcome: DNSResolutionOutcome) {
-        self.outcome = outcome
+        outcomes = [outcome]
+    }
+
+    init(outcomes: [DNSResolutionOutcome]) {
+        precondition(!outcomes.isEmpty)
+        self.outcomes = outcomes
     }
 
     func resolve(host: String, timeout: Duration) async -> DNSResolutionOutcome {
+        invocationCount += 1
+        defer { outcomeIndex += 1 }
+        return outcomes[min(outcomeIndex, outcomes.endIndex - 1)]
+    }
+}
+
+private struct StubControlLoader: ControlEndpointLoading {
+    let httpsStatus: Int?
+    let httpsErrorCode: String?
+    let httpStatus: Int?
+    let httpBody: String?
+    let httpErrorCode: String?
+    let recorder: ControlEndpointTestRecorder?
+
+    init(
+        httpsStatus: Int?,
+        httpsErrorCode: String? = nil,
+        httpStatus: Int?,
+        httpBody: String?,
+        httpErrorCode: String? = nil,
+        recorder: ControlEndpointTestRecorder? = nil
+    ) {
+        self.httpsStatus = httpsStatus
+        self.httpsErrorCode = httpsErrorCode
+        self.httpStatus = httpStatus
+        self.httpBody = httpBody
+        self.httpErrorCode = httpErrorCode
+        self.recorder = recorder
+    }
+
+    func load(url: URL, timeout: Duration) async -> (status: Int?, body: String?, errorCode: String?) {
+        await recorder?.record(url: url, timeout: timeout)
+        if url.scheme == "https" {
+            return (httpsStatus, nil, httpsErrorCode)
+        }
+        return (httpStatus, httpBody, httpErrorCode)
+    }
+}
+
+private struct StubIPv6Loader: IPv6ControlEndpointLoading {
+    let outcome: IPv6ControlEndpointLoadOutcome
+
+    init(_ outcome: IPv6ControlEndpointLoadOutcome) {
+        self.outcome = outcome
+    }
+
+    func load(url: URL, timeout: Duration) async -> IPv6ControlEndpointLoadOutcome {
         outcome
     }
 }
 
-private struct StubProxySettingsReader: SystemProxySettingsReading {
-    let configuration: SystemProxyConfiguration?
+private struct StubGlobalIPv6AddressSource: GlobalIPv6AddressSourcing {
+    let hasAddress: Bool
 
-    init(_ configuration: SystemProxyConfiguration?) {
-        self.configuration = configuration
+    func hasGlobalIPv6Address() -> Bool {
+        hasAddress
+    }
+}
+
+private struct StubIPv6AddressResolver: IPv6AddressResolving {
+    let addresses: [String]
+
+    func resolveAAAA(host: String, timeout: Duration) async -> [String] {
+        addresses
+    }
+}
+
+private actor RecordingIPv6AddressResolver: IPv6AddressResolving {
+    let addresses: [String]
+    private(set) var hosts: [String] = []
+
+    init(addresses: [String]) {
+        self.addresses = addresses
     }
 
-    func read() -> SystemProxyConfiguration? {
-        configuration
+    func resolveAAAA(host: String, timeout: Duration) async -> [String] {
+        hosts.append(host)
+        return addresses
+    }
+}
+
+private struct IPv6LoaderTestRequest: Equatable, Sendable {
+    let url: URL
+    let ipv6Address: String
+    let serverName: String
+    let timeout: Duration
+}
+
+private actor IPv6LoaderTestRecorder {
+    private(set) var requests: [IPv6LoaderTestRequest] = []
+
+    func record(_ request: IPv6LoaderTestRequest) {
+        requests.append(request)
+    }
+}
+
+private struct RecordingIPv6HTTPSConnector: IPv6HTTPSConnecting {
+    let succeeds: Bool
+    let recorder: IPv6LoaderTestRecorder
+
+    func load(
+        url: URL,
+        ipv6Address: String,
+        serverName: String,
+        timeout: Duration
+    ) async -> Bool {
+        await recorder.record(.init(
+            url: url,
+            ipv6Address: ipv6Address,
+            serverName: serverName,
+            timeout: timeout
+        ))
+        return succeeds
+    }
+}
+
+private struct StubIPv6HTTPSConnector: IPv6HTTPSConnecting {
+    let succeeds: Bool
+
+    func load(
+        url: URL,
+        ipv6Address: String,
+        serverName: String,
+        timeout: Duration
+    ) async -> Bool {
+        succeeds
+    }
+}
+
+private actor ControlEndpointTestRecorder {
+    private(set) var urls: [String] = []
+    private(set) var timeouts: [Duration] = []
+
+    func record(url: URL, timeout: Duration) {
+        urls.append(url.absoluteString)
+        timeouts.append(timeout)
+    }
+}
+
+private struct StubProxyConfigurationResolver: ProxyConfigurationResolving {
+    let resolution: ProxyResolutionDirective
+
+    init(_ resolution: ProxyResolutionDirective) {
+        self.resolution = resolution
+    }
+
+    func resolution(for url: URL) -> ProxyResolutionDirective {
+        resolution
+    }
+}
+
+private struct PACResolutionTestRequest: Equatable, Sendable {
+    let pacURL: URL
+    let targetURL: URL
+    let timeout: Duration
+}
+
+private actor PACResolutionTestRecorder {
+    private(set) var requests: [PACResolutionTestRequest] = []
+
+    func record(pacURL: URL, targetURL: URL, timeout: Duration) {
+        requests.append(.init(pacURL: pacURL, targetURL: targetURL, timeout: timeout))
+    }
+}
+
+private struct StubPACResolver: PACResolving {
+    let resolution: EffectiveProxy
+    let recorder: PACResolutionTestRecorder?
+
+    init(_ resolution: EffectiveProxy, recorder: PACResolutionTestRecorder? = nil) {
+        self.resolution = resolution
+        self.recorder = recorder
+    }
+
+    func resolve(pacURL: URL, targetURL: URL, timeout: Duration) async -> EffectiveProxy {
+        await recorder?.record(pacURL: pacURL, targetURL: targetURL, timeout: timeout)
+        return resolution
+    }
+}
+
+private struct StubProxyResolver: ProxyResolving {
+    let resolution: EffectiveProxy
+
+    init(_ resolution: EffectiveProxy) {
+        self.resolution = resolution
+    }
+
+    func resolve(for url: URL) async -> EffectiveProxy {
+        resolution
+    }
+}
+
+private struct ProxyEgressTestRequest: Equatable, Sendable {
+    let url: URL
+    let proxy: EffectiveProxy
+}
+
+private actor ProxyEgressTestRecorder {
+    private(set) var requests: [ProxyEgressTestRequest] = []
+
+    func record(url: URL, proxy: EffectiveProxy) {
+        requests.append(.init(url: url, proxy: proxy))
+    }
+}
+
+private struct StubProxyEgressLoader: ProxyEgressLoading {
+    let statusCode: Int?
+    let errorCode: String?
+    let recorder: ProxyEgressTestRecorder?
+
+    init(
+        statusCode: Int?,
+        errorCode: String? = nil,
+        recorder: ProxyEgressTestRecorder? = nil
+    ) {
+        self.statusCode = statusCode
+        self.errorCode = errorCode
+        self.recorder = recorder
+    }
+
+    func load(
+        url: URL,
+        through proxy: EffectiveProxy,
+        timeout: Duration
+    ) async -> ProxyEgressResponse {
+        await recorder?.record(url: url, proxy: proxy)
+        return ProxyEgressResponse(statusCode: statusCode, errorCode: errorCode)
     }
 }
 
@@ -351,6 +1169,24 @@ private struct StubProxyConnector: ProxyEndpointConnecting {
 
     func canConnect(to endpoint: ProxyEndpoint, timeout: Duration) async -> Bool {
         reachable
+    }
+}
+
+private actor ProxyConnectorTestRecorder {
+    private(set) var endpoints: [ProxyEndpoint] = []
+
+    func record(_ endpoint: ProxyEndpoint) {
+        endpoints.append(endpoint)
+    }
+}
+
+private struct RecordingProxyConnector: ProxyEndpointConnecting {
+    let reachable: Bool
+    let recorder: ProxyConnectorTestRecorder
+
+    func canConnect(to endpoint: ProxyEndpoint, timeout: Duration) async -> Bool {
+        await recorder.record(endpoint)
+        return reachable
     }
 }
 
@@ -370,5 +1206,97 @@ private struct StubDiagnosticCheck: DiagnosticCheck {
     func run() async -> NetworkDiagnosticResult {
         await recorder.record(id)
         return result
+    }
+}
+
+private actor RestartableDiagnosticProbe {
+    private let blockFirstInvocation: Bool
+    private var firstInvocationContinuation: CheckedContinuation<Void, Never>?
+    private var invocationWaiters: [(count: Int, continuation: CheckedContinuation<Void, Never>)] = []
+    private(set) var invocationCount = 0
+
+    init(blockFirstInvocation: Bool = false) {
+        self.blockFirstInvocation = blockFirstInvocation
+    }
+
+    func run() async {
+        invocationCount += 1
+        let completedCount = invocationCount
+        let readyWaiters = invocationWaiters.filter { $0.count <= completedCount }
+        invocationWaiters.removeAll { $0.count <= completedCount }
+        for waiter in readyWaiters {
+            waiter.continuation.resume()
+        }
+
+        guard blockFirstInvocation, completedCount == 1 else { return }
+        await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                firstInvocationContinuation = continuation
+            }
+        } onCancel: {
+            Task { await self.releaseFirstInvocation() }
+        }
+    }
+
+    func waitForInvocationCount(_ expectedCount: Int) async {
+        guard invocationCount < expectedCount else { return }
+        await withCheckedContinuation { continuation in
+            invocationWaiters.append((expectedCount, continuation))
+        }
+    }
+
+    func releaseFirstInvocation() {
+        firstInvocationContinuation?.resume()
+        firstInvocationContinuation = nil
+    }
+}
+
+private struct ProbeDiagnosticCheck: DiagnosticCheck {
+    let id: NetworkDiagnosticCheckID
+    let result: NetworkDiagnosticResult
+    let rerunPolicy: DiagnosticCheckRerunPolicy
+    let probe: RestartableDiagnosticProbe
+
+    func run() async -> NetworkDiagnosticResult {
+        await probe.run()
+        return result
+    }
+}
+
+private actor ControlledNetworkFingerprintMonitor: NetworkFingerprintMonitoring {
+    let initial: NetworkFingerprint
+    private var continuation: AsyncStream<NetworkFingerprint>.Continuation?
+    private var pending: [NetworkFingerprint] = []
+
+    init(initial: NetworkFingerprint) {
+        self.initial = initial
+    }
+
+    func currentFingerprint() async -> NetworkFingerprint? {
+        initial
+    }
+
+    nonisolated func changes(
+        from baseline: NetworkFingerprint
+    ) -> AsyncStream<NetworkFingerprint> {
+        AsyncStream { continuation in
+            Task { await self.install(continuation) }
+        }
+    }
+
+    func send(_ fingerprint: NetworkFingerprint) {
+        guard let continuation else {
+            pending.append(fingerprint)
+            return
+        }
+        continuation.yield(fingerprint)
+    }
+
+    private func install(_ continuation: AsyncStream<NetworkFingerprint>.Continuation) {
+        self.continuation = continuation
+        for fingerprint in pending {
+            continuation.yield(fingerprint)
+        }
+        pending = []
     }
 }

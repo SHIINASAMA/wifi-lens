@@ -20342,31 +20342,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Review the DNS or proxy result below."
+            "value": "Review any result marked for attention below."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "下のDNSまたはプロキシの結果を確認してください。"
+            "value": "下で注意が必要と表示された結果を確認してください。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请检查下方的 DNS 或代理检测结果。"
+            "value": "请检查下方标记为需要注意的检测结果。"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Prüfe unten das DNS- oder Proxy-Ergebnis."
+            "value": "Prüfe unten alle Ergebnisse, die Aufmerksamkeit erfordern."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Revisa el resultado de DNS o proxy que aparece abajo."
+            "value": "Revisa abajo cualquier resultado que requiera atención."
           }
         }
       }
@@ -24127,6 +24127,916 @@
           "stringUnit": {
             "state": "translated",
             "value": "No se pudieron descargar uno o varios archivos de registro de IEEE. Inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "network_diagnostics.status.blocked": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blocked"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ブロックされています"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已阻止"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blockiert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bloqueado"
+          }
+        }
+      }
+    },
+    "network_diagnostics.status.skipped": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skipped"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スキップ済み"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已跳过"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Übersprungen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omitido"
+          }
+        }
+      }
+    },
+    "network_diagnostics.check.path.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System Network Path"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "システムネットワーク経路"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系统网络路径"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Systemnetzwerkpfad"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruta de red del sistema"
+          }
+        }
+      }
+    },
+    "network_diagnostics.check.internet.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Internet Access"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インターネットアクセス"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "互联网访问"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Internetzugang"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acceso a Internet"
+          }
+        }
+      }
+    },
+    "network_diagnostics.path.normal.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System network path is available"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "システムネットワーク経路を利用できます"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系统网络路径可用"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Systemnetzwerkpfad ist verfügbar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La ruta de red del sistema está disponible"
+          }
+        }
+      }
+    },
+    "network_diagnostics.path.abnormal.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No system network path is available. Check Wi-Fi or Ethernet."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "利用可能なシステムネットワーク経路がありません。Wi-Fi または Ethernet を確認してください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有可用的系统网络路径。请检查 Wi-Fi 或以太网。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein Systemnetzwerkpfad ist verfügbar. Prüfe Wi-Fi oder Ethernet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay una ruta de red del sistema disponible. Comprueba Wi-Fi o Ethernet."
+          }
+        }
+      }
+    },
+    "network_diagnostics.path.indeterminate.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The system network path could not be confirmed. Try again later."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "システムネットワーク経路を確認できませんでした。しばらくしてからもう一度お試しください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂时无法确认系统网络路径，请稍后重试。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Systemnetzwerkpfad konnte nicht bestätigt werden. Versuche es später erneut."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo confirmar la ruta de red del sistema. Inténtalo de nuevo más tarde."
+          }
+        }
+      }
+    },
+    "network_diagnostics.internet.normal.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HTTPS access verified"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HTTPS アクセスを確認しました"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已验证 HTTPS 访问"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HTTPS-Zugriff bestätigt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acceso HTTPS verificado"
+          }
+        }
+      }
+    },
+    "network_diagnostics.internet.normal.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The HTTPS request succeeded and the captive-portal control response matched."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HTTPS リクエストが成功し、キャプティブポータルの制御レスポンスが一致しました。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HTTPS 请求成功，强制门户控制响应符合预期。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die HTTPS-Anfrage war erfolgreich und die Kontrollantwort für das Captive Portal stimmte überein."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La solicitud HTTPS se completó correctamente y la respuesta de control del portal cautivo coincidió."
+          }
+        }
+      }
+    },
+    "network_diagnostics.internet.abnormal.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Control endpoint checks need attention"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "制御エンドポイントの確認が必要です"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "控制端点检查需要注意"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontrollendpunktprüfungen erfordern Aufmerksamkeit"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las comprobaciones de los puntos de conexión de control requieren atención"
+          }
+        }
+      }
+    },
+    "network_diagnostics.internet.abnormal.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One or more control endpoint responses did not match the expected result."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 つ以上の制御エンドポイントのレスポンスが想定された結果と一致しませんでした。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一个或多个控制端点响应与预期结果不符。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mindestens eine Antwort eines Kontrollendpunkts entsprach nicht dem erwarteten Ergebnis."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una o más respuestas de los puntos de conexión de control no coincidieron con el resultado esperado."
+          }
+        }
+      }
+    },
+    "network_diagnostics.internet.indeterminate.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Control endpoint check is inconclusive"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "制御エンドポイントの確認結果は確定できません"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "控制端点检查结果无法确定"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontrollendpunktprüfung ist nicht eindeutig"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La comprobación del punto de conexión de control no es concluyente"
+          }
+        }
+      }
+    },
+    "network_diagnostics.internet.indeterminate.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HTTPS access succeeded, but the captive-portal control endpoint did not respond in time."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HTTPS アクセスは成功しましたが、キャプティブポータルの制御エンドポイントが時間内に応答しませんでした。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HTTPS 访问成功，但强制门户控制端点未在规定时间内响应。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der HTTPS-Zugriff war erfolgreich, aber der Kontrollendpunkt für Captive Portale hat nicht rechtzeitig geantwortet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El acceso HTTPS se completó correctamente, pero el punto de conexión de control del portal cautivo no respondió a tiempo."
+          }
+        }
+      }
+    },
+    "network_diagnostics.dns.available.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DNS resolution is available."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DNS の名前解決を利用できます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DNS 解析可用。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die DNS-Auflösung ist verfügbar."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La resolución de DNS está disponible."
+          }
+        }
+      }
+    },
+    "network_diagnostics.dns.inconsistent.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DNS resolution is inconsistent across test names."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テスト名で DNS 解決の結果が一致しません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "各测试域名的 DNS 解析结果不一致。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die DNS-Auflösung ist bei den Testnamen uneinheitlich."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La resolución de DNS es inconsistente entre los nombres de prueba."
+          }
+        }
+      }
+    },
+    "network_diagnostics.dns.unavailable.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DNS resolution failed for all test names."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべてのテスト名で DNS 解決に失敗しました。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所有测试域名的 DNS 解析均失败。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die DNS-Auflösung ist für alle Testnamen fehlgeschlagen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La resolución de DNS falló para todos los nombres de prueba."
+          }
+        }
+      }
+    },
+    "network_diagnostics.dns.unable_to_determine.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The DNS result could not be determined."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DNS の結果を判断できませんでした。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法确定 DNS 结果。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das DNS-Ergebnis konnte nicht ermittelt werden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo determinar el resultado de DNS."
+          }
+        }
+      }
+    },
+    "network_diagnostics.proxy.automatic.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "automatic proxy configuration was detected and was not evaluated."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動プロキシ構成が検出されましたが、評価されませんでした。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "检测到自动代理配置，但未进行评估。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine automatische Proxy-Konfiguration wurde erkannt und nicht ausgewertet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se detectó una configuración automática del proxy, pero no se evaluó."
+          }
+        }
+      }
+    },
+    "network_diagnostics.proxy.pac_unavailable.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic proxy configuration is unavailable"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動プロキシ構成を利用できません"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动代理配置不可用"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die automatische Proxy-Konfiguration ist nicht verfügbar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La configuración automática del proxy no está disponible"
+          }
+        }
+      }
+    },
+    "network_diagnostics.proxy.authentication_required.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The system proxy requires authentication"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "システムプロキシには認証が必要です"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系统代理需要身份验证"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Systemproxy erfordert eine Authentifizierung"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El proxy del sistema requiere autenticación"
+          }
+        }
+      }
+    },
+    "network_diagnostics.proxy.endpoint_unavailable.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The selected proxy endpoint is unavailable"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選択されたプロキシエンドポイントを利用できません"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所选代理端点不可用"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der ausgewählte Proxy-Endpunkt ist nicht verfügbar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El punto de conexión del proxy seleccionado no está disponible"
+          }
+        }
+      }
+    },
+    "network_diagnostics.proxy.egress_unavailable.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The selected proxy cannot reach the control endpoint"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選択されたプロキシから制御エンドポイントに接続できません"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所选代理无法访问控制端点"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der ausgewählte Proxy kann den Kontrollendpunkt nicht erreichen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El proxy seleccionado no puede acceder al punto de conexión de control"
+          }
+        }
+      }
+    },
+    "network_diagnostics.check.ipv6.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IPv6 Access"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IPv6-Zugriff"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acceso IPv6"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IPv6アクセス"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IPv6 访问"
+          }
+        }
+      }
+    },
+    "network_diagnostics.ipv6.normal.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IPv6 HTTPS access verified"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IPv6-HTTPS-Zugriff bestätigt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acceso HTTPS mediante IPv6 verificado"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IPv6経由のHTTPSアクセスを確認しました"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已验证通过 IPv6 的 HTTPS 访问"
+          }
+        }
+      }
+    },
+    "network_diagnostics.ipv6.indeterminate.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IPv6 HTTPS access could not be verified. IPv4 access may still work."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der IPv6-HTTPS-Zugriff konnte nicht bestätigt werden. Der IPv4-Zugriff kann weiterhin funktionieren."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo verificar el acceso HTTPS mediante IPv6. Es posible que el acceso IPv4 siga funcionando."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IPv6経由のHTTPSアクセスを確認できませんでした。IPv4アクセスは引き続き利用できる可能性があります。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法验证通过 IPv6 的 HTTPS 访问。IPv4 访问可能仍然可用。"
+          }
+        }
+      }
+    },
+    "network_diagnostics.ipv6.skipped.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No global IPv6 address is available, so the optional IPv6 check was skipped."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine globale IPv6-Adresse ist verfügbar. Daher wurde die optionale IPv6-Prüfung übersprungen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay ninguna dirección IPv6 global disponible, por lo que se omitió la comprobación IPv6 opcional."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "グローバルIPv6アドレスを利用できないため、オプションのIPv6チェックをスキップしました。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有可用的全局 IPv6 地址，因此跳过了可选的 IPv6 检查。"
           }
         }
       }

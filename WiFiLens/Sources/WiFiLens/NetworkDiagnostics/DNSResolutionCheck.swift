@@ -95,42 +95,77 @@ private final class DNSResolutionContext: @unchecked Sendable {
 }
 
 struct DNSResolutionCheck: DiagnosticCheck {
+    // Temporary third-party probe targets pending product-controlled DNS names.
+    private static let defaultProbeTargets = [
+        "www.apple.com",
+        "www.microsoft.com",
+        "www.msftconnecttest.com",
+    ]
+
     let id = NetworkDiagnosticCheckID.dns
     private let resolver: any DNSResolving
-    private let host: String
+    let probeTargets: [String]
     private let timeout: Duration
 
     init(
         resolver: any DNSResolving = SystemDNSResolver(),
-        host: String = "example.com",
+        probeTargets: [String] = Self.defaultProbeTargets,
         timeout: Duration = .seconds(5)
     ) {
+        precondition(probeTargets.count == 3, "DNS self-check requires exactly three probe targets")
         self.resolver = resolver
-        self.host = host
+        self.probeTargets = probeTargets
         self.timeout = timeout
     }
 
     func run() async -> NetworkDiagnosticResult {
-        let outcome = await resolver.resolve(host: host, timeout: timeout)
-        return switch outcome {
-        case .resolved:
-            NetworkDiagnosticResult(
+        var outcomes: [DNSResolutionOutcome] = []
+        for host in probeTargets {
+            let firstOutcome = await resolver.resolve(host: host, timeout: timeout)
+            guard firstOutcome == .indeterminate, !Task.isCancelled else {
+                outcomes.append(firstOutcome)
+                continue
+            }
+            outcomes.append(await resolver.resolve(host: host, timeout: timeout))
+        }
+        let successCount = outcomes.count { $0 == .resolved }
+        let failureCount = outcomes.count { $0 == .failed }
+        let indeterminateCount = outcomes.count { $0 == .indeterminate }
+        let evidence = [
+            NetworkDiagnosticEvidence(code: "dns.success-count", value: "\(successCount)/\(probeTargets.count)"),
+            NetworkDiagnosticEvidence(code: "dns.failure-count", value: "\(failureCount)/\(probeTargets.count)"),
+            NetworkDiagnosticEvidence(code: "dns.indeterminate-count", value: "\(indeterminateCount)/\(probeTargets.count)"),
+        ]
+
+        if successCount == probeTargets.count {
+            return NetworkDiagnosticResult(
                 id: id,
                 status: .normal,
-                summary: String(localized: "network_diagnostics.dns.normal.summary", comment: "Network self-check DNS success summary")
-            )
-        case .failed:
-            NetworkDiagnosticResult(
-                id: id,
-                status: .abnormal,
-                summary: String(localized: "network_diagnostics.dns.abnormal.summary", comment: "Network self-check DNS failure summary")
-            )
-        case .indeterminate:
-            NetworkDiagnosticResult(
-                id: id,
-                status: .indeterminate,
-                summary: String(localized: "network_diagnostics.dns.indeterminate.summary", comment: "Network self-check DNS indeterminate summary")
+                summary: String(localized: "network_diagnostics.dns.available.summary", comment: "Network self-check DNS all test names resolved"),
+                evidence: evidence
             )
         }
+        if failureCount == probeTargets.count {
+            return NetworkDiagnosticResult(
+                id: id,
+                status: .abnormal,
+                summary: String(localized: "network_diagnostics.dns.unavailable.summary", comment: "Network self-check DNS all test names failed"),
+                evidence: evidence
+            )
+        }
+        if indeterminateCount == probeTargets.count {
+            return NetworkDiagnosticResult(
+                id: id,
+                status: .indeterminate,
+                summary: String(localized: "network_diagnostics.dns.unable_to_determine.summary", comment: "Network self-check DNS no test name produced a result"),
+                evidence: evidence
+            )
+        }
+        return NetworkDiagnosticResult(
+            id: id,
+            status: .indeterminate,
+            summary: String(localized: "network_diagnostics.dns.inconsistent.summary", comment: "Network self-check DNS test names had mixed outcomes"),
+            evidence: evidence
+        )
     }
 }

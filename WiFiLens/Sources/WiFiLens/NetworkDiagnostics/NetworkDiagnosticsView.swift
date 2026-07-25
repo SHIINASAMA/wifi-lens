@@ -119,14 +119,14 @@ struct NetworkDiagnosticsView: View {
 
                 Spacer(minLength: 16)
 
-                Text("\(viewModel.results.count)/\(NetworkDiagnosticCheckID.allCases.count)")
+                Text("\(viewModel.results.count)/\(viewModel.checkIDs.count)")
                     .font(.callout.monospacedDigit().weight(.medium))
                     .foregroundStyle(.secondary)
             }
 
             ProgressView(
                 value: Double(viewModel.results.count),
-                total: Double(NetworkDiagnosticCheckID.allCases.count)
+                total: Double(viewModel.checkIDs.count)
             )
             .progressViewStyle(.linear)
             .accessibilityLabel(String(localized: "network_diagnostics.state.checking", comment: "Network self-check running state"))
@@ -276,6 +276,7 @@ struct NetworkDiagnosticsView: View {
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
                 .background(statusColor(result.status).opacity(0.10), in: Capsule())
+                .accessibilityLabel(statusAccessibilityLabel(for: result))
         } else {
             HStack(spacing: 6) {
                 ProgressView().controlSize(.mini)
@@ -292,11 +293,19 @@ struct NetworkDiagnosticsView: View {
     @ViewBuilder
     private func resultCell(_ row: NetworkDiagnosticsWorkbenchRow) -> some View {
         if let result = row.result {
-            Text(result.summary)
-                .font(.callout)
-                .foregroundStyle(.primary)
-                .lineSpacing(1)
-                .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(result.summary)
+                    .font(.callout)
+                    .foregroundStyle(.primary)
+                    .lineSpacing(1)
+                if let detail = result.detail, detail != result.summary {
+                    Text(detail)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineSpacing(1)
+                }
+            }
+            .fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -304,12 +313,13 @@ struct NetworkDiagnosticsView: View {
         NetworkDiagnosticsPresentation.workbenchRows(
             pagePhase: viewModel.phase,
             executionPhases: viewModel.executionPhases,
-            results: viewModel.results
+            results: viewModel.results,
+            checkIDs: viewModel.checkIDs
         )
     }
 
     private var activeCheckID: NetworkDiagnosticCheckID? {
-        NetworkDiagnosticCheckID.allCases.first {
+        viewModel.checkIDs.first {
             viewModel.executionPhases[$0] == .checking
         }
     }
@@ -347,10 +357,14 @@ struct NetworkDiagnosticsView: View {
 
     private func checkTitle(_ id: NetworkDiagnosticCheckID) -> String {
         switch id {
-        case .connectivity:
-            String(localized: "network_diagnostics.check.connectivity.title", comment: "Network connectivity check title")
+        case .path:
+            String(localized: "network_diagnostics.check.path.title", comment: "Network system path check title")
         case .dns:
             String(localized: "network_diagnostics.check.dns.title", comment: "DNS resolution check title")
+        case .internet:
+            String(localized: "network_diagnostics.check.internet.title", comment: "Internet access check title")
+        case .ipv6:
+            String(localized: "network_diagnostics.check.ipv6.title", comment: "Optional forced IPv6 access check title")
         case .proxy:
             String(localized: "network_diagnostics.check.proxy.title", comment: "System proxy check title")
         }
@@ -358,8 +372,10 @@ struct NetworkDiagnosticsView: View {
 
     private func checkIcon(_ id: NetworkDiagnosticCheckID) -> String {
         switch id {
-        case .connectivity: "network"
+        case .path: "network"
         case .dns: "globe"
+        case .internet: "globe"
+        case .ipv6: "6.circle"
         case .proxy: "arrow.triangle.branch"
         }
     }
@@ -372,22 +388,34 @@ struct NetworkDiagnosticsView: View {
             String(localized: "network_diagnostics.status.abnormal", comment: "Abnormal network self-check status")
         case .indeterminate:
             String(localized: "network_diagnostics.status.indeterminate", comment: "Indeterminate network self-check status")
+        case .blocked:
+            String(localized: "network_diagnostics.status.blocked", comment: "Blocked network self-check status")
+        case .skipped:
+            String(localized: "network_diagnostics.status.skipped", comment: "Skipped network self-check status")
         }
     }
 
     private func statusIcon(_ status: NetworkDiagnosticStatus) -> String {
-        switch status {
-        case .normal: "checkmark.circle.fill"
-        case .abnormal: "xmark.circle.fill"
-        case .indeterminate: "questionmark.circle.fill"
+        status.presentation.icon
+    }
+
+    private func statusAccessibilityLabel(for result: NetworkDiagnosticResult) -> String {
+        switch result.status {
+        case .blocked, .skipped:
+            let reason = result.detail ?? result.summary
+            return "\(statusTitle(result.status)). \(reason)"
+        case .normal, .abnormal, .indeterminate:
+            return statusTitle(result.status)
         }
     }
 
     private func statusColor(_ status: NetworkDiagnosticStatus) -> Color {
-        switch status {
-        case .normal: .green
-        case .abnormal: .red
-        case .indeterminate: .orange
+        switch status.presentation.tone {
+        case .success: .green
+        case .error: .red
+        case .caution: .orange
+        case .informational: .blue
+        case .muted: .secondary
         }
     }
 

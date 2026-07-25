@@ -42,11 +42,12 @@ enum NetworkDiagnosticsPresentation {
     static func workbenchRows(
         pagePhase: NetworkDiagnosticsPagePhase,
         executionPhases: [NetworkDiagnosticCheckID: NetworkDiagnosticExecutionPhase],
-        results: [NetworkDiagnosticCheckID: NetworkDiagnosticResult]
+        results: [NetworkDiagnosticCheckID: NetworkDiagnosticResult],
+        checkIDs: [NetworkDiagnosticCheckID] = NetworkDiagnosticCheckID.allCases
     ) -> [NetworkDiagnosticsWorkbenchRow] {
         guard pagePhase != .idle else { return [] }
 
-        return NetworkDiagnosticCheckID.allCases.compactMap { id in
+        return checkIDs.compactMap { id in
             let executionPhase = executionPhases[id] ?? .waiting
             if pagePhase == .running, executionPhase == .waiting {
                 return nil
@@ -73,20 +74,30 @@ final class NetworkDiagnosticsViewModel {
     private(set) var executionPhases: [NetworkDiagnosticCheckID: NetworkDiagnosticExecutionPhase]
     private(set) var results: [NetworkDiagnosticCheckID: NetworkDiagnosticResult] = [:]
     private(set) var conclusion: NetworkDiagnosticConclusion?
+    private(set) var automaticRestartCount = 0
+    let checkIDs: [NetworkDiagnosticCheckID]
 
     @ObservationIgnored private let checks: [any DiagnosticCheck]
     @ObservationIgnored private let minimumStepDuration: Duration
+    @ObservationIgnored private let fingerprintMonitor: any NetworkFingerprintMonitoring
     @ObservationIgnored private var activeTask: Task<Void, Never>?
 
     init(checks: [any DiagnosticCheck] = [
         NetworkConnectivityCheck(),
         DNSResolutionCheck(),
+        HTTPSControlEndpointCheck(),
+        IPv6ControlEndpointCheck(),
         SystemProxyCheck(),
-    ], minimumStepDuration: Duration = NetworkDiagnosticsViewModel.defaultMinimumStepDuration) {
+    ],
+    minimumStepDuration: Duration = NetworkDiagnosticsViewModel.defaultMinimumStepDuration,
+    fingerprintMonitor: any NetworkFingerprintMonitoring = SystemNetworkFingerprintMonitor()
+    ) {
         self.checks = checks
         self.minimumStepDuration = minimumStepDuration
+        self.fingerprintMonitor = fingerprintMonitor
+        self.checkIDs = checks.map(\.id)
         self.executionPhases = Dictionary(
-            uniqueKeysWithValues: NetworkDiagnosticCheckID.allCases.map { ($0, .waiting) }
+            uniqueKeysWithValues: checks.map { ($0.id, .waiting) }
         )
     }
 
@@ -100,23 +111,12 @@ final class NetworkDiagnosticsViewModel {
 
         results = [:]
         conclusion = nil
+        automaticRestartCount = 0
         phase = .running
-        executionPhases = Dictionary(
-            uniqueKeysWithValues: NetworkDiagnosticCheckID.allCases.map { ($0, .waiting) }
-        )
-        if let first = NetworkDiagnosticCheckID.allCases.first {
-            executionPhases[first] = .checking
-        }
+        prepareExecutionPhases(retaining: [])
 
-        let runner = DiagnosticRunner(
-            checks: checks,
-            minimumStepDuration: minimumStepDuration
-        )
         activeTask = Task { [weak self] in
-            let results = await runner.run { [weak self] result in
-                await self?.accept(result)
-            }
-            self?.finish(results)
+            await self?.runSession()
         }
         return true
     }
@@ -130,20 +130,145 @@ final class NetworkDiagnosticsViewModel {
         results[result.id] = result
         executionPhases[result.id] = .completed
 
-        guard let index = NetworkDiagnosticCheckID.allCases.firstIndex(of: result.id) else { return }
-        let nextIndex = NetworkDiagnosticCheckID.allCases.index(after: index)
-        if nextIndex < NetworkDiagnosticCheckID.allCases.endIndex {
-            executionPhases[NetworkDiagnosticCheckID.allCases[nextIndex]] = .checking
+        guard let index = checkIDs.firstIndex(of: result.id) else { return }
+        let nextIndex = checkIDs.index(after: index)
+        if nextIndex < checkIDs.endIndex {
+            executionPhases[checkIDs[nextIndex]] = .checking
+        }
+    }
+
+    private func runSession() async {
+        let initialFingerprint = await fingerprintMonitor.currentFingerprint()
+        let restartController = NetworkDiagnosticRestartController(
+            baseline: initialFingerprint
+        )
+
+        await withTaskCancellationHandler {
+            await executeSession(
+                initialFingerprint: initialFingerprint,
+                restartController: restartController
+            )
+        } onCancel: {
+            Task { await restartController.cancelCurrentRun() }
+        }
+        activeTask = nil
+    }
+
+    private func executeSession(
+        initialFingerprint: NetworkFingerprint?,
+        restartController: NetworkDiagnosticRestartController
+    ) async {
+        let monitorTask: Task<Void, Never>? = initialFingerprint.map { baseline in
+            let fingerprintMonitor = fingerprintMonitor
+            return Task {
+                for await fingerprint in fingerprintMonitor.changes(from: baseline) {
+                    guard !Task.isCancelled else { break }
+                    await restartController.observe(fingerprint)
+                }
+            }
+        }
+        defer { monitorTask?.cancel() }
+
+        var retainedResults: [NetworkDiagnosticResult] = []
+        while !Task.isCancelled {
+            let runner = DiagnosticRunner(
+                checks: checks,
+                minimumStepDuration: minimumStepDuration
+            )
+            let retainedSnapshot = retainedResults
+            let runTask = Task { [weak self] in
+                await runner.run(retaining: retainedSnapshot) { [weak self] result in
+                    await self?.accept(result)
+                }
+            }
+            await restartController.install(runTask)
+            let orderedResults = await runTask.value
+
+            if await restartController.completeRun(), automaticRestartCount == 0 {
+                automaticRestartCount = 1
+                retainedResults = configurationOnlyResults(from: orderedResults)
+                results = Dictionary(uniqueKeysWithValues: retainedResults.map { ($0.id, $0) })
+                conclusion = nil
+                prepareExecutionPhases(retaining: retainedResults)
+                continue
+            }
+
+            finish(orderedResults)
+            return
+        }
+        phase = .idle
+    }
+
+    private func configurationOnlyResults(
+        from orderedResults: [NetworkDiagnosticResult]
+    ) -> [NetworkDiagnosticResult] {
+        let configurationOnlyIDs = Set(
+            checks.filter { $0.rerunPolicy == .configurationOnly }.map(\.id)
+        )
+        return orderedResults.filter { configurationOnlyIDs.contains($0.id) }
+    }
+
+    private func prepareExecutionPhases(retaining retainedResults: [NetworkDiagnosticResult]) {
+        let retainedIDs = Set(retainedResults.map(\.id))
+        executionPhases = Dictionary(uniqueKeysWithValues: checkIDs.map { id in
+            (id, retainedIDs.contains(id) ? .completed : .waiting)
+        })
+        if let firstPendingID = checkIDs.first(where: { !retainedIDs.contains($0) }) {
+            executionPhases[firstPendingID] = .checking
         }
     }
 
     private func finish(_ orderedResults: [NetworkDiagnosticResult]) {
-        defer { activeTask = nil }
-        guard !Task.isCancelled, let conclusion = NetworkDiagnosticConclusion.evaluate(orderedResults) else {
+        guard !Task.isCancelled, let conclusion = NetworkDiagnosticConclusion.evaluate(
+            orderedResults,
+            requiredIDs: Set(checkIDs)
+        ) else {
             phase = .idle
             return
         }
         self.conclusion = conclusion
         phase = .completed
+    }
+}
+
+private actor NetworkDiagnosticRestartController {
+    private let baseline: NetworkFingerprint?
+    private var currentRun: Task<[NetworkDiagnosticResult], Never>?
+    private var restartRequested = false
+    private var restartConsumed = false
+
+    init(baseline: NetworkFingerprint?) {
+        self.baseline = baseline
+    }
+
+    func install(_ task: Task<[NetworkDiagnosticResult], Never>) {
+        currentRun = task
+        if restartRequested {
+            task.cancel()
+        }
+    }
+
+    func observe(_ fingerprint: NetworkFingerprint) {
+        guard
+            let baseline,
+            fingerprint != baseline,
+            !restartConsumed
+        else {
+            return
+        }
+        restartConsumed = true
+        restartRequested = true
+        currentRun?.cancel()
+    }
+
+    func completeRun() -> Bool {
+        currentRun = nil
+        defer { restartRequested = false }
+        return restartRequested
+    }
+
+    func cancelCurrentRun() {
+        currentRun?.cancel()
+        currentRun = nil
     }
 }

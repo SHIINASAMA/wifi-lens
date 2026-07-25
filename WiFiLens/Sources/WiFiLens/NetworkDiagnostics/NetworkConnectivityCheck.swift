@@ -49,7 +49,7 @@ struct SystemNetworkPathChecker: NetworkPathChecking {
 }
 
 struct NetworkConnectivityCheck: DiagnosticCheck {
-    let id = NetworkDiagnosticCheckID.connectivity
+    let id = NetworkDiagnosticCheckID.path
     private let pathSource: any NetworkPathChecking
     private let timeout: Duration
 
@@ -68,19 +68,26 @@ struct NetworkConnectivityCheck: DiagnosticCheck {
             NetworkDiagnosticResult(
                 id: id,
                 status: .normal,
-                summary: String(localized: "network_diagnostics.connectivity.normal.summary", comment: "Network self-check connectivity success summary")
+                summary: String(
+                    localized: "network_diagnostics.path.normal.summary",
+                    comment: "Network self-check system path success summary"
+                ),
+                detail: String(
+                    localized: "network_diagnostics.path.normal.summary",
+                    comment: "Network self-check system path success detail"
+                )
             )
         case .unsatisfied:
             NetworkDiagnosticResult(
                 id: id,
                 status: .abnormal,
-                summary: String(localized: "network_diagnostics.connectivity.abnormal.summary", comment: "Network self-check connectivity failure summary")
+                summary: String(localized: "network_diagnostics.path.abnormal.summary", comment: "Network self-check system path failure summary")
             )
         case .requiresConnection, nil:
             NetworkDiagnosticResult(
                 id: id,
                 status: .indeterminate,
-                summary: String(localized: "network_diagnostics.connectivity.indeterminate.summary", comment: "Network self-check connectivity indeterminate summary")
+                summary: String(localized: "network_diagnostics.path.indeterminate.summary", comment: "Network self-check system path indeterminate summary")
             )
         }
     }

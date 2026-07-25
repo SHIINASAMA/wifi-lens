@@ -8,6 +8,18 @@
 	<string>https://github.com/SHIINASAMA/wifi-lens/releases/latest/download/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>DUcvL7RzZrjRBNr+lIn15cbk0Uvm4SboSpvlz9H2z5g=</string>
+	<!-- TEMPORARY TEST configuration for the Microsoft HTTP captive-portal probe; remove when replaced by an owned HTTPS endpoint. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>www.msftconnecttest.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 </dict>

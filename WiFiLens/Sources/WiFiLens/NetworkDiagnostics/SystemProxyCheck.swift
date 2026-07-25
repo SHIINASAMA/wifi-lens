@@ -152,59 +152,237 @@ private final class ProxyConnectionContext: @unchecked Sendable {
     }
 }
 
+struct ProxyEgressResponse: Equatable, Sendable {
+    let statusCode: Int?
+    let errorCode: String?
+}
+
+protocol ProxyEgressLoading: Sendable {
+    func load(
+        url: URL,
+        through proxy: EffectiveProxy,
+        timeout: Duration
+    ) async -> ProxyEgressResponse
+}
+
+struct SystemProxyEgressLoader: ProxyEgressLoading {
+    func load(
+        url: URL,
+        through proxy: EffectiveProxy,
+        timeout: Duration
+    ) async -> ProxyEgressResponse {
+        guard let configuration = Self.configuration(for: proxy, timeout: timeout) else {
+            return ProxyEgressResponse(statusCode: nil, errorCode: "proxy-type-unavailable")
+        }
+
+        var request = URLRequest(
+            url: url,
+            cachePolicy: .reloadIgnoringLocalCacheData,
+            timeoutInterval: timeout.proxyCheckTimeInterval
+        )
+        request.httpMethod = "GET"
+
+        let session = URLSession(
+            configuration: configuration,
+            delegate: ProxyEgressRedirectDelegate(),
+            delegateQueue: nil
+        )
+        defer { session.invalidateAndCancel() }
+
+        do {
+            let (_, response) = try await session.data(for: request)
+            guard let response = response as? HTTPURLResponse else {
+                return ProxyEgressResponse(statusCode: nil, errorCode: "non-http-response")
+            }
+            return ProxyEgressResponse(statusCode: response.statusCode, errorCode: nil)
+        } catch let error as URLError {
+            return Self.response(for: error)
+        } catch {
+            return ProxyEgressResponse(statusCode: nil, errorCode: "request-failed")
+        }
+    }
+
+    static func response(for error: URLError) -> ProxyEgressResponse {
+        if error.code == .userAuthenticationRequired {
+            return ProxyEgressResponse(statusCode: 407, errorCode: nil)
+        }
+        return ProxyEgressResponse(statusCode: nil, errorCode: String(error.code.rawValue))
+    }
+
+    static func configuration(
+        for proxy: EffectiveProxy,
+        timeout: Duration
+    ) -> URLSessionConfiguration? {
+        let proxyConfiguration: ProxyConfiguration
+        switch proxy {
+        case .http(let endpoint):
+            guard let networkEndpoint = endpoint.networkEndpoint else { return nil }
+            proxyConfiguration = ProxyConfiguration(
+                httpCONNECTProxy: networkEndpoint
+            )
+        case .https(let endpoint):
+            guard let networkEndpoint = endpoint.networkEndpoint else { return nil }
+            proxyConfiguration = ProxyConfiguration(
+                httpCONNECTProxy: networkEndpoint,
+                tlsOptions: NWProtocolTLS.Options()
+            )
+        case .socks(let endpoint):
+            guard let networkEndpoint = endpoint.networkEndpoint else { return nil }
+            proxyConfiguration = ProxyConfiguration(socksv5Proxy: networkEndpoint)
+        case .direct, .unavailable:
+            return nil
+        }
+
+        var selectedProxyConfiguration = proxyConfiguration
+        selectedProxyConfiguration.allowFailover = false
+
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.urlCache = nil
+        configuration.httpCookieStorage = nil
+        configuration.urlCredentialStorage = nil
+        configuration.waitsForConnectivity = false
+        configuration.timeoutIntervalForRequest = timeout.proxyCheckTimeInterval
+        configuration.timeoutIntervalForResource = timeout.proxyCheckTimeInterval
+        configuration.proxyConfigurations = [selectedProxyConfiguration]
+        return configuration
+    }
+}
+
+private extension ProxyEndpoint {
+    var networkEndpoint: NWEndpoint? {
+        guard let networkPort = NWEndpoint.Port(rawValue: port) else { return nil }
+        return .hostPort(
+            host: NWEndpoint.Host(host),
+            port: networkPort
+        )
+    }
+}
+
 struct SystemProxyCheck: DiagnosticCheck {
     let id = NetworkDiagnosticCheckID.proxy
-    private let settingsReader: any SystemProxySettingsReading
+    private let resolver: any ProxyResolving
     private let connector: any ProxyEndpointConnecting
+    private let egressLoader: any ProxyEgressLoading
+    private let controlURL: URL
     private let timeout: Duration
 
     init(
-        settingsReader: any SystemProxySettingsReading = SystemProxySettingsReader(),
+        resolver: any ProxyResolving = SystemProxyResolver(),
         connector: any ProxyEndpointConnecting = NetworkProxyEndpointConnector(),
+        egressLoader: any ProxyEgressLoading = SystemProxyEgressLoader(),
+        controlURL: URL = HTTPSControlEndpointCheck().captivePortalEndpoint,
         timeout: Duration = .seconds(3)
     ) {
-        self.settingsReader = settingsReader
+        self.resolver = resolver
         self.connector = connector
+        self.egressLoader = egressLoader
+        self.controlURL = controlURL
         self.timeout = timeout
     }
 
     func run() async -> NetworkDiagnosticResult {
-        guard let configuration = settingsReader.read() else {
-            return result(.indeterminate, key: "network_diagnostics.proxy.indeterminate.summary")
-        }
-
-        let allReachable = await withTaskGroup(of: Bool.self, returning: Bool.self) { group in
-            for endpoint in configuration.endpoints {
-                group.addTask {
-                    await connector.canConnect(to: endpoint, timeout: timeout)
-                }
-            }
-            for await reachable in group where !reachable {
-                group.cancelAll()
-                return false
-            }
-            return true
-        }
-
-        if !allReachable {
-            return result(.abnormal, key: "network_diagnostics.proxy.abnormal.summary")
-        }
-        if configuration.hasInvalidExplicitProxy
-            || configuration.pacEnabled
-            || configuration.autoDiscoveryEnabled {
-            return result(.indeterminate, key: "network_diagnostics.proxy.indeterminate.summary")
-        }
-        if configuration.endpoints.isEmpty {
+        let proxy = await resolver.resolve(for: controlURL)
+        if proxy == .direct {
             return result(.normal, key: "network_diagnostics.proxy.disabled.summary")
         }
-        return result(.normal, key: "network_diagnostics.proxy.normal.summary")
+
+        if case .unavailable(let reason) = proxy {
+            if reason.hasPrefix("pac-") {
+                return result(
+                    .indeterminate,
+                    key: "network_diagnostics.proxy.pac_unavailable.summary",
+                    evidence: [.init(code: "proxy.pac-unavailable", value: reason)]
+                )
+            }
+            return result(
+                .indeterminate,
+                key: "network_diagnostics.proxy.indeterminate.summary",
+                evidence: [.init(code: "proxy.resolution-unavailable", value: reason)]
+            )
+        }
+
+        guard let endpoint = proxy.endpoint else {
+            return result(.indeterminate, key: "network_diagnostics.proxy.indeterminate.summary")
+        }
+        guard await connector.canConnect(to: endpoint, timeout: timeout) else {
+            return result(
+                .abnormal,
+                key: "network_diagnostics.proxy.endpoint_unavailable.summary",
+                evidence: [.init(code: "proxy.endpoint-unavailable", value: nil)]
+            )
+        }
+
+        let response = await egressLoader.load(url: controlURL, through: proxy, timeout: timeout)
+        if response.statusCode == 407 {
+            return result(
+                .abnormal,
+                key: "network_diagnostics.proxy.authentication_required.summary",
+                evidence: [.init(code: "proxy.authentication-required", value: "407")]
+            )
+        }
+        guard let statusCode = response.statusCode, (200..<300).contains(statusCode) else {
+            return result(
+                .abnormal,
+                key: "network_diagnostics.proxy.egress_unavailable.summary",
+                evidence: [
+                    .init(
+                        code: "proxy.egress-unavailable",
+                        value: response.errorCode ?? response.statusCode.map(String.init) ?? "unknown"
+                    ),
+                ]
+            )
+        }
+        return result(
+            .normal,
+            key: "network_diagnostics.proxy.normal.summary",
+            evidence: [.init(code: "proxy.egress-available", value: String(statusCode))]
+        )
     }
 
-    private func result(_ status: NetworkDiagnosticStatus, key: String.LocalizationValue) -> NetworkDiagnosticResult {
+    private func result(
+        _ status: NetworkDiagnosticStatus,
+        key: String.LocalizationValue,
+        evidence: [NetworkDiagnosticEvidence] = []
+    ) -> NetworkDiagnosticResult {
         NetworkDiagnosticResult(
             id: id,
             status: status,
-            summary: String(localized: key, comment: "Network self-check system proxy result summary")
+            summary: String(localized: key, comment: "Network self-check system proxy result summary"),
+            evidence: evidence
+        )
+    }
+}
+
+private extension EffectiveProxy {
+    var endpoint: ProxyEndpoint? {
+        switch self {
+        case .http(let endpoint), .https(let endpoint), .socks(let endpoint):
+            endpoint
+        case .direct, .unavailable:
+            nil
+        }
+    }
+}
+
+private final class ProxyEgressRedirectDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+    func urlSession(
+        _ session: URLSession,
+        task: URLSessionTask,
+        willPerformHTTPRedirection response: HTTPURLResponse,
+        newRequest request: URLRequest,
+        completionHandler: @escaping (URLRequest?) -> Void
+    ) {
+        completionHandler(nil)
+    }
+}
+
+private extension Duration {
+    var proxyCheckTimeInterval: TimeInterval {
+        let components = self.components
+        return max(
+            0.001,
+            Double(components.seconds) + Double(components.attoseconds) / 1_000_000_000_000_000_000
         )
     }
 }
