@@ -1,26 +1,39 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/screenshot-swiftui.png">
-  <img alt="WiFi Lens macOS Wi-Fi スペクトラムアナライザ" src="assets/screenshot-swiftui.png" width="800">
-</picture>
-
 # WiFi Lens
 
+**macOS 向けのネイティブなオープンソース Wi-Fi アナライザおよびネットワーク診断アプリ。**
+
+チャンネルの混雑を可視化し、接続の問題を解決し、Wi-Fi ローミングを検証——すべて Mac 上でローカルに実行します。
+
+[![最新リリース](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
+[![macOS](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
+[![ライセンス](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Swift CI](https://github.com/SHIINASAMA/wifi-lens/workflows/Swift%20CI/badge.svg)](https://github.com/SHIINASAMA/wifi-lens/actions?query=workflow%3A%22Swift+CI%22)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
-[![X](https://img.shields.io/badge/X-@WiFiLens-1d9bf0)](https://x.com/WiFiLens)
-[![Email](https://img.shields.io/badge/email-wifi--lens@outlook.com-0078d4)](mailto:wifi-lens@outlook.com)
-[![Website](https://img.shields.io/badge/website-wifi--lens.shiinalabs.com-2563eb)](https://wifi-lens.shiinalabs.com)
-
-🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
-
-**Wi-Fi ネットワークを分析・最適化するためのネイティブ macOS ツール。**
 
 <p align="center">
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746">
-    <img src="assets/appstore-badge-en.svg" alt="Mac App Store で WiFi Lens Pro をダウンロード" width="240">
-  </a>
+  <a href="https://github.com/SHIINASAMA/wifi-lens/releases/latest"><strong>オープンソース版をダウンロード</strong></a>
+  ·
+  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>WiFi Lens Pro を入手</strong></a>
+  ·
+  <a href="https://wifi-lens.shiinalabs.com">公式サイト</a>
 </p>
+
+macOS 14+ · Intel および Apple Silicon · テレメトリなし
+
+<img alt="macOS 上で Wi-Fi スペクトラム分析を表示する WiFi Lens" src="assets/screenshot-swiftui.png" width="800">
+
+## オープンソース版か Pro か？
+
+| オープンソース版 | WiFi Lens Pro |
+|---|---|
+| 無料・オープンソース — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) | 一回買いの Mac App Store 版 — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) |
+| 3 バンド Wi-Fi スキャンとスペクトル分析 | オープンソース版の全機能を含む |
+| チャンネル品質、ネットワーク詳細、ローミングテスト | スペクトラムセッション録画——時間経過によるキャプチャと再生 |
+| ネットワーク自己診断、BLE スキャナ、MCP サーバー | 期間をまたぐスペクトルの並列比較 |
+| PNG/CSV エクスポート · Sparkle アップデート | 常駐メニューバー · タイムラインとトレンド · Mac App Store アップデート |
+
+> 両版のコア Wi-Fi 分析機能は同一です。Pro は専門ワークフロー向けにスペクトル録画、比較、常駐メニューバー、タイムラインを追加します。
+
+🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
 
 ---
 
@@ -28,7 +41,7 @@
 
 WiFi Lens は、SwiftUI、CoreWLAN、CoreBluetooth で開発したネイティブ macOS Wi-Fi・Bluetooth アナライザです。周辺の無線ネットワークと BLE デバイスをリアルタイムで表示し、接続問題の診断、混雑の少ないチャンネルの選択、アクセスポイント間のローミング動作の確認に役立ちます。
 
-このリポジトリでは無料のオープンソース版を提供しています。WiFi Lens Pro は追加機能を含む別売りの有料版です。
+このリポジトリでは無料のオープンソース版を提供しています。WiFi Lens Pro は別売りの有料版で、スペクトル録画、比較、常駐メニューバー、タイムライン機能を追加します。
 
 **典型的なユースケース：**
 
@@ -41,23 +54,29 @@ WiFi Lens は、SwiftUI、CoreWLAN、CoreBluetooth で開発したネイティ�
 
 ## 機能
 
-| カテゴリ | 機能 |
-|----------|-----------|
-| 📡 **Wi-Fi スキャン** | 2.4、5、6 GHz バンド全体でのリアルタイムスキャン、ネットワークごとの信号強度を表示 |
-| 📊 **スペクトルビュー** | チャンネル占有を一目で示すガウスベル曲線チャート |
-| 🎯 **チャンネル品質** | 混雑スコアと地域ベースの推奨、あなたの規制ドメインに調整済み |
-| 🔍 **ネットワーク詳細** | PHY 世代、チャンネル幅、802.11k/r/v ローミング、WPA3、隠し SSID |
-| 📶 **接続情報** | IP、ゲートウェイ、DNS、MAC、チャンネル、Tx レート、セキュリティサマリー |
-| 📈 **トレンドチャート** | 設定可能なスキャン間隔でネットワークごとの信号履歴を時間経過とともに表示 |
-| 🔄 **ローミングテスト** | タイムラインチャート、範囲セレクタ、セッション保存/読み込み機能付き AP 遷移モニタリング |
-| 🗺️ **チャンネルヒートマップ** | バンドごとの占有ヒートマップですぐに混雑パターンを特定 |
-| 🎧 **BLE スキャナ** | Bluetooth LE デバイス発見、RSSI 分析、トレンドチャート、デバイス追跡 |
-| 🎨 **スマートカラーリング** | SSID に基づく一貫した色割り当て。同じネットワークには同じ色を使用 |
-| 🔒 **プライバシーファースト** | テレメトリと利用状況分析なし。Wi-Fi スキャンデータは Mac 内に保持 |
-| 🌐 **MCP サーバー** | 外部ツール連携用の内蔵 HTTP API（`127.0.0.1:19840`） |
-| 🔄 **自動アップデート** | GitHub 版で任意の Sparkle アップデート確認を提供 |
-| 📤 **エクスポート** | バンドごとのチャートを PNG 画像または CSV データとして保存 |
-| 🌍 **ローカライズ** | 英語、ドイツ語、スペイン語、日本語、簡体字中国語 |
+| カテゴリ | 機能 | エディション |
+|----------|-----------|---------|
+| 📡 **Wi-Fi スキャン** | 2.4、5、6 GHz バンド全体でのリアルタイムスキャン、ネットワークごとの信号強度を表示 | OSS & Pro |
+| 📊 **スペクトルビュー** | チャンネル占有を一目で示すガウスベル曲線チャート | OSS & Pro |
+| 🎯 **チャンネル品質** | 混雑スコアと地域ベースの推奨、あなたの規制ドメインに調整済み | OSS & Pro |
+| 🔍 **ネットワーク詳細** | PHY 世代、チャンネル幅、802.11k/r/v ローミング、WPA3、隠し SSID | OSS & Pro |
+| 📶 **接続情報** | IP、ゲートウェイ、DNS、MAC、チャンネル、Tx レート、セキュリティサマリー | OSS & Pro |
+| 🩺 **ネットワーク自己診断** | ワンクリックの接続診断——パス、DNS、HTTPS、プロキシ到達性を証拠に基づいて判定 | OSS & Pro |
+| 📈 **タイムラインとトレンド** | 設定可能なスキャン間隔でネットワークごとの信号履歴を時間経過とともに表示 | Pro のみ |
+| 🔄 **ローミングテスト** | タイムラインチャート、範囲セレクタ、セッション保存/読み込み機能付き AP 遷移モニタリング | OSS & Pro |
+| 🗺️ **チャンネルヒートマップ** | バンドごとの占有ヒートマップですぐに混雑パターンを特定 | OSS & Pro |
+| 🎬 **スペクトル録画** | 時間経過によるスペクトルの変化をキャプチャして再生 | Pro のみ |
+| 🔭 **スペクトル比較** | 期間をまたぐスペクトルの並列比較 | Pro のみ |
+| 🎧 **BLE スキャナ** | Bluetooth LE デバイス発見、RSSI 分析、トレンドチャート、デバイス追跡 | OSS & Pro |
+| 🎨 **スマートカラーリング** | SSID に基づく一貫した色割り当て。同じネットワークには同じ色を使用 | OSS & Pro |
+| 📍 **メニューバー** | メニューバーに常駐——アイコンをクリックするだけでいつでもアナライザを起動 | Pro のみ |
+| 🔒 **プライバシーファースト** | テレメトリと利用状況分析なし。Wi-Fi スキャンデータは Mac 内に保持 | OSS & Pro |
+| 🌐 **MCP サーバー** | 外部ツール連携用の内蔵 HTTP API（`127.0.0.1:19840`） | OSS & Pro |
+| 🔄 **自動アップデート** | GitHub 版で任意の Sparkle アップデート確認を提供 | OSS & Pro |
+| 📤 **エクスポート** | バンドごとのチャートを PNG 画像または CSV データとして保存 | OSS & Pro |
+| 🌍 **ローカライズ** | 英語、ドイツ語、スペイン語、日本語、簡体字中国語 | OSS & Pro |
+
+**Pro のみ**と記載された機能を除き、すべての機能がオープンソース版に含まれます。Pro はオープンソース版の全機能に加え、録画・比較・メニューバー・タイムラインツールを提供します。
 
 ---
 
@@ -75,18 +94,16 @@ WiFi Lens は、SwiftUI、CoreWLAN、CoreBluetooth で開発したネイティ�
 
 ## ダウンロード
 
-[![最新リリースをダウンロード](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest/)
-[![Mac App Store で WiFi Lens Pro をダウンロード](https://img.shields.io/badge/Download-Mac%20App%20Store-black?logo=apple)](https://apps.apple.com/app/wifi-lens-pro/id6776590746)
+**macOS 14 (Sonoma) 以降**が必要。Intel および Apple Silicon Mac の両方で動作します。6 GHz 帯のスキャンには Wi-Fi 6E/7 ハードウェアが必要です。
 
-GitHub Releases ではオープンソース版を提供しています。WiFi Lens Pro は対応地域の Mac App Store で入手できます。
-
-macOS 14 (Sonoma) 以降が必要。Intel および Apple Silicon Mac の両方で動作します。
-
-> 🌐 **公式サイト：** [wifi-lens.shiinalabs.com](https://wifi-lens.shiinalabs.com) では、スクリーンショット、機能紹介、AI/MCP ワークフロー、FAQ を掲載しています。
+- **オープンソース版** — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest)（無料、任意の Sparkle 自動アップデート付き）
+- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746)（対応地域）
 
 > [!IMPORTANT]
 > macOS 14 以降では、Wi-Fi SSID を読み取るために**位置情報サービス**を有効にする必要があります。
 > **システム設定 → プライバシーとセキュリティ → 位置情報サービス**を開き、確認が表示されたら WiFi Lens を有効にしてください。
+
+> 🌐 **公式サイト：** [wifi-lens.shiinalabs.com](https://wifi-lens.shiinalabs.com) では、スクリーンショット、機能紹介、AI/MCP ワークフロー、FAQ を掲載しています。
 
 ## プライバシー
 
@@ -130,6 +147,8 @@ xed WiFiLens.xcodeproj
 
 Pull request は [.agents/references/project/ARCHITECTURE.md](.agents/references/project/ARCHITECTURE.md) の規約に従い、可能な限りテストを含めてください。コーディングエージェントを使用する場合は [.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md) を参照してください。
 
+**連絡先：** [X の @WiFiLens](https://x.com/WiFiLens) · [wifi-lens@shiinalabs.com](mailto:wifi-lens@shiinalabs.com)
+
 ---
 
 ## 謝辞
@@ -141,7 +160,3 @@ Pull request は [.agents/references/project/ARCHITECTURE.md](.agents/references
 ## ライセンス
 
 Apache License 2.0 © 2020 nolze, 2026 SHIINASAMA。詳細は [LICENSE](LICENSE) を参照。
-
----
-
-**Topics:** `macos` `wifi` `network` `tool` `swift` `bluetooth` `analyzer` `swiftui` `corewlan` `corebluetooth` `open-source` `mcp`

@@ -1,26 +1,39 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/screenshot-swiftui.png">
-  <img alt="WiFi Lens analizador de espectro Wi-Fi para macOS" src="assets/screenshot-swiftui.png" width="800">
-</picture>
-
 # WiFi Lens
 
+**Una aplicación nativa de código abierto de análisis Wi-Fi y diagnóstico de red para macOS.**
+
+Visualiza la congestión de canales, soluciona problemas de conectividad y valida el roaming Wi-Fi — todo localmente en tu Mac.
+
+[![Última versión](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
+[![macOS](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
+[![Licencia](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Swift CI](https://github.com/SHIINASAMA/wifi-lens/workflows/Swift%20CI/badge.svg)](https://github.com/SHIINASAMA/wifi-lens/actions?query=workflow%3A%22Swift+CI%22)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
-[![X](https://img.shields.io/badge/X-@WiFiLens-1d9bf0)](https://x.com/WiFiLens)
-[![Email](https://img.shields.io/badge/email-wifi--lens@outlook.com-0078d4)](mailto:wifi-lens@outlook.com)
-[![Website](https://img.shields.io/badge/website-wifi--lens.shiinalabs.com-2563eb)](https://wifi-lens.shiinalabs.com)
-
-🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
-
-**Una herramienta nativa de macOS para analizar y optimizar tus redes Wi-Fi.**
 
 <p align="center">
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746">
-    <img src="assets/appstore-badge-en.svg" alt="Descargar WiFi Lens Pro en el Mac App Store" width="240">
-  </a>
+  <a href="https://github.com/SHIINASAMA/wifi-lens/releases/latest"><strong>Descargar edición de código abierto</strong></a>
+  ·
+  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>Obtener WiFi Lens Pro</strong></a>
+  ·
+  <a href="https://wifi-lens.shiinalabs.com">Sitio web oficial</a>
 </p>
+
+macOS 14+ · Intel y Apple Silicon · Sin telemetría
+
+<img alt="WiFi Lens mostrando análisis de espectro Wi-Fi en macOS" src="assets/screenshot-swiftui.png" width="800">
+
+## ¿Código abierto o Pro?
+
+| Edición de código abierto | WiFi Lens Pro |
+|---|---|
+| Gratuita y de código abierto — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) | Edición de pago de un solo pago en Mac App Store — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) |
+| Escaneo Wi-Fi de tres bandas y análisis de espectro | Incluye todas las funciones de código abierto |
+| Calidad del canal, detalles de red, pruebas de roaming | Grabación de sesiones de espectro — captura y reproducción a lo largo del tiempo |
+| Autodiagnóstico de red, escáner BLE, servidor MCP | Comparación de espectro en paralelo entre períodos |
+| Exportar PNG/CSV · Actualizaciones Sparkle | Barra de menús persistente · Línea temporal y tendencias · Actualizaciones de Mac App Store |
+
+> El análisis básico de Wi-Fi es idéntico en ambas ediciones. Pro añade grabación y comparación de espectro, barra de menús persistente y línea temporal para flujos de trabajo profesionales.
+
+🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
 
 ---
 
@@ -28,7 +41,7 @@
 
 WiFi Lens es un analizador nativo de Wi-Fi y Bluetooth para macOS, desarrollado con SwiftUI, CoreWLAN y CoreBluetooth. Muestra las redes inalámbricas y los dispositivos BLE cercanos en tiempo real para que puedas diagnosticar problemas de conectividad, elegir un canal menos congestionado y verificar el roaming entre puntos de acceso.
 
-Este repositorio contiene la edición gratuita y de código abierto. WiFi Lens Pro es una edición de pago independiente con funciones adicionales.
+Este repositorio contiene la edición gratuita y de código abierto. WiFi Lens Pro es una edición de pago independiente que añade grabación y comparación de espectro, barra de menús persistente y línea temporal.
 
 **Casos de uso típicos:**
 
@@ -41,23 +54,29 @@ Este repositorio contiene la edición gratuita y de código abierto. WiFi Lens P
 
 ## Funciones
 
-| Categoría | Capacidad |
-|----------|-----------|
-| 📡 **Escaneo Wi-Fi** | Escaneo en tiempo real de las bandas de 2,4, 5 y 6 GHz con intensidad de señal por red |
-| 📊 **Vista de Espectro** | Gráficos de curva de campana gaussiana que muestran la ocupación del canal al instante |
-| 🎯 **Calidad del Canal** | Puntuaciones de congestión con recomendaciones basadas en región adaptadas a tu dominio regulatorio |
-| 🔍 **Detalles de Red** | Generación PHY, ancho de canal, roaming 802.11k/r/v, WPA3, SSID oculto |
-| 📶 **Información de Conexión** | IP, gateway, DNS, MAC, canal, tasa Tx y resumen de seguridad |
-| 📈 **Gráficos de Tendencias** | Historial de señal por red a lo largo del tiempo con intervalo de escaneo configurable |
-| 🔄 **Prueba de Roaming** | Monitoreo de transición AP con gráfico temporal, selector de rango y guardado/carga de sesión |
-| 🗺️ **Mapa de Calor del Canal** | Mapa de calor de ocupación por banda para identificar patrones de congestión al instante |
-| 🎧 **Escáner BLE** | Descubrimiento de dispositivos Bluetooth LE, análisis RSSI, gráficos de tendencias y seguimiento de dispositivos |
-| 🎨 **Colores Inteligentes** | Asignación de color determinista basada en el SSID; la misma red conserva el mismo color |
-| 🔒 **Privacidad Primero** | Sin telemetría ni analítica; los datos de escaneo Wi-Fi permanecen en tu Mac |
-| 🌐 **Servidor MCP** | API HTTP embebida en `127.0.0.1:19840` para integración con herramientas externas |
-| 🔄 **Actualizaciones Automáticas** | Comprobaciones opcionales mediante Sparkle en la edición de GitHub |
-| 📤 **Exportar** | Guarda gráficos por banda como imágenes PNG o datos CSV |
-| 🌍 **Localizado** | Inglés, alemán, español, japonés y chino simplificado |
+| Categoría | Capacidad | Edición |
+|----------|-----------|---------|
+| 📡 **Escaneo Wi-Fi** | Escaneo en tiempo real de las bandas de 2,4, 5 y 6 GHz con intensidad de señal por red | OSS & Pro |
+| 📊 **Vista de Espectro** | Gráficos de curva de campana gaussiana que muestran la ocupación del canal al instante | OSS & Pro |
+| 🎯 **Calidad del Canal** | Puntuaciones de congestión con recomendaciones basadas en región adaptadas a tu dominio regulatorio | OSS & Pro |
+| 🔍 **Detalles de Red** | Generación PHY, ancho de canal, roaming 802.11k/r/v, WPA3, SSID oculto | OSS & Pro |
+| 📶 **Información de Conexión** | IP, gateway, DNS, MAC, canal, tasa Tx y resumen de seguridad | OSS & Pro |
+| 🩺 **Autodiagnóstico de red** | Diagnóstico de conexión con un clic — ruta, DNS, HTTPS y accesibilidad del proxy, con conclusiones basadas en evidencia | OSS & Pro |
+| 📈 **Línea temporal y tendencias** | Historial de señal por red a lo largo del tiempo con intervalo de escaneo configurable | Solo Pro |
+| 🔄 **Prueba de Roaming** | Monitoreo de transición AP con gráfico temporal, selector de rango y guardado/carga de sesión | OSS & Pro |
+| 🗺️ **Mapa de Calor del Canal** | Mapa de calor de ocupación por banda para identificar patrones de congestión al instante | OSS & Pro |
+| 🎬 **Grabación de espectro** | Captura y reproduce cambios del espectro a lo largo del tiempo | Solo Pro |
+| 🔭 **Comparación de espectro** | Comparación en paralelo del espectro entre períodos | Solo Pro |
+| 🎧 **Escáner BLE** | Descubrimiento de dispositivos Bluetooth LE, análisis RSSI, gráficos de tendencias y seguimiento de dispositivos | OSS & Pro |
+| 🎨 **Colores Inteligentes** | Asignación de color determinista basada en el SSID; la misma red conserva el mismo color | OSS & Pro |
+| 📍 **Barra de menús** | Vive en tu barra de menús — haz clic en el icono para abrir el analizador en cualquier momento | Solo Pro |
+| 🔒 **Privacidad Primero** | Sin telemetría ni analítica; los datos de escaneo Wi-Fi permanecen en tu Mac | OSS & Pro |
+| 🌐 **Servidor MCP** | API HTTP embebida en `127.0.0.1:19840` para integración con herramientas externas | OSS & Pro |
+| 🔄 **Actualizaciones Automáticas** | Comprobaciones opcionales mediante Sparkle en la edición de GitHub | OSS & Pro |
+| 📤 **Exportar** | Guarda gráficos por banda como imágenes PNG o datos CSV | OSS & Pro |
+| 🌍 **Localizado** | Inglés, alemán, español, japonés y chino simplificado | OSS & Pro |
+
+Todas las funciones están incluidas en la edición de código abierto, salvo las marcadas **Solo Pro**. Pro incluye todas las funciones de código abierto más las herramientas de grabación, comparación, barra de menús y línea temporal.
 
 ---
 
@@ -75,18 +94,16 @@ Este repositorio contiene la edición gratuita y de código abierto. WiFi Lens P
 
 ## Descargar
 
-[![Descargar última versión](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest/)
-[![Descargar WiFi Lens Pro en el Mac App Store](https://img.shields.io/badge/Download-Mac%20App%20Store-black?logo=apple)](https://apps.apple.com/app/wifi-lens-pro/id6776590746)
+Requiere **macOS 14 (Sonoma) o posterior**. Funciona en Macs Intel y Apple Silicon. El escaneo de la banda de 6 GHz requiere hardware Wi-Fi 6E/7.
 
-GitHub Releases ofrece la edición de código abierto. WiFi Lens Pro está disponible en el Mac App Store en las regiones compatibles.
-
-Requiere macOS 14 (Sonoma) o posterior. Funciona en Macs Intel y Apple Silicon.
-
-> 🌐 **Sitio web oficial:** [wifi-lens.shiinalabs.com](https://wifi-lens.shiinalabs.com) ofrece capturas de pantalla, una guía de funciones, flujos de trabajo de IA/MCP y preguntas frecuentes.
+- **Edición de código abierto** — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) (gratuita, con comprobaciones opcionales mediante Sparkle)
+- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) (regiones compatibles)
 
 > [!IMPORTANT]
 > En macOS 14 o posterior, los **Servicios de localización** deben estar activados para que la app lea los nombres SSID Wi-Fi.
 > Ve a **Ajustes del Sistema → Privacidad y seguridad → Localización** y activa WiFi Lens cuando se solicite.
+
+> 🌐 **Sitio web oficial:** [wifi-lens.shiinalabs.com](https://wifi-lens.shiinalabs.com) ofrece capturas de pantalla, una guía de funciones, flujos de trabajo de IA/MCP y preguntas frecuentes.
 
 ## Privacidad
 
@@ -130,6 +147,8 @@ Los informes de errores y las propuestas de funciones son bienvenidos. Abre un [
 
 Las pull requests deben seguir las convenciones de [.agents/references/project/ARCHITECTURE.md](.agents/references/project/ARCHITECTURE.md) e incluir pruebas cuando sea práctico. Si usas agentes de programación, consulta las directrices de [.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md).
 
+**Contacto:** [@WiFiLens en X](https://x.com/WiFiLens) · [wifi-lens@shiinalabs.com](mailto:wifi-lens@shiinalabs.com)
+
 ---
 
 ## Agradecimientos
@@ -141,7 +160,3 @@ Este proyecto comenzó como una bifurcación de [tiny-wifi-analyzer](https://git
 ## Licencia
 
 Apache License 2.0 © 2020 nolze, 2026 SHIINASAMA. Ver [LICENSE](LICENSE) para texto completo.
-
----
-
-**Topics:** `macos` `wifi` `network` `tool` `swift` `bluetooth` `analyzer` `swiftui` `corewlan` `corebluetooth` `open-source` `mcp`
