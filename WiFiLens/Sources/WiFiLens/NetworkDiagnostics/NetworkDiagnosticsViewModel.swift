@@ -142,12 +142,16 @@ final class NetworkDiagnosticsViewModel {
     }
 
     private func runSession() async {
-        let initialFingerprint = await fingerprintMonitor.currentFingerprint()
         let restartController = NetworkDiagnosticRestartController()
 
         await withTaskCancellationHandler {
+            let fingerprintObservation = await fingerprintMonitor.observation()
+            guard !Task.isCancelled else {
+                phase = .idle
+                return
+            }
             await executeSession(
-                initialFingerprint: initialFingerprint,
+                fingerprintObservation: fingerprintObservation,
                 restartController: restartController
             )
         } onCancel: {
@@ -157,13 +161,12 @@ final class NetworkDiagnosticsViewModel {
     }
 
     private func executeSession(
-        initialFingerprint: NetworkFingerprint?,
+        fingerprintObservation: NetworkFingerprintObservation?,
         restartController: NetworkDiagnosticRestartController
     ) async {
-        let monitorTask: Task<Void, Never>? = initialFingerprint.map { baseline in
-            let fingerprintMonitor = fingerprintMonitor
+        let monitorTask: Task<Void, Never>? = fingerprintObservation.map { observation in
             return Task {
-                for await fingerprint in fingerprintMonitor.changes(from: baseline) {
+                for await fingerprint in observation.changes {
                     guard !Task.isCancelled else { break }
                     await restartController.observe(fingerprint)
                 }
@@ -236,18 +239,22 @@ final class NetworkDiagnosticsViewModel {
 actor NetworkDiagnosticRestartController {
     private var currentRun: Task<[NetworkDiagnosticResult], Never>?
     private var restartRequested = false
+    private var restartInstallPending = false
+    private var cancellationRequested = false
     private var finalized = false
 
     func install(_ task: Task<[NetworkDiagnosticResult], Never>) {
         currentRun = task
-        if restartRequested {
+        restartInstallPending = false
+        if restartRequested || cancellationRequested {
             task.cancel()
         }
     }
 
     @discardableResult
     func observe(_: NetworkFingerprint) -> Bool {
-        guard !finalized else { return false }
+        guard !finalized, !cancellationRequested else { return false }
+        guard !restartInstallPending else { return true }
         restartRequested = true
         currentRun?.cancel()
         return true
@@ -255,8 +262,13 @@ actor NetworkDiagnosticRestartController {
 
     func completeRun() -> Bool {
         currentRun = nil
+        if cancellationRequested {
+            finalized = true
+            return false
+        }
         if restartRequested {
             restartRequested = false
+            restartInstallPending = true
             return true
         }
         finalized = true
@@ -264,6 +276,9 @@ actor NetworkDiagnosticRestartController {
     }
 
     func cancelCurrentRun() {
+        cancellationRequested = true
+        restartRequested = false
+        restartInstallPending = false
         currentRun?.cancel()
         currentRun = nil
     }

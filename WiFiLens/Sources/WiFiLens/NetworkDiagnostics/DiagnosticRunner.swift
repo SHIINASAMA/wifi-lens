@@ -13,6 +13,13 @@ extension DiagnosticCheck {
     var rerunPolicy: DiagnosticCheckRerunPolicy { .networkSensitive }
 }
 
+extension NetworkDiagnosticStatus: Hashable {}
+
+private struct DiagnosticDependency {
+    let id: NetworkDiagnosticCheckID
+    let blockingStatuses: Set<NetworkDiagnosticStatus>
+}
+
 struct DiagnosticRunner: Sendable {
     let checks: [any DiagnosticCheck]
     var minimumStepDuration: Duration = .zero
@@ -58,18 +65,26 @@ struct DiagnosticRunner: Sendable {
         for id: NetworkDiagnosticCheckID,
         from results: [NetworkDiagnosticResult]
     ) -> NetworkDiagnosticResult? {
-        let dependencies: [NetworkDiagnosticCheckID] = switch id {
+        let hardFailureStatuses: Set<NetworkDiagnosticStatus> = [.abnormal, .blocked]
+        let dependencies: [DiagnosticDependency] = switch id {
         case .path:
             []
         case .dns:
-            [.path]
+            [.init(id: .path, blockingStatuses: hardFailureStatuses)]
         case .internet, .ipv6:
-            [.path, .dns]
+            [
+                .init(id: .path, blockingStatuses: hardFailureStatuses),
+                .init(id: .dns, blockingStatuses: hardFailureStatuses),
+            ]
         case .proxy:
-            [.path]
+            [.init(id: .path, blockingStatuses: hardFailureStatuses)]
         }
         return dependencies.compactMap { dependency in
-            results.first { $0.id == dependency }
-        }.first { $0.status != .normal }
+            guard let result = results.first(where: { $0.id == dependency.id }),
+                  dependency.blockingStatuses.contains(result.status) else {
+                return nil
+            }
+            return result
+        }.first
     }
 }

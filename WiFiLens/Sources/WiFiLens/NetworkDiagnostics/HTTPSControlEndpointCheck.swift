@@ -16,6 +16,8 @@ struct SystemControlEndpointLoader: ControlEndpointLoading {
         configuration.waitsForConnectivity = false
         configuration.timeoutIntervalForRequest = timeoutInterval
         configuration.timeoutIntervalForResource = timeoutInterval
+        configuration.connectionProxyDictionary = [:]
+        configuration.proxyConfigurations = []
         return configuration
     }
 

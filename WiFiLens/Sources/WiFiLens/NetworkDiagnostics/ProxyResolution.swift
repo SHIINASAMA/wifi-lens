@@ -9,8 +9,29 @@ enum EffectiveProxy: Equatable, Sendable {
     case unavailable(String)
 }
 
+struct ProxyCandidateResolution: Equatable, Sendable {
+    let candidates: [EffectiveProxy]
+    let evidenceCodes: [String]
+}
+
+enum ProxyTargetRouteStatus: Equatable, Sendable {
+    case direct
+    case proxied
+    case authenticationRequired
+    case unavailable
+    case indeterminate
+}
+
+struct ProxyTargetRouteResult: Equatable, Sendable {
+    let target: URL
+    let status: ProxyTargetRouteStatus
+    let selectedCandidateIndex: Int?
+    let selectedProxy: EffectiveProxy?
+    let evidence: [NetworkDiagnosticEvidence]
+}
+
 protocol ProxyResolving: Sendable {
-    func resolve(for url: URL) async -> EffectiveProxy
+    func resolve(for url: URL) async -> ProxyCandidateResolution
 }
 
 enum ProxyResolutionDirective: Equatable, Sendable {
@@ -19,6 +40,7 @@ enum ProxyResolutionDirective: Equatable, Sendable {
     case https(ProxyEndpoint)
     case socks(ProxyEndpoint)
     case pac(URL)
+    case pacScript(String)
     case unavailable(String)
 
     var effectiveProxy: EffectiveProxy {
@@ -31,7 +53,7 @@ enum ProxyResolutionDirective: Equatable, Sendable {
             .https(endpoint)
         case .socks(let endpoint):
             .socks(endpoint)
-        case .pac:
+        case .pac, .pacScript:
             .unavailable("pac-execution-invalid")
         case .unavailable(let reason):
             .unavailable(reason)
@@ -40,11 +62,53 @@ enum ProxyResolutionDirective: Equatable, Sendable {
 }
 
 protocol ProxyConfigurationResolving: Sendable {
-    func resolution(for url: URL) -> ProxyResolutionDirective
+    func resolutions(for url: URL) -> [ProxyResolutionDirective]
 }
 
 protocol PACResolving: Sendable {
-    func resolve(pacURL: URL, targetURL: URL, timeout: Duration) async -> EffectiveProxy
+    func resolve(
+        pacURL: URL,
+        targetURL: URL,
+        timeout: Duration
+    ) async -> ProxyCandidateResolution
+
+    func resolve(
+        pacScript: String,
+        targetURL: URL,
+        timeout: Duration
+    ) async -> ProxyCandidateResolution
+}
+
+extension PACResolving {
+    func resolve(
+        pacScript: String,
+        targetURL: URL,
+        timeout: Duration
+    ) async -> ProxyCandidateResolution {
+        ProxyCandidateResolution(candidates: [], evidenceCodes: ["pac-script-unsupported"])
+    }
+}
+
+enum PACSource: Equatable, Sendable {
+    case url(URL)
+    case script(String)
+}
+
+enum PACCallbackOutcome: Equatable, Sendable {
+    case success(ProxyCandidateResolution)
+    case failure
+}
+
+protocol PACCallbackExecution: Sendable {
+    func cancel()
+}
+
+protocol PACCallbackExecuting: Sendable {
+    func execute(
+        source: PACSource,
+        targetURL: URL,
+        callback: @escaping @Sendable (PACCallbackOutcome) -> Void
+    ) -> any PACCallbackExecution
 }
 
 struct SystemProxyResolver: ProxyResolving {
@@ -62,12 +126,79 @@ struct SystemProxyResolver: ProxyResolving {
         self.pacResolver = pacResolver
     }
 
-    func resolve(for url: URL) async -> EffectiveProxy {
-        let resolution = configurationResolver.resolution(for: url)
-        guard case .pac(let pacURL) = resolution else {
-            return resolution.effectiveProxy
+    func resolve(for url: URL) async -> ProxyCandidateResolution {
+        guard !Task.isCancelled else { return Self.cancelledResolution() }
+        var candidates: [EffectiveProxy] = []
+        var evidenceCodes: [String] = []
+        let directives = configurationResolver.resolutions(for: url)
+        guard !Task.isCancelled else { return Self.cancelledResolution() }
+
+        for directive in directives {
+            guard !Task.isCancelled else {
+                return Self.cancelledResolution(preserving: evidenceCodes)
+            }
+            switch directive {
+            case .direct, .http, .https, .socks:
+                candidates.append(directive.effectiveProxy)
+            case .pac(let pacURL):
+                let pacResolution = await pacResolver.resolve(
+                    pacURL: pacURL,
+                    targetURL: url,
+                    timeout: pacTimeout
+                )
+                evidenceCodes.append(contentsOf: pacResolution.evidenceCodes)
+                guard !Task.isCancelled else {
+                    return Self.cancelledResolution(preserving: evidenceCodes)
+                }
+                candidates.append(contentsOf: pacResolution.candidates)
+            case .pacScript(let script):
+                let pacResolution = await pacResolver.resolve(
+                    pacScript: script,
+                    targetURL: url,
+                    timeout: pacTimeout
+                )
+                evidenceCodes.append(contentsOf: pacResolution.evidenceCodes)
+                guard !Task.isCancelled else {
+                    return Self.cancelledResolution(preserving: evidenceCodes)
+                }
+                candidates.append(contentsOf: pacResolution.candidates)
+            case .unavailable(let reason):
+                evidenceCodes.append(reason)
+            }
         }
-        return await pacResolver.resolve(pacURL: pacURL, targetURL: url, timeout: pacTimeout)
+
+        guard !Task.isCancelled else {
+            return Self.cancelledResolution(preserving: evidenceCodes)
+        }
+        if candidates.isEmpty, evidenceCodes.isEmpty {
+            evidenceCodes.append("resolution-empty")
+        }
+        return ProxyCandidateResolution(candidates: candidates, evidenceCodes: evidenceCodes)
+    }
+
+    private static func cancelledResolution(
+        preserving evidenceCodes: [String] = []
+    ) -> ProxyCandidateResolution {
+        var evidenceCodes = evidenceCodes
+        if !evidenceCodes.contains("resolution-cancelled") {
+            evidenceCodes.append("resolution-cancelled")
+        }
+        return ProxyCandidateResolution(candidates: [], evidenceCodes: evidenceCodes)
+    }
+
+    static func directives(from values: [Any]) -> [ProxyResolutionDirective] {
+        values.map(directive(from:))
+    }
+
+    static func candidates(from values: [Any]) -> [EffectiveProxy] {
+        directives(from: values).compactMap { directive in
+            switch directive {
+            case .direct, .http, .https, .socks:
+                directive.effectiveProxy
+            case .pac, .pacScript, .unavailable:
+                nil
+            }
+        }
     }
 
     static func directive(from value: Any) -> ProxyResolutionDirective {
@@ -88,7 +219,13 @@ struct SystemProxyResolver: ProxyResolving {
             return .pac(pacURL)
         }
         if type == kCFProxyTypeAutoConfigurationJavaScript as NSString {
-            return .unavailable("pac-url-unavailable")
+            guard
+                let script = dictionary[kCFProxyAutoConfigurationJavaScriptKey] as? String,
+                !script.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            else {
+                return .unavailable("pac-script-unavailable")
+            }
+            return .pacScript(script)
         }
         if type == kCFProxyTypeHTTP as NSString {
             return endpoint(in: dictionary).map(ProxyResolutionDirective.http)
@@ -108,6 +245,7 @@ struct SystemProxyResolver: ProxyResolving {
     private static func endpoint(in dictionary: NSDictionary) -> ProxyEndpoint? {
         guard
             let host = dictionary[kCFProxyHostNameKey] as? String,
+            !host.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
             let portNumber = dictionary[kCFProxyPortNumberKey] as? NSNumber,
             (1...Int(UInt16.max)).contains(portNumber.intValue)
         else {
@@ -118,29 +256,57 @@ struct SystemProxyResolver: ProxyResolving {
 }
 
 struct CFNetworkProxyConfigurationResolver: ProxyConfigurationResolving {
-    func resolution(for url: URL) -> ProxyResolutionDirective {
+    func resolutions(for url: URL) -> [ProxyResolutionDirective] {
         guard let settings = CFNetworkCopySystemProxySettings()?.takeRetainedValue() else {
-            return .unavailable("settings-unavailable")
+            return [.unavailable("settings-unavailable")]
         }
 
         let proxyList = CFNetworkCopyProxiesForURL(url as CFURL, settings).takeRetainedValue()
-        guard let firstProxy = (proxyList as NSArray).firstObject else {
-            return .unavailable("resolution-empty")
+        let values = (proxyList as NSArray).map { $0 }
+        guard !values.isEmpty else {
+            return [.unavailable("resolution-empty")]
         }
 
-        return SystemProxyResolver.directive(from: firstProxy)
+        return SystemProxyResolver.directives(from: values)
     }
 }
 
 struct SystemPACResolver: PACResolving {
-    func resolve(pacURL: URL, targetURL: URL, timeout: Duration) async -> EffectiveProxy {
+    private let callbackExecutor: any PACCallbackExecuting
+
+    init(callbackExecutor: any PACCallbackExecuting = SystemPACCallbackExecutor()) {
+        self.callbackExecutor = callbackExecutor
+    }
+
+    func resolve(
+        pacURL: URL,
+        targetURL: URL,
+        timeout: Duration
+    ) async -> ProxyCandidateResolution {
+        await resolve(source: .url(pacURL), targetURL: targetURL, timeout: timeout)
+    }
+
+    func resolve(
+        pacScript: String,
+        targetURL: URL,
+        timeout: Duration
+    ) async -> ProxyCandidateResolution {
+        await resolve(source: .script(pacScript), targetURL: targetURL, timeout: timeout)
+    }
+
+    private func resolve(
+        source: PACSource,
+        targetURL: URL,
+        timeout: Duration
+    ) async -> ProxyCandidateResolution {
         let context = PACResolutionContext()
         return await withTaskCancellationHandler {
             await withCheckedContinuation { continuation in
                 context.start(
-                    pacURL: pacURL,
+                    source: source,
                     targetURL: targetURL,
                     timeout: timeout,
+                    callbackExecutor: callbackExecutor,
                     continuation: continuation
                 )
             }
@@ -148,30 +314,55 @@ struct SystemPACResolver: PACResolving {
             context.cancel()
         }
     }
+
+    static func resolution(from values: [Any]) -> ProxyCandidateResolution {
+        guard !values.isEmpty else {
+            return ProxyCandidateResolution(
+                candidates: [],
+                evidenceCodes: ["pac-execution-failed"]
+            )
+        }
+
+        var candidates: [EffectiveProxy] = []
+        var evidenceCodes: [String] = []
+        for directive in SystemProxyResolver.directives(from: values) {
+            switch directive {
+            case .direct, .http, .https, .socks:
+                candidates.append(directive.effectiveProxy)
+            case .pac, .pacScript:
+                evidenceCodes.append("pac-execution-invalid")
+            case .unavailable(let reason):
+                evidenceCodes.append(reason)
+            }
+        }
+        return ProxyCandidateResolution(candidates: candidates, evidenceCodes: evidenceCodes)
+    }
 }
 
-private final class PACResolutionContext: @unchecked Sendable {
+private struct SystemPACCallbackExecutor: PACCallbackExecuting {
+    func execute(
+        source: PACSource,
+        targetURL: URL,
+        callback: @escaping @Sendable (PACCallbackOutcome) -> Void
+    ) -> any PACCallbackExecution {
+        let execution = SystemPACCallbackExecution(callback: callback)
+        execution.start(source: source, targetURL: targetURL)
+        return execution
+    }
+}
+
+private final class SystemPACCallbackExecution: PACCallbackExecution, @unchecked Sendable {
     private let lock = NSLock()
-    private var continuation: CheckedContinuation<EffectiveProxy, Never>?
+    private var callback: (@Sendable (PACCallbackOutcome) -> Void)?
     private var source: CFRunLoopSource?
     private var runLoop: CFRunLoop?
     private var cancellationRequested = false
 
-    func start(
-        pacURL: URL,
-        targetURL: URL,
-        timeout: Duration,
-        continuation: CheckedContinuation<EffectiveProxy, Never>
-    ) {
-        lock.lock()
-        guard !cancellationRequested else {
-            lock.unlock()
-            continuation.resume(returning: .unavailable("pac-cancelled"))
-            return
-        }
-        self.continuation = continuation
-        lock.unlock()
+    init(callback: @escaping @Sendable (PACCallbackOutcome) -> Void) {
+        self.callback = callback
+    }
 
+    func start(source pacSource: PACSource, targetURL: URL) {
         var clientContext = CFStreamClientContext(
             version: 0,
             info: Unmanaged.passUnretained(self).toOpaque(),
@@ -179,15 +370,25 @@ private final class PACResolutionContext: @unchecked Sendable {
             release: nil,
             copyDescription: nil
         )
-        let source = CFNetworkExecuteProxyAutoConfigurationURL(
-            pacURL as CFURL,
-            targetURL as CFURL,
-            proxyAutoConfigurationCallback,
-            &clientContext
-        )
+        let source: CFRunLoopSource = switch pacSource {
+        case .url(let pacURL):
+            CFNetworkExecuteProxyAutoConfigurationURL(
+                pacURL as CFURL,
+                targetURL as CFURL,
+                proxyAutoConfigurationCallback,
+                &clientContext
+            )
+        case .script(let script):
+            CFNetworkExecuteProxyAutoConfigurationScript(
+                script as CFString,
+                targetURL as CFURL,
+                proxyAutoConfigurationCallback,
+                &clientContext
+            )
+        }
 
         lock.lock()
-        guard self.continuation != nil else {
+        guard !cancellationRequested, callback != nil else {
             lock.unlock()
             CFRunLoopSourceInvalidate(source)
             return
@@ -196,51 +397,33 @@ private final class PACResolutionContext: @unchecked Sendable {
         lock.unlock()
 
         DispatchQueue(label: "io.github.kaoru.wifi-lens.network-diagnostics.pac").async { [self] in
-            run(timeout: timeout)
+            run()
         }
     }
 
     func receive(proxyList: CFArray, error: CFError?) {
-        guard error == nil, let firstProxy = (proxyList as NSArray).firstObject else {
-            finish(.unavailable("pac-execution-failed"))
+        let outcome: PACCallbackOutcome
+        if error != nil {
+            outcome = .failure
+        } else {
+            let values = (proxyList as NSArray).map { $0 }
+            outcome = .success(SystemPACResolver.resolution(from: values))
+        }
+
+        lock.lock()
+        guard !cancellationRequested, let callback else {
+            lock.unlock()
             return
         }
-        finish(SystemProxyResolver.directive(from: firstProxy).effectiveProxy)
+        self.callback = nil
+        lock.unlock()
+        callback(outcome)
     }
 
     func cancel() {
         lock.lock()
         cancellationRequested = true
-        let hasContinuation = continuation != nil
-        lock.unlock()
-        if hasContinuation {
-            finish(.unavailable("pac-cancelled"))
-        }
-    }
-
-    private func run(timeout: Duration) {
-        let runLoop = CFRunLoopGetCurrent()
-
-        lock.lock()
-        guard continuation != nil, let source else {
-            lock.unlock()
-            return
-        }
-        self.runLoop = runLoop
-        lock.unlock()
-
-        CFRunLoopAddSource(runLoop, source, .defaultMode)
-        CFRunLoopRunInMode(.defaultMode, timeout.proxyResolutionTimeInterval, false)
-        finish(.unavailable("pac-timeout"))
-    }
-
-    private func finish(_ resolution: EffectiveProxy) {
-        lock.lock()
-        guard let continuation else {
-            lock.unlock()
-            return
-        }
-        self.continuation = nil
+        callback = nil
         let source = self.source
         self.source = nil
         let runLoop = self.runLoop
@@ -254,6 +437,133 @@ private final class PACResolutionContext: @unchecked Sendable {
             CFRunLoopStop(runLoop)
             CFRunLoopWakeUp(runLoop)
         }
+    }
+
+    private func run() {
+        let runLoop = CFRunLoopGetCurrent()
+        lock.lock()
+        guard !cancellationRequested, let source else {
+            lock.unlock()
+            return
+        }
+        self.runLoop = runLoop
+        lock.unlock()
+
+        CFRunLoopAddSource(runLoop, source, .defaultMode)
+        CFRunLoopRun()
+    }
+}
+
+private final class PACResolutionContext: @unchecked Sendable {
+    private let lock = NSLock()
+    private var continuation: CheckedContinuation<ProxyCandidateResolution, Never>?
+    private var execution: (any PACCallbackExecution)?
+    private var timeoutTask: Task<Void, Never>?
+    private var cancellationRequested = false
+
+    func start(
+        source: PACSource,
+        targetURL: URL,
+        timeout: Duration,
+        callbackExecutor: any PACCallbackExecuting,
+        continuation: CheckedContinuation<ProxyCandidateResolution, Never>
+    ) {
+        lock.lock()
+        guard !cancellationRequested else {
+            lock.unlock()
+            continuation.resume(returning: ProxyCandidateResolution(
+                candidates: [],
+                evidenceCodes: ["pac-cancelled"]
+            ))
+            return
+        }
+        self.continuation = continuation
+        lock.unlock()
+
+        let execution = callbackExecutor.execute(
+            source: source,
+            targetURL: targetURL
+        ) { [weak self] outcome in
+            self?.receive(outcome)
+        }
+        install(execution)
+
+        let timeoutTask = Task { [weak self] in
+            do {
+                try await Task.sleep(for: timeout)
+            } catch {
+                return
+            }
+            self?.finish(ProxyCandidateResolution(
+                candidates: [],
+                evidenceCodes: ["pac-timeout"]
+            ))
+        }
+        install(timeoutTask)
+    }
+
+    func receive(_ outcome: PACCallbackOutcome) {
+        switch outcome {
+        case .success(let resolution):
+            finish(resolution)
+        case .failure:
+            finish(ProxyCandidateResolution(
+                candidates: [],
+                evidenceCodes: ["pac-execution-failed"]
+            ))
+        }
+    }
+
+    func cancel() {
+        lock.lock()
+        cancellationRequested = true
+        let hasContinuation = continuation != nil
+        lock.unlock()
+        if hasContinuation {
+            finish(ProxyCandidateResolution(
+                candidates: [],
+                evidenceCodes: ["pac-cancelled"]
+            ))
+        }
+    }
+
+    private func install(_ execution: any PACCallbackExecution) {
+        lock.lock()
+        guard continuation != nil else {
+            lock.unlock()
+            execution.cancel()
+            return
+        }
+        self.execution = execution
+        lock.unlock()
+    }
+
+    private func install(_ timeoutTask: Task<Void, Never>) {
+        lock.lock()
+        guard continuation != nil else {
+            lock.unlock()
+            timeoutTask.cancel()
+            return
+        }
+        self.timeoutTask = timeoutTask
+        lock.unlock()
+    }
+
+    private func finish(_ resolution: ProxyCandidateResolution) {
+        lock.lock()
+        guard let continuation else {
+            lock.unlock()
+            return
+        }
+        self.continuation = nil
+        let execution = self.execution
+        self.execution = nil
+        let timeoutTask = self.timeoutTask
+        self.timeoutTask = nil
+        lock.unlock()
+
+        execution?.cancel()
+        timeoutTask?.cancel()
         continuation.resume(returning: resolution)
     }
 }
@@ -263,18 +573,8 @@ private func proxyAutoConfigurationCallback(
     proxyList: CFArray,
     error: CFError?
 ) {
-    Unmanaged<PACResolutionContext>
+    Unmanaged<SystemPACCallbackExecution>
         .fromOpaque(client)
         .takeUnretainedValue()
         .receive(proxyList: proxyList, error: error)
-}
-
-private extension Duration {
-    var proxyResolutionTimeInterval: TimeInterval {
-        let components = self.components
-        return max(
-            0.001,
-            Double(components.seconds) + Double(components.attoseconds) / 1_000_000_000_000_000_000
-        )
-    }
 }

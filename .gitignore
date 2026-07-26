@@ -7,7 +7,11 @@ __MACOSX/
 Icon[]
 
 # Local agent artifacts
-/docs/superpowers/
+/docs/superpowers/**
+!/docs/superpowers/specs/
+!/docs/superpowers/specs/2026-07-26-network-diagnostics-review-fixes-design.md
+!/docs/superpowers/plans/
+!/docs/superpowers/plans/2026-07-26-network-diagnostics-review-fixes.md
 
 # Xcode user data
 xcuserdata/

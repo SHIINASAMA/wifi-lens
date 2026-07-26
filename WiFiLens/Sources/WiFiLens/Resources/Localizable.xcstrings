@@ -24802,31 +24802,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The system proxy requires authentication"
+            "value": "A tested proxy route requires authentication"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "システムプロキシには認証が必要です"
+            "value": "テストしたプロキシルートには認証が必要です"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "系统代理需要身份验证"
+            "value": "测试的代理路由需要身份验证"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Der Systemproxy erfordert eine Authentifizierung"
+            "value": "Eine getestete Proxy-Route erfordert eine Authentifizierung"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "El proxy del sistema requiere autenticación"
+            "value": "Una ruta de proxy probada requiere autenticación"
           }
         }
       }
@@ -25037,6 +25037,181 @@
           "stringUnit": {
             "state": "translated",
             "value": "没有可用的全局 IPv6 地址，因此跳过了可选的 IPv6 检查。"
+          }
+        }
+      }
+    },
+    "network_diagnostics.proxy.direct_routes.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The tested HTTP and HTTPS routes use direct connections"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テストした HTTP および HTTPS ルートは直接接続を使用しています"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试的 HTTP 和 HTTPS 路由使用直接连接"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die getesteten HTTP- und HTTPS-Routen verwenden Direktverbindungen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las rutas HTTP y HTTPS probadas usan conexiones directas"
+          }
+        }
+      }
+    },
+    "network_diagnostics.proxy.mixed_routing.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The tested HTTP and HTTPS routes use different proxy paths"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テストした HTTP および HTTPS ルートは異なるプロキシ経路を使用しています"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试的 HTTP 和 HTTPS 路由使用不同的代理路径"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die getesteten HTTP- und HTTPS-Routen verwenden unterschiedliche Proxy-Pfade"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las rutas HTTP y HTTPS probadas usan distintas rutas de proxy"
+          }
+        }
+      }
+    },
+    "network_diagnostics.proxy.routes_available.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The tested proxy routes are available"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テストしたプロキシルートを利用できます"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试的代理路由可用"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die getesteten Proxy-Routen sind verfügbar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las rutas de proxy probadas están disponibles"
+          }
+        }
+      }
+    },
+    "network_diagnostics.proxy.route_unavailable.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A tested proxy route is unavailable"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テストしたプロキシルートを利用できません"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试的代理路由不可用"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine getestete Proxy-Route ist nicht verfügbar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una ruta de proxy probada no está disponible"
+          }
+        }
+      }
+    },
+    "network_diagnostics.proxy.unable_to_determine.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to determine the tested proxy routes"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テストしたプロキシルートを判定できません"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法确定测试的代理路由"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die getesteten Proxy-Routen konnten nicht ermittelt werden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudieron determinar las rutas de proxy probadas"
           }
         }
       }
