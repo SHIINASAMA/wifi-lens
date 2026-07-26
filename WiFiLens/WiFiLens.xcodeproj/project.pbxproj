@@ -17,6 +17,14 @@
 		ND0000000000000000000017 /* NetworkConnectivityCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000022 /* NetworkConnectivityCheck.swift */; };
 		ND0000000000000000000018 /* DNSResolutionCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000023 /* DNSResolutionCheck.swift */; };
 		ND0000000000000000000019 /* SystemProxyCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000024 /* SystemProxyCheck.swift */; };
+		ND0000000000000000000051 /* HTTPSControlEndpointCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000050 /* HTTPSControlEndpointCheck.swift */; };
+		ND0000000000000000000052 /* HTTPSControlEndpointCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000050 /* HTTPSControlEndpointCheck.swift */; };
+		ND0000000000000000000054 /* ProxyResolution.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000053 /* ProxyResolution.swift */; };
+		ND0000000000000000000055 /* ProxyResolution.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000053 /* ProxyResolution.swift */; };
+		ND0000000000000000000058 /* IPv6ControlEndpointCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000056 /* IPv6ControlEndpointCheck.swift */; };
+		ND0000000000000000000059 /* IPv6ControlEndpointCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000056 /* IPv6ControlEndpointCheck.swift */; };
+		ND0000000000000000000060 /* NetworkFingerprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000057 /* NetworkFingerprint.swift */; };
+		ND0000000000000000000061 /* NetworkFingerprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000057 /* NetworkFingerprint.swift */; };
 		ND0000000000000000000040 /* NetworkDiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000042 /* NetworkDiagnosticsViewModel.swift */; };
 		ND0000000000000000000041 /* NetworkDiagnosticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000042 /* NetworkDiagnosticsViewModel.swift */; };
 		ND0000000000000000000043 /* NetworkDiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ND0000000000000000000045 /* NetworkDiagnosticsView.swift */; };
@@ -422,6 +430,10 @@
 		ND0000000000000000000022 /* NetworkConnectivityCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkConnectivityCheck.swift; sourceTree = "<group>"; };
 		ND0000000000000000000023 /* DNSResolutionCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSResolutionCheck.swift; sourceTree = "<group>"; };
 		ND0000000000000000000024 /* SystemProxyCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemProxyCheck.swift; sourceTree = "<group>"; };
+		ND0000000000000000000050 /* HTTPSControlEndpointCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPSControlEndpointCheck.swift; sourceTree = "<group>"; };
+		ND0000000000000000000053 /* ProxyResolution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProxyResolution.swift; sourceTree = "<group>"; };
+		ND0000000000000000000056 /* IPv6ControlEndpointCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPv6ControlEndpointCheck.swift; sourceTree = "<group>"; };
+		ND0000000000000000000057 /* NetworkFingerprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkFingerprint.swift; sourceTree = "<group>"; };
 		ND0000000000000000000042 /* NetworkDiagnosticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDiagnosticsViewModel.swift; sourceTree = "<group>"; };
 		ND0000000000000000000045 /* NetworkDiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDiagnosticsView.swift; sourceTree = "<group>"; };
 		ND0000000000000000000002 /* NetworkDiagnosticsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDiagnosticsTests.swift; sourceTree = "<group>"; };
@@ -965,6 +977,10 @@
 				ND0000000000000000000022 /* NetworkConnectivityCheck.swift */,
 				ND0000000000000000000023 /* DNSResolutionCheck.swift */,
 				ND0000000000000000000024 /* SystemProxyCheck.swift */,
+				ND0000000000000000000050 /* HTTPSControlEndpointCheck.swift */,
+				ND0000000000000000000053 /* ProxyResolution.swift */,
+				ND0000000000000000000056 /* IPv6ControlEndpointCheck.swift */,
+				ND0000000000000000000057 /* NetworkFingerprint.swift */,
 				ND0000000000000000000042 /* NetworkDiagnosticsViewModel.swift */,
 				ND0000000000000000000045 /* NetworkDiagnosticsView.swift */,
 			);
@@ -1589,6 +1605,10 @@
 				ND0000000000000000000014 /* NetworkConnectivityCheck.swift in Sources */,
 				ND0000000000000000000015 /* DNSResolutionCheck.swift in Sources */,
 				ND0000000000000000000016 /* SystemProxyCheck.swift in Sources */,
+				ND0000000000000000000051 /* HTTPSControlEndpointCheck.swift in Sources */,
+				ND0000000000000000000054 /* ProxyResolution.swift in Sources */,
+				ND0000000000000000000058 /* IPv6ControlEndpointCheck.swift in Sources */,
+				ND0000000000000000000060 /* NetworkFingerprint.swift in Sources */,
 				ND0000000000000000000040 /* NetworkDiagnosticsViewModel.swift in Sources */,
 				ND0000000000000000000043 /* NetworkDiagnosticsView.swift in Sources */,
 				237EB0EBBBFBAC33EAE1380B /* BluetoothPermissionManager.swift in Sources */,
@@ -1785,6 +1805,10 @@
 				ND0000000000000000000017 /* NetworkConnectivityCheck.swift in Sources */,
 				ND0000000000000000000018 /* DNSResolutionCheck.swift in Sources */,
 				ND0000000000000000000019 /* SystemProxyCheck.swift in Sources */,
+				ND0000000000000000000052 /* HTTPSControlEndpointCheck.swift in Sources */,
+				ND0000000000000000000055 /* ProxyResolution.swift in Sources */,
+				ND0000000000000000000059 /* IPv6ControlEndpointCheck.swift in Sources */,
+				ND0000000000000000000061 /* NetworkFingerprint.swift in Sources */,
 				ND0000000000000000000041 /* NetworkDiagnosticsViewModel.swift in Sources */,
 				ND0000000000000000000044 /* NetworkDiagnosticsView.swift in Sources */,
 				EC20000000000000000000004 /* ProEditionComposition.swift in Sources */,
@@ -2068,7 +2092,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.6;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "WiFi Lens can run an MCP server on localhost when you enable it in Settings, so local tools like Claude Desktop can read Wi-Fi scan data. The server is off by default. No data leaves this Mac.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "WiFi Lens uses local networking when you enable its MCP server and when Network Self-Check tests reachability of your configured network proxy. These checks do not collect or transmit your Wi-Fi scan data.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "macOS requires this permission for any app that reads Wi‑Fi network names (SSIDs). WiFi Lens never accesses your GPS coordinates and never logs your location.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2255,7 +2279,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.6;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "WiFi Lens can run an MCP server on localhost when you enable it in Settings, so local tools like Claude Desktop can read Wi-Fi scan data. The server is off by default. No data leaves this Mac.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "WiFi Lens uses local networking when you enable its MCP server and when Network Self-Check tests reachability of your configured network proxy. These checks do not collect or transmit your Wi-Fi scan data.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "macOS requires this permission for any app that reads Wi‑Fi network names (SSIDs). WiFi Lens never accesses your GPS coordinates and never logs your location.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2302,7 +2326,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.6;
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "WiFi Lens may use Bluetooth to discover nearby BLE devices and analyze signal strength when Bluetooth Analysis is enabled in Settings.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "WiFi Lens can run an MCP server on localhost when you enable it in Settings, so local tools like Claude Desktop can read Wi-Fi scan data. The server is off by default. No data leaves this Mac.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "WiFi Lens uses local networking when you enable its MCP server and when Network Self-Check tests reachability of your configured network proxy. These checks do not collect or transmit your Wi-Fi scan data.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "macOS requires this permission for any app that reads Wi‑Fi network names (SSIDs). WiFi Lens never accesses your GPS coordinates and never logs your location.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (

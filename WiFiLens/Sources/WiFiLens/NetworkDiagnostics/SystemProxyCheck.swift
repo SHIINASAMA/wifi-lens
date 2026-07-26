@@ -107,24 +107,29 @@ struct NetworkProxyEndpointConnector: ProxyEndpointConnecting {
     func canConnect(to endpoint: ProxyEndpoint, timeout: Duration) async -> Bool {
         guard let port = NWEndpoint.Port(rawValue: endpoint.port) else { return false }
         let connection = NWConnection(host: NWEndpoint.Host(endpoint.host), port: port, using: .tcp)
+        let context = ProxyConnectionContext(connection: connection)
 
-        return await withCheckedContinuation { continuation in
-            let context = ProxyConnectionContext(connection: connection, continuation: continuation)
-            connection.stateUpdateHandler = { state in
-                switch state {
-                case .ready:
-                    context.finish(true)
-                case .failed, .cancelled:
+        return await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                guard context.install(continuation: continuation) else { return }
+                connection.stateUpdateHandler = { state in
+                    switch state {
+                    case .ready:
+                        context.finish(true)
+                    case .failed, .cancelled:
+                        context.finish(false)
+                    default:
+                        break
+                    }
+                }
+                connection.start(queue: DispatchQueue(label: "io.github.kaoru.wifi-lens.network-diagnostics.proxy"))
+                Task {
+                    try? await Task.sleep(for: timeout)
                     context.finish(false)
-                default:
-                    break
                 }
             }
-            connection.start(queue: DispatchQueue(label: "io.github.kaoru.wifi-lens.network-diagnostics.proxy"))
-            Task {
-                try? await Task.sleep(for: timeout)
-                context.finish(false)
-            }
+        } onCancel: {
+            context.cancel()
         }
     }
 }
@@ -133,10 +138,22 @@ private final class ProxyConnectionContext: @unchecked Sendable {
     private let lock = NSLock()
     private let connection: NWConnection
     private var continuation: CheckedContinuation<Bool, Never>?
+    private var cancellationRequested = false
 
-    init(connection: NWConnection, continuation: CheckedContinuation<Bool, Never>) {
+    init(connection: NWConnection) {
         self.connection = connection
+    }
+
+    func install(continuation: CheckedContinuation<Bool, Never>) -> Bool {
+        lock.lock()
+        guard !cancellationRequested else {
+            lock.unlock()
+            continuation.resume(returning: false)
+            return false
+        }
         self.continuation = continuation
+        lock.unlock()
+        return true
     }
 
     func finish(_ reachable: Bool) {
@@ -150,61 +167,513 @@ private final class ProxyConnectionContext: @unchecked Sendable {
         connection.cancel()
         continuation.resume(returning: reachable)
     }
+
+    func cancel() {
+        lock.lock()
+        cancellationRequested = true
+        lock.unlock()
+        connection.cancel()
+        finish(false)
+    }
+}
+
+struct ProxyEgressResponse: Equatable, Sendable {
+    let statusCode: Int?
+    let errorCode: String?
+}
+
+protocol ProxyEgressLoading: Sendable {
+    func load(
+        url: URL,
+        through proxy: EffectiveProxy,
+        timeout: Duration
+    ) async -> ProxyEgressResponse
+}
+
+struct SystemProxyEgressLoader: ProxyEgressLoading {
+    func load(
+        url: URL,
+        through proxy: EffectiveProxy,
+        timeout: Duration
+    ) async -> ProxyEgressResponse {
+        guard let configuration = Self.configuration(for: proxy, timeout: timeout) else {
+            return ProxyEgressResponse(statusCode: nil, errorCode: "proxy-type-unavailable")
+        }
+
+        var request = URLRequest(
+            url: url,
+            cachePolicy: .reloadIgnoringLocalCacheData,
+            timeoutInterval: timeout.proxyCheckTimeInterval
+        )
+        request.httpMethod = "GET"
+
+        let session = URLSession(
+            configuration: configuration,
+            delegate: ProxyEgressRedirectDelegate(),
+            delegateQueue: nil
+        )
+        defer { session.invalidateAndCancel() }
+
+        do {
+            let (_, response) = try await session.data(for: request)
+            guard let response = response as? HTTPURLResponse else {
+                return ProxyEgressResponse(statusCode: nil, errorCode: "non-http-response")
+            }
+            return ProxyEgressResponse(statusCode: response.statusCode, errorCode: nil)
+        } catch let error as URLError {
+            return Self.response(for: error)
+        } catch {
+            return ProxyEgressResponse(statusCode: nil, errorCode: "request-failed")
+        }
+    }
+
+    static func response(for error: URLError) -> ProxyEgressResponse {
+        if error.code == .userAuthenticationRequired {
+            return ProxyEgressResponse(statusCode: 407, errorCode: nil)
+        }
+        return ProxyEgressResponse(statusCode: nil, errorCode: String(error.code.rawValue))
+    }
+
+    static func configuration(
+        for proxy: EffectiveProxy,
+        timeout: Duration
+    ) -> URLSessionConfiguration? {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.urlCache = nil
+        configuration.httpCookieStorage = nil
+        configuration.urlCredentialStorage = nil
+        configuration.waitsForConnectivity = false
+        configuration.timeoutIntervalForRequest = timeout.proxyCheckTimeInterval
+        configuration.timeoutIntervalForResource = timeout.proxyCheckTimeInterval
+
+        switch proxy {
+        case .http(let endpoint):
+            configuration.connectionProxyDictionary = [
+                kCFNetworkProxiesHTTPEnable as String: true,
+                kCFNetworkProxiesHTTPProxy as String: endpoint.host,
+                kCFNetworkProxiesHTTPPort as String: Int(endpoint.port),
+                kCFNetworkProxiesHTTPSEnable as String: false,
+                kCFNetworkProxiesSOCKSEnable as String: false,
+                kCFNetworkProxiesProxyAutoConfigEnable as String: false,
+                kCFNetworkProxiesProxyAutoDiscoveryEnable as String: false,
+            ]
+            configuration.proxyConfigurations = []
+        case .https(let endpoint):
+            guard let networkEndpoint = endpoint.networkEndpoint else { return nil }
+            var selectedProxy = ProxyConfiguration(httpCONNECTProxy: networkEndpoint)
+            selectedProxy.allowFailover = false
+            configuration.connectionProxyDictionary = [:]
+            configuration.proxyConfigurations = [selectedProxy]
+        case .socks(let endpoint):
+            guard let networkEndpoint = endpoint.networkEndpoint else { return nil }
+            var selectedProxy = ProxyConfiguration(socksv5Proxy: networkEndpoint)
+            selectedProxy.allowFailover = false
+            configuration.connectionProxyDictionary = [:]
+            configuration.proxyConfigurations = [selectedProxy]
+        case .direct, .unavailable:
+            return nil
+        }
+        return configuration
+    }
+}
+
+private extension ProxyEndpoint {
+    var networkEndpoint: NWEndpoint? {
+        guard let networkPort = NWEndpoint.Port(rawValue: port) else { return nil }
+        return .hostPort(
+            host: NWEndpoint.Host(host),
+            port: networkPort
+        )
+    }
 }
 
 struct SystemProxyCheck: DiagnosticCheck {
     let id = NetworkDiagnosticCheckID.proxy
-    private let settingsReader: any SystemProxySettingsReading
+    private static let defaultHTTPTarget = URL(
+        string: "http://www.msftconnecttest.com/connecttest.txt"
+    )!
+    private static let defaultHTTPSTarget = URL(string: "https://www.apple.com/")!
+
+    private let resolver: any ProxyResolving
     private let connector: any ProxyEndpointConnecting
+    private let egressLoader: any ProxyEgressLoading
+    private let httpTarget: URL
+    private let httpsTarget: URL
     private let timeout: Duration
 
     init(
-        settingsReader: any SystemProxySettingsReading = SystemProxySettingsReader(),
+        resolver: any ProxyResolving = SystemProxyResolver(),
         connector: any ProxyEndpointConnecting = NetworkProxyEndpointConnector(),
+        egressLoader: any ProxyEgressLoading = SystemProxyEgressLoader(),
+        httpTarget: URL = Self.defaultHTTPTarget,
+        httpsTarget: URL = Self.defaultHTTPSTarget,
         timeout: Duration = .seconds(3)
     ) {
-        self.settingsReader = settingsReader
+        self.resolver = resolver
         self.connector = connector
+        self.egressLoader = egressLoader
+        self.httpTarget = httpTarget
+        self.httpsTarget = httpsTarget
         self.timeout = timeout
     }
 
     func run() async -> NetworkDiagnosticResult {
-        guard let configuration = settingsReader.read() else {
-            return result(.indeterminate, key: "network_diagnostics.proxy.indeterminate.summary")
+        guard !Task.isCancelled else {
+            return cancellationResult(stage: "before-http-resolution")
+        }
+        let httpResolution = await resolver.resolve(for: httpTarget)
+        guard !Task.isCancelled else {
+            return cancellationResult(
+                stage: "after-http-resolution",
+                target: httpTarget,
+                resolution: httpResolution
+            )
+        }
+        let httpsResolution = await resolver.resolve(for: httpsTarget)
+        guard !Task.isCancelled else {
+            return cancellationResult(
+                stage: "after-https-resolution",
+                target: httpsTarget,
+                resolution: httpsResolution
+            )
+        }
+        let httpResult = await evaluate(
+            target: httpTarget,
+            resolution: httpResolution,
+            timeout: timeout
+        )
+        guard !Task.isCancelled else {
+            return cancellationResult(
+                stage: "after-http-evaluation",
+                evidence: httpResult.evidence
+            )
+        }
+        let httpsResult = await evaluate(
+            target: httpsTarget,
+            resolution: httpsResolution,
+            timeout: timeout
+        )
+        guard !Task.isCancelled else {
+            return cancellationResult(
+                stage: "after-https-evaluation",
+                evidence: httpResult.evidence + httpsResult.evidence
+            )
         }
 
-        let allReachable = await withTaskGroup(of: Bool.self, returning: Bool.self) { group in
-            for endpoint in configuration.endpoints {
-                group.addTask {
-                    await connector.canConnect(to: endpoint, timeout: timeout)
-                }
-            }
-            for await reachable in group where !reachable {
-                group.cancelAll()
-                return false
-            }
-            return true
-        }
-
-        if !allReachable {
-            return result(.abnormal, key: "network_diagnostics.proxy.abnormal.summary")
-        }
-        if configuration.hasInvalidExplicitProxy
-            || configuration.pacEnabled
-            || configuration.autoDiscoveryEnabled {
-            return result(.indeterminate, key: "network_diagnostics.proxy.indeterminate.summary")
-        }
-        if configuration.endpoints.isEmpty {
-            return result(.normal, key: "network_diagnostics.proxy.disabled.summary")
-        }
-        return result(.normal, key: "network_diagnostics.proxy.normal.summary")
+        return aggregate([httpResult, httpsResult])
     }
 
-    private func result(_ status: NetworkDiagnosticStatus, key: String.LocalizationValue) -> NetworkDiagnosticResult {
+    func evaluate(
+        target: URL,
+        resolution: ProxyCandidateResolution,
+        timeout: Duration
+    ) async -> ProxyTargetRouteResult {
+        let clock = ContinuousClock()
+        let deadline = clock.now.advanced(by: timeout)
+        let evidencePrefix = "proxy.\(target.scheme?.lowercased() ?? "unknown")"
+        var evidence = resolution.evidenceCodes.map {
+            NetworkDiagnosticEvidence(code: "\(evidencePrefix).resolution", value: $0)
+        }
+        var authenticationCandidate: (index: Int, proxy: EffectiveProxy)?
+        var attemptedEndpoint = false
+
+        guard !Task.isCancelled else {
+            return cancelledRoute(
+                target: target,
+                evidencePrefix: evidencePrefix,
+                evidence: evidence,
+                stage: "before-candidates"
+            )
+        }
+        guard !resolution.candidates.isEmpty else {
+            if resolution.evidenceCodes.isEmpty {
+                evidence.append(.init(code: "\(evidencePrefix).resolution", value: "resolution-empty"))
+            }
+            return ProxyTargetRouteResult(
+                target: target,
+                status: .indeterminate,
+                selectedCandidateIndex: nil,
+                selectedProxy: nil,
+                evidence: evidence
+            )
+        }
+
+        for (index, candidate) in resolution.candidates.enumerated() {
+            guard !Task.isCancelled else {
+                return cancelledRoute(
+                    target: target,
+                    evidencePrefix: evidencePrefix,
+                    evidence: evidence,
+                    stage: "candidate"
+                )
+            }
+            let attemptStart = clock.now
+            let remaining = attemptStart.duration(to: deadline)
+            guard remaining > .zero else {
+                evidence.append(.init(code: "\(evidencePrefix).timeout", value: "expired"))
+                break
+            }
+
+            let remainingCandidateCount = resolution.candidates.count - index
+            let attemptTimeout = remaining / Double(remainingCandidateCount)
+            let attemptDeadline = attemptStart.advanced(by: attemptTimeout)
+            evidence.append(.init(code: "\(evidencePrefix).candidate-index", value: String(index)))
+            evidence.append(.init(code: "\(evidencePrefix).route-type", value: candidate.routeType))
+            evidence.append(.init(code: "\(evidencePrefix).fallback-used", value: String(index > 0)))
+
+            if candidate == .direct {
+                evidence.append(.init(code: "\(evidencePrefix).endpoint-status", value: "not-required"))
+                evidence.append(.init(code: "\(evidencePrefix).authentication-status", value: "not-required"))
+                evidence.append(.init(code: "\(evidencePrefix).egress-status", value: "base-check"))
+                return ProxyTargetRouteResult(
+                    target: target,
+                    status: .direct,
+                    selectedCandidateIndex: index,
+                    selectedProxy: .direct,
+                    evidence: evidence
+                )
+            }
+
+            guard let endpoint = candidate.endpoint else {
+                if case .unavailable(let reason) = candidate {
+                    evidence.append(.init(code: "\(evidencePrefix).resolution", value: reason))
+                }
+                continue
+            }
+
+            attemptedEndpoint = true
+            let endpointAvailable = await connector.canConnect(to: endpoint, timeout: attemptTimeout)
+            guard !Task.isCancelled else {
+                return cancelledRoute(
+                    target: target,
+                    evidencePrefix: evidencePrefix,
+                    evidence: evidence,
+                    stage: "endpoint"
+                )
+            }
+            guard endpointAvailable else {
+                evidence.append(.init(code: "\(evidencePrefix).endpoint-status", value: "unavailable"))
+                evidence.append(.init(code: "\(evidencePrefix).authentication-status", value: "not-tested"))
+                evidence.append(.init(code: "\(evidencePrefix).egress-status", value: "not-tested"))
+                evidence.append(.init(code: "proxy.endpoint-unavailable", value: nil))
+                continue
+            }
+            evidence.append(.init(code: "\(evidencePrefix).endpoint-status", value: "available"))
+
+            let egressTimeout = clock.now.duration(to: attemptDeadline)
+            guard egressTimeout > .zero else {
+                evidence.append(.init(code: "\(evidencePrefix).authentication-status", value: "not-tested"))
+                evidence.append(.init(code: "\(evidencePrefix).egress-status", value: "timed-out"))
+                evidence.append(.init(code: "proxy.egress-unavailable", value: "timed-out"))
+                continue
+            }
+
+            let response = await egressLoader.load(
+                url: target,
+                through: candidate,
+                timeout: egressTimeout
+            )
+            guard !Task.isCancelled else {
+                return cancelledRoute(
+                    target: target,
+                    evidencePrefix: evidencePrefix,
+                    evidence: evidence,
+                    stage: "egress"
+                )
+            }
+            if response.statusCode == 407 {
+                evidence.append(.init(code: "\(evidencePrefix).authentication-status", value: "required"))
+                evidence.append(.init(code: "\(evidencePrefix).egress-status", value: "407"))
+                evidence.append(.init(code: "proxy.authentication-required", value: "407"))
+                if authenticationCandidate == nil {
+                    authenticationCandidate = (index, candidate)
+                }
+                continue
+            }
+
+            guard let statusCode = response.statusCode, (200..<300).contains(statusCode) else {
+                let failure = response.errorCode ?? response.statusCode.map(String.init) ?? "unknown"
+                evidence.append(.init(code: "\(evidencePrefix).authentication-status", value: "not-required"))
+                evidence.append(.init(code: "\(evidencePrefix).egress-status", value: failure))
+                evidence.append(.init(code: "proxy.egress-unavailable", value: failure))
+                continue
+            }
+
+            evidence.append(.init(code: "\(evidencePrefix).authentication-status", value: "not-required"))
+            evidence.append(.init(code: "\(evidencePrefix).egress-status", value: String(statusCode)))
+            evidence.append(.init(code: "proxy.egress-available", value: String(statusCode)))
+            return ProxyTargetRouteResult(
+                target: target,
+                status: .proxied,
+                selectedCandidateIndex: index,
+                selectedProxy: candidate,
+                evidence: evidence
+            )
+        }
+
+        if let authenticationCandidate {
+            return ProxyTargetRouteResult(
+                target: target,
+                status: .authenticationRequired,
+                selectedCandidateIndex: authenticationCandidate.index,
+                selectedProxy: authenticationCandidate.proxy,
+                evidence: evidence
+            )
+        }
+
+        return ProxyTargetRouteResult(
+            target: target,
+            status: attemptedEndpoint ? .unavailable : .indeterminate,
+            selectedCandidateIndex: nil,
+            selectedProxy: nil,
+            evidence: evidence
+        )
+    }
+
+    private func cancelledRoute(
+        target: URL,
+        evidencePrefix: String,
+        evidence: [NetworkDiagnosticEvidence],
+        stage: String
+    ) -> ProxyTargetRouteResult {
+        ProxyTargetRouteResult(
+            target: target,
+            status: .indeterminate,
+            selectedCandidateIndex: nil,
+            selectedProxy: nil,
+            evidence: evidence + [.init(code: "\(evidencePrefix).cancelled", value: stage)]
+        )
+    }
+
+    private func cancellationResult(
+        stage: String,
+        target: URL? = nil,
+        resolution: ProxyCandidateResolution? = nil,
+        evidence: [NetworkDiagnosticEvidence] = []
+    ) -> NetworkDiagnosticResult {
+        let resolutionEvidence: [NetworkDiagnosticEvidence]
+        if let target, let resolution {
+            let prefix = "proxy.\(target.scheme?.lowercased() ?? "unknown").resolution"
+            resolutionEvidence = resolution.evidenceCodes.map {
+                .init(code: prefix, value: $0)
+            }
+        } else {
+            resolutionEvidence = []
+        }
+        return result(
+            .indeterminate,
+            key: "network_diagnostics.proxy.unable_to_determine.summary",
+            evidence: evidence
+                + resolutionEvidence
+                + [.init(code: "proxy.cancelled", value: stage)]
+        )
+    }
+
+    private func aggregate(_ routes: [ProxyTargetRouteResult]) -> NetworkDiagnosticResult {
+        let statuses = routes.map(\.status)
+        let evidence = routes.flatMap(\.evidence)
+
+        if statuses.contains(.authenticationRequired) {
+            return result(
+                .abnormal,
+                key: "network_diagnostics.proxy.authentication_required.summary",
+                evidence: evidence
+            )
+        }
+        if statuses.contains(.unavailable) {
+            return result(
+                .abnormal,
+                key: "network_diagnostics.proxy.route_unavailable.summary",
+                evidence: evidence
+            )
+        }
+        if statuses.contains(.indeterminate) {
+            return result(
+                .indeterminate,
+                key: "network_diagnostics.proxy.unable_to_determine.summary",
+                evidence: evidence
+            )
+        }
+        if statuses.allSatisfy({ $0 == .direct }) {
+            return result(
+                .indeterminate,
+                key: "network_diagnostics.proxy.direct_routes.summary",
+                evidence: evidence
+            )
+        }
+        if statuses.allSatisfy({ $0 == .proxied }) {
+            return result(
+                .normal,
+                key: "network_diagnostics.proxy.routes_available.summary",
+                evidence: evidence
+            )
+        }
+        return result(
+            .indeterminate,
+            key: "network_diagnostics.proxy.mixed_routing.summary",
+            evidence: evidence
+        )
+    }
+
+    private func result(
+        _ status: NetworkDiagnosticStatus,
+        key: String.LocalizationValue,
+        evidence: [NetworkDiagnosticEvidence] = []
+    ) -> NetworkDiagnosticResult {
         NetworkDiagnosticResult(
             id: id,
             status: status,
-            summary: String(localized: key, comment: "Network self-check system proxy result summary")
+            summary: String(localized: key, comment: "Network self-check system proxy result summary"),
+            evidence: evidence
+        )
+    }
+}
+
+private extension EffectiveProxy {
+    var routeType: String {
+        switch self {
+        case .direct:
+            "direct"
+        case .http:
+            "http"
+        case .https:
+            "https"
+        case .socks:
+            "socks"
+        case .unavailable:
+            "unavailable"
+        }
+    }
+
+    var endpoint: ProxyEndpoint? {
+        switch self {
+        case .http(let endpoint), .https(let endpoint), .socks(let endpoint):
+            endpoint
+        case .direct, .unavailable:
+            nil
+        }
+    }
+}
+
+private final class ProxyEgressRedirectDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+    func urlSession(
+        _ session: URLSession,
+        task: URLSessionTask,
+        willPerformHTTPRedirection response: HTTPURLResponse,
+        newRequest request: URLRequest,
+        completionHandler: @escaping (URLRequest?) -> Void
+    ) {
+        completionHandler(nil)
+    }
+}
+
+private extension Duration {
+    var proxyCheckTimeInterval: TimeInterval {
+        let components = self.components
+        return max(
+            0.001,
+            Double(components.seconds) + Double(components.attoseconds) / 1_000_000_000_000_000_000
         )
     }
 }

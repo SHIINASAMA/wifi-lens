@@ -13,45 +13,50 @@ protocol DNSResolving: Sendable {
 
 struct SystemDNSResolver: DNSResolving {
     func resolve(host: String, timeout: Duration) async -> DNSResolutionOutcome {
-        await withCheckedContinuation { continuation in
-            let context = DNSResolutionContext(continuation: continuation)
-            var serviceRef: DNSServiceRef?
-            let opaqueContext = Unmanaged.passUnretained(context).toOpaque()
-            let error = DNSServiceGetAddrInfo(
-                &serviceRef,
-                0,
-                0,
-                0,
-                host,
-                { _, _, _, errorCode, _, address, _, opaqueContext in
-                    guard let opaqueContext else { return }
-                    let context = Unmanaged<DNSResolutionContext>
-                        .fromOpaque(opaqueContext)
-                        .takeUnretainedValue()
-                    if errorCode == kDNSServiceErr_NoError, address != nil {
-                        context.finish(.resolved)
-                    } else {
-                        context.finish(.failed)
-                    }
-                },
-                opaqueContext
-            )
+        let context = DNSResolutionContext()
+        return await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                guard context.install(continuation: continuation) else { return }
+                var serviceRef: DNSServiceRef?
+                let opaqueContext = Unmanaged.passUnretained(context).toOpaque()
+                let error = DNSServiceGetAddrInfo(
+                    &serviceRef,
+                    0,
+                    0,
+                    0,
+                    host,
+                    { _, _, _, errorCode, _, address, _, opaqueContext in
+                        guard let opaqueContext else { return }
+                        let context = Unmanaged<DNSResolutionContext>
+                            .fromOpaque(opaqueContext)
+                            .takeUnretainedValue()
+                        if errorCode == kDNSServiceErr_NoError, address != nil {
+                            context.finish(.resolved)
+                        } else {
+                            context.finish(.failed)
+                        }
+                    },
+                    opaqueContext
+                )
 
-            guard error == kDNSServiceErr_NoError, let serviceRef else {
-                context.finish(.failed)
-                return
+                guard error == kDNSServiceErr_NoError, let serviceRef else {
+                    context.finish(.failed)
+                    return
+                }
+
+                DNSServiceSetDispatchQueue(
+                    serviceRef,
+                    DispatchQueue(label: "io.github.kaoru.wifi-lens.network-diagnostics.dns")
+                )
+                context.install(serviceRef: serviceRef)
+
+                Task {
+                    try? await Task.sleep(for: timeout)
+                    context.finish(.indeterminate)
+                }
             }
-
-            context.install(serviceRef: serviceRef)
-            DNSServiceSetDispatchQueue(
-                serviceRef,
-                DispatchQueue(label: "io.github.kaoru.wifi-lens.network-diagnostics.dns")
-            )
-
-            Task {
-                try? await Task.sleep(for: timeout)
-                context.finish(.indeterminate)
-            }
+        } onCancel: {
+            context.cancel()
         }
     }
 }
@@ -60,9 +65,18 @@ private final class DNSResolutionContext: @unchecked Sendable {
     private let lock = NSLock()
     private var continuation: CheckedContinuation<DNSResolutionOutcome, Never>?
     private var serviceRef: DNSServiceRef?
+    private var cancellationRequested = false
 
-    init(continuation: CheckedContinuation<DNSResolutionOutcome, Never>) {
+    func install(continuation: CheckedContinuation<DNSResolutionOutcome, Never>) -> Bool {
+        lock.lock()
+        guard !cancellationRequested else {
+            lock.unlock()
+            continuation.resume(returning: .indeterminate)
+            return false
+        }
         self.continuation = continuation
+        lock.unlock()
+        return true
     }
 
     func install(serviceRef: DNSServiceRef) {
@@ -92,45 +106,88 @@ private final class DNSResolutionContext: @unchecked Sendable {
         }
         continuation.resume(returning: outcome)
     }
+
+    func cancel() {
+        lock.lock()
+        cancellationRequested = true
+        lock.unlock()
+        finish(.indeterminate)
+    }
 }
 
 struct DNSResolutionCheck: DiagnosticCheck {
+    // Temporary third-party probe targets pending product-controlled DNS names.
+    private static let defaultProbeTargets = [
+        "www.apple.com",
+        "www.microsoft.com",
+        "www.msftconnecttest.com",
+    ]
+
     let id = NetworkDiagnosticCheckID.dns
     private let resolver: any DNSResolving
-    private let host: String
+    let probeTargets: [String]
     private let timeout: Duration
 
     init(
         resolver: any DNSResolving = SystemDNSResolver(),
-        host: String = "example.com",
+        probeTargets: [String] = Self.defaultProbeTargets,
         timeout: Duration = .seconds(5)
     ) {
+        precondition(probeTargets.count == 3, "DNS self-check requires exactly three probe targets")
         self.resolver = resolver
-        self.host = host
+        self.probeTargets = probeTargets
         self.timeout = timeout
     }
 
     func run() async -> NetworkDiagnosticResult {
-        let outcome = await resolver.resolve(host: host, timeout: timeout)
-        return switch outcome {
-        case .resolved:
-            NetworkDiagnosticResult(
+        var outcomes: [DNSResolutionOutcome] = []
+        for host in probeTargets {
+            guard !Task.isCancelled else { break }
+            let firstOutcome = await resolver.resolve(host: host, timeout: timeout)
+            if firstOutcome == .indeterminate, !Task.isCancelled {
+                outcomes.append(await resolver.resolve(host: host, timeout: timeout))
+            } else {
+                outcomes.append(firstOutcome)
+            }
+        }
+        let successCount = outcomes.count { $0 == .resolved }
+        let failureCount = outcomes.count { $0 == .failed }
+        let indeterminateCount = outcomes.count { $0 == .indeterminate }
+        let evidence = [
+            NetworkDiagnosticEvidence(code: "dns.success-count", value: "\(successCount)/\(probeTargets.count)"),
+            NetworkDiagnosticEvidence(code: "dns.failure-count", value: "\(failureCount)/\(probeTargets.count)"),
+            NetworkDiagnosticEvidence(code: "dns.indeterminate-count", value: "\(indeterminateCount)/\(probeTargets.count)"),
+        ]
+
+        if successCount == probeTargets.count {
+            return NetworkDiagnosticResult(
                 id: id,
                 status: .normal,
-                summary: String(localized: "network_diagnostics.dns.normal.summary", comment: "Network self-check DNS success summary")
-            )
-        case .failed:
-            NetworkDiagnosticResult(
-                id: id,
-                status: .abnormal,
-                summary: String(localized: "network_diagnostics.dns.abnormal.summary", comment: "Network self-check DNS failure summary")
-            )
-        case .indeterminate:
-            NetworkDiagnosticResult(
-                id: id,
-                status: .indeterminate,
-                summary: String(localized: "network_diagnostics.dns.indeterminate.summary", comment: "Network self-check DNS indeterminate summary")
+                summary: String(localized: "network_diagnostics.dns.available.summary", comment: "Network self-check DNS all test names resolved"),
+                evidence: evidence
             )
         }
+        if failureCount == probeTargets.count {
+            return NetworkDiagnosticResult(
+                id: id,
+                status: .abnormal,
+                summary: String(localized: "network_diagnostics.dns.unavailable.summary", comment: "Network self-check DNS all test names failed"),
+                evidence: evidence
+            )
+        }
+        if indeterminateCount == probeTargets.count {
+            return NetworkDiagnosticResult(
+                id: id,
+                status: .indeterminate,
+                summary: String(localized: "network_diagnostics.dns.unable_to_determine.summary", comment: "Network self-check DNS no test name produced a result"),
+                evidence: evidence
+            )
+        }
+        return NetworkDiagnosticResult(
+            id: id,
+            status: .indeterminate,
+            summary: String(localized: "network_diagnostics.dns.inconsistent.summary", comment: "Network self-check DNS test names had mixed outcomes"),
+            evidence: evidence
+        )
     }
 }
