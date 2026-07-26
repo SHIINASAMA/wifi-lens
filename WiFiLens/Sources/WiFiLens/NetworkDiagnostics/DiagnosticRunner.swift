@@ -79,7 +79,7 @@ struct DiagnosticRunner: Sendable {
         case .proxy:
             [.init(id: .path, blockingStatuses: hardFailureStatuses)]
         }
-        return dependencies.compactMap { dependency in
+        return dependencies.compactMap { dependency -> NetworkDiagnosticResult? in
             guard let result = results.first(where: { $0.id == dependency.id }),
                   dependency.blockingStatuses.contains(result.status) else {
                 return nil
