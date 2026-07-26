@@ -25,6 +25,7 @@ struct NetworkDiagnosticsView: View {
             }
         }
         .animation(reduceMotion ? nil : .snappy(duration: 0.24), value: viewModel.phase)
+        .onDisappear { viewModel.cancel() }
     }
 
     private var commandBar: some View {

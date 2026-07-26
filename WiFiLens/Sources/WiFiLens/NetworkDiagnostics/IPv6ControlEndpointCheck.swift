@@ -50,22 +50,37 @@ struct SystemIPv6ControlEndpointLoader: IPv6ControlEndpointLoading {
         guard addressSource.hasGlobalIPv6Address() else {
             return .noGlobalAddress
         }
+        let clock = ContinuousClock()
+        let deadline = clock.now.advanced(by: timeout)
         guard
             url.scheme == "https",
             let serverName = url.host,
-            let ipv6Address = await resolver.resolveAAAA(host: serverName, timeout: timeout).first,
+            !Task.isCancelled
+        else {
+            return .failed
+        }
+        let ipv6Addresses = await resolver.resolveAAAA(host: serverName, timeout: timeout)
+        guard
+            !ipv6Addresses.isEmpty,
             !Task.isCancelled
         else {
             return .failed
         }
 
-        let succeeded = await connector.load(
-            url: url,
-            ipv6Address: ipv6Address,
-            serverName: serverName,
-            timeout: timeout
-        )
-        return succeeded ? .succeeded : .failed
+        for (index, ipv6Address) in ipv6Addresses.enumerated() {
+            guard !Task.isCancelled, clock.now < deadline else { return .failed }
+            let remainingAddressCount = ipv6Addresses.count - index
+            let attemptTimeout = clock.now.duration(to: deadline) / Double(remainingAddressCount)
+            if await connector.load(
+                url: url,
+                ipv6Address: ipv6Address,
+                serverName: serverName,
+                timeout: attemptTimeout
+            ) {
+                return .succeeded
+            }
+        }
+        return .failed
     }
 }
 
@@ -198,10 +213,16 @@ struct SystemIPv6AddressResolver: IPv6AddressResolving {
                     context.finish()
                     return
                 }
-                context.install(serviceRef: serviceRef)
-                DNSServiceSetDispatchQueue(
-                    serviceRef,
-                    DispatchQueue(label: "io.github.kaoru.wifi-lens.network-diagnostics.ipv6-dns")
+                IPv6DNSServiceActivation.configureThenInstall(
+                    configureDelivery: {
+                        DNSServiceSetDispatchQueue(
+                            serviceRef,
+                            DispatchQueue(label: "io.github.kaoru.wifi-lens.network-diagnostics.ipv6-dns")
+                        )
+                    },
+                    installOwnership: {
+                        context.install(serviceRef: serviceRef)
+                    }
                 )
 
                 Task {
@@ -232,6 +253,16 @@ struct SystemIPv6AddressResolver: IPv6AddressResolving {
             decoding: buffer.prefix(while: { $0 != 0 }).map(UInt8.init),
             as: UTF8.self
         )
+    }
+}
+
+enum IPv6DNSServiceActivation {
+    static func configureThenInstall(
+        configureDelivery: () -> Void,
+        installOwnership: () -> Void
+    ) {
+        configureDelivery()
+        installOwnership()
     }
 }
 

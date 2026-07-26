@@ -64,7 +64,7 @@ Chart Engine (ChartLens package):
 | `BLE/` | BLEScanner, BLEDeviceTracker, BLEViewModel, BLEScannerView, BLETrendChartView, BLEAdvertisementEvent, BLEChannel, BLEDeviceSnapshot, BLERSSISample, BluetoothPermissionManager. See [BLE.md](BLE.md) |
 | `Debug/` | DebugChartView, DebugRoamingChartView (DEV builds only) |
 | `MCP/` | MCPServer — embedded HTTP/1.1 JSON API (NWListener on 127.0.0.1:19840) exposing scan data |
-| `NetworkDiagnostics/` | Shared OSS/Pro manual network self-check: ordered connectivity, DNS resolution, and system proxy checks with injected system adapters and three-state results |
+| `NetworkDiagnostics/` | Shared OSS/Pro manual network self-check: path state, sampled DNS, HTTPS/captive-portal evidence, system proxy/PAC/egress, forced IPv6, network-change reruns, and normal/abnormal/indeterminate/blocked/skipped results |
 | `Regulatory/` | RegulatoryPipeline, RegulatoryDatabase, RegulatoryFilter, RegionInferenceEngine, ChannelRecommendation, DeviceCompatibilityFilter, RegulatoryDomain. See [REGULATORY.md](REGULATORY.md) |
 | `Observation/` | Immutable Wi-Fi observation models, providers, analyzers, single-cycle pipeline, Store projection, and the production observation runtime |
 | `Utilities/` | Constants, Color extensions, BuildConfig, DeviceCapabilities, GatewayPinger |

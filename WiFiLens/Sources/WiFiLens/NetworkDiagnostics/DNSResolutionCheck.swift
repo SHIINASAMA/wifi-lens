@@ -13,45 +13,50 @@ protocol DNSResolving: Sendable {
 
 struct SystemDNSResolver: DNSResolving {
     func resolve(host: String, timeout: Duration) async -> DNSResolutionOutcome {
-        await withCheckedContinuation { continuation in
-            let context = DNSResolutionContext(continuation: continuation)
-            var serviceRef: DNSServiceRef?
-            let opaqueContext = Unmanaged.passUnretained(context).toOpaque()
-            let error = DNSServiceGetAddrInfo(
-                &serviceRef,
-                0,
-                0,
-                0,
-                host,
-                { _, _, _, errorCode, _, address, _, opaqueContext in
-                    guard let opaqueContext else { return }
-                    let context = Unmanaged<DNSResolutionContext>
-                        .fromOpaque(opaqueContext)
-                        .takeUnretainedValue()
-                    if errorCode == kDNSServiceErr_NoError, address != nil {
-                        context.finish(.resolved)
-                    } else {
-                        context.finish(.failed)
-                    }
-                },
-                opaqueContext
-            )
+        let context = DNSResolutionContext()
+        return await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                guard context.install(continuation: continuation) else { return }
+                var serviceRef: DNSServiceRef?
+                let opaqueContext = Unmanaged.passUnretained(context).toOpaque()
+                let error = DNSServiceGetAddrInfo(
+                    &serviceRef,
+                    0,
+                    0,
+                    0,
+                    host,
+                    { _, _, _, errorCode, _, address, _, opaqueContext in
+                        guard let opaqueContext else { return }
+                        let context = Unmanaged<DNSResolutionContext>
+                            .fromOpaque(opaqueContext)
+                            .takeUnretainedValue()
+                        if errorCode == kDNSServiceErr_NoError, address != nil {
+                            context.finish(.resolved)
+                        } else {
+                            context.finish(.failed)
+                        }
+                    },
+                    opaqueContext
+                )
 
-            guard error == kDNSServiceErr_NoError, let serviceRef else {
-                context.finish(.failed)
-                return
+                guard error == kDNSServiceErr_NoError, let serviceRef else {
+                    context.finish(.failed)
+                    return
+                }
+
+                DNSServiceSetDispatchQueue(
+                    serviceRef,
+                    DispatchQueue(label: "io.github.kaoru.wifi-lens.network-diagnostics.dns")
+                )
+                context.install(serviceRef: serviceRef)
+
+                Task {
+                    try? await Task.sleep(for: timeout)
+                    context.finish(.indeterminate)
+                }
             }
-
-            context.install(serviceRef: serviceRef)
-            DNSServiceSetDispatchQueue(
-                serviceRef,
-                DispatchQueue(label: "io.github.kaoru.wifi-lens.network-diagnostics.dns")
-            )
-
-            Task {
-                try? await Task.sleep(for: timeout)
-                context.finish(.indeterminate)
-            }
+        } onCancel: {
+            context.cancel()
         }
     }
 }
@@ -60,9 +65,18 @@ private final class DNSResolutionContext: @unchecked Sendable {
     private let lock = NSLock()
     private var continuation: CheckedContinuation<DNSResolutionOutcome, Never>?
     private var serviceRef: DNSServiceRef?
+    private var cancellationRequested = false
 
-    init(continuation: CheckedContinuation<DNSResolutionOutcome, Never>) {
+    func install(continuation: CheckedContinuation<DNSResolutionOutcome, Never>) -> Bool {
+        lock.lock()
+        guard !cancellationRequested else {
+            lock.unlock()
+            continuation.resume(returning: .indeterminate)
+            return false
+        }
         self.continuation = continuation
+        lock.unlock()
+        return true
     }
 
     func install(serviceRef: DNSServiceRef) {
@@ -91,6 +105,13 @@ private final class DNSResolutionContext: @unchecked Sendable {
             DNSServiceRefDeallocate(serviceRef)
         }
         continuation.resume(returning: outcome)
+    }
+
+    func cancel() {
+        lock.lock()
+        cancellationRequested = true
+        lock.unlock()
+        finish(.indeterminate)
     }
 }
 
@@ -121,12 +142,13 @@ struct DNSResolutionCheck: DiagnosticCheck {
     func run() async -> NetworkDiagnosticResult {
         var outcomes: [DNSResolutionOutcome] = []
         for host in probeTargets {
+            guard !Task.isCancelled else { break }
             let firstOutcome = await resolver.resolve(host: host, timeout: timeout)
-            guard firstOutcome == .indeterminate, !Task.isCancelled else {
+            if firstOutcome == .indeterminate, !Task.isCancelled {
+                outcomes.append(await resolver.resolve(host: host, timeout: timeout))
+            } else {
                 outcomes.append(firstOutcome)
-                continue
             }
-            outcomes.append(await resolver.resolve(host: host, timeout: timeout))
         }
         let successCount = outcomes.count { $0 == .resolved }
         let failureCount = outcomes.count { $0 == .failed }

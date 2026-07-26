@@ -126,6 +126,10 @@ final class NetworkDiagnosticsViewModel {
         await task?.value
     }
 
+    func cancel() {
+        activeTask?.cancel()
+    }
+
     private func accept(_ result: NetworkDiagnosticResult) {
         results[result.id] = result
         executionPhases[result.id] = .completed
@@ -139,9 +143,7 @@ final class NetworkDiagnosticsViewModel {
 
     private func runSession() async {
         let initialFingerprint = await fingerprintMonitor.currentFingerprint()
-        let restartController = NetworkDiagnosticRestartController(
-            baseline: initialFingerprint
-        )
+        let restartController = NetworkDiagnosticRestartController()
 
         await withTaskCancellationHandler {
             await executeSession(
@@ -184,8 +186,8 @@ final class NetworkDiagnosticsViewModel {
             await restartController.install(runTask)
             let orderedResults = await runTask.value
 
-            if await restartController.completeRun(), automaticRestartCount == 0 {
-                automaticRestartCount = 1
+            if await restartController.completeRun() {
+                automaticRestartCount += 1
                 retainedResults = configurationOnlyResults(from: orderedResults)
                 results = Dictionary(uniqueKeysWithValues: retainedResults.map { ($0.id, $0) })
                 conclusion = nil
@@ -231,15 +233,10 @@ final class NetworkDiagnosticsViewModel {
     }
 }
 
-private actor NetworkDiagnosticRestartController {
-    private let baseline: NetworkFingerprint?
+actor NetworkDiagnosticRestartController {
     private var currentRun: Task<[NetworkDiagnosticResult], Never>?
     private var restartRequested = false
-    private var restartConsumed = false
-
-    init(baseline: NetworkFingerprint?) {
-        self.baseline = baseline
-    }
+    private var finalized = false
 
     func install(_ task: Task<[NetworkDiagnosticResult], Never>) {
         currentRun = task
@@ -248,23 +245,22 @@ private actor NetworkDiagnosticRestartController {
         }
     }
 
-    func observe(_ fingerprint: NetworkFingerprint) {
-        guard
-            let baseline,
-            fingerprint != baseline,
-            !restartConsumed
-        else {
-            return
-        }
-        restartConsumed = true
+    @discardableResult
+    func observe(_: NetworkFingerprint) -> Bool {
+        guard !finalized else { return false }
         restartRequested = true
         currentRun?.cancel()
+        return true
     }
 
     func completeRun() -> Bool {
         currentRun = nil
-        defer { restartRequested = false }
-        return restartRequested
+        if restartRequested {
+            restartRequested = false
+            return true
+        }
+        finalized = true
+        return false
     }
 
     func cancelCurrentRun() {

@@ -56,6 +56,31 @@ struct NetworkDiagnosticsTests {
         #expect(await publications.values == NetworkDiagnosticCheckID.allCases)
     }
 
+    @Test("runner blocks downstream probes when the network path is unusable")
+    func runnerBlocksDependentChecks() async {
+        let invocations = DiagnosticTestRecorder()
+        let checks: [any DiagnosticCheck] = NetworkDiagnosticCheckID.allCases.map { id in
+            StubDiagnosticCheck(
+                id: id,
+                result: NetworkDiagnosticResult(
+                    id: id,
+                    status: id == .path ? .abnormal : .normal,
+                    summary: id.rawValue
+                ),
+                recorder: invocations
+            )
+        }
+
+        let results = await DiagnosticRunner(checks: checks).run { _ in }
+
+        #expect(await invocations.values == [.path])
+        #expect(results.first?.status == .abnormal)
+        #expect(results.dropFirst().allSatisfy { $0.status == .blocked })
+        #expect(results.dropFirst().allSatisfy {
+            $0.evidence == [.init(code: "blocked.by", value: "path")]
+        })
+    }
+
     @Test("runner keeps each check visible for its minimum presentation duration")
     func runnerMinimumPresentationDuration() async {
         let check = StubDiagnosticCheck(
@@ -210,14 +235,34 @@ struct NetworkDiagnosticsTests {
         let outcome = await loader.load(url: endpoint, timeout: .seconds(4))
 
         #expect(outcome == .succeeded)
-        #expect(await recorder.requests == [
-            .init(
-                url: endpoint,
-                ipv6Address: "2001:db8::42",
-                serverName: "control.example",
-                timeout: .seconds(4)
-            ),
-        ])
+        let requests = await recorder.requests
+        #expect(requests.count == 1)
+        #expect(requests.first?.url == endpoint)
+        #expect(requests.first?.ipv6Address == "2001:db8::42")
+        #expect(requests.first?.serverName == "control.example")
+        #expect(requests.first.map { $0.timeout > .zero && $0.timeout <= .seconds(4) } == true)
+    }
+
+    @Test("system IPv6 loader tries later resolved addresses")
+    func ipv6LoaderFallsBackAcrossAddresses() async {
+        let connector = SequencedIPv6HTTPSConnector(successfulAddress: "2001:db8::2")
+        let loader = SystemIPv6ControlEndpointLoader(
+            addressSource: StubGlobalIPv6AddressSource(hasAddress: true),
+            resolver: StubIPv6AddressResolver(addresses: ["2001:db8::1", "2001:db8::2"]),
+            connector: connector
+        )
+
+        let outcome = await loader.load(
+            url: URL(string: "https://control.example/health")!,
+            timeout: .seconds(4)
+        )
+
+        #expect(outcome == .succeeded)
+        #expect(await connector.addresses == ["2001:db8::1", "2001:db8::2"])
+        let timeouts = await connector.timeouts
+        #expect(timeouts.count == 2)
+        #expect(timeouts.first.map { $0 > .zero && $0 <= .seconds(2) } == true)
+        #expect(timeouts.last.map { $0 > .zero && $0 <= .seconds(4) } == true)
     }
 
     @Test("system IPv6 loader skips resolution when no global address is present")
@@ -236,6 +281,18 @@ struct NetworkDiagnosticsTests {
 
         #expect(outcome == .noGlobalAddress)
         #expect(await resolver.hosts.isEmpty)
+    }
+
+    @Test("IPv6 DNS configures delivery before the resolver context owns the service")
+    func ipv6DNSActivationOrder() {
+        var events: [String] = []
+
+        IPv6DNSServiceActivation.configureThenInstall(
+            configureDelivery: { events.append("configure") },
+            installOwnership: { events.append("install") }
+        )
+
+        #expect(events == ["configure", "install"])
     }
 
     @Test("an incomplete run has no conclusion")
@@ -531,6 +588,19 @@ struct NetworkDiagnosticsTests {
 
         #expect(result.status == .normal)
         #expect(await resolver.invocationCount == 4)
+    }
+
+    @Test("cancelling DNS sampling does not start the remaining hosts")
+    func dnsCancellationStopsSampling() async {
+        let resolver = CancellationAwareDNSResolver()
+        let check = DNSResolutionCheck(resolver: resolver, timeout: .seconds(30))
+        let task = Task { await check.run() }
+
+        await resolver.waitForInvocation()
+        task.cancel()
+        _ = await task.value
+
+        #expect(await resolver.invocationCount == 1)
     }
 
     @Test("all indeterminate DNS samples cannot be determined")
@@ -867,6 +937,127 @@ struct NetworkDiagnosticsTests {
         #expect(await probe.invocationCount == 1)
     }
 
+    @Test("a second network change during the rerun starts a fresh run")
+    @MainActor
+    func repeatedFingerprintChangesRestartAgain() async {
+        let initial = makeFingerprint(interfaceName: "en0", dnsHash: 1)
+        let fingerprintMonitor = ControlledNetworkFingerprintMonitor(initial: initial)
+        let probe = BlockingDiagnosticProbe()
+        let viewModel = NetworkDiagnosticsViewModel(
+            checks: [BlockingProbeDiagnosticCheck(id: .path, probe: probe)],
+            minimumStepDuration: .zero,
+            fingerprintMonitor: fingerprintMonitor
+        )
+
+        #expect(viewModel.start())
+        await probe.waitForInvocationCount(1)
+        await fingerprintMonitor.send(makeFingerprint(interfaceName: "en1", dnsHash: 2))
+        await probe.waitForInvocationCount(2)
+        await fingerprintMonitor.send(makeFingerprint(interfaceName: "en2", dnsHash: 3))
+        await probe.waitForInvocationCount(3)
+        await probe.release(invocation: 3)
+        await viewModel.waitForCompletion()
+
+        #expect(viewModel.phase == .completed)
+        #expect(viewModel.automaticRestartCount == 2)
+        #expect(await probe.invocationCount == 3)
+    }
+
+    @Test("the controller closes network-change intake before results are published")
+    func fingerprintControllerFinalizationGate() async {
+        let controller = NetworkDiagnosticRestartController()
+        let fingerprint = makeFingerprint(interfaceName: "en1", dnsHash: 2)
+
+        #expect(await controller.completeRun() == false)
+        #expect(await controller.observe(fingerprint) == false)
+    }
+
+    @Test("a later same-interface path update is still a network change")
+    func sameInterfacePathUpdateIsDetected() async {
+        let baseline = makeFingerprint(interfaceName: "en0", dnsHash: 1)
+        let path = NetworkPathFingerprint(
+            interfaceType: baseline.interfaceType,
+            interfaceName: baseline.interfaceName,
+            pathStatus: baseline.pathStatus
+        )
+        let monitor = SystemNetworkFingerprintMonitor(
+            settingsReader: MutableFingerprintSettingsReader(dnsHash: 1, proxyHash: 7),
+            pathSource: FiniteNetworkPathFingerprintSource(values: [path, path]),
+            settingsPoller: SilentNetworkFingerprintSettingsPoller()
+        )
+
+        var changes: [NetworkFingerprint] = []
+        for await fingerprint in monitor.changes(from: baseline) {
+            changes.append(fingerprint)
+        }
+
+        #expect(changes == [baseline])
+    }
+
+    @Test("explicit cancellation stops an active diagnostics session")
+    @MainActor
+    func viewModelCancellation() async {
+        let probe = BlockingDiagnosticProbe()
+        let viewModel = NetworkDiagnosticsViewModel(
+            checks: [BlockingProbeDiagnosticCheck(id: .path, probe: probe)],
+            minimumStepDuration: .zero,
+            fingerprintMonitor: DisabledNetworkFingerprintMonitor()
+        )
+
+        #expect(viewModel.start())
+        await probe.waitForInvocationCount(1)
+        viewModel.cancel()
+        await viewModel.waitForCompletion()
+
+        #expect(viewModel.phase == .idle)
+        #expect(viewModel.conclusion == nil)
+    }
+
+    @Test("system fingerprint monitor detects DNS settings changes without a path update")
+    func fingerprintDetectsSettingsOnlyChange() async {
+        let baseline = makeFingerprint(interfaceName: "en0", dnsHash: 1)
+        let settingsReader = MutableFingerprintSettingsReader(dnsHash: 1, proxyHash: 7)
+        let monitor = SystemNetworkFingerprintMonitor(
+            settingsReader: settingsReader,
+            pathSource: SilentNetworkPathFingerprintSource(),
+            settingsPoller: ImmediateNetworkFingerprintSettingsPoller(),
+            settingsPollInterval: .milliseconds(10)
+        )
+
+        settingsReader.setDNSHash(2)
+        var changedFingerprint: NetworkFingerprint?
+        for await fingerprint in monitor.changes(from: baseline) {
+            changedFingerprint = fingerprint
+            break
+        }
+
+        #expect(changedFingerprint?.interfaceName == "en0")
+        #expect(changedFingerprint?.dnsSettingsHash == 2)
+        #expect(changedFingerprint?.staticProxySettingsHash == 7)
+    }
+
+    @Test("proxy fingerprint includes PAC and automatic discovery settings")
+    func proxyFingerprintIncludesAutomaticSettings() {
+        let baseline = SystemNetworkFingerprintSettingsReader.proxySettingsHash(for: [
+            "ProxyAutoConfigEnable": 0,
+            "ProxyAutoConfigURLString": "https://proxy.example/old.pac",
+            "ProxyAutoDiscoveryEnable": 0,
+        ])
+        let changedPAC = SystemNetworkFingerprintSettingsReader.proxySettingsHash(for: [
+            "ProxyAutoConfigEnable": 1,
+            "ProxyAutoConfigURLString": "https://proxy.example/new.pac",
+            "ProxyAutoDiscoveryEnable": 0,
+        ])
+        let changedDiscovery = SystemNetworkFingerprintSettingsReader.proxySettingsHash(for: [
+            "ProxyAutoConfigEnable": 0,
+            "ProxyAutoConfigURLString": "https://proxy.example/old.pac",
+            "ProxyAutoDiscoveryEnable": 1,
+        ])
+
+        #expect(changedPAC != baseline)
+        #expect(changedDiscovery != baseline)
+    }
+
     private func makeResults(
         path: NetworkDiagnosticStatus,
         dns: NetworkDiagnosticStatus,
@@ -937,6 +1128,24 @@ private actor StubDNSResolver: DNSResolving {
         invocationCount += 1
         defer { outcomeIndex += 1 }
         return outcomes[min(outcomeIndex, outcomes.endIndex - 1)]
+    }
+}
+
+private actor CancellationAwareDNSResolver: DNSResolving {
+    private var invocationWaiter: CheckedContinuation<Void, Never>?
+    private(set) var invocationCount = 0
+
+    func resolve(host: String, timeout: Duration) async -> DNSResolutionOutcome {
+        invocationCount += 1
+        invocationWaiter?.resume()
+        invocationWaiter = nil
+        try? await Task.sleep(for: timeout)
+        return .indeterminate
+    }
+
+    func waitForInvocation() async {
+        guard invocationCount == 0 else { return }
+        await withCheckedContinuation { invocationWaiter = $0 }
     }
 }
 
@@ -1060,6 +1269,27 @@ private struct StubIPv6HTTPSConnector: IPv6HTTPSConnecting {
         timeout: Duration
     ) async -> Bool {
         succeeds
+    }
+}
+
+private actor SequencedIPv6HTTPSConnector: IPv6HTTPSConnecting {
+    let successfulAddress: String
+    private(set) var addresses: [String] = []
+    private(set) var timeouts: [Duration] = []
+
+    init(successfulAddress: String) {
+        self.successfulAddress = successfulAddress
+    }
+
+    func load(
+        url: URL,
+        ipv6Address: String,
+        serverName: String,
+        timeout: Duration
+    ) async -> Bool {
+        addresses.append(ipv6Address)
+        timeouts.append(timeout)
+        return ipv6Address == successfulAddress
     }
 }
 
@@ -1263,13 +1493,56 @@ private struct ProbeDiagnosticCheck: DiagnosticCheck {
     }
 }
 
+private actor BlockingDiagnosticProbe {
+    private var continuations: [Int: CheckedContinuation<Void, Never>] = [:]
+    private var invocationWaiters: [(count: Int, continuation: CheckedContinuation<Void, Never>)] = []
+    private(set) var invocationCount = 0
+
+    func run() async {
+        invocationCount += 1
+        let invocation = invocationCount
+        let readyWaiters = invocationWaiters.filter { $0.count <= invocation }
+        invocationWaiters.removeAll { $0.count <= invocation }
+        readyWaiters.forEach { $0.continuation.resume() }
+
+        await withTaskCancellationHandler {
+            await withCheckedContinuation { continuations[invocation] = $0 }
+        } onCancel: {
+            Task { await self.release(invocation: invocation) }
+        }
+    }
+
+    func waitForInvocationCount(_ expectedCount: Int) async {
+        guard invocationCount < expectedCount else { return }
+        await withCheckedContinuation {
+            invocationWaiters.append((expectedCount, $0))
+        }
+    }
+
+    func release(invocation: Int) {
+        continuations.removeValue(forKey: invocation)?.resume()
+    }
+}
+
+private struct BlockingProbeDiagnosticCheck: DiagnosticCheck {
+    let id: NetworkDiagnosticCheckID
+    let probe: BlockingDiagnosticProbe
+
+    func run() async -> NetworkDiagnosticResult {
+        await probe.run()
+        return .init(id: id, status: .normal, summary: id.rawValue)
+    }
+}
+
 private actor ControlledNetworkFingerprintMonitor: NetworkFingerprintMonitoring {
     let initial: NetworkFingerprint
+    private var lastFingerprint: NetworkFingerprint
     private var continuation: AsyncStream<NetworkFingerprint>.Continuation?
     private var pending: [NetworkFingerprint] = []
 
     init(initial: NetworkFingerprint) {
         self.initial = initial
+        self.lastFingerprint = initial
     }
 
     func currentFingerprint() async -> NetworkFingerprint? {
@@ -1285,6 +1558,8 @@ private actor ControlledNetworkFingerprintMonitor: NetworkFingerprintMonitoring 
     }
 
     func send(_ fingerprint: NetworkFingerprint) {
+        guard fingerprint != lastFingerprint else { return }
+        lastFingerprint = fingerprint
         guard let continuation else {
             pending.append(fingerprint)
             return
@@ -1298,5 +1573,68 @@ private actor ControlledNetworkFingerprintMonitor: NetworkFingerprintMonitoring 
             continuation.yield(fingerprint)
         }
         pending = []
+    }
+}
+
+private struct SilentNetworkPathFingerprintSource: NetworkPathFingerprintSourcing {
+    func currentPathFingerprint() async -> NetworkPathFingerprint? {
+        nil
+    }
+
+    func pathFingerprintChanges() -> AsyncStream<NetworkPathFingerprint> {
+        AsyncStream { $0.finish() }
+    }
+}
+
+private struct FiniteNetworkPathFingerprintSource: NetworkPathFingerprintSourcing {
+    let values: [NetworkPathFingerprint]
+
+    func currentPathFingerprint() async -> NetworkPathFingerprint? {
+        values.first
+    }
+
+    func pathFingerprintChanges() -> AsyncStream<NetworkPathFingerprint> {
+        AsyncStream { continuation in
+            values.forEach { continuation.yield($0) }
+            continuation.finish()
+        }
+    }
+}
+
+private struct ImmediateNetworkFingerprintSettingsPoller: NetworkFingerprintSettingsPolling {
+    func ticks(every interval: Duration) -> AsyncStream<Void> {
+        AsyncStream { continuation in
+            continuation.yield(())
+            continuation.finish()
+        }
+    }
+}
+
+private struct SilentNetworkFingerprintSettingsPoller: NetworkFingerprintSettingsPolling {
+    func ticks(every interval: Duration) -> AsyncStream<Void> {
+        AsyncStream { $0.finish() }
+    }
+}
+
+private final class MutableFingerprintSettingsReader: NetworkFingerprintSettingsReading, @unchecked Sendable {
+    private let lock = NSLock()
+    private var dnsHash: UInt64
+    private let proxyHash: UInt64
+
+    init(dnsHash: UInt64, proxyHash: UInt64) {
+        self.dnsHash = dnsHash
+        self.proxyHash = proxyHash
+    }
+
+    func dnsSettingsHash() -> UInt64 {
+        lock.withLock { dnsHash }
+    }
+
+    func staticProxySettingsHash() -> UInt64 {
+        proxyHash
+    }
+
+    func setDNSHash(_ value: UInt64) {
+        lock.withLock { dnsHash = value }
     }
 }

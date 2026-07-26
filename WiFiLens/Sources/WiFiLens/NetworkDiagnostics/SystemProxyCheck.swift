@@ -107,24 +107,29 @@ struct NetworkProxyEndpointConnector: ProxyEndpointConnecting {
     func canConnect(to endpoint: ProxyEndpoint, timeout: Duration) async -> Bool {
         guard let port = NWEndpoint.Port(rawValue: endpoint.port) else { return false }
         let connection = NWConnection(host: NWEndpoint.Host(endpoint.host), port: port, using: .tcp)
+        let context = ProxyConnectionContext(connection: connection)
 
-        return await withCheckedContinuation { continuation in
-            let context = ProxyConnectionContext(connection: connection, continuation: continuation)
-            connection.stateUpdateHandler = { state in
-                switch state {
-                case .ready:
-                    context.finish(true)
-                case .failed, .cancelled:
+        return await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                guard context.install(continuation: continuation) else { return }
+                connection.stateUpdateHandler = { state in
+                    switch state {
+                    case .ready:
+                        context.finish(true)
+                    case .failed, .cancelled:
+                        context.finish(false)
+                    default:
+                        break
+                    }
+                }
+                connection.start(queue: DispatchQueue(label: "io.github.kaoru.wifi-lens.network-diagnostics.proxy"))
+                Task {
+                    try? await Task.sleep(for: timeout)
                     context.finish(false)
-                default:
-                    break
                 }
             }
-            connection.start(queue: DispatchQueue(label: "io.github.kaoru.wifi-lens.network-diagnostics.proxy"))
-            Task {
-                try? await Task.sleep(for: timeout)
-                context.finish(false)
-            }
+        } onCancel: {
+            context.cancel()
         }
     }
 }
@@ -133,10 +138,22 @@ private final class ProxyConnectionContext: @unchecked Sendable {
     private let lock = NSLock()
     private let connection: NWConnection
     private var continuation: CheckedContinuation<Bool, Never>?
+    private var cancellationRequested = false
 
-    init(connection: NWConnection, continuation: CheckedContinuation<Bool, Never>) {
+    init(connection: NWConnection) {
         self.connection = connection
+    }
+
+    func install(continuation: CheckedContinuation<Bool, Never>) -> Bool {
+        lock.lock()
+        guard !cancellationRequested else {
+            lock.unlock()
+            continuation.resume(returning: false)
+            return false
+        }
         self.continuation = continuation
+        lock.unlock()
+        return true
     }
 
     func finish(_ reachable: Bool) {
@@ -149,6 +166,14 @@ private final class ProxyConnectionContext: @unchecked Sendable {
         lock.unlock()
         connection.cancel()
         continuation.resume(returning: reachable)
+    }
+
+    func cancel() {
+        lock.lock()
+        cancellationRequested = true
+        lock.unlock()
+        connection.cancel()
+        finish(false)
     }
 }
 

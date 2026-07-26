@@ -31,6 +31,80 @@ protocol NetworkFingerprintSettingsReading: Sendable {
     func staticProxySettingsHash() -> UInt64
 }
 
+struct NetworkPathFingerprint: Equatable, Sendable {
+    let interfaceType: String?
+    let interfaceName: String?
+    let pathStatus: NetworkPathState
+}
+
+protocol NetworkPathFingerprintSourcing: Sendable {
+    func currentPathFingerprint() async -> NetworkPathFingerprint?
+    func pathFingerprintChanges() -> AsyncStream<NetworkPathFingerprint>
+}
+
+protocol NetworkFingerprintSettingsPolling: Sendable {
+    func ticks(every interval: Duration) -> AsyncStream<Void>
+}
+
+struct SystemNetworkFingerprintSettingsPoller: NetworkFingerprintSettingsPolling {
+    func ticks(every interval: Duration) -> AsyncStream<Void> {
+        AsyncStream { continuation in
+            let task = Task {
+                while !Task.isCancelled {
+                    try? await Task.sleep(for: interval)
+                    guard !Task.isCancelled else { break }
+                    continuation.yield(())
+                }
+                continuation.finish()
+            }
+            continuation.onTermination = { _ in task.cancel() }
+        }
+    }
+}
+
+struct SystemNetworkPathFingerprintSource: NetworkPathFingerprintSourcing {
+    func currentPathFingerprint() async -> NetworkPathFingerprint? {
+        for await fingerprint in pathFingerprintStream() {
+            return fingerprint
+        }
+        return nil
+    }
+
+    func pathFingerprintChanges() -> AsyncStream<NetworkPathFingerprint> {
+        pathFingerprintStream()
+    }
+
+    private func pathFingerprintStream() -> AsyncStream<NetworkPathFingerprint> {
+        let monitor = NWPathMonitor()
+        return AsyncStream { continuation in
+            monitor.pathUpdateHandler = { path in
+                continuation.yield(Self.fingerprint(for: path))
+            }
+            continuation.onTermination = { _ in monitor.cancel() }
+            monitor.start(queue: DispatchQueue(
+                label: "io.github.kaoru.wifi-lens.network-diagnostics.fingerprint-path"
+            ))
+        }
+    }
+
+    private static func fingerprint(for path: NWPath) -> NetworkPathFingerprint {
+        let activeInterface = path.availableInterfaces
+            .filter { path.usesInterfaceType($0.type) }
+            .sorted { lhs, rhs in
+                if lhs.type.fingerprintName != rhs.type.fingerprintName {
+                    return lhs.type.fingerprintName < rhs.type.fingerprintName
+                }
+                return lhs.name < rhs.name
+            }
+            .first
+        return NetworkPathFingerprint(
+            interfaceType: activeInterface?.type.fingerprintName,
+            interfaceName: activeInterface?.name,
+            pathStatus: path.status.fingerprintState
+        )
+    }
+}
+
 struct SystemNetworkFingerprintSettingsReader: NetworkFingerprintSettingsReading {
     private static let dnsKeys: Set<String> = [
         "DomainName", "Options", "SearchDomains", "SearchOrder",
@@ -41,6 +115,7 @@ struct SystemNetworkFingerprintSettingsReader: NetworkFingerprintSettingsReading
         "HTTPEnable", "HTTPProxy", "HTTPPort",
         "HTTPSEnable", "HTTPSProxy", "HTTPSPort",
         "SOCKSEnable", "SOCKSProxy", "SOCKSPort",
+        "ProxyAutoConfigEnable", "ProxyAutoConfigURLString", "ProxyAutoDiscoveryEnable",
         "ExceptionsList", "ExcludeSimpleHostnames",
     ]
 
@@ -56,8 +131,12 @@ struct SystemNetworkFingerprintSettingsReader: NetworkFingerprintSettingsReading
 
     func staticProxySettingsHash() -> UInt64 {
         guard let settings = CFNetworkCopySystemProxySettings()?.takeRetainedValue() as? [String: Any] else {
-            return StableNetworkSettingsHash.value(for: [:])
+            return Self.proxySettingsHash(for: [:])
         }
+        return Self.proxySettingsHash(for: settings)
+    }
+
+    static func proxySettingsHash(for settings: [String: Any]) -> UInt64 {
         let staticSettings = Dictionary(uniqueKeysWithValues: Self.staticProxyKeys.compactMap { key in
             settings[key].map { (key, $0) }
         })
@@ -67,29 +146,57 @@ struct SystemNetworkFingerprintSettingsReader: NetworkFingerprintSettingsReading
 
 struct SystemNetworkFingerprintMonitor: NetworkFingerprintMonitoring {
     private let settingsReader: any NetworkFingerprintSettingsReading
+    private let pathSource: any NetworkPathFingerprintSourcing
+    private let settingsPoller: any NetworkFingerprintSettingsPolling
+    private let settingsPollInterval: Duration
 
     init(
-        settingsReader: any NetworkFingerprintSettingsReading = SystemNetworkFingerprintSettingsReader()
+        settingsReader: any NetworkFingerprintSettingsReading = SystemNetworkFingerprintSettingsReader(),
+        pathSource: any NetworkPathFingerprintSourcing = SystemNetworkPathFingerprintSource(),
+        settingsPoller: any NetworkFingerprintSettingsPolling = SystemNetworkFingerprintSettingsPoller(),
+        settingsPollInterval: Duration = .milliseconds(250)
     ) {
         self.settingsReader = settingsReader
+        self.pathSource = pathSource
+        self.settingsPoller = settingsPoller
+        self.settingsPollInterval = settingsPollInterval
     }
 
     func currentFingerprint() async -> NetworkFingerprint? {
-        for await fingerprint in fingerprintStream() {
-            return fingerprint
-        }
-        return nil
+        guard let path = await pathSource.currentPathFingerprint() else { return nil }
+        return fingerprint(path: path)
     }
 
     func changes(from baseline: NetworkFingerprint) -> AsyncStream<NetworkFingerprint> {
         AsyncStream { continuation in
+            let emissionState = NetworkFingerprintEmissionState(baseline: baseline)
             let task = Task {
-                for await fingerprint in fingerprintStream() {
-                    guard !Task.isCancelled else { break }
-                    guard fingerprint != baseline else { continue }
-                    continuation.yield(fingerprint)
-                    continuation.finish()
-                    return
+                await withTaskGroup(of: Void.self) { group in
+                    group.addTask {
+                        for await path in pathSource.pathFingerprintChanges() {
+                            guard !Task.isCancelled else { return }
+                            let fingerprint = fingerprint(path: path)
+                            if await emissionState.shouldEmitPath(fingerprint) {
+                                continuation.yield(fingerprint)
+                            }
+                        }
+                    }
+                    group.addTask {
+                        for await _ in settingsPoller.ticks(every: settingsPollInterval) {
+                            guard !Task.isCancelled else { return }
+                            let fingerprint = fingerprint(
+                                path: NetworkPathFingerprint(
+                                    interfaceType: baseline.interfaceType,
+                                    interfaceName: baseline.interfaceName,
+                                    pathStatus: baseline.pathStatus
+                                )
+                            )
+                            if await emissionState.shouldEmitSettings(fingerprint) {
+                                continuation.yield(fingerprint)
+                            }
+                        }
+                    }
+                    await group.waitForAll()
                 }
                 continuation.finish()
             }
@@ -97,33 +204,53 @@ struct SystemNetworkFingerprintMonitor: NetworkFingerprintMonitoring {
         }
     }
 
-    private func fingerprintStream() -> AsyncStream<NetworkFingerprint> {
-        let monitor = NWPathMonitor()
-        let settingsReader = settingsReader
-        return AsyncStream { continuation in
-            monitor.pathUpdateHandler = { path in
-                let activeInterface = path.availableInterfaces
-                    .filter { path.usesInterfaceType($0.type) }
-                    .sorted { lhs, rhs in
-                        if lhs.type.fingerprintName != rhs.type.fingerprintName {
-                            return lhs.type.fingerprintName < rhs.type.fingerprintName
-                        }
-                        return lhs.name < rhs.name
-                    }
-                    .first
-                continuation.yield(NetworkFingerprint(
-                    interfaceType: activeInterface?.type.fingerprintName,
-                    interfaceName: activeInterface?.name,
-                    pathStatus: path.status.fingerprintState,
-                    dnsSettingsHash: settingsReader.dnsSettingsHash(),
-                    staticProxySettingsHash: settingsReader.staticProxySettingsHash()
-                ))
-            }
-            continuation.onTermination = { _ in monitor.cancel() }
-            monitor.start(queue: DispatchQueue(
-                label: "io.github.kaoru.wifi-lens.network-diagnostics.fingerprint"
-            ))
+    private func fingerprint(path: NetworkPathFingerprint) -> NetworkFingerprint {
+        NetworkFingerprint(
+            interfaceType: path.interfaceType,
+            interfaceName: path.interfaceName,
+            pathStatus: path.pathStatus,
+            dnsSettingsHash: settingsReader.dnsSettingsHash(),
+            staticProxySettingsHash: settingsReader.staticProxySettingsHash()
+        )
+    }
+}
+
+private actor NetworkFingerprintEmissionState {
+    private let baseline: NetworkFingerprint
+    private var lastEmitted: NetworkFingerprint
+    private var receivedInitialPath = false
+
+    init(baseline: NetworkFingerprint) {
+        self.baseline = baseline
+        self.lastEmitted = baseline
+    }
+
+    func shouldEmitPath(_ fingerprint: NetworkFingerprint) -> Bool {
+        if !receivedInitialPath {
+            receivedInitialPath = true
+            guard !fingerprint.hasSamePath(as: baseline) else { return false }
         }
+        lastEmitted = fingerprint
+        return true
+    }
+
+    func shouldEmitSettings(_ fingerprint: NetworkFingerprint) -> Bool {
+        guard
+            fingerprint.dnsSettingsHash != lastEmitted.dnsSettingsHash
+                || fingerprint.staticProxySettingsHash != lastEmitted.staticProxySettingsHash
+        else {
+            return false
+        }
+        lastEmitted = fingerprint
+        return true
+    }
+}
+
+private extension NetworkFingerprint {
+    func hasSamePath(as other: NetworkFingerprint) -> Bool {
+        interfaceType == other.interfaceType
+            && interfaceName == other.interfaceName
+            && pathStatus == other.pathStatus
     }
 }
 
