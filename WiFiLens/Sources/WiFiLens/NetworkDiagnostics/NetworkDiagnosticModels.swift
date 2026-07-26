@@ -89,7 +89,9 @@ enum NetworkDiagnosticConclusion: String, Equatable, Sendable {
         }
         if let internet = resultsByID[.internet],
            internet.status == .abnormal,
-           !internet.evidence.contains(where: { $0.code == "https.available" }) {
+           !internet.evidence.contains(where: { $0.code == "https.available" }),
+           !hasAvailableHTTPSProxy(resultsByID[.proxy]),
+           internet.evidence.contains(where: { $0.code == "https.connectivity-error" }) {
             return .networkUnavailable
         }
         if resultsByID.values.contains(where: { result in
@@ -99,5 +101,17 @@ enum NetworkDiagnosticConclusion: String, Equatable, Sendable {
             return .needsAttention
         }
         return .networkNormal
+    }
+
+    private static func hasAvailableHTTPSProxy(_ result: NetworkDiagnosticResult?) -> Bool {
+        guard result?.status == .normal else { return false }
+        return result?.evidence.contains { evidence in
+            guard evidence.code == "proxy.https.egress-status",
+                  let value = evidence.value,
+                  let statusCode = Int(value) else {
+                return false
+            }
+            return (200..<300).contains(statusCode)
+        } == true
     }
 }

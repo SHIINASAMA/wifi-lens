@@ -101,7 +101,7 @@ struct HTTPSControlEndpointCheck: DiagnosticCheck {
         if let errorCode = response.errorCode {
             return EndpointEvaluation(
                 succeeded: false,
-                evidence: .init(code: "https.transport-error", value: errorCode)
+                evidence: .init(code: httpsErrorEvidenceCode(errorCode), value: errorCode)
             )
         }
         guard let status = response.status else {
@@ -120,6 +120,33 @@ struct HTTPSControlEndpointCheck: DiagnosticCheck {
             succeeded: true,
             evidence: .init(code: "https.available", value: String(status))
         )
+    }
+
+    private func httpsErrorEvidenceCode(_ errorCode: String) -> String {
+        guard let rawValue = Int(errorCode) else { return "https.transport-error" }
+        switch URLError.Code(rawValue: rawValue) {
+        case .secureConnectionFailed:
+            return "https.tls-error"
+        case .serverCertificateHasBadDate, .serverCertificateNotYetValid:
+            return "https.certificate-time-error"
+        case .serverCertificateUntrusted,
+             .serverCertificateHasUnknownRoot,
+             .clientCertificateRejected,
+             .clientCertificateRequired:
+            return "https.certificate-error"
+        case .timedOut,
+             .cannotFindHost,
+             .cannotConnectToHost,
+             .networkConnectionLost,
+             .dnsLookupFailed,
+             .notConnectedToInternet,
+             .internationalRoamingOff,
+             .callIsActive,
+             .dataNotAllowed:
+            return "https.connectivity-error"
+        default:
+            return "https.transport-error"
+        }
     }
 
     private func evaluateCaptivePortal(

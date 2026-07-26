@@ -204,11 +204,65 @@ struct NetworkDiagnosticsTests {
 
     @Test("failed base HTTPS suppresses proxy endpoint symptom")
     func conclusionSuppressesProxySymptom() {
-        let results = makeResults(
+        var results = makeResults(
             path: .normal,
             dns: .indeterminate,
             internet: .abnormal,
             proxy: .abnormal
+        )
+        results[2] = NetworkDiagnosticResult(
+            id: .internet,
+            status: .abnormal,
+            summary: "internet",
+            evidence: [.init(
+                code: "https.connectivity-error",
+                value: String(URLError.timedOut.rawValue)
+            )]
+        )
+
+        #expect(NetworkDiagnosticConclusion.evaluate(results) == .networkUnavailable)
+    }
+
+    @Test("failed direct path with a usable HTTPS proxy needs attention")
+    func usableProxyPreventsNetworkUnavailableConclusion() {
+        var results = makeResults(
+            path: .normal,
+            dns: .normal,
+            internet: .abnormal,
+            proxy: .normal
+        )
+        results[4] = NetworkDiagnosticResult(
+            id: .proxy,
+            status: .normal,
+            summary: "proxy",
+            evidence: [.init(code: "proxy.https.egress-status", value: "200")]
+        )
+
+        #expect(NetworkDiagnosticConclusion.evaluate(results) == .needsAttention)
+    }
+
+    @Test("DIRECT routing without direct egress still reports network unavailable")
+    func directRouteDecisionDoesNotProveConnectivity() {
+        var results = makeResults(
+            path: .normal,
+            dns: .normal,
+            internet: .abnormal,
+            proxy: .normal
+        )
+        results[2] = NetworkDiagnosticResult(
+            id: .internet,
+            status: .abnormal,
+            summary: "internet",
+            evidence: [.init(
+                code: "https.connectivity-error",
+                value: String(URLError.notConnectedToInternet.rawValue)
+            )]
+        )
+        results[4] = NetworkDiagnosticResult(
+            id: .proxy,
+            status: .normal,
+            summary: "proxy",
+            evidence: [.init(code: "proxy.https.egress-status", value: "base-check")]
         )
 
         #expect(NetworkDiagnosticConclusion.evaluate(results) == .networkUnavailable)
@@ -539,10 +593,26 @@ struct NetworkDiagnosticsTests {
 
     @Test("control endpoint failures retain distinct evidence")
     func controlEndpointFailureEvidence() async {
-        let transportFailure = await HTTPSControlEndpointCheck(
+        let tlsFailure = await HTTPSControlEndpointCheck(
             loader: StubControlLoader(
                 httpsStatus: nil,
-                httpsErrorCode: "-1200",
+                httpsErrorCode: String(URLError.secureConnectionFailed.rawValue),
+                httpStatus: 200,
+                httpBody: "Microsoft Connect Test"
+            )
+        ).run()
+        let certificateTimeFailure = await HTTPSControlEndpointCheck(
+            loader: StubControlLoader(
+                httpsStatus: nil,
+                httpsErrorCode: String(URLError.serverCertificateNotYetValid.rawValue),
+                httpStatus: 200,
+                httpBody: "Microsoft Connect Test"
+            )
+        ).run()
+        let connectivityFailure = await HTTPSControlEndpointCheck(
+            loader: StubControlLoader(
+                httpsStatus: nil,
+                httpsErrorCode: String(URLError.timedOut.rawValue),
                 httpStatus: 200,
                 httpBody: "Microsoft Connect Test"
             )
@@ -562,9 +632,38 @@ struct NetworkDiagnosticsTests {
             )
         ).run()
 
-        #expect(transportFailure.evidence.contains(.init(code: "https.transport-error", value: "-1200")))
+        #expect(tlsFailure.evidence.contains(.init(
+            code: "https.tls-error",
+            value: String(URLError.secureConnectionFailed.rawValue)
+        )))
+        #expect(certificateTimeFailure.evidence.contains(.init(
+            code: "https.certificate-time-error",
+            value: String(URLError.serverCertificateNotYetValid.rawValue)
+        )))
+        #expect(connectivityFailure.evidence.contains(.init(
+            code: "https.connectivity-error",
+            value: String(URLError.timedOut.rawValue)
+        )))
         #expect(httpsStatusFailure.evidence.contains(.init(code: "https.http-status", value: "503")))
         #expect(captivePortalRedirect.evidence.contains(.init(code: "captive-portal.redirect", value: "302")))
+
+        let baseResults = [
+            NetworkDiagnosticResult(id: .path, status: .normal, summary: "path"),
+            NetworkDiagnosticResult(id: .dns, status: .normal, summary: "dns"),
+        ]
+        let trailingResults = [
+            NetworkDiagnosticResult(id: .ipv6, status: .skipped, summary: "ipv6"),
+            NetworkDiagnosticResult(id: .proxy, status: .abnormal, summary: "proxy"),
+        ]
+        #expect(NetworkDiagnosticConclusion.evaluate(
+            baseResults + [tlsFailure] + trailingResults
+        ) == .needsAttention)
+        #expect(NetworkDiagnosticConclusion.evaluate(
+            baseResults + [certificateTimeFailure] + trailingResults
+        ) == .needsAttention)
+        #expect(NetworkDiagnosticConclusion.evaluate(
+            baseResults + [connectivityFailure] + trailingResults
+        ) == .networkUnavailable)
     }
 
     @Test("control check loads the approved endpoints with an explicit timeout")
