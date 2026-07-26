@@ -597,7 +597,7 @@ struct SystemProxyCheck: DiagnosticCheck {
         }
         if statuses.allSatisfy({ $0 == .direct }) {
             return result(
-                .normal,
+                .indeterminate,
                 key: "network_diagnostics.proxy.direct_routes.summary",
                 evidence: evidence
             )
@@ -610,7 +610,7 @@ struct SystemProxyCheck: DiagnosticCheck {
             )
         }
         return result(
-            .normal,
+            .indeterminate,
             key: "network_diagnostics.proxy.mixed_routing.summary",
             evidence: evidence
         )

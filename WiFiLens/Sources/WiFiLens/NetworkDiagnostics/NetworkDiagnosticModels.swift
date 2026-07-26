@@ -97,6 +97,10 @@ enum NetworkDiagnosticConclusion: String, Equatable, Sendable {
         if resultsByID.values.contains(where: { result in
             result.status != .normal
                 && !(result.id == .ipv6 && result.status == .skipped)
+                && !isUnverifiedDirectRouteNeutral(
+                    result,
+                    internet: resultsByID[.internet]
+                )
         }) {
             return .needsAttention
         }
@@ -113,5 +117,17 @@ enum NetworkDiagnosticConclusion: String, Equatable, Sendable {
             }
             return (200..<300).contains(statusCode)
         } == true
+    }
+
+    private static func isUnverifiedDirectRouteNeutral(
+        _ result: NetworkDiagnosticResult,
+        internet: NetworkDiagnosticResult?
+    ) -> Bool {
+        result.id == .proxy
+            && result.status == .indeterminate
+            && internet?.status == .normal
+            && result.evidence.contains { evidence in
+                evidence.code.hasSuffix(".egress-status") && evidence.value == "base-check"
+            }
     }
 }

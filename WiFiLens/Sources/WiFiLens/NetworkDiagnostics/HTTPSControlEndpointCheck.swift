@@ -89,7 +89,7 @@ struct HTTPSControlEndpointCheck: DiagnosticCheck {
         return NetworkDiagnosticResult(
             id: id,
             status: status,
-            summary: localizedSummary(for: status),
+            summary: localizedSummary(for: status, httpsEvidence: httpsEvaluation.evidence),
             detail: localizedDetail(for: status),
             evidence: [httpsEvaluation.evidence, captivePortalEvaluation.evidence]
         )
@@ -189,14 +189,26 @@ struct HTTPSControlEndpointCheck: DiagnosticCheck {
         )
     }
 
-    private func localizedSummary(for status: NetworkDiagnosticStatus) -> String {
+    private func localizedSummary(
+        for status: NetworkDiagnosticStatus,
+        httpsEvidence: NetworkDiagnosticEvidence
+    ) -> String {
         switch status {
         case .normal:
             String(localized: "network_diagnostics.internet.normal.summary", comment: "Network self-check HTTPS control endpoint result summary")
         case .indeterminate:
             String(localized: "network_diagnostics.internet.indeterminate.summary", comment: "Network self-check HTTPS control endpoint result summary")
         case .abnormal, .blocked, .skipped:
-            String(localized: "network_diagnostics.internet.abnormal.summary", comment: "Network self-check HTTPS control endpoint result summary")
+            switch httpsEvidence.code {
+            case "https.connectivity-error":
+                String(localized: "network_diagnostics.internet.connectivity_failure.summary", comment: "Network self-check connectivity failure summary")
+            case "https.tls-error", "https.certificate-error":
+                String(localized: "network_diagnostics.internet.secure_connection_failure.summary", comment: "Network self-check TLS or certificate failure summary")
+            case "https.certificate-time-error":
+                String(localized: "network_diagnostics.internet.certificate_time_failure.summary", comment: "Network self-check certificate time failure summary")
+            default:
+                String(localized: "network_diagnostics.internet.abnormal.summary", comment: "Network self-check HTTPS control endpoint result summary")
+            }
         }
     }
 

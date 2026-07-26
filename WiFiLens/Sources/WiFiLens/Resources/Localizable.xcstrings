@@ -25215,6 +25215,111 @@
           }
         }
       }
+    },
+    "network_diagnostics.internet.connectivity_failure.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The direct HTTPS connection could not be established"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直接 HTTPS 接続を確立できませんでした"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法建立直接 HTTPS 连接"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die direkte HTTPS-Verbindung konnte nicht hergestellt werden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo establecer la conexión HTTPS directa"
+          }
+        }
+      }
+    },
+    "network_diagnostics.internet.secure_connection_failure.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The HTTPS connection failed during TLS or certificate validation"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TLS または証明書の検証中に HTTPS 接続が失敗しました"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HTTPS 连接在 TLS 或证书验证期间失败"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die HTTPS-Verbindung ist bei der TLS- oder Zertifikatsprüfung fehlgeschlagen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La conexión HTTPS falló durante la validación TLS o del certificado"
+          }
+        }
+      }
+    },
+    "network_diagnostics.internet.certificate_time_failure.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The HTTPS certificate is not valid for the current system time"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在のシステム時刻では HTTPS 証明書が有効ではありません"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前系统时间不在 HTTPS 证书的有效期内"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das HTTPS-Zertifikat ist für die aktuelle Systemzeit nicht gültig"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El certificado HTTPS no es válido para la hora actual del sistema"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -313,6 +313,24 @@ struct NetworkDiagnosticsTests {
         #expect(NetworkDiagnosticConclusion.evaluate(results) == .networkNormal)
     }
 
+    @Test("verified base connectivity keeps an unverified DIRECT proxy route neutral")
+    func verifiedBaseConnectivityKeepsDirectRouteNeutral() {
+        var results = makeResults(
+            path: .normal,
+            dns: .normal,
+            internet: .normal,
+            proxy: .indeterminate
+        )
+        results[4] = NetworkDiagnosticResult(
+            id: .proxy,
+            status: .indeterminate,
+            summary: "direct routing selected",
+            evidence: [.init(code: "proxy.https.egress-status", value: "base-check")]
+        )
+
+        #expect(NetworkDiagnosticConclusion.evaluate(results) == .networkNormal)
+    }
+
     @Test("no global IPv6 address is skipped without changing a normal conclusion")
     func ipv6SkippedIsConclusionNeutral() async {
         let ipv6 = await IPv6ControlEndpointCheck(
@@ -609,6 +627,14 @@ struct NetworkDiagnosticsTests {
                 httpBody: "Microsoft Connect Test"
             )
         ).run()
+        let certificateValidationFailure = await HTTPSControlEndpointCheck(
+            loader: StubControlLoader(
+                httpsStatus: nil,
+                httpsErrorCode: String(URLError.serverCertificateUntrusted.rawValue),
+                httpStatus: 200,
+                httpBody: "Microsoft Connect Test"
+            )
+        ).run()
         let connectivityFailure = await HTTPSControlEndpointCheck(
             loader: StubControlLoader(
                 httpsStatus: nil,
@@ -640,12 +666,29 @@ struct NetworkDiagnosticsTests {
             code: "https.certificate-time-error",
             value: String(URLError.serverCertificateNotYetValid.rawValue)
         )))
+        #expect(certificateValidationFailure.evidence.contains(.init(
+            code: "https.certificate-error",
+            value: String(URLError.serverCertificateUntrusted.rawValue)
+        )))
         #expect(connectivityFailure.evidence.contains(.init(
             code: "https.connectivity-error",
             value: String(URLError.timedOut.rawValue)
         )))
         #expect(httpsStatusFailure.evidence.contains(.init(code: "https.http-status", value: "503")))
         #expect(captivePortalRedirect.evidence.contains(.init(code: "captive-portal.redirect", value: "302")))
+        #expect(tlsFailure.summary == String(
+            localized: "network_diagnostics.internet.secure_connection_failure.summary",
+            comment: "Network self-check TLS or certificate failure summary"
+        ))
+        #expect(certificateValidationFailure.summary == tlsFailure.summary)
+        #expect(certificateTimeFailure.summary == String(
+            localized: "network_diagnostics.internet.certificate_time_failure.summary",
+            comment: "Network self-check certificate time failure summary"
+        ))
+        #expect(connectivityFailure.summary == String(
+            localized: "network_diagnostics.internet.connectivity_failure.summary",
+            comment: "Network self-check connectivity failure summary"
+        ))
 
         let baseResults = [
             NetworkDiagnosticResult(id: .path, status: .normal, summary: "path"),
@@ -660,6 +703,9 @@ struct NetworkDiagnosticsTests {
         ) == .needsAttention)
         #expect(NetworkDiagnosticConclusion.evaluate(
             baseResults + [certificateTimeFailure] + trailingResults
+        ) == .needsAttention)
+        #expect(NetworkDiagnosticConclusion.evaluate(
+            baseResults + [certificateValidationFailure] + trailingResults
         ) == .needsAttention)
         #expect(NetworkDiagnosticConclusion.evaluate(
             baseResults + [connectivityFailure] + trailingResults
@@ -1038,7 +1084,7 @@ struct NetworkDiagnosticsTests {
 
         let result = await check.run()
 
-        #expect(result.status == .normal)
+        #expect(result.status == .indeterminate)
         #expect(await connectorRecorder.endpoints.isEmpty)
         #expect(await egressRecorder.requests.isEmpty)
     }
@@ -1064,7 +1110,7 @@ struct NetworkDiagnosticsTests {
 
         let result = await check.run()
 
-        #expect(result.status == .normal)
+        #expect(result.status == .indeterminate)
         #expect(result.evidence.contains(.init(code: "proxy.http.endpoint-status", value: "unavailable")))
         #expect(result.evidence.contains(.init(code: "proxy.http.candidate-index", value: "1")))
         #expect(result.evidence.contains(.init(code: "proxy.http.route-type", value: "direct")))
@@ -1096,7 +1142,7 @@ struct NetworkDiagnosticsTests {
 
         let result = await check.run()
 
-        #expect(result.status == .normal)
+        #expect(result.status == .indeterminate)
         #expect(await connector.endpoints == [staleEndpoint, workingEndpoint])
         #expect(await egressRecorder.requests.map(\.proxy) == [selectedProxy])
         #expect(result.evidence.contains(.init(code: "proxy.http.candidate-index", value: "1")))
@@ -1131,7 +1177,7 @@ struct NetworkDiagnosticsTests {
         let connectorTimeouts = await connector.timeouts
         let egressTimeouts = await egressLoader.timeouts
 
-        #expect(result.status == .normal)
+        #expect(result.status == .indeterminate)
         #expect(connectorTimeouts.count == 2)
         #expect(egressTimeouts.count == 2)
         #expect(connectorTimeouts.first.map { $0 > .zero && $0 <= .milliseconds(1_050) } == true)
@@ -1162,7 +1208,7 @@ struct NetworkDiagnosticsTests {
         let result = await check.run()
 
         #expect(await recorder.urls == [httpURL.absoluteString, httpsURL.absoluteString])
-        #expect(result.status == .normal)
+        #expect(result.status == .indeterminate)
         #expect(result.summary == String(
             localized: "network_diagnostics.proxy.mixed_routing.summary",
             comment: "Network self-check mixed target proxy routing result summary"
@@ -1183,7 +1229,7 @@ struct NetworkDiagnosticsTests {
             egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "unexpected")
         ).run()
 
-        #expect(result.status == .normal)
+        #expect(result.status == .indeterminate)
         #expect(result.summary == String(
             localized: "network_diagnostics.proxy.direct_routes.summary",
             comment: "Network self-check direct target routes result summary"
@@ -1555,7 +1601,7 @@ struct NetworkDiagnosticsTests {
 
         let result = await check.run()
 
-        #expect(result.status == .normal)
+        #expect(result.status == .indeterminate)
         #expect(await recorder.requests == [.init(url: controlURL, proxy: proxy)])
     }
 
