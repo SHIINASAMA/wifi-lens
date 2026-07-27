@@ -1,11 +1,12 @@
 name: Pages Deploy
 
 on:
-  workflow_run:
-    workflows:
-      - Web CI
-    types:
-      - completed
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/pages-deploy.yml"
+      - "web/**"
   workflow_dispatch:
 
 permissions:
@@ -19,21 +20,12 @@ concurrency:
 
 jobs:
   deploy:
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      (
-        github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.event == 'push' &&
-        github.event.workflow_run.head_branch == 'master'
-      )
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - uses: pnpm/action-setup@v6
         with:
