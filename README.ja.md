@@ -1,8 +1,8 @@
 # WiFi Lens
 
-**macOS 向けのネイティブなオープンソース Wi-Fi アナライザおよびネットワーク診断アプリ。**
+**Wi-Fi 分析機能を備えた、macOS 向けネイティブのオープンソースネットワーク診断アプリ。**
 
-チャンネルの混雑を可視化し、接続の問題を解決し、Wi-Fi ローミングを検証——すべて Mac 上でローカルに実行します。
+接続の問題を診断し、Wi-Fi チャンネルの混雑を分析し、ローミング動作を検証——結果は Mac 上でローカルに処理されます。
 
 [![最新リリース](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![macOS](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
@@ -39,7 +39,7 @@ macOS 14+ · Intel および Apple Silicon · テレメトリなし
 
 ## WiFi Lens について
 
-WiFi Lens は、SwiftUI、CoreWLAN、CoreBluetooth で開発したネイティブ macOS Wi-Fi・Bluetooth アナライザです。周辺の無線ネットワークと BLE デバイスをリアルタイムで表示し、接続問題の診断、混雑の少ないチャンネルの選択、アクセスポイント間のローミング動作の確認に役立ちます。
+WiFi Lens は、SwiftUI、CoreWLAN、CoreBluetooth で開発されたネイティブ macOS ネットワーク診断アプリです。ネットワーク自己診断、Wi-Fi スキャン、チャンネル混雑分析、ローミング検証を通じて、接続の問題解決を支援します。内蔵の BLE スキャン機能により、近くのワイヤレスデバイスをさらに把握できます。
 
 このリポジトリでは無料のオープンソース版を提供しています。WiFi Lens Pro は別売りの有料版で、スペクトル録画、常駐メニューバー、イベントタイムライン機能を追加します。
 

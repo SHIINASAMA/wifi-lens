@@ -1,8 +1,8 @@
 # WiFi Lens
 
-**一款原生、开源的 macOS Wi-Fi 分析与网络诊断应用。**
+**一款原生、开源的 macOS 网络诊断应用，内置 Wi-Fi 分析功能。**
 
-可视化信道拥堵、排查连接问题、验证 Wi-Fi 漫游——全部在你的 Mac 上本地完成。
+诊断连接问题、分析 Wi-Fi 信道拥堵、验证漫游行为——结果在你的 Mac 上本地处理。
 
 [![最新版本](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![macOS](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
@@ -39,7 +39,7 @@ macOS 14+ · Intel 与 Apple Silicon · 无遥测
 
 ## 关于 WiFi Lens
 
-WiFi Lens 是一款使用 SwiftUI、CoreWLAN 和 CoreBluetooth 开发的原生 macOS Wi-Fi 与蓝牙分析器。它实时呈现附近的无线网络和 BLE 设备，帮助你诊断连接问题、选择拥堵较少的信道，并验证接入点之间的漫游行为。
+WiFi Lens 是一款使用 SwiftUI、CoreWLAN 和 CoreBluetooth 开发的原生 macOS 网络诊断应用。它通过网络自检、Wi-Fi 扫描、信道拥塞分析和漫游验证帮你排查连接问题。内置 BLE 扫描让你能进一步感知周围的无线设备。
 
 本仓库提供免费开源版。WiFi Lens Pro 是独立付费版，增加频谱录制、常驻菜单栏与事件时间线功能。
 

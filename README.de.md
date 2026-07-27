@@ -1,8 +1,8 @@
 # WiFi Lens
 
-**Ein nativer Open-Source-Wi-Fi-Analysator und Netzwerk-Diagnose-App für macOS.**
+**Eine native Open-Source-Netzwerkdiagnose-App für macOS mit integrierter Wi-Fi-Analyse.**
 
-Kanalbelegung visualisieren, Verbindungsprobleme beheben und Wi-Fi-Roaming validieren — alles lokal auf deinem Mac.
+Verbindungsprobleme diagnostizieren, Wi-Fi-Kanalauslastung analysieren und Roaming-Verhalten validieren — die Ergebnisse werden lokal auf deinem Mac verarbeitet.
 
 [![Letzte Version](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![macOS](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
@@ -39,7 +39,7 @@ macOS 14+ · Intel & Apple Silicon · Keine Telemetrie
 
 ## Über WiFi Lens
 
-WiFi Lens ist ein nativer Wi-Fi- und Bluetooth-Analysator für macOS, entwickelt mit SwiftUI, CoreWLAN und CoreBluetooth. Die App erfasst drahtlose Netzwerke und BLE-Geräte in deiner Umgebung in Echtzeit. So kannst du Verbindungsprobleme untersuchen, einen weniger ausgelasteten Kanal wählen und das Roaming zwischen Access Points prüfen.
+WiFi Lens ist eine native macOS-Netzwerkdiagnose-App, entwickelt mit SwiftUI, CoreWLAN und CoreBluetooth. Sie hilft dir, Verbindungsprobleme durch Netzwerk-Selbsttests, Wi-Fi-Scans, Analyse der Kanalauslastung und Roaming-Validierung zu beheben. Der integrierte BLE-Scanner bietet zusätzliche Einblicke in nahegelegene drahtlose Geräte.
 
 Dieses Repository enthält die kostenlose Open-Source-Edition. WiFi Lens Pro ist eine separate kostenpflichtige Edition, die Spektrumsaufzeichnung, dauerhafte Menüleiste und Ereignis-Zeitachse ergänzt.
 
