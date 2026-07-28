@@ -146,6 +146,8 @@ Bug reports and feature ideas are welcome. Open an [issue](https://github.com/SH
 
 Pull requests should follow the conventions in [.agents/references/project/ARCHITECTURE.md](.agents/references/project/ARCHITECTURE.md) and include test coverage where practical. See [.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md) for AI assistant guidelines if you use coding agents.
 
+At their discretion, the maintainer may recognize substantial contributions to WiFi Lens with an Apple-issued promo code for WiFi Lens Pro. See [Contributor Recognition](.github/CONTRIBUTING.md#contributor-recognition) for details.
+
 **Contact:** [@WiFiLens on X](https://x.com/WiFiLens) · [wifi-lens@shiinalabs.com](mailto:wifi-lens@shiinalabs.com)
 
 ---

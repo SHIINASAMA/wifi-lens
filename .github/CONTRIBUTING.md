@@ -44,7 +44,7 @@ WiFi Lens requires macOS 14 or later.
 git clone https://github.com/SHIINASAMA/wifi-lens
 cd wifi-lens
 git submodule update --init ChartLens
-````
+```
 
 Open the project with:
 
@@ -162,6 +162,34 @@ Contributors remain responsible for all submitted code and must:
 
 AI-generated code is held to the same quality, security, privacy, and
 testing standards as manually written code.
+
+## Contributor Recognition
+
+The maintainer may offer an Apple-issued promo code for WiFi Lens Pro as a
+thank-you to people whose accepted contributions have a substantial positive
+impact on WiFi Lens.
+
+Relevant contributions may include code improvements, bug fixes,
+documentation, localization, testing, and validated issue investigation. The
+maintainer considers each contribution on its own or together with a person's
+other work, based on its impact, quality, relevance to current project needs,
+and lasting usefulness. There are no fixed thresholds. Routine, trivial,
+spammy, or automated contributions do not qualify on their own. The
+number of submissions, stars, forks, or downloads does not establish
+eligibility.
+
+This recognition is voluntary. It is not compensation, a bounty, or an
+entitlement. Submitting a contribution, or having one accepted, does not
+guarantee a promo code.
+
+Each person may receive one promo code. The maintainer sends codes privately.
+Codes have no cash alternative. Apple controls their availability, expiration,
+redemption, and storefront eligibility. WiFi Lens never asks for Apple ID
+credentials to deliver a code.
+
+This policy applies to contributions accepted on or after July 28, 2026. The
+maintainer may also recognize earlier contributions but does not promise a
+complete retrospective review.
 
 ## License
 
