@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       astro:
-        specifier: ^7.1.0
-        version: 7.1.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@24.13.2)(jiti@1.21.7)(rollup@4.62.2)
+        specifier: ^7.1.4
+        version: 7.1.4(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@24.13.2)(jiti@1.21.7)(rollup@4.62.2)
 
 packages:
 
@@ -177,8 +177,8 @@ packages:
   '@emnapi/runtime@1.11.1':
     resolution: {integrity: sha512-vgj7R3y3Wgx24IQaGPA/R6YFXLHVMOZ0uVEyIQPaWs+rd1AzfEMXlAC22FYwO1XkKR6NPsq7mUandH8oIRdZFw==}
 
-  '@emnapi/runtime@1.11.2':
-    resolution: {integrity: sha512-kyOl3X0DuTiT1h2ft8r2fYO8JYtU9a9Xis/zBSiGArNaagCOWx90N1k2wxp18czFDH+OgcWGb5ZP/XMt3dcyPA==}
+  '@emnapi/runtime@1.11.3':
+    resolution: {integrity: sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA==}
 
   '@emnapi/wasi-threads@1.2.2':
     resolution: {integrity: sha512-c95qOXkHdydNKhscBTebqEC1CVAZpyqOfVfBzQ1qgzyl3gfeldUjIggDbIZgDKsHLgnsM+igH7TJ/eAasaVuMA==}
@@ -834,8 +834,8 @@ packages:
     resolution: {integrity: sha512-COROpnaoap1E2F000S62r6A60uHZnmlvomhfyT2DlTcrY1OrBKn2UhH7qn5wTC9zMvD0AY7csdPSNwKP+7WiQw==}
     engines: {node: '>= 0.4'}
 
-  astro@7.1.0:
-    resolution: {integrity: sha512-jXHNZXpO0HOuANLwv5uLg5WFXFmIMyDTMlokIb8sv10y8QItOFaikwrqvp6+Pe0MSqvp+aO7V1SfVriFcCEKgA==}
+  astro@7.1.4:
+    resolution: {integrity: sha512-e0gkBReJECAZuuTgpEB5JMUc6J4mM6boD6wuVE1pBf/fMywG47f8qm9XQoA6kZB1RWHiHmUlLuQ2jd9Q5+72HQ==}
     engines: {node: '>=22.12.0', npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
     peerDependencies:
@@ -889,9 +889,9 @@ packages:
   cookie-es@1.2.3:
     resolution: {integrity: sha512-lXVyvUvrNXblMqzIRrxHb57UUVmqsSWlxqt3XIjCkUP0wDAf6uicO6KMbEgYrMNtEvWgWHwe42CKxPu9MYAnWw==}
 
-  cookie@1.1.1:
-    resolution: {integrity: sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==}
-    engines: {node: '>=18'}
+  cookie@2.0.1:
+    resolution: {integrity: sha512-yuToqVvRrj6pfDXREyQAAv8SkAEk/8GS3jQRTiUMm66TVtBYmqQeoEjL2Lmq8Rpo6271vH76InTChTitEAm65w==}
+    engines: {node: '>=22'}
 
   crossws@0.3.5:
     resolution: {integrity: sha512-ojKiDvcmByhwa8YYqbQI/hg7MEU0NC03+pSdEq4ZUnZR9xXpwk7E43SMNGkn+JxJGPFtNvQ48+vV2p+P1ml5PA==}
@@ -1153,8 +1153,8 @@ packages:
     resolution: {integrity: sha512-4pfM1Ff0x50o0tQwb5ucw/RzNyD0/YJME6IVcStalZuMWxdt3sR3huStTtxz4PUmvZfRguvDejasvQ2kifR11g==}
     engines: {node: 20 || >=22}
 
-  magic-string@0.30.21:
-    resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
+  magic-string@1.1.0:
+    resolution: {integrity: sha512-kS3VHe0nEPST2saQV4Rbkchcd3UBRkVTQHo1D3h/ZTwFDhai/mfKkmtPAtD129EOI7K3HlHIsFOt0WrI2/oU9g==}
 
   magicast@0.5.3:
     resolution: {integrity: sha512-pVKE4UdSQ7DvHzivsCIFx2BJn1mHG6KsyrFcaxFx6tONdneEuThrDx0Cj3AMg58KyN4pzYT+LHOotxDQDjNvkw==}
@@ -1192,8 +1192,8 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  neotraverse@0.6.18:
-    resolution: {integrity: sha512-Z4SmBUweYa09+o6pG+eASabEpP6QkQ70yHj351pQoEXIs8uHbaU2DWVmzBANKgflPa47A50PtB2+NgRpQvr7vA==}
+  neotraverse@1.0.1:
+    resolution: {integrity: sha512-WmmLty1YWwJl9yZi77v2dVIV6X2kuYV8YYBI/G3LWGKdGHmHUvL1z7FW0iDvEvGAwNEoc5x1tOOOyDnf5jJw/w==}
     engines: {node: '>= 10'}
 
   nlcst-to-string@4.0.0:
@@ -1260,8 +1260,8 @@ packages:
     resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
     engines: {node: '>=12'}
 
-  postcss@8.5.22:
-    resolution: {integrity: sha512-KBDEIpLrvpv16pp3K0Fw+UCoZfopFjjgeB+0tA/aaThfEE74kKDLrgg603YvOWJyg3+WYtyq3xYsQWsIyZlPqQ==}
+  postcss@8.5.23:
+    resolution: {integrity: sha512-g50586zr4bZmwFiTlflMu8E0bDTb5I5gertgwAKmsdUlTQIhZtunzUlD1WSzwcVWPoAVpsrA6vlfCD7oXvRwgg==}
     engines: {node: ^10 || ^12 || >=14}
 
   prismjs@1.30.0:
@@ -1310,8 +1310,8 @@ packages:
   satteri@0.9.5:
     resolution: {integrity: sha512-ZuWVl+vnM64y+/TtX8Kosv2c00W+hLQiiwnEL6H0UKVVrxFqMw4D2CJHHQaouVd89OAhtBBfjWLqhKi3TVUV4w==}
 
-  sax@1.6.0:
-    resolution: {integrity: sha512-6R3J5M4AcbtLUdZmRv2SygeVaM7IhrLXu9BmnOGmmACak8fiUtOsYNWUS4uK7upbmHIBbLBeFeI//477BKLBzA==}
+  sax@1.6.1:
+    resolution: {integrity: sha512-42tBVwLWnaQvW5zc4HbZrTuWccECCZfBi92FDuwtqxasH+JbPB3/FOKb1m222K42R4WxuxzzMsTswfzgtSu64Q==}
     engines: {node: '>=11.0.0'}
 
   semver@7.8.5:
@@ -1335,8 +1335,8 @@ packages:
   sisteransi@1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
 
-  smol-toml@1.7.0:
-    resolution: {integrity: sha512-aqVvWoyO21L23mb+drl4RmMXbf6N7FdHjAhTRA9ZBL7apWBgfWC16KjrASI+1p9GAroljyMHj6fK67i0UiTNvQ==}
+  smol-toml@1.7.1:
+    resolution: {integrity: sha512-PPlsspAZ4jbMBu5DMFhfUGDQLu/vrL4SyBROVS37x8ynnVmFIs1VPBz1Co8Xks3TvpIaZXmU85y4DrQ+UyVFoQ==}
     engines: {node: '>= 18'}
 
   source-map-js@1.2.1:
@@ -1573,9 +1573,9 @@ snapshots:
   '@astrojs/compiler-binding-linux-x64-musl@0.3.1':
     optional: true
 
-  '@astrojs/compiler-binding-wasm32-wasi@0.3.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)':
+  '@astrojs/compiler-binding-wasm32-wasi@0.3.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.1.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)
+      '@napi-rs/wasm-runtime': 1.1.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
@@ -1587,7 +1587,7 @@ snapshots:
   '@astrojs/compiler-binding-win32-x64-msvc@0.3.1':
     optional: true
 
-  '@astrojs/compiler-binding@0.3.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)':
+  '@astrojs/compiler-binding@0.3.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)':
     optionalDependencies:
       '@astrojs/compiler-binding-darwin-arm64': 0.3.1
       '@astrojs/compiler-binding-darwin-x64': 0.3.1
@@ -1595,16 +1595,16 @@ snapshots:
       '@astrojs/compiler-binding-linux-arm64-musl': 0.3.1
       '@astrojs/compiler-binding-linux-x64-gnu': 0.3.1
       '@astrojs/compiler-binding-linux-x64-musl': 0.3.1
-      '@astrojs/compiler-binding-wasm32-wasi': 0.3.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)
+      '@astrojs/compiler-binding-wasm32-wasi': 0.3.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)
       '@astrojs/compiler-binding-win32-arm64-msvc': 0.3.1
       '@astrojs/compiler-binding-win32-x64-msvc': 0.3.1
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
 
-  '@astrojs/compiler-rs@0.3.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)':
+  '@astrojs/compiler-rs@0.3.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)':
     dependencies:
-      '@astrojs/compiler-binding': 0.3.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)
+      '@astrojs/compiler-binding': 0.3.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
@@ -1617,7 +1617,7 @@ snapshots:
       picomatch: 4.0.5
       retext-smartypants: 6.2.0
       shiki: 4.3.1
-      smol-toml: 1.7.0
+      smol-toml: 1.7.1
       unified: 11.0.5
 
   '@astrojs/markdown-satteri@0.3.4':
@@ -1710,7 +1710,7 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@emnapi/runtime@1.11.2':
+  '@emnapi/runtime@1.11.3':
     dependencies:
       tslib: 2.8.1
     optional: true
@@ -1888,7 +1888,7 @@ snapshots:
 
   '@img/sharp-wasm32@0.35.3':
     dependencies:
-      '@emnapi/runtime': 1.11.2
+      '@emnapi/runtime': 1.11.3
     optional: true
 
   '@img/sharp-webcontainers-wasm32@0.35.3':
@@ -1914,10 +1914,10 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
-  '@napi-rs/wasm-runtime@1.1.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)':
+  '@napi-rs/wasm-runtime@1.1.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)':
     dependencies:
       '@emnapi/core': 1.11.1
-      '@emnapi/runtime': 1.11.2
+      '@emnapi/runtime': 1.11.3
       '@tybys/wasm-util': 0.10.3
     optional: true
 
@@ -2144,9 +2144,9 @@ snapshots:
 
   aria-query@5.3.2: {}
 
-  astro@7.1.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@24.13.2)(jiti@1.21.7)(rollup@4.62.2):
+  astro@7.1.4(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@24.13.2)(jiti@1.21.7)(rollup@4.62.2):
     dependencies:
-      '@astrojs/compiler-rs': 0.3.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)
+      '@astrojs/compiler-rs': 0.3.1(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)
       '@astrojs/internal-helpers': 0.10.1
       '@astrojs/markdown-satteri': 0.3.4
       '@astrojs/telemetry': 3.3.3
@@ -2160,7 +2160,7 @@ snapshots:
       ci-info: 4.4.0
       clsx: 2.1.1
       common-ancestor-path: 2.0.0
-      cookie: 1.1.1
+      cookie: 2.0.1
       devalue: 5.8.2
       diff: 8.0.4
       dset: 3.1.4
@@ -2174,10 +2174,10 @@ snapshots:
       http-cache-semantics: 4.2.0
       js-yaml: 4.3.0
       jsonc-parser: 3.3.1
-      magic-string: 0.30.21
+      magic-string: 1.1.0
       magicast: 0.5.3
       mrmime: 2.0.1
-      neotraverse: 0.6.18
+      neotraverse: 1.0.1
       obug: 2.1.4
       p-limit: 7.3.1
       p-queue: 9.3.3
@@ -2186,7 +2186,7 @@ snapshots:
       picomatch: 4.0.5
       semver: 7.8.5
       shiki: 4.3.1
-      smol-toml: 1.7.0
+      smol-toml: 1.7.1
       svgo: 4.0.2
       tinyclip: 0.1.15
       tinyexec: 1.2.4
@@ -2264,7 +2264,7 @@ snapshots:
 
   cookie-es@1.2.3: {}
 
-  cookie@1.1.1: {}
+  cookie@2.0.1: {}
 
   crossws@0.3.5:
     dependencies:
@@ -2538,7 +2538,7 @@ snapshots:
 
   lru-cache@11.5.2: {}
 
-  magic-string@0.30.21:
+  magic-string@1.1.0:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
 
@@ -2585,7 +2585,7 @@ snapshots:
 
   nanoid@3.3.16: {}
 
-  neotraverse@0.6.18: {}
+  neotraverse@1.0.1: {}
 
   nlcst-to-string@4.0.0:
     dependencies:
@@ -2644,7 +2644,7 @@ snapshots:
 
   picomatch@4.0.5: {}
 
-  postcss@8.5.22:
+  postcss@8.5.23:
     dependencies:
       nanoid: 3.3.16
       picocolors: 1.1.1
@@ -2748,7 +2748,7 @@ snapshots:
       '@bruits/satteri-win32-arm64-msvc': 0.9.5
       '@bruits/satteri-win32-x64-msvc': 0.9.5
 
-  sax@1.6.0: {}
+  sax@1.6.1: {}
 
   semver@7.8.5: {}
 
@@ -2799,7 +2799,7 @@ snapshots:
 
   sisteransi@1.0.5: {}
 
-  smol-toml@1.7.0: {}
+  smol-toml@1.7.1: {}
 
   source-map-js@1.2.1: {}
 
@@ -2818,7 +2818,7 @@ snapshots:
       css-what: 6.2.2
       csso: 5.0.5
       picocolors: 1.1.1
-      sax: 1.6.0
+      sax: 1.6.1
 
   tiny-inflate@1.0.3: {}
 
@@ -2916,7 +2916,7 @@ snapshots:
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.5
-      postcss: 8.5.22
+      postcss: 8.5.23
       rolldown: 1.1.5
       tinyglobby: 0.2.17
     optionalDependencies:
