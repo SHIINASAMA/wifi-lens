@@ -153,97 +153,99 @@ private struct AppRootView: View {
         } else if !UITestMode.isActive && selectedPage.requiresWiFi && !viewModel.isWiFiAvailable {
             WiFiOffView()
         } else {
-            ZStack {
-                // These pages stay mounted to preserve page-local state. The detail
-                // container must therefore fill the available split-view space
-                // explicitly instead of letting hidden pages influence window sizing.
-                OverviewView(viewModel: viewModel, store: viewModel.store)
-                    .opacity(selectedPage == .overview ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .overview)
-                    .accessibilityIdentifier("page-overview")
+            // Pages stay mounted to preserve page-local state. GeometryReader keeps their
+            // layout minimums off the window: SwiftUI otherwise turns the tallest hidden
+            // page into an NSHostingView.minHeight constraint on the NSWindow itself.
+            GeometryReader { _ in
+                ZStack {
+                    OverviewView(viewModel: viewModel, store: viewModel.store)
+                        .opacity(selectedPage == .overview ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .overview)
+                        .accessibilityIdentifier("page-overview")
 
-                EditionComposition.detailContribution(context: EditionCompositionContext(
-                    mainWindowID: sceneState.id,
-                    mainWindowState: sceneState.editionWindowState,
-                    scannerViewModel: viewModel,
-                    macVendorDatabaseManager: macVendorDatabaseManager,
-                    selectedPage: Binding(
-                        get: { sceneState.selectedPage },
-                        set: { sceneState.selectedPage = $0 }
-                    ),
-                    secondaryToolbarSelections: $secondaryToolbarSelections,
-                    bleEnabled: $bleEnabled,
-                    openMainWindow: { _ in }
-                ))
-
-                ChannelQualityView(
-                    channels: viewModel.channelRecommendations,
-                    mode: channelViewMode
-                )
-                    .opacity(selectedPage == .channels ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .channels)
-                    .accessibilityIdentifier("page-channels")
-
-                if selectedPage == .interfaces {
-                    InterfacesView(
-                        interfaces: viewModel.networkInfo,
+                    EditionComposition.detailContribution(context: EditionCompositionContext(
+                        mainWindowID: sceneState.id,
+                        mainWindowState: sceneState.editionWindowState,
                         scannerViewModel: viewModel,
-                        throughputMonitor: viewModel.throughputMonitor,
-                        mode: interfaceViewMode
+                        macVendorDatabaseManager: macVendorDatabaseManager,
+                        selectedPage: Binding(
+                            get: { sceneState.selectedPage },
+                            set: { sceneState.selectedPage = $0 }
+                        ),
+                        secondaryToolbarSelections: $secondaryToolbarSelections,
+                        bleEnabled: $bleEnabled,
+                        openMainWindow: { _ in }
+                    ))
+
+                    ChannelQualityView(
+                        channels: viewModel.channelRecommendations,
+                        mode: channelViewMode
                     )
-                        .accessibilityIdentifier("page-interfaces")
+                        .opacity(selectedPage == .channels ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .channels)
+                        .accessibilityIdentifier("page-channels")
+
+                    if selectedPage == .interfaces {
+                        InterfacesView(
+                            interfaces: viewModel.networkInfo,
+                            scannerViewModel: viewModel,
+                            throughputMonitor: viewModel.throughputMonitor,
+                            mode: interfaceViewMode
+                        )
+                            .accessibilityIdentifier("page-interfaces")
+                    }
+
+                    NetworkDiagnosticsView(viewModel: networkDiagnosticsViewModel)
+                        .opacity(selectedPage == .networkDiagnostics ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .networkDiagnostics)
+                        .accessibilityIdentifier("page-networkDiagnostics")
+
+                    RoamingTestView(viewModel: roamingViewModel)
+                        .opacity(selectedPage == .roaming ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .roaming)
+                        .accessibilityIdentifier("page-roaming")
+                        .accessibilityElement(children: .contain)
+
+                    BLEScannerView(viewModel: bleViewModel, bleEnabled: bleEnabled)
+                        .opacity(selectedPage == .bleScanner ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .bleScanner)
+                        .accessibilityIdentifier("page-bleScanner")
+                        .accessibilityElement(children: .contain)
+
+                    SettingsView(
+                        macVendorDatabaseManager: macVendorDatabaseManager,
+                        updater: sparkleUpdater,
+                        locationPermission: viewModel.locationManager,
+                        bluetoothPermission: bleViewModel?.bluetoothPermission,
+                        bleEnabled: $bleEnabled,
+                        onScanIntervalChange: { viewModel.scanIntervalSeconds = $0 },
+                        onRegulatoryRegionChange: viewModel.handleRegulatoryRegionOverrideChange
+                    )
+                        .opacity(selectedPage == .settings ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .settings)
+                        .accessibilityIdentifier("page-settings")
+
+    #if DEBUG
+                    SpectrumDebugContainerView()
+                        .opacity(selectedPage == .spectrumDebugChart ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .spectrumDebugChart)
+                        .accessibilityIdentifier("page-spectrumDebugChart")
+
+                    DebugContainerView()
+                        .opacity(selectedPage == .debugChart ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .debugChart)
+                        .accessibilityIdentifier("page-debugChart")
+
+    #if DEBUG && PRO
+                    DebugTimelineContainerView()
+                        .opacity(selectedPage == .debugTimeline ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .debugTimeline)
+                        .accessibilityIdentifier("page-debugTimeline")
+    #endif
+    #endif
                 }
-
-                NetworkDiagnosticsView(viewModel: networkDiagnosticsViewModel)
-                    .opacity(selectedPage == .networkDiagnostics ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .networkDiagnostics)
-                    .accessibilityIdentifier("page-networkDiagnostics")
-
-                RoamingTestView(viewModel: roamingViewModel)
-                    .opacity(selectedPage == .roaming ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .roaming)
-                    .accessibilityIdentifier("page-roaming")
-                    .accessibilityElement(children: .contain)
-
-                BLEScannerView(viewModel: bleViewModel, bleEnabled: bleEnabled)
-                    .opacity(selectedPage == .bleScanner ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .bleScanner)
-                    .accessibilityIdentifier("page-bleScanner")
-                    .accessibilityElement(children: .contain)
-
-                SettingsView(
-                    macVendorDatabaseManager: macVendorDatabaseManager,
-                    updater: sparkleUpdater,
-                    locationPermission: viewModel.locationManager,
-                    bluetoothPermission: bleViewModel?.bluetoothPermission,
-                    bleEnabled: $bleEnabled,
-                    onScanIntervalChange: { viewModel.scanIntervalSeconds = $0 },
-                    onRegulatoryRegionChange: viewModel.handleRegulatoryRegionOverrideChange
-                )
-                    .opacity(selectedPage == .settings ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .settings)
-                    .accessibilityIdentifier("page-settings")
-
-#if DEBUG
-                SpectrumDebugContainerView()
-                    .opacity(selectedPage == .spectrumDebugChart ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .spectrumDebugChart)
-                    .accessibilityIdentifier("page-spectrumDebugChart")
-
-                DebugContainerView()
-                    .opacity(selectedPage == .debugChart ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .debugChart)
-                    .accessibilityIdentifier("page-debugChart")
-
-#if DEBUG && PRO
-                DebugTimelineContainerView()
-                    .opacity(selectedPage == .debugTimeline ? 1 : 0)
-                    .allowsHitTesting(selectedPage == .debugTimeline)
-                    .accessibilityIdentifier("page-debugTimeline")
-#endif
-#endif
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
     }
 
