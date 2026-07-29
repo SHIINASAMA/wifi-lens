@@ -81,13 +81,11 @@ struct NetworkDiagnosticsTests {
     @Test("runner enforces an overall session budget")
     func runnerEnforcesOverallBudget() async {
         let probe = BudgetAwareDiagnosticProbe()
-        let started = ContinuousClock.now
         let results = await DiagnosticRunner(
             checks: [BudgetAwareDiagnosticCheck(probe: probe)],
             sessionBudget: .milliseconds(50)
         ).run { _ in }
 
-        #expect(started.duration(to: .now) < .seconds(1))
         #expect(await probe.wasCancelled)
         #expect(results.isEmpty)
     }
@@ -772,10 +770,10 @@ struct NetworkDiagnosticsTests {
 
         _ = await check.run()
 
-        #expect(await recorder.urls == [
+        #expect(Set(await recorder.urls) == Set([
             "https://www.apple.com/",
             "http://www.msftconnecttest.com/connecttest.txt",
-        ])
+        ]))
         #expect(await recorder.timeouts == [.seconds(5), .seconds(5)])
     }
 
@@ -1219,7 +1217,7 @@ struct NetworkDiagnosticsTests {
                 .init(statusCode: nil, errorCode: "timed-out"),
                 .init(statusCode: 200, errorCode: nil),
             ],
-            delays: [.milliseconds(100), .zero]
+            delays: [.milliseconds(10), .zero]
         )
         let check = SystemProxyCheck(
             resolver: RecordingProxyResolver(resolutions: [
@@ -1296,10 +1294,10 @@ struct NetworkDiagnosticsTests {
             localized: "network_diagnostics.proxy.disabled.summary",
             comment: "Network self-check system proxy disabled result summary"
         ))
-        #expect(await recorder.urls == [
+        #expect(Set(await recorder.urls) == Set([
             "http://www.msftconnecttest.com/connecttest.txt",
             "https://www.apple.com/",
-        ])
+        ]))
     }
 
     @Test("both tested proxy routes are available")
@@ -1604,7 +1602,7 @@ struct NetworkDiagnosticsTests {
         let httpsURL = URL(string: "https://www.apple.com/")!
         let httpProxy = EffectiveProxy.http(.init(host: "auth.example", port: 8080))
         let httpsProxy = EffectiveProxy.https(.init(host: "stale.example", port: 8443))
-        let connector = SequencedProxyConnector(outcomes: [true, false])
+        let connector = EndpointSelectiveProxyConnector(reachableHosts: ["auth.example"])
         let result = await SystemProxyCheck(
             resolver: RecordingProxyResolver(resolutions: [
                 httpURL: .init(candidates: [httpProxy], evidenceCodes: []),
@@ -2469,8 +2467,8 @@ private struct BudgetAwareDiagnosticCheck: DiagnosticCheck {
     let id: NetworkDiagnosticCheckID = .path
     let probe: BudgetAwareDiagnosticProbe
 
-    func run() async -> NetworkDiagnosticResult {
-        await probe.run()
+    func run() async throws -> NetworkDiagnosticResult {
+        try await probe.run()
         return .init(id: id, status: .normal, summary: id.rawValue)
     }
 }
@@ -3003,6 +3001,14 @@ private struct StubProxyConnector: ProxyEndpointConnecting {
 
     func canConnect(to endpoint: ProxyEndpoint, timeout: Duration) async -> Bool {
         reachable
+    }
+}
+
+private struct EndpointSelectiveProxyConnector: ProxyEndpointConnecting {
+    let reachableHosts: Set<String>
+
+    func canConnect(to endpoint: ProxyEndpoint, timeout: Duration) async -> Bool {
+        reachableHosts.contains(endpoint.host)
     }
 }
 

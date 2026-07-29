@@ -6,7 +6,7 @@ enum DiagnosticCheckRerunPolicy: Equatable, Sendable {
 protocol DiagnosticCheck: Sendable {
     var id: NetworkDiagnosticCheckID { get }
     var rerunPolicy: DiagnosticCheckRerunPolicy { get }
-    func run() async -> NetworkDiagnosticResult
+    func run() async throws -> NetworkDiagnosticResult
 }
 
 extension DiagnosticCheck {
@@ -71,9 +71,15 @@ struct DiagnosticRunner: Sendable {
         let clock = ContinuousClock()
         let remaining = clock.now.duration(to: deadline)
         guard remaining > .zero else { return nil }
-        let task = Task { await check.run() }
+        let task = Task { try await check.run() }
         return await withTaskGroup(of: NetworkDiagnosticResult?.self) { group in
-            group.addTask { await task.value }
+            group.addTask {
+                do {
+                    return try await task.value
+                } catch {
+                    return nil
+                }
+            }
             group.addTask {
                 try? await clock.sleep(for: remaining)
                 task.cancel()
