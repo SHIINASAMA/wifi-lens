@@ -50,6 +50,59 @@ struct NetworkDiagnosticsTests {
         #expect(NetworkDiagnosticStatus.skipped.presentation != NetworkDiagnosticStatus.indeterminate.presentation)
     }
 
+    @Test("proxy authentication evidence maps to a credential remediation")
+    func proxyAuthenticationRemediation() {
+        let result = NetworkDiagnosticResult(
+            id: .proxy,
+            status: .abnormal,
+            summary: "Proxy authentication required",
+            evidence: [.init(code: "proxy.authentication-required", value: "407")]
+        )
+
+        let remediation = NetworkDiagnosticRemediation.forResult(result)
+
+        #expect(remediation.actionKey == "network_diagnostics.remediation.proxy_authentication.action")
+        #expect(remediation.rerunKey == "network_diagnostics.remediation.rerun")
+    }
+
+    @Test("indeterminate remediation does not claim a confirmed cause")
+    func indeterminateRemediationIsTentative() {
+        let result = NetworkDiagnosticResult(
+            id: .dns,
+            status: .indeterminate,
+            summary: "DNS could not be determined"
+        )
+
+        let remediation = NetworkDiagnosticRemediation.forResult(result)
+
+        #expect(remediation.causeKey == "network_diagnostics.remediation.indeterminate.cause")
+        #expect(remediation.actionKey == "network_diagnostics.remediation.indeterminate.action")
+    }
+
+    @Test("path summary composes interface tunnel proxy and internet segments")
+    func pathSummaryComposition() {
+        let results = [
+            NetworkDiagnosticResult(
+                id: .path,
+                status: .normal,
+                summary: "Path available",
+                evidence: [
+                    .init(code: "path.interface-type", value: "wifi"),
+                    .init(code: "path.interface-name", value: "en0"),
+                    .init(code: "path.routed-tunnel", value: "utun6"),
+                ]
+            ),
+            NetworkDiagnosticResult(
+                id: .proxy,
+                status: .normal,
+                summary: "Proxy route available",
+                evidence: [.init(code: "proxy.https.route-type", value: "https")]
+            ),
+        ]
+
+        #expect(NetworkPathSummary.from(results: results)?.text == "Mac → Wi-Fi en0 → VPN/Tunnel utun6 → HTTPS proxy → Internet")
+    }
+
     @Test("a blocked probe does not become an independent network fault")
     func blockedProbeIsNotAbnormal() {
         let result = NetworkDiagnosticResult.blocked(id: .internet, summary: "DNS is unavailable")

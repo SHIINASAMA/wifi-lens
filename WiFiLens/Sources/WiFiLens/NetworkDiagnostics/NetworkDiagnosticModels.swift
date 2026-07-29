@@ -44,6 +44,122 @@ struct NetworkDiagnosticEvidence: Equatable, Sendable {
     let value: String?
 }
 
+struct NetworkDiagnosticRemediation: Equatable, Sendable {
+    let detectionKey: String
+    let causeKey: String
+    let actionKey: String
+    let rerunKey: String
+
+    static func forResult(_ result: NetworkDiagnosticResult) -> Self {
+        let codes = Set(result.evidence.map(\.code))
+        let base: (String, String, String) = if codes.contains("proxy.authentication-required") {
+            (
+                "network_diagnostics.remediation.proxy_authentication.detection",
+                "network_diagnostics.remediation.proxy_authentication.cause",
+                "network_diagnostics.remediation.proxy_authentication.action"
+            )
+        } else if codes.contains("captive-portal.suspected") || codes.contains("captive-portal.redirect") {
+            (
+                "network_diagnostics.remediation.captive_portal.detection",
+                "network_diagnostics.remediation.captive_portal.cause",
+                "network_diagnostics.remediation.captive_portal.action"
+            )
+        } else if codes.contains("https.certificate-time-error") {
+            (
+                "network_diagnostics.remediation.certificate_time.detection",
+                "network_diagnostics.remediation.certificate_time.cause",
+                "network_diagnostics.remediation.certificate_time.action"
+            )
+        } else if codes.contains("proxy.endpoint-unavailable") || codes.contains("proxy.egress-unavailable") {
+            (
+                "network_diagnostics.remediation.proxy_unavailable.detection",
+                "network_diagnostics.remediation.proxy_unavailable.cause",
+                "network_diagnostics.remediation.proxy_unavailable.action"
+            )
+        } else if result.id == .dns && result.status == .abnormal {
+            (
+                "network_diagnostics.remediation.dns_unavailable.detection",
+                "network_diagnostics.remediation.dns_unavailable.cause",
+                "network_diagnostics.remediation.dns_unavailable.action"
+            )
+        } else if result.id == .path && result.status == .abnormal {
+            (
+                "network_diagnostics.remediation.path_unavailable.detection",
+                "network_diagnostics.remediation.path_unavailable.cause",
+                "network_diagnostics.remediation.path_unavailable.action"
+            )
+        } else if result.status == .indeterminate {
+            (
+                "network_diagnostics.remediation.indeterminate.detection",
+                "network_diagnostics.remediation.indeterminate.cause",
+                "network_diagnostics.remediation.indeterminate.action"
+            )
+        } else {
+            (
+                "network_diagnostics.remediation.generic.detection",
+                "network_diagnostics.remediation.generic.cause",
+                "network_diagnostics.remediation.generic.action"
+            )
+        }
+
+        return .init(
+            detectionKey: base.0,
+            causeKey: base.1,
+            actionKey: base.2,
+            rerunKey: "network_diagnostics.remediation.rerun"
+        )
+    }
+}
+
+struct NetworkPathSummary: Equatable, Sendable {
+    let segments: [String]
+
+    var text: String { segments.joined(separator: " → ") }
+
+    static func from(results: [NetworkDiagnosticResult]) -> Self? {
+        guard let path = results.first(where: { $0.id == .path }) else { return nil }
+        let pathEvidence = Dictionary(uniqueKeysWithValues: path.evidence.compactMap { evidence in
+            evidence.value.map { (evidence.code, $0) }
+        })
+        let interfaceName = pathEvidence["path.interface-name"]
+        let interfaceType = pathEvidence["path.interface-type"]
+        let interfaceLabel: String = switch interfaceType {
+        case "wifi": "Wi-Fi"
+        case "wiredEthernet": "Ethernet"
+        default: "Network"
+        }
+        var segments = ["Mac", interfaceName.map { "\(interfaceLabel) \($0)" } ?? interfaceLabel]
+
+        if let tunnel = pathEvidence["path.routed-tunnel"] {
+            segments.append("VPN/Tunnel \(tunnel)")
+        }
+
+        if let proxy = results.first(where: { $0.id == .proxy }) {
+            let routeType = proxy.evidence.first {
+                $0.code == "proxy.https.route-type" && $0.value != "direct"
+            }?.value ?? proxy.evidence.first {
+                $0.code == "proxy.http.route-type" && $0.value != "direct"
+            }?.value
+            if let routeType {
+                segments.append("\(routeType.uppercased()) proxy")
+            }
+        }
+        segments.append("Internet")
+        return .init(segments: segments)
+    }
+}
+
+extension NetworkDiagnosticConclusion {
+    static func primaryIssue(in results: [NetworkDiagnosticResult]) -> NetworkDiagnosticResult? {
+        let priority: [NetworkDiagnosticCheckID] = [.path, .dns, .internet, .proxy, .ipv6]
+        return priority.compactMap { id in
+            results.first {
+                $0.id == id && ($0.status == .abnormal || $0.status == .indeterminate)
+            }
+        }.first
+    }
+}
+
 struct NetworkDiagnosticResult: Equatable, Identifiable, Sendable {
     let id: NetworkDiagnosticCheckID
     let status: NetworkDiagnosticStatus
