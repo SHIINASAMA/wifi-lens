@@ -322,7 +322,9 @@ struct SystemProxyCheck: DiagnosticCheck {
         guard !Task.isCancelled else {
             return cancellationResult(stage: "before-http-resolution")
         }
-        let httpResolution = await resolver.resolve(for: httpTarget)
+        async let httpResolutionTask = resolver.resolve(for: httpTarget)
+        async let httpsResolutionTask = resolver.resolve(for: httpsTarget)
+        let (httpResolution, httpsResolution) = await (httpResolutionTask, httpsResolutionTask)
         guard !Task.isCancelled else {
             return cancellationResult(
                 stage: "after-http-resolution",
@@ -330,33 +332,20 @@ struct SystemProxyCheck: DiagnosticCheck {
                 resolution: httpResolution
             )
         }
-        let httpsResolution = await resolver.resolve(for: httpsTarget)
-        guard !Task.isCancelled else {
-            return cancellationResult(
-                stage: "after-https-resolution",
-                target: httpsTarget,
-                resolution: httpsResolution
-            )
-        }
-        let httpResult = await evaluate(
+        async let httpResultTask = evaluate(
             target: httpTarget,
             resolution: httpResolution,
             timeout: timeout
         )
-        guard !Task.isCancelled else {
-            return cancellationResult(
-                stage: "after-http-evaluation",
-                evidence: httpResult.evidence
-            )
-        }
-        let httpsResult = await evaluate(
+        async let httpsResultTask = evaluate(
             target: httpsTarget,
             resolution: httpsResolution,
             timeout: timeout
         )
+        let (httpResult, httpsResult) = await (httpResultTask, httpsResultTask)
         guard !Task.isCancelled else {
             return cancellationResult(
-                stage: "after-https-evaluation",
+                stage: "after-target-evaluation",
                 evidence: httpResult.evidence + httpsResult.evidence
             )
         }

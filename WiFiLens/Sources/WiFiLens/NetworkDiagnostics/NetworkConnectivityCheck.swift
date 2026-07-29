@@ -1,6 +1,16 @@
 import Foundation
 import Network
 
+protocol NetworkInterfaceInfoSourcing: Sendable {
+    func currentInterface() async -> NetworkInterfaceInfo?
+}
+
+struct SystemNetworkInterfaceInfoSource: NetworkInterfaceInfoSourcing {
+    func currentInterface() async -> NetworkInterfaceInfo? {
+        NetworkInfoService.fetch()
+    }
+}
+
 enum NetworkPathState: Equatable, Sendable {
     case satisfied
     case unsatisfied
@@ -84,19 +94,28 @@ extension NetworkPathChecking {
 struct NetworkConnectivityCheck: DiagnosticCheck {
     let id = NetworkDiagnosticCheckID.path
     private let pathSource: any NetworkPathChecking
+    private let interfaceSource: any NetworkInterfaceInfoSourcing
+    private let gatewayLatency: any GatewayLatencyProviding
     private let timeout: Duration
 
     init(
         pathSource: any NetworkPathChecking = SystemNetworkPathChecker(),
+        interfaceSource: any NetworkInterfaceInfoSourcing = SystemNetworkInterfaceInfoSource(),
+        gatewayLatency: any GatewayLatencyProviding = GatewayLatencyProvider(),
         timeout: Duration = .seconds(3)
     ) {
         self.pathSource = pathSource
+        self.interfaceSource = interfaceSource
+        self.gatewayLatency = gatewayLatency
         self.timeout = timeout
     }
 
     func run() async -> NetworkDiagnosticResult {
         let state = await pathSource.currentState(timeout: timeout)
-        let evidence = await pathSource.diagnosticEvidence(timeout: timeout)
+        let pathEvidence = await pathSource.diagnosticEvidence(timeout: timeout)
+        let interface = await interfaceSource.currentInterface()
+        let gateway = await gatewayLatency.measure(routerIP: interface?.router)
+        let evidence = pathEvidence + self.pathEvidence(interface: interface, gateway: gateway)
         return switch state {
         case .satisfied:
             NetworkDiagnosticResult(
@@ -127,6 +146,36 @@ struct NetworkConnectivityCheck: DiagnosticCheck {
                 evidence: evidence
             )
         }
+    }
+
+    private func pathEvidence(
+        interface: NetworkInterfaceInfo?,
+        gateway: GatewayLatencyResult
+    ) -> [NetworkDiagnosticEvidence] {
+        var evidence: [NetworkDiagnosticEvidence] = []
+        if let interface {
+            evidence.append(.init(code: "path.interface", value: interface.interfaceName))
+            if let address = interface.ipv4Addresses.first {
+                evidence.append(.init(code: "path.local-ip", value: address))
+            }
+            if let subnet = interface.subnetMasks.first {
+                evidence.append(.init(code: "path.subnet-mask", value: subnet))
+            }
+            if let router = interface.router {
+                evidence.append(.init(code: "path.router", value: router))
+            }
+            if let dns = interface.dnsServers.first {
+                evidence.append(.init(code: "path.dns-server", value: dns))
+            }
+        }
+        if let latency = gateway.latencyMs {
+            evidence.append(.init(code: "path.gateway-latency-ms", value: String(latency)))
+        } else if let router = gateway.routerIP, gateway.error != nil {
+            evidence.append(.init(code: "path.gateway-unreachable", value: router))
+        } else if gateway.error != nil {
+            evidence.append(.init(code: "path.gateway-unavailable", value: nil))
+        }
+        return evidence
     }
 }
 

@@ -69,6 +69,7 @@ enum NetworkDiagnosticsPresentation {
 @Observable
 final class NetworkDiagnosticsViewModel {
     static let defaultMinimumStepDuration = Duration.milliseconds(800)
+    static let defaultSessionBudget = Duration.seconds(30)
 
     private(set) var phase = NetworkDiagnosticsPagePhase.idle
     private(set) var executionPhases: [NetworkDiagnosticCheckID: NetworkDiagnosticExecutionPhase]
@@ -178,7 +179,8 @@ final class NetworkDiagnosticsViewModel {
         while !Task.isCancelled {
             let runner = DiagnosticRunner(
                 checks: checks,
-                minimumStepDuration: minimumStepDuration
+                minimumStepDuration: minimumStepDuration,
+                sessionBudget: Self.defaultSessionBudget
             )
             let retainedSnapshot = retainedResults
             let runTask = Task { [weak self] in

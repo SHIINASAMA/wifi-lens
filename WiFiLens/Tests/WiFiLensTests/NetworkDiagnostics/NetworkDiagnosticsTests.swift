@@ -131,6 +131,18 @@ struct NetworkDiagnosticsTests {
         #expect(await publications.values == NetworkDiagnosticCheckID.allCases)
     }
 
+    @Test("runner enforces an overall session budget")
+    func runnerEnforcesOverallBudget() async {
+        let probe = BudgetAwareDiagnosticProbe()
+        let results = await DiagnosticRunner(
+            checks: [BudgetAwareDiagnosticCheck(probe: probe)],
+            sessionBudget: .milliseconds(50)
+        ).run { _ in }
+
+        #expect(await probe.wasCancelled)
+        #expect(results.isEmpty)
+    }
+
     @Test("indeterminate DNS does not block internet or IPv6")
     func indeterminateDNSDoesNotBlockInternetOrIPv6() async {
         let invocations = DiagnosticTestRecorder()
@@ -587,6 +599,42 @@ struct NetworkDiagnosticsTests {
         ))
     }
 
+    @Test("path check records local interface and gateway evidence separately")
+    func pathCheckRecordsGatewayEvidence() async {
+        let result = await NetworkConnectivityCheck(
+            pathSource: StubPathSource(.satisfied),
+            interfaceSource: StubNetworkInterfaceSource(interface: makeNetworkInterface(router: "192.0.2.1")),
+            gatewayLatency: StubGatewayLatencyProvider(result: GatewayLatencyResult(
+                timestamp: Date(),
+                routerIP: "192.0.2.1",
+                latencyMs: 2.5
+            ))
+        ).run()
+
+        #expect(result.status == .normal)
+        #expect(result.evidence.contains(.init(code: "path.interface", value: "en0")))
+        #expect(result.evidence.contains(.init(code: "path.local-ip", value: "192.0.2.10")))
+        #expect(result.evidence.contains(.init(code: "path.subnet-mask", value: "255.255.255.0")))
+        #expect(result.evidence.contains(.init(code: "path.router", value: "192.0.2.1")))
+        #expect(result.evidence.contains(.init(code: "path.gateway-latency-ms", value: "2.5")))
+    }
+
+    @Test("gateway nonresponse is advisory and does not fail the local path")
+    func gatewayFailureIsAdvisory() async {
+        let result = await NetworkConnectivityCheck(
+            pathSource: StubPathSource(.satisfied),
+            interfaceSource: StubNetworkInterfaceSource(interface: makeNetworkInterface(router: "192.0.2.1")),
+            gatewayLatency: StubGatewayLatencyProvider(result: GatewayLatencyResult(
+                timestamp: Date(),
+                routerIP: "192.0.2.1",
+                error: .gatewayPingFailed("192.0.2.1")
+            ))
+        ).run()
+
+        #expect(result.status == .normal)
+        #expect(result.evidence.contains(.init(code: "path.gateway-unreachable", value: "192.0.2.1")))
+    }
+
     @Test("Microsoft captive-portal probe rejects a rewritten response")
     func captivePortalProbeRejectsRewrittenResponse() async {
         let check = HTTPSControlEndpointCheck(
@@ -618,6 +666,38 @@ struct NetworkDiagnosticsTests {
         #expect(result.status == .normal)
         #expect(result.evidence.contains(.init(code: "https.available", value: "200")))
         #expect(result.evidence.contains(.init(code: "captive-portal.clear", value: nil)))
+    }
+
+    @Test("independent control endpoints load concurrently and preserve evidence order")
+    func controlEndpointsRunConcurrently() async {
+        let loader = ConcurrentControlLoader()
+        let result = await HTTPSControlEndpointCheck(loader: loader).run()
+
+        #expect(await loader.maximumInFlight == 2)
+        #expect(result.evidence.map(\.code).prefix(2) == ["https.available", "captive-portal.clear"])
+    }
+
+    @Test("control endpoint metrics are redacted to bounded transaction fields")
+    func controlEndpointMetricsAreRedacted() async {
+        let result = await HTTPSControlEndpointCheck(
+            loader: MetricsControlLoader(
+                metrics: .init(
+                    dnsDuration: .milliseconds(12),
+                    connectDuration: .milliseconds(34),
+                    tlsDuration: .milliseconds(56),
+                    negotiatedTLSVersion: "TLSv1.3",
+                    isProxyConnection: true,
+                    remoteAddress: "192.0.2.10:443"
+                )
+            )
+        ).run()
+
+        #expect(result.evidence.contains(.init(code: "https.metrics.dns-ms", value: "12")))
+        #expect(result.evidence.contains(.init(code: "https.metrics.connect-ms", value: "34")))
+        #expect(result.evidence.contains(.init(code: "https.metrics.tls-ms", value: "56")))
+        #expect(result.evidence.contains(.init(code: "https.metrics.tls-version", value: "TLSv1.3")))
+        #expect(result.evidence.contains(.init(code: "https.metrics.proxy", value: "true")))
+        #expect(!result.evidence.contains { $0.value == "192.0.2.10:443" })
     }
 
     @Test("Apple HTTPS success and Microsoft HTTP timeout is indeterminate")
@@ -779,10 +859,10 @@ struct NetworkDiagnosticsTests {
 
         _ = await check.run()
 
-        #expect(await recorder.urls == [
+        #expect(Set(await recorder.urls) == Set([
             "https://www.apple.com/",
             "http://www.msftconnecttest.com/connecttest.txt",
-        ])
+        ]))
         #expect(await recorder.timeouts == [.seconds(5), .seconds(5)])
     }
 
@@ -846,6 +926,18 @@ struct NetworkDiagnosticsTests {
         ])
     }
 
+    @Test("independent DNS samples start concurrently and aggregate in target order")
+    func dnsSamplesRunConcurrently() async {
+        let resolver = ConcurrentDNSResolver()
+        let result = await DNSResolutionCheck(
+            resolver: resolver,
+            timeout: .seconds(1)
+        ).run()
+
+        #expect(await resolver.maximumInFlight == 3)
+        #expect(result.evidence.contains(.init(code: "dns.success-count", value: "3/3")))
+    }
+
     @Test("one failed lookup among successful samples is unstable, not unavailable")
     func dnsQuorum() async {
         let check = DNSResolutionCheck(
@@ -877,7 +969,7 @@ struct NetworkDiagnosticsTests {
         #expect(await resolver.invocationCount == 4)
     }
 
-    @Test("cancelling DNS sampling does not start the remaining hosts")
+    @Test("cancelling DNS sampling does not retry or exceed one attempt per host")
     func dnsCancellationStopsSampling() async {
         let resolver = CancellationAwareDNSResolver()
         let check = DNSResolutionCheck(resolver: resolver, timeout: .seconds(30))
@@ -887,7 +979,7 @@ struct NetworkDiagnosticsTests {
         task.cancel()
         _ = await task.value
 
-        #expect(await resolver.invocationCount == 1)
+        #expect(await resolver.invocationCount <= 3)
     }
 
     @Test("all indeterminate DNS samples cannot be determined")
@@ -1214,7 +1306,7 @@ struct NetworkDiagnosticsTests {
                 .init(statusCode: nil, errorCode: "timed-out"),
                 .init(statusCode: 200, errorCode: nil),
             ],
-            delays: [.milliseconds(100), .zero]
+            delays: [.milliseconds(10), .zero]
         )
         let check = SystemProxyCheck(
             resolver: RecordingProxyResolver(resolutions: [
@@ -1291,10 +1383,10 @@ struct NetworkDiagnosticsTests {
             localized: "network_diagnostics.proxy.disabled.summary",
             comment: "Network self-check system proxy disabled result summary"
         ))
-        #expect(await recorder.urls == [
+        #expect(Set(await recorder.urls) == Set([
             "http://www.msftconnecttest.com/connecttest.txt",
             "https://www.apple.com/",
-        ])
+        ]))
     }
 
     @Test("both tested proxy routes are available")
@@ -1599,7 +1691,7 @@ struct NetworkDiagnosticsTests {
         let httpsURL = URL(string: "https://www.apple.com/")!
         let httpProxy = EffectiveProxy.http(.init(host: "auth.example", port: 8080))
         let httpsProxy = EffectiveProxy.https(.init(host: "stale.example", port: 8443))
-        let connector = SequencedProxyConnector(outcomes: [true, false])
+        let connector = EndpointSelectiveProxyConnector(reachableHosts: ["auth.example"])
         let result = await SystemProxyCheck(
             resolver: RecordingProxyResolver(resolutions: [
                 httpURL: .init(candidates: [httpProxy], evidenceCodes: []),
@@ -1658,7 +1750,7 @@ struct NetworkDiagnosticsTests {
         #expect(await recorder.requests == [.init(url: controlURL, proxy: proxy)])
     }
 
-    @Test("cancelled proxy resolution does not resolve the second target")
+    @Test("cancelled concurrent proxy resolution remains bounded")
     func proxyCancellationStopsSecondTargetResolution() async {
         let resolver = CancellationIgnoringProxyResolver()
         let check = SystemProxyCheck(
@@ -1672,9 +1764,7 @@ struct NetworkDiagnosticsTests {
         task.cancel()
         let result = await task.value
 
-        #expect(await resolver.urls == [
-            "http://www.msftconnecttest.com/connecttest.txt",
-        ])
+        #expect(await resolver.urls.count <= 2)
         #expect(result.status == .indeterminate)
         #expect(result.evidence.contains(.init(
             code: "proxy.cancelled",
@@ -2062,6 +2152,54 @@ struct NetworkDiagnosticsTests {
         #expect(changedDiscovery != baseline)
     }
 
+    @Test("VPN and TUN interface names are classified without VPN manager access")
+    func tunnelInterfaceClassification() {
+        let tunnels = NetworkTunnelInterfaceClassifier.tunnelInterfaces(from: [
+            "en0", "utun3", "ipsec0", "ppp0", "bridge0", "utun2"
+        ])
+
+        #expect(tunnels == ["ipsec0", "ppp0", "utun2", "utun3"])
+        #expect(NetworkTunnelInterfaceClassifier.routedTunnelInterface(
+            activeInterfaceName: "utun3",
+            tunnelInterfaces: tunnels
+        ) == "utun3")
+        #expect(NetworkTunnelInterfaceClassifier.routedTunnelInterface(
+            activeInterfaceName: "en0",
+            tunnelInterfaces: tunnels
+        ) == nil)
+    }
+
+    @Test("tunnel presence and routed interface changes are fingerprint changes")
+    func tunnelFingerprintChangesTriggerObservation() async throws {
+        let baselinePath = NetworkPathFingerprint(
+            interfaceType: "wifi",
+            interfaceName: "en0",
+            pathStatus: .satisfied,
+            tunnelInterfaces: [],
+            routedTunnelInterface: nil
+        )
+        let changedPath = NetworkPathFingerprint(
+            interfaceType: "wifi",
+            interfaceName: "en0",
+            pathStatus: .satisfied,
+            tunnelInterfaces: ["utun3"],
+            routedTunnelInterface: "utun3"
+        )
+        let monitor = SystemNetworkFingerprintMonitor(
+            settingsReader: MutableFingerprintSettingsReader(dnsHash: 1, proxyHash: 7),
+            pathSource: FiniteNetworkPathFingerprintSource(values: [baselinePath, changedPath]),
+            settingsPoller: SilentNetworkFingerprintSettingsPoller()
+        )
+
+        let observation = try #require(await monitor.observation())
+        var iterator = observation.changes.makeAsyncIterator()
+        let change = await iterator.next()
+
+        #expect(observation.baseline.tunnelInterfaces.isEmpty)
+        #expect(change?.tunnelInterfaces == ["utun3"])
+        #expect(change?.routedTunnelInterface == "utun3")
+    }
+
     private func makeResults(
         path: NetworkDiagnosticStatus,
         dns: NetworkDiagnosticStatus,
@@ -2410,6 +2548,68 @@ private struct StubPathSource: NetworkPathChecking {
     }
 }
 
+private actor ConcurrentDNSResolver: DNSResolving {
+    private(set) var maximumInFlight = 0
+    private var inFlight = 0
+
+    func resolve(host: String, timeout: Duration) async -> DNSResolutionOutcome {
+        inFlight += 1
+        maximumInFlight = max(maximumInFlight, inFlight)
+        try? await Task.sleep(for: .milliseconds(20))
+        inFlight -= 1
+        return .resolved
+    }
+}
+
+private actor ConcurrentControlLoader: ControlEndpointLoading {
+    private(set) var maximumInFlight = 0
+    private var inFlight = 0
+
+    func load(url: URL, timeout: Duration) async -> ControlEndpointLoadResult {
+        inFlight += 1
+        maximumInFlight = max(maximumInFlight, inFlight)
+        try? await Task.sleep(for: .milliseconds(20))
+        inFlight -= 1
+        if url.scheme == "https" {
+            return .init(status: 200, body: nil, errorCode: nil)
+        }
+        return .init(status: 200, body: "Microsoft Connect Test", errorCode: nil)
+    }
+}
+
+private struct MetricsControlLoader: ControlEndpointLoading {
+    let metrics: ControlEndpointMetrics
+
+    func load(url: URL, timeout: Duration) async -> ControlEndpointLoadResult {
+        if url.scheme == "https" {
+            return .init(status: 200, body: nil, errorCode: nil, metrics: metrics)
+        }
+        return .init(status: 200, body: "Microsoft Connect Test", errorCode: nil)
+    }
+}
+
+private actor BudgetAwareDiagnosticProbe {
+    private(set) var wasCancelled = false
+
+    func run() async {
+        do {
+            try await Task.sleep(for: .seconds(30))
+        } catch {
+            wasCancelled = true
+        }
+    }
+}
+
+private struct BudgetAwareDiagnosticCheck: DiagnosticCheck {
+    let id: NetworkDiagnosticCheckID = .path
+    let probe: BudgetAwareDiagnosticProbe
+
+    func run() async throws -> NetworkDiagnosticResult {
+        try await probe.run()
+        return .init(id: id, status: .normal, summary: id.rawValue)
+    }
+}
+
 private actor StubDNSResolver: DNSResolving {
     private var outcomes: [DNSResolutionOutcome]
     private var outcomeIndex = 0
@@ -2473,12 +2673,12 @@ private struct StubControlLoader: ControlEndpointLoading {
         self.recorder = recorder
     }
 
-    func load(url: URL, timeout: Duration) async -> (status: Int?, body: String?, errorCode: String?) {
+    func load(url: URL, timeout: Duration) async -> ControlEndpointLoadResult {
         await recorder?.record(url: url, timeout: timeout)
         if url.scheme == "https" {
-            return (httpsStatus, nil, httpsErrorCode)
+            return .init(status: httpsStatus, body: nil, errorCode: httpsErrorCode)
         }
-        return (httpStatus, httpBody, httpErrorCode)
+        return .init(status: httpStatus, body: httpBody, errorCode: httpErrorCode)
     }
 }
 
@@ -2941,6 +3141,14 @@ private struct StubProxyConnector: ProxyEndpointConnecting {
     }
 }
 
+private struct EndpointSelectiveProxyConnector: ProxyEndpointConnecting {
+    let reachableHosts: Set<String>
+
+    func canConnect(to endpoint: ProxyEndpoint, timeout: Duration) async -> Bool {
+        reachableHosts.contains(endpoint.host)
+    }
+}
+
 private actor ProxyConnectorTestRecorder {
     private(set) var endpoints: [ProxyEndpoint] = []
 
@@ -3248,4 +3456,39 @@ private final class SequencedFingerprintSettingsReader: NetworkFingerprintSettin
     func staticProxySettingsHash() -> UInt64 {
         proxyHash
     }
+}
+
+private struct StubNetworkInterfaceSource: NetworkInterfaceInfoSourcing {
+    let interface: NetworkInterfaceInfo?
+
+    func currentInterface() async -> NetworkInterfaceInfo? {
+        interface
+    }
+}
+
+private struct StubGatewayLatencyProvider: GatewayLatencyProviding {
+    let result: GatewayLatencyResult
+
+    func measure(routerIP: String?) async -> GatewayLatencyResult {
+        result
+    }
+}
+
+private func makeNetworkInterface(router: String?) -> NetworkInterfaceInfo {
+    NetworkInterfaceInfo(
+        interfaceName: "en0",
+        hardwareMAC: "00:11:22:33:44:55",
+        ipv4Addresses: ["192.0.2.10"],
+        subnetMasks: ["255.255.255.0"],
+        router: router,
+        dnsServers: ["192.0.2.53"],
+        ssid: "Test Network",
+        bssid: nil,
+        channel: nil,
+        band: nil,
+        rssi: nil,
+        txRate: nil,
+        phyMode: nil,
+        security: "WPA2"
+    )
 }
