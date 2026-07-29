@@ -78,6 +78,20 @@ struct NetworkDiagnosticsTests {
         #expect(await publications.values == NetworkDiagnosticCheckID.allCases)
     }
 
+    @Test("runner enforces an overall session budget")
+    func runnerEnforcesOverallBudget() async {
+        let probe = BudgetAwareDiagnosticProbe()
+        let started = ContinuousClock.now
+        let results = await DiagnosticRunner(
+            checks: [BudgetAwareDiagnosticCheck(probe: probe)],
+            sessionBudget: .milliseconds(50)
+        ).run { _ in }
+
+        #expect(started.duration(to: .now) < .seconds(1))
+        #expect(await probe.wasCancelled)
+        #expect(results.isEmpty)
+    }
+
     @Test("indeterminate DNS does not block internet or IPv6")
     func indeterminateDNSDoesNotBlockInternetOrIPv6() async {
         let invocations = DiagnosticTestRecorder()
@@ -567,6 +581,38 @@ struct NetworkDiagnosticsTests {
         #expect(result.evidence.contains(.init(code: "captive-portal.clear", value: nil)))
     }
 
+    @Test("independent control endpoints load concurrently and preserve evidence order")
+    func controlEndpointsRunConcurrently() async {
+        let loader = ConcurrentControlLoader()
+        let result = await HTTPSControlEndpointCheck(loader: loader).run()
+
+        #expect(await loader.maximumInFlight == 2)
+        #expect(result.evidence.map(\.code).prefix(2) == ["https.available", "captive-portal.clear"])
+    }
+
+    @Test("control endpoint metrics are redacted to bounded transaction fields")
+    func controlEndpointMetricsAreRedacted() async {
+        let result = await HTTPSControlEndpointCheck(
+            loader: MetricsControlLoader(
+                metrics: .init(
+                    dnsDuration: .milliseconds(12),
+                    connectDuration: .milliseconds(34),
+                    tlsDuration: .milliseconds(56),
+                    negotiatedTLSVersion: "TLSv1.3",
+                    isProxyConnection: true,
+                    remoteAddress: "192.0.2.10:443"
+                )
+            )
+        ).run()
+
+        #expect(result.evidence.contains(.init(code: "https.metrics.dns-ms", value: "12")))
+        #expect(result.evidence.contains(.init(code: "https.metrics.connect-ms", value: "34")))
+        #expect(result.evidence.contains(.init(code: "https.metrics.tls-ms", value: "56")))
+        #expect(result.evidence.contains(.init(code: "https.metrics.tls-version", value: "TLSv1.3")))
+        #expect(result.evidence.contains(.init(code: "https.metrics.proxy", value: "true")))
+        #expect(!result.evidence.contains { $0.value == "192.0.2.10:443" })
+    }
+
     @Test("Apple HTTPS success and Microsoft HTTP timeout is indeterminate")
     func controlEndpointMicrosoftTimeoutIsIndeterminate() async {
         let result = await HTTPSControlEndpointCheck(
@@ -793,6 +839,18 @@ struct NetworkDiagnosticsTests {
         ])
     }
 
+    @Test("independent DNS samples start concurrently and aggregate in target order")
+    func dnsSamplesRunConcurrently() async {
+        let resolver = ConcurrentDNSResolver()
+        let result = await DNSResolutionCheck(
+            resolver: resolver,
+            timeout: .seconds(1)
+        ).run()
+
+        #expect(await resolver.maximumInFlight == 3)
+        #expect(result.evidence.contains(.init(code: "dns.success-count", value: "3/3")))
+    }
+
     @Test("one failed lookup among successful samples is unstable, not unavailable")
     func dnsQuorum() async {
         let check = DNSResolutionCheck(
@@ -824,7 +882,7 @@ struct NetworkDiagnosticsTests {
         #expect(await resolver.invocationCount == 4)
     }
 
-    @Test("cancelling DNS sampling does not start the remaining hosts")
+    @Test("cancelling DNS sampling does not retry or exceed one attempt per host")
     func dnsCancellationStopsSampling() async {
         let resolver = CancellationAwareDNSResolver()
         let check = DNSResolutionCheck(resolver: resolver, timeout: .seconds(30))
@@ -834,7 +892,7 @@ struct NetworkDiagnosticsTests {
         task.cancel()
         _ = await task.value
 
-        #expect(await resolver.invocationCount == 1)
+        #expect(await resolver.invocationCount <= 3)
     }
 
     @Test("all indeterminate DNS samples cannot be determined")
@@ -1605,7 +1663,7 @@ struct NetworkDiagnosticsTests {
         #expect(await recorder.requests == [.init(url: controlURL, proxy: proxy)])
     }
 
-    @Test("cancelled proxy resolution does not resolve the second target")
+    @Test("cancelled concurrent proxy resolution remains bounded")
     func proxyCancellationStopsSecondTargetResolution() async {
         let resolver = CancellationIgnoringProxyResolver()
         let check = SystemProxyCheck(
@@ -1619,9 +1677,7 @@ struct NetworkDiagnosticsTests {
         task.cancel()
         let result = await task.value
 
-        #expect(await resolver.urls == [
-            "http://www.msftconnecttest.com/connecttest.txt",
-        ])
+        #expect(await resolver.urls.count <= 2)
         #expect(result.status == .indeterminate)
         #expect(result.evidence.contains(.init(
             code: "proxy.cancelled",
@@ -2357,6 +2413,68 @@ private struct StubPathSource: NetworkPathChecking {
     }
 }
 
+private actor ConcurrentDNSResolver: DNSResolving {
+    private(set) var maximumInFlight = 0
+    private var inFlight = 0
+
+    func resolve(host: String, timeout: Duration) async -> DNSResolutionOutcome {
+        inFlight += 1
+        maximumInFlight = max(maximumInFlight, inFlight)
+        try? await Task.sleep(for: .milliseconds(20))
+        inFlight -= 1
+        return .resolved
+    }
+}
+
+private actor ConcurrentControlLoader: ControlEndpointLoading {
+    private(set) var maximumInFlight = 0
+    private var inFlight = 0
+
+    func load(url: URL, timeout: Duration) async -> ControlEndpointLoadResult {
+        inFlight += 1
+        maximumInFlight = max(maximumInFlight, inFlight)
+        try? await Task.sleep(for: .milliseconds(20))
+        inFlight -= 1
+        if url.scheme == "https" {
+            return .init(status: 200, body: nil, errorCode: nil)
+        }
+        return .init(status: 200, body: "Microsoft Connect Test", errorCode: nil)
+    }
+}
+
+private struct MetricsControlLoader: ControlEndpointLoading {
+    let metrics: ControlEndpointMetrics
+
+    func load(url: URL, timeout: Duration) async -> ControlEndpointLoadResult {
+        if url.scheme == "https" {
+            return .init(status: 200, body: nil, errorCode: nil, metrics: metrics)
+        }
+        return .init(status: 200, body: "Microsoft Connect Test", errorCode: nil)
+    }
+}
+
+private actor BudgetAwareDiagnosticProbe {
+    private(set) var wasCancelled = false
+
+    func run() async {
+        do {
+            try await Task.sleep(for: .seconds(30))
+        } catch {
+            wasCancelled = true
+        }
+    }
+}
+
+private struct BudgetAwareDiagnosticCheck: DiagnosticCheck {
+    let id: NetworkDiagnosticCheckID = .path
+    let probe: BudgetAwareDiagnosticProbe
+
+    func run() async -> NetworkDiagnosticResult {
+        await probe.run()
+        return .init(id: id, status: .normal, summary: id.rawValue)
+    }
+}
+
 private actor StubDNSResolver: DNSResolving {
     private var outcomes: [DNSResolutionOutcome]
     private var outcomeIndex = 0
@@ -2420,12 +2538,12 @@ private struct StubControlLoader: ControlEndpointLoading {
         self.recorder = recorder
     }
 
-    func load(url: URL, timeout: Duration) async -> (status: Int?, body: String?, errorCode: String?) {
+    func load(url: URL, timeout: Duration) async -> ControlEndpointLoadResult {
         await recorder?.record(url: url, timeout: timeout)
         if url.scheme == "https" {
-            return (httpsStatus, nil, httpsErrorCode)
+            return .init(status: httpsStatus, body: nil, errorCode: httpsErrorCode)
         }
-        return (httpStatus, httpBody, httpErrorCode)
+        return .init(status: httpStatus, body: httpBody, errorCode: httpErrorCode)
     }
 }
 
