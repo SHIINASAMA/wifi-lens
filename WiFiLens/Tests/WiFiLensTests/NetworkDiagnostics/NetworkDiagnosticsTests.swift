@@ -2045,6 +2045,54 @@ struct NetworkDiagnosticsTests {
         #expect(changedDiscovery != baseline)
     }
 
+    @Test("VPN and TUN interface names are classified without VPN manager access")
+    func tunnelInterfaceClassification() {
+        let tunnels = NetworkTunnelInterfaceClassifier.tunnelInterfaces(from: [
+            "en0", "utun3", "ipsec0", "ppp0", "bridge0", "utun2"
+        ])
+
+        #expect(tunnels == ["ipsec0", "ppp0", "utun2", "utun3"])
+        #expect(NetworkTunnelInterfaceClassifier.routedTunnelInterface(
+            activeInterfaceName: "utun3",
+            tunnelInterfaces: tunnels
+        ) == "utun3")
+        #expect(NetworkTunnelInterfaceClassifier.routedTunnelInterface(
+            activeInterfaceName: "en0",
+            tunnelInterfaces: tunnels
+        ) == nil)
+    }
+
+    @Test("tunnel presence and routed interface changes are fingerprint changes")
+    func tunnelFingerprintChangesTriggerObservation() async throws {
+        let baselinePath = NetworkPathFingerprint(
+            interfaceType: "wifi",
+            interfaceName: "en0",
+            pathStatus: .satisfied,
+            tunnelInterfaces: [],
+            routedTunnelInterface: nil
+        )
+        let changedPath = NetworkPathFingerprint(
+            interfaceType: "wifi",
+            interfaceName: "en0",
+            pathStatus: .satisfied,
+            tunnelInterfaces: ["utun3"],
+            routedTunnelInterface: "utun3"
+        )
+        let monitor = SystemNetworkFingerprintMonitor(
+            settingsReader: MutableFingerprintSettingsReader(dnsHash: 1, proxyHash: 7),
+            pathSource: FiniteNetworkPathFingerprintSource(values: [baselinePath, changedPath]),
+            settingsPoller: SilentNetworkFingerprintSettingsPoller()
+        )
+
+        let observation = try #require(await monitor.observation())
+        var iterator = observation.changes.makeAsyncIterator()
+        let change = await iterator.next()
+
+        #expect(observation.baseline.tunnelInterfaces.isEmpty)
+        #expect(change?.tunnelInterfaces == ["utun3"])
+        #expect(change?.routedTunnelInterface == "utun3")
+    }
+
     private func makeResults(
         path: NetworkDiagnosticStatus,
         dns: NetworkDiagnosticStatus,

@@ -9,6 +9,26 @@ struct NetworkFingerprint: Equatable, Sendable {
     let pathStatus: NetworkPathState
     let dnsSettingsHash: UInt64
     let staticProxySettingsHash: UInt64
+    let tunnelInterfaces: [String]
+    let routedTunnelInterface: String?
+
+    init(
+        interfaceType: String?,
+        interfaceName: String?,
+        pathStatus: NetworkPathState,
+        dnsSettingsHash: UInt64,
+        staticProxySettingsHash: UInt64,
+        tunnelInterfaces: [String] = [],
+        routedTunnelInterface: String? = nil
+    ) {
+        self.interfaceType = interfaceType
+        self.interfaceName = interfaceName
+        self.pathStatus = pathStatus
+        self.dnsSettingsHash = dnsSettingsHash
+        self.staticProxySettingsHash = staticProxySettingsHash
+        self.tunnelInterfaces = tunnelInterfaces
+        self.routedTunnelInterface = routedTunnelInterface
+    }
 }
 
 struct NetworkFingerprintObservation: Sendable {
@@ -35,6 +55,69 @@ struct NetworkPathFingerprint: Equatable, Sendable {
     let interfaceType: String?
     let interfaceName: String?
     let pathStatus: NetworkPathState
+    let tunnelInterfaces: [String]
+    let routedTunnelInterface: String?
+
+    init(
+        interfaceType: String?,
+        interfaceName: String?,
+        pathStatus: NetworkPathState,
+        tunnelInterfaces: [String] = [],
+        routedTunnelInterface: String? = nil
+    ) {
+        self.interfaceType = interfaceType
+        self.interfaceName = interfaceName
+        self.pathStatus = pathStatus
+        self.tunnelInterfaces = tunnelInterfaces
+        self.routedTunnelInterface = routedTunnelInterface
+    }
+}
+
+enum NetworkTunnelInterfaceClassifier {
+    static let prefixes = ["utun", "ipsec", "ppp"]
+
+    static func tunnelInterfaces(from names: [String]) -> [String] {
+        names.filter { name in
+            prefixes.contains { name.hasPrefix($0) }
+        }.sorted()
+    }
+
+    static func routedTunnelInterface(
+        activeInterfaceName: String?,
+        tunnelInterfaces: [String]
+    ) -> String? {
+        guard let activeInterfaceName,
+              tunnelInterfaces.contains(activeInterfaceName) else {
+            return nil
+        }
+        return activeInterfaceName
+    }
+}
+
+struct SystemNetworkTunnelStateReader {
+    static func state(for path: NWPath) -> (
+        tunnelInterfaces: [String],
+        routedTunnelInterface: String?
+    ) {
+        let interfaceNames = NetworkInfoService.fetchAll().map(\.interfaceName)
+        let tunnels = NetworkTunnelInterfaceClassifier.tunnelInterfaces(from: interfaceNames)
+        let activeInterface = path.availableInterfaces
+            .filter { path.usesInterfaceType($0.type) }
+            .sorted { lhs, rhs in
+                if lhs.type.fingerprintName != rhs.type.fingerprintName {
+                    return lhs.type.fingerprintName < rhs.type.fingerprintName
+                }
+                return lhs.name < rhs.name
+            }
+            .first?.name
+        return (
+            tunnels,
+            NetworkTunnelInterfaceClassifier.routedTunnelInterface(
+                activeInterfaceName: activeInterface,
+                tunnelInterfaces: tunnels
+            )
+        )
+    }
 }
 
 protocol NetworkPathFingerprintSourcing: Sendable {
@@ -89,10 +172,13 @@ struct SystemNetworkPathFingerprintSource: NetworkPathFingerprintSourcing {
                 return lhs.name < rhs.name
             }
             .first
+        let tunnelState = SystemNetworkTunnelStateReader.state(for: path)
         return NetworkPathFingerprint(
             interfaceType: activeInterface?.type.fingerprintName,
             interfaceName: activeInterface?.name,
-            pathStatus: path.status.fingerprintState
+            pathStatus: path.status.fingerprintState,
+            tunnelInterfaces: tunnelState.tunnelInterfaces,
+            routedTunnelInterface: tunnelState.routedTunnelInterface
         )
     }
 }
@@ -201,7 +287,9 @@ struct SystemNetworkFingerprintMonitor: NetworkFingerprintMonitoring {
             interfaceName: path.interfaceName,
             pathStatus: path.pathStatus,
             dnsSettingsHash: settingsReader.dnsSettingsHash(),
-            staticProxySettingsHash: settingsReader.staticProxySettingsHash()
+            staticProxySettingsHash: settingsReader.staticProxySettingsHash(),
+            tunnelInterfaces: path.tunnelInterfaces,
+            routedTunnelInterface: path.routedTunnelInterface
         )
     }
 }
@@ -245,7 +333,9 @@ private actor NetworkFingerprintEmissionState {
             interfaceName: latest.interfaceName,
             pathStatus: latest.pathStatus,
             dnsSettingsHash: dnsSettingsHash,
-            staticProxySettingsHash: staticProxySettingsHash
+            staticProxySettingsHash: staticProxySettingsHash,
+            tunnelInterfaces: latest.tunnelInterfaces,
+            routedTunnelInterface: latest.routedTunnelInterface
         )
         latest = fingerprint
         return fingerprint
