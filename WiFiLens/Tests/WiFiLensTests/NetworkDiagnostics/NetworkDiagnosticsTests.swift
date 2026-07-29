@@ -534,6 +534,42 @@ struct NetworkDiagnosticsTests {
         ))
     }
 
+    @Test("path check records local interface and gateway evidence separately")
+    func pathCheckRecordsGatewayEvidence() async {
+        let result = await NetworkConnectivityCheck(
+            pathSource: StubPathSource(.satisfied),
+            interfaceSource: StubNetworkInterfaceSource(interface: makeNetworkInterface(router: "192.0.2.1")),
+            gatewayLatency: StubGatewayLatencyProvider(result: GatewayLatencyResult(
+                timestamp: Date(),
+                routerIP: "192.0.2.1",
+                latencyMs: 2.5
+            ))
+        ).run()
+
+        #expect(result.status == .normal)
+        #expect(result.evidence.contains(.init(code: "path.interface", value: "en0")))
+        #expect(result.evidence.contains(.init(code: "path.local-ip", value: "192.0.2.10")))
+        #expect(result.evidence.contains(.init(code: "path.subnet-mask", value: "255.255.255.0")))
+        #expect(result.evidence.contains(.init(code: "path.router", value: "192.0.2.1")))
+        #expect(result.evidence.contains(.init(code: "path.gateway-latency-ms", value: "2.5")))
+    }
+
+    @Test("gateway nonresponse is advisory and does not fail the local path")
+    func gatewayFailureIsAdvisory() async {
+        let result = await NetworkConnectivityCheck(
+            pathSource: StubPathSource(.satisfied),
+            interfaceSource: StubNetworkInterfaceSource(interface: makeNetworkInterface(router: "192.0.2.1")),
+            gatewayLatency: StubGatewayLatencyProvider(result: GatewayLatencyResult(
+                timestamp: Date(),
+                routerIP: "192.0.2.1",
+                error: .gatewayPingFailed("192.0.2.1")
+            ))
+        ).run()
+
+        #expect(result.status == .normal)
+        #expect(result.evidence.contains(.init(code: "path.gateway-unreachable", value: "192.0.2.1")))
+    }
+
     @Test("Microsoft captive-portal probe rejects a rewritten response")
     func captivePortalProbeRejectsRewrittenResponse() async {
         let check = HTTPSControlEndpointCheck(
@@ -3195,4 +3231,39 @@ private final class SequencedFingerprintSettingsReader: NetworkFingerprintSettin
     func staticProxySettingsHash() -> UInt64 {
         proxyHash
     }
+}
+
+private struct StubNetworkInterfaceSource: NetworkInterfaceInfoSourcing {
+    let interface: NetworkInterfaceInfo?
+
+    func currentInterface() async -> NetworkInterfaceInfo? {
+        interface
+    }
+}
+
+private struct StubGatewayLatencyProvider: GatewayLatencyProviding {
+    let result: GatewayLatencyResult
+
+    func measure(routerIP: String?) async -> GatewayLatencyResult {
+        result
+    }
+}
+
+private func makeNetworkInterface(router: String?) -> NetworkInterfaceInfo {
+    NetworkInterfaceInfo(
+        interfaceName: "en0",
+        hardwareMAC: "00:11:22:33:44:55",
+        ipv4Addresses: ["192.0.2.10"],
+        subnetMasks: ["255.255.255.0"],
+        router: router,
+        dnsServers: ["192.0.2.53"],
+        ssid: "Test Network",
+        bssid: nil,
+        channel: nil,
+        band: nil,
+        rssi: nil,
+        txRate: nil,
+        phyMode: nil,
+        security: "WPA2"
+    )
 }
