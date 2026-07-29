@@ -1,10 +1,54 @@
 import Foundation
 
+struct ControlEndpointMetrics: Equatable, Sendable {
+    let dnsDuration: Duration?
+    let connectDuration: Duration?
+    let tlsDuration: Duration?
+    let negotiatedTLSVersion: String?
+    let isProxyConnection: Bool?
+    let remoteAddress: String?
+
+    init(
+        dnsDuration: Duration? = nil,
+        connectDuration: Duration? = nil,
+        tlsDuration: Duration? = nil,
+        negotiatedTLSVersion: String? = nil,
+        isProxyConnection: Bool? = nil,
+        remoteAddress: String? = nil
+    ) {
+        self.dnsDuration = dnsDuration
+        self.connectDuration = connectDuration
+        self.tlsDuration = tlsDuration
+        self.negotiatedTLSVersion = negotiatedTLSVersion
+        self.isProxyConnection = isProxyConnection
+        self.remoteAddress = remoteAddress
+    }
+}
+
+struct ControlEndpointLoadResult: Equatable, Sendable {
+    let status: Int?
+    let body: String?
+    let errorCode: String?
+    let metrics: ControlEndpointMetrics?
+
+    init(
+        status: Int?,
+        body: String?,
+        errorCode: String?,
+        metrics: ControlEndpointMetrics? = nil
+    ) {
+        self.status = status
+        self.body = body
+        self.errorCode = errorCode
+        self.metrics = metrics
+    }
+}
+
 protocol ControlEndpointLoading: Sendable {
     func load(
         url: URL,
         timeout: Duration
-    ) async -> (status: Int?, body: String?, errorCode: String?)
+    ) async -> ControlEndpointLoadResult
 }
 
 struct SystemControlEndpointLoader: ControlEndpointLoading {
@@ -24,7 +68,7 @@ struct SystemControlEndpointLoader: ControlEndpointLoading {
     func load(
         url: URL,
         timeout: Duration
-    ) async -> (status: Int?, body: String?, errorCode: String?) {
+    ) async -> ControlEndpointLoadResult {
         var request = URLRequest(
             url: url,
             cachePolicy: .reloadIgnoringLocalCacheData,
@@ -32,9 +76,10 @@ struct SystemControlEndpointLoader: ControlEndpointLoading {
         )
         request.httpMethod = "GET"
 
+        let metricsCollector = ControlEndpointMetricsCollector()
         let session = URLSession(
             configuration: Self.configuration(timeout: timeout),
-            delegate: ControlEndpointRedirectDelegate(),
+            delegate: ControlEndpointDelegate(metricsCollector: metricsCollector),
             delegateQueue: nil
         )
         defer { session.invalidateAndCancel() }
@@ -42,13 +87,18 @@ struct SystemControlEndpointLoader: ControlEndpointLoading {
         do {
             let (data, response) = try await session.data(for: request)
             guard let response = response as? HTTPURLResponse else {
-                return (nil, nil, "non-http-response")
+                return .init(status: nil, body: nil, errorCode: "non-http-response")
             }
-            return (response.statusCode, String(data: data, encoding: .utf8), nil)
+            return .init(
+                status: response.statusCode,
+                body: String(data: data, encoding: .utf8),
+                errorCode: nil,
+                metrics: metricsCollector.metrics
+            )
         } catch let error as URLError {
-            return (nil, nil, String(error.code.rawValue))
+            return .init(status: nil, body: nil, errorCode: String(error.code.rawValue), metrics: metricsCollector.metrics)
         } catch {
-            return (nil, nil, String(describing: type(of: error)))
+            return .init(status: nil, body: nil, errorCode: String(describing: type(of: error)), metrics: metricsCollector.metrics)
         }
     }
 }
@@ -73,8 +123,9 @@ struct HTTPSControlEndpointCheck: DiagnosticCheck {
     }
 
     func run() async -> NetworkDiagnosticResult {
-        let httpsResponse = await loader.load(url: httpsEndpoint, timeout: timeout)
-        let captivePortalResponse = await loader.load(url: captivePortalEndpoint, timeout: timeout)
+        async let httpsLoad = loader.load(url: httpsEndpoint, timeout: timeout)
+        async let captivePortalLoad = loader.load(url: captivePortalEndpoint, timeout: timeout)
+        let (httpsResponse, captivePortalResponse) = await (httpsLoad, captivePortalLoad)
         let httpsEvaluation = evaluateHTTPS(httpsResponse)
         let captivePortalEvaluation = evaluateCaptivePortal(captivePortalResponse)
         let status: NetworkDiagnosticStatus
@@ -86,17 +137,40 @@ struct HTTPSControlEndpointCheck: DiagnosticCheck {
             status = .abnormal
         }
 
+        let metricsEvidence = metricEvidence(for: httpsResponse.metrics, prefix: "https")
+            + metricEvidence(for: captivePortalResponse.metrics, prefix: "captive-portal")
         return NetworkDiagnosticResult(
             id: id,
             status: status,
             summary: localizedSummary(for: status, httpsEvidence: httpsEvaluation.evidence),
             detail: localizedDetail(for: status),
-            evidence: [httpsEvaluation.evidence, captivePortalEvaluation.evidence]
+            evidence: [httpsEvaluation.evidence, captivePortalEvaluation.evidence] + metricsEvidence
         )
     }
 
+    private func metricEvidence(for metrics: ControlEndpointMetrics?, prefix: String) -> [NetworkDiagnosticEvidence] {
+        guard let metrics else { return [] }
+        var evidence: [NetworkDiagnosticEvidence] = []
+        if let duration = metrics.dnsDuration {
+            evidence.append(.init(code: "\(prefix).metrics.dns-ms", value: duration.millisecondsString))
+        }
+        if let duration = metrics.connectDuration {
+            evidence.append(.init(code: "\(prefix).metrics.connect-ms", value: duration.millisecondsString))
+        }
+        if let duration = metrics.tlsDuration {
+            evidence.append(.init(code: "\(prefix).metrics.tls-ms", value: duration.millisecondsString))
+        }
+        if let version = metrics.negotiatedTLSVersion {
+            evidence.append(.init(code: "\(prefix).metrics.tls-version", value: version))
+        }
+        if let isProxyConnection = metrics.isProxyConnection {
+            evidence.append(.init(code: "\(prefix).metrics.proxy", value: String(isProxyConnection)))
+        }
+        return evidence
+    }
+
     private func evaluateHTTPS(
-        _ response: (status: Int?, body: String?, errorCode: String?)
+        _ response: ControlEndpointLoadResult
     ) -> EndpointEvaluation {
         if let errorCode = response.errorCode {
             return EndpointEvaluation(
@@ -150,7 +224,7 @@ struct HTTPSControlEndpointCheck: DiagnosticCheck {
     }
 
     private func evaluateCaptivePortal(
-        _ response: (status: Int?, body: String?, errorCode: String?)
+        _ response: ControlEndpointLoadResult
     ) -> EndpointEvaluation {
         if let errorCode = response.errorCode {
             return EndpointEvaluation(
@@ -240,7 +314,30 @@ private struct EndpointEvaluation {
     }
 }
 
-private final class ControlEndpointRedirectDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+private final class ControlEndpointMetricsCollector: @unchecked Sendable {
+    private let lock = NSLock()
+    private var storedMetrics: ControlEndpointMetrics?
+
+    var metrics: ControlEndpointMetrics? {
+        lock.lock()
+        defer { lock.unlock() }
+        return storedMetrics
+    }
+
+    func store(_ metrics: ControlEndpointMetrics) {
+        lock.lock()
+        storedMetrics = metrics
+        lock.unlock()
+    }
+}
+
+private final class ControlEndpointDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+    private let metricsCollector: ControlEndpointMetricsCollector
+
+    init(metricsCollector: ControlEndpointMetricsCollector) {
+        self.metricsCollector = metricsCollector
+    }
+
     func urlSession(
         _ session: URLSession,
         task: URLSessionTask,
@@ -249,6 +346,22 @@ private final class ControlEndpointRedirectDelegate: NSObject, URLSessionTaskDel
         completionHandler: @escaping (URLRequest?) -> Void
     ) {
         completionHandler(nil)
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
+        guard let transaction = metrics.transactionMetrics.last else { return }
+        metricsCollector.store(.init(
+            dnsDuration: Self.duration(from: transaction.domainLookupStartDate, to: transaction.domainLookupEndDate),
+            connectDuration: Self.duration(from: transaction.connectStartDate, to: transaction.connectEndDate),
+            tlsDuration: Self.duration(from: transaction.secureConnectionStartDate, to: transaction.secureConnectionEndDate),
+            negotiatedTLSVersion: transaction.negotiatedTLSProtocolVersion.map { String(describing: $0) },
+            isProxyConnection: transaction.isProxyConnection
+        ))
+    }
+
+    private static func duration(from start: Date?, to end: Date?) -> Duration? {
+        guard let start, let end else { return nil }
+        return .milliseconds(Int64(max(0, end.timeIntervalSince(start) * 1_000)))
     }
 }
 
@@ -259,5 +372,12 @@ private extension Duration {
             0.001,
             Double(components.seconds) + Double(components.attoseconds) / 1_000_000_000_000_000_000
         )
+    }
+
+    var millisecondsString: String {
+        let components = self.components
+        let milliseconds = Double(components.seconds) * 1_000
+            + Double(components.attoseconds) / 1_000_000_000_000_000
+        return String(Int64(max(0, milliseconds.rounded())))
     }
 }
