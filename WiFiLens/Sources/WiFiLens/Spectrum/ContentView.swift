@@ -81,6 +81,8 @@ struct ContentView: View {
     @Bindable var viewModel: ScannerViewModel
     @Bindable var macVendorDatabaseManager: MACVendorDatabaseManager
 
+    private static let bundledDatabaseAvailable = MACVendorBundledDatabase.load() != nil
+
     @State private var sortOrder: [NSSortDescriptor] = [NSSortDescriptor(key: "ssid", ascending: true)]
     @State private var panel1ChartType: BandPanelSelection = .band24
     @State private var panel2ChartType: BandPanelSelection = .band5
@@ -94,7 +96,7 @@ struct ContentView: View {
     }
 
     private var isVendorColumnAvailable: Bool {
-        macVendorDatabaseManager.availability.isVendorColumnAvailable
+        Self.bundledDatabaseAvailable
     }
 
     var body: some View {
