@@ -279,7 +279,12 @@ struct EditionCompositionTests {
         let stopGate = TerminationTestGate()
         let replyProbe = TerminationBoolProbe()
         var steps: [String] = []
-        let coordinator = ApplicationTerminationCoordinator(reply: { replyProbe.record($0) })
+        let coordinator = ApplicationTerminationCoordinator(
+            waitForDeadline: { _ in
+                try await Task.sleep(for: .seconds(3_600))
+            },
+            reply: { replyProbe.record($0) }
+        )
         coordinator.configure(
             stopRuntime: {
                 steps.append("runtime")
