@@ -154,6 +154,14 @@ struct NetworkDiagnosticsView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+                if conclusion == .needsAttention,
+                   let issue = NetworkDiagnosticConclusion.primaryIssue(in: Array(viewModel.results.values)) {
+                    let remediation = NetworkDiagnosticRemediation.forResult(issue)
+                    Text(String(localized: .init(stringLiteral: remediation.actionKey), comment: "Network self-check primary remediation action"))
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             Spacer(minLength: 0)
         }
@@ -169,8 +177,28 @@ struct NetworkDiagnosticsView: View {
         if viewModel.phase == .idle {
             readyWorkspace
         } else {
-            resultTable(mode)
+            VStack(alignment: .leading, spacing: 12) {
+                if let pathSummary {
+                    pathSummaryCard(pathSummary)
+                }
+                resultTable(mode)
+            }
         }
+    }
+
+    private func pathSummaryCard(_ summary: NetworkPathSummary) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(String(localized: "network_diagnostics.path_summary.title", comment: "Network self-check observed path title"))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(summary.text)
+                .font(.callout.monospaced())
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 14)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("network-diagnostics-path-summary")
     }
 
     private var readyWorkspace: some View {
@@ -305,9 +333,28 @@ struct NetworkDiagnosticsView: View {
                         .foregroundStyle(.secondary)
                         .lineSpacing(1)
                 }
+                if result.status == .abnormal || result.status == .indeterminate {
+                    remediationView(for: result)
+                }
             }
             .fixedSize(horizontal: false, vertical: true)
         }
+    }
+
+    private func remediationView(for result: NetworkDiagnosticResult) -> some View {
+        let remediation = NetworkDiagnosticRemediation.forResult(result)
+        return VStack(alignment: .leading, spacing: 2) {
+            Text(String(localized: .init(stringLiteral: remediation.detectionKey), comment: "Network self-check remediation detected condition"))
+                .font(.caption.weight(.medium))
+            Text(String(localized: .init(stringLiteral: remediation.actionKey), comment: "Network self-check remediation next action"))
+                .font(.caption)
+                .foregroundStyle(.orange)
+            Text(String(localized: .init(stringLiteral: remediation.rerunKey), comment: "Network self-check remediation rerun instruction"))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.top, 4)
+        .accessibilityElement(children: .combine)
     }
 
     private var workbenchRows: [NetworkDiagnosticsWorkbenchRow] {
@@ -317,6 +364,10 @@ struct NetworkDiagnosticsView: View {
             results: viewModel.results,
             checkIDs: viewModel.checkIDs
         )
+    }
+
+    private var pathSummary: NetworkPathSummary? {
+        NetworkPathSummary.from(results: Array(viewModel.results.values))
     }
 
     private var activeCheckID: NetworkDiagnosticCheckID? {

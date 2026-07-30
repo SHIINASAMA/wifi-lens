@@ -6,7 +6,7 @@ enum DiagnosticCheckRerunPolicy: Equatable, Sendable {
 protocol DiagnosticCheck: Sendable {
     var id: NetworkDiagnosticCheckID { get }
     var rerunPolicy: DiagnosticCheckRerunPolicy { get }
-    func run() async -> NetworkDiagnosticResult
+    func run() async throws -> NetworkDiagnosticResult
 }
 
 extension DiagnosticCheck {
@@ -23,6 +23,7 @@ private struct DiagnosticDependency {
 struct DiagnosticRunner: Sendable {
     let checks: [any DiagnosticCheck]
     var minimumStepDuration: Duration = .zero
+    var sessionBudget: Duration = .seconds(30)
 
     func run(
         retaining retainedResults: [NetworkDiagnosticResult] = [],
@@ -31,6 +32,7 @@ struct DiagnosticRunner: Sendable {
         var results: [NetworkDiagnosticResult] = []
         let retainedByID = Dictionary(uniqueKeysWithValues: retainedResults.map { ($0.id, $0) })
         let clock = ContinuousClock()
+        let sessionDeadline = clock.now.advanced(by: sessionBudget)
 
         for check in checks {
             guard !Task.isCancelled else { break }
@@ -51,14 +53,42 @@ struct DiagnosticRunner: Sendable {
                 continue
             }
             let started = clock.now
-            let result = await check.run()
-            try? await clock.sleep(until: started.advanced(by: minimumStepDuration))
+            guard let result = await run(check, until: sessionDeadline) else { break }
+            let presentationDeadline = started.advanced(by: minimumStepDuration)
+            try? await clock.sleep(until: min(presentationDeadline, sessionDeadline))
             guard !Task.isCancelled else { break }
             results.append(result)
             await onResult(result)
         }
 
         return results
+    }
+
+    private func run(
+        _ check: any DiagnosticCheck,
+        until deadline: ContinuousClock.Instant
+    ) async -> NetworkDiagnosticResult? {
+        let clock = ContinuousClock()
+        let remaining = clock.now.duration(to: deadline)
+        guard remaining > .zero else { return nil }
+        let task = Task { try await check.run() }
+        return await withTaskGroup(of: NetworkDiagnosticResult?.self) { group in
+            group.addTask {
+                do {
+                    return try await task.value
+                } catch {
+                    return nil
+                }
+            }
+            group.addTask {
+                try? await clock.sleep(for: remaining)
+                task.cancel()
+                return nil
+            }
+            let result = await group.next() ?? nil
+            group.cancelAll()
+            return result
+        }
     }
 
     private func blockingResult(

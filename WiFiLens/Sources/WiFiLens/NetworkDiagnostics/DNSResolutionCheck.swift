@@ -140,15 +140,21 @@ struct DNSResolutionCheck: DiagnosticCheck {
     }
 
     func run() async -> NetworkDiagnosticResult {
-        var outcomes: [DNSResolutionOutcome] = []
-        for host in probeTargets {
-            guard !Task.isCancelled else { break }
-            let firstOutcome = await resolver.resolve(host: host, timeout: timeout)
-            if firstOutcome == .indeterminate, !Task.isCancelled {
-                outcomes.append(await resolver.resolve(host: host, timeout: timeout))
-            } else {
-                outcomes.append(firstOutcome)
+        let outcomes = await withTaskGroup(of: DNSResolutionOutcome.self, returning: [DNSResolutionOutcome].self) { group in
+            for host in probeTargets {
+                group.addTask {
+                    let firstOutcome = await resolver.resolve(host: host, timeout: timeout)
+                    if firstOutcome == .indeterminate, !Task.isCancelled {
+                        return await resolver.resolve(host: host, timeout: timeout)
+                    }
+                    return firstOutcome
+                }
             }
+            var outcomes: [DNSResolutionOutcome] = []
+            for await outcome in group {
+                outcomes.append(outcome)
+            }
+            return outcomes
         }
         let successCount = outcomes.count { $0 == .resolved }
         let failureCount = outcomes.count { $0 == .failed }
