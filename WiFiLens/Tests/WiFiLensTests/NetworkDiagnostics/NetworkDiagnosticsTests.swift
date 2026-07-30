@@ -1306,7 +1306,7 @@ struct NetworkDiagnosticsTests {
                 .init(statusCode: nil, errorCode: "timed-out"),
                 .init(statusCode: 200, errorCode: nil),
             ],
-            delays: [.milliseconds(10), .zero]
+            delays: [.zero, .zero]
         )
         let check = SystemProxyCheck(
             resolver: RecordingProxyResolver(resolutions: [
