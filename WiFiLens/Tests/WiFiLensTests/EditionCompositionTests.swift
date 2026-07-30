@@ -277,9 +277,9 @@ struct EditionCompositionTests {
     @Test("repeated termination requests share one ordered operation and one AppKit reply")
     func repeatedTerminationRequestsShareOneOperation() async {
         let stopGate = TerminationTestGate()
+        let replyProbe = TerminationReplyProbe()
         var steps: [String] = []
-        var replies: [Bool] = []
-        let coordinator = ApplicationTerminationCoordinator(reply: { replies.append($0) })
+        let coordinator = ApplicationTerminationCoordinator(reply: { replyProbe.record($0) })
         coordinator.configure(
             stopRuntime: {
                 steps.append("runtime")
@@ -292,32 +292,30 @@ struct EditionCompositionTests {
 
         #expect(coordinator.requestTermination() == .terminateLater)
         #expect(coordinator.requestTermination() == .terminateLater)
-        await Task.yield()
+        await stopGate.waitUntilEntered()
         #expect(steps == ["runtime"])
-        #expect(replies.isEmpty)
+        #expect(replyProbe.replies.isEmpty)
 
         await stopGate.open()
-        for _ in 0..<1_000 {
-            if replies == [true] { break }
-            await Task.yield()
-        }
+        await replyProbe.waitForFirstReply()
 
         #expect(steps == ["runtime", "edition"])
-        #expect(replies == [true])
+        #expect(replyProbe.replies == [true])
         #expect(coordinator.requestTermination() == .terminateLater)
-        await Task.yield()
-        #expect(replies == [true])
+        #expect(replyProbe.replies == [true])
     }
 
     @MainActor
     @Test("termination deadline replies once when runtime stop ignores cancellation")
     func terminationDeadlineDoesNotAwaitNonCooperativeRuntimeStop() async {
         let stopGate = TerminationTestGate()
+        let deadlineGate = TerminationTestGate()
+        let replyProbe = TerminationReplyProbe()
         var editionCalls = 0
-        var replies: [Bool] = []
         let coordinator = ApplicationTerminationCoordinator(
-            terminationDeadline: .milliseconds(20),
-            reply: { replies.append($0) }
+            terminationDeadline: .seconds(3),
+            waitForDeadline: { _ in await deadlineGate.wait() },
+            reply: { replyProbe.record($0) }
         )
         coordinator.configure(
             stopRuntime: {
@@ -329,17 +327,37 @@ struct EditionCompositionTests {
         )
 
         #expect(coordinator.requestTermination() == .terminateLater)
-        for _ in 0..<200 {
-            if !replies.isEmpty { break }
-            try? await Task.sleep(for: .milliseconds(1))
-        }
+        await stopGate.waitUntilEntered()
+        await deadlineGate.waitUntilEntered()
+        #expect(replyProbe.replies.isEmpty)
 
-        #expect(replies == [true])
+        await deadlineGate.open()
+        await replyProbe.waitForFirstReply()
+
+        #expect(replyProbe.replies == [true])
         #expect(editionCalls == 0)
 
         await stopGate.open()
-        for _ in 0..<20 { await Task.yield() }
-        #expect(replies == [true])
+        #expect(replyProbe.replies == [true])
+    }
+
+    @MainActor
+    @Test("a cancelled termination operation skips edition cleanup")
+    func cancelledTerminationOperationSkipsEditionCleanup() async {
+        let stopGate = TerminationTestGate()
+        var editionCalls = 0
+        let operation = Task { @MainActor in
+            await performApplicationTermination(
+                stopRuntime: { await stopGate.wait() },
+                terminateEdition: { editionCalls += 1 }
+            )
+        }
+
+        await stopGate.waitUntilEntered()
+        operation.cancel()
+        await stopGate.open()
+
+        #expect(await operation.value == false)
         #expect(editionCalls == 0)
     }
 
@@ -411,11 +429,22 @@ private func eventually(
 
 private actor TerminationTestGate {
     private var isOpen = false
+    private var hasEntered = false
     private var waiters: [CheckedContinuation<Void, Never>] = []
+    private var entryWaiters: [CheckedContinuation<Void, Never>] = []
 
     func wait() async {
+        hasEntered = true
+        let pendingEntryWaiters = entryWaiters
+        entryWaiters.removeAll()
+        pendingEntryWaiters.forEach { $0.resume() }
         if isOpen { return }
         await withCheckedContinuation { waiters.append($0) }
+    }
+
+    func waitUntilEntered() async {
+        if hasEntered { return }
+        await withCheckedContinuation { entryWaiters.append($0) }
     }
 
     func open() {
@@ -423,6 +452,24 @@ private actor TerminationTestGate {
         let pending = waiters
         waiters.removeAll()
         pending.forEach { $0.resume() }
+    }
+}
+
+@MainActor
+private final class TerminationReplyProbe {
+    private(set) var replies: [Bool] = []
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+
+    func record(_ reply: Bool) {
+        replies.append(reply)
+        let pending = waiters
+        waiters.removeAll()
+        pending.forEach { $0.resume() }
+    }
+
+    func waitForFirstReply() async {
+        if !replies.isEmpty { return }
+        await withCheckedContinuation { waiters.append($0) }
     }
 }
 

@@ -785,14 +785,27 @@ func resolvedWindowFocusIntent(hasExistingMainWindow: Bool) -> ResolvedMainWindo
 }
 
 @MainActor
+func performApplicationTermination(
+    stopRuntime: @MainActor () async -> Void,
+    terminateEdition: @MainActor () async -> Void
+) async -> Bool {
+    await stopRuntime()
+    guard !Task.isCancelled else { return false }
+    await terminateEdition()
+    return true
+}
+
+@MainActor
 final class ApplicationTerminationCoordinator: NSObject, NSApplicationDelegate {
     typealias TerminationStep = @MainActor () async -> Void
+    typealias DeadlineWait = @MainActor (Duration) async throws -> Void
 
     static let defaultTerminationDeadline: Duration = .seconds(3)
 
     private var stopRuntime: TerminationStep = {}
     private var terminateEdition: TerminationStep = {}
     private let terminationDeadline: Duration
+    private let waitForDeadline: DeadlineWait
     private let reply: @MainActor (Bool) -> Void
     private var terminationTask: Task<Void, Never>?
     private var deadlineTask: Task<Void, Never>?
@@ -807,9 +820,13 @@ final class ApplicationTerminationCoordinator: NSObject, NSApplicationDelegate {
 
     init(
         terminationDeadline: Duration = defaultTerminationDeadline,
+        waitForDeadline: @escaping DeadlineWait = { duration in
+            try await Task.sleep(for: duration)
+        },
         reply: @escaping @MainActor (Bool) -> Void
     ) {
         self.terminationDeadline = terminationDeadline
+        self.waitForDeadline = waitForDeadline
         self.reply = reply
         super.init()
     }
@@ -827,16 +844,19 @@ final class ApplicationTerminationCoordinator: NSObject, NSApplicationDelegate {
         guard terminationTask == nil, !hasReplied else { return .terminateLater }
         let stopRuntime = stopRuntime
         let terminateEdition = terminateEdition
+        let waitForDeadline = waitForDeadline
         terminationTask = Task { @MainActor [weak self] in
-            await stopRuntime()
-            guard !Task.isCancelled else { return }
-            await terminateEdition()
+            let completed = await performApplicationTermination(
+                stopRuntime: stopRuntime,
+                terminateEdition: terminateEdition
+            )
+            guard completed else { return }
             self?.finishTermination(cancelOperation: false)
         }
         deadlineTask = Task { @MainActor [weak self] in
             guard let self else { return }
             do {
-                try await Task.sleep(for: terminationDeadline)
+                try await waitForDeadline(terminationDeadline)
             } catch {
                 return
             }
