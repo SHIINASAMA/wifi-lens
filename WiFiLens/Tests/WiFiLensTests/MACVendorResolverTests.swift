@@ -50,12 +50,13 @@ struct MACVendorResolverTests {
     @Test func bundledDatabasePreservesSnapshotDateAndEntries() throws {
         let data = try #require(
             """
-            {"schemaVersion":1,"retrievedAt":"2026-07-30","sources":[],"ambiguousPrefixCount":0,"notice":"","entries":[{"prefix":"001122","prefixLength":24,"organization":"Example Networks"}]}
+            {"schemaVersion":1,"retrievedAt":"2026-07-31","sourceUpdatedAt":"2026-07-30","sources":[],"ambiguousPrefixCount":0,"notice":"","entries":[{"prefix":"001122","prefixLength":24,"organization":"Example Networks"}]}
             """.data(using: .utf8)
         )
         let database = try JSONDecoder().decode(MACVendorBundledDatabase.self, from: data)
         let resolver = MACVendorResolver(database: database)
 
+        #expect(database.retrievedAt == "2026-07-31")
         #expect(database.sourceUpdatedAt == "2026-07-30")
         #expect(database.totalRecordCount == 1)
         #expect(resolver.resolve("00:11:22:33:44:55") == .registered("Example Networks"))

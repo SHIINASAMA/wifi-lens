@@ -69,6 +69,7 @@ def build_database(
     entries: Iterable[dict[str, object]],
     retrieved_at: str,
     sources: list[str],
+    source_updated_at: str | None = None,
 ) -> dict[str, object]:
     unique: dict[tuple[int, str], dict[str, object]] = {}
     ambiguous: set[tuple[int, str]] = set()
@@ -90,6 +91,7 @@ def build_database(
     return {
         "schemaVersion": 1,
         "retrievedAt": retrieved_at,
+        "sourceUpdatedAt": source_updated_at or retrieved_at,
         "sources": sorted(sources),
         "ambiguousPrefixCount": len(ambiguous),
         "notice": (
@@ -116,7 +118,12 @@ def download_text(url: str) -> TextIO:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--retrieved-at", required=True, help="Snapshot date in YYYY-MM-DD")
+    parser.add_argument("--retrieved-at", required=True, help="Download date in YYYY-MM-DD")
+    parser.add_argument(
+        "--source-updated-at",
+        required=True,
+        help="IEEE source snapshot date in YYYY-MM-DD",
+    )
     parser.add_argument(
         "--output",
         type=Path,
@@ -128,13 +135,20 @@ def main() -> None:
 
     if not SNAPSHOT_DATE_PATTERN.fullmatch(args.retrieved_at):
         parser.error("--retrieved-at must use YYYY-MM-DD")
+    if not SNAPSHOT_DATE_PATTERN.fullmatch(args.source_updated_at):
+        parser.error("--source-updated-at must use YYYY-MM-DD")
 
     all_entries: list[dict[str, object]] = []
     for url, spec in REGISTRIES.items():
         with download_text(url) as stream:
             all_entries.extend(parse_registry(stream, spec))
 
-    database = build_database(all_entries, args.retrieved_at, list(REGISTRIES))
+    database = build_database(
+        all_entries,
+        args.retrieved_at,
+        list(REGISTRIES),
+        source_updated_at=args.source_updated_at,
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(

@@ -2,13 +2,15 @@ import Foundation
 
 struct MACVendorBundledDatabase: Decodable, Equatable, Sendable {
     let schemaVersion: Int
+    let retrievedAt: String
     let sourceUpdatedAt: String
     let sources: [String]
     let entries: [MACVendorEntry]
 
     private enum CodingKeys: String, CodingKey {
         case schemaVersion
-        case sourceUpdatedAt = "retrievedAt"
+        case retrievedAt
+        case sourceUpdatedAt
         case sources
         case entries
     }

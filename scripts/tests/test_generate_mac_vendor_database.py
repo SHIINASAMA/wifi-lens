@@ -74,6 +74,8 @@ class MACVendorDatabaseGeneratorTests(unittest.TestCase):
             ],
             [(36, "001122334"), (28, "0011223"), (24, "001122")],
         )
+        self.assertEqual(database["retrievedAt"], "2026-07-22")
+        self.assertEqual(database["sourceUpdatedAt"], "2026-07-22")
 
     def test_identical_duplicate_prefix_is_deduplicated(self):
         database = build_database(
