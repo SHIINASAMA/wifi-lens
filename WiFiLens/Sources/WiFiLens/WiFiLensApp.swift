@@ -16,7 +16,7 @@ private struct AppRootView: View {
 
     @Bindable var viewModel: ScannerViewModel
     @Bindable var macVendorDatabaseManager: MACVendorDatabaseManager
-    let macVendorDatabase: MACVendorBundledDatabase?
+    let macVendorDatabaseSummary: MACVendorBundledDatabaseSummary?
     @Bindable var roamingViewModel: RoamingTestViewModel
     var bleViewModel: BLEViewModel?
     @Binding var showCrashLog: Bool
@@ -147,6 +147,7 @@ private struct AppRootView: View {
                     mainWindowState: sceneState.editionWindowState,
                     scannerViewModel: viewModel,
                     macVendorDatabaseManager: macVendorDatabaseManager,
+                    isMACVendorDatabaseAvailable: macVendorDatabaseSummary != nil,
                     selectedPage: Binding(
                         get: { sceneState.selectedPage },
                         set: { sceneState.selectedPage = $0 }
@@ -192,7 +193,7 @@ private struct AppRootView: View {
                     .accessibilityElement(children: .contain)
 
                 SettingsView(
-                    macVendorDatabase: macVendorDatabase,
+                    macVendorDatabaseSummary: macVendorDatabaseSummary,
                     updater: sparkleUpdater,
                     locationPermission: viewModel.locationManager,
                     bluetoothPermission: bleViewModel?.bluetoothPermission,
@@ -868,7 +869,7 @@ struct WiFiLensApp: App {
     private var terminationCoordinator
     @State private var viewModel: ScannerViewModel
     @State private var macVendorDatabaseManager: MACVendorDatabaseManager
-    private let macVendorDatabase: MACVendorBundledDatabase?
+    private let macVendorDatabaseSummary: MACVendorBundledDatabaseSummary?
     @State private var roamingViewModel = RoamingTestViewModel()
     @State private var bleViewModel: BLEViewModel?
     @State private var sparkleUpdater = SparkleUpdater()
@@ -883,13 +884,18 @@ struct WiFiLensApp: App {
     @AppStorage("menuBarEnabled") private var menuBarEnabled: Bool = true
 
     init() {
-        let vendorResolver = MACVendorResolver()
-        macVendorDatabase = MACVendorBundledDatabase.load()
+        let database = MACVendorBundledDatabase.load()
+        let vendorResolver = MACVendorResolver(database: database)
+        let databaseSummary = database?.summary
+        macVendorDatabaseSummary = databaseSummary
         _viewModel = State(initialValue: ScannerViewModel(vendorResolver: vendorResolver))
         _macVendorDatabaseManager = State(
             initialValue: MACVendorDatabaseManager(
                 resolver: vendorResolver,
-                service: MACVendorDatabaseService()
+                service: MACVendorDatabaseService(),
+                initialAvailability: databaseSummary.map {
+                    .installed($0.legacyDatabaseSummary)
+                } ?? .notInstalled
             )
         )
 
@@ -918,7 +924,7 @@ struct WiFiLensApp: App {
                 AppRootView(
                     viewModel: viewModel,
                     macVendorDatabaseManager: macVendorDatabaseManager,
-                    macVendorDatabase: macVendorDatabase,
+                    macVendorDatabaseSummary: macVendorDatabaseSummary,
                     roamingViewModel: roamingViewModel,
                     bleViewModel: bleViewModel,
                     showCrashLog: $showCrashLog,

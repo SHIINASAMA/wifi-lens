@@ -59,6 +59,8 @@ struct MACVendorResolverTests {
         #expect(database.retrievedAt == "2026-07-31")
         #expect(database.sourceUpdatedAt == "2026-07-30")
         #expect(database.totalRecordCount == 1)
+        #expect(database.summary.sourceUpdatedAt == "2026-07-30")
+        #expect(database.summary.totalRecordCount == 1)
         #expect(resolver.resolve("00:11:22:33:44:55") == .registered("Example Networks"))
     }
 

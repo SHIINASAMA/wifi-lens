@@ -1,5 +1,20 @@
 import Foundation
 
+struct MACVendorBundledDatabaseSummary: Equatable, Sendable {
+    let sourceUpdatedAt: String
+    let sourceUpdatedDate: Date?
+    let totalRecordCount: Int
+
+    var legacyDatabaseSummary: MACVendorDatabaseSummary {
+        MACVendorDatabaseSummary(
+            source: .ieeeDownload,
+            createdAt: sourceUpdatedDate ?? .distantPast,
+            registryCounts: [:],
+            totalRecordCount: totalRecordCount
+        )
+    }
+}
+
 struct MACVendorBundledDatabase: Decodable, Equatable, Sendable {
     struct Source: Decodable, Equatable, Sendable {
         let url: String
@@ -24,6 +39,14 @@ struct MACVendorBundledDatabase: Decodable, Equatable, Sendable {
 
     var sourceUpdatedDate: Date? {
         ISO8601DateFormatter().date(from: sourceUpdatedAt)
+    }
+
+    var summary: MACVendorBundledDatabaseSummary {
+        MACVendorBundledDatabaseSummary(
+            sourceUpdatedAt: sourceUpdatedAt,
+            sourceUpdatedDate: sourceUpdatedDate,
+            totalRecordCount: totalRecordCount
+        )
     }
 
     static func load(from bundle: Bundle = .main) -> MACVendorBundledDatabase? {

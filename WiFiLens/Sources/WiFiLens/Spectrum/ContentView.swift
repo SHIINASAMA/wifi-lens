@@ -79,9 +79,7 @@ struct SpectrumDashboardLayout {
 
 struct ContentView: View {
     @Bindable var viewModel: ScannerViewModel
-    @Bindable var macVendorDatabaseManager: MACVendorDatabaseManager
-
-    private static let bundledDatabaseAvailable = MACVendorBundledDatabase.load() != nil
+    let isVendorColumnAvailable: Bool
 
     @State private var sortOrder: [NSSortDescriptor] = [NSSortDescriptor(key: "ssid", ascending: true)]
     @State private var panel1ChartType: BandPanelSelection = .band24
@@ -95,8 +93,16 @@ struct ContentView: View {
         )
     }
 
-    private var isVendorColumnAvailable: Bool {
-        Self.bundledDatabaseAvailable
+    init(viewModel: ScannerViewModel, isVendorColumnAvailable: Bool) {
+        self.viewModel = viewModel
+        self.isVendorColumnAvailable = isVendorColumnAvailable
+    }
+
+    init(viewModel: ScannerViewModel, macVendorDatabaseManager: MACVendorDatabaseManager) {
+        self.init(
+            viewModel: viewModel,
+            isVendorColumnAvailable: macVendorDatabaseManager.availability.isVendorColumnAvailable
+        )
     }
 
     var body: some View {

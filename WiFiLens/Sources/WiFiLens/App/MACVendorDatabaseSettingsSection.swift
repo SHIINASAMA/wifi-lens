@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MACVendorDatabaseSettingsSection: View {
-    let database: MACVendorBundledDatabase?
+    let summary: MACVendorBundledDatabaseSummary?
 
     var body: some View {
         Section {
@@ -18,13 +18,13 @@ struct MACVendorDatabaseSettingsSection: View {
 
     @ViewBuilder
     private var availabilityContent: some View {
-        if let database {
+        if let summary {
             statusRow(
                 icon: "checkmark.circle.fill",
                 status: String(localized: "settings.mac_vendor.status_bundled", comment: "Bundled MAC vendor database is available"),
                 color: .green
             )
-            installedDetailRows(database)
+            installedDetailRows(summary)
         } else {
             statusRow(
                 icon: "exclamationmark.triangle.fill",
@@ -45,10 +45,10 @@ struct MACVendorDatabaseSettingsSection: View {
     }
 
     @ViewBuilder
-    private func installedDetailRows(_ database: MACVendorBundledDatabase) -> some View {
+    private func installedDetailRows(_ summary: MACVendorBundledDatabaseSummary) -> some View {
         let source = String(localized: "settings.mac_vendor.source_ieee", comment: "Database source: bundled IEEE snapshot")
-        let date = database.sourceUpdatedDate?.formatted(date: .abbreviated, time: .omitted) ?? database.sourceUpdatedAt
-        let count = database.totalRecordCount.formatted()
+        let date = summary.sourceUpdatedDate?.formatted(date: .abbreviated, time: .omitted) ?? summary.sourceUpdatedAt
+        let count = summary.totalRecordCount.formatted()
 
         LabeledContent(String(localized: "settings.mac_vendor.source_label", comment: "MAC vendor database source field label"), value: source)
             .accessibilityElement(children: .ignore)
@@ -72,7 +72,7 @@ struct MACVendorDatabaseSettingsSection: View {
 private struct MACVendorDatabaseSettingsSectionPreview: View {
     var body: some View {
         Form {
-            MACVendorDatabaseSettingsSection(database: MACVendorBundledDatabase.load())
+            MACVendorDatabaseSettingsSection(summary: MACVendorBundledDatabase.load()?.summary)
         }
         .formStyle(.grouped)
         .frame(width: 520, height: 480)
