@@ -34,7 +34,7 @@ final class MACVendorDatabaseManager {
         fileprivate let task: Task<Void, Never>
     }
 
-    private(set) var availability: MACVendorDatabaseAvailability = .loading
+    private(set) var availability: MACVendorDatabaseAvailability
     private(set) var operation: MACVendorDatabaseOperation = .idle
     private var pendingManualImport: MACVendorDatabaseSummary?
     private(set) var databaseRevision = 0
@@ -55,10 +55,12 @@ final class MACVendorDatabaseManager {
 
     init(
         resolver: MACVendorResolver,
-        service: any MACVendorDatabaseServicing
+        service: any MACVendorDatabaseServicing,
+        initialAvailability: MACVendorDatabaseAvailability = .loading
     ) {
         self.resolver = resolver
         self.service = service
+        availability = initialAvailability
     }
 
     func loadInstalledDatabase() async {
