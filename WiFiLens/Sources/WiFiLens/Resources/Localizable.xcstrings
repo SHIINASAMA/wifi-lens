@@ -25320,6 +25320,76 @@
           }
         }
       }
+    },
+    "settings.mac_vendor.status_bundled": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bundled"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "内蔵"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "内置"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Integriert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incluida"
+          }
+        }
+      }
+    },
+    "settings.mac_vendor.footer_bundled": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vendor names come from a bundled IEEE registry snapshot and are not updated at runtime."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ベンダー名は内蔵された IEEE レジストリのスナップショットに基づき、実行時には更新されません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "厂商名称来自内置的 IEEE 注册表快照，不会在运行时更新。"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Herstellernamen stammen aus einem integrierten IEEE-Register-Snapshot und werden zur Laufzeit nicht aktualisiert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los nombres de los fabricantes proceden de una instantánea integrada del registro IEEE y no se actualizan durante la ejecución."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

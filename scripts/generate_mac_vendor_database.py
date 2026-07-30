@@ -28,6 +28,8 @@ REGISTRIES = {
     "https://standards-oui.ieee.org/iab/iab.csv": RegistrySpec("IAB", 36),
 }
 
+SNAPSHOT_DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
 
 def normalize_organization(value: str) -> str:
     return " ".join(html.unescape(value).split())
@@ -115,8 +117,17 @@ def download_text(url: str) -> TextIO:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--retrieved-at", required=True, help="Snapshot date in YYYY-MM-DD")
-    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path(__file__).resolve().parents[1]
+        / "WiFiLens/Sources/WiFiLens/Resources/mac-vendor-database.json",
+        help="Output resource path (defaults to the bundled app resource)",
+    )
     args = parser.parse_args()
+
+    if not SNAPSHOT_DATE_PATTERN.fullmatch(args.retrieved_at):
+        parser.error("--retrieved-at must use YYYY-MM-DD")
 
     all_entries: list[dict[str, object]] = []
     for url, spec in REGISTRIES.items():
@@ -124,6 +135,7 @@ def main() -> None:
             all_entries.extend(parse_registry(stream, spec))
 
     database = build_database(all_entries, args.retrieved_at, list(REGISTRIES))
+    args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(
             database,

@@ -3,9 +3,16 @@ import unittest
 
 from scripts.generate_mac_vendor_database import (
     RegistrySpec,
+    SNAPSHOT_DATE_PATTERN,
     build_database,
     parse_registry,
 )
+
+
+def test_snapshot_date_requires_iso_calendar_shape():
+    assert SNAPSHOT_DATE_PATTERN.fullmatch("2026-07-30")
+    assert not SNAPSHOT_DATE_PATTERN.fullmatch("2026/07/30")
+    assert not SNAPSHOT_DATE_PATTERN.fullmatch("2026-7-30")
 
 
 class MACVendorDatabaseGeneratorTests(unittest.TestCase):
