@@ -10,7 +10,10 @@ import io
 import json
 import re
 import urllib.request
+import warnings
+from datetime import datetime, timezone
 from dataclasses import dataclass
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Iterable, TextIO
 
@@ -28,7 +31,30 @@ REGISTRIES = {
     "https://standards-oui.ieee.org/iab/iab.csv": RegistrySpec("IAB", 36),
 }
 
-SNAPSHOT_DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+def utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def normalize_iso_override(value: str, argument_name: str) -> str:
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as error:
+        raise ValueError(f"{argument_name} must use ISO 8601 format") from error
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def parse_last_modified(value: str | None) -> str | None:
+    if not value:
+        return None
+    try:
+        parsed = parsedate_to_datetime(value)
+    except (TypeError, ValueError, IndexError):
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 def normalize_organization(value: str) -> str:
@@ -68,7 +94,7 @@ def parse_registry(stream: TextIO, spec: RegistrySpec) -> list[dict[str, object]
 def build_database(
     entries: Iterable[dict[str, object]],
     retrieved_at: str,
-    sources: list[str],
+    sources: list[dict[str, str | None]],
     source_updated_at: str | None = None,
 ) -> dict[str, object]:
     unique: dict[tuple[int, str], dict[str, object]] = {}
@@ -88,11 +114,24 @@ def build_database(
         unique.values(),
         key=lambda entry: (-int(entry["prefixLength"]), str(entry["prefix"])),
     )
+    available_source_dates = [
+        source["lastModifiedAt"]
+        for source in sources
+        if source.get("lastModifiedAt")
+    ]
+    if not source_updated_at and not available_source_dates:
+        raise ValueError("all IEEE sources are missing Last-Modified and no override was provided")
+    if len(available_source_dates) < len(sources):
+        warnings.warn(
+            "one or more IEEE sources are missing Last-Modified; sourceUpdatedAt uses available values",
+            RuntimeWarning,
+            stacklevel=2,
+        )
     return {
         "schemaVersion": 1,
         "retrievedAt": retrieved_at,
-        "sourceUpdatedAt": source_updated_at or retrieved_at,
-        "sources": sorted(sources),
+        "sourceUpdatedAt": source_updated_at or max(available_source_dates),
+        "sources": sorted(sources, key=lambda source: source["url"]),
         "ambiguousPrefixCount": len(ambiguous),
         "notice": (
             "Derived from IEEE Registration Authority public listings. "
@@ -102,7 +141,7 @@ def build_database(
     }
 
 
-def download_text(url: str) -> TextIO:
+def download_text(url: str) -> tuple[TextIO, str | None]:
     request = urllib.request.Request(
         url,
         headers={
@@ -113,16 +152,16 @@ def download_text(url: str) -> TextIO:
         },
     )
     with urllib.request.urlopen(request, timeout=180) as response:
-        return io.StringIO(response.read().decode("utf-8-sig"))
+        content = response.read().decode("utf-8-sig")
+        return io.StringIO(content), parse_last_modified(response.headers.get("Last-Modified"))
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--retrieved-at", required=True, help="Download date in YYYY-MM-DD")
+    parser.add_argument("--retrieved-at", help="Override retrieval time in ISO 8601 format")
     parser.add_argument(
         "--source-updated-at",
-        required=True,
-        help="IEEE source snapshot date in YYYY-MM-DD",
+        help="Override IEEE source update time in ISO 8601 format",
     )
     parser.add_argument(
         "--output",
@@ -133,21 +172,29 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    if not SNAPSHOT_DATE_PATTERN.fullmatch(args.retrieved_at):
-        parser.error("--retrieved-at must use YYYY-MM-DD")
-    if not SNAPSHOT_DATE_PATTERN.fullmatch(args.source_updated_at):
-        parser.error("--source-updated-at must use YYYY-MM-DD")
+    try:
+        retrieved_at = normalize_iso_override(args.retrieved_at, "--retrieved-at") if args.retrieved_at else utc_now_iso()
+        source_updated_at = (
+            normalize_iso_override(args.source_updated_at, "--source-updated-at")
+            if args.source_updated_at
+            else None
+        )
+    except ValueError as error:
+        parser.error(str(error))
 
     all_entries: list[dict[str, object]] = []
+    sources: list[dict[str, str | None]] = []
     for url, spec in REGISTRIES.items():
-        with download_text(url) as stream:
+        stream, last_modified_at = download_text(url)
+        with stream:
             all_entries.extend(parse_registry(stream, spec))
+        sources.append({"url": url, "lastModifiedAt": last_modified_at})
 
     database = build_database(
         all_entries,
-        args.retrieved_at,
-        list(REGISTRIES),
-        source_updated_at=args.source_updated_at,
+        retrieved_at,
+        sources,
+        source_updated_at=source_updated_at,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(

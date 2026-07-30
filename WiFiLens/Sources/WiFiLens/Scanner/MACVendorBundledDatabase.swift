@@ -1,10 +1,15 @@
 import Foundation
 
 struct MACVendorBundledDatabase: Decodable, Equatable, Sendable {
+    struct Source: Decodable, Equatable, Sendable {
+        let url: String
+        let lastModifiedAt: String?
+    }
+
     let schemaVersion: Int
     let retrievedAt: String
     let sourceUpdatedAt: String
-    let sources: [String]
+    let sources: [Source]
     let entries: [MACVendorEntry]
 
     private enum CodingKeys: String, CodingKey {
@@ -18,11 +23,7 @@ struct MACVendorBundledDatabase: Decodable, Equatable, Sendable {
     var totalRecordCount: Int { entries.count }
 
     var sourceUpdatedDate: Date? {
-        let formatter = DateFormatter()
-        formatter.calendar = Calendar(identifier: .gregorian)
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.date(from: sourceUpdatedAt)
+        ISO8601DateFormatter().date(from: sourceUpdatedAt)
     }
 
     static func load(from bundle: Bundle = .main) -> MACVendorBundledDatabase? {
