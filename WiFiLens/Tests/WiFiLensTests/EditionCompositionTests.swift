@@ -277,9 +277,14 @@ struct EditionCompositionTests {
     @Test("repeated termination requests share one ordered operation and one AppKit reply")
     func repeatedTerminationRequestsShareOneOperation() async {
         let stopGate = TerminationTestGate()
+        let replyProbe = TerminationBoolProbe()
         var steps: [String] = []
-        var replies: [Bool] = []
-        let coordinator = ApplicationTerminationCoordinator(reply: { replies.append($0) })
+        let coordinator = ApplicationTerminationCoordinator(
+            waitForDeadline: { _ in
+                try await Task.sleep(for: .seconds(3_600))
+            },
+            reply: { replyProbe.record($0) }
+        )
         coordinator.configure(
             stopRuntime: {
                 steps.append("runtime")
@@ -292,36 +297,36 @@ struct EditionCompositionTests {
 
         #expect(coordinator.requestTermination() == .terminateLater)
         #expect(coordinator.requestTermination() == .terminateLater)
-        await Task.yield()
+        await stopGate.waitUntilEntered()
         #expect(steps == ["runtime"])
-        #expect(replies.isEmpty)
+        #expect(replyProbe.values.isEmpty)
 
         await stopGate.open()
-        for _ in 0..<1_000 {
-            if replies == [true] { break }
-            await Task.yield()
-        }
+        await replyProbe.waitForFirstValue()
 
         #expect(steps == ["runtime", "edition"])
-        #expect(replies == [true])
+        #expect(replyProbe.values == [true])
         #expect(coordinator.requestTermination() == .terminateLater)
-        await Task.yield()
-        #expect(replies == [true])
+        #expect(replyProbe.values == [true])
     }
 
     @MainActor
     @Test("termination deadline replies once when runtime stop ignores cancellation")
     func terminationDeadlineDoesNotAwaitNonCooperativeRuntimeStop() async {
         let stopGate = TerminationTestGate()
+        let deadlineGate = TerminationTestGate()
+        let replyProbe = TerminationBoolProbe()
+        let cancellationProbe = TerminationBoolProbe()
         var editionCalls = 0
-        var replies: [Bool] = []
         let coordinator = ApplicationTerminationCoordinator(
-            terminationDeadline: .milliseconds(20),
-            reply: { replies.append($0) }
+            terminationDeadline: .seconds(3),
+            waitForDeadline: { _ in await deadlineGate.wait() },
+            reply: { replyProbe.record($0) }
         )
         coordinator.configure(
             stopRuntime: {
                 await stopGate.wait()
+                cancellationProbe.record(Task.isCancelled)
             },
             terminateEdition: {
                 editionCalls += 1
@@ -329,17 +334,41 @@ struct EditionCompositionTests {
         )
 
         #expect(coordinator.requestTermination() == .terminateLater)
-        for _ in 0..<200 {
-            if !replies.isEmpty { break }
-            try? await Task.sleep(for: .milliseconds(1))
-        }
+        await stopGate.waitUntilEntered()
+        await deadlineGate.waitUntilEntered()
+        #expect(replyProbe.values.isEmpty)
 
-        #expect(replies == [true])
+        await deadlineGate.open()
+        await replyProbe.waitForFirstValue()
+
+        #expect(replyProbe.values == [true])
         #expect(editionCalls == 0)
 
         await stopGate.open()
-        for _ in 0..<20 { await Task.yield() }
-        #expect(replies == [true])
+        await cancellationProbe.waitForFirstValue()
+
+        #expect(cancellationProbe.values == [true])
+        #expect(editionCalls == 0)
+        #expect(replyProbe.values == [true])
+    }
+
+    @MainActor
+    @Test("a cancelled termination operation skips edition cleanup")
+    func cancelledTerminationOperationSkipsEditionCleanup() async {
+        let stopGate = TerminationTestGate()
+        var editionCalls = 0
+        let operation = Task { @MainActor in
+            await performApplicationTermination(
+                stopRuntime: { await stopGate.wait() },
+                terminateEdition: { editionCalls += 1 }
+            )
+        }
+
+        await stopGate.waitUntilEntered()
+        operation.cancel()
+        await stopGate.open()
+
+        #expect(await operation.value == false)
         #expect(editionCalls == 0)
     }
 
@@ -410,12 +439,48 @@ private func eventually(
 }
 
 private actor TerminationTestGate {
+    private struct EntryWaiter {
+        let continuation: CheckedContinuation<Bool, Never>
+        let watchdog: Task<Void, Never>
+    }
+
     private var isOpen = false
+    private var hasEntered = false
     private var waiters: [CheckedContinuation<Void, Never>] = []
+    private var entryWaiters: [UUID: EntryWaiter] = [:]
 
     func wait() async {
+        hasEntered = true
+        let pendingEntryWaiters = entryWaiters.values
+        entryWaiters.removeAll()
+        pendingEntryWaiters.forEach {
+            $0.watchdog.cancel()
+            $0.continuation.resume(returning: true)
+        }
         if isOpen { return }
         await withCheckedContinuation { waiters.append($0) }
+    }
+
+    func waitUntilEntered(watchdogDuration: Duration = .seconds(5)) async {
+        if hasEntered { return }
+        let id = UUID()
+        let entered = await withCheckedContinuation { continuation in
+            let watchdog = Task.detached { [weak self] in
+                do {
+                    try await Task.sleep(for: watchdogDuration)
+                } catch {
+                    return
+                }
+                await self?.expireEntryWaiter(id)
+            }
+            entryWaiters[id] = EntryWaiter(
+                continuation: continuation,
+                watchdog: watchdog
+            )
+        }
+        if !entered {
+            Issue.record("Termination operation did not enter the test gate before the watchdog expired")
+        }
     }
 
     func open() {
@@ -423,6 +488,59 @@ private actor TerminationTestGate {
         let pending = waiters
         waiters.removeAll()
         pending.forEach { $0.resume() }
+    }
+
+    private func expireEntryWaiter(_ id: UUID) {
+        guard let waiter = entryWaiters.removeValue(forKey: id) else { return }
+        waiter.continuation.resume(returning: false)
+    }
+}
+
+@MainActor
+private final class TerminationBoolProbe {
+    private struct Waiter {
+        let continuation: CheckedContinuation<Bool, Never>
+        let watchdog: Task<Void, Never>
+    }
+
+    private(set) var values: [Bool] = []
+    private var waiters: [UUID: Waiter] = [:]
+
+    func record(_ value: Bool) {
+        values.append(value)
+        let pending = waiters.values
+        waiters.removeAll()
+        pending.forEach {
+            $0.watchdog.cancel()
+            $0.continuation.resume(returning: true)
+        }
+    }
+
+    func waitForFirstValue(watchdogDuration: Duration = .seconds(5)) async {
+        if !values.isEmpty { return }
+        let id = UUID()
+        let recorded = await withCheckedContinuation { continuation in
+            let watchdog = Task { @MainActor [weak self] in
+                do {
+                    try await Task.sleep(for: watchdogDuration)
+                } catch {
+                    return
+                }
+                self?.expireWaiter(id)
+            }
+            waiters[id] = Waiter(
+                continuation: continuation,
+                watchdog: watchdog
+            )
+        }
+        if !recorded {
+            Issue.record("Expected termination event was not recorded before the watchdog expired")
+        }
+    }
+
+    private func expireWaiter(_ id: UUID) {
+        guard let waiter = waiters.removeValue(forKey: id) else { return }
+        waiter.continuation.resume(returning: false)
     }
 }
 
