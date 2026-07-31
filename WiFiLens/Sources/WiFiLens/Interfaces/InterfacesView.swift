@@ -99,6 +99,12 @@ struct InterfacesView: View {
                     Text(wifi.displaySSID)
                         .font(.title3)
                         .fontWeight(.semibold)
+                        // Same guardrail as OverviewView.connectionCard: a long SSID
+                        // is one unbreakable token that would widen the hero past the
+                        // detail column at the minimum window size.
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .help(wifi.displaySSID)
                     HStack(spacing: 6) {
                         Circle().fill(.green).frame(width: 6, height: 6).accessibilityHidden(true)
                         Text(String(localized: "common.label.connected", comment: "Connected state indicator"))

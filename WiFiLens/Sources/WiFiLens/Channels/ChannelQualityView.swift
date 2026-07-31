@@ -75,10 +75,12 @@ struct ChannelQualityView: View {
                 tableView
             }
         }
-        // Same guardrail as Spectrum.ContentView: these ideal dimensions are page
-        // layout hints, not a signal to resize the app window. Do not pair them with
-        // scene-level `.windowResizability(.contentSize)`.
-        .frame(minWidth: 700, idealWidth: 1000, minHeight: 600, idealHeight: 700)
+        // Ideal dimensions are page layout hints, not a signal to resize the app window.
+        // Do not pair them with scene-level `.windowResizability(.contentSize)`. The
+        // minimums were removed because `minWidth: 700` forces the whole page to lay out
+        // 700pt wide — wider than the ~600pt detail column at the minimum window size,
+        // which clips the page's right edge.
+        .frame(idealWidth: 1000, idealHeight: 700)
     }
 
     // MARK: - Recommendation Status
