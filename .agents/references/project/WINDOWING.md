@@ -113,6 +113,37 @@ minimum on the window.
 - Remove `.fixedSize(horizontal: false, vertical: true)` from the BLE description text.
 - Wrap the state-preserving page `ZStack` in a `GeometryReader`, which severs layout-minimum
   propagation from hidden pages to the window.
+- Declare the window's minimum size in SwiftUI as well; see the follow-up below.
+
+## Follow-up: The Window Lost Its Lower Bound
+
+- Report source: Pull request review
+- Report date: July 30, 2026
+- Environment: `macOS 27 beta 4`
+
+### User-visible symptoms
+
+- The main window could be dragged down to a few hundred points in either direction.
+- The detail column collapsed until only the sidebar was left.
+
+### Root cause
+
+Severing the pages' layout minimums removed *every* content-derived minimum, and the app has no
+other floor that survives. `WindowAccessor` did assign `NSWindow.minSize` and `contentMinSize`,
+but SwiftUI's hosting controller recomputes both from the hosted content on each layout pass:
+with the detail column reporting no minimum, `minSize` was rewritten to roughly `{148, 48}`.
+The 820x620 policy was therefore never in force during interaction.
+
+`NSWindow.minSize` only constrains interactive resizing. `setFrame` and `setContentSize` ignore
+it, which is why a test has to resize through the accessibility frame setter to observe the clamp.
+
+### Fix
+
+- Declare the minimum in SwiftUI as a fixed constant (`View.mainWindowMinimumSize()`), so the
+  minimum SwiftUI hands to the window is the policy value rather than whatever the pages report.
+  It is a constant, so page content still cannot become a sizing policy.
+- Keep the AppKit assignment (`MainWindowSizing.applyMinimumSize(to:)`) as the floor that applies
+  before SwiftUI's first layout pass.
 
 ## Shipping Policy
 
@@ -120,17 +151,23 @@ The shipping app now follows these rules:
 
 1. The main window is a standard macOS resizable window.
 2. The app may provide a default launch size and minimum size, but page content does not control the real `NSWindow` size.
-3. Every restored frame is normalized against the current screen's `visibleFrame` before being shown.
-4. If a restored frame is obviously invalid, the app falls back to a centered default size.
-5. Page-level `idealWidth` / `idealHeight` values are allowed only as local layout hints.
+3. Both bounds hold: hidden pages must not expand the window past the screen, and the user must not be able to shrink it below `MainWindowSizing.minSize` (820x620).
+4. Every restored frame is normalized against the current screen's `visibleFrame` before being shown.
+5. If a restored frame is obviously invalid, the app falls back to a centered default size.
+6. Page-level `idealWidth` / `idealHeight` values are allowed only as local layout hints.
 
 ## Current Implementation
 
 - Scene-level sizing guardrails live in `WiFiLens/Sources/WiFiLens/WiFiLensApp.swift`.
+- The default size and the minimum size live in `MainWindowSizing` in the same file. The minimum
+  is applied twice: `applyMinimumSize(to:)` from `WindowAccessor`, and `mainWindowMinimumSize()`
+  on the root view so SwiftUI's layout pass cannot lower it.
 - The state-preserving page `ZStack` is wrapped in a `GeometryReader` in the same file so
   hidden pages cannot impose layout minimums on the window.
 - Frame normalization logic lives in `WiFiLens/Sources/WiFiLens/Utilities/WindowFramePolicy.swift`.
-- Regression tests live in `WiFiLens/Tests/WiFiLensTests/WindowFramePolicyTests.swift`.
+- Regression tests live in `WiFiLens/Tests/WiFiLensTests/WindowFramePolicyTests.swift`,
+  `DetailPageMinimumHeightTests.swift` (upper bound), and `MainWindowMinimumSizeTests.swift`
+  (lower bound).
 
 ## Audit Results
 
@@ -162,4 +199,6 @@ Audit date: June 27, 2026
 - If another state-preservation `ZStack` is introduced, wrap it in a `GeometryReader` so hidden pages do not become a sizing policy. A `.frame(maxWidth:maxHeight:)` on the container is not sufficient: it bounds maximums and still propagates the children's minimums to the window. `.frame(idealWidth:idealHeight:)` does not work either.
 - Do not apply `.fixedSize(horizontal: false, vertical: true)` to text on an always-mounted page. It reports the height needed at the minimum proposed width, which SwiftUI can turn into an `NSHostingView.minHeight` constraint on the `NSWindow`. Bound the text instead (`.lineLimit`, or a `maxWidth` frame).
 - Any content-derived minimum can reach the window regardless of `windowResizability`. When a window sizing bug appears, check the live `NSHostingView.minHeight` constraints on the split-view columns before suspecting autosave or scene modifiers.
+- Do not rely on `NSWindow.minSize` alone. SwiftUI's hosting controller rewrites it from the hosted content on every layout pass, and it constrains only interactive resizing — `setFrame` and `setContentSize` ignore it. Any window minimum must also be declared in SwiftUI.
+- When testing window minimums, host the view with `NSHostingController` as the window's `contentViewController`, the way `WindowGroup` does. An `NSHostingView` assigned directly to `contentView` leaves an already-assigned `minSize` alone and hides the defect.
 - Keep the `openWindow` adapter and pending route in the app-owned lifecycle coordinator. A `MainWindowSceneState` must not be the sole owner of the action required to create its replacement after the final window closes.
