@@ -24,10 +24,12 @@ private struct BLEDisabledView: View {
             Text(String(localized: "ble.disabled.title", comment: "Title when BLE feature is disabled in settings"))
                 .font(.title3)
                 .multilineTextAlignment(.center)
+            // .fixedSize(vertical:) is unsafe on this text: it reports the height needed at
+            // the *minimum* proposed width, wrapping into a ~1400pt column that SwiftUI then
+            // imposes as the main window's minimum height.
             Text(String(localized: "ble.disabled.description", comment: "Description prompting user to enable BLE in settings"))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
