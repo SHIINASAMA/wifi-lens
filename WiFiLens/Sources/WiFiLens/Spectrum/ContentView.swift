@@ -109,7 +109,11 @@ struct ContentView: View {
         VStack(spacing: 0) {
             contentArea
         }
-        .frame(minWidth: 700, idealWidth: 1000, minHeight: 600)
+        // Same guardrail as Channels.ChannelQualityView: `minWidth: 700` forces the
+        // whole dashboard to lay out 700pt wide — wider than the ~600pt detail column
+        // at the minimum window size, clipping the right edge. Keep only the ideals as
+        // page layout hints.
+        .frame(idealWidth: 1000, idealHeight: 700)
         .onChange(of: viewModel.hiddenBands) { _, _ in viewModel.applyGlobalFilterToBands() }
         .onChange(of: viewModel.hideHiddenSSIDs) { _, _ in viewModel.applyGlobalFilterToBands() }
     }

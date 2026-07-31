@@ -153,12 +153,20 @@ struct RoamingTestView: View {
                         .accessibilityHidden(true)
                     Text(viewModel.currentSSID ?? "—")
                         .font(.title3.weight(.semibold))
+                        // Same guardrail as OverviewView.connectionCard: without a line
+                        // limit, an unbreakable long SSID would push the metrics off
+                        // the card at narrow widths.
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .help(viewModel.currentSSID ?? "")
                 }
                 HStack(spacing: 8) {
                     if let bssid = viewModel.currentBSSID {
                         Text(bssid)
                             .font(.caption.monospaced())
                             .foregroundColor(.secondary)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                     }
                     if let phy = viewModel.currentPhyMode {
                         Text("·")

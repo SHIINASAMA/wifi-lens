@@ -109,19 +109,27 @@ struct OverviewView: View {
                     Text(wifi.displaySSID)
                         .font(.title3)
                         .fontWeight(.semibold)
+                        // Long SSIDs are a single unbreakable token; without a line
+                        // limit they widen the card past the detail column at the
+                        // minimum window size. Truncate instead of overflowing.
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .help(wifi.displaySSID)
                     HStack(spacing: 6) {
                         Circle().fill(Color.green).frame(width: 6, height: 6).accessibilityHidden(true)
                         Text(String(localized: "common.label.connected", comment: "Connected state indicator"))
                             .font(.caption)
                             .foregroundColor(.secondary)
+                            .lineLimit(1)
                         if let ch = wifi.channel {
                             Text("·  \(bandName(ch))  ·  Ch \(ch)")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
+                                .lineLimit(1)
                         }
                     }
                 }
-                Spacer()
+                Spacer(minLength: 12)
 
                 VStack(alignment: .trailing, spacing: 4) {
                     Text("\(wifi.rssi ?? -100) dBm")
@@ -130,6 +138,9 @@ struct OverviewView: View {
                         .accessibilityLabel(String(format: String(localized: "roaming.accessibility.rssi_fmt", comment: "RSSI accessibility label with value and quality"), wifi.rssi ?? -100, signalLabel(wifi.rssi ?? -100)))
                     signalBars(wifi.rssi ?? -100)
                 }
+                // Keep the RSSI cluster intact at its intrinsic width when the SSID
+                // compresses; all squeezing happens on the truncatable left side.
+                .fixedSize(horizontal: true, vertical: false)
             }
 
             GeometryReader { geo in
