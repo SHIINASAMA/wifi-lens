@@ -73,6 +73,10 @@
 		MV0000000000000000000041 /* MACVendorDatabaseReminderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000042 /* MACVendorDatabaseReminderTests.swift */; };
 		MV0000000000000000000043 /* MACVendorDatabaseReminder.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000045 /* MACVendorDatabaseReminder.swift */; };
 		MV0000000000000000000044 /* MACVendorDatabaseReminder.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000045 /* MACVendorDatabaseReminder.swift */; };
+		MV0000000000000000000046 /* MACVendorBundledDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000047 /* MACVendorBundledDatabase.swift */; };
+		MV0000000000000000000048 /* MACVendorBundledDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000047 /* MACVendorBundledDatabase.swift */; };
+		MV0000000000000000000049 /* mac-vendor-database.json in Resources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000050 /* mac-vendor-database.json */; };
+		MV0000000000000000000051 /* mac-vendor-database.json in Resources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000050 /* mac-vendor-database.json */; };
 		2FA3CB9C5DD2446AAA549779 /* GatewayPinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF472346A62545B9866DA8ED /* GatewayPinger.swift */; };
 		318908BC49D244B1EEE68A9A /* ChannelSpanCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA4E8568B0D4661E9B9E71E /* ChannelSpanCalculator.swift */; };
 		3711656F0C3ECD58CA29D407 /* NativeTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A3299502DE1A130760C8A7 /* NativeTableView.swift */; };
@@ -493,6 +497,8 @@
 		MV0000000000000000000040 /* MACVendorDatabaseUpdateSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseUpdateSheet.swift; sourceTree = "<group>"; };
 		MV0000000000000000000042 /* MACVendorDatabaseReminderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseReminderTests.swift; sourceTree = "<group>"; };
 		MV0000000000000000000045 /* MACVendorDatabaseReminder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseReminder.swift; sourceTree = "<group>"; };
+		MV0000000000000000000047 /* MACVendorBundledDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorBundledDatabase.swift; sourceTree = "<group>"; };
+		MV0000000000000000000050 /* mac-vendor-database.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = mac-vendor-database.json; sourceTree = "<group>"; };
 		8F405489976429A068F15F86 /* WiFiLensTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WiFiLensTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FD8F4CBC15819F4DB5C5510 /* SSIDColorHasher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSIDColorHasher.swift; sourceTree = "<group>"; };
 		90CF4B22A68C668A58043392 /* ExternalLinksTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalLinksTests.swift; sourceTree = "<group>"; };
@@ -833,6 +839,7 @@
 				MV0000000000000000000011 /* MACVendorDatabaseModels.swift */,
 				MV0000000000000000000021 /* MACVendorDatabaseStore.swift */,
 				MV0000000000000000000005 /* MACVendorResolver.swift */,
+				MV0000000000000000000047 /* MACVendorBundledDatabase.swift */,
 				8077FDB57D91D930A13EA2B1 /* WiFiScanner.swift */,
 				E5A1B3C8D4F6123456780001 /* WiFiPowerMonitor.swift */,
 				D74387CFA1E33037E9F1888E /* ScannerViewModel.swift */,
@@ -1043,6 +1050,7 @@
 				FBBD169B2FD063630093F940 /* Assets.xcassets */,
 				FBBD16982FD062F60093F940 /* PrivacyInfo.xcprivacy */,
 				FBB1F0AB2FC61E3D00E9D2C6 /* Localizable.xcstrings */,
+				MV0000000000000000000050 /* mac-vendor-database.json */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -1562,6 +1570,7 @@
 				FBBD169A2FD062F60093F940 /* PrivacyInfo.xcprivacy in Resources */,
 				FBBD169D2FD063630093F940 /* Assets.xcassets in Resources */,
 				FB1E329D2FC7316C009D1BDC /* Localizable.xcstrings in Resources */,
+				MV0000000000000000000051 /* mac-vendor-database.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1572,6 +1581,7 @@
 				FBBD16992FD062F60093F940 /* PrivacyInfo.xcprivacy in Resources */,
 				FBBD169C2FD063630093F940 /* Assets.xcassets in Resources */,
 				FBB1F0AC2FC61E3D00E9D2C6 /* Localizable.xcstrings in Resources */,
+				MV0000000000000000000049 /* mac-vendor-database.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1606,6 +1616,7 @@
 				MV0000000000000000000015 /* MACVendorCSVParser.swift in Sources */,
 				MV0000000000000000000013 /* MACVendorDatabaseModels.swift in Sources */,
 				MV0000000000000000000003 /* MACVendorResolver.swift in Sources */,
+				MV0000000000000000000046 /* MACVendorBundledDatabase.swift in Sources */,
 				ND0000000000000000000010 /* NetworkDiagnosticModels.swift in Sources */,
 				ND0000000000000000000011 /* DiagnosticRunner.swift in Sources */,
 				ND0000000000000000000014 /* NetworkConnectivityCheck.swift in Sources */,
@@ -1802,6 +1813,7 @@
 				MV0000000000000000000036 /* MACVendorDatabaseSettingsSection.swift in Sources */,
 				MV0000000000000000000038 /* MACVendorDatabaseUpdateSheet.swift in Sources */,
 				MV0000000000000000000033 /* MACVendorDatabaseManager.swift in Sources */,
+				MV0000000000000000000048 /* MACVendorBundledDatabase.swift in Sources */,
 				MV0000000000000000000030 /* MACVendorDatabaseService.swift in Sources */,
 				MV0000000000000000000025 /* MACVendorDatabaseDownloader.swift in Sources */,
 				MV0000000000000000000019 /* MACVendorDatabaseStore.swift in Sources */,

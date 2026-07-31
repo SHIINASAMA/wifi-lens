@@ -39,7 +39,7 @@ extension View {
 private struct AppRootView: View {
     @Bindable var viewModel: ScannerViewModel
     @Bindable var macVendorDatabaseManager: MACVendorDatabaseManager
-    let macVendorReminderPolicy: MACVendorDatabaseReminderPolicy
+    let macVendorDatabaseSummary: MACVendorBundledDatabaseSummary?
     @Bindable var roamingViewModel: RoamingTestViewModel
     var bleViewModel: BLEViewModel?
     @Binding var showCrashLog: Bool
@@ -56,13 +56,10 @@ private struct AppRootView: View {
 
     @AppStorage("hideTitleBadge") private var hideTitleBadge = true
     @AppStorage("bleEnabled") private var bleEnabled: Bool = false
-    @AppStorage("remindWhenMACVendorDatabaseEmpty") private var remindWhenVendorDatabaseEmpty = true
     @State private var sceneState = MainWindowSceneState()
     @State private var sidebarVisibility = NavigationSplitViewVisibility.automatic
     @State private var secondaryToolbarSelections = SecondaryToolbarSelections()
     @State private var networkDiagnosticsViewModel = NetworkDiagnosticsViewModel()
-    @State private var showsMACVendorReminder = false
-    @State private var showsMACVendorUpdateSheet = false
 
     private var selectedPage: SidebarPage { sceneState.selectedPage }
 
@@ -107,23 +104,6 @@ private struct AppRootView: View {
 
     private func handleSelectedPageChange(_ newPage: SidebarPage) {
         updateMainWindowRoute(sceneState.id, newPage)
-        considerMACVendorReminder()
-    }
-
-    private func considerMACVendorReminder() {
-        guard !showsMACVendorReminder,
-              !showsMACVendorUpdateSheet,
-              !showCrashLog,
-              !viewModel.locationManager.showDeniedAlert
-        else { return }
-
-        if macVendorReminderPolicy.shouldPresent(
-            isSpectrum: selectedPage == .spectrum,
-            isDatabaseEmpty: macVendorDatabaseManager.availability.shouldRemindWhenEmpty,
-            remindersEnabled: remindWhenVendorDatabaseEmpty
-        ) {
-            showsMACVendorReminder = true
-        }
     }
 
 
@@ -191,6 +171,7 @@ private struct AppRootView: View {
                         mainWindowState: sceneState.editionWindowState,
                         scannerViewModel: viewModel,
                         macVendorDatabaseManager: macVendorDatabaseManager,
+                        isMACVendorDatabaseAvailable: macVendorDatabaseSummary != nil,
                         selectedPage: Binding(
                             get: { sceneState.selectedPage },
                             set: { sceneState.selectedPage = $0 }
@@ -236,7 +217,7 @@ private struct AppRootView: View {
                         .accessibilityElement(children: .contain)
 
                     SettingsView(
-                        macVendorDatabaseManager: macVendorDatabaseManager,
+                        macVendorDatabaseSummary: macVendorDatabaseSummary,
                         updater: sparkleUpdater,
                         locationPermission: viewModel.locationManager,
                         bluetoothPermission: bleViewModel?.bluetoothPermission,
@@ -339,41 +320,10 @@ private struct AppRootView: View {
             roamingViewModel.handleWiFiPowerStateChange(viewModel.wifiPowerState)
             updateMCPServer()
         }
-        .task {
-            await macVendorDatabaseManager.loadInstalledDatabase()
-            viewModel.vendorDatabaseDidChange()
-        }
-        .onChange(of: macVendorDatabaseManager.databaseRevision) { _, _ in
-            viewModel.vendorDatabaseDidChange()
-        }
-        .onChange(of: macVendorDatabaseManager.availability) { _, _ in
-            considerMACVendorReminder()
-        }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 Task { await viewModel.handleSceneDidBecomeActive() }
             }
-        }
-        .confirmationDialog(
-            String(localized: "settings.mac_vendor.reminder.title", comment: "Reminder title when the MAC vendor database is not installed"),
-            isPresented: $showsMACVendorReminder,
-            titleVisibility: .visible
-        ) {
-            Button(String(localized: "settings.mac_vendor.update_action", comment: "Open the MAC vendor database update sheet")) {
-                showsMACVendorReminder = false
-                DispatchQueue.main.async {
-                    showsMACVendorUpdateSheet = true
-                }
-            }
-            Button(String(localized: "settings.mac_vendor.reminder.later", comment: "Dismiss the MAC vendor database reminder for this session"), role: .cancel) {}
-            Button(String(localized: "settings.mac_vendor.reminder.do_not_ask_again", comment: "Disable future MAC vendor database reminders")) {
-                remindWhenVendorDatabaseEmpty = false
-            }
-        } message: {
-            Text(String(localized: "settings.mac_vendor.reminder.message", comment: "Explain that the Spectrum view can show vendor names after a database update"))
-        }
-        .sheet(isPresented: $showsMACVendorUpdateSheet) {
-            MACVendorDatabaseUpdateSheet(manager: macVendorDatabaseManager)
         }
     }
 }
@@ -858,14 +808,27 @@ func resolvedWindowFocusIntent(hasExistingMainWindow: Bool) -> ResolvedMainWindo
 }
 
 @MainActor
+func performApplicationTermination(
+    stopRuntime: @MainActor () async -> Void,
+    terminateEdition: @MainActor () async -> Void
+) async -> Bool {
+    await stopRuntime()
+    guard !Task.isCancelled else { return false }
+    await terminateEdition()
+    return true
+}
+
+@MainActor
 final class ApplicationTerminationCoordinator: NSObject, NSApplicationDelegate {
     typealias TerminationStep = @MainActor () async -> Void
+    typealias DeadlineWait = @MainActor (Duration) async throws -> Void
 
     static let defaultTerminationDeadline: Duration = .seconds(3)
 
     private var stopRuntime: TerminationStep = {}
     private var terminateEdition: TerminationStep = {}
     private let terminationDeadline: Duration
+    private let waitForDeadline: DeadlineWait
     private let reply: @MainActor (Bool) -> Void
     private var terminationTask: Task<Void, Never>?
     private var deadlineTask: Task<Void, Never>?
@@ -880,9 +843,13 @@ final class ApplicationTerminationCoordinator: NSObject, NSApplicationDelegate {
 
     init(
         terminationDeadline: Duration = defaultTerminationDeadline,
+        waitForDeadline: @escaping DeadlineWait = { duration in
+            try await Task.sleep(for: duration)
+        },
         reply: @escaping @MainActor (Bool) -> Void
     ) {
         self.terminationDeadline = terminationDeadline
+        self.waitForDeadline = waitForDeadline
         self.reply = reply
         super.init()
     }
@@ -900,16 +867,19 @@ final class ApplicationTerminationCoordinator: NSObject, NSApplicationDelegate {
         guard terminationTask == nil, !hasReplied else { return .terminateLater }
         let stopRuntime = stopRuntime
         let terminateEdition = terminateEdition
+        let waitForDeadline = waitForDeadline
         terminationTask = Task { @MainActor [weak self] in
-            await stopRuntime()
-            guard !Task.isCancelled else { return }
-            await terminateEdition()
+            let completed = await performApplicationTermination(
+                stopRuntime: stopRuntime,
+                terminateEdition: terminateEdition
+            )
+            guard completed else { return }
             self?.finishTermination(cancelOperation: false)
         }
         deadlineTask = Task { @MainActor [weak self] in
             guard let self else { return }
             do {
-                try await Task.sleep(for: terminationDeadline)
+                try await waitForDeadline(terminationDeadline)
             } catch {
                 return
             }
@@ -942,7 +912,7 @@ struct WiFiLensApp: App {
     private var terminationCoordinator
     @State private var viewModel: ScannerViewModel
     @State private var macVendorDatabaseManager: MACVendorDatabaseManager
-    @State private var macVendorReminderPolicy = MACVendorDatabaseReminderPolicy()
+    private let macVendorDatabaseSummary: MACVendorBundledDatabaseSummary?
     @State private var roamingViewModel = RoamingTestViewModel()
     @State private var bleViewModel: BLEViewModel?
     @State private var sparkleUpdater = SparkleUpdater()
@@ -957,12 +927,18 @@ struct WiFiLensApp: App {
     @AppStorage("menuBarEnabled") private var menuBarEnabled: Bool = true
 
     init() {
-        let vendorResolver = MACVendorResolver()
+        let database = MACVendorBundledDatabase.load()
+        let vendorResolver = MACVendorResolver(database: database)
+        let databaseSummary = database?.summary
+        macVendorDatabaseSummary = databaseSummary
         _viewModel = State(initialValue: ScannerViewModel(vendorResolver: vendorResolver))
         _macVendorDatabaseManager = State(
             initialValue: MACVendorDatabaseManager(
                 resolver: vendorResolver,
-                service: MACVendorDatabaseService()
+                service: MACVendorDatabaseService(),
+                initialAvailability: databaseSummary.map {
+                    .installed($0.legacyDatabaseSummary)
+                } ?? .notInstalled
             )
         )
 
@@ -991,7 +967,7 @@ struct WiFiLensApp: App {
                 AppRootView(
                     viewModel: viewModel,
                     macVendorDatabaseManager: macVendorDatabaseManager,
-                    macVendorReminderPolicy: macVendorReminderPolicy,
+                    macVendorDatabaseSummary: macVendorDatabaseSummary,
                     roamingViewModel: roamingViewModel,
                     bleViewModel: bleViewModel,
                     showCrashLog: $showCrashLog,

@@ -21,7 +21,11 @@ final class MACVendorResolver: MACVendorResolving {
     private var cache: [String: MACVendorLookupResult] = [:]
 
     convenience init() {
-        self.init(entries: [])
+        self.init(database: MACVendorBundledDatabase.load())
+    }
+
+    convenience init(database: MACVendorBundledDatabase?) {
+        self.init(entries: database?.entries ?? [])
     }
 
     init(databaseData: Data?) {

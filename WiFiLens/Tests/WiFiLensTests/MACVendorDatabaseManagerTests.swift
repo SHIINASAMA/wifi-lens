@@ -4,6 +4,22 @@ import Testing
 
 @MainActor
 struct MACVendorDatabaseManagerTests {
+    @Test func bundledLaunchAvailabilityIsAvailableWithoutLoadingPersistedDatabase() async {
+        let summary = makeDatabase(organization: "Bundled Name").summary
+        let service = FakeMACVendorDatabaseService()
+        let manager = MACVendorDatabaseManager(
+            resolver: MACVendorResolver(entries: []),
+            service: service,
+            initialAvailability: .installed(summary)
+        )
+
+        await manager.loadInstalledDatabase()
+
+        #expect(manager.availability == .installed(summary))
+        #expect(manager.databaseRevision == 0)
+        #expect(await service.loadCallCount == 0)
+    }
+
     @Test func missingLaunchDatabasePublishesNotInstalled() async {
         let resolver = makeResolver(organization: "Stale Name")
         let service = FakeMACVendorDatabaseService()
@@ -19,7 +35,7 @@ struct MACVendorDatabaseManagerTests {
 
     @Test func validLaunchDatabaseInstallsResolverAndPublishesSummary() async {
         let database = makeDatabase(organization: "Installed Name")
-        let resolver = MACVendorResolver()
+        let resolver = MACVendorResolver(entries: [])
         let service = FakeMACVendorDatabaseService(loadedDatabase: database)
         let manager = MACVendorDatabaseManager(resolver: resolver, service: service)
 
@@ -31,7 +47,7 @@ struct MACVendorDatabaseManagerTests {
     }
 
     @Test func corruptLaunchDatabaseIsUnavailableWithoutPresentingBlockingError() async {
-        let resolver = MACVendorResolver()
+        let resolver = MACVendorResolver(entries: [])
         let service = FakeMACVendorDatabaseService(loadError: .persistenceFailure)
         let manager = MACVendorDatabaseManager(resolver: resolver, service: service)
 
@@ -179,7 +195,7 @@ struct MACVendorDatabaseManagerTests {
         let preparedDatabase = makeDatabase(organization: "Previously Prepared")
         let service = FakeMACVendorDatabaseService(preparedDatabase: preparedDatabase)
         let manager = MACVendorDatabaseManager(
-            resolver: MACVendorResolver(),
+            resolver: MACVendorResolver(entries: []),
             service: service
         )
         await manager.prepareManualImport(urls: fourFixtureURLs())
@@ -197,7 +213,7 @@ struct MACVendorDatabaseManagerTests {
 
     @Test func confirmationWithoutPreparedImportPublishesTypedError() async {
         let manager = MACVendorDatabaseManager(
-            resolver: MACVendorResolver(),
+            resolver: MACVendorResolver(entries: []),
             service: FakeMACVendorDatabaseService()
         )
 
@@ -229,7 +245,7 @@ struct MACVendorDatabaseManagerTests {
         let ownerB = UUID()
         let service = FakeMACVendorDatabaseService(suspendDownload: true)
         let manager = MACVendorDatabaseManager(
-            resolver: MACVendorResolver(),
+            resolver: MACVendorResolver(entries: []),
             service: service
         )
 
@@ -255,7 +271,7 @@ struct MACVendorDatabaseManagerTests {
         let ownerB = UUID()
         let service = FakeMACVendorDatabaseService(suspendPreparation: true)
         let manager = MACVendorDatabaseManager(
-            resolver: MACVendorResolver(),
+            resolver: MACVendorResolver(entries: []),
             service: service
         )
 
@@ -321,7 +337,7 @@ struct MACVendorDatabaseManagerTests {
         let preparedDatabase = makeDatabase(organization: "Prepared Name")
         let service = FakeMACVendorDatabaseService(preparedDatabase: preparedDatabase)
         let manager = MACVendorDatabaseManager(
-            resolver: MACVendorResolver(),
+            resolver: MACVendorResolver(entries: []),
             service: service
         )
 
@@ -342,7 +358,7 @@ struct MACVendorDatabaseManagerTests {
             suspendDownload: true
         )
         let manager = MACVendorDatabaseManager(
-            resolver: MACVendorResolver(),
+            resolver: MACVendorResolver(entries: []),
             service: service
         )
         await manager.prepareManualImport(urls: fourFixtureURLs(), ownerID: ownerA)
@@ -368,7 +384,7 @@ struct MACVendorDatabaseManagerTests {
         let ownerB = UUID()
         let service = FakeMACVendorDatabaseService(downloadError: .downloadFailed(.maM))
         let manager = MACVendorDatabaseManager(
-            resolver: MACVendorResolver(),
+            resolver: MACVendorResolver(entries: []),
             service: service
         )
 
@@ -388,7 +404,7 @@ struct MACVendorDatabaseManagerTests {
     @Test func processErrorRemainsGlobalAndCannotBeDismissedBySheetOwner() async {
         let owner = UUID()
         let manager = MACVendorDatabaseManager(
-            resolver: MACVendorResolver(),
+            resolver: MACVendorResolver(entries: []),
             service: FakeMACVendorDatabaseService(clearError: .persistenceFailure)
         )
 
@@ -490,7 +506,7 @@ struct MACVendorDatabaseManagerTests {
             suspendDownload: true
         )
         let manager = MACVendorDatabaseManager(
-            resolver: MACVendorResolver(),
+            resolver: MACVendorResolver(entries: []),
             service: service
         )
         await manager.loadInstalledDatabase()
@@ -512,7 +528,7 @@ struct MACVendorDatabaseManagerTests {
             suspendPreparation: true
         )
         let manager = MACVendorDatabaseManager(
-            resolver: MACVendorResolver(),
+            resolver: MACVendorResolver(entries: []),
             service: service
         )
 
@@ -568,7 +584,7 @@ struct MACVendorDatabaseManagerTests {
             loadedDatabase: database,
             suspendDownload: true
         )
-        let manager = MACVendorDatabaseManager(resolver: MACVendorResolver(), service: service)
+        let manager = MACVendorDatabaseManager(resolver: MACVendorResolver(entries: []), service: service)
         await manager.loadInstalledDatabase()
 
         let downloadTask = Task { await manager.downloadAndInstall() }

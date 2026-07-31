@@ -50,6 +50,59 @@ struct NetworkDiagnosticsTests {
         #expect(NetworkDiagnosticStatus.skipped.presentation != NetworkDiagnosticStatus.indeterminate.presentation)
     }
 
+    @Test("proxy authentication evidence maps to a credential remediation")
+    func proxyAuthenticationRemediation() {
+        let result = NetworkDiagnosticResult(
+            id: .proxy,
+            status: .abnormal,
+            summary: "Proxy authentication required",
+            evidence: [.init(code: "proxy.authentication-required", value: "407")]
+        )
+
+        let remediation = NetworkDiagnosticRemediation.forResult(result)
+
+        #expect(remediation.actionKey == "network_diagnostics.remediation.proxy_authentication.action")
+        #expect(remediation.rerunKey == "network_diagnostics.remediation.rerun")
+    }
+
+    @Test("indeterminate remediation does not claim a confirmed cause")
+    func indeterminateRemediationIsTentative() {
+        let result = NetworkDiagnosticResult(
+            id: .dns,
+            status: .indeterminate,
+            summary: "DNS could not be determined"
+        )
+
+        let remediation = NetworkDiagnosticRemediation.forResult(result)
+
+        #expect(remediation.causeKey == "network_diagnostics.remediation.indeterminate.cause")
+        #expect(remediation.actionKey == "network_diagnostics.remediation.indeterminate.action")
+    }
+
+    @Test("path summary composes interface tunnel proxy and internet segments")
+    func pathSummaryComposition() {
+        let results = [
+            NetworkDiagnosticResult(
+                id: .path,
+                status: .normal,
+                summary: "Path available",
+                evidence: [
+                    .init(code: "path.interface-type", value: "wifi"),
+                    .init(code: "path.interface-name", value: "en0"),
+                    .init(code: "path.routed-tunnel", value: "utun6"),
+                ]
+            ),
+            NetworkDiagnosticResult(
+                id: .proxy,
+                status: .normal,
+                summary: "Proxy route available",
+                evidence: [.init(code: "proxy.https.route-type", value: "https")]
+            ),
+        ]
+
+        #expect(NetworkPathSummary.from(results: results)?.text == "Mac → Wi-Fi en0 → VPN/Tunnel utun6 → HTTPS proxy → Internet")
+    }
+
     @Test("a blocked probe does not become an independent network fault")
     func blockedProbeIsNotAbnormal() {
         let result = NetworkDiagnosticResult.blocked(id: .internet, summary: "DNS is unavailable")
@@ -1241,10 +1294,9 @@ struct NetworkDiagnosticsTests {
         #expect(result.evidence.contains(.init(code: "proxy.http.fallback-used", value: "true")))
     }
 
-    @Test("candidate attempts share one overall timeout")
+    @Test("candidate attempts share one controlled overall timeout")
     func proxyCandidateAttemptsShareTimeout() async {
-        let httpURL = URL(string: "http://www.msftconnecttest.com/connecttest.txt")!
-        let httpsURL = URL(string: "https://www.apple.com/")!
+        let target = URL(string: "http://www.msftconnecttest.com/connecttest.txt")!
         let firstProxy = EffectiveProxy.http(.init(host: "first.example", port: 8080))
         let secondProxy = EffectiveProxy.http(.init(host: "second.example", port: 8081))
         let connector = SequencedProxyConnector(outcomes: [true, true])
@@ -1253,29 +1305,75 @@ struct NetworkDiagnosticsTests {
                 .init(statusCode: nil, errorCode: "timed-out"),
                 .init(statusCode: 200, errorCode: nil),
             ],
-            delays: [.milliseconds(10), .zero]
+            delays: [.zero, .zero]
         )
+        let clock = SequencedProxyCheckClock(offsets: [
+            .zero,
+            .zero,
+            .milliseconds(250),
+            .milliseconds(1_200),
+            .milliseconds(1_300),
+        ])
         let check = SystemProxyCheck(
-            resolver: RecordingProxyResolver(resolutions: [
-                httpURL: .init(candidates: [firstProxy, secondProxy], evidenceCodes: []),
-                httpsURL: .init(candidates: [.direct], evidenceCodes: []),
-            ]),
+            resolver: RecordingProxyResolver(resolutions: [:]),
             connector: connector,
             egressLoader: egressLoader,
+            timeout: .seconds(2),
+            clock: clock
+        )
+
+        let result = await check.evaluate(
+            target: target,
+            resolution: .init(candidates: [firstProxy, secondProxy], evidenceCodes: []),
             timeout: .seconds(2)
         )
 
-        let result = await check.run()
-        let connectorTimeouts = await connector.timeouts
-        let egressTimeouts = await egressLoader.timeouts
+        #expect(result.status == .proxied)
+        #expect(result.selectedCandidateIndex == 1)
+        #expect(result.selectedProxy == secondProxy)
+        #expect(await connector.endpoints == [
+            .init(host: "first.example", port: 8080),
+            .init(host: "second.example", port: 8081),
+        ])
+        #expect(await connector.timeouts == [.seconds(1), .milliseconds(800)])
+        #expect(await egressLoader.timeouts == [.milliseconds(750), .milliseconds(700)])
+    }
 
-        #expect(result.status == .indeterminate)
-        #expect(connectorTimeouts.count == 2)
-        #expect(egressTimeouts.count == 2)
-        #expect(connectorTimeouts.first.map { $0 > .zero && $0 <= .milliseconds(1_050) } == true)
-        #expect(egressTimeouts.first.map { $0 > .zero && $0 <= .milliseconds(1_050) } == true)
-        #expect(connectorTimeouts.last.map { $0 > .zero && $0 < .seconds(2) } == true)
-        #expect(egressTimeouts.last.map { $0 > .zero && $0 < .seconds(2) } == true)
+    @Test("an expired overall proxy timeout does not start another candidate")
+    func expiredProxyTimeoutStopsCandidateFallback() async {
+        let target = URL(string: "http://www.msftconnecttest.com/connecttest.txt")!
+        let firstProxy = EffectiveProxy.http(.init(host: "first.example", port: 8080))
+        let secondProxy = EffectiveProxy.http(.init(host: "second.example", port: 8081))
+        let connector = SequencedProxyConnector(outcomes: [true, true])
+        let egressLoader = SequencedProxyEgressLoader(
+            responses: [.init(statusCode: nil, errorCode: "timed-out")],
+            delays: [.zero]
+        )
+        let clock = SequencedProxyCheckClock(offsets: [
+            .zero,
+            .zero,
+            .milliseconds(250),
+            .milliseconds(2_100),
+        ])
+        let check = SystemProxyCheck(
+            resolver: RecordingProxyResolver(resolutions: [:]),
+            connector: connector,
+            egressLoader: egressLoader,
+            timeout: .seconds(2),
+            clock: clock
+        )
+
+        let result = await check.evaluate(
+            target: target,
+            resolution: .init(candidates: [firstProxy, secondProxy], evidenceCodes: []),
+            timeout: .seconds(2)
+        )
+
+        #expect(result.status == .unavailable)
+        #expect(await connector.endpoints == [.init(host: "first.example", port: 8080)])
+        #expect(await connector.timeouts == [.seconds(1)])
+        #expect(await egressLoader.timeouts == [.milliseconds(750)])
+        #expect(result.evidence.contains(.init(code: "proxy.http.timeout", value: "expired")))
     }
 
     @Test("proxy check resolves the HTTP and HTTPS targets independently")
@@ -1298,8 +1396,10 @@ struct NetworkDiagnosticsTests {
         )
 
         let result = await check.run()
+        let resolvedURLs = await recorder.urls
 
-        #expect(await recorder.urls == [httpURL.absoluteString, httpsURL.absoluteString])
+        #expect(resolvedURLs.count == 2)
+        #expect(Set(resolvedURLs) == Set([httpURL.absoluteString, httpsURL.absoluteString]))
         #expect(result.status == .indeterminate)
         #expect(result.summary == String(
             localized: "network_diagnostics.proxy.mixed_routing.summary",
@@ -3053,6 +3153,25 @@ private actor SequencedProxyEgressLoader: ProxyEgressLoading {
             return ProxyEgressResponse(statusCode: nil, errorCode: "fixture-exhausted")
         }
         return responses[index]
+    }
+}
+
+private final class SequencedProxyCheckClock: ProxyCheckClock, @unchecked Sendable {
+    private let lock = NSLock()
+    private let instants: [ContinuousClock.Instant]
+    private var index = 0
+
+    init(offsets: [Duration]) {
+        let origin = ContinuousClock().now
+        instants = offsets.map { origin.advanced(by: $0) }
+    }
+
+    func now() -> ContinuousClock.Instant {
+        lock.lock()
+        defer { lock.unlock() }
+        precondition(index < instants.count, "Proxy test clock exhausted")
+        defer { index += 1 }
+        return instants[index]
     }
 }
 

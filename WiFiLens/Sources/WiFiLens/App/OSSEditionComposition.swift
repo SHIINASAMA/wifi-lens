@@ -41,7 +41,7 @@ enum EditionComposition {
         case .spectrum:
             OSSSpectrumCompositionView(
                 scannerViewModel: context.scannerViewModel,
-                macVendorDatabaseManager: context.macVendorDatabaseManager,
+                isVendorColumnAvailable: context.isMACVendorDatabaseAvailable,
                 selection: context.secondaryToolbarSelections.wrappedValue.spectrum
             )
             .accessibilityIdentifier("page-spectrum")
@@ -82,7 +82,7 @@ enum EditionComposition {
 
 private struct OSSSpectrumCompositionView: View {
     @Bindable var scannerViewModel: ScannerViewModel
-    @Bindable var macVendorDatabaseManager: MACVendorDatabaseManager
+    let isVendorColumnAvailable: Bool
     let selection: SecondaryToolbarItemID
 
     var body: some View {
@@ -96,7 +96,7 @@ private struct OSSSpectrumCompositionView: View {
         } else {
             ContentView(
                 viewModel: scannerViewModel,
-                macVendorDatabaseManager: macVendorDatabaseManager
+                isVendorColumnAvailable: isVendorColumnAvailable
             )
         }
     }

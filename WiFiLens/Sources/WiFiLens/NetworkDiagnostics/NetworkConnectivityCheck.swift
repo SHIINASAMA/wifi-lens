@@ -56,6 +56,39 @@ struct SystemNetworkPathChecker: NetworkPathChecking {
             return first
         }
     }
+
+    func diagnosticEvidence(timeout: Duration) async -> [NetworkDiagnosticEvidence] {
+        let monitor = NWPathMonitor()
+        let stream = AsyncStream<NWPath> { continuation in
+            monitor.pathUpdateHandler = { path in
+                continuation.yield(path)
+                continuation.finish()
+            }
+            continuation.onTermination = { _ in monitor.cancel() }
+            monitor.start(queue: DispatchQueue(label: "io.github.kaoru.wifi-lens.network-diagnostics.path-evidence"))
+        }
+        defer { monitor.cancel() }
+        for await path in stream {
+            let activeInterface = path.availableInterfaces
+                .filter { path.usesInterfaceType($0.type) }
+                .sorted { $0.name < $1.name }
+                .first
+            guard let activeInterface else { return [] }
+            var evidence = [
+                NetworkDiagnosticEvidence(code: "path.interface-type", value: activeInterface.type.pathEvidenceName),
+                NetworkDiagnosticEvidence(code: "path.interface-name", value: activeInterface.name),
+            ]
+            if ["utun", "ipsec", "ppp"].contains(where: { activeInterface.name.hasPrefix($0) }) {
+                evidence.append(.init(code: "path.routed-tunnel", value: activeInterface.name))
+            }
+            return evidence
+        }
+        return []
+    }
+}
+
+extension NetworkPathChecking {
+    func diagnosticEvidence(timeout: Duration) async -> [NetworkDiagnosticEvidence] { [] }
 }
 
 struct NetworkConnectivityCheck: DiagnosticCheck {
@@ -79,9 +112,10 @@ struct NetworkConnectivityCheck: DiagnosticCheck {
 
     func run() async -> NetworkDiagnosticResult {
         let state = await pathSource.currentState(timeout: timeout)
+        let pathEvidence = await pathSource.diagnosticEvidence(timeout: timeout)
         let interface = await interfaceSource.currentInterface()
         let gateway = await gatewayLatency.measure(routerIP: interface?.router)
-        let evidence = pathEvidence(interface: interface, gateway: gateway)
+        let evidence = pathEvidence + self.pathEvidence(interface: interface, gateway: gateway)
         return switch state {
         case .satisfied:
             NetworkDiagnosticResult(
@@ -142,5 +176,18 @@ struct NetworkConnectivityCheck: DiagnosticCheck {
             evidence.append(.init(code: "path.gateway-unavailable", value: nil))
         }
         return evidence
+    }
+}
+
+private extension NWInterface.InterfaceType {
+    var pathEvidenceName: String {
+        switch self {
+        case .wifi: "wifi"
+        case .wiredEthernet: "wiredEthernet"
+        case .cellular: "cellular"
+        case .loopback: "loopback"
+        case .other: "other"
+        @unknown default: "other"
+        }
     }
 }

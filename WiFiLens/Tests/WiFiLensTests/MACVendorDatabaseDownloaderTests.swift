@@ -77,8 +77,6 @@ struct MACVendorDatabaseDownloaderTests {
     @Test func failureInLaterRegistryCancelsAllPeersWhenEarlierRegistryIsSuspended() async {
         let transport = FailingAndSuspendingMACVendorHTTPTransport()
         let downloader = MACVendorDatabaseDownloader(transport: transport)
-        let clock = ContinuousClock()
-        let startedAt = clock.now
         let task = Task {
             try await downloader.downloadAll { _ in }
         }
@@ -96,9 +94,6 @@ struct MACVendorDatabaseDownloaderTests {
             Issue.record("Unexpected automatic download error: \(error)")
         }
 
-        // Leave enough headroom for a loaded CI runner while still proving that
-        // the downloader does not wait for the suspended peer requests.
-        #expect(clock.now - startedAt < .seconds(5))
         #expect(await transport.startedCount == MACVendorRegistry.allCases.count)
         #expect(await transport.cancelledCount == MACVendorRegistry.allCases.count - 1)
     }

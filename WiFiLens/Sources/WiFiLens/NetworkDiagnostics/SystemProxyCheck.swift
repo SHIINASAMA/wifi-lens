@@ -288,6 +288,18 @@ private extension ProxyEndpoint {
     }
 }
 
+protocol ProxyCheckClock: Sendable {
+    func now() -> ContinuousClock.Instant
+}
+
+struct ContinuousProxyCheckClock: ProxyCheckClock {
+    private let clock = ContinuousClock()
+
+    func now() -> ContinuousClock.Instant {
+        clock.now
+    }
+}
+
 struct SystemProxyCheck: DiagnosticCheck {
     let id = NetworkDiagnosticCheckID.proxy
     private static let defaultHTTPTarget = URL(
@@ -301,6 +313,7 @@ struct SystemProxyCheck: DiagnosticCheck {
     private let httpTarget: URL
     private let httpsTarget: URL
     private let timeout: Duration
+    private let clock: any ProxyCheckClock
 
     init(
         resolver: any ProxyResolving = SystemProxyResolver(),
@@ -308,7 +321,8 @@ struct SystemProxyCheck: DiagnosticCheck {
         egressLoader: any ProxyEgressLoading = SystemProxyEgressLoader(),
         httpTarget: URL = Self.defaultHTTPTarget,
         httpsTarget: URL = Self.defaultHTTPSTarget,
-        timeout: Duration = .seconds(3)
+        timeout: Duration = .seconds(3),
+        clock: any ProxyCheckClock = ContinuousProxyCheckClock()
     ) {
         self.resolver = resolver
         self.connector = connector
@@ -316,6 +330,7 @@ struct SystemProxyCheck: DiagnosticCheck {
         self.httpTarget = httpTarget
         self.httpsTarget = httpsTarget
         self.timeout = timeout
+        self.clock = clock
     }
 
     func run() async -> NetworkDiagnosticResult {
@@ -358,8 +373,7 @@ struct SystemProxyCheck: DiagnosticCheck {
         resolution: ProxyCandidateResolution,
         timeout: Duration
     ) async -> ProxyTargetRouteResult {
-        let clock = ContinuousClock()
-        let deadline = clock.now.advanced(by: timeout)
+        let deadline = clock.now().advanced(by: timeout)
         let evidencePrefix = "proxy.\(target.scheme?.lowercased() ?? "unknown")"
         var evidence = resolution.evidenceCodes.map {
             NetworkDiagnosticEvidence(code: "\(evidencePrefix).resolution", value: $0)
@@ -397,7 +411,7 @@ struct SystemProxyCheck: DiagnosticCheck {
                     stage: "candidate"
                 )
             }
-            let attemptStart = clock.now
+            let attemptStart = clock.now()
             let remaining = attemptStart.duration(to: deadline)
             guard remaining > .zero else {
                 evidence.append(.init(code: "\(evidencePrefix).timeout", value: "expired"))
@@ -450,7 +464,7 @@ struct SystemProxyCheck: DiagnosticCheck {
             }
             evidence.append(.init(code: "\(evidencePrefix).endpoint-status", value: "available"))
 
-            let egressTimeout = clock.now.duration(to: attemptDeadline)
+            let egressTimeout = clock.now().duration(to: attemptDeadline)
             guard egressTimeout > .zero else {
                 evidence.append(.init(code: "\(evidencePrefix).authentication-status", value: "not-tested"))
                 evidence.append(.init(code: "\(evidencePrefix).egress-status", value: "timed-out"))
