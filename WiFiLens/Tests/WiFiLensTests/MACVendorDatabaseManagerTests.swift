@@ -926,12 +926,16 @@ private func fourFixtureURLs() -> [URL] {
     MACVendorRegistry.allCases.map { URL(fileURLWithPath: "/tmp/\($0.rawValue).csv") }
 }
 
+/// Polls an asynchronous condition with a generous budget. These tests await
+/// cross-actor handshakes (main-actor manager → fake service actor → back) that can
+/// take well over a second under full-suite parallel load; the original 1000 × 1ms
+/// budget timed out intermittently on busy machines.
 private func waitUntil(
     _ condition: @escaping @Sendable () async -> Bool
 ) async {
     for _ in 0..<1_000 {
         if await condition() { return }
-        try? await Task.sleep(for: .milliseconds(1))
+        try? await Task.sleep(for: .milliseconds(5))
     }
     Issue.record("Timed out waiting for asynchronous test state")
 }
