@@ -364,6 +364,146 @@ struct TimelineSkeletonView: View {
     }
 }
 
+struct StatisticsSkeletonView: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            summaryCard
+            metricGrid
+            distributionCard
+        }
+    }
+
+    private var summaryCard: some View {
+        card {
+            VStack(alignment: .leading, spacing: 8) {
+                line(widthRatio: 0.30, height: 10, opacity: 0.28)
+                line(widthRatio: 0.46, height: 8, opacity: 0.16)
+                line(widthRatio: 0.38, height: 7, opacity: 0.12)
+            }
+        }
+    }
+
+    private var metricGrid: some View {
+        HStack(spacing: 12) {
+            metricCell
+            metricCell
+            metricCell
+        }
+    }
+
+    private var metricCell: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            line(widthRatio: 0.55, height: 7, opacity: 0.14)
+            line(widthRatio: 0.40, height: 12, opacity: 0.30)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(cardShape)
+    }
+
+    private var distributionCard: some View {
+        card {
+            VStack(alignment: .leading, spacing: 10) {
+                line(widthRatio: 0.26, height: 10, opacity: 0.28)
+                line(widthRatio: 0.86, height: 8, opacity: 0.16)
+                line(widthRatio: 0.68, height: 8, opacity: 0.12)
+                line(widthRatio: 0.74, height: 8, opacity: 0.10)
+            }
+        }
+    }
+
+    private func card(@ViewBuilder content: () -> some View) -> some View {
+        content()
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(cardShape)
+    }
+
+    private var cardShape: some View {
+        RoundedRectangle(cornerRadius: 12)
+            .fill(Color.primary.opacity(0.04))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+            )
+    }
+
+    private func line(widthRatio: CGFloat, height: CGFloat, opacity: Double) -> some View {
+        GeometryReader { geometry in
+            RoundedRectangle(cornerRadius: 3)
+                .fill(Color.primary.opacity(opacity))
+                .frame(width: geometry.size.width * widthRatio, height: height)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(height: height)
+    }
+}
+
+struct InsightsSkeletonView: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            statusCard
+            insightCard(iconOpacity: 0.28)
+            insightCard(iconOpacity: 0.20)
+        }
+    }
+
+    private var statusCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            line(widthRatio: 0.34, height: 10, opacity: 0.28)
+            line(widthRatio: 0.60, height: 8, opacity: 0.16)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(cardShape)
+    }
+
+    private func insightCard(iconOpacity: Double) -> some View {
+        HStack(spacing: 12) {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.primary.opacity(iconOpacity))
+                .frame(width: 36, height: 36)
+
+            VStack(alignment: .leading, spacing: 6) {
+                line(widthRatio: 0.50, height: 9, opacity: 0.26)
+                line(widthRatio: 0.70, height: 7, opacity: 0.14)
+            }
+
+            Spacer(minLength: 8)
+
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color.primary.opacity(0.10))
+                .frame(width: 56, height: 22)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6)
+                        .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                )
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(cardShape)
+    }
+
+    private var cardShape: some View {
+        RoundedRectangle(cornerRadius: 12)
+            .fill(Color.primary.opacity(0.04))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+            )
+    }
+
+    private func line(widthRatio: CGFloat, height: CGFloat, opacity: Double) -> some View {
+        GeometryReader { geometry in
+            RoundedRectangle(cornerRadius: 3)
+                .fill(Color.primary.opacity(opacity))
+                .frame(width: geometry.size.width * widthRatio, height: height)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(height: height)
+    }
+}
+
 struct RecordingSkeletonView: View {
     var body: some View {
         VStack(spacing: 0) {

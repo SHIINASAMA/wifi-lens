@@ -54,6 +54,22 @@ enum EditionComposition {
                 customSkeleton: { TimelineSkeletonView() }
             )
             .accessibilityIdentifier("page-timeline")
+        case .statistics:
+            ProFeaturePlaceholderView(
+                featureName: String(localized: "pro.statistics.title", comment: "Pro Statistics feature title"),
+                featureDescription: String(localized: "pro.statistics.description", comment: "Pro Statistics feature description"),
+                featureIcon: SidebarPage.statistics.icon,
+                customSkeleton: { StatisticsSkeletonView() }
+            )
+            .accessibilityIdentifier("page-statistics")
+        case .insights:
+            ProFeaturePlaceholderView(
+                featureName: String(localized: "pro.insights.title", comment: "Pro Insights feature title"),
+                featureDescription: String(localized: "pro.insights.description", comment: "Pro Insights feature description"),
+                featureIcon: SidebarPage.insights.icon,
+                customSkeleton: { InsightsSkeletonView() }
+            )
+            .accessibilityIdentifier("page-insights")
         default:
             EmptyView()
         }

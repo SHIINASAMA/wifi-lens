@@ -129,6 +129,129 @@ struct RuntimeTests {
         #expect(store.currentStatus == status)
     }
 
+    @Test("scan generation delivers lifecycle start before work and stop exactly once")
+    func observationLifecycleOrder() async {
+        let source = ScriptedScanSource()
+        let consumer = LifecycleRecordingConsumer()
+        let dates = LockedDateSequence([10, 20, 30])
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(), scanSource: source,
+            now: { dates.next() }
+        )
+        runtime.addConsumer(consumer)
+
+        await runtime.startScanning(configuration: .init(scanInterval: .seconds(4))) { _ in }
+        #expect(consumer.events == [.started(date: Date(timeIntervalSince1970: 10), interval: .seconds(4))])
+        await runtime.stopScanning()
+        await runtime.stopScanning()
+
+        #expect(consumer.events == [
+            .started(date: Date(timeIntervalSince1970: 10), interval: .seconds(4)),
+            .stopped(date: Date(timeIntervalSince1970: 20)),
+        ])
+    }
+
+    @Test("restart closes the old generation before starting the new interval")
+    func observationLifecycleRestartOrdering() async {
+        let source = ScriptedScanSource()
+        let consumer = LifecycleRecordingConsumer()
+        let dates = LockedDateSequence([10, 20, 30, 40])
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(), scanSource: source,
+            now: { dates.next() }
+        )
+        runtime.addConsumer(consumer)
+
+        await runtime.startScanning(configuration: .init(scanInterval: .seconds(4))) { _ in }
+        await runtime.restartScanning(configuration: .init(scanInterval: .seconds(9)))
+        await runtime.stopScanning()
+
+        #expect(consumer.events == [
+            .started(date: Date(timeIntervalSince1970: 10), interval: .seconds(4)),
+            .stopped(date: Date(timeIntervalSince1970: 20)),
+            .started(date: Date(timeIntervalSince1970: 30), interval: .seconds(9)),
+            .stopped(date: Date(timeIntervalSince1970: 40)),
+        ])
+    }
+
+    @Test("publication rejection closes the active observation generation")
+    func publicationRejectionStopsObservationLifecycle() async {
+        let source = ScriptedScanSource()
+        let consumer = LifecycleRecordingConsumer()
+        let dates = LockedDateSequence([10, 20])
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(), scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource(),
+            now: { dates.next() }
+        )
+        runtime.addConsumer(consumer)
+        await runtime.startScanning(configuration: .testDefault, isPublicationEligible: { false }) { _ in }
+        await source.yield(.networks([]))
+        await runtime.drainRawCyclesForTesting()
+
+        #expect(consumer.events == [
+            .started(date: Date(timeIntervalSince1970: 10), interval: .seconds(3)),
+            .stopped(date: Date(timeIntervalSince1970: 20)),
+        ])
+    }
+
+    @Test("all consumers receive one shared lifecycle timestamp")
+    func observationLifecycleTimestampIsShared() async {
+        let source = ScriptedScanSource()
+        let first = LifecycleRecordingConsumer()
+        let second = LifecycleRecordingConsumer()
+        let dates = LockedDateSequence([10, 11, 20])
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(), scanSource: source,
+            now: { dates.next() }
+        )
+        runtime.addConsumer(first)
+        runtime.addConsumer(second)
+        await runtime.startScanning(configuration: .testDefault) { _ in }
+
+        #expect(first.events.first == second.events.first)
+        #expect(first.events.first == .started(date: Date(timeIntervalSince1970: 10), interval: .seconds(3)))
+        await runtime.stopScanning()
+    }
+
+    @Test("synchronous scan emission cannot overtake lifecycle start")
+    func synchronousEmissionFollowsLifecycleStart() async {
+        let source = ScriptedScanSource()
+        await source.setSynchronousStartEvent(.networks([]))
+        let consumer = LifecycleRecordingConsumer()
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(), scanSource: source,
+            interfaceSource: ImmediateInterfaceSnapshotSource(),
+            now: { Date(timeIntervalSince1970: 10) }
+        )
+        runtime.addConsumer(consumer)
+        await runtime.startScanning(configuration: .testDefault) { _ in }
+        await runtime.drainRawCyclesForTesting()
+
+        #expect(consumer.events.prefix(2) == [
+            .started(date: Date(timeIntervalSince1970: 10), interval: .seconds(3)),
+            .observation,
+        ])
+        await runtime.stopScanning()
+    }
+
+    @Test("start superseded during capability lookup emits no lifecycle")
+    func supersededCapabilityLookupHasNoLifecycle() async {
+        let source = ScriptedScanSource()
+        await source.suspendNextCapabilityLookup()
+        let consumer = LifecycleRecordingConsumer()
+        let runtime = WiFiObservationRuntime(store: WiFiObservationStore(), scanSource: source)
+        runtime.addConsumer(consumer)
+        let start = Task { @MainActor in await runtime.startScanning(configuration: .testDefault) { _ in } }
+        await source.waitUntilCapabilityLookupEntered()
+        let stop = Task { @MainActor in await runtime.stopScanning() }
+        await source.releaseCapabilityLookup()
+        await start.value
+        await stop.value
+
+        #expect(consumer.events.isEmpty)
+    }
+
     @Test("runtime exposes scan cadence energy diagnostics")
     func scanCadenceDiagnosticsAreQueryable() async {
         let source = ScriptedScanSource()
@@ -1310,6 +1433,7 @@ private actor ScriptedScanSource: WiFiScanStreaming {
     private var hasCompletedStop = false
     private var stopCompletedContinuation: CheckedContinuation<Void, Never>?
     private var cadenceSkippedSlotCount: UInt64 = 0
+    private var synchronousStartEvent: WiFiScanEvent?
 
     func startScanning(
         interval: Duration,
@@ -1317,6 +1441,9 @@ private actor ScriptedScanSource: WiFiScanStreaming {
     ) async {
         requestedIntervals.append(interval)
         handlers[UUID()] = onEvent
+        if let synchronousStartEvent {
+            await onEvent(synchronousStartEvent)
+        }
     }
 
     func stopScanning() async {
@@ -1374,6 +1501,10 @@ private actor ScriptedScanSource: WiFiScanStreaming {
 
     func setCadenceSkippedSlotCount(_ count: UInt64) {
         cadenceSkippedSlotCount = count
+    }
+
+    func setSynchronousStartEvent(_ event: WiFiScanEvent) {
+        synchronousStartEvent = event
     }
 
     func yield(_ event: WiFiScanEvent) async {
@@ -1792,6 +1923,44 @@ private final class CapturingObservationConsumer: WiFiObservationConsuming {
 
     func consume(_ observation: WiFiObservation) async throws {
         observations.append(observation)
+    }
+}
+
+private enum RecordedObservationLifecycleEvent: Equatable {
+    case started(date: Date, interval: Duration)
+    case observation
+    case stopped(date: Date)
+}
+
+@MainActor
+private final class LifecycleRecordingConsumer: WiFiObservationConsuming {
+    private(set) var events: [RecordedObservationLifecycleEvent] = []
+
+    func consume(_ observation: WiFiObservation) async throws {
+        _ = observation
+        events.append(.observation)
+    }
+
+    func consumeLifecycle(_ event: WiFiObservationLifecycleEvent) async throws {
+        switch event {
+        case .started(let date, let expectedInterval):
+            events.append(.started(date: date, interval: expectedInterval))
+        case .stopped(let date):
+            events.append(.stopped(date: date))
+        }
+    }
+}
+
+private final class LockedDateSequence: @unchecked Sendable {
+    private let lock = NSLock()
+    private var values: [Date]
+
+    init(_ seconds: [TimeInterval]) {
+        values = seconds.map(Date.init(timeIntervalSince1970:))
+    }
+
+    func next() -> Date {
+        lock.withLock { values.isEmpty ? Date(timeIntervalSince1970: -1) : values.removeFirst() }
     }
 }
 

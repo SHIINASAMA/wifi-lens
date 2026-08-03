@@ -315,19 +315,33 @@ private struct AppRootView: View {
             installMainWindowOpenAction {
                 openWindow(id: WiFiLensApp.mainWindowSceneID)
             }
-            EditionComposition.startLifecycle(observationRuntime: viewModel.observationRuntime)
-            await viewModel.start()
-            roamingViewModel.handleWiFiPowerStateChange(viewModel.wifiPowerState)
+            // Under `xcodebuild test` the app process hosts the unit test
+            // bundle, so the real scanner must not start: CoreWLAN and
+            // NetworkInfoService are synchronous XPC calls that can stall the
+            // test process. Unit tests inject their own stores and fakes.
+            if !ProcessInfo.processInfo.isRunningUnderTestHost {
+                EditionComposition.startLifecycle(observationRuntime: viewModel.observationRuntime)
+                await viewModel.start()
+                roamingViewModel.handleWiFiPowerStateChange(viewModel.wifiPowerState)
+            }
             updateMCPServer()
         }
         .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .active {
+            if newPhase == .active, !ProcessInfo.processInfo.isRunningUnderTestHost {
                 Task { await viewModel.handleSceneDidBecomeActive() }
             }
         }
     }
 }
 
+private extension ProcessInfo {
+    /// True while the app process hosts a unit test bundle. `xcodebuild test`
+    /// sets this environment variable for the injected test host, so app
+    /// startup must not begin real scanning or observation in that process.
+    var isRunningUnderTestHost: Bool {
+        environment["XCTestConfigurationFilePath"] != nil
+    }
+}
 
 private struct WindowAccessor: NSViewRepresentable {
     let defaultSize: CGSize
