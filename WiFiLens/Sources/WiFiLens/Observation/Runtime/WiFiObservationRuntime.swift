@@ -1,8 +1,18 @@
 import Foundation
 
+enum WiFiObservationLifecycleEvent: Sendable {
+    case started(at: Date, expectedInterval: Duration)
+    case stopped(at: Date)
+}
+
 @MainActor
 protocol WiFiObservationConsuming: AnyObject {
     func consume(_ observation: WiFiObservation) async throws
+    func consumeLifecycle(_ event: WiFiObservationLifecycleEvent) async throws
+}
+
+extension WiFiObservationConsuming {
+    func consumeLifecycle(_ event: WiFiObservationLifecycleEvent) async throws { _ = event }
 }
 
 struct ObservationConsumerDiagnostics: Equatable, Sendable {
@@ -58,12 +68,14 @@ final class WiFiObservationRuntime {
     private var pendingRawCycle: RawCycleAdmission?
     private var rawCycleReplacementCount: UInt64 = 0
     private var activeScanGeneration: UUID?
+    private var activeLifecycleGeneration: UUID?
     private var outputProjection: (@MainActor (WiFiObservationScanOutput) -> Void)?
     private var requestedOutputProjection: (@MainActor (WiFiObservationScanOutput) -> Void)?
     private var publicationEligibility: (@MainActor () -> Bool)?
     private var requestedPublicationEligibility: (@MainActor () -> Bool)?
     private var latestLifecycleRequestID: UInt64 = 0
     private var lifecycleCommandTail: Task<Void, Never>?
+    private let now: @Sendable () -> Date
 #if DEBUG
     var onActiveScanStoppedForTesting: (@MainActor () -> Void)?
     var onConsumerDrainStartedForTesting: (@MainActor () -> Void)?
@@ -79,12 +91,14 @@ final class WiFiObservationRuntime {
         store: WiFiObservationStore = .shared,
         pipeline: any WiFiObservationPipelining = WiFiObservationPipeline(),
         scanSource: any WiFiScanStreaming = WiFiScanner(),
-        interfaceSource: any NetworkInterfaceSnapshotSourcing = SystemNetworkInterfaceSnapshotSource()
+        interfaceSource: any NetworkInterfaceSnapshotSourcing = SystemNetworkInterfaceSnapshotSource(),
+        now: @escaping @Sendable () -> Date = { Date() }
     ) {
         self.store = store
         self.pipeline = pipeline
         self.scanSource = scanSource
         self.interfaceSource = interfaceSource
+        self.now = now
     }
 
     func addConsumer(_ consumer: any WiFiObservationConsuming) {
@@ -167,11 +181,10 @@ final class WiFiObservationRuntime {
         requestedPublicationEligibility = nil
         let command = enqueueLifecycleCommand { [weak self] _ in
             guard let self else { return }
-            await self.stopActiveScan(stopSource: hadRequestedScan)
-#if DEBUG
-            self.onActiveScanStoppedForTesting?()
-#endif
-            await self.drainConsumers()
+            await self.stopActiveScan(
+                stopSource: hadRequestedScan,
+                notifyScanStoppedForTesting: true
+            )
             self.outputProjection = nil
             self.publicationEligibility = nil
         }
@@ -207,8 +220,13 @@ final class WiFiObservationRuntime {
         )
         let generation = UUID()
         activeScanGeneration = generation
+        activeLifecycleGeneration = generation
         outputProjection = onOutput
         publicationEligibility = isPublicationEligible
+        let startedAt = now()
+        for worker in workers.values {
+            await worker.sessionStarted(at: startedAt, expectedInterval: configuration.scanInterval)
+        }
         await scanSource.startScanning(interval: configuration.scanInterval) { [weak self] event in
             await self?.admitRawCycle(RawCycleAdmission(
                 event: event,
@@ -219,6 +237,8 @@ final class WiFiObservationRuntime {
         }
         guard isLatestLifecycleRequest(requestID) else {
             await scanSource.stopScanning()
+            await drainConsumers()
+            await finishLifecycleIfOwned(generation, at: now())
             return
         }
     }
@@ -291,7 +311,10 @@ final class WiFiObservationRuntime {
         guard activeScanGeneration == generation, !Task.isCancelled else { return false }
         guard publicationEligibility?() != false else {
             clearPublicationRequestAfterRejection()
+            activeScanGeneration = nil
             await scanSource.stopScanning()
+            await drainConsumers()
+            await finishLifecycleIfOwned(generation, at: now())
             return false
         }
         store.apply(cycle.observation)
@@ -315,7 +338,11 @@ final class WiFiObservationRuntime {
         publicationEligibility = nil
     }
 
-    private func stopActiveScan(stopSource: Bool) async {
+    private func stopActiveScan(
+        stopSource: Bool,
+        notifyScanStoppedForTesting: Bool = false
+    ) async {
+        let lifecycleGeneration = activeLifecycleGeneration
         let task = rawCycleTask
         rawCycleTask = nil
         pendingRawCycle = nil
@@ -326,6 +353,21 @@ final class WiFiObservationRuntime {
             await scanSource.stopScanning()
         }
         await task?.value
+#if DEBUG
+        if notifyScanStoppedForTesting {
+            onActiveScanStoppedForTesting?()
+        }
+#endif
+        await drainConsumers()
+        if let lifecycleGeneration {
+            await finishLifecycleIfOwned(lifecycleGeneration, at: now())
+        }
+    }
+
+    private func finishLifecycleIfOwned(_ generation: UUID, at date: Date) async {
+        guard activeLifecycleGeneration == generation else { return }
+        activeLifecycleGeneration = nil
+        for worker in workers.values { await worker.sessionStopped(at: date) }
     }
 
     private func ownsScanLifecycle(_ generation: UUID) -> Bool {
@@ -389,6 +431,24 @@ private final class ObservationConsumerWorker {
             let waiters = drainWaiters
             drainWaiters.removeAll()
             waiters.forEach { $0.resume() }
+        }
+    }
+
+    func sessionStarted(at date: Date, expectedInterval: Duration) async {
+        do {
+            try await consumer.consumeLifecycle(.started(at: date, expectedInterval: expectedInterval))
+        } catch {
+            failureCount += 1
+            AppLogger.general.error("Observation consumer lifecycle start failed: \(String(describing: error))")
+        }
+    }
+
+    func sessionStopped(at date: Date) async {
+        do {
+            try await consumer.consumeLifecycle(.stopped(at: date))
+        } catch {
+            failureCount += 1
+            AppLogger.general.error("Observation consumer lifecycle stop failed: \(String(describing: error))")
         }
     }
 

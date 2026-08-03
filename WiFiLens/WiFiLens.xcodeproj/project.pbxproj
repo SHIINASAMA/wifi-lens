@@ -291,8 +291,29 @@
 		EC20000000000000000000008 /* ProSettingsComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000007 /* ProSettingsComposition.swift */; };
 		EC2000000000000000000000A /* ProMenuBarComposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000009 /* ProMenuBarComposition.swift */; };
 		EC2000000000000000000000C /* ProSpectrumCompositionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2000000000000000000000D /* ProSpectrumCompositionView.swift */; };
+		EC20000000000000000000010 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2000000000000000000000F /* StatisticsView.swift */; };
+		EC20000000000000000000012 /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000011 /* InsightsView.swift */; };
+		EC20000000000000000000014 /* AnalysisDataReadiness.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000013 /* AnalysisDataReadiness.swift */; };
+		EC20000000000000000000016 /* TimelineStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000017 /* TimelineStatistics.swift */; };
+		EC20000000000000000000018 /* StatisticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000019 /* StatisticsViewModel.swift */; };
+		EC2000000000000000000001A /* Insight.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2000000000000000000001B /* Insight.swift */; };
+		EC2000000000000000000001C /* InsightRuleEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2000000000000000000001D /* InsightRuleEngine.swift */; };
+		EC2000000000000000000001E /* InitialInsightRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2000000000000000000001F /* InitialInsightRules.swift */; };
+		EC20000000000000000000020 /* InsightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000021 /* InsightsViewModel.swift */; };
 		EC20000000000000000000002 /* EditionCompositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000001 /* EditionCompositionTests.swift */; };
 		E30000000000000000000002 /* WiFiObservationEventSQLiteStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000001 /* WiFiObservationEventSQLiteStoreTests.swift */; };
+		EA1000000000000000000002 /* AnalysisScopeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1000000000000000000001 /* AnalysisScopeTests.swift */; };
+		EA1000000000000000000004 /* AnalysisScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1000000000000000000003 /* AnalysisScope.swift */; };
+		EB2000000000000000000002 /* AnalysisSchemaV3MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2000000000000000000001 /* AnalysisSchemaV3MigrationTests.swift */; };
+		EB2000000000000000000004 /* released-v1.5.0-schema-v2.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = EB2000000000000000000003 /* released-v1.5.0-schema-v2.sqlite */; };
+		EB3000000000000000000002 /* AnalysisObservationCoverageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB3000000000000000000001 /* AnalysisObservationCoverageTests.swift */; };
+		EF1000000000000000000002 /* InsightModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF1000000000000000000001 /* InsightModelTests.swift */; };
+		EF2000000000000000000002 /* InsightRuleValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF2000000000000000000001 /* InsightRuleValidationTests.swift */; };
+		ED1000000000000000000002 /* AnalysisSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED1000000000000000000001 /* AnalysisSnapshotTests.swift */; };
+		ED2000000000000000000002 /* AnalysisNetworkScopeIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED2000000000000000000001 /* AnalysisNetworkScopeIntegrationTests.swift */; };
+		ED3000000000000000000002 /* AnalysisWorkspaceScenarioValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED3000000000000000000001 /* AnalysisWorkspaceScenarioValidationTests.swift */; };
+		EB4000000000000000000002 /* AnalysisObservationCoverage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4000000000000000000001 /* AnalysisObservationCoverage.swift */; };
+		ED1000000000000000000004 /* AnalysisSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED1000000000000000000003 /* AnalysisSnapshot.swift */; };
 		E20000000000000000000002 /* WiFiObservationEventJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000001 /* WiFiObservationEventJournal.swift */; };
 		FB92F9212FBE208500BCEC67 /* DebugChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F91F2FBE208500BCEC67 /* DebugChartView.swift */; };
 		FB92F9232FBE208500BCEC67 /* DebugContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */; };
@@ -604,8 +625,29 @@
 		EC20000000000000000000007 /* ProSettingsComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProSettingsComposition.swift; sourceTree = "<group>"; };
 		EC20000000000000000000009 /* ProMenuBarComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProMenuBarComposition.swift; sourceTree = "<group>"; };
 		EC2000000000000000000000D /* ProSpectrumCompositionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProSpectrumCompositionView.swift; sourceTree = "<group>"; };
+		EC2000000000000000000000F /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
+		EC20000000000000000000011 /* InsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsView.swift; sourceTree = "<group>"; };
+		EC20000000000000000000013 /* AnalysisDataReadiness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisDataReadiness.swift; sourceTree = "<group>"; };
+		EC20000000000000000000017 /* TimelineStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineStatistics.swift; sourceTree = "<group>"; };
+		EC20000000000000000000019 /* StatisticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewModel.swift; sourceTree = "<group>"; };
+		EC2000000000000000000001B /* Insight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Insight.swift; sourceTree = "<group>"; };
+		EC2000000000000000000001D /* InsightRuleEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightRuleEngine.swift; sourceTree = "<group>"; };
+		EC2000000000000000000001F /* InitialInsightRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialInsightRules.swift; sourceTree = "<group>"; };
+		EC20000000000000000000021 /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
 		EC20000000000000000000001 /* EditionCompositionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditionCompositionTests.swift; sourceTree = "<group>"; };
 		E30000000000000000000001 /* WiFiObservationEventSQLiteStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventSQLiteStoreTests.swift; sourceTree = "<group>"; };
+		EA1000000000000000000001 /* AnalysisScopeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisScopeTests.swift; sourceTree = "<group>"; };
+		EA1000000000000000000003 /* AnalysisScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisScope.swift; sourceTree = "<group>"; };
+		EB2000000000000000000001 /* AnalysisSchemaV3MigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisSchemaV3MigrationTests.swift; sourceTree = "<group>"; };
+		EB2000000000000000000003 /* released-v1.5.0-schema-v2.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = "released-v1.5.0-schema-v2.sqlite"; sourceTree = "<group>"; };
+		EB3000000000000000000001 /* AnalysisObservationCoverageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisObservationCoverageTests.swift; sourceTree = "<group>"; };
+		EF1000000000000000000001 /* InsightModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightModelTests.swift; sourceTree = "<group>"; };
+		EF2000000000000000000001 /* InsightRuleValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightRuleValidationTests.swift; sourceTree = "<group>"; };
+		ED1000000000000000000001 /* AnalysisSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisSnapshotTests.swift; sourceTree = "<group>"; };
+		ED2000000000000000000001 /* AnalysisNetworkScopeIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisNetworkScopeIntegrationTests.swift; sourceTree = "<group>"; };
+		ED3000000000000000000001 /* AnalysisWorkspaceScenarioValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisWorkspaceScenarioValidationTests.swift; sourceTree = "<group>"; };
+		EB4000000000000000000001 /* AnalysisObservationCoverage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisObservationCoverage.swift; sourceTree = "<group>"; };
+		ED1000000000000000000003 /* AnalysisSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisSnapshot.swift; sourceTree = "<group>"; };
 		E20000000000000000000001 /* WiFiObservationEventJournal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventJournal.swift; sourceTree = "<group>"; };
 		FB92F91F2FBE208500BCEC67 /* DebugChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugChartView.swift; sourceTree = "<group>"; };
 		FB92F9222FBE208500BCEC67 /* DebugContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugContainerView.swift; sourceTree = "<group>"; };
@@ -1060,6 +1102,15 @@
 		FB8FCB1B2FF6C4E300BB2929 /* WiFiLensProTests */ = {
 			isa = PBXGroup;
 			children = (
+				EA1000000000000000000001 /* AnalysisScopeTests.swift */,
+				EB2000000000000000000001 /* AnalysisSchemaV3MigrationTests.swift */,
+				EB3000000000000000000001 /* AnalysisObservationCoverageTests.swift */,
+				ED1000000000000000000001 /* AnalysisSnapshotTests.swift */,
+				ED2000000000000000000001 /* AnalysisNetworkScopeIntegrationTests.swift */,
+				ED3000000000000000000001 /* AnalysisWorkspaceScenarioValidationTests.swift */,
+				EF1000000000000000000001 /* InsightModelTests.swift */,
+				EF2000000000000000000001 /* InsightRuleValidationTests.swift */,
+				EB2000000000000000000005 /* Fixtures */,
 				EC20000000000000000000001 /* EditionCompositionTests.swift */,
 				E10000000000000000000001 /* EventJournalTests.swift */,
 				E30000000000000000000001 /* WiFiObservationEventSQLiteStoreTests.swift */,
@@ -1072,6 +1123,14 @@
 			name = WiFiLensProTests;
 			path = ../Pro/Tests/WiFiLensProTests;
 			sourceTree = SOURCE_ROOT;
+		};
+		EB2000000000000000000005 /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				EB2000000000000000000003 /* released-v1.5.0-schema-v2.sqlite */,
+			);
+			path = Fixtures;
+			sourceTree = "<group>";
 		};
 		FBA000060000000000000006 /* WiFiLensUITests */ = {
 			isa = PBXGroup;
@@ -1139,6 +1198,7 @@
 			isa = PBXGroup;
 			children = (
 				EC2000000000000000000000B /* App */,
+				EC20000000000000000000015 /* Analysis */,
 				FBD0A4762FE5C06000000023 /* Events */,
 				A71200010000000000000001 /* Presentation */,
 				FBD0A4842FE5C06000000031 /* Timeline */,
@@ -1159,8 +1219,27 @@
 				EC20000000000000000000007 /* ProSettingsComposition.swift */,
 				EC20000000000000000000009 /* ProMenuBarComposition.swift */,
 				EC2000000000000000000000D /* ProSpectrumCompositionView.swift */,
+				EC2000000000000000000000F /* StatisticsView.swift */,
+				EC20000000000000000000019 /* StatisticsViewModel.swift */,
+				EC20000000000000000000011 /* InsightsView.swift */,
+				EC20000000000000000000021 /* InsightsViewModel.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		EC20000000000000000000015 /* Analysis */ = {
+			isa = PBXGroup;
+			children = (
+				EA1000000000000000000003 /* AnalysisScope.swift */,
+				EB4000000000000000000001 /* AnalysisObservationCoverage.swift */,
+				EC20000000000000000000013 /* AnalysisDataReadiness.swift */,
+				EC20000000000000000000017 /* TimelineStatistics.swift */,
+				ED1000000000000000000003 /* AnalysisSnapshot.swift */,
+				EC2000000000000000000001B /* Insight.swift */,
+				EC2000000000000000000001D /* InsightRuleEngine.swift */,
+				EC2000000000000000000001F /* InitialInsightRules.swift */,
+			);
+			path = Analysis;
 			sourceTree = "<group>";
 		};
 		FBD0A4562FE5C06000000003 /* MenuBar */ = {
@@ -1592,6 +1671,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EB2000000000000000000004 /* released-v1.5.0-schema-v2.sqlite in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1840,6 +1920,18 @@
 				EC20000000000000000000008 /* ProSettingsComposition.swift in Sources */,
 				EC2000000000000000000000A /* ProMenuBarComposition.swift in Sources */,
 				EC2000000000000000000000C /* ProSpectrumCompositionView.swift in Sources */,
+				EC20000000000000000000010 /* StatisticsView.swift in Sources */,
+				EC20000000000000000000012 /* InsightsView.swift in Sources */,
+				EA1000000000000000000004 /* AnalysisScope.swift in Sources */,
+				EB4000000000000000000002 /* AnalysisObservationCoverage.swift in Sources */,
+				EC20000000000000000000014 /* AnalysisDataReadiness.swift in Sources */,
+				EC20000000000000000000016 /* TimelineStatistics.swift in Sources */,
+				ED1000000000000000000004 /* AnalysisSnapshot.swift in Sources */,
+				EC20000000000000000000018 /* StatisticsViewModel.swift in Sources */,
+				EC2000000000000000000001A /* Insight.swift in Sources */,
+				EC2000000000000000000001C /* InsightRuleEngine.swift in Sources */,
+				EC2000000000000000000001E /* InitialInsightRules.swift in Sources */,
+				EC20000000000000000000020 /* InsightsViewModel.swift in Sources */,
 				FB1E32482FC7316C009D1BDC /* BluetoothPermissionManager.swift in Sources */,
 				FB1E32492FC7316C009D1BDC /* BLEChannel.swift in Sources */,
 				FB1E324A2FC7316C009D1BDC /* BLEAdvertisementEvent.swift in Sources */,
@@ -1979,6 +2071,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA1000000000000000000002 /* AnalysisScopeTests.swift in Sources */,
+				EB2000000000000000000002 /* AnalysisSchemaV3MigrationTests.swift in Sources */,
+				EB3000000000000000000002 /* AnalysisObservationCoverageTests.swift in Sources */,
+				ED1000000000000000000002 /* AnalysisSnapshotTests.swift in Sources */,
+				ED2000000000000000000002 /* AnalysisNetworkScopeIntegrationTests.swift in Sources */,
+				ED3000000000000000000002 /* AnalysisWorkspaceScenarioValidationTests.swift in Sources */,
+				EF1000000000000000000002 /* InsightModelTests.swift in Sources */,
+				EF2000000000000000000002 /* InsightRuleValidationTests.swift in Sources */,
 				EC20000000000000000000002 /* EditionCompositionTests.swift in Sources */,
 				E10000000000000000000002 /* EventJournalTests.swift in Sources */,
 				E30000000000000000000002 /* WiFiObservationEventSQLiteStoreTests.swift in Sources */,

@@ -105,18 +105,40 @@ struct MenuBarWindowBehaviorTests {
         #expect(!SidebarPage.timeline.requiresWiFi)
     }
 
+    @Test("Analysis routes have stable identities and order")
+    func analysisRoutesHaveStableIdentitiesAndOrder() {
+        #expect(SidebarPage.statistics.rawValue == "statistics")
+        #expect(SidebarPage.insights.rawValue == "insights")
+        #expect(SidebarPage.analysisPages == [.timeline, .statistics, .insights])
+        #expect(SidebarPage.timeline.rawValue == "timeline")
+        #expect(!SidebarPage.statistics.requiresLocationAuthorization)
+        #expect(!SidebarPage.statistics.requiresWiFi)
+        #expect(!SidebarPage.insights.requiresLocationAuthorization)
+        #expect(!SidebarPage.insights.requiresWiFi)
+    }
+
     @Test("Timeline badge reflects edition semantics")
     func timelineBadgeReflectsEdition() {
         #expect(SidebarPage.timelineBadgeStyle(for: .oss) == .pro)
         #expect(SidebarPage.timelineBadgeStyle(for: .pro) == .preview)
-        #expect(SidebarPage.timeline.badgeStyle == SidebarPage.timelineBadgeStyle(for: .current))
+        #expect(SidebarPage.timeline.badgeStyle == nil)
+    }
+
+    @Test("Analysis group badge reflects Timeline preview semantics")
+    func analysisBadgesReflectTimelinePreviewSemantics() {
+        for page in [SidebarPage.timeline, .statistics, .insights] {
+            #expect(page.badgeStyle == nil)
+        }
+        #expect(SidebarSection.analysis.badgeStyle == SidebarPage.analysisBadgeStyle(for: .current))
+        #expect(SidebarPage.analysisBadgeStyle(for: .oss) == .pro)
+        #expect(SidebarPage.analysisBadgeStyle(for: .pro) == .preview)
     }
 
     @Test("sidebar section titles use localized keys")
     func sidebarSectionTitlesUseLocalizedKeys() {
         #expect(SidebarSection.overview.localizationKey == "sidebar.section.overview")
         #expect(SidebarSection.tools.localizationKey == "sidebar.section.tools")
-        #expect(SidebarSection.insights.localizationKey == "sidebar.section.insights")
+        #expect(SidebarSection.analysis.localizationKey == "sidebar.section.analysis")
         #expect(SidebarSection.debug.localizationKey == "sidebar.section.debug")
         #expect(SidebarSection.settings.localizationKey == "sidebar.section.settings")
     }

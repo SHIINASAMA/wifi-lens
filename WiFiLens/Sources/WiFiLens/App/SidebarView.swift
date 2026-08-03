@@ -9,6 +9,8 @@ enum SidebarPage: String, CaseIterable {
     case roaming
     case bleScanner
     case timeline
+    case statistics
+    case insights
     case settings
 #if DEBUG
     case spectrumDebugChart
@@ -20,7 +22,7 @@ enum SidebarPage: String, CaseIterable {
 
     var requiresLocationAuthorization: Bool {
         switch self {
-        case .overview, .settings, .bleScanner, .timeline, .networkDiagnostics:
+        case .overview, .settings, .bleScanner, .timeline, .statistics, .insights, .networkDiagnostics:
             false
         case .spectrum, .channels, .interfaces, .roaming:
             true
@@ -37,7 +39,7 @@ enum SidebarPage: String, CaseIterable {
 
     var requiresWiFi: Bool {
         switch self {
-        case .overview, .settings, .bleScanner, .timeline, .networkDiagnostics:
+        case .overview, .settings, .bleScanner, .timeline, .statistics, .insights, .networkDiagnostics:
             false
         case .spectrum, .channels, .interfaces, .roaming:
             true
@@ -62,6 +64,8 @@ enum SidebarPage: String, CaseIterable {
         case .roaming:   String(localized: "nav.roaming_test", comment: "Roaming Test sidebar navigation item")
         case .bleScanner: String(localized: "nav.ble_scanner", comment: "BLE Scanner sidebar navigation item")
         case .timeline: String(localized: "nav.timeline", comment: "Timeline sidebar navigation item")
+        case .statistics: String(localized: "nav.statistics", comment: "Statistics sidebar navigation item")
+        case .insights: String(localized: "nav.insights", comment: "Insights sidebar navigation item")
         case .settings:   String(localized: "common.action.settings", comment: "Settings button or menu item")
 #if DEBUG
         case .spectrumDebugChart: String(localized: "nav.spectrum_debug_chart", comment: "Spectrum Debug Chart sidebar navigation item (dev only)")
@@ -83,6 +87,8 @@ enum SidebarPage: String, CaseIterable {
         case .roaming:   "arrow.triangle.swap"
         case .bleScanner: "personalhotspot"
         case .timeline: "clock.arrow.circlepath"
+        case .statistics: "chart.bar.xaxis"
+        case .insights: "lightbulb"
         case .settings:   "gearshape"
 #if DEBUG
         case .spectrumDebugChart: "antenna.radiowaves.left.and.right"
@@ -98,14 +104,16 @@ enum SidebarPage: String, CaseIterable {
         switch self {
         case .networkDiagnostics:
             .preview
-        case .timeline:
-            Self.timelineBadgeStyle(for: .current)
         default:
             nil
         }
     }
 
     static func timelineBadgeStyle(for config: BuildConfig) -> SidebarBadge.Style {
+        analysisBadgeStyle(for: config)
+    }
+
+    static func analysisBadgeStyle(for config: BuildConfig) -> SidebarBadge.Style {
         switch config {
         case .oss:
             .pro
@@ -113,12 +121,14 @@ enum SidebarPage: String, CaseIterable {
             .preview
         }
     }
+
+    static let analysisPages: [SidebarPage] = [.timeline, .statistics, .insights]
 }
 
 enum SidebarSection {
     case overview
     case tools
-    case insights
+    case analysis
     case debug
     case settings
 
@@ -128,8 +138,8 @@ enum SidebarSection {
             "sidebar.section.overview"
         case .tools:
             "sidebar.section.tools"
-        case .insights:
-            "sidebar.section.insights"
+        case .analysis:
+            "sidebar.section.analysis"
         case .debug:
             "sidebar.section.debug"
         case .settings:
@@ -139,6 +149,17 @@ enum SidebarSection {
 
     var title: String {
         String(localized: String.LocalizationValue(localizationKey), comment: "Sidebar section title")
+    }
+
+    /// Edition badge shown on the group title. The Analysis group carries one
+    /// badge for all of its routes instead of repeating it on every row.
+    var badgeStyle: SidebarBadge.Style? {
+        switch self {
+        case .analysis:
+            SidebarPage.analysisBadgeStyle(for: .current)
+        default:
+            nil
+        }
     }
 }
 
@@ -214,10 +235,12 @@ struct SidebarView: View {
                 }
             }
             Section {
-                sidebarGroupTitle(.insights)
-                sidebarRow(for: .timeline)
-                    .tag(SidebarPage.timeline)
-                    .accessibilityIdentifier("sidebar-\(SidebarPage.timeline.rawValue)")
+                sidebarGroupTitle(.analysis)
+                ForEach(SidebarPage.analysisPages, id: \.self) { page in
+                    sidebarRow(for: page)
+                        .tag(page)
+                        .accessibilityIdentifier("sidebar-\(page.rawValue)")
+                }
             }
 #if DEBUG
             Section {
@@ -279,12 +302,20 @@ struct SidebarView: View {
     }
 
     private func sidebarGroupTitle(_ section: SidebarSection) -> some View {
-        Text(section.title)
-            .font(.system(size: 10, weight: .semibold))
-            .foregroundStyle(.secondary)
-            .textCase(nil)
-            .padding(.top, 6)
-            .padding(.bottom, 2)
+        HStack(spacing: 6) {
+            Text(section.title)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .textCase(nil)
+
+            Spacer(minLength: 4)
+
+            if let badgeStyle = section.badgeStyle {
+                SidebarBadge(style: badgeStyle)
+            }
+        }
+        .padding(.top, 6)
+        .padding(.bottom, 2)
     }
 }
 
