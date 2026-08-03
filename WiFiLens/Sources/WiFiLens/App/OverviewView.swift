@@ -429,12 +429,54 @@ struct OverviewView: View {
 
 // MARK: - 3D Earth Globe
 
+/// SCNView whose render loop only starts once its window is on screen.
+/// Starting `isPlaying` for an offscreen window (e.g. the never-ordered-front
+/// NSWindows in DetailPageHorizontalOverflowTests) makes SceneKit render into
+/// a 0x0 drawable — a fatal Metal texture-description validation assertion
+/// that crashes the test host on headless CI.
+private final class GlobeSCNView: SCNView {
+    private var visibilityObserver: NSObjectProtocol?
+
+    /// Idempotent — safe to call from makeNSView's deferred block,
+    /// viewDidMoveToWindow, the visibility notification, and updateNSView.
+    func startPlaybackIfVisible() {
+        guard let window, window.isVisible, !bounds.isEmpty else { return }
+        isPlaying = true
+    }
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        // Remove the previous observer (either the one for the old window,
+        // or the one for the window we are detaching from).
+        if let visibilityObserver {
+            NotificationCenter.default.removeObserver(visibilityObserver)
+            self.visibilityObserver = nil
+        }
+        guard let window else { return }
+        // Fires when the window becomes visible (occlusion state changes),
+        // catching the "window shown after the view was created" case.
+        // `queue: .main` + `[weak self]` keeps the callback on the main
+        // actor and lets the view outlive the observer without a deinit
+        // that touches MainActor state from a background thread.
+        visibilityObserver = NotificationCenter.default.addObserver(
+            forName: NSWindow.didChangeOcclusionStateNotification,
+            object: window,
+            queue: .main
+        ) { [weak self] _ in
+            // queue: .main guarantees the callback runs on the main actor.
+            MainActor.assumeIsolated {
+                self?.startPlaybackIfVisible()
+            }
+        }
+    }
+}
+
 private struct EarthGlobeView: NSViewRepresentable {
     let color: Color
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
-    func makeNSView(context: Context) -> SCNView {
+    func makeNSView(context: Context) -> GlobeSCNView {
         let scene = SCNScene()
 
         // Axial tilt container — Earth rotates at 23.5° from orbital plane
@@ -574,7 +616,7 @@ private struct EarthGlobeView: NSViewRepresentable {
 
         context.coordinator.scene = scene
 
-        let scnView = SCNView()
+        let scnView = GlobeSCNView()
         scnView.backgroundColor = .clear
         scnView.allowsCameraControl = false
         scnView.isJitteringEnabled = true
@@ -583,11 +625,12 @@ private struct EarthGlobeView: NSViewRepresentable {
 
         scnView.scene = scene
         scnView.isPlaying = false
-        DispatchQueue.main.async { scnView.isPlaying = true }
+        DispatchQueue.main.async { scnView.startPlaybackIfVisible() }
         return scnView
     }
 
-    func updateNSView(_ nsView: SCNView, context: Context) {
+    func updateNSView(_ nsView: GlobeSCNView, context: Context) {
+        nsView.startPlaybackIfVisible()
         guard let tilt = nsView.scene?.rootNode.childNode(withName: "tilt", recursively: false) else { return }
         if let innerGlow = tilt.childNode(withName: "innerGlow", recursively: false) {
             innerGlow.geometry?.materials.first?.diffuse.contents = NSColor(color).withAlphaComponent(0.06)
