@@ -11,8 +11,6 @@ Project documentation lives under `docs/`; see [`docs/README.md`](docs/README.md
 | `docs/README.md` | Project documentation index |
 | `docs/TODO.md` | Active product and engineering roadmap |
 | `docs/ISSUES.md` | Active known issues and deferred defects |
-| `docs/superpowers/specs/` | Accepted or active design records |
-| `docs/superpowers/plans/` | Task-specific implementation plans |
 | `.agents/references/README.md` | Task-oriented technical reference router |
 | `.agents/references/collaboration-rules.md` | AI assistant behavior rules, enforced prohibitions, and must-follows |
 | `Pro/AGENTS.md` | Entry point for tasks explicitly scoped to the private Pro edition |

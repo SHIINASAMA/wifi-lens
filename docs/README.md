@@ -14,20 +14,6 @@ rather than archived. `ISSUES.md` records active problems and explicitly
 deferred items — resolved issues are removed unless they carry long-term
 context.
 
-## Design records
-
-[superpowers/specs/](superpowers/specs/) contains accepted or active design
-documents. File names include the date the design was written. These records
-are retained as decision references even after implementation.
-
-## Implementation plans
-
-[superpowers/plans/](superpowers/plans/) contains task-specific implementation
-plans. Plans are process documents — when the corresponding feature is
-complete, the plan is marked `Status: Completed` at the top of the file or
-removed. Plans should not be treated as active tasks unless their status
-indicates otherwise.
-
 ## Agent-oriented technical references
 
 Agent-optimized technical knowledge (architecture, testing, accessibility,
