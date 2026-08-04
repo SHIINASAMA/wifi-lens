@@ -11937,31 +11937,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "No network connection is available. Check Wi-Fi or Ethernet."
+            "value": "No network connection is available. Check Wi-Fi or Ethernet"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "利用できるネットワーク接続がありません。Wi-Fi または Ethernet を確認してください。"
+            "value": "利用できるネットワーク接続がありません。Wi-Fi または Ethernet を確認してください"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "未连接到可用网络，请检查 Wi-Fi 或网线。"
+            "value": "未连接到可用网络，请检查 Wi-Fi 或网线"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Keine Netzwerkverbindung verfügbar. Prüfe Wi-Fi oder Ethernet."
+            "value": "Keine Netzwerkverbindung verfügbar. Prüfe Wi-Fi oder Ethernet"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No hay ninguna conexión de red disponible. Comprueba la conexión Wi-Fi o Ethernet."
+            "value": "No hay ninguna conexión de red disponible. Comprueba la conexión Wi-Fi o Ethernet"
           }
         }
       }
@@ -11972,31 +11972,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The network connection could not be confirmed. Try again later."
+            "value": "The network connection could not be confirmed. Try again later"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ネットワーク接続を確認できませんでした。しばらくしてからもう一度お試しください。"
+            "value": "ネットワーク接続を確認できませんでした。しばらくしてからもう一度お試しください"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "暂时无法确认网络连接状态，请稍后重试。"
+            "value": "暂时无法确认网络连接状态，请稍后重试"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die Netzwerkverbindung konnte nicht bestätigt werden. Versuche es später erneut."
+            "value": "Die Netzwerkverbindung konnte nicht bestätigt werden. Versuche es später erneut"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No se pudo confirmar la conexión de red. Inténtalo de nuevo más tarde."
+            "value": "No se pudo confirmar la conexión de red. Inténtalo de nuevo más tarde"
           }
         }
       }
@@ -12077,31 +12077,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Domain names cannot be resolved, so some websites may not open. Check DNS settings."
+            "value": "Domain names cannot be resolved, so some websites may not open. Check DNS settings"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ドメイン名を解決できないため、一部の Web サイトを開けない可能性があります。DNS 設定を確認してください。"
+            "value": "ドメイン名を解決できないため、一部の Web サイトを開けない可能性があります。DNS 設定を確認してください"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "无法解析域名，部分网站可能无法打开；请检查 DNS 设置。"
+            "value": "无法解析域名，部分网站可能无法打开；请检查 DNS 设置"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Domänennamen können nicht aufgelöst werden, daher lassen sich manche Websites möglicherweise nicht öffnen. Prüfe die DNS-Einstellungen."
+            "value": "Domänennamen können nicht aufgelöst werden, daher lassen sich manche Websites möglicherweise nicht öffnen. Prüfe die DNS-Einstellungen"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No se pueden resolver los nombres de dominio, por lo que es posible que algunos sitios web no se abran. Comprueba los ajustes de DNS."
+            "value": "No se pueden resolver los nombres de dominio, por lo que es posible que algunos sitios web no se abran. Comprueba los ajustes de DNS"
           }
         }
       }
@@ -12112,31 +12112,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "DNS resolution is available."
+            "value": "DNS resolution is available"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "DNS の名前解決を利用できます。"
+            "value": "DNS の名前解決を利用できます"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "DNS 解析可用。"
+            "value": "DNS 解析可用"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die DNS-Auflösung ist verfügbar."
+            "value": "Die DNS-Auflösung ist verfügbar"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "La resolución de DNS está disponible."
+            "value": "La resolución de DNS está disponible"
           }
         }
       }
@@ -12147,31 +12147,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "DNS resolution is inconsistent across test names."
+            "value": "DNS resolution is inconsistent across test names"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "テスト名で DNS 解決の結果が一致しません。"
+            "value": "テスト名で DNS 解決の結果が一致しません"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "各测试域名的 DNS 解析结果不一致。"
+            "value": "各测试域名的 DNS 解析结果不一致"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die DNS-Auflösung ist bei den Testnamen uneinheitlich."
+            "value": "Die DNS-Auflösung ist bei den Testnamen uneinheitlich"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "La resolución de DNS es inconsistente entre los nombres de prueba."
+            "value": "La resolución de DNS es inconsistente entre los nombres de prueba"
           }
         }
       }
@@ -12182,31 +12182,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The DNS check could not be completed. Try again later."
+            "value": "The DNS check could not be completed. Try again later"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "DNS チェックを完了できませんでした。しばらくしてからもう一度お試しください。"
+            "value": "DNS チェックを完了できませんでした。しばらくしてからもう一度お試しください"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "暂时无法完成 DNS 检查，请稍后重试。"
+            "value": "暂时无法完成 DNS 检查，请稍后重试"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die DNS-Prüfung konnte nicht abgeschlossen werden. Versuche es später erneut."
+            "value": "Die DNS-Prüfung konnte nicht abgeschlossen werden. Versuche es später erneut"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No se pudo completar la comprobación de DNS. Inténtalo de nuevo más tarde."
+            "value": "No se pudo completar la comprobación de DNS. Inténtalo de nuevo más tarde"
           }
         }
       }
@@ -12252,31 +12252,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The DNS result could not be determined."
+            "value": "The DNS result could not be determined"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "DNS の結果を判断できませんでした。"
+            "value": "DNS の結果を判断できませんでした"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "无法确定 DNS 结果。"
+            "value": "无法确定 DNS 结果"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Das DNS-Ergebnis konnte nicht ermittelt werden."
+            "value": "Das DNS-Ergebnis konnte nicht ermittelt werden"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No se pudo determinar el resultado de DNS."
+            "value": "No se pudo determinar el resultado de DNS"
           }
         }
       }
@@ -12287,31 +12287,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "DNS resolution failed for all test names."
+            "value": "DNS resolution failed for all test names"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "すべてのテスト名で DNS 解決に失敗しました。"
+            "value": "すべてのテスト名で DNS 解決に失敗しました"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "所有测试域名的 DNS 解析均失败。"
+            "value": "所有测试域名的 DNS 解析均失败"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die DNS-Auflösung ist für alle Testnamen fehlgeschlagen."
+            "value": "Die DNS-Auflösung ist für alle Testnamen fehlgeschlagen"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "La resolución de DNS falló para todos los nombres de prueba."
+            "value": "La resolución de DNS falló para todos los nombres de prueba"
           }
         }
       }
@@ -12637,31 +12637,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "IPv6 HTTPS access could not be verified. IPv4 access may still work."
+            "value": "IPv6 HTTPS access could not be verified. IPv4 access may still work"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Der IPv6-HTTPS-Zugriff konnte nicht bestätigt werden. Der IPv4-Zugriff kann weiterhin funktionieren."
+            "value": "Der IPv6-HTTPS-Zugriff konnte nicht bestätigt werden. Der IPv4-Zugriff kann weiterhin funktionieren"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No se pudo verificar el acceso HTTPS mediante IPv6. Es posible que el acceso IPv4 siga funcionando."
+            "value": "No se pudo verificar el acceso HTTPS mediante IPv6. Es posible que el acceso IPv4 siga funcionando"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "IPv6経由のHTTPSアクセスを確認できませんでした。IPv4アクセスは引き続き利用できる可能性があります。"
+            "value": "IPv6経由のHTTPSアクセスを確認できませんでした。IPv4アクセスは引き続き利用できる可能性があります"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "无法验证通过 IPv6 的 HTTPS 访问。IPv4 访问可能仍然可用。"
+            "value": "无法验证通过 IPv6 的 HTTPS 访问。IPv4 访问可能仍然可用"
           }
         }
       }
@@ -12707,31 +12707,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "No global IPv6 address is available, so the optional IPv6 check was skipped."
+            "value": "No global IPv6 address is available, so the optional IPv6 check was skipped"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Keine globale IPv6-Adresse ist verfügbar. Daher wurde die optionale IPv6-Prüfung übersprungen."
+            "value": "Keine globale IPv6-Adresse ist verfügbar. Daher wurde die optionale IPv6-Prüfung übersprungen"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No hay ninguna dirección IPv6 global disponible, por lo que se omitió la comprobación IPv6 opcional."
+            "value": "No hay ninguna dirección IPv6 global disponible, por lo que se omitió la comprobación IPv6 opcional"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "グローバルIPv6アドレスを利用できないため、オプションのIPv6チェックをスキップしました。"
+            "value": "グローバルIPv6アドレスを利用できないため、オプションのIPv6チェックをスキップしました"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "没有可用的全局 IPv6 地址，因此跳过了可选的 IPv6 检查。"
+            "value": "没有可用的全局 IPv6 地址，因此跳过了可选的 IPv6 检查"
           }
         }
       }
@@ -12742,31 +12742,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "No system network path is available. Check Wi-Fi or Ethernet."
+            "value": "No system network path is available. Check Wi-Fi or Ethernet"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "利用可能なシステムネットワーク経路がありません。Wi-Fi または Ethernet を確認してください。"
+            "value": "利用可能なシステムネットワーク経路がありません。Wi-Fi または Ethernet を確認してください"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "没有可用的系统网络路径。请检查 Wi-Fi 或以太网。"
+            "value": "没有可用的系统网络路径。请检查 Wi-Fi 或以太网"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kein Systemnetzwerkpfad ist verfügbar. Prüfe Wi-Fi oder Ethernet."
+            "value": "Kein Systemnetzwerkpfad ist verfügbar. Prüfe Wi-Fi oder Ethernet"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No hay una ruta de red del sistema disponible. Comprueba Wi-Fi o Ethernet."
+            "value": "No hay una ruta de red del sistema disponible. Comprueba Wi-Fi o Ethernet"
           }
         }
       }
@@ -12777,31 +12777,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The system network path could not be confirmed. Try again later."
+            "value": "The system network path could not be confirmed. Try again later"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "システムネットワーク経路を確認できませんでした。しばらくしてからもう一度お試しください。"
+            "value": "システムネットワーク経路を確認できませんでした。しばらくしてからもう一度お試しください"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "暂时无法确认系统网络路径，请稍后重试。"
+            "value": "暂时无法确认系统网络路径，请稍后重试"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Der Systemnetzwerkpfad konnte nicht bestätigt werden. Versuche es später erneut."
+            "value": "Der Systemnetzwerkpfad konnte nicht bestätigt werden. Versuche es später erneut"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No se pudo confirmar la ruta de red del sistema. Inténtalo de nuevo más tarde."
+            "value": "No se pudo confirmar la ruta de red del sistema. Inténtalo de nuevo más tarde"
           }
         }
       }
@@ -12847,31 +12847,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The system proxy cannot be reached and may prevent websites from opening. Check or turn off the proxy settings."
+            "value": "The system proxy cannot be reached and may prevent websites from opening. Check or turn off the proxy settings"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "システムプロキシに接続できないため、Web サイトを開けない可能性があります。プロキシ設定を確認するか、オフにしてください。"
+            "value": "システムプロキシに接続できないため、Web サイトを開けない可能性があります。プロキシ設定を確認するか、オフにしてください"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "系统代理无法连接，可能导致网页无法访问；请检查或关闭代理设置。"
+            "value": "系统代理无法连接，可能导致网页无法访问；请检查或关闭代理设置"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Der Systemproxy ist nicht erreichbar und verhindert möglicherweise das Öffnen von Websites. Prüfe oder deaktiviere die Proxyeinstellungen."
+            "value": "Der Systemproxy ist nicht erreichbar und verhindert möglicherweise das Öffnen von Websites. Prüfe oder deaktiviere die Proxyeinstellungen"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No se puede acceder al proxy del sistema, lo que puede impedir que se abran sitios web. Comprueba o desactiva los ajustes del proxy."
+            "value": "No se puede acceder al proxy del sistema, lo que puede impedir que se abran sitios web. Comprueba o desactiva los ajustes del proxy"
           }
         }
       }
@@ -13092,31 +13092,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The system proxy could not be fully verified."
+            "value": "The system proxy could not be fully verified"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "システムプロキシを完全には確認できませんでした。"
+            "value": "システムプロキシを完全には確認できませんでした"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "无法完整确认系统代理是否可用。"
+            "value": "无法完整确认系统代理是否可用"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Der Systemproxy konnte nicht vollständig überprüft werden."
+            "value": "Der Systemproxy konnte nicht vollständig überprüft werden"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "No se pudo verificar por completo el proxy del sistema."
+            "value": "No se pudo verificar por completo el proxy del sistema"
           }
         }
       }
