@@ -11,7 +11,7 @@ The following rules are **hard constraints** and must be followed in all circums
 
 ## Project Language
 
-- **English is the primary language for repository-facing artifacts.** Repository-facing artifacts must be written in English, including source code comments, documentation, commit messages, issue descriptions, pull request content, and other text committed to the repository. Localization strings (`.xcstrings`) are the only exception — they support `en`, `ja`, and `zh-Hans`.
+- **English is the primary language for repository-facing artifacts.** Repository-facing artifacts must be written in English, including source code comments, documentation, commit messages, issue descriptions, pull request content, and other text committed to the repository. Localization strings (`.xcstrings`) are the only exception — they support `en`, `de`, `es`, `ja`, and `zh-Hans`.
 - **Agent–developer communication follows the developer's language preference.** Communication between agents and developers may use the developer's preferred language unless explicitly requested otherwise.
 
 ## Prohibited Actions
@@ -56,7 +56,7 @@ other checks whose purpose is to gate that commit.
 
 - **No UI tests by default**: Do not run `WiFiLensUITests`, `WiFiLensProUITests`, or full scheme `xcodebuild test` commands that include UI test bundles unless the user explicitly asks for UI tests. Use build verification and unit-test-only verification by default.
 
-- **Place Markdown by responsibility**: Project facts and design records go under `docs/`. Agent Skills and Agent-only references go under `.agents/`. The only root exceptions are `AGENTS.md`, `CLAUDE.md`, and `README.md`.
+- **Place Markdown by responsibility**: Project roadmaps, known issues, design records, and implementation plans go under `docs/` (see `docs/README.md`). Agent-oriented technical references (architecture, testing, etc.) live under `.agents/references/project/`. Agent Skills and Agent-only workflow references go under `.agents/`. The only root exceptions are `AGENTS.md`, `CLAUDE.md`, and `README.md`.
 
 ## Behavioral Style
 

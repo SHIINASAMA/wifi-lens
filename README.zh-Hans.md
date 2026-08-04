@@ -144,7 +144,9 @@ xed WiFiLens.xcodeproj
 
 欢迎提交 Bug 报告和功能建议。你可以创建 [issue](https://github.com/SHIINASAMA/wifi-lens/issues) 或发起 [discussion](https://github.com/SHIINASAMA/wifi-lens/discussions)。
 
-Pull request 应遵循 [.agents/references/project/ARCHITECTURE.md](.agents/references/project/ARCHITECTURE.md) 中的约定，并在可行时包含测试覆盖。如果使用代码助手，请查看 [.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md)。
+请查看[贡献指南](.github/CONTRIBUTING.md)了解开发配置、Pull Request 规范和本地化要求。如果使用代码助手，也请阅读 [.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md)。
+
+维护者可酌情通过 Apple 发放的 WiFi Lens Pro 兑换码来感谢对项目有重大贡献的贡献者。详见[贡献者认可](.github/CONTRIBUTING.md#contributor-recognition)。
 
 **联系方式：** [X 上的 @WiFiLens](https://x.com/WiFiLens) · [wifi-lens@shiinalabs.com](mailto:wifi-lens@shiinalabs.com)
 

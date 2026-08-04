@@ -1,5 +1,7 @@
 # Network Diagnostics Stage Model Implementation Plan
 
+> **Status: Completed.** The corresponding features are implemented in `WiFiLens/Sources/WiFiLens/NetworkDiagnostics/`.
+
 > **Execution note:** Work through the checked steps in order, using the repository's plan-execution workflow and test-driven gates.
 
 **Goal:** Define `This Mac` / `LAN` / `Internet` stages in the network self-check: a derived-stage domain model, a dedicated gateway reachability check, a pipeline diagram with connectivity status on the connecting lines, and a stage-grouped workbench table.

@@ -144,7 +144,9 @@ La documentación de arquitectura, pruebas y hoja de ruta se encuentra en [docs/
 
 Los informes de errores y las propuestas de funciones son bienvenidos. Abre un [issue](https://github.com/SHIINASAMA/wifi-lens/issues) o inicia una [discussion](https://github.com/SHIINASAMA/wifi-lens/discussions).
 
-Las pull requests deben seguir las convenciones de [.agents/references/project/ARCHITECTURE.md](.agents/references/project/ARCHITECTURE.md) e incluir pruebas cuando sea práctico. Si usas agentes de programación, consulta las directrices de [.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md).
+Consulta las [pautas de contribución](.github/CONTRIBUTING.md) para la configuración de desarrollo, convenciones de pull requests y requisitos de localización. Si usas agentes de programación, consulta también las directrices de [.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md).
+
+El mantenedor puede reconocer contribuciones sustanciales a WiFi Lens con un código promocional de WiFi Lens Pro emitido por Apple. Consulta [Reconocimiento de contribuyentes](.github/CONTRIBUTING.md#contributor-recognition) para más detalles.
 
 **Contacto:** [@WiFiLens en X](https://x.com/WiFiLens) · [wifi-lens@shiinalabs.com](mailto:wifi-lens@shiinalabs.com)
 

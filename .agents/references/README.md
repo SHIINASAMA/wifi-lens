@@ -3,6 +3,10 @@
 Read only the references relevant to the current task. These files describe
 durable project facts and constraints; they are not step-by-step workflows.
 
+Project roadmaps, known issues, design records, and implementation plans are
+in `docs/` (see `docs/README.md`). The references below are Agent-optimized
+technical knowledge organized for on-demand loading by task type.
+
 | Reference | Use when working on |
 |---|---|
 | `project/ARCHITECTURE.md` | App structure, data flow, source layout, shared patterns, or localization conventions |

@@ -92,7 +92,7 @@ All user-facing strings must use the project's localization system.
 * Use `String(localized:comment:)`.
 * Use hierarchical lowercase localization keys.
 * Add new entries to `Resources/Localizable.xcstrings`.
-* Preserve English, Japanese, and Simplified Chinese localization support.
+* Preserve English, German, Spanish, Japanese, and Simplified Chinese localization support.
 * Do not embed user-facing English strings directly in SwiftUI views.
 
 Documentation, code comments, commit messages, issues, and pull requests

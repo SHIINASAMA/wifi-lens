@@ -1,5 +1,7 @@
 # Network Diagnostics Review Fixes Implementation Plan
 
+> **Status: Completed.** The corresponding features are implemented in `WiFiLens/Sources/WiFiLens/NetworkDiagnostics/`.
+
 > **Execution note:** Work through the checked steps in order, using the repository's plan-execution workflow and test-driven gates.
 
 **Goal:** Correct proxy-path attribution, ordered fallback behavior, target-specific proxy reporting, dependency blocking, and local-network privacy copy in the macOS network self-check.

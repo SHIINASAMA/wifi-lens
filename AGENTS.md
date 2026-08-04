@@ -4,18 +4,18 @@ This file provides guidance to AI coding agents (Codex, Copilot, Cursor, Windsur
 
 ## Documentation and Agent Assets
 
-Project documentation lives under `docs/`. Cross-agent workflows and behavior references live under `.agents/`; see `.agents/README.md` for the boundary. Never create standalone `.md` files at the repo root (except this file, `CLAUDE.md`, and `README.md`).
+Project documentation lives under `docs/`; see [`docs/README.md`](docs/README.md) for the full index. Cross-agent workflows and behavior references live under `.agents/`; see `.agents/README.md` for the boundary. Never create standalone `.md` files at the repo root (except this file, `CLAUDE.md`, and `README.md`).
 
-| File | Purpose |
+| Path | Purpose |
 |------|---------|
-| `docs/TODO.md` | Feature roadmap and checked-off items |
-| `docs/ISSUES.md` | Bugs, regressions, and deferred work with status |
-| `docs/superpowers/specs/2026-07-26-network-diagnostics-review-fixes-design.md` | Approved design for correcting proxy routing, fallback, dependency gating, and privacy copy in the network self-check |
-| `docs/superpowers/specs/2026-08-04-network-diagnostics-stages-design.md` | Approved design for defining This Mac / LAN / Internet stages in the network self-check |
-| `docs/superpowers/plans/2026-07-26-network-diagnostics-review-fixes.md` | Test-driven implementation plan for the approved network self-check review fixes |
-| `docs/superpowers/plans/2026-08-04-network-diagnostics-stages.md` | Test-driven implementation plan for the This Mac / LAN / Internet stage model |
-| `Pro/docs/ARCHITECTURE.md` | Private Pro architecture index; read only for tasks explicitly scoped to Pro |
-| `Pro/docs/REVIEW-TIMELINE.md` | Private Pro roadmap; read only for tasks explicitly scoped to Pro |
+| `docs/README.md` | Project documentation index |
+| `docs/TODO.md` | Active product and engineering roadmap |
+| `docs/ISSUES.md` | Active known issues and deferred defects |
+| `docs/superpowers/specs/` | Accepted or active design records |
+| `docs/superpowers/plans/` | Task-specific implementation plans |
+| `.agents/references/README.md` | Task-oriented technical reference router |
+| `.agents/references/collaboration-rules.md` | AI assistant behavior rules, enforced prohibitions, and must-follows |
+| `Pro/AGENTS.md` | Entry point for tasks explicitly scoped to the private Pro edition |
 
 ## Agent Assets
 
@@ -45,7 +45,7 @@ Agent-asset change that mentions Pro or crosses the root/submodule boundary.
 
 <!-- knowledge-boundary-gate:start -->
 Run `.agents/skills/protect-knowledge-boundary/scripts/check_public_knowledge.py` and `.agents/skills/protect-knowledge-boundary/scripts/verify_integrity.py` before completing knowledge-boundary changes.
-Integrity manifest SHA-256: `d95689171c133bd39107c37363fa328a79ff3333ea6bb57e4cbb465c59d2f2fe`
+Integrity manifest SHA-256: `b31a3788f324e1ecbcf714f25858f2339444184caa85b813c2a61ba9f89f717c`
 <!-- knowledge-boundary-gate:end -->
 
 ## Build & Test
@@ -88,7 +88,7 @@ When adding new test files, ensure they are:
 - macOS 14+, Swift 6.0, SwiftUI + AppKit interop with CoreWLAN and CoreBluetooth
 - `ScannerViewModel` is `@Observable`, passed via `@Bindable`
 - Tests use Swift Testing (`@Test`, `#expect()`) with `@testable import WiFiLens`
-- Localization: `String(localized: "domain.component.element", comment: "Context for translators")` → `Resources/Localizable.xcstrings` (`en`, `ja`, `zh-Hans`)
+- Localization: `String(localized: "domain.component.element", comment: "Context for translators")` → `Resources/Localizable.xcstrings` (`en`, `de`, `es`, `ja`, `zh-Hans`)
 - Keys use hierarchical dot-notation (e.g., `settings.scan.interval_1s`, `overview.diagnosis.great.title`) — see `.agents/references/project/ARCHITECTURE.md` for full convention
 - New strings must be manually added to `.xcstrings` with `"extractionState": "manual"` and explicit `en` localization — auto-extraction is off
 - Use `String(format: String(localized: "format.key"), args...)` for parameterized strings, not string interpolation in keys
@@ -101,4 +101,4 @@ When adding new test files, ensure they are:
 - **English is the primary language for repository-facing artifacts.** Repository-facing artifacts must be written in English, including source code comments, documentation, commit messages, issue descriptions, pull request content, and other text committed to the repository. Only `.xcstrings` localization files are exceptions.
 - **Agent–developer communication follows the developer's language preference.** Communication between agents and developers may use the developer's preferred language unless explicitly requested otherwise.
 - **Project `.md` docs go in `docs/`** — Agent Skills and Agent-only references belong under `.agents/`; this AGENTS.md, CLAUDE.md, and README are the only root exceptions
-- When creating new docs, update the table in this file
+- When creating new docs, update [`docs/README.md`](docs/README.md) and the table above if a new top-level entry point is needed

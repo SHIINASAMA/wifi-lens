@@ -144,7 +144,7 @@ Architecture, testing, and roadmap docs live in [docs/](docs/).
 
 Bug reports and feature ideas are welcome. Open an [issue](https://github.com/SHIINASAMA/wifi-lens/issues) or start a [discussion](https://github.com/SHIINASAMA/wifi-lens/discussions).
 
-Pull requests should follow the conventions in [.agents/references/project/ARCHITECTURE.md](.agents/references/project/ARCHITECTURE.md) and include test coverage where practical. See [.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md) for AI assistant guidelines if you use coding agents.
+See [Contributing Guidelines](.github/CONTRIBUTING.md) for development setup, pull request conventions, and localization requirements. If you use coding agents, also review [.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md) for AI assistant guidelines.
 
 At their discretion, the maintainer may recognize substantial contributions to WiFi Lens with an Apple-issued promo code for WiFi Lens Pro. See [Contributor Recognition](.github/CONTRIBUTING.md#contributor-recognition) for details.
 

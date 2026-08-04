@@ -32,7 +32,7 @@ Please use a subject such as:
 
 ```text
 [Security] Brief vulnerability description
-````
+```
 
 ## What to Include
 

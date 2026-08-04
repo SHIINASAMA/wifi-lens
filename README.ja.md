@@ -144,7 +144,9 @@ xed WiFiLens.xcodeproj
 
 バグレポートと機能アイデアを歓迎します。[issue](https://github.com/SHIINASAMA/wifi-lens/issues) を開くか、[discussion](https://github.com/SHIINASAMA/wifi-lens/discussions) を開始してください。
 
-Pull request は [.agents/references/project/ARCHITECTURE.md](.agents/references/project/ARCHITECTURE.md) の規約に従い、可能な限りテストを含めてください。コーディングエージェントを使用する場合は [.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md) を参照してください。
+開発セットアップ、Pull Request の規約、ローカライズ要件については[貢献ガイドライン](.github/CONTRIBUTING.md)を参照してください。コーディングエージェントを使用する場合は、[.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md) も参照してください。
+
+メンテナは、WiFi Lens に多大な貢献をした貢献者に対し、Apple 発行の WiFi Lens Pro プロモコードを提供する場合があります。詳細は[貢献者認定](.github/CONTRIBUTING.md#contributor-recognition)を参照してください。
 
 **連絡先：** [X の @WiFiLens](https://x.com/WiFiLens) · [wifi-lens@shiinalabs.com](mailto:wifi-lens@shiinalabs.com)
 

@@ -8,11 +8,17 @@ Codex, Claude Code, and OpenCode. Its contents are public/shared knowledge.
 - `skills/` contains reusable Agent Skills. Edit skills only here.
 - `references/` contains routed project knowledge and cross-workflow guidance.
   Start with `references/README.md`.
+- `references/project/` contains Agent-optimized technical references
+  (architecture, testing, accessibility, BLE, charts, MCP, regulatory, and
+  windowing). These are durable project facts organized for on-demand loading,
+  not step-by-step workflows.
 - Skill-specific references, scripts, and assets stay inside that skill's
   directory.
 
-Project facts, architecture, testing knowledge, and design records remain in
-`docs/`, even when agents are their primary readers.
+Project roadmaps, known issues, design records, and implementation plans live
+in `docs/`; see `docs/README.md` for the index. Agent-oriented technical
+references live here under `references/project/` so agents can load only
+what a task needs.
 
 Private Pro documentation stays inside the `Pro/` submodule. Public Agent
 assets may index that documentation for explicitly Pro-scoped work, but must
