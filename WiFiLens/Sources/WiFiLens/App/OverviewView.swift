@@ -429,19 +429,64 @@ struct OverviewView: View {
 
 // MARK: - 3D Earth Globe
 
-/// SCNView whose render loop only starts once its window is on screen.
-/// Starting `isPlaying` for an offscreen window (e.g. the never-ordered-front
-/// NSWindows in DetailPageHorizontalOverflowTests) makes SceneKit render into
-/// a 0x0 drawable — a fatal Metal texture-description validation assertion
-/// that crashes the test host on headless CI.
-private final class GlobeSCNView: SCNView {
+/// Plain container that only creates the SceneKit globe once its window is
+/// actually on screen. Even with `isPlaying = false`, SCNView renders a
+/// frame when it first attaches to a window, so a never-ordered-front
+/// NSWindow (e.g. the ones in DetailPageHorizontalOverflowTests) makes
+/// SceneKit render into a 0x0 drawable — a fatal Metal texture-description
+/// validation assertion that crashes the test host on headless CI. Keeping
+/// the SCNView out of the hierarchy until the window is visible avoids the
+/// Metal render path entirely.
+private final class GlobeContainerView: NSView {
     private var visibilityObserver: NSObjectProtocol?
+    private var globeView: SCNView?
+    private var pendingTint: NSColor?
 
-    /// Idempotent — safe to call from makeNSView's deferred block,
-    /// viewDidMoveToWindow, the visibility notification, and updateNSView.
-    func startPlaybackIfVisible() {
+    var scene: SCNScene? {
+        didSet { updatePlaybackIfVisible() }
+    }
+
+    var tint: NSColor? {
+        didSet {
+            pendingTint = tint
+            applyTint()
+        }
+    }
+
+    /// Idempotent — safe to call from scene/tint didSet, makeNSView's
+    /// deferred block, viewDidMoveToWindow, and the visibility notification.
+    func updatePlaybackIfVisible() {
         guard let window, window.isVisible, !bounds.isEmpty else { return }
-        isPlaying = true
+        guard globeView == nil else {
+            globeView?.isPlaying = true
+            return
+        }
+        guard let scene else { return }
+        let view = SCNView()
+        view.backgroundColor = .clear
+        view.allowsCameraControl = false
+        view.isJitteringEnabled = true
+        view.antialiasingMode = .multisampling8X
+        view.preferredFramesPerSecond = 0
+        view.scene = scene
+        view.isPlaying = true
+        view.frame = bounds
+        view.autoresizingMask = [.width, .height]
+        addSubview(view)
+        globeView = view
+        applyTint()
+    }
+
+    private func applyTint() {
+        guard let globeView, let scene = globeView.scene, let tint else { return }
+        if let tilt = scene.rootNode.childNode(withName: "tilt", recursively: false) {
+            if let innerGlow = tilt.childNode(withName: "innerGlow", recursively: false) {
+                innerGlow.geometry?.materials.first?.diffuse.contents = tint.withAlphaComponent(0.06)
+            }
+            if let glow = tilt.childNode(withName: "glow", recursively: false) {
+                glow.geometry?.materials.first?.diffuse.contents = tint.withAlphaComponent(0.08)
+            }
+        }
     }
 
     override func viewDidMoveToWindow() {
@@ -465,9 +510,10 @@ private final class GlobeSCNView: SCNView {
         ) { [weak self] _ in
             // queue: .main guarantees the callback runs on the main actor.
             MainActor.assumeIsolated {
-                self?.startPlaybackIfVisible()
+                self?.updatePlaybackIfVisible()
             }
         }
+        updatePlaybackIfVisible()
     }
 }
 
@@ -476,7 +522,7 @@ private struct EarthGlobeView: NSViewRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
-    func makeNSView(context: Context) -> GlobeSCNView {
+    func makeNSView(context: Context) -> GlobeContainerView {
         let scene = SCNScene()
 
         // Axial tilt container — Earth rotates at 23.5° from orbital plane
@@ -616,28 +662,15 @@ private struct EarthGlobeView: NSViewRepresentable {
 
         context.coordinator.scene = scene
 
-        let scnView = GlobeSCNView()
-        scnView.backgroundColor = .clear
-        scnView.allowsCameraControl = false
-        scnView.isJitteringEnabled = true
-        scnView.antialiasingMode = .multisampling8X
-        scnView.preferredFramesPerSecond = 0
-
-        scnView.scene = scene
-        scnView.isPlaying = false
-        DispatchQueue.main.async { scnView.startPlaybackIfVisible() }
-        return scnView
+        let container = GlobeContainerView()
+        container.tint = NSColor(color)
+        container.scene = scene
+        DispatchQueue.main.async { container.updatePlaybackIfVisible() }
+        return container
     }
 
-    func updateNSView(_ nsView: GlobeSCNView, context: Context) {
-        nsView.startPlaybackIfVisible()
-        guard let tilt = nsView.scene?.rootNode.childNode(withName: "tilt", recursively: false) else { return }
-        if let innerGlow = tilt.childNode(withName: "innerGlow", recursively: false) {
-            innerGlow.geometry?.materials.first?.diffuse.contents = NSColor(color).withAlphaComponent(0.06)
-        }
-        if let glow = tilt.childNode(withName: "glow", recursively: false) {
-            glow.geometry?.materials.first?.diffuse.contents = NSColor(color).withAlphaComponent(0.08)
-        }
+    func updateNSView(_ nsView: GlobeContainerView, context: Context) {
+        nsView.tint = NSColor(color)
     }
 
     class Coordinator { var scene: SCNScene? }
