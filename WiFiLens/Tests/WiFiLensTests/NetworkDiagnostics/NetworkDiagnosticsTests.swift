@@ -1449,33 +1449,36 @@ struct NetworkDiagnosticsTests {
         ) == nil)
     }
 
-    @Test("first path wait is bounded by the timeout")
-    func firstPathWaitIsBounded() async {
-        let neverEnding = AsyncStream<NWPath> { _ in }
-        let start = ContinuousClock.now
+    @Test("tunnel path wait returns nil when the timeout fires before any path")
+    func tunnelPathWaitTimeoutWins() async {
+        let streamTerminated = LockedFlag()
+        let neverEnding = AsyncStream<NWPath> { continuation in
+            continuation.onTermination = { _ in streamTerminated.set() }
+        }
+
         let path = await SystemProxyTunnelStateReader.firstPath(
             from: neverEnding,
-            timeout: .milliseconds(50)
+            timeout: {}
         )
-        let elapsed = start.duration(to: .now)
 
         #expect(path == nil)
-        #expect(elapsed >= .milliseconds(40))
-        #expect(elapsed < .seconds(1))
+        #expect(streamTerminated.isSet)
     }
 
-    @Test("first path wait returns immediately for a finished stream")
-    func firstPathReturnsImmediatelyForFinishedStream() async {
+    @Test("tunnel path wait cancels the pending timeout when the path side completes first")
+    func tunnelPathWaitCancelsPendingTimeout() async {
+        let probe = TunnelTimeoutCancellationProbe()
         let finished = AsyncStream<NWPath> { continuation in
             continuation.finish()
         }
 
         let path = await SystemProxyTunnelStateReader.firstPath(
             from: finished,
-            timeout: .seconds(5)
+            timeout: { await probe.park() }
         )
 
         #expect(path == nil)
+        #expect(probe.didCancel)
     }
 
     @Test("failed proxy candidate falls back to DIRECT for the same target")
@@ -3299,6 +3302,56 @@ private struct StubProxyTunnelStateReader: ProxyTunnelStateReading {
 
     func tunnelState() async -> ProxyTunnelState? {
         state
+    }
+}
+
+private final class TunnelTimeoutCancellationProbe: @unchecked Sendable {
+    private let lock = NSLock()
+    private var parkedContinuation: CheckedContinuation<Void, Never>?
+    private var cancelled = false
+
+    var didCancel: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return cancelled
+    }
+
+    func park() async {
+        await withTaskCancellationHandler {
+            await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                lock.lock()
+                if cancelled {
+                    lock.unlock()
+                    continuation.resume()
+                } else {
+                    parkedContinuation = continuation
+                    lock.unlock()
+                }
+            }
+        } onCancel: {
+            lock.lock()
+            cancelled = true
+            parkedContinuation?.resume()
+            parkedContinuation = nil
+            lock.unlock()
+        }
+    }
+}
+
+private final class LockedFlag: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = false
+
+    var isSet: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return value
+    }
+
+    func set() {
+        lock.lock()
+        value = true
+        lock.unlock()
     }
 }
 

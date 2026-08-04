@@ -119,7 +119,9 @@ struct SystemProxyTunnelStateReader: ProxyTunnelStateReading {
     func tunnelState() async -> ProxyTunnelState? {
         let path = await Self.firstPath(
             from: Self.makePathStream(),
-            timeout: Self.pathWaitTimeout
+            timeout: {
+                try? await Task.sleep(for: Self.pathWaitTimeout)
+            }
         )
         let pathRouted = path.flatMap {
             SystemNetworkTunnelStateReader.state(for: $0).routedTunnelInterface
@@ -143,22 +145,22 @@ struct SystemProxyTunnelStateReader: ProxyTunnelStateReading {
 
     static func firstPath(
         from stream: AsyncStream<NWPath>,
-        timeout: Duration
+        timeout: @escaping @Sendable () async -> Void
     ) async -> NWPath? {
-        let pathTask = Task<NWPath?, Never> {
-            for await path in stream {
-                return path
-            }
-            return nil
-        }
-        return await withTaskGroup(of: NWPath?.self) { group in
-            group.addTask { await pathTask.value }
+        await withTaskGroup(of: NWPath?.self) { group in
             group.addTask {
-                try? await Task.sleep(for: timeout)
+                for await path in stream {
+                    return path
+                }
                 return nil
             }
-            defer { pathTask.cancel() }
-            return await group.next() ?? nil
+            group.addTask {
+                await timeout()
+                return nil
+            }
+            let result = await group.next() ?? nil
+            group.cancelAll()
+            return result
         }
     }
 
