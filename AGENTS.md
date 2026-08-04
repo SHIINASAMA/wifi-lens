@@ -11,7 +11,9 @@ Project documentation lives under `docs/`. Cross-agent workflows and behavior re
 | `docs/TODO.md` | Feature roadmap and checked-off items |
 | `docs/ISSUES.md` | Bugs, regressions, and deferred work with status |
 | `docs/superpowers/specs/2026-07-26-network-diagnostics-review-fixes-design.md` | Approved design for correcting proxy routing, fallback, dependency gating, and privacy copy in the network self-check |
+| `docs/superpowers/specs/2026-08-04-network-diagnostics-stages-design.md` | Approved design for defining This Mac / LAN / Internet stages in the network self-check |
 | `docs/superpowers/plans/2026-07-26-network-diagnostics-review-fixes.md` | Test-driven implementation plan for the approved network self-check review fixes |
+| `docs/superpowers/plans/2026-08-04-network-diagnostics-stages.md` | Test-driven implementation plan for the This Mac / LAN / Internet stage model |
 | `Pro/docs/ARCHITECTURE.md` | Private Pro architecture index; read only for tasks explicitly scoped to Pro |
 | `Pro/docs/REVIEW-TIMELINE.md` | Private Pro roadmap; read only for tasks explicitly scoped to Pro |
 

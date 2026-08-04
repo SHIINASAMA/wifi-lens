@@ -3,6 +3,7 @@ import SwiftUI
 struct NetworkDiagnosticsView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Bindable var viewModel: NetworkDiagnosticsViewModel
+    @State private var expandedGroupOverride: [String: Bool] = [:]
 
     var body: some View {
         GeometryReader { geometry in
@@ -174,31 +175,25 @@ struct NetworkDiagnosticsView: View {
 
     @ViewBuilder
     private func workspace(_ mode: NetworkDiagnosticsWorkbenchLayoutMode) -> some View {
-        if viewModel.phase == .idle {
-            readyWorkspace
-        } else {
-            VStack(alignment: .leading, spacing: 12) {
-                if let pathSummary {
-                    pathSummaryCard(pathSummary)
-                }
+        VStack(alignment: .leading, spacing: 12) {
+            pipelineView
+            if viewModel.phase == .idle {
+                readyWorkspace
+            } else {
                 resultTable(mode)
             }
         }
     }
 
-    private func pathSummaryCard(_ summary: NetworkPathSummary) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(String(localized: "network_diagnostics.path_summary.title", comment: "Network self-check observed path title"))
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-            Text(summary.text)
-                .font(.callout.monospaced())
-                .fixedSize(horizontal: false, vertical: true)
-        }
+    private var pipelineView: some View {
+        NetworkDiagnosticsPipelineView(
+            presentation: NetworkDiagnosticsPipelinePresentation.from(
+                results: viewModel.results,
+                executionPhases: viewModel.executionPhases
+            )
+        )
         .padding(.horizontal, 20)
         .padding(.top, 14)
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("network-diagnostics-path-summary")
     }
 
     private var readyWorkspace: some View {
@@ -227,50 +222,50 @@ struct NetworkDiagnosticsView: View {
         Group {
             switch mode {
             case .regular:
-                Table(workbenchRows) {
-                    TableColumn(columnCheckTitle) { row in
-                        checkCell(row)
+                Table(workbenchItems) {
+                    TableColumn(columnCheckTitle) { item in
+                        checkCell(item)
                             .padding(.vertical, 7)
                     }
                     .width(min: 150, ideal: 190)
 
-                    TableColumn(columnStatusTitle) { row in
-                        statusCell(row)
+                    TableColumn(columnStatusTitle) { item in
+                        statusCell(item)
                             .padding(.vertical, 7)
                     }
                     .width(min: 112, ideal: 132)
 
-                    TableColumn(columnResultTitle) { row in
-                        resultCell(row)
+                    TableColumn(columnResultTitle) { item in
+                        resultCell(item)
                             .padding(.vertical, 7)
                     }
                 }
             case .condensed:
-                Table(workbenchRows) {
-                    TableColumn(columnCheckTitle) { row in
+                Table(workbenchItems) {
+                    TableColumn(columnCheckTitle) { item in
                         VStack(alignment: .leading, spacing: 5) {
-                            checkCell(row)
-                            statusCell(row)
+                            checkCell(item)
+                            statusCell(item)
                         }
                         .padding(.vertical, 7)
                     }
                     .width(min: 178, ideal: 220)
 
-                    TableColumn(columnResultTitle) { row in
-                        resultCell(row)
+                    TableColumn(columnResultTitle) { item in
+                        resultCell(item)
                             .padding(.vertical, 7)
                     }
                 }
             case .compact:
-                Table(workbenchRows) {
-                    TableColumn(columnResultTitle) { row in
+                Table(workbenchItems) {
+                    TableColumn(columnResultTitle) { item in
                         VStack(alignment: .leading, spacing: 8) {
                             HStack(alignment: .center, spacing: 12) {
-                                checkCell(row)
+                                checkCell(item)
                                 Spacer(minLength: 8)
-                                statusCell(row)
+                                statusCell(item)
                             }
-                            resultCell(row)
+                            resultCell(item)
                         }
                         .padding(.vertical, 7)
                     }
@@ -297,6 +292,15 @@ struct NetworkDiagnosticsView: View {
     }
 
     @ViewBuilder
+    private func checkCell(_ item: NetworkDiagnosticsWorkbenchItem) -> some View {
+        switch item {
+        case .stageHeader(let stage): stageHeaderCell(stage)
+        case .additionalHeader: additionalHeaderCell
+        case .check(let row): checkCell(row)
+        }
+    }
+
+    @ViewBuilder
     private func statusCell(_ row: NetworkDiagnosticsWorkbenchRow) -> some View {
         if let result = row.result {
             Label(statusTitle(result.status), systemImage: statusIcon(result.status))
@@ -316,6 +320,14 @@ struct NetworkDiagnosticsView: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
             .background(Color.accentColor.opacity(0.10), in: Capsule())
+        }
+    }
+
+    @ViewBuilder
+    private func statusCell(_ item: NetworkDiagnosticsWorkbenchItem) -> some View {
+        switch item {
+        case .stageHeader, .additionalHeader: EmptyView()
+        case .check(let row): statusCell(row)
         }
     }
 
@@ -341,6 +353,97 @@ struct NetworkDiagnosticsView: View {
         }
     }
 
+    @ViewBuilder
+    private func resultCell(_ item: NetworkDiagnosticsWorkbenchItem) -> some View {
+        switch item {
+        case .stageHeader, .additionalHeader: EmptyView()
+        case .check(let row): resultCell(row)
+        }
+    }
+
+    private func stageTitle(_ stage: NetworkDiagnosticStage) -> String {
+        switch stage {
+        case .thisMac:
+            String(localized: "network_diagnostics.stage.this_mac.title", comment: "Network self-check local environment stage title")
+        case .lan:
+            String(localized: "network_diagnostics.stage.lan.title", comment: "Network self-check LAN connectivity stage title")
+        case .internet:
+            String(localized: "network_diagnostics.stage.internet.title", comment: "Network self-check internet connectivity stage title")
+        }
+    }
+
+    private var additionalTitle: String {
+        String(localized: "network_diagnostics.stage.additional.title", comment: "Network self-check additional checks group title")
+    }
+
+    private func stageIcon(_ stage: NetworkDiagnosticStage) -> String {
+        switch stage {
+        case .thisMac: "macbook"
+        case .lan: "wifi"
+        case .internet: "globe"
+        }
+    }
+
+    private func stageHeaderCell(_ stage: NetworkDiagnosticStage) -> some View {
+        groupHeaderCell(
+            id: "stage.\(String(describing: stage))",
+            title: stageTitle(stage),
+            icon: stageIcon(stage)
+        )
+    }
+
+    private var additionalHeaderCell: some View {
+        groupHeaderCell(id: "additional", title: additionalTitle, icon: "square.grid.2x2")
+    }
+
+    private func groupHeaderCell(id: String, title: String, icon: String) -> some View {
+        Button {
+            expandedGroupOverride[id] = !isExpanded(id: id, items: rawWorkbenchItems)
+        } label: {
+            HStack(spacing: 8) {
+                Label {
+                    Text(title)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                } icon: {
+                    Image(systemName: icon)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: isExpanded(id: id, items: rawWorkbenchItems) ? "chevron.down" : "chevron.right")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(.isHeader)
+    }
+
+    private func isExpanded(id: String, items: [NetworkDiagnosticsWorkbenchItem]) -> Bool {
+        expandedGroupOverride[id] ?? !defaultsToCollapsed(id: id, items: items)
+    }
+
+    private func defaultsToCollapsed(id: String, items: [NetworkDiagnosticsWorkbenchItem]) -> Bool {
+        guard viewModel.phase == .completed else { return false }
+        var inGroup = false
+        var allClear = true
+        for item in items {
+            switch item {
+            case .stageHeader(let stage):
+                inGroup = id == "stage.\(String(describing: stage))"
+            case .additionalHeader:
+                inGroup = id == "additional"
+            case .check(let row):
+                if inGroup, let result = row.result,
+                   result.status != .normal, result.status != .skipped {
+                    allClear = false
+                }
+            }
+        }
+        return allClear
+    }
+
     private func remediationView(for result: NetworkDiagnosticResult) -> some View {
         let remediation = NetworkDiagnosticRemediation.forResult(result)
         return VStack(alignment: .leading, spacing: 2) {
@@ -357,8 +460,8 @@ struct NetworkDiagnosticsView: View {
         .accessibilityElement(children: .combine)
     }
 
-    private var workbenchRows: [NetworkDiagnosticsWorkbenchRow] {
-        NetworkDiagnosticsPresentation.workbenchRows(
+    private var rawWorkbenchItems: [NetworkDiagnosticsWorkbenchItem] {
+        NetworkDiagnosticsPresentation.workbenchItems(
             pagePhase: viewModel.phase,
             executionPhases: viewModel.executionPhases,
             results: viewModel.results,
@@ -366,8 +469,24 @@ struct NetworkDiagnosticsView: View {
         )
     }
 
-    private var pathSummary: NetworkPathSummary? {
-        NetworkPathSummary.from(results: Array(viewModel.results.values))
+    private var workbenchItems: [NetworkDiagnosticsWorkbenchItem] {
+        var filtered: [NetworkDiagnosticsWorkbenchItem] = []
+        var groupCollapsed = false
+        for item in rawWorkbenchItems {
+            switch item {
+            case .stageHeader(let stage):
+                groupCollapsed = !isExpanded(id: "stage.\(String(describing: stage))", items: rawWorkbenchItems)
+                filtered.append(item)
+            case .additionalHeader:
+                groupCollapsed = !isExpanded(id: "additional", items: rawWorkbenchItems)
+                filtered.append(item)
+            case .check:
+                if !groupCollapsed {
+                    filtered.append(item)
+                }
+            }
+        }
+        return filtered
     }
 
     private var activeCheckID: NetworkDiagnosticCheckID? {
@@ -411,6 +530,8 @@ struct NetworkDiagnosticsView: View {
         switch id {
         case .path:
             String(localized: "network_diagnostics.check.path.title", comment: "Network system path check title")
+        case .gatewayReachability:
+            String(localized: "network_diagnostics.check.gateway_reachability.title", comment: "Gateway reachability check title")
         case .dns:
             String(localized: "network_diagnostics.check.dns.title", comment: "DNS resolution check title")
         case .internet:
@@ -425,6 +546,7 @@ struct NetworkDiagnosticsView: View {
     private func checkIcon(_ id: NetworkDiagnosticCheckID) -> String {
         switch id {
         case .path: "network"
+        case .gatewayReachability: "point.3.connected.trianglepath.dotted"
         case .dns: "globe"
         case .internet: "globe"
         case .ipv6: "6.circle"
@@ -506,6 +628,262 @@ struct NetworkDiagnosticsView: View {
         case .networkNormal: .green
         case .needsAttention: .orange
         case .networkUnavailable: .red
+        }
+    }
+}
+
+struct NetworkDiagnosticsPipelinePresentation: Equatable, Sendable {
+    enum StationKind: Hashable, Equatable, Sendable {
+        case thisMac
+        case router
+        case internet
+    }
+
+    enum EdgeKind: Hashable, Equatable, Sendable {
+        case lan
+        case internet
+    }
+
+    struct Station: Equatable, Identifiable, Sendable {
+        let kind: StationKind
+        let status: NetworkDiagnosticStatus?
+        let isUnreachable: Bool
+
+        var id: StationKind { kind }
+    }
+
+    struct Edge: Equatable, Identifiable, Sendable {
+        let kind: EdgeKind
+        let status: NetworkDiagnosticStatus?
+        let isActive: Bool
+
+        var id: EdgeKind { kind }
+    }
+
+    let stations: [Station]
+    let edges: [Edge]
+
+    static func from(
+        results: [NetworkDiagnosticCheckID: NetworkDiagnosticResult],
+        executionPhases: [NetworkDiagnosticCheckID: NetworkDiagnosticExecutionPhase],
+        resolver: NetworkDiagnosticStageResolver = NetworkDiagnosticStageResolver()
+    ) -> Self {
+        let thisMac = resolver.status(for: .thisMac, results: results)
+        let lan = resolver.status(for: .lan, results: results)
+        let internet = resolver.status(for: .internet, results: results)
+
+        let stations = [
+            Station(kind: .thisMac, status: thisMac, isUnreachable: false),
+            Station(kind: .router, status: lan, isUnreachable: lan == .abnormal || lan == .blocked),
+            Station(kind: .internet, status: internet, isUnreachable: internet == .abnormal || internet == .blocked),
+        ]
+        let edges = [
+            Edge(kind: .lan, status: lan, isActive: isActive(stage: .lan, executionPhases: executionPhases)),
+            Edge(kind: .internet, status: internet, isActive: isActive(stage: .internet, executionPhases: executionPhases)),
+        ]
+        return Self(stations: stations, edges: edges)
+    }
+
+    private static func isActive(
+        stage: NetworkDiagnosticStage,
+        executionPhases: [NetworkDiagnosticCheckID: NetworkDiagnosticExecutionPhase]
+    ) -> Bool {
+        stage.contributingCheckIDs.contains { executionPhases[$0] == .checking }
+    }
+}
+
+struct NetworkDiagnosticsPipelineView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    let presentation: NetworkDiagnosticsPipelinePresentation
+
+    var body: some View {
+        HStack(spacing: 0) {
+            station(presentation.stations[0])
+            edge(presentation.edges[0])
+            station(presentation.stations[1])
+            edge(presentation.edges[1])
+            station(presentation.stations[2])
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityLabel)
+    }
+
+    private func station(_ station: NetworkDiagnosticsPipelinePresentation.Station) -> some View {
+        VStack(spacing: 6) {
+            ZStack {
+                Circle()
+                    .strokeBorder(
+                        stationRingColor(station),
+                        style: StrokeStyle(lineWidth: 2.5, dash: station.isUnreachable ? [5, 4] : [])
+                    )
+                    .frame(width: 44, height: 44)
+                    .background(Circle().fill(stationRingColor(station).opacity(0.10)))
+                Image(systemName: stationIcon(station.kind))
+                    .font(.system(size: 19))
+                    .foregroundStyle(stationRingColor(station))
+            }
+            Text(stationTitle(station.kind))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.primary)
+            if let status = station.status {
+                Label(statusTitle(status), systemImage: statusIcon(status))
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(statusColor(status))
+            }
+        }
+        .frame(width: 110)
+    }
+
+    @ViewBuilder
+    private func edge(_ edge: NetworkDiagnosticsPipelinePresentation.Edge) -> some View {
+        VStack(spacing: 6) {
+            edgeLabel(edge)
+            rail(edge)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private func edgeLabel(_ edge: NetworkDiagnosticsPipelinePresentation.Edge) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: edgeIcon(edge.kind))
+            Text(edgeTitle(edge.kind))
+        }
+        .font(.caption2.weight(.semibold))
+        .foregroundStyle(edgeColor(edge))
+        .padding(.horizontal, 8)
+        .padding(.vertical, 3)
+        .background(edgeColor(edge).opacity(0.10), in: Capsule())
+    }
+
+    @ViewBuilder
+    private func rail(_ edge: NetworkDiagnosticsPipelinePresentation.Edge) -> some View {
+        let content = railContent(edge)
+        if edge.isActive, !reduceMotion {
+            SwiftUI.TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
+                let cycle = context.date.timeIntervalSinceReferenceDate
+                    .truncatingRemainder(dividingBy: 1.4) / 1.4
+                content.opacity(0.45 + 0.55 * abs(cycle - 0.5) * 2)
+            }
+        } else {
+            content
+        }
+    }
+
+    private func railContent(_ edge: NetworkDiagnosticsPipelinePresentation.Edge) -> some View {
+        let color = edgeColor(edge)
+        let breakable = edge.status == .abnormal || edge.status == .indeterminate || edge.status == .blocked
+        return ZStack {
+            if breakable {
+                HStack(spacing: 7) {
+                    railLine(color: color, dashed: true)
+                    Image(systemName: breakIcon(edge.status))
+                        .font(.system(size: 13))
+                        .foregroundStyle(color)
+                    railLine(color: color, dashed: true)
+                }
+            } else {
+                HStack(spacing: 0) {
+                    railLine(color: color, dashed: false)
+                    Image(systemName: "arrowtriangle.right.fill")
+                        .font(.system(size: 8))
+                        .foregroundStyle(color)
+                }
+            }
+        }
+        .frame(height: 20)
+    }
+
+    private func railLine(color: Color, dashed: Bool) -> some View {
+        Rectangle()
+            .stroke(color, style: StrokeStyle(lineWidth: 3, dash: dashed ? [7, 5] : []))
+            .frame(height: 3)
+            .frame(maxWidth: .infinity)
+    }
+
+    private func edgeColor(_ edge: NetworkDiagnosticsPipelinePresentation.Edge) -> Color {
+        if edge.isActive { return .accentColor }
+        guard let status = edge.status else { return .secondary }
+        return statusColor(status)
+    }
+
+    private func stationRingColor(_ station: NetworkDiagnosticsPipelinePresentation.Station) -> Color {
+        if station.isUnreachable { return .secondary }
+        guard let status = station.status else { return .secondary }
+        return statusColor(status)
+    }
+
+    private func breakIcon(_ status: NetworkDiagnosticStatus?) -> String {
+        switch status {
+        case .abnormal: "xmark.circle.fill"
+        case .indeterminate: "questionmark.circle.fill"
+        case .blocked: "lock.fill"
+        default: "xmark.circle.fill"
+        }
+    }
+
+    private func stationIcon(_ kind: NetworkDiagnosticsPipelinePresentation.StationKind) -> String {
+        switch kind {
+        case .thisMac: "macbook"
+        case .router: "wifi.router"
+        case .internet: "globe"
+        }
+    }
+
+    private func edgeIcon(_ kind: NetworkDiagnosticsPipelinePresentation.EdgeKind) -> String {
+        switch kind {
+        case .lan: "wifi"
+        case .internet: "globe"
+        }
+    }
+
+    private func stationTitle(_ kind: NetworkDiagnosticsPipelinePresentation.StationKind) -> String {
+        switch kind {
+        case .thisMac:
+            String(localized: "network_diagnostics.stage.this_mac.title", comment: "Network self-check local environment stage title")
+        case .router:
+            String(localized: "network_diagnostics.diagram.router.title", comment: "Network self-check pipeline router station title")
+        case .internet:
+            String(localized: "network_diagnostics.stage.internet.title", comment: "Network self-check internet connectivity stage title")
+        }
+    }
+
+    private func edgeTitle(_ kind: NetworkDiagnosticsPipelinePresentation.EdgeKind) -> String {
+        switch kind {
+        case .lan:
+            String(localized: "network_diagnostics.stage.lan.title", comment: "Network self-check LAN connectivity stage title")
+        case .internet:
+            String(localized: "network_diagnostics.stage.internet.title", comment: "Network self-check internet connectivity stage title")
+        }
+    }
+
+    private var accessibilityLabel: String {
+        presentation.stations.map { station in
+            let title = stationTitle(station.kind)
+            guard let status = station.status else {
+                return "\(title): \(String(localized: "network_diagnostics.state.waiting", comment: "Network self-check waiting state"))"
+            }
+            return "\(title): \(statusTitle(status))"
+        }
+        .joined(separator: ", ")
+    }
+
+    private func statusTitle(_ status: NetworkDiagnosticStatus) -> String {
+        String(localized: .init(stringLiteral: status.presentation.labelKey), comment: "Network self-check status label")
+    }
+
+    private func statusIcon(_ status: NetworkDiagnosticStatus) -> String {
+        status.presentation.icon
+    }
+
+    private func statusColor(_ status: NetworkDiagnosticStatus) -> Color {
+        switch status.presentation.tone {
+        case .success: .green
+        case .error: .red
+        case .caution: .orange
+        case .informational: .blue
+        case .muted: .secondary
         }
     }
 }

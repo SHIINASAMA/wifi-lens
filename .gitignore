@@ -10,8 +10,11 @@ Icon[]
 /docs/superpowers/**
 !/docs/superpowers/specs/
 !/docs/superpowers/specs/2026-07-26-network-diagnostics-review-fixes-design.md
+!/docs/superpowers/specs/2026-08-04-network-diagnostics-stages-design.md
 !/docs/superpowers/plans/
 !/docs/superpowers/plans/2026-07-26-network-diagnostics-review-fixes.md
+!/docs/superpowers/plans/2026-08-04-network-diagnostics-stages.md
+.superpowers/
 
 # Xcode user data
 xcuserdata/

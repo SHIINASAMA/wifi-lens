@@ -99,6 +99,8 @@ struct DiagnosticRunner: Sendable {
         let dependencies: [DiagnosticDependency] = switch id {
         case .path:
             []
+        case .gatewayReachability:
+            [.init(id: .path, blockingStatuses: hardFailureStatuses)]
         case .dns:
             [.init(id: .path, blockingStatuses: hardFailureStatuses)]
         case .internet, .ipv6:
