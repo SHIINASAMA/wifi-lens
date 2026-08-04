@@ -1,5 +1,6 @@
 import CFNetwork
 import Foundation
+import Network
 import Testing
 @testable import WiFi_Lens
 
@@ -1403,23 +1404,78 @@ struct NetworkDiagnosticsTests {
         #expect(result.evidence.contains(.init(code: "proxy.https.route-type", value: "tunnel")))
         #expect(result.evidence.contains(.init(code: "proxy.http.tunnel-interface", value: "utun98")))
         #expect(result.evidence.contains(.init(code: "proxy.https.tunnel-interface", value: "utun98")))
+        #expect(result.evidence.contains(.init(code: "proxy.http.tunnel-detection-source", value: "nwpath")))
+        #expect(result.evidence.contains(.init(code: "proxy.https.tunnel-detection-source", value: "nwpath")))
         #expect(result.evidence.contains(.init(code: "proxy.http.egress-status", value: "base-check")))
+    }
+
+    @Test("active interface tunnel detection uses the softer summary")
+    func activeInterfaceTunnelUsesSofterSummary() async {
+        let check = SystemProxyCheck(
+            resolver: StubProxyResolver(.direct),
+            connector: StubProxyConnector(reachable: false),
+            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "unexpected"),
+            tunnelReader: StubProxyTunnelStateReader(
+                interface: "utun98",
+                source: .activeInterface
+            )
+        )
+
+        let result = await check.run()
+
+        #expect(result.status == .normal)
+        #expect(result.summary == String(
+            localized: "network_diagnostics.proxy.tunnel_routes_active.summary",
+            comment: "Network self-check active tunnel interface proxy route result summary"
+        ))
+        #expect(result.evidence.contains(.init(code: "proxy.http.route-type", value: "tunnel")))
+        #expect(result.evidence.contains(.init(code: "proxy.http.tunnel-detection-source", value: "active-interface")))
+        #expect(result.evidence.contains(.init(code: "proxy.https.tunnel-detection-source", value: "active-interface")))
     }
 
     @Test("tunnel candidate prefers the routed interface then an active ipv4 tunnel")
     func tunnelCandidatePriority() {
-        #expect(SystemProxyTunnelStateReader.candidateTunnelInterface(
+        #expect(SystemProxyTunnelStateReader.candidateTunnelState(
             pathRouted: "utun3",
             activeIPv4Tunnels: ["utun98"]
-        ) == "utun3")
-        #expect(SystemProxyTunnelStateReader.candidateTunnelInterface(
+        ) == ProxyTunnelState(interface: "utun3", source: .nwpath))
+        #expect(SystemProxyTunnelStateReader.candidateTunnelState(
             pathRouted: nil,
             activeIPv4Tunnels: ["utun98"]
-        ) == "utun98")
-        #expect(SystemProxyTunnelStateReader.candidateTunnelInterface(
+        ) == ProxyTunnelState(interface: "utun98", source: .activeInterface))
+        #expect(SystemProxyTunnelStateReader.candidateTunnelState(
             pathRouted: nil,
             activeIPv4Tunnels: []
         ) == nil)
+    }
+
+    @Test("first path wait is bounded by the timeout")
+    func firstPathWaitIsBounded() async {
+        let neverEnding = AsyncStream<NWPath> { _ in }
+        let start = ContinuousClock.now
+        let path = await SystemProxyTunnelStateReader.firstPath(
+            from: neverEnding,
+            timeout: .milliseconds(50)
+        )
+        let elapsed = start.duration(to: .now)
+
+        #expect(path == nil)
+        #expect(elapsed >= .milliseconds(40))
+        #expect(elapsed < .seconds(1))
+    }
+
+    @Test("first path wait returns immediately for a finished stream")
+    func firstPathReturnsImmediatelyForFinishedStream() async {
+        let finished = AsyncStream<NWPath> { continuation in
+            continuation.finish()
+        }
+
+        let path = await SystemProxyTunnelStateReader.firstPath(
+            from: finished,
+            timeout: .seconds(5)
+        )
+
+        #expect(path == nil)
     }
 
     @Test("failed proxy candidate falls back to DIRECT for the same target")
@@ -3230,10 +3286,19 @@ private struct StubProxyResolver: ProxyResolving {
 }
 
 private struct StubProxyTunnelStateReader: ProxyTunnelStateReading {
-    let interface: String?
+    let state: ProxyTunnelState?
 
-    func routedTunnelInterface() async -> String? {
-        interface
+    init(
+        interface: String?,
+        source: ProxyTunnelDetectionSource = .nwpath
+    ) {
+        self.state = interface.map {
+            ProxyTunnelState(interface: $0, source: source)
+        }
+    }
+
+    func tunnelState() async -> ProxyTunnelState? {
+        state
     }
 }
 

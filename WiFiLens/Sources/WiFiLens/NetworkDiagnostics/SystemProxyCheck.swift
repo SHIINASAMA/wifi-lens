@@ -99,14 +99,72 @@ struct SystemProxySettingsReader: SystemProxySettingsReading {
     }
 }
 
+enum ProxyTunnelDetectionSource: String, Equatable, Sendable {
+    case nwpath
+    case activeInterface = "active-interface"
+}
+
+struct ProxyTunnelState: Equatable, Sendable {
+    let interface: String
+    let source: ProxyTunnelDetectionSource
+}
+
 protocol ProxyTunnelStateReading: Sendable {
-    func routedTunnelInterface() async -> String?
+    func tunnelState() async -> ProxyTunnelState?
 }
 
 struct SystemProxyTunnelStateReader: ProxyTunnelStateReading {
-    func routedTunnelInterface() async -> String? {
-        let monitor = NWPathMonitor()
-        let stream = AsyncStream<NWPath> { continuation in
+    static let pathWaitTimeout: Duration = .seconds(1)
+
+    func tunnelState() async -> ProxyTunnelState? {
+        let path = await Self.firstPath(
+            from: Self.makePathStream(),
+            timeout: Self.pathWaitTimeout
+        )
+        let pathRouted = path.flatMap {
+            SystemNetworkTunnelStateReader.state(for: $0).routedTunnelInterface
+        }
+        return Self.candidateTunnelState(
+            pathRouted: pathRouted,
+            activeIPv4Tunnels: Self.activeIPv4TunnelInterfaces()
+        )
+    }
+
+    static func candidateTunnelState(
+        pathRouted: String?,
+        activeIPv4Tunnels: [String]
+    ) -> ProxyTunnelState? {
+        if let pathRouted {
+            return ProxyTunnelState(interface: pathRouted, source: .nwpath)
+        }
+        guard let first = activeIPv4Tunnels.first else { return nil }
+        return ProxyTunnelState(interface: first, source: .activeInterface)
+    }
+
+    static func firstPath(
+        from stream: AsyncStream<NWPath>,
+        timeout: Duration
+    ) async -> NWPath? {
+        let pathTask = Task<NWPath?, Never> {
+            for await path in stream {
+                return path
+            }
+            return nil
+        }
+        return await withTaskGroup(of: NWPath?.self) { group in
+            group.addTask { await pathTask.value }
+            group.addTask {
+                try? await Task.sleep(for: timeout)
+                return nil
+            }
+            defer { pathTask.cancel() }
+            return await group.next() ?? nil
+        }
+    }
+
+    private static func makePathStream() -> AsyncStream<NWPath> {
+        AsyncStream { continuation in
+            let monitor = NWPathMonitor()
             monitor.pathUpdateHandler = { path in
                 continuation.yield(path)
                 continuation.finish()
@@ -114,23 +172,6 @@ struct SystemProxyTunnelStateReader: ProxyTunnelStateReading {
             continuation.onTermination = { _ in monitor.cancel() }
             monitor.start(queue: DispatchQueue(label: "io.github.kaoru.wifi-lens.network-diagnostics.proxy-tunnel"))
         }
-        defer { monitor.cancel() }
-        for await path in stream {
-            let pathRouted = SystemNetworkTunnelStateReader.state(for: path).routedTunnelInterface
-            return Self.candidateTunnelInterface(
-                pathRouted: pathRouted,
-                activeIPv4Tunnels: Self.activeIPv4TunnelInterfaces()
-            )
-        }
-        return nil
-    }
-
-    static func candidateTunnelInterface(
-        pathRouted: String?,
-        activeIPv4Tunnels: [String]
-    ) -> String? {
-        if let pathRouted { return pathRouted }
-        return activeIPv4Tunnels.first
     }
 
     static func activeIPv4TunnelInterfaces() -> [String] {
@@ -405,13 +446,13 @@ struct SystemProxyCheck: DiagnosticCheck {
         guard !Task.isCancelled else {
             return cancellationResult(stage: "before-http-resolution")
         }
-        async let tunnelInterfaceTask = tunnelReader.routedTunnelInterface()
+        async let tunnelStateTask = tunnelReader.tunnelState()
         async let httpResolutionTask = resolver.resolve(for: httpTarget)
         async let httpsResolutionTask = resolver.resolve(for: httpsTarget)
-        let (httpResolution, httpsResolution, tunnelInterface) = await (
+        let (httpResolution, httpsResolution, tunnelState) = await (
             httpResolutionTask,
             httpsResolutionTask,
-            tunnelInterfaceTask
+            tunnelStateTask
         )
         guard !Task.isCancelled else {
             return cancellationResult(
@@ -424,13 +465,13 @@ struct SystemProxyCheck: DiagnosticCheck {
             target: httpTarget,
             resolution: httpResolution,
             timeout: timeout,
-            tunnelInterface: tunnelInterface
+            tunnelState: tunnelState
         )
         async let httpsResultTask = evaluate(
             target: httpsTarget,
             resolution: httpsResolution,
             timeout: timeout,
-            tunnelInterface: tunnelInterface
+            tunnelState: tunnelState
         )
         let (httpResult, httpsResult) = await (httpResultTask, httpsResultTask)
         guard !Task.isCancelled else {
@@ -447,7 +488,7 @@ struct SystemProxyCheck: DiagnosticCheck {
         target: URL,
         resolution: ProxyCandidateResolution,
         timeout: Duration,
-        tunnelInterface: String? = nil
+        tunnelState: ProxyTunnelState? = nil
     ) async -> ProxyTargetRouteResult {
         let deadline = clock.now().advanced(by: timeout)
         let evidencePrefix = "proxy.\(target.scheme?.lowercased() ?? "unknown")"
@@ -498,20 +539,24 @@ struct SystemProxyCheck: DiagnosticCheck {
             let attemptTimeout = remaining / Double(remainingCandidateCount)
             let attemptDeadline = attemptStart.advanced(by: attemptTimeout)
             evidence.append(.init(code: "\(evidencePrefix).candidate-index", value: String(index)))
-            let routeType = (candidate == .direct && tunnelInterface != nil) ? "tunnel" : candidate.routeType
+            let routeType = (candidate == .direct && tunnelState != nil) ? "tunnel" : candidate.routeType
             evidence.append(.init(code: "\(evidencePrefix).route-type", value: routeType))
             evidence.append(.init(code: "\(evidencePrefix).fallback-used", value: String(index > 0)))
 
             if candidate == .direct {
-                if let tunnelInterface {
-                    evidence.append(.init(code: "\(evidencePrefix).tunnel-interface", value: tunnelInterface))
+                if let tunnelState {
+                    evidence.append(.init(code: "\(evidencePrefix).tunnel-interface", value: tunnelState.interface))
+                    evidence.append(.init(
+                        code: "\(evidencePrefix).tunnel-detection-source",
+                        value: tunnelState.source.rawValue
+                    ))
                 }
                 evidence.append(.init(code: "\(evidencePrefix).endpoint-status", value: "not-required"))
                 evidence.append(.init(code: "\(evidencePrefix).authentication-status", value: "not-required"))
                 evidence.append(.init(code: "\(evidencePrefix).egress-status", value: "base-check"))
                 return ProxyTargetRouteResult(
                     target: target,
-                    status: tunnelInterface == nil ? .direct : .tunnel,
+                    status: tunnelState == nil ? .direct : .tunnel,
                     selectedCandidateIndex: index,
                     selectedProxy: .direct,
                     evidence: evidence
@@ -680,9 +725,15 @@ struct SystemProxyCheck: DiagnosticCheck {
         }
         if statuses.allSatisfy({ $0 == .tunnel || $0 == .direct }),
            statuses.contains(.tunnel) {
+            let nwPathConfirmed = evidence.contains { evidence in
+                evidence.code.hasSuffix(".tunnel-detection-source")
+                    && evidence.value == ProxyTunnelDetectionSource.nwpath.rawValue
+            }
             return result(
                 .normal,
-                key: "network_diagnostics.proxy.tunnel_routes.summary",
+                key: nwPathConfirmed
+                    ? "network_diagnostics.proxy.tunnel_routes.summary"
+                    : "network_diagnostics.proxy.tunnel_routes_active.summary",
                 evidence: evidence
             )
         }

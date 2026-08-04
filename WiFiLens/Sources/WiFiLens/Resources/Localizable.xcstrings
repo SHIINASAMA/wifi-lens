@@ -32219,6 +32219,41 @@
           }
         }
       }
+    },
+    "network_diagnostics.proxy.tunnel_routes_active.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Active virtual network interface detected"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アクティブな仮想ネットワークインターフェースを検出しました"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "检测到活跃的虚拟网络接口"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktive virtuelle Netzwerkschnittstelle erkannt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se detectó una interfaz de red virtual activa"
+          }
+        }
+      }
     }
   }
 }
