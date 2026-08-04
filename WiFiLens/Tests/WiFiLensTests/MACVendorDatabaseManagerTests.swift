@@ -72,7 +72,7 @@ struct MACVendorDatabaseManagerTests {
         await manager.loadInstalledDatabase()
 
         let downloadTask = Task { await manager.downloadAndInstall() }
-        await waitUntil { await service.installCallCount == 1 }
+        await service.waitUntilInstallCalled()
 
         #expect(manager.operation == .installing)
         #expect(manager.availability == .installed(oldDatabase.summary))
@@ -250,7 +250,7 @@ struct MACVendorDatabaseManagerTests {
         )
 
         let downloadTask = Task { await manager.downloadAndInstall(ownerID: ownerA) }
-        await waitUntil { await service.downloadCallCount == 1 }
+        await service.waitUntilDownloadCalled()
 
         #expect(manager.cancelCurrentOperation(ownerID: ownerB) == nil)
         #expect(manager.operation != .idle)
@@ -278,7 +278,7 @@ struct MACVendorDatabaseManagerTests {
         let preparationTask = Task {
             await manager.prepareManualImport(urls: fourFixtureURLs(), ownerID: ownerA)
         }
-        await waitUntil { await service.prepareCallCount == 1 }
+        await service.waitUntilPrepareCalled()
 
         #expect(manager.operation(for: ownerA) == .readingFiles)
         #expect(manager.operation(for: ownerB) == .idle)
@@ -364,7 +364,7 @@ struct MACVendorDatabaseManagerTests {
         await manager.prepareManualImport(urls: fourFixtureURLs(), ownerID: ownerA)
 
         let downloadTask = Task { await manager.downloadAndInstall(ownerID: ownerB) }
-        await waitUntil { await service.downloadCallCount == 1 }
+        await service.waitUntilDownloadCalled()
 
         #expect(manager.cancelCurrentOperation(ownerID: ownerA) == nil)
         manager.discardPreparedManualImport(ownerID: ownerA)
@@ -465,7 +465,7 @@ struct MACVendorDatabaseManagerTests {
         await manager.loadInstalledDatabase()
 
         let downloadTask = Task { await manager.downloadAndInstall() }
-        await waitUntil { await service.downloadCallCount == 1 }
+        await service.waitUntilDownloadCalled()
         manager.cancelCurrentOperation()
         await downloadTask.value
 
@@ -488,7 +488,7 @@ struct MACVendorDatabaseManagerTests {
         await manager.loadInstalledDatabase()
 
         let preparationTask = Task { await manager.prepareManualImport(urls: fourFixtureURLs()) }
-        await waitUntil { await service.prepareCallCount == 1 }
+        await service.waitUntilPrepareCalled()
         manager.cancelCurrentOperation()
         await preparationTask.value
 
@@ -512,7 +512,7 @@ struct MACVendorDatabaseManagerTests {
         await manager.loadInstalledDatabase()
 
         let downloadTask = Task { await manager.downloadAndInstall() }
-        await waitUntil { await service.downloadCallCount == 1 }
+        await service.waitUntilDownloadCalled()
 
         let handle = try #require(manager.cancelCurrentOperation())
         await manager.waitForCancellation(handle)
@@ -533,7 +533,7 @@ struct MACVendorDatabaseManagerTests {
         )
 
         let downloadTask = Task { await manager.downloadAndInstall() }
-        await waitUntil { await service.downloadCallCount == 1 }
+        await service.waitUntilDownloadCalled()
         let staleHandle = try #require(manager.cancelCurrentOperation())
         await downloadTask.value
         #expect(manager.operation == .idle)
@@ -541,7 +541,7 @@ struct MACVendorDatabaseManagerTests {
         let preparationTask = Task {
             await manager.prepareManualImport(urls: fourFixtureURLs())
         }
-        await waitUntil { await service.prepareCallCount == 1 }
+        await service.waitUntilPrepareCalled()
         #expect(manager.operation == .readingFiles)
 
         await manager.waitForCancellation(staleHandle)
@@ -567,7 +567,7 @@ struct MACVendorDatabaseManagerTests {
         await manager.loadInstalledDatabase()
 
         let downloadTask = Task { await manager.downloadAndInstall() }
-        await waitUntil { await service.installCallCount == 1 }
+        await service.waitUntilInstallCalled()
         manager.cancelCurrentOperation()
         await service.releaseInstall()
         await downloadTask.value
@@ -588,7 +588,7 @@ struct MACVendorDatabaseManagerTests {
         await manager.loadInstalledDatabase()
 
         let downloadTask = Task { await manager.downloadAndInstall() }
-        await waitUntil { await service.downloadCallCount == 1 }
+        await service.waitUntilDownloadCalled()
         let operationBeforeCompetition = manager.operation
 
         await manager.prepareManualImport(urls: fourFixtureURLs())
@@ -756,6 +756,9 @@ private actor FakeMACVendorDatabaseService: MACVendorDatabaseServicing {
     private let suspendPreparation: Bool
     private let suspendInstall: Bool
     private var installReleased = false
+    private var downloadWaiters: [CheckedContinuation<Void, Never>] = []
+    private var prepareWaiters: [CheckedContinuation<Void, Never>] = []
+    private var installWaiters: [CheckedContinuation<Void, Never>] = []
 
     private(set) var loadCallCount = 0
     private(set) var downloadCallCount = 0
@@ -802,6 +805,9 @@ private actor FakeMACVendorDatabaseService: MACVendorDatabaseServicing {
         progress: @Sendable (Int) async -> Void
     ) async throws -> MACVendorDatabase {
         downloadCallCount += 1
+        let pendingDownloadWaiters = downloadWaiters
+        downloadWaiters.removeAll()
+        pendingDownloadWaiters.forEach { $0.resume() }
         for completed in 1...MACVendorRegistry.allCases.count {
             await progress(completed)
         }
@@ -820,6 +826,9 @@ private actor FakeMACVendorDatabaseService: MACVendorDatabaseServicing {
 
     func prepareManualImport(urls: [URL], createdAt: Date) async throws -> MACVendorDatabase {
         prepareCallCount += 1
+        let pendingPrepareWaiters = prepareWaiters
+        prepareWaiters.removeAll()
+        pendingPrepareWaiters.forEach { $0.resume() }
         do {
             while suspendPreparation {
                 try Task.checkCancellation()
@@ -835,6 +844,9 @@ private actor FakeMACVendorDatabaseService: MACVendorDatabaseServicing {
 
     func install(_ database: MACVendorDatabase) async throws {
         installCallCount += 1
+        let pendingInstallWaiters = installWaiters
+        installWaiters.removeAll()
+        pendingInstallWaiters.forEach { $0.resume() }
         while suspendInstall, !installReleased {
             try await Task.sleep(for: .milliseconds(5))
         }
@@ -852,6 +864,21 @@ private actor FakeMACVendorDatabaseService: MACVendorDatabaseServicing {
 
     func setPreparationError(_ error: MACVendorDatabaseError?) {
         preparationError = error
+    }
+
+    func waitUntilDownloadCalled() async {
+        if downloadCallCount > 0 { return }
+        await withCheckedContinuation { downloadWaiters.append($0) }
+    }
+
+    func waitUntilPrepareCalled() async {
+        if prepareCallCount > 0 { return }
+        await withCheckedContinuation { prepareWaiters.append($0) }
+    }
+
+    func waitUntilInstallCalled() async {
+        if installCallCount > 0 { return }
+        await withCheckedContinuation { installWaiters.append($0) }
     }
 }
 
@@ -924,20 +951,6 @@ private func makeDatabase(
 
 private func fourFixtureURLs() -> [URL] {
     MACVendorRegistry.allCases.map { URL(fileURLWithPath: "/tmp/\($0.rawValue).csv") }
-}
-
-/// Polls an asynchronous condition with a generous budget. These tests await
-/// cross-actor handshakes (main-actor manager → fake service actor → back) that can
-/// take well over a second under full-suite parallel load; the original 1000 × 1ms
-/// budget timed out intermittently on busy machines.
-private func waitUntil(
-    _ condition: @escaping @Sendable () async -> Bool
-) async {
-    for _ in 0..<1_000 {
-        if await condition() { return }
-        try? await Task.sleep(for: .milliseconds(5))
-    }
-    Issue.record("Timed out waiting for asynchronous test state")
 }
 
 private func makeTemporaryDirectory() throws -> URL {

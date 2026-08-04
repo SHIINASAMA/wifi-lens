@@ -1,20 +1,11 @@
 import Foundation
+import Observation
 import Testing
 @testable import WiFi_Lens
 
 @Suite("Roaming Migration")
 @MainActor
 struct RoamingMigrationTests {
-    private func waitUntil(_ condition: @MainActor () -> Bool) async -> Bool {
-        for _ in 0..<50 {
-            if condition() {
-                return true
-            }
-            try? await Task.sleep(for: .milliseconds(20))
-        }
-        return condition()
-    }
-
     private func connectedStatus(
         ssid: String = "TestNet",
         bssid: String = "AA:BB:CC:DD:EE:FF",
@@ -41,9 +32,10 @@ struct RoamingMigrationTests {
         let status = connectedStatus()
         let provider = MockRoamingProbeProvider(result: status)
         let vm = RoamingTestViewModel(roamingProvider: provider)
+        let state = ObservationWatcher()
 
         vm.checkReadiness()
-        #expect(await waitUntil { vm.state == .ready })
+        await state.waitUntil { vm.state == .ready }
 
         #expect(vm.state == .ready)
         #expect(vm.currentSSID == "TestNet")
@@ -63,9 +55,10 @@ struct RoamingMigrationTests {
         )
         let provider = MockRoamingProbeProvider(result: status)
         let vm = RoamingTestViewModel(roamingProvider: provider)
+        let state = ObservationWatcher()
 
         vm.checkReadiness()
-        #expect(await waitUntil { vm.errorMessage != nil })
+        await state.waitUntil { vm.errorMessage != nil }
 
         #expect(vm.state == .idle)
         #expect(vm.errorMessage != nil)
@@ -76,13 +69,14 @@ struct RoamingMigrationTests {
         let status = connectedStatus(bssid: "11:22:33:44:55:66")
         let provider = MockRoamingProbeProvider(result: status)
         let vm = RoamingTestViewModel(roamingProvider: provider)
+        let state = ObservationWatcher()
 
         vm.checkReadiness()
-        #expect(await waitUntil { vm.state == .ready })
+        await state.waitUntil { vm.state == .ready }
         #expect(vm.state == .ready)
 
         vm.startTest()
-        #expect(await waitUntil { vm.state == .running && vm.segments.count == 1 })
+        await state.waitUntil { vm.state == .running && vm.segments.count == 1 }
 
         #expect(vm.state == .running)
         #expect(vm.segments.count == 1)
@@ -104,13 +98,14 @@ struct RoamingMigrationTests {
             roamingProvider: roamingProvider,
             latencyProvider: latencyProvider
         )
+        let state = ObservationWatcher()
 
         vm.checkReadiness()
-        #expect(await waitUntil { vm.state == .ready })
+        await state.waitUntil { vm.state == .ready }
         #expect(vm.state == .ready)
 
         vm.startTest()
-        #expect(await waitUntil { vm.state == .running })
+        await state.waitUntil { vm.state == .running }
         #expect(vm.state == .running)
         vm.stopTest()
     }
@@ -120,5 +115,48 @@ struct RoamingMigrationTests {
         let vm = RoamingTestViewModel()
         #expect(vm.state == .idle)
         #expect(vm.canStart == false)
+    }
+}
+
+@MainActor
+private final class ObservationWatcher {
+    private var pending: [(@MainActor () -> Bool, CheckedContinuation<Void, Never>)] = []
+    private var isTracking = false
+
+    func waitUntil(_ predicate: @escaping @MainActor () -> Bool) async {
+        if predicate() { return }
+        await withCheckedContinuation { continuation in
+            pending.append((predicate, continuation))
+            if !isTracking {
+                isTracking = true
+                track()
+            }
+        }
+    }
+
+    private func track() {
+        withObservationTracking {
+            for (predicate, _) in pending {
+                _ = predicate()
+            }
+        } onChange: { [weak self] in
+            Task { @MainActor in
+                guard let self else { return }
+                var ready: [(@MainActor () -> Bool, CheckedContinuation<Void, Never>)] = []
+                self.pending = self.pending.filter { entry in
+                    if entry.0() {
+                        ready.append(entry)
+                        return false
+                    }
+                    return true
+                }
+                ready.forEach { $0.1.resume() }
+                if !self.pending.isEmpty {
+                    self.track()
+                } else {
+                    self.isTracking = false
+                }
+            }
+        }
     }
 }

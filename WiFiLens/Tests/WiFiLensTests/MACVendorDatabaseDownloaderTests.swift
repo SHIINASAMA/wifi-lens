@@ -54,7 +54,7 @@ struct MACVendorDatabaseDownloaderTests {
             try await downloader.downloadAll { _ in }
         }
 
-        try? await Task.sleep(for: .milliseconds(100))
+        await transport.waitUntilAllRequestsStarted()
 
         #expect(await transport.startedCount == MACVendorRegistry.allCases.count)
         task.cancel()
@@ -113,7 +113,6 @@ struct MACVendorDatabaseDownloaderTests {
         task.cancel()
         await transport.releaseFailure()
         await transport.waitUntilFailureWillReturn()
-        await Task.yield()
         await transport.releasePeers()
 
         do {
@@ -352,9 +351,11 @@ struct MACVendorDatabaseDownloaderTests {
 
     @Test func productionTransportCancellationStopsLoading() async {
         let url = productionTestURL("cancellation")
-        let stopped = LockedFlag()
+        let started = AsyncSignal()
+        let stopped = AsyncSignal()
         MACVendorStubURLProtocol.register(url: url) { stub in
-            stub.onStop = { stopped.set() }
+            started.signal()
+            stub.onStop = { stopped.signal() }
             stub.respond(chunks: [Data("partial".utf8)], finish: false)
         }
         defer { MACVendorStubURLProtocol.unregister(url: url) }
@@ -367,14 +368,11 @@ struct MACVendorDatabaseDownloaderTests {
             )
         }
 
-        try? await Task.sleep(for: .milliseconds(50))
+        await started.wait()
         task.cancel()
         _ = try? await task.value
 
-        for _ in 0..<20 where !stopped.value {
-            try? await Task.sleep(for: .milliseconds(10))
-        }
-        #expect(stopped.value)
+        await stopped.wait()
     }
 
 }
@@ -437,6 +435,7 @@ private actor SuspendingMACVendorHTTPTransport: MACVendorHTTPTransport {
 
 private actor BlockingMACVendorHTTPTransport: MACVendorHTTPTransport {
     private(set) var startedCount = 0
+    private var allStartedWaiters: [CheckedContinuation<Void, Never>] = []
 
     func fetch(
         _ request: URLRequest,
@@ -444,8 +443,18 @@ private actor BlockingMACVendorHTTPTransport: MACVendorHTTPTransport {
         byteBudget: MACVendorDownloadByteBudget
     ) async throws -> MACVendorHTTPResponse {
         startedCount += 1
+        if startedCount == MACVendorRegistry.allCases.count {
+            let pending = allStartedWaiters
+            allStartedWaiters.removeAll()
+            pending.forEach { $0.resume() }
+        }
         try await Task.sleep(for: .seconds(60))
         throw RecordingTransportError.unexpectedResume
+    }
+
+    func waitUntilAllRequestsStarted() async {
+        if startedCount == MACVendorRegistry.allCases.count { return }
+        await withCheckedContinuation { allStartedWaiters.append($0) }
     }
 }
 
@@ -692,12 +701,36 @@ private final class MACVendorStubURLProtocol: URLProtocol, @unchecked Sendable {
     }
 }
 
-private final class LockedFlag: @unchecked Sendable {
+private final class AsyncSignal: @unchecked Sendable {
     private let lock = NSLock()
-    private var storedValue = false
+    private var isSignaled = false
+    private var waiters: [CheckedContinuation<Void, Never>] = []
 
-    var value: Bool { lock.withLock { storedValue } }
-    func set() { lock.withLock { storedValue = true } }
+    func signal() {
+        var pending: [CheckedContinuation<Void, Never>] = []
+        lock.withLock {
+            isSignaled = true
+            pending = waiters
+            waiters.removeAll()
+        }
+        pending.forEach { $0.resume() }
+    }
+
+    func wait() async {
+        await withCheckedContinuation { continuation in
+            var resumeImmediately = false
+            lock.withLock {
+                if isSignaled {
+                    resumeImmediately = true
+                } else {
+                    waiters.append(continuation)
+                }
+            }
+            if resumeImmediately {
+                continuation.resume()
+            }
+        }
+    }
 }
 
 private func productionTestURL(_ name: String) -> URL {
