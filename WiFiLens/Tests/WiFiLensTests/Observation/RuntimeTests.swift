@@ -2020,35 +2020,63 @@ private final class LockedDateSequence: @unchecked Sendable {
 }
 
 @MainActor
-private final class SuspendedObservationConsumer: WiFiObservationConsuming {
+private final class SuspendedObservationConsumer: WiFiObservationConsuming, @unchecked Sendable {
+    private let lock = NSLock()
     private var enteredContinuation: CheckedContinuation<Void, Never>?
     private var suspensionContinuation: CheckedContinuation<Void, Never>?
     private var hasEntered = false
-    private(set) var isSuspended = false
+    private var isSuspendedValue = false
+    private var isResumed = false
     private(set) var observations: [WiFiObservation] = []
+
+    var isSuspended: Bool { lock.withLock { isSuspendedValue } }
 
     func consume(_ observation: WiFiObservation) async throws {
         observations.append(observation)
-        hasEntered = true
-        enteredContinuation?.resume()
-        enteredContinuation = nil
-        isSuspended = true
-        await withCheckedContinuation { continuation in
-            suspensionContinuation = continuation
+        var enteredWaiter: CheckedContinuation<Void, Never>?
+        lock.withLock {
+            isSuspendedValue = true
+            hasEntered = true
+            enteredWaiter = enteredContinuation
+            enteredContinuation = nil
         }
-        isSuspended = false
+        enteredWaiter?.resume()
+        await withCheckedContinuation { continuation in
+            var resumeImmediately = false
+            lock.withLock {
+                if isResumed {
+                    resumeImmediately = true
+                } else {
+                    suspensionContinuation = continuation
+                }
+            }
+            if resumeImmediately { continuation.resume() }
+        }
+        lock.withLock { isSuspendedValue = false }
     }
 
     func waitUntilEntered() async {
-        guard !hasEntered else { return }
         await withCheckedContinuation { continuation in
-            enteredContinuation = continuation
+            var resumeImmediately = false
+            lock.withLock {
+                if hasEntered {
+                    resumeImmediately = true
+                } else {
+                    enteredContinuation = continuation
+                }
+            }
+            if resumeImmediately { continuation.resume() }
         }
     }
 
     func resume() {
-        suspensionContinuation?.resume()
-        suspensionContinuation = nil
+        var pending: CheckedContinuation<Void, Never>?
+        lock.withLock {
+            isResumed = true
+            pending = suspensionContinuation
+            suspensionContinuation = nil
+        }
+        pending?.resume()
     }
 }
 
