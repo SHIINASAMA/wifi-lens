@@ -38,6 +38,20 @@ struct NetworkDiagnosticsWorkbenchRow: Equatable, Identifiable, Sendable {
     let result: NetworkDiagnosticResult?
 }
 
+enum NetworkDiagnosticsWorkbenchItem: Equatable, Identifiable {
+    case stageHeader(NetworkDiagnosticStage)
+    case additionalHeader
+    case check(NetworkDiagnosticsWorkbenchRow)
+
+    var id: String {
+        switch self {
+        case .stageHeader(let stage): "header.\(String(describing: stage))"
+        case .additionalHeader: "header.additional"
+        case .check(let row): "check.\(row.id.rawValue)"
+        }
+    }
+}
+
 enum NetworkDiagnosticsPresentation {
     static func workbenchRows(
         pagePhase: NetworkDiagnosticsPagePhase,
@@ -63,6 +77,44 @@ enum NetworkDiagnosticsPresentation {
         }
     }
 
+    static func stage(for checkID: NetworkDiagnosticCheckID) -> NetworkDiagnosticStage? {
+        switch checkID {
+        case .path, .dns, .proxy: .thisMac
+        case .gatewayReachability: .lan
+        case .internet: .internet
+        case .ipv6: nil
+        }
+    }
+
+    static func workbenchItems(
+        pagePhase: NetworkDiagnosticsPagePhase,
+        executionPhases: [NetworkDiagnosticCheckID: NetworkDiagnosticExecutionPhase],
+        results: [NetworkDiagnosticCheckID: NetworkDiagnosticResult],
+        checkIDs: [NetworkDiagnosticCheckID] = NetworkDiagnosticCheckID.allCases
+    ) -> [NetworkDiagnosticsWorkbenchItem] {
+        let rows = workbenchRows(
+            pagePhase: pagePhase,
+            executionPhases: executionPhases,
+            results: results,
+            checkIDs: checkIDs
+        )
+        guard !rows.isEmpty else { return [] }
+
+        var items: [NetworkDiagnosticsWorkbenchItem] = []
+        for currentStage in NetworkDiagnosticStage.allCases {
+            let stageRows = rows.filter { stage(for: $0.id) == currentStage }
+            if stageRows.isEmpty { continue }
+            items.append(.stageHeader(currentStage))
+            items.append(contentsOf: stageRows.map { .check($0) })
+        }
+        let additionalRows = rows.filter { stage(for: $0.id) == nil }
+        if !additionalRows.isEmpty {
+            items.append(.additionalHeader)
+            items.append(contentsOf: additionalRows.map { .check($0) })
+        }
+        return items
+    }
+
 }
 
 @MainActor
@@ -85,6 +137,7 @@ final class NetworkDiagnosticsViewModel {
 
     init(checks: [any DiagnosticCheck] = [
         NetworkConnectivityCheck(),
+        GatewayReachabilityCheck(),
         DNSResolutionCheck(),
         HTTPSControlEndpointCheck(),
         IPv6ControlEndpointCheck(),

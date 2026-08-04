@@ -16,6 +16,7 @@ struct ProxyCandidateResolution: Equatable, Sendable {
 
 enum ProxyTargetRouteStatus: Equatable, Sendable {
     case direct
+    case tunnel
     case proxied
     case authenticationRequired
     case unavailable

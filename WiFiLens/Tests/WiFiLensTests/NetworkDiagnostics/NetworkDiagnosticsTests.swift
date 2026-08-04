@@ -1,5 +1,6 @@
 import CFNetwork
 import Foundation
+import Network
 import Testing
 @testable import WiFi_Lens
 
@@ -29,9 +30,9 @@ struct NetworkDiagnosticsTests {
 
     @Test("diagnostic identifiers keep path and internet distinct in execution order")
     func diagnosticIdentifierOrder() {
-        #expect(NetworkDiagnosticCheckID.allCases == [.path, .dns, .internet, .ipv6, .proxy])
+        #expect(NetworkDiagnosticCheckID.allCases == [.path, .gatewayReachability, .dns, .internet, .ipv6, .proxy])
         #expect(NetworkDiagnosticCheckID.path != .internet)
-        #expect(Set(NetworkDiagnosticCheckID.allCases).count == 5)
+        #expect(Set(NetworkDiagnosticCheckID.allCases).count == 6)
     }
 
     @Test("blocked and skipped statuses have distinct presentations")
@@ -79,35 +80,153 @@ struct NetworkDiagnosticsTests {
         #expect(remediation.actionKey == "network_diagnostics.remediation.indeterminate.action")
     }
 
-    @Test("path summary composes interface tunnel proxy and internet segments")
-    func pathSummaryComposition() {
-        let results = [
-            NetworkDiagnosticResult(
-                id: .path,
-                status: .normal,
-                summary: "Path available",
-                evidence: [
-                    .init(code: "path.interface-type", value: "wifi"),
-                    .init(code: "path.interface-name", value: "en0"),
-                    .init(code: "path.routed-tunnel", value: "utun6"),
-                ]
-            ),
-            NetworkDiagnosticResult(
-                id: .proxy,
-                status: .normal,
-                summary: "Proxy route available",
-                evidence: [.init(code: "proxy.https.route-type", value: "https")]
-            ),
-        ]
-
-        #expect(NetworkPathSummary.from(results: results)?.text == "Mac → Wi-Fi en0 → VPN/Tunnel utun6 → HTTPS proxy → Internet")
-    }
-
     @Test("a blocked probe does not become an independent network fault")
     func blockedProbeIsNotAbnormal() {
         let result = NetworkDiagnosticResult.blocked(id: .internet, summary: "DNS is unavailable")
         #expect(result.status == .blocked)
         #expect(result.detail == "DNS is unavailable")
+    }
+
+    @Test("runner blocks gateway reachability after a hard path failure")
+    func runnerBlocksGatewayReachabilityAfterPathFailure() async {
+        let recorder = DiagnosticTestRecorder()
+        let checks: [any DiagnosticCheck] = [
+            StubDiagnosticCheck(id: .path, result: NetworkDiagnosticResult(id: .path, status: .abnormal, summary: "no path"), recorder: recorder),
+            StubDiagnosticCheck(id: .gatewayReachability, result: NetworkDiagnosticResult(id: .gatewayReachability, status: .normal, summary: "unused"), recorder: recorder),
+            StubDiagnosticCheck(id: .dns, result: NetworkDiagnosticResult(id: .dns, status: .normal, summary: "unused"), recorder: recorder),
+        ]
+        let runner = DiagnosticRunner(checks: checks, minimumStepDuration: .zero)
+
+        let results = await runner.run { _ in }
+
+        #expect(results.map(\.id) == [.path, .gatewayReachability, .dns])
+        #expect(results[1].status == .blocked)
+        #expect(results[1].evidence.contains(.init(code: "blocked.by", value: "path")))
+    }
+
+    @Test("gateway reachability abnormal does not block downstream checks")
+    func gatewayReachabilityAbnormalDoesNotBlockDownstream() async {
+        let recorder = DiagnosticTestRecorder()
+        let checks: [any DiagnosticCheck] = NetworkDiagnosticCheckID.allCases.map { id in
+            let status: NetworkDiagnosticStatus = id == .gatewayReachability ? .abnormal : .normal
+            return StubDiagnosticCheck(id: id, result: NetworkDiagnosticResult(id: id, status: status, summary: id.rawValue), recorder: recorder)
+        }
+        let runner = DiagnosticRunner(checks: checks, minimumStepDuration: .zero)
+
+        let results = await runner.run { _ in }
+
+        #expect(results.map(\.id) == NetworkDiagnosticCheckID.allCases)
+        #expect(results[1].status == .abnormal)
+        #expect(results[2].status == .normal)
+        #expect(results[3].status == .normal)
+        #expect(results[4].status == .normal)
+    }
+
+    @Test("gateway reachability abnormal drives the needs attention conclusion")
+    func gatewayReachabilityDrivesNeedsAttention() {
+        let results = [
+            NetworkDiagnosticResult(id: .path, status: .normal, summary: ""),
+            NetworkDiagnosticResult(id: .gatewayReachability, status: .abnormal, summary: ""),
+            NetworkDiagnosticResult(id: .dns, status: .normal, summary: ""),
+            NetworkDiagnosticResult(id: .internet, status: .normal, summary: ""),
+            NetworkDiagnosticResult(id: .ipv6, status: .skipped, summary: ""),
+            NetworkDiagnosticResult(id: .proxy, status: .normal, summary: ""),
+        ]
+
+        #expect(NetworkDiagnosticConclusion.evaluate(results) == .needsAttention)
+        #expect(NetworkDiagnosticConclusion.primaryIssue(in: results)?.id == .gatewayReachability)
+    }
+
+    @Test("stage resolver aggregates this mac from path dns and proxy and maps lan to its check")
+    func stageResolverThisMacAndLan() {
+        let resolver = NetworkDiagnosticStageResolver()
+        let abnormalDNS: [NetworkDiagnosticCheckID: NetworkDiagnosticResult] = [
+            .path: .init(id: .path, status: .normal, summary: ""),
+            .dns: .init(id: .dns, status: .abnormal, summary: ""),
+            .proxy: .init(id: .proxy, status: .normal, summary: ""),
+            .gatewayReachability: .init(id: .gatewayReachability, status: .normal, summary: ""),
+        ]
+
+        #expect(resolver.status(for: .thisMac, results: abnormalDNS) == .abnormal)
+        #expect(resolver.status(for: .lan, results: abnormalDNS) == .normal)
+        let proxyOnly: [NetworkDiagnosticCheckID: NetworkDiagnosticResult] = [
+            .path: .init(id: .path, status: .normal, summary: ""),
+            .dns: .init(id: .dns, status: .normal, summary: ""),
+            .proxy: .init(id: .proxy, status: .abnormal, summary: ""),
+            .gatewayReachability: .init(id: .gatewayReachability, status: .normal, summary: ""),
+        ]
+        #expect(resolver.status(for: .thisMac, results: proxyOnly) == .abnormal)
+        #expect(resolver.status(for: .thisMac, results: [:]) == nil)
+        let missingContributors: [NetworkDiagnosticCheckID: NetworkDiagnosticResult] = [
+            .path: .init(id: .path, status: .normal, summary: ""),
+        ]
+        #expect(resolver.status(for: .thisMac, results: missingContributors) == nil)
+    }
+
+    @Test("internet stage follows the internet check and ignores dns and ipv6")
+    func stageResolverInternet() {
+        let resolver = NetworkDiagnosticStageResolver()
+
+        #expect(resolver.status(for: .internet, results: [.internet: .init(id: .internet, status: .normal, summary: "")]) == .normal)
+        #expect(resolver.status(for: .internet, results: [.internet: .init(id: .internet, status: .abnormal, summary: "")]) == .abnormal)
+        #expect(resolver.status(for: .internet, results: [.internet: .init(id: .internet, status: .indeterminate, summary: "")]) == .indeterminate)
+        #expect(resolver.status(for: .internet, results: [.internet: .init(id: .internet, status: .blocked, summary: "")]) == .blocked)
+        let extras: [NetworkDiagnosticCheckID: NetworkDiagnosticResult] = [
+            .internet: .init(id: .internet, status: .normal, summary: ""),
+            .dns: .init(id: .dns, status: .abnormal, summary: ""),
+            .ipv6: .init(id: .ipv6, status: .abnormal, summary: ""),
+        ]
+        #expect(resolver.status(for: .internet, results: extras) == .normal)
+    }
+
+    @Test("internet stage requires the internet result")
+    func stageResolverRequiresInternetResult() {
+        let resolver = NetworkDiagnosticStageResolver()
+        let partial: [NetworkDiagnosticCheckID: NetworkDiagnosticResult] = [
+            .dns: .init(id: .dns, status: .normal, summary: ""),
+        ]
+
+        #expect(resolver.status(for: .internet, results: partial) == nil)
+    }
+
+    @Test("pipeline presentation maps stages to stations and edges")
+    func pipelinePresentation() {
+        let results: [NetworkDiagnosticCheckID: NetworkDiagnosticResult] = [
+            .path: .init(id: .path, status: .normal, summary: ""),
+            .gatewayReachability: .init(id: .gatewayReachability, status: .abnormal, summary: ""),
+            .dns: .init(id: .dns, status: .normal, summary: ""),
+            .internet: .init(id: .internet, status: .normal, summary: ""),
+            .ipv6: .init(id: .ipv6, status: .skipped, summary: ""),
+            .proxy: .init(id: .proxy, status: .normal, summary: ""),
+        ]
+        let presentation = NetworkDiagnosticsPipelinePresentation.from(
+            results: results,
+            executionPhases: [:]
+        )
+
+        #expect(presentation.stations.map(\.kind) == [.thisMac, .router, .internet])
+        #expect(presentation.edges.map(\.kind) == [.lan, .internet])
+        #expect(presentation.stations[0].status == .normal)
+        #expect(presentation.stations[1].status == .abnormal)
+        #expect(presentation.stations[1].isUnreachable)
+        #expect(presentation.stations[2].status == .normal)
+        #expect(!presentation.stations[2].isUnreachable)
+        #expect(presentation.edges[0].status == .abnormal)
+        #expect(presentation.edges[1].status == .normal)
+    }
+
+    @Test("pipeline edge becomes active while its checks are running")
+    func pipelineEdgeActive() {
+        let executionPhases: [NetworkDiagnosticCheckID: NetworkDiagnosticExecutionPhase] = [
+            .gatewayReachability: .checking,
+        ]
+        let presentation = NetworkDiagnosticsPipelinePresentation.from(
+            results: [:],
+            executionPhases: executionPhases
+        )
+
+        #expect(presentation.edges[0].isActive)
+        #expect(!presentation.edges[1].isActive)
     }
 
     @Test("runner executes checks and publishes results in order")
@@ -160,8 +279,8 @@ struct NetworkDiagnosticsTests {
 
         let results = await DiagnosticRunner(checks: checks).run { _ in }
 
-        #expect(results.map(\.status) == [.normal, .indeterminate, .normal, .normal, .normal])
-        #expect(await invocations.values == [.path, .dns, .internet, .ipv6, .proxy])
+        #expect(results.map(\.status) == [.normal, .normal, .indeterminate, .normal, .normal, .normal])
+        #expect(await invocations.values == [.path, .gatewayReachability, .dns, .internet, .ipv6, .proxy])
     }
 
     @Test("abnormal DNS blocks hostname-dependent internet and IPv6 checks")
@@ -181,8 +300,8 @@ struct NetworkDiagnosticsTests {
 
         let results = await DiagnosticRunner(checks: checks).run { _ in }
 
-        #expect(results.map(\.status) == [.normal, .abnormal, .blocked, .blocked, .normal])
-        #expect(await invocations.values == [.path, .dns, .proxy])
+        #expect(results.map(\.status) == [.normal, .normal, .abnormal, .blocked, .blocked, .normal])
+        #expect(await invocations.values == [.path, .gatewayReachability, .dns, .proxy])
     }
 
     @Test("indeterminate path continues independent evidence probes")
@@ -202,8 +321,8 @@ struct NetworkDiagnosticsTests {
 
         let results = await DiagnosticRunner(checks: checks).run { _ in }
 
-        #expect(results.map(\.status) == [.indeterminate, .normal, .normal, .normal, .normal])
-        #expect(await invocations.values == [.path, .dns, .internet, .ipv6, .proxy])
+        #expect(results.map(\.status) == [.indeterminate, .normal, .normal, .normal, .normal, .normal])
+        #expect(await invocations.values == [.path, .gatewayReachability, .dns, .internet, .ipv6, .proxy])
     }
 
     @Test("abnormal path blocks network probes")
@@ -223,7 +342,7 @@ struct NetworkDiagnosticsTests {
 
         let results = await DiagnosticRunner(checks: checks).run { _ in }
 
-        #expect(results.map(\.status) == [.abnormal, .blocked, .blocked, .blocked, .blocked])
+        #expect(results.map(\.status) == [.abnormal, .blocked, .blocked, .blocked, .blocked, .blocked])
         #expect(await invocations.values == [.path])
     }
 
@@ -275,7 +394,7 @@ struct NetworkDiagnosticsTests {
             internet: .abnormal,
             proxy: .abnormal
         )
-        results[2] = NetworkDiagnosticResult(
+        results[3] = NetworkDiagnosticResult(
             id: .internet,
             status: .abnormal,
             summary: "internet",
@@ -296,7 +415,7 @@ struct NetworkDiagnosticsTests {
             internet: .abnormal,
             proxy: .normal
         )
-        results[4] = NetworkDiagnosticResult(
+        results[5] = NetworkDiagnosticResult(
             id: .proxy,
             status: .normal,
             summary: "proxy",
@@ -314,7 +433,7 @@ struct NetworkDiagnosticsTests {
             internet: .abnormal,
             proxy: .normal
         )
-        results[2] = NetworkDiagnosticResult(
+        results[3] = NetworkDiagnosticResult(
             id: .internet,
             status: .abnormal,
             summary: "internet",
@@ -323,7 +442,7 @@ struct NetworkDiagnosticsTests {
                 value: String(URLError.notConnectedToInternet.rawValue)
             )]
         )
-        results[4] = NetworkDiagnosticResult(
+        results[5] = NetworkDiagnosticResult(
             id: .proxy,
             status: .normal,
             summary: "proxy",
@@ -349,6 +468,7 @@ struct NetworkDiagnosticsTests {
     func captivePortalSymptomAfterHTTPSSuccess() {
         let results = [
             NetworkDiagnosticResult(id: .path, status: .normal, summary: "path"),
+            NetworkDiagnosticResult(id: .gatewayReachability, status: .normal, summary: "gateway"),
             NetworkDiagnosticResult(id: .dns, status: .normal, summary: "dns"),
             NetworkDiagnosticResult(
                 id: .internet,
@@ -386,7 +506,7 @@ struct NetworkDiagnosticsTests {
             internet: .normal,
             proxy: .indeterminate
         )
-        results[4] = NetworkDiagnosticResult(
+        results[5] = NetworkDiagnosticResult(
             id: .proxy,
             status: .indeterminate,
             summary: "direct routing selected",
@@ -415,8 +535,8 @@ struct NetworkDiagnosticsTests {
         ) == .networkNormal)
     }
 
-    @Test("IPv6 failure is advisory when base HTTPS succeeds")
-    func ipv6IsIndependent() async {
+    @Test("IPv6 failure does not affect the overall conclusion")
+    func ipv6IsConclusionNeutral() async {
         let ipv6 = await IPv6ControlEndpointCheck(loader: StubIPv6Loader(.failed)).run()
 
         #expect(ipv6.status == .indeterminate)
@@ -429,7 +549,7 @@ struct NetworkDiagnosticsTests {
                 ipv6: ipv6.status,
                 proxy: .normal
             )
-        ) == .needsAttention)
+        ) == .networkNormal)
     }
 
     @Test("IPv6 control endpoint success is normal")
@@ -533,8 +653,8 @@ struct NetworkDiagnosticsTests {
         #expect(NetworkDiagnosticsTablePresentation.usesAlternatingRowBackgrounds == false)
     }
 
-    @Test("workbench reveals completed and active rows but hides future checks")
-    func workbenchRowVisibility() {
+    @Test("workbench items interleave stage headers with check rows")
+    func workbenchItemGrouping() {
         let path = NetworkDiagnosticResult(
             id: .path,
             status: .normal,
@@ -546,21 +666,21 @@ struct NetworkDiagnosticsTests {
             .proxy: .waiting,
         ]
 
-        #expect(NetworkDiagnosticsPresentation.workbenchRows(
+        #expect(NetworkDiagnosticsPresentation.workbenchItems(
             pagePhase: .idle,
             executionPhases: executionPhases,
             results: [:]
         ).isEmpty)
 
-        let runningRows = NetworkDiagnosticsPresentation.workbenchRows(
+        let runningItems = NetworkDiagnosticsPresentation.workbenchItems(
             pagePhase: .running,
             executionPhases: executionPhases,
             results: [.path: path],
             checkIDs: [.path, .dns, .proxy]
         )
-        #expect(runningRows.map(\.id) == [.path, .dns])
-        #expect(runningRows[0].result == path)
-        #expect(runningRows[1].result == nil)
+        #expect(runningItems.map(\.id) == ["header.thisMac", "check.path", "check.dns"])
+        #expect(runningItems[0] == .stageHeader(.thisMac))
+        #expect(runningItems[1] == .check(.init(id: .path, executionPhase: .completed, result: path)))
 
         let completedResults = Dictionary(uniqueKeysWithValues: makeResults(
             path: .normal,
@@ -568,13 +688,17 @@ struct NetworkDiagnosticsTests {
             internet: .normal,
             proxy: .indeterminate
         ).map { ($0.id, $0) })
-        let completedRows = NetworkDiagnosticsPresentation.workbenchRows(
+        let completedItems = NetworkDiagnosticsPresentation.workbenchItems(
             pagePhase: .completed,
             executionPhases: executionPhases,
             results: completedResults,
-            checkIDs: [.path, .dns, .proxy]
+            checkIDs: [.path, .dns, .ipv6, .proxy]
         )
-        #expect(completedRows.map(\.id) == [.path, .dns, .proxy])
+        #expect(completedItems.map(\.id) == [
+            "header.thisMac", "check.path", "check.dns", "check.proxy",
+            "header.additional", "check.ipv6",
+        ])
+        #expect(completedItems[4] == .additionalHeader)
     }
 
     @Test("system path check maps path states")
@@ -599,10 +723,9 @@ struct NetworkDiagnosticsTests {
         ))
     }
 
-    @Test("path check records local interface and gateway evidence separately")
-    func pathCheckRecordsGatewayEvidence() async {
-        let result = await NetworkConnectivityCheck(
-            pathSource: StubPathSource(.satisfied),
+    @Test("gateway reachability check succeeds with latency evidence")
+    func gatewayReachabilitySuccess() async {
+        let result = await GatewayReachabilityCheck(
             interfaceSource: StubNetworkInterfaceSource(interface: makeNetworkInterface(router: "192.0.2.1")),
             gatewayLatency: StubGatewayLatencyProvider(result: GatewayLatencyResult(
                 timestamp: Date(),
@@ -611,18 +734,14 @@ struct NetworkDiagnosticsTests {
             ))
         ).run()
 
+        #expect(result.id == .gatewayReachability)
         #expect(result.status == .normal)
-        #expect(result.evidence.contains(.init(code: "path.interface", value: "en0")))
-        #expect(result.evidence.contains(.init(code: "path.local-ip", value: "192.0.2.10")))
-        #expect(result.evidence.contains(.init(code: "path.subnet-mask", value: "255.255.255.0")))
-        #expect(result.evidence.contains(.init(code: "path.router", value: "192.0.2.1")))
-        #expect(result.evidence.contains(.init(code: "path.gateway-latency-ms", value: "2.5")))
+        #expect(result.evidence.contains(.init(code: "gateway.latency-ms", value: "2.5")))
     }
 
-    @Test("gateway nonresponse is advisory and does not fail the local path")
-    func gatewayFailureIsAdvisory() async {
-        let result = await NetworkConnectivityCheck(
-            pathSource: StubPathSource(.satisfied),
+    @Test("gateway nonresponse fails the gateway reachability check")
+    func gatewayNonresponseFailsCheck() async {
+        let result = await GatewayReachabilityCheck(
             interfaceSource: StubNetworkInterfaceSource(interface: makeNetworkInterface(router: "192.0.2.1")),
             gatewayLatency: StubGatewayLatencyProvider(result: GatewayLatencyResult(
                 timestamp: Date(),
@@ -631,8 +750,36 @@ struct NetworkDiagnosticsTests {
             ))
         ).run()
 
+        #expect(result.status == .abnormal)
+        #expect(result.evidence.contains(.init(code: "gateway.unreachable", value: "192.0.2.1")))
+    }
+
+    @Test("gateway reachability is indeterminate without a router IP")
+    func gatewayReachabilityWithoutRouterIP() async {
+        let result = await GatewayReachabilityCheck(
+            interfaceSource: StubNetworkInterfaceSource(interface: makeNetworkInterface(router: nil)),
+            gatewayLatency: StubGatewayLatencyProvider(result: GatewayLatencyResult(
+                timestamp: Date(),
+                error: .missingRouterIP
+            ))
+        ).run()
+
+        #expect(result.status == .indeterminate)
+        #expect(result.evidence.contains(.init(code: "gateway.unavailable", value: nil)))
+    }
+
+    @Test("path check keeps interface evidence without gateway latency")
+    func pathCheckKeepsInterfaceEvidence() async {
+        let result = await NetworkConnectivityCheck(
+            pathSource: StubPathSource(.satisfied),
+            interfaceSource: StubNetworkInterfaceSource(interface: makeNetworkInterface(router: "192.0.2.1"))
+        ).run()
+
         #expect(result.status == .normal)
-        #expect(result.evidence.contains(.init(code: "path.gateway-unreachable", value: "192.0.2.1")))
+        #expect(result.evidence.contains(.init(code: "path.interface", value: "en0")))
+        #expect(result.evidence.contains(.init(code: "path.local-ip", value: "192.0.2.10")))
+        #expect(result.evidence.contains(.init(code: "path.router", value: "192.0.2.1")))
+        #expect(!result.evidence.contains { $0.code.hasPrefix("gateway.") })
     }
 
     @Test("Microsoft captive-portal probe rejects a rewritten response")
@@ -732,6 +879,7 @@ struct NetworkDiagnosticsTests {
 
         let conclusion = NetworkDiagnosticConclusion.evaluate([
             NetworkDiagnosticResult(id: .path, status: .normal, summary: "path"),
+            NetworkDiagnosticResult(id: .gatewayReachability, status: .normal, summary: "gateway"),
             NetworkDiagnosticResult(id: .dns, status: .normal, summary: "dns"),
             internet,
             NetworkDiagnosticResult(id: .ipv6, status: .skipped, summary: "ipv6"),
@@ -825,6 +973,7 @@ struct NetworkDiagnosticsTests {
 
         let baseResults = [
             NetworkDiagnosticResult(id: .path, status: .normal, summary: "path"),
+            NetworkDiagnosticResult(id: .gatewayReachability, status: .normal, summary: "gateway"),
             NetworkDiagnosticResult(id: .dns, status: .normal, summary: "dns"),
         ]
         let trailingResults = [
@@ -902,7 +1051,7 @@ struct NetworkDiagnosticsTests {
     @Test("production checks run path DNS HTTPS and proxy in dependency order")
     @MainActor
     func productionCheckOrder() {
-        #expect(NetworkDiagnosticsViewModel().checkIDs == [.path, .dns, .internet, .ipv6, .proxy])
+        #expect(NetworkDiagnosticsViewModel().checkIDs == [.path, .gatewayReachability, .dns, .internet, .ipv6, .proxy])
     }
 
     @Test("all successful DNS samples are available")
@@ -1224,7 +1373,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(.direct),
             connector: RecordingProxyConnector(reachable: false, recorder: connectorRecorder),
-            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "unexpected", recorder: egressRecorder)
+            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "unexpected", recorder: egressRecorder),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1232,6 +1382,103 @@ struct NetworkDiagnosticsTests {
         #expect(result.status == .indeterminate)
         #expect(await connectorRecorder.endpoints.isEmpty)
         #expect(await egressRecorder.requests.isEmpty)
+    }
+
+    @Test("routed tunnel interface is recognized as the proxy route")
+    func tunneledRoutingIsRecognized() async {
+        let check = SystemProxyCheck(
+            resolver: StubProxyResolver(.direct),
+            connector: StubProxyConnector(reachable: false),
+            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "unexpected"),
+            tunnelReader: StubProxyTunnelStateReader(interface: "utun98")
+        )
+
+        let result = await check.run()
+
+        #expect(result.status == .normal)
+        #expect(result.summary == String(
+            localized: "network_diagnostics.proxy.tunnel_routes.summary",
+            comment: "Network self-check tunneled proxy route result summary"
+        ))
+        #expect(result.evidence.contains(.init(code: "proxy.http.route-type", value: "tunnel")))
+        #expect(result.evidence.contains(.init(code: "proxy.https.route-type", value: "tunnel")))
+        #expect(result.evidence.contains(.init(code: "proxy.http.tunnel-interface", value: "utun98")))
+        #expect(result.evidence.contains(.init(code: "proxy.https.tunnel-interface", value: "utun98")))
+        #expect(result.evidence.contains(.init(code: "proxy.http.tunnel-detection-source", value: "nwpath")))
+        #expect(result.evidence.contains(.init(code: "proxy.https.tunnel-detection-source", value: "nwpath")))
+        #expect(result.evidence.contains(.init(code: "proxy.http.egress-status", value: "base-check")))
+    }
+
+    @Test("active interface tunnel detection uses the softer summary")
+    func activeInterfaceTunnelUsesSofterSummary() async {
+        let check = SystemProxyCheck(
+            resolver: StubProxyResolver(.direct),
+            connector: StubProxyConnector(reachable: false),
+            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "unexpected"),
+            tunnelReader: StubProxyTunnelStateReader(
+                interface: "utun98",
+                source: .activeInterface
+            )
+        )
+
+        let result = await check.run()
+
+        #expect(result.status == .normal)
+        #expect(result.summary == String(
+            localized: "network_diagnostics.proxy.tunnel_routes_active.summary",
+            comment: "Network self-check active tunnel interface proxy route result summary"
+        ))
+        #expect(result.evidence.contains(.init(code: "proxy.http.route-type", value: "tunnel")))
+        #expect(result.evidence.contains(.init(code: "proxy.http.tunnel-detection-source", value: "active-interface")))
+        #expect(result.evidence.contains(.init(code: "proxy.https.tunnel-detection-source", value: "active-interface")))
+    }
+
+    @Test("tunnel candidate prefers the routed interface then an active ipv4 tunnel")
+    func tunnelCandidatePriority() {
+        #expect(SystemProxyTunnelStateReader.candidateTunnelState(
+            pathRouted: "utun3",
+            activeIPv4Tunnels: ["utun98"]
+        ) == ProxyTunnelState(interface: "utun3", source: .nwpath))
+        #expect(SystemProxyTunnelStateReader.candidateTunnelState(
+            pathRouted: nil,
+            activeIPv4Tunnels: ["utun98"]
+        ) == ProxyTunnelState(interface: "utun98", source: .activeInterface))
+        #expect(SystemProxyTunnelStateReader.candidateTunnelState(
+            pathRouted: nil,
+            activeIPv4Tunnels: []
+        ) == nil)
+    }
+
+    @Test("tunnel path wait returns nil when the timeout fires before any path")
+    func tunnelPathWaitTimeoutWins() async {
+        let streamTerminated = LockedFlag()
+        let neverEnding = AsyncStream<NWPath> { continuation in
+            continuation.onTermination = { _ in streamTerminated.set() }
+        }
+
+        let path = await SystemProxyTunnelStateReader.firstPath(
+            from: neverEnding,
+            timeout: {}
+        )
+
+        #expect(path == nil)
+        #expect(streamTerminated.isSet)
+    }
+
+    @Test("tunnel path wait cancels the pending timeout when the path side completes first")
+    func tunnelPathWaitCancelsPendingTimeout() async {
+        let probe = TunnelTimeoutCancellationProbe()
+        let finished = AsyncStream<NWPath> { continuation in
+            continuation.finish()
+        }
+
+        let path = await SystemProxyTunnelStateReader.firstPath(
+            from: finished,
+            timeout: { await probe.park() }
+        )
+
+        #expect(path == nil)
+        #expect(probe.didCancel)
     }
 
     @Test("failed proxy candidate falls back to DIRECT for the same target")
@@ -1250,7 +1497,8 @@ struct NetworkDiagnosticsTests {
             egressLoader: StubProxyEgressLoader(
                 statusCode: 200,
                 recorder: egressRecorder
-            )
+            ),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1282,7 +1530,8 @@ struct NetworkDiagnosticsTests {
                 httpsURL: .init(candidates: [.direct], evidenceCodes: []),
             ]),
             connector: connector,
-            egressLoader: StubProxyEgressLoader(statusCode: 204, recorder: egressRecorder)
+            egressLoader: StubProxyEgressLoader(statusCode: 204, recorder: egressRecorder),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1318,6 +1567,7 @@ struct NetworkDiagnosticsTests {
             resolver: RecordingProxyResolver(resolutions: [:]),
             connector: connector,
             egressLoader: egressLoader,
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
             timeout: .seconds(2),
             clock: clock
         )
@@ -1359,6 +1609,7 @@ struct NetworkDiagnosticsTests {
             resolver: RecordingProxyResolver(resolutions: [:]),
             connector: connector,
             egressLoader: egressLoader,
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
             timeout: .seconds(2),
             clock: clock
         )
@@ -1392,7 +1643,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: resolver,
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1418,7 +1670,8 @@ struct NetworkDiagnosticsTests {
         let result = await SystemProxyCheck(
             resolver: resolver,
             connector: StubProxyConnector(reachable: false),
-            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "unexpected")
+            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "unexpected"),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         ).run()
 
         #expect(result.status == .indeterminate)
@@ -1454,7 +1707,8 @@ struct NetworkDiagnosticsTests {
         let result = await SystemProxyCheck(
             resolver: resolver,
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         ).run()
 
         #expect(result.status == .normal)
@@ -1479,7 +1733,8 @@ struct NetworkDiagnosticsTests {
         let result = await SystemProxyCheck(
             resolver: resolver,
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 407)
+            egressLoader: StubProxyEgressLoader(statusCode: 407),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         ).run()
 
         #expect(result.status == .abnormal)
@@ -1504,7 +1759,8 @@ struct NetworkDiagnosticsTests {
         let result = await SystemProxyCheck(
             resolver: resolver,
             connector: StubProxyConnector(reachable: false),
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         ).run()
 
         #expect(result.status == .abnormal)
@@ -1530,7 +1786,8 @@ struct NetworkDiagnosticsTests {
                 evidenceCodes: ["resolution-empty"]
             )),
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         ).run()
 
         #expect(result.status == .indeterminate)
@@ -1557,7 +1814,8 @@ struct NetworkDiagnosticsTests {
                 pacResolver: StubPACResolver(.unavailable("pac-timeout"))
             ),
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1578,7 +1836,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(proxy),
             connector: StubProxyConnector(reachable: false),
-            egressLoader: StubProxyEgressLoader(statusCode: 200, recorder: egressRecorder)
+            egressLoader: StubProxyEgressLoader(statusCode: 200, recorder: egressRecorder),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1598,7 +1857,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(proxy),
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 407)
+            egressLoader: StubProxyEgressLoader(statusCode: 407),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1679,7 +1939,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(.direct),
             connector: RecordingProxyConnector(reachable: true, recorder: connectorRecorder),
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let route = await check.evaluate(
@@ -1716,7 +1977,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(.direct),
             connector: connector,
-            egressLoader: egress
+            egressLoader: egress,
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let route = await check.evaluate(
@@ -1745,7 +2007,8 @@ struct NetworkDiagnosticsTests {
                 httpsURL: .init(candidates: [httpsProxy], evidenceCodes: []),
             ]),
             connector: connector,
-            egressLoader: StubProxyEgressLoader(statusCode: 407)
+            egressLoader: StubProxyEgressLoader(statusCode: 407),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         ).run()
 
         #expect(result.status == .abnormal)
@@ -1763,7 +2026,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(proxy),
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "-1005")
+            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "-1005"),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1788,7 +2052,8 @@ struct NetworkDiagnosticsTests {
                 httpsURL: .init(candidates: [.direct], evidenceCodes: []),
             ]),
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 200, recorder: recorder)
+            egressLoader: StubProxyEgressLoader(statusCode: 200, recorder: recorder),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1803,7 +2068,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: resolver,
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
         let task = Task { await check.run() }
 
@@ -1854,7 +2120,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(.direct),
             connector: connector,
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
         let task = Task {
             await check.evaluate(
@@ -1886,7 +2153,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(.direct),
             connector: connector,
-            egressLoader: egress
+            egressLoader: egress,
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
         let task = Task {
             await check.evaluate(
@@ -2249,6 +2517,7 @@ struct NetworkDiagnosticsTests {
 
     private func makeResults(
         path: NetworkDiagnosticStatus,
+        gateway: NetworkDiagnosticStatus = .normal,
         dns: NetworkDiagnosticStatus,
         internet: NetworkDiagnosticStatus,
         ipv6: NetworkDiagnosticStatus = .skipped,
@@ -2256,6 +2525,7 @@ struct NetworkDiagnosticsTests {
     ) -> [NetworkDiagnosticResult] {
         [
             NetworkDiagnosticResult(id: .path, status: path, summary: "path"),
+            NetworkDiagnosticResult(id: .gatewayReachability, status: gateway, summary: "gateway"),
             NetworkDiagnosticResult(id: .dns, status: dns, summary: "dns"),
             NetworkDiagnosticResult(id: .internet, status: internet, summary: "internet"),
             NetworkDiagnosticResult(id: .ipv6, status: ipv6, summary: "ipv6"),
@@ -3015,6 +3285,73 @@ private struct StubProxyResolver: ProxyResolving {
 
     func resolve(for url: URL) async -> ProxyCandidateResolution {
         resolution
+    }
+}
+
+private struct StubProxyTunnelStateReader: ProxyTunnelStateReading {
+    let state: ProxyTunnelState?
+
+    init(
+        interface: String?,
+        source: ProxyTunnelDetectionSource = .nwpath
+    ) {
+        self.state = interface.map {
+            ProxyTunnelState(interface: $0, source: source)
+        }
+    }
+
+    func tunnelState() async -> ProxyTunnelState? {
+        state
+    }
+}
+
+private final class TunnelTimeoutCancellationProbe: @unchecked Sendable {
+    private let lock = NSLock()
+    private var parkedContinuation: CheckedContinuation<Void, Never>?
+    private var cancelled = false
+
+    var didCancel: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return cancelled
+    }
+
+    func park() async {
+        await withTaskCancellationHandler {
+            await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                lock.lock()
+                if cancelled {
+                    lock.unlock()
+                    continuation.resume()
+                } else {
+                    parkedContinuation = continuation
+                    lock.unlock()
+                }
+            }
+        } onCancel: {
+            lock.lock()
+            cancelled = true
+            parkedContinuation?.resume()
+            parkedContinuation = nil
+            lock.unlock()
+        }
+    }
+}
+
+private final class LockedFlag: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = false
+
+    var isSet: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return value
+    }
+
+    func set() {
+        lock.lock()
+        value = true
+        lock.unlock()
     }
 }
 

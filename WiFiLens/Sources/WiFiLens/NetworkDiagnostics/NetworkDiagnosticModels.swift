@@ -5,7 +5,7 @@ enum NetworkDiagnosticStatus: String, CaseIterable, Equatable, Sendable {
 }
 
 enum NetworkDiagnosticCheckID: String, CaseIterable, Equatable, Hashable, Sendable {
-    case path, dns, internet, ipv6, proxy
+    case path, gatewayReachability, dns, internet, ipv6, proxy
 }
 
 enum NetworkDiagnosticStatusTone: Equatable, Sendable {
@@ -111,52 +111,50 @@ struct NetworkDiagnosticRemediation: Equatable, Sendable {
     }
 }
 
-struct NetworkPathSummary: Equatable, Sendable {
-    let segments: [String]
-
-    var text: String { segments.joined(separator: " → ") }
-
-    static func from(results: [NetworkDiagnosticResult]) -> Self? {
-        guard let path = results.first(where: { $0.id == .path }) else { return nil }
-        let pathEvidence = Dictionary(uniqueKeysWithValues: path.evidence.compactMap { evidence in
-            evidence.value.map { (evidence.code, $0) }
-        })
-        let interfaceName = pathEvidence["path.interface-name"]
-        let interfaceType = pathEvidence["path.interface-type"]
-        let interfaceLabel: String = switch interfaceType {
-        case "wifi": "Wi-Fi"
-        case "wiredEthernet": "Ethernet"
-        default: "Network"
-        }
-        var segments = ["Mac", interfaceName.map { "\(interfaceLabel) \($0)" } ?? interfaceLabel]
-
-        if let tunnel = pathEvidence["path.routed-tunnel"] {
-            segments.append("VPN/Tunnel \(tunnel)")
-        }
-
-        if let proxy = results.first(where: { $0.id == .proxy }) {
-            let routeType = proxy.evidence.first {
-                $0.code == "proxy.https.route-type" && $0.value != "direct"
-            }?.value ?? proxy.evidence.first {
-                $0.code == "proxy.http.route-type" && $0.value != "direct"
-            }?.value
-            if let routeType {
-                segments.append("\(routeType.uppercased()) proxy")
-            }
-        }
-        segments.append("Internet")
-        return .init(segments: segments)
-    }
-}
-
 extension NetworkDiagnosticConclusion {
     static func primaryIssue(in results: [NetworkDiagnosticResult]) -> NetworkDiagnosticResult? {
-        let priority: [NetworkDiagnosticCheckID] = [.path, .dns, .internet, .proxy, .ipv6]
+        let priority: [NetworkDiagnosticCheckID] = [.path, .gatewayReachability, .dns, .internet, .proxy]
         return priority.compactMap { id in
             results.first {
                 $0.id == id && ($0.status == .abnormal || $0.status == .indeterminate)
             }
         }.first
+    }
+}
+
+enum NetworkDiagnosticStage: CaseIterable, Equatable, Sendable {
+    case thisMac
+    case lan
+    case internet
+
+    var contributingCheckIDs: [NetworkDiagnosticCheckID] {
+        switch self {
+        case .thisMac: [.path, .dns, .proxy]
+        case .lan: [.gatewayReachability]
+        case .internet: [.internet]
+        }
+    }
+}
+
+struct NetworkDiagnosticStageResolver: Sendable {
+    func status(
+        for stage: NetworkDiagnosticStage,
+        results: [NetworkDiagnosticCheckID: NetworkDiagnosticResult]
+    ) -> NetworkDiagnosticStatus? {
+        let contributingIDs = stage.contributingCheckIDs
+        let contributing = contributingIDs.compactMap { results[$0] }
+        guard contributing.count == contributingIDs.count else { return nil }
+
+        if contributing.contains(where: { $0.status == .abnormal }) {
+            return .abnormal
+        }
+        if contributing.contains(where: { $0.status == .indeterminate }) {
+            return .indeterminate
+        }
+        if contributing.allSatisfy({ $0.status == .blocked }) {
+            return .blocked
+        }
+        return .normal
     }
 }
 
@@ -212,7 +210,7 @@ enum NetworkDiagnosticConclusion: String, Equatable, Sendable {
         }
         if resultsByID.values.contains(where: { result in
             result.status != .normal
-                && !(result.id == .ipv6 && result.status == .skipped)
+                && result.id != .ipv6
                 && !isUnverifiedDirectRouteNeutral(
                     result,
                     internet: resultsByID[.internet]
