@@ -1372,7 +1372,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(.direct),
             connector: RecordingProxyConnector(reachable: false, recorder: connectorRecorder),
-            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "unexpected", recorder: egressRecorder)
+            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "unexpected", recorder: egressRecorder),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1380,6 +1381,45 @@ struct NetworkDiagnosticsTests {
         #expect(result.status == .indeterminate)
         #expect(await connectorRecorder.endpoints.isEmpty)
         #expect(await egressRecorder.requests.isEmpty)
+    }
+
+    @Test("routed tunnel interface is recognized as the proxy route")
+    func tunneledRoutingIsRecognized() async {
+        let check = SystemProxyCheck(
+            resolver: StubProxyResolver(.direct),
+            connector: StubProxyConnector(reachable: false),
+            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "unexpected"),
+            tunnelReader: StubProxyTunnelStateReader(interface: "utun98")
+        )
+
+        let result = await check.run()
+
+        #expect(result.status == .normal)
+        #expect(result.summary == String(
+            localized: "network_diagnostics.proxy.tunnel_routes.summary",
+            comment: "Network self-check tunneled proxy route result summary"
+        ))
+        #expect(result.evidence.contains(.init(code: "proxy.http.route-type", value: "tunnel")))
+        #expect(result.evidence.contains(.init(code: "proxy.https.route-type", value: "tunnel")))
+        #expect(result.evidence.contains(.init(code: "proxy.http.tunnel-interface", value: "utun98")))
+        #expect(result.evidence.contains(.init(code: "proxy.https.tunnel-interface", value: "utun98")))
+        #expect(result.evidence.contains(.init(code: "proxy.http.egress-status", value: "base-check")))
+    }
+
+    @Test("tunnel candidate prefers the routed interface then an active ipv4 tunnel")
+    func tunnelCandidatePriority() {
+        #expect(SystemProxyTunnelStateReader.candidateTunnelInterface(
+            pathRouted: "utun3",
+            activeIPv4Tunnels: ["utun98"]
+        ) == "utun3")
+        #expect(SystemProxyTunnelStateReader.candidateTunnelInterface(
+            pathRouted: nil,
+            activeIPv4Tunnels: ["utun98"]
+        ) == "utun98")
+        #expect(SystemProxyTunnelStateReader.candidateTunnelInterface(
+            pathRouted: nil,
+            activeIPv4Tunnels: []
+        ) == nil)
     }
 
     @Test("failed proxy candidate falls back to DIRECT for the same target")
@@ -1398,7 +1438,8 @@ struct NetworkDiagnosticsTests {
             egressLoader: StubProxyEgressLoader(
                 statusCode: 200,
                 recorder: egressRecorder
-            )
+            ),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1430,7 +1471,8 @@ struct NetworkDiagnosticsTests {
                 httpsURL: .init(candidates: [.direct], evidenceCodes: []),
             ]),
             connector: connector,
-            egressLoader: StubProxyEgressLoader(statusCode: 204, recorder: egressRecorder)
+            egressLoader: StubProxyEgressLoader(statusCode: 204, recorder: egressRecorder),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1466,6 +1508,7 @@ struct NetworkDiagnosticsTests {
             resolver: RecordingProxyResolver(resolutions: [:]),
             connector: connector,
             egressLoader: egressLoader,
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
             timeout: .seconds(2),
             clock: clock
         )
@@ -1507,6 +1550,7 @@ struct NetworkDiagnosticsTests {
             resolver: RecordingProxyResolver(resolutions: [:]),
             connector: connector,
             egressLoader: egressLoader,
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
             timeout: .seconds(2),
             clock: clock
         )
@@ -1540,7 +1584,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: resolver,
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1566,7 +1611,8 @@ struct NetworkDiagnosticsTests {
         let result = await SystemProxyCheck(
             resolver: resolver,
             connector: StubProxyConnector(reachable: false),
-            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "unexpected")
+            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "unexpected"),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         ).run()
 
         #expect(result.status == .indeterminate)
@@ -1602,7 +1648,8 @@ struct NetworkDiagnosticsTests {
         let result = await SystemProxyCheck(
             resolver: resolver,
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         ).run()
 
         #expect(result.status == .normal)
@@ -1627,7 +1674,8 @@ struct NetworkDiagnosticsTests {
         let result = await SystemProxyCheck(
             resolver: resolver,
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 407)
+            egressLoader: StubProxyEgressLoader(statusCode: 407),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         ).run()
 
         #expect(result.status == .abnormal)
@@ -1652,7 +1700,8 @@ struct NetworkDiagnosticsTests {
         let result = await SystemProxyCheck(
             resolver: resolver,
             connector: StubProxyConnector(reachable: false),
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         ).run()
 
         #expect(result.status == .abnormal)
@@ -1678,7 +1727,8 @@ struct NetworkDiagnosticsTests {
                 evidenceCodes: ["resolution-empty"]
             )),
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         ).run()
 
         #expect(result.status == .indeterminate)
@@ -1705,7 +1755,8 @@ struct NetworkDiagnosticsTests {
                 pacResolver: StubPACResolver(.unavailable("pac-timeout"))
             ),
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1726,7 +1777,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(proxy),
             connector: StubProxyConnector(reachable: false),
-            egressLoader: StubProxyEgressLoader(statusCode: 200, recorder: egressRecorder)
+            egressLoader: StubProxyEgressLoader(statusCode: 200, recorder: egressRecorder),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1746,7 +1798,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(proxy),
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 407)
+            egressLoader: StubProxyEgressLoader(statusCode: 407),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1827,7 +1880,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(.direct),
             connector: RecordingProxyConnector(reachable: true, recorder: connectorRecorder),
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let route = await check.evaluate(
@@ -1864,7 +1918,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(.direct),
             connector: connector,
-            egressLoader: egress
+            egressLoader: egress,
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let route = await check.evaluate(
@@ -1893,7 +1948,8 @@ struct NetworkDiagnosticsTests {
                 httpsURL: .init(candidates: [httpsProxy], evidenceCodes: []),
             ]),
             connector: connector,
-            egressLoader: StubProxyEgressLoader(statusCode: 407)
+            egressLoader: StubProxyEgressLoader(statusCode: 407),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         ).run()
 
         #expect(result.status == .abnormal)
@@ -1911,7 +1967,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(proxy),
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "-1005")
+            egressLoader: StubProxyEgressLoader(statusCode: nil, errorCode: "-1005"),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1936,7 +1993,8 @@ struct NetworkDiagnosticsTests {
                 httpsURL: .init(candidates: [.direct], evidenceCodes: []),
             ]),
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 200, recorder: recorder)
+            egressLoader: StubProxyEgressLoader(statusCode: 200, recorder: recorder),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
 
         let result = await check.run()
@@ -1951,7 +2009,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: resolver,
             connector: StubProxyConnector(reachable: true),
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
         let task = Task { await check.run() }
 
@@ -2002,7 +2061,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(.direct),
             connector: connector,
-            egressLoader: StubProxyEgressLoader(statusCode: 200)
+            egressLoader: StubProxyEgressLoader(statusCode: 200),
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
         let task = Task {
             await check.evaluate(
@@ -2034,7 +2094,8 @@ struct NetworkDiagnosticsTests {
         let check = SystemProxyCheck(
             resolver: StubProxyResolver(.direct),
             connector: connector,
-            egressLoader: egress
+            egressLoader: egress,
+            tunnelReader: StubProxyTunnelStateReader(interface: nil),
         )
         let task = Task {
             await check.evaluate(
@@ -3165,6 +3226,14 @@ private struct StubProxyResolver: ProxyResolving {
 
     func resolve(for url: URL) async -> ProxyCandidateResolution {
         resolution
+    }
+}
+
+private struct StubProxyTunnelStateReader: ProxyTunnelStateReading {
+    let interface: String?
+
+    func routedTunnelInterface() async -> String? {
+        interface
     }
 }
 

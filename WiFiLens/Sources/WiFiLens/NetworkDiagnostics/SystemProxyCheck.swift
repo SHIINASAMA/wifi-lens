@@ -99,6 +99,71 @@ struct SystemProxySettingsReader: SystemProxySettingsReading {
     }
 }
 
+protocol ProxyTunnelStateReading: Sendable {
+    func routedTunnelInterface() async -> String?
+}
+
+struct SystemProxyTunnelStateReader: ProxyTunnelStateReading {
+    func routedTunnelInterface() async -> String? {
+        let monitor = NWPathMonitor()
+        let stream = AsyncStream<NWPath> { continuation in
+            monitor.pathUpdateHandler = { path in
+                continuation.yield(path)
+                continuation.finish()
+            }
+            continuation.onTermination = { _ in monitor.cancel() }
+            monitor.start(queue: DispatchQueue(label: "io.github.kaoru.wifi-lens.network-diagnostics.proxy-tunnel"))
+        }
+        defer { monitor.cancel() }
+        for await path in stream {
+            let pathRouted = SystemNetworkTunnelStateReader.state(for: path).routedTunnelInterface
+            return Self.candidateTunnelInterface(
+                pathRouted: pathRouted,
+                activeIPv4Tunnels: Self.activeIPv4TunnelInterfaces()
+            )
+        }
+        return nil
+    }
+
+    static func candidateTunnelInterface(
+        pathRouted: String?,
+        activeIPv4Tunnels: [String]
+    ) -> String? {
+        if let pathRouted { return pathRouted }
+        return activeIPv4Tunnels.first
+    }
+
+    static func activeIPv4TunnelInterfaces() -> [String] {
+        var addrPtr: UnsafeMutablePointer<ifaddrs>?
+        guard getifaddrs(&addrPtr) == 0, let first = addrPtr else { return [] }
+        defer { freeifaddrs(first) }
+
+        var byName: [String: (up: Bool, hasIPv4: Bool)] = [:]
+        for ptr in sequence(first: first, next: { $0.pointee.ifa_next }) {
+            guard let namePtr = ptr.pointee.ifa_name else { continue }
+            let name = String(cString: namePtr)
+            let flags = ptr.pointee.ifa_flags
+            var entry = byName[name] ?? (up: false, hasIPv4: false)
+            entry.up = entry.up
+                || (flags & UInt32(IFF_UP) != 0 && flags & UInt32(IFF_RUNNING) != 0)
+            if let addr = ptr.pointee.ifa_addr,
+               addr.pointee.sa_family == sa_family_t(AF_INET) {
+                entry.hasIPv4 = true
+            }
+            byName[name] = entry
+        }
+
+        return byName
+            .filter { name, entry in
+                NetworkTunnelInterfaceClassifier.prefixes.contains { name.hasPrefix($0) }
+                    && entry.up
+                    && entry.hasIPv4
+            }
+            .keys
+            .sorted()
+    }
+}
+
 protocol ProxyEndpointConnecting: Sendable {
     func canConnect(to endpoint: ProxyEndpoint, timeout: Duration) async -> Bool
 }
@@ -310,6 +375,7 @@ struct SystemProxyCheck: DiagnosticCheck {
     private let resolver: any ProxyResolving
     private let connector: any ProxyEndpointConnecting
     private let egressLoader: any ProxyEgressLoading
+    private let tunnelReader: any ProxyTunnelStateReading
     private let httpTarget: URL
     private let httpsTarget: URL
     private let timeout: Duration
@@ -319,6 +385,7 @@ struct SystemProxyCheck: DiagnosticCheck {
         resolver: any ProxyResolving = SystemProxyResolver(),
         connector: any ProxyEndpointConnecting = NetworkProxyEndpointConnector(),
         egressLoader: any ProxyEgressLoading = SystemProxyEgressLoader(),
+        tunnelReader: any ProxyTunnelStateReading = SystemProxyTunnelStateReader(),
         httpTarget: URL = Self.defaultHTTPTarget,
         httpsTarget: URL = Self.defaultHTTPSTarget,
         timeout: Duration = .seconds(3),
@@ -327,6 +394,7 @@ struct SystemProxyCheck: DiagnosticCheck {
         self.resolver = resolver
         self.connector = connector
         self.egressLoader = egressLoader
+        self.tunnelReader = tunnelReader
         self.httpTarget = httpTarget
         self.httpsTarget = httpsTarget
         self.timeout = timeout
@@ -337,9 +405,14 @@ struct SystemProxyCheck: DiagnosticCheck {
         guard !Task.isCancelled else {
             return cancellationResult(stage: "before-http-resolution")
         }
+        async let tunnelInterfaceTask = tunnelReader.routedTunnelInterface()
         async let httpResolutionTask = resolver.resolve(for: httpTarget)
         async let httpsResolutionTask = resolver.resolve(for: httpsTarget)
-        let (httpResolution, httpsResolution) = await (httpResolutionTask, httpsResolutionTask)
+        let (httpResolution, httpsResolution, tunnelInterface) = await (
+            httpResolutionTask,
+            httpsResolutionTask,
+            tunnelInterfaceTask
+        )
         guard !Task.isCancelled else {
             return cancellationResult(
                 stage: "after-http-resolution",
@@ -350,12 +423,14 @@ struct SystemProxyCheck: DiagnosticCheck {
         async let httpResultTask = evaluate(
             target: httpTarget,
             resolution: httpResolution,
-            timeout: timeout
+            timeout: timeout,
+            tunnelInterface: tunnelInterface
         )
         async let httpsResultTask = evaluate(
             target: httpsTarget,
             resolution: httpsResolution,
-            timeout: timeout
+            timeout: timeout,
+            tunnelInterface: tunnelInterface
         )
         let (httpResult, httpsResult) = await (httpResultTask, httpsResultTask)
         guard !Task.isCancelled else {
@@ -371,7 +446,8 @@ struct SystemProxyCheck: DiagnosticCheck {
     func evaluate(
         target: URL,
         resolution: ProxyCandidateResolution,
-        timeout: Duration
+        timeout: Duration,
+        tunnelInterface: String? = nil
     ) async -> ProxyTargetRouteResult {
         let deadline = clock.now().advanced(by: timeout)
         let evidencePrefix = "proxy.\(target.scheme?.lowercased() ?? "unknown")"
@@ -422,16 +498,20 @@ struct SystemProxyCheck: DiagnosticCheck {
             let attemptTimeout = remaining / Double(remainingCandidateCount)
             let attemptDeadline = attemptStart.advanced(by: attemptTimeout)
             evidence.append(.init(code: "\(evidencePrefix).candidate-index", value: String(index)))
-            evidence.append(.init(code: "\(evidencePrefix).route-type", value: candidate.routeType))
+            let routeType = (candidate == .direct && tunnelInterface != nil) ? "tunnel" : candidate.routeType
+            evidence.append(.init(code: "\(evidencePrefix).route-type", value: routeType))
             evidence.append(.init(code: "\(evidencePrefix).fallback-used", value: String(index > 0)))
 
             if candidate == .direct {
+                if let tunnelInterface {
+                    evidence.append(.init(code: "\(evidencePrefix).tunnel-interface", value: tunnelInterface))
+                }
                 evidence.append(.init(code: "\(evidencePrefix).endpoint-status", value: "not-required"))
                 evidence.append(.init(code: "\(evidencePrefix).authentication-status", value: "not-required"))
                 evidence.append(.init(code: "\(evidencePrefix).egress-status", value: "base-check"))
                 return ProxyTargetRouteResult(
                     target: target,
-                    status: .direct,
+                    status: tunnelInterface == nil ? .direct : .tunnel,
                     selectedCandidateIndex: index,
                     selectedProxy: .direct,
                     evidence: evidence
@@ -595,6 +675,14 @@ struct SystemProxyCheck: DiagnosticCheck {
             return result(
                 .indeterminate,
                 key: "network_diagnostics.proxy.unable_to_determine.summary",
+                evidence: evidence
+            )
+        }
+        if statuses.allSatisfy({ $0 == .tunnel || $0 == .direct }),
+           statuses.contains(.tunnel) {
+            return result(
+                .normal,
+                key: "network_diagnostics.proxy.tunnel_routes.summary",
                 evidence: evidence
             )
         }

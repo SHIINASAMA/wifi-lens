@@ -32184,6 +32184,41 @@
           }
         }
       }
+    },
+    "network_diagnostics.proxy.tunnel_routes.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Routing through a virtual network interface"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过虚拟网卡路由"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仮想ネットワークインターフェース経由でルーティングしています"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Routing über eine virtuelle Netzwerkschnittstelle"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enrutamiento a través de una interfaz de red virtual"
+          }
+        }
+      }
     }
   }
 }
