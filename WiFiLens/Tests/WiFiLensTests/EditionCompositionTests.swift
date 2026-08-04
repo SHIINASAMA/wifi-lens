@@ -17,9 +17,13 @@ struct EditionCompositionTests {
     func sharedRouteResourcesUsePerWindowLeases() async {
         var spectrumTransitions: [Bool] = []
         var bleTransitions: [Bool] = []
+        let bleProbe = SignalProbe()
         let coordinator = MainWindowRouteResourceCoordinator(
             setSpectrumActive: { spectrumTransitions.append($0) },
-            setBLEActive: { bleTransitions.append($0) }
+            setBLEActive: { active in
+                bleTransitions.append(active)
+                bleProbe.signal()
+            }
         )
         let windowA = UUID()
         let windowB = UUID()
@@ -34,7 +38,7 @@ struct EditionCompositionTests {
         #expect(spectrumTransitions == [true, false])
 
         coordinator.update(windowID: windowA, route: .bleScanner)
-        await Task.yield()
+        await bleProbe.waitForSignal()
         coordinator.register(windowID: windowB, route: .overview)
         coordinator.update(windowID: windowB, route: .bleScanner)
         coordinator.release(windowID: windowA)
@@ -163,7 +167,7 @@ struct EditionCompositionTests {
 
         coordinator.release(windowID: windowID)
         await scanner.resumeNextStart()
-        await eventually { await scanner.stopCount == 1 }
+        await scanner.waitUntilStoppedOnce()
 
         #expect(viewModel.isScanning == false)
         #expect(await scanner.activeSessionCount == 0)
@@ -192,15 +196,15 @@ struct EditionCompositionTests {
         await oldScanner.waitUntilStartIsSuspended()
 
         coordinator.bind(spectrumViewModels: [], bleViewModel: newViewModel)
-        await eventually { newViewModel.isScanning }
+        await newScanner.waitUntilStartScanningCalled()
         await oldScanner.resumeNextStart()
-        await eventually { await oldScanner.stopCount == 1 }
+        await oldScanner.waitUntilStoppedOnce()
 
         #expect(newViewModel.isScanning)
         #expect(await newScanner.activeSessionCount == 1)
 
         coordinator.release(windowID: windowID)
-        await eventually { await newScanner.activeSessionCount == 0 }
+        await newScanner.waitUntilActiveSessionCountZero()
     }
 
     @MainActor
@@ -281,7 +285,7 @@ struct EditionCompositionTests {
         var steps: [String] = []
         let coordinator = ApplicationTerminationCoordinator(
             waitForDeadline: { _ in
-                try await Task.sleep(for: .seconds(3_600))
+                await withCheckedContinuation { (_: CheckedContinuation<Void, Never>) in }
             },
             reply: { replyProbe.record($0) }
         )
@@ -379,11 +383,33 @@ struct EditionCompositionTests {
     }
 }
 
+@MainActor
+private final class SignalProbe {
+    private var isSignaled = false
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+
+    func signal() {
+        isSignaled = true
+        let pending = waiters
+        waiters.removeAll()
+        pending.forEach { $0.resume() }
+    }
+
+    func waitForSignal() async {
+        if isSignaled { return }
+        await withCheckedContinuation { waiters.append($0) }
+    }
+}
+
 private actor PausableBLEScanner: BLEScanning {
     private var shouldSuspendStarts: Bool
     private var startWaiters: [CheckedContinuation<Void, Never>] = []
     private var startObservedWaiters: [CheckedContinuation<Void, Never>] = []
+    private var startCalledWaiters: [CheckedContinuation<Void, Never>] = []
+    private var stopWaiters: [CheckedContinuation<Void, Never>] = []
+    private var emptySessionWaiters: [CheckedContinuation<Void, Never>] = []
     private var continuations: [UUID: AsyncStream<BLEScanEvent>.Continuation] = [:]
+    private(set) var startCalled = false
     private(set) var stopCount = 0
 
     init(startsSuspended: Bool = true) {
@@ -393,6 +419,10 @@ private actor PausableBLEScanner: BLEScanning {
     var activeSessionCount: Int { continuations.count }
 
     func startScanning() async -> BLEScanSession {
+        startCalled = true
+        let pendingStartCalledWaiters = startCalledWaiters
+        startCalledWaiters.removeAll()
+        pendingStartCalledWaiters.forEach { $0.resume() }
         if shouldSuspendStarts {
             let observed = startObservedWaiters
             startObservedWaiters.removeAll()
@@ -419,68 +449,54 @@ private actor PausableBLEScanner: BLEScanning {
         startWaiters.removeFirst().resume()
     }
 
+    func waitUntilStartScanningCalled() async {
+        if startCalled { return }
+        await withCheckedContinuation { startCalledWaiters.append($0) }
+    }
+
+    func waitUntilStoppedOnce() async {
+        if stopCount >= 1 { return }
+        await withCheckedContinuation { stopWaiters.append($0) }
+    }
+
+    func waitUntilActiveSessionCountZero() async {
+        if continuations.isEmpty { return }
+        await withCheckedContinuation { emptySessionWaiters.append($0) }
+    }
+
     private func stop(id: UUID) {
         guard let continuation = continuations.removeValue(forKey: id) else { return }
         stopCount += 1
+        let pendingStopWaiters = stopWaiters
+        stopWaiters.removeAll()
+        pendingStopWaiters.forEach { $0.resume() }
+        if continuations.isEmpty {
+            let pendingEmptySessionWaiters = emptySessionWaiters
+            emptySessionWaiters.removeAll()
+            pendingEmptySessionWaiters.forEach { $0.resume() }
+        }
         continuation.finish()
     }
 }
 
-@MainActor
-private func eventually(
-    attempts: Int = 1_000,
-    _ condition: @escaping () async -> Bool
-) async {
-    for _ in 0..<attempts {
-        if await condition() { return }
-        try? await Task.sleep(for: .milliseconds(1))
-    }
-    Issue.record("condition did not become true")
-}
-
 private actor TerminationTestGate {
-    private struct EntryWaiter {
-        let continuation: CheckedContinuation<Bool, Never>
-        let watchdog: Task<Void, Never>
-    }
-
     private var isOpen = false
     private var hasEntered = false
     private var waiters: [CheckedContinuation<Void, Never>] = []
-    private var entryWaiters: [UUID: EntryWaiter] = [:]
+    private var entryWaiters: [CheckedContinuation<Void, Never>] = []
 
     func wait() async {
         hasEntered = true
-        let pendingEntryWaiters = entryWaiters.values
+        let pendingEntryWaiters = entryWaiters
         entryWaiters.removeAll()
-        pendingEntryWaiters.forEach {
-            $0.watchdog.cancel()
-            $0.continuation.resume(returning: true)
-        }
+        pendingEntryWaiters.forEach { $0.resume() }
         if isOpen { return }
         await withCheckedContinuation { waiters.append($0) }
     }
 
-    func waitUntilEntered(watchdogDuration: Duration = .seconds(5)) async {
+    func waitUntilEntered() async {
         if hasEntered { return }
-        let id = UUID()
-        let entered = await withCheckedContinuation { continuation in
-            let watchdog = Task.detached { [weak self] in
-                do {
-                    try await Task.sleep(for: watchdogDuration)
-                } catch {
-                    return
-                }
-                await self?.expireEntryWaiter(id)
-            }
-            entryWaiters[id] = EntryWaiter(
-                continuation: continuation,
-                watchdog: watchdog
-            )
-        }
-        if !entered {
-            Issue.record("Termination operation did not enter the test gate before the watchdog expired")
-        }
+        await withCheckedContinuation { entryWaiters.append($0) }
     }
 
     func open() {
@@ -489,58 +505,23 @@ private actor TerminationTestGate {
         waiters.removeAll()
         pending.forEach { $0.resume() }
     }
-
-    private func expireEntryWaiter(_ id: UUID) {
-        guard let waiter = entryWaiters.removeValue(forKey: id) else { return }
-        waiter.continuation.resume(returning: false)
-    }
 }
 
 @MainActor
 private final class TerminationBoolProbe {
-    private struct Waiter {
-        let continuation: CheckedContinuation<Bool, Never>
-        let watchdog: Task<Void, Never>
-    }
-
     private(set) var values: [Bool] = []
-    private var waiters: [UUID: Waiter] = [:]
+    private var waiters: [CheckedContinuation<Void, Never>] = []
 
     func record(_ value: Bool) {
         values.append(value)
-        let pending = waiters.values
+        let pending = waiters
         waiters.removeAll()
-        pending.forEach {
-            $0.watchdog.cancel()
-            $0.continuation.resume(returning: true)
-        }
+        pending.forEach { $0.resume() }
     }
 
-    func waitForFirstValue(watchdogDuration: Duration = .seconds(5)) async {
+    func waitForFirstValue() async {
         if !values.isEmpty { return }
-        let id = UUID()
-        let recorded = await withCheckedContinuation { continuation in
-            let watchdog = Task { @MainActor [weak self] in
-                do {
-                    try await Task.sleep(for: watchdogDuration)
-                } catch {
-                    return
-                }
-                self?.expireWaiter(id)
-            }
-            waiters[id] = Waiter(
-                continuation: continuation,
-                watchdog: watchdog
-            )
-        }
-        if !recorded {
-            Issue.record("Expected termination event was not recorded before the watchdog expired")
-        }
-    }
-
-    private func expireWaiter(_ id: UUID) {
-        guard let waiter = waiters.removeValue(forKey: id) else { return }
-        waiter.continuation.resume(returning: false)
+        await withCheckedContinuation { waiters.append($0) }
     }
 }
 

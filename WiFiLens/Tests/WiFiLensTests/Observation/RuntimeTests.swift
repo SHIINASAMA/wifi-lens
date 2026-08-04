@@ -278,6 +278,7 @@ struct RuntimeTests {
         )
         var outputs: [WiFiObservationScanOutput] = []
         var publicationWasVisible: [Bool] = []
+        let outputCounter = EventCounter()
         let configuration = WiFiObservationRuntimeConfiguration(
             scanInterval: .seconds(4),
             userRegionOverride: .JP,
@@ -287,12 +288,13 @@ struct RuntimeTests {
         await runtime.startScanning(configuration: configuration) { output in
             outputs.append(output)
             publicationWasVisible.append(store.currentStatus == output.cycle.observation.currentStatus)
+            outputCounter.increment()
         }
         let first = [runtimeNetwork(bssid: "AA:01", channel: 1)]
         let second = [runtimeNetwork(bssid: "AA:02", channel: 36)]
         await source.yield(.networks(first))
         await source.yield(.networks(second))
-        await waitUntil { outputs.count == 2 }
+        await outputCounter.waitForCount(2)
 
         let snapshot = await source.snapshot()
         let calls = await pipeline.calls
@@ -341,7 +343,7 @@ struct RuntimeTests {
         #expect(overloaded.replacementCount == 1)
 
         await pipeline.releaseFirstCycle()
-        await waitUntil { await pipeline.completedBSSIDs.count == 2 }
+        await pipeline.waitUntilCompletedBSSIDCount(2)
 
         #expect(await pipeline.completedBSSIDs == [first.bssid, latest.bssid])
         #expect(runtime.rawCycleDiagnostics().replacementCount == 1)
@@ -396,10 +398,14 @@ struct RuntimeTests {
             interfaceSource: interfaceSource
         )
         var output: WiFiObservationScanOutput?
+        let outputCounter = EventCounter()
 
-        await runtime.startScanning(configuration: .testDefault) { output = $0 }
+        await runtime.startScanning(configuration: .testDefault) {
+            output = $0
+            outputCounter.increment()
+        }
         await source.yield(.networks([runtimeNetwork(bssid: "AA:02", channel: 36)]))
-        await waitUntil { output != nil }
+        await outputCounter.waitForCount(1)
 
         let snapshot = output?.interfaceSnapshot
         #expect(interfaceSource.captureCount == 1)
@@ -431,10 +437,14 @@ struct RuntimeTests {
             interfaceSource: interfaceSource
         )
         var output: WiFiObservationScanOutput?
+        let outputCounter = EventCounter()
 
-        await runtime.startScanning(configuration: .testDefault) { output = $0 }
+        await runtime.startScanning(configuration: .testDefault) {
+            output = $0
+            outputCounter.increment()
+        }
         await source.yield(.failure("permission changed"))
-        await waitUntil { output != nil }
+        await outputCounter.waitForCount(1)
 
         let expectedError = WiFiObservationError.environmentScanFailed("permission changed")
         let snapshot = output?.interfaceSnapshot
@@ -473,7 +483,7 @@ struct RuntimeTests {
             outputCount += 1
         }
         await source.yield(.networks([runtimeNetwork(bssid: "AA:0F", channel: 36)]))
-        await waitUntil { await source.snapshot().stopCalls == 1 }
+        await source.waitUntilStopCallCount(1)
         await runtime.drainConsumers()
 
         #expect(store.lastUpdated == nil)
@@ -497,7 +507,7 @@ struct RuntimeTests {
             isPublicationEligible: { false }
         ) { _ in }
         await source.yield(.networks([runtimeNetwork(bssid: "AA:10", channel: 36)]))
-        await waitUntil { await source.snapshot().stopCalls == 1 }
+        await source.waitUntilStopCallCount(1)
 
         await runtime.restartScanning(configuration: .init(
             scanInterval: .seconds(9),
@@ -522,7 +532,7 @@ struct RuntimeTests {
 
         await runtime.startScanning(configuration: .testDefault) { _ in }
         await runtime.stopScanning()
-        await waitUntil { await source.snapshot().activeStreamCount == 0 }
+        await source.waitUntilActiveStreamCount(0)
 
         let snapshot = await source.snapshot()
         #expect(snapshot.stopCalls == 1)
@@ -539,16 +549,21 @@ struct RuntimeTests {
             scanSource: source
         )
         var outputCount = 0
+        let outputCounter = EventCounter()
 
-        await runtime.startScanning(configuration: .testDefault) { _ in outputCount += 1 }
+        await runtime.startScanning(configuration: .testDefault) {
+            _ in
+            outputCount += 1
+            outputCounter.increment()
+        }
         await runtime.restartScanning(configuration: WiFiObservationRuntimeConfiguration(
             scanInterval: .seconds(9),
             userRegionOverride: nil,
             userDefaultsRegionOverride: nil
         ))
-        await waitUntil { await source.snapshot().activeStreamCount == 1 }
+        await source.waitUntilActiveStreamCount(1)
         await source.yield(.networks([runtimeNetwork(bssid: "AA:09", channel: 9)]))
-        await waitUntil { outputCount == 1 }
+        await outputCounter.waitForCount(1)
 
         let snapshot = await source.snapshot()
         #expect(snapshot.requestedIntervals == [.seconds(3), .seconds(9)])
@@ -575,15 +590,17 @@ struct RuntimeTests {
             await runtime.startScanning(configuration: .testDefault) { _ in outputCount += 1 }
         }
         await source.waitUntilCapabilityLookupEntered()
+        let stopEntered = MainActorMilestone()
         let stopTask = Task { @MainActor in
+            stopEntered.reach()
             await runtime.stopScanning()
         }
-        await Task.yield()
+        await stopEntered.waitUntilReached()
         await source.releaseCapabilityLookup()
         await stopTask.value
         await startTask.value
         await source.yield(.networks([runtimeNetwork(bssid: "AA:10", channel: 10)]))
-        await Task.yield()
+        await runtime.drainRawCyclesForTesting()
 
         let snapshot = await source.snapshot()
         #expect(snapshot.requestedIntervals.isEmpty)
@@ -607,18 +624,20 @@ struct RuntimeTests {
             await runtime.startScanning(configuration: .testDefault) { _ in }
         }
         await source.waitUntilCapabilityLookupEntered()
+        let restartEntered = MainActorMilestone()
         let restart = Task { @MainActor in
+            restartEntered.reach()
             await runtime.restartScanning(configuration: WiFiObservationRuntimeConfiguration(
                 scanInterval: .seconds(9),
                 userRegionOverride: nil,
                 userDefaultsRegionOverride: nil
             ))
         }
-        await Task.yield()
+        await restartEntered.waitUntilReached()
         await source.releaseCapabilityLookup()
         await firstStart.value
         await restart.value
-        await waitUntil { await source.snapshot().activeStreamCount > 0 }
+        await source.waitUntilActiveStreamCount(1)
 
         let snapshot = await source.snapshot()
         #expect(snapshot.requestedIntervals == [.seconds(9)])
@@ -638,33 +657,37 @@ struct RuntimeTests {
             scanSource: source
         )
         var completed: Set<String> = []
-        var restartEntered = false
-        var stopEntered = false
+        let restartEntered = MainActorMilestone()
+        let stopEntered = MainActorMilestone()
+        let completedCounter = EventCounter()
 
         Task { @MainActor in
             await runtime.startScanning(configuration: .testDefault) { _ in }
             completed.insert("A")
+            completedCounter.increment()
         }
         await source.waitUntilCapabilityLookupEntered()
         Task { @MainActor in
-            restartEntered = true
+            restartEntered.reach()
             await runtime.restartScanning(configuration: .init(
                 scanInterval: .seconds(9),
                 userRegionOverride: nil,
                 userDefaultsRegionOverride: nil
             ))
             completed.insert("B")
+            completedCounter.increment()
         }
-        await waitUntil { restartEntered }
+        await restartEntered.waitUntilReached()
         Task { @MainActor in
-            stopEntered = true
+            stopEntered.reach()
             await runtime.stopScanning()
             completed.insert("C")
+            completedCounter.increment()
         }
-        await waitUntil { stopEntered }
+        await stopEntered.waitUntilReached()
 
         await source.releaseCapabilityLookup()
-        await waitUntil { completed == ["A", "B", "C"] }
+        await completedCounter.waitForCount(3)
 
         let snapshot = await source.snapshot()
         #expect(completed == ["A", "B", "C"])
@@ -682,38 +705,42 @@ struct RuntimeTests {
             scanSource: source
         )
         var completed: Set<String> = []
-        var restartEntered = false
-        var latestStartEntered = false
+        let restartEntered = MainActorMilestone()
+        let latestStartEntered = MainActorMilestone()
+        let completedCounter = EventCounter()
 
         Task { @MainActor in
             await runtime.startScanning(configuration: .testDefault) { _ in }
             completed.insert("A")
+            completedCounter.increment()
         }
         await source.waitUntilCapabilityLookupEntered()
         Task { @MainActor in
-            restartEntered = true
+            restartEntered.reach()
             await runtime.restartScanning(configuration: .init(
                 scanInterval: .seconds(9),
                 userRegionOverride: nil,
                 userDefaultsRegionOverride: nil
             ))
             completed.insert("B")
+            completedCounter.increment()
         }
-        await waitUntil { restartEntered }
+        await restartEntered.waitUntilReached()
         Task { @MainActor in
-            latestStartEntered = true
+            latestStartEntered.reach()
             await runtime.startScanning(configuration: .init(
                 scanInterval: .seconds(11),
                 userRegionOverride: nil,
                 userDefaultsRegionOverride: nil
             )) { _ in }
             completed.insert("C")
+            completedCounter.increment()
         }
-        await waitUntil { latestStartEntered }
+        await latestStartEntered.waitUntilReached()
 
         await source.releaseCapabilityLookup()
-        await waitUntil { completed == ["A", "B", "C"] }
-        await waitUntil { await source.snapshot().activeStreamCount == 1 }
+        await completedCounter.waitForCount(3)
+        await source.waitUntilActiveStreamCount(1)
 
         let snapshot = await source.snapshot()
         #expect(completed == ["A", "B", "C"])
@@ -723,15 +750,6 @@ struct RuntimeTests {
         await runtime.stopScanning()
     }
 
-    private func waitUntil(
-        _ condition: @escaping @MainActor () async -> Bool
-    ) async {
-        for _ in 0..<1_000 {
-            if await condition() { return }
-            try? await Task.sleep(for: .milliseconds(1))
-        }
-        Issue.record("Timed out waiting for asynchronous runtime work")
-    }
 }
 
 @Suite("Scanner runtime migration", .serialized)
@@ -798,7 +816,7 @@ struct ScannerRuntimeMigrationTests {
 
         await scanner.debugStartScanLoopForTesting()
         scanner.scanIntervalSeconds = 1
-        try await waitUntil { await source.snapshot().requestedIntervals.count == 2 }
+        await source.waitUntilRequestedIntervalCount(2)
 
         #expect(await source.snapshot().requestedIntervals == [.seconds(3), .seconds(1)])
         scanner.stop()
@@ -916,7 +934,7 @@ struct ScannerRuntimeMigrationTests {
 
         await scanner.debugStartScanLoopForTesting()
         scanner.debugReconcileWiFiStateForTesting(.poweredOff)
-        try await waitUntil { await source.snapshot().stopCalls == 1 }
+        await source.waitUntilStopCallCount(1)
         await source.yield(.networks([runtimeNetwork(bssid: "AA:0D", channel: 36)]))
         await runtime.drainConsumers()
 
@@ -1210,10 +1228,12 @@ struct ScannerRuntimeMigrationTests {
             await scanner.debugStartScanLoopForTesting()
         }
         await source.waitUntilCapabilityLookupEntered()
+        let terminationEntered = MainActorMilestone()
         let termination = Task { @MainActor in
+            terminationEntered.reach()
             await scanner.stopForTermination()
         }
-        await Task.yield()
+        await terminationEntered.waitUntilReached()
         await source.releaseCapabilityLookup()
         await start.value
         await termination.value
@@ -1273,7 +1293,7 @@ struct ScannerRuntimeMigrationTests {
         let freshStart = Task { @MainActor in
             await scanner.debugStartScanLoopForTesting()
         }
-        try await waitUntil { await source.snapshot().stopCalls == 1 }
+        await source.waitUntilStopCallCount(1)
         await pipeline.releaseFirstCycle()
         await freshStart.value
         await source.yield(.networks([newNetwork]))
@@ -1289,23 +1309,6 @@ struct ScannerRuntimeMigrationTests {
         scanner.stop()
     }
 
-    private func waitUntil(
-        timeout: Duration = .seconds(5),
-        _ condition: @escaping @MainActor () async -> Bool
-    ) async throws {
-        let clock = ContinuousClock()
-        let deadline = clock.now.advanced(by: timeout)
-
-        while clock.now < deadline {
-            if await condition() { return }
-            try await clock.sleep(for: .milliseconds(1))
-        }
-
-        try #require(
-            await condition(),
-            "Timed out waiting for Scanner runtime work"
-        )
-    }
 }
 
 @Suite("Wi-Fi scan cadence")
@@ -1434,13 +1437,18 @@ private actor ScriptedScanSource: WiFiScanStreaming {
     private var stopCompletedContinuation: CheckedContinuation<Void, Never>?
     private var cadenceSkippedSlotCount: UInt64 = 0
     private var synchronousStartEvent: WiFiScanEvent?
+    private var requestedIntervalsWaiters: [(Int, CheckedContinuation<Void, Never>)] = []
+    private var stopCallWaiters: [(Int, CheckedContinuation<Void, Never>)] = []
+    private var activeStreamWaiters: [(Int, CheckedContinuation<Void, Never>)] = []
 
     func startScanning(
         interval: Duration,
         onEvent: @escaping @Sendable (WiFiScanEvent) async -> Void
     ) async {
         requestedIntervals.append(interval)
+        resumeWaiters(targeting: &requestedIntervalsWaiters, count: requestedIntervals.count)
         handlers[UUID()] = onEvent
+        resumeWaiters(targeting: &activeStreamWaiters, count: handlers.count)
         if let synchronousStartEvent {
             await onEvent(synchronousStartEvent)
         }
@@ -1448,10 +1456,42 @@ private actor ScriptedScanSource: WiFiScanStreaming {
 
     func stopScanning() async {
         stopCalls += 1
+        resumeWaiters(targeting: &stopCallWaiters, count: stopCalls)
         handlers.removeAll()
+        resumeWaiters(targeting: &activeStreamWaiters, count: handlers.count)
         hasCompletedStop = true
         stopCompletedContinuation?.resume()
         stopCompletedContinuation = nil
+    }
+
+    func waitUntilRequestedIntervalCount(_ target: Int) async {
+        if requestedIntervals.count >= target { return }
+        await withCheckedContinuation { requestedIntervalsWaiters.append((target, $0)) }
+    }
+
+    func waitUntilStopCallCount(_ target: Int) async {
+        if stopCalls >= target { return }
+        await withCheckedContinuation { stopCallWaiters.append((target, $0)) }
+    }
+
+    func waitUntilActiveStreamCount(_ target: Int) async {
+        if handlers.count == target { return }
+        await withCheckedContinuation { activeStreamWaiters.append((target, $0)) }
+    }
+
+    private func resumeWaiters(
+        targeting waiters: inout [(Int, CheckedContinuation<Void, Never>)],
+        count: Int
+    ) {
+        var pending: [(Int, CheckedContinuation<Void, Never>)] = []
+        waiters = waiters.filter { waiter in
+            if count == waiter.0 {
+                pending.append(waiter)
+                return false
+            }
+            return true
+        }
+        pending.forEach { $0.1.resume() }
     }
 
     func waitUntilStopCompleted() async {
@@ -1821,6 +1861,7 @@ private actor SuspendingFirstCyclePipeline: WiFiObservationPipelining {
     private var firstCycleEntered = false
     private var enteredContinuation: CheckedContinuation<Void, Never>?
     private var releaseContinuation: CheckedContinuation<Void, Never>?
+    private var completedBSSIDWaiters: [(Int, CheckedContinuation<Void, Never>)] = []
     private(set) var completedBSSIDs: [String] = []
 
     func produceCycle(
@@ -1839,6 +1880,15 @@ private actor SuspendingFirstCyclePipeline: WiFiObservationPipelining {
 
         let bssid = networks.first?.bssid
         if let bssid { completedBSSIDs.append(bssid) }
+        var pendingCompletedWaiters: [(Int, CheckedContinuation<Void, Never>)] = []
+        completedBSSIDWaiters = completedBSSIDWaiters.filter { waiter in
+            if completedBSSIDs.count >= waiter.0 {
+                pendingCompletedWaiters.append(waiter)
+                return false
+            }
+            return true
+        }
+        pendingCompletedWaiters.forEach { $0.1.resume() }
         return WiFiObservationCycleResult(
             observation: WiFiObservation(
                 timestamp: context.timestamp,
@@ -1873,6 +1923,11 @@ private actor SuspendingFirstCyclePipeline: WiFiObservationPipelining {
     func releaseFirstCycle() {
         releaseContinuation?.resume()
         releaseContinuation = nil
+    }
+
+    func waitUntilCompletedBSSIDCount(_ target: Int) async {
+        if completedBSSIDs.count >= target { return }
+        await withCheckedContinuation { completedBSSIDWaiters.append((target, $0)) }
     }
 
 }
@@ -2002,6 +2057,30 @@ private actor AsyncCompletionProbe {
 
     func markCompleted() {
         isCompleted = true
+    }
+}
+
+@MainActor
+private final class EventCounter {
+    private(set) var count = 0
+    private var waiters: [(Int, CheckedContinuation<Void, Never>)] = []
+
+    func increment() {
+        count += 1
+        var pending: [(Int, CheckedContinuation<Void, Never>)] = []
+        waiters = waiters.filter { waiter in
+            if count >= waiter.0 {
+                pending.append(waiter)
+                return false
+            }
+            return true
+        }
+        pending.forEach { $0.1.resume() }
+    }
+
+    func waitForCount(_ target: Int) async {
+        if count >= target { return }
+        await withCheckedContinuation { waiters.append((target, $0)) }
     }
 }
 
