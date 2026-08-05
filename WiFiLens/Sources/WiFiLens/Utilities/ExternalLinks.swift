@@ -3,6 +3,7 @@ import Foundation
 enum ExternalDestination {
     case privacyPolicy
     case appStore
+    case appStoreWriteReview
     case appStoreCampaign
     case website
     case github
@@ -20,6 +21,8 @@ enum ExternalLinks {
             "https://wifi-lens.shiinalabs.com/privacy"
         case .appStore:
             "https://apps.apple.com/app/wifi-lens-pro/id6776590746"
+        case .appStoreWriteReview:
+            "https://apps.apple.com/app/wifi-lens-pro/id6776590746?action=write-review"
         case .appStoreCampaign:
             // Official App Store Connect "oss_invite" Campaign Link. Regenerate
             // from App Analytics -> Campaigns if the campaign changes; never

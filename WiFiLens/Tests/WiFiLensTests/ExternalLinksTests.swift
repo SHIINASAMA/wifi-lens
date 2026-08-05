@@ -13,6 +13,14 @@ struct ExternalLinksTests {
         #expect(ExternalLinks.url(for: .appStore)?.absoluteString == "https://apps.apple.com/app/wifi-lens-pro/id6776590746")
     }
 
+    @Test("app store write-review maps to the manual rating destination")
+    func appStoreWriteReviewURL() {
+        #expect(
+            ExternalLinks.url(for: .appStoreWriteReview)?.absoluteString
+                == "https://apps.apple.com/app/wifi-lens-pro/id6776590746?action=write-review"
+        )
+    }
+
     @Test("app store campaign maps to the official oss_invite campaign link")
     func appStoreCampaignURL() {
         #expect(
