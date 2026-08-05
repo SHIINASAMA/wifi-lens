@@ -9,7 +9,7 @@ enum ExportSuccessPresentation: Equatable, Sendable {
     case preserveExisting  // Pro: keep the existing success alert
 }
 
-/// Snapshot export service for the OSS target.
+/// Shared PNG snapshot export service used by both editions.
 /// Composites all visible band charts into a single high-resolution PNG image.
 @MainActor
 enum ExportService {

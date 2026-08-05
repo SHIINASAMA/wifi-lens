@@ -272,16 +272,41 @@ final class GuidanceCoordinatorTests {
         #expect(store.load().meaningfulCompletionCount == 5)
     }
 
-    @Test func dismissExportFeedbackConsumesAttachedInvitationAsLater() {
+    @Test func dismissExportFeedbackConsumesAttachedInvitationAsLater() throws {
         let coordinator = makeCoordinator(state: invitationState())
         coordinator.handleExportSucceeded()
-        #expect(coordinator.pendingInvitation != nil)
+        let invitation = try #require(coordinator.pendingInvitation)
+        coordinator.invitationPresented(id: invitation.id)
 
         coordinator.dismissExportFeedback()
 
         #expect(coordinator.exportFeedback == nil)
         #expect(coordinator.pendingInvitation == nil)
-        #expect(store.load().invitationDismissalCount == 1)
+        let loaded = store.load()
+        #expect(loaded.invitationPresentationCount == 1)
+        #expect(loaded.invitationDismissalCount == 1)
+        #expect(loaded.lastInvitationDate == now)
+
+        // The presented-then-dismissed invitation starts the 30-day cooldown.
+        let decision = coordinator.record(.diagnosticsCompleted)
+        #expect(decision == .none(.invitationCooldown))
+    }
+
+    @Test func dismissExportFeedbackBeforePresentationCancelsWithoutTrace() throws {
+        let coordinator = makeCoordinator(state: invitationState())
+        coordinator.handleExportSucceeded()
+        _ = try #require(coordinator.pendingInvitation)
+
+        coordinator.dismissExportFeedback()
+
+        #expect(coordinator.exportFeedback == nil)
+        #expect(coordinator.pendingInvitation == nil)
+        let loaded = store.load()
+        #expect(loaded.invitationPresentationCount == 0)
+        #expect(loaded.invitationDismissalCount == 0)
+        #expect(loaded.lastInvitationDate == nil)
+        #expect(events(named: "guidance.invitation.cancelled").count == 1)
+        #expect(events(named: "guidance.invitation.dismissed").isEmpty)
     }
 
     @Test func dismissExportFeedbackWithoutInvitationClearsFeedbackOnly() {

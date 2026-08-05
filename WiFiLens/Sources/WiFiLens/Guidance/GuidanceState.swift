@@ -1,6 +1,6 @@
 import Foundation
 
-/// Persisted Issue #17 state. The struct owns its invariants both on live
+/// Persisted lifecycle-guidance state. The struct owns its invariants both on live
 /// mutation (`recordActiveDay`) and on restore (the normalized initializer),
 /// so corrupted storage can never violate them.
 struct GuidanceState: Equatable, Sendable {

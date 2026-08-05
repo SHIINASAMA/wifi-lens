@@ -118,7 +118,7 @@ final class GuidanceCoordinator {
                 now: now(),
                 calendar: calendar,
                 appVersion: appVersion(),
-                isProAppInstalled: isProAppInstalled()
+                isProAppInstalled: canInvite && configuration.invitationEnabled ? isProAppInstalled() : false
             )
         }
 
@@ -163,7 +163,7 @@ final class GuidanceCoordinator {
     func dismissExportFeedback() {
         exportFeedback = nil
         if let invitation = pendingInvitation, invitation.moment == .exportSucceeded {
-            dismissInvitation(id: invitation.id)
+            endInvitationPresentation(id: invitation.id)
         }
     }
 
