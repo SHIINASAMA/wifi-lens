@@ -2,7 +2,14 @@ import SwiftUI
 import AppKit
 import UniformTypeIdentifiers
 
-/// Snapshot export service for the OSS target.
+/// How export success feedback is presented. A presentation concern only —
+/// the guidance policy never reads it.
+enum ExportSuccessPresentation: Equatable, Sendable {
+    case banner            // OSS: non-modal success banner + invitation
+    case preserveExisting  // Pro: keep the existing success alert
+}
+
+/// Shared PNG snapshot export service used by both editions.
 /// Composites all visible band charts into a single high-resolution PNG image.
 @MainActor
 enum ExportService {
@@ -75,7 +82,17 @@ enum ExportService {
                 do {
                     try png.write(to: url)
                     await MainActor.run {
-                        showSuccess(String(localized: "export.image_saved_message", comment: "Chart image exported successfully"))
+                        // Presentation is an explicit edition strategy: OSS shows the
+                        // non-modal banner (which records the moment), Pro keeps its
+                        // existing success alert and records the moment for rating
+                        // eligibility only.
+                        switch EditionComposition.exportSuccessPresentation {
+                        case .banner:
+                            GuidanceCoordinator.shared.handleExportSucceeded()
+                        case .preserveExisting:
+                            GuidanceCoordinator.shared.record(.exportSucceeded)
+                            showSuccess(String(localized: "export.image_saved_message", comment: "Chart image exported successfully"))
+                        }
                     }
                 } catch {
                     await MainActor.run {

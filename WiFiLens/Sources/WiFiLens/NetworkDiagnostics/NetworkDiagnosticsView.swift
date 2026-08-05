@@ -3,7 +3,9 @@ import SwiftUI
 struct NetworkDiagnosticsView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Bindable var viewModel: NetworkDiagnosticsViewModel
+    let guidance: GuidanceCoordinator = .shared
     @State private var expandedGroupOverride: [String: Bool] = [:]
+    @State private var renderedInvitationID: UUID?
 
     var body: some View {
         GeometryReader { geometry in
@@ -19,6 +21,13 @@ struct NetworkDiagnosticsView: View {
                 } else if let conclusion = viewModel.conclusion {
                     conclusionStrip(conclusion)
                     Divider()
+                    if let invitation = guidance.pendingInvitation,
+                       invitation.moment == .diagnosticsCompleted {
+                        ProInvitationCard(invitation: invitation, guidance: guidance)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 12)
+                            .onAppear { renderedInvitationID = invitation.id }
+                    }
                 }
 
                 workspace(layoutMode)
@@ -26,7 +35,23 @@ struct NetworkDiagnosticsView: View {
             }
         }
         .animation(reduceMotion ? nil : .snappy(duration: 0.24), value: viewModel.phase)
-        .onDisappear { viewModel.cancel() }
+#if DEBUG
+        // Debug-only: the current, real host consumes the one-shot staging
+        // request set by the Debug menu, so a closed old window can never
+        // stage into a stale view model.
+        .onAppear {
+            if GuidanceDebugOverrides.consumeDiagnosticsStaging() {
+                viewModel.debugStageCompletedResult()
+            }
+        }
+#endif
+        .onDisappear {
+            viewModel.cancel()
+            if let id = renderedInvitationID {
+                guidance.endInvitationPresentation(id: id)
+                renderedInvitationID = nil
+            }
+        }
     }
 
     private var commandBar: some View {

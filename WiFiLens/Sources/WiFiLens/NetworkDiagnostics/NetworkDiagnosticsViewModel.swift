@@ -133,6 +133,7 @@ final class NetworkDiagnosticsViewModel {
     @ObservationIgnored private let checks: [any DiagnosticCheck]
     @ObservationIgnored private let minimumStepDuration: Duration
     @ObservationIgnored private let fingerprintMonitor: any NetworkFingerprintMonitoring
+    @ObservationIgnored private let guidance: GuidanceCoordinator
     @ObservationIgnored private var activeTask: Task<Void, Never>?
 
     init(checks: [any DiagnosticCheck] = [
@@ -144,11 +145,13 @@ final class NetworkDiagnosticsViewModel {
         SystemProxyCheck(),
     ],
     minimumStepDuration: Duration = NetworkDiagnosticsViewModel.defaultMinimumStepDuration,
-    fingerprintMonitor: any NetworkFingerprintMonitoring = SystemNetworkFingerprintMonitor()
+    fingerprintMonitor: any NetworkFingerprintMonitoring = SystemNetworkFingerprintMonitor(),
+    guidance: GuidanceCoordinator = .shared
     ) {
         self.checks = checks
         self.minimumStepDuration = minimumStepDuration
         self.fingerprintMonitor = fingerprintMonitor
+        self.guidance = guidance
         self.checkIDs = checks.map(\.id)
         self.executionPhases = Dictionary(
             uniqueKeysWithValues: checks.map { ($0.id, .waiting) }
@@ -288,6 +291,7 @@ final class NetworkDiagnosticsViewModel {
         }
         self.conclusion = conclusion
         phase = .completed
+        guidance.record(.diagnosticsCompleted)
     }
 }
 
@@ -338,3 +342,28 @@ actor NetworkDiagnosticRestartController {
         currentRun = nil
     }
 }
+
+#if DEBUG
+extension NetworkDiagnosticsViewModel {
+    /// Debug-only: publishes a synthetic completed result so the real
+    /// diagnostics host renders its production conclusion strip and the
+    /// production invitation card, without running a real diagnostic. Never
+    /// writes Timeline, diagnostic history, or user data; the production
+    /// `record(.diagnosticsCompleted)` path is not invoked (Debug triggers
+    /// schedule invitations explicitly).
+    func debugStageCompletedResult() {
+        activeTask?.cancel()
+        activeTask = nil
+        let staged = checkIDs.map { id in
+            NetworkDiagnosticResult(id: id, status: .normal, summary: "Debug staged result")
+        }
+        results = Dictionary(uniqueKeysWithValues: staged.map { ($0.id, $0) })
+        executionPhases = Dictionary(uniqueKeysWithValues: staged.map { ($0.id, .completed) })
+        conclusion = NetworkDiagnosticConclusion.evaluate(
+            staged,
+            requiredIDs: Set(checkIDs)
+        )
+        phase = .completed
+    }
+}
+#endif

@@ -1,6 +1,36 @@
+import AppKit
 import SwiftUI
 
 enum EditionComposition {
+    static var guidanceConfiguration: GuidanceConfiguration {
+        var config = GuidanceConfiguration()
+        config.invitationEnabled = true
+        config.appStoreCampaignURL = ExternalLinks.url(for: .appStoreCampaign)
+        return config
+    }
+
+    static var exportSuccessPresentation: ExportSuccessPresentation { .banner }
+
+    static func makeOnboardingExistingInstallationDetector() -> any ExistingInstallationDetecting {
+        SparkleAutomaticCheckExistingInstallationDetector()
+    }
+
+    static var onboardingConfiguration: OnboardingConfiguration {
+        OnboardingConfiguration(
+            welcomeEnabled: true,
+            showsProLink: true,
+            proURL: ExternalLinks.url(for: .appStoreCampaign),
+            startRoute: .overview,
+            startToolbarSelection: nil,
+            primaryActionKey: "onboarding.welcome.start",
+            highlights: [
+                OnboardingHighlight(icon: "wifi", titleKey: "onboarding.welcome.highlight.live"),
+                OnboardingHighlight(icon: "waveform.path.ecg", titleKey: "onboarding.welcome.highlight.diagnostics"),
+                OnboardingHighlight(icon: "square.and.arrow.up", titleKey: "onboarding.welcome.highlight.export")
+            ]
+        )
+    }
+
     @MainActor
     static var markdownExportCommandContribution: MarkdownExportCommandContribution {
         .lockedPreview
@@ -74,6 +104,71 @@ enum EditionComposition {
             EmptyView()
         }
     }
+
+#if DEBUG
+    /// Debug-only manual testing controls for the OSS invitation flow. The
+    /// whole menu is compiled out of Release builds.
+    @MainActor
+    static func debugCommands(
+        showMainWindow: @escaping (SidebarPage) -> Void
+    ) -> some Commands {
+        CommandMenu("Debug") {
+            Menu("Onboarding") {
+                Button("Reset Welcome State") {
+                    OnboardingCoordinator.shared.debugReset()
+                }
+                Button("Show Welcome Now") {
+                    guard EditionComposition.onboardingConfiguration.welcomeEnabled else { return }
+                    OnboardingCoordinator.shared.debugRequestShowWelcome()
+                    NSApp.activate(ignoringOtherApps: true)
+                    if let mainWindow = NSApp.windows.first(where: { $0.canBecomeMain }) {
+                        mainWindow.makeKeyAndOrderFront(nil)
+                    } else {
+                        showMainWindow(.overview)
+                    }
+                }
+                Button("Log Onboarding State") {
+                    OnboardingCoordinator.shared.debugLogState(edition: "OSS")
+                }
+            }
+            Divider()
+            Menu("Lifecycle Guidance") {
+                Button("Reset Lifecycle Guidance State") {
+                    GuidanceCoordinator.shared.debugResetState()
+                }
+                Button("Prepare OSS Invitation Eligibility") {
+                    GuidanceCoordinator.shared.debugPrepareInvitationEligibility()
+                }
+                Button("Trigger Diagnostics Invitation") {
+                    GuidanceCoordinator.shared.debugScheduleInvitation(for: .diagnosticsCompleted)
+                    GuidanceDebugOverrides.requestDiagnosticsStaging()
+                    showMainWindow(.networkDiagnostics)
+                }
+                Button("Trigger Export Invitation Banner") {
+                    GuidanceCoordinator.shared.debugScheduleInvitation(for: .exportSucceeded)
+                    GuidanceCoordinator.shared.debugPublishExportFeedback()
+                    NSApp.activate(ignoringOtherApps: true)
+                    if let mainWindow = NSApp.windows.first(where: { $0.canBecomeMain }) {
+                        mainWindow.makeKeyAndOrderFront(nil)
+                    } else {
+                        showMainWindow(.overview)
+                    }
+                }
+                Picker("Pro Installation Override", selection: Binding(
+                    get: { GuidanceDebugOverrides.proInstallationOverride },
+                    set: { GuidanceDebugOverrides.setProInstallationOverride($0) }
+                )) {
+                    Text("Use Real Detection").tag(ProInstallationOverride.useRealDetection)
+                    Text("Treat Pro as Not Installed").tag(ProInstallationOverride.treatAsNotInstalled)
+                    Text("Treat Pro as Installed").tag(ProInstallationOverride.treatAsInstalled)
+                }
+                Button("Log Lifecycle Guidance State") {
+                    GuidanceCoordinator.shared.debugLogState(edition: "OSS")
+                }
+            }
+        }
+    }
+#endif
 
     static func startLifecycle(observationRuntime: WiFiObservationRuntime) {}
 

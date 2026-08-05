@@ -2181,10 +2181,12 @@ struct NetworkDiagnosticsTests {
     @MainActor
     func viewModelManualStart() async {
         let recorder = DiagnosticTestRecorder()
+        let guidance = IsolatedGuidance()
         let viewModel = NetworkDiagnosticsViewModel(
             checks: makeStubChecks(recorder: recorder),
             minimumStepDuration: .zero,
-            fingerprintMonitor: DisabledNetworkFingerprintMonitor()
+            fingerprintMonitor: DisabledNetworkFingerprintMonitor(),
+            guidance: guidance.coordinator
         )
 
         #expect(viewModel.phase == .idle)
@@ -2205,10 +2207,12 @@ struct NetworkDiagnosticsTests {
     @MainActor
     func viewModelRerun() async {
         let recorder = DiagnosticTestRecorder()
+        let guidance = IsolatedGuidance()
         let viewModel = NetworkDiagnosticsViewModel(
             checks: makeStubChecks(recorder: recorder),
             minimumStepDuration: .zero,
-            fingerprintMonitor: DisabledNetworkFingerprintMonitor()
+            fingerprintMonitor: DisabledNetworkFingerprintMonitor(),
+            guidance: guidance.coordinator
         )
 
         #expect(viewModel.start())
@@ -2226,6 +2230,7 @@ struct NetworkDiagnosticsTests {
     func fingerprintChangeRestartsOnce() async {
         let initial = makeFingerprint(interfaceName: "en0", dnsHash: 1)
         let fingerprintMonitor = ControlledNetworkFingerprintMonitor(initial: initial)
+        let guidance = IsolatedGuidance()
         let configurationProbe = RestartableDiagnosticProbe()
         let networkProbe = RestartableDiagnosticProbe(blockFirstInvocation: true)
         let checks: [any DiagnosticCheck] = [
@@ -2245,7 +2250,8 @@ struct NetworkDiagnosticsTests {
         let viewModel = NetworkDiagnosticsViewModel(
             checks: checks,
             minimumStepDuration: .zero,
-            fingerprintMonitor: fingerprintMonitor
+            fingerprintMonitor: fingerprintMonitor,
+            guidance: guidance.coordinator
         )
 
         #expect(viewModel.start())
@@ -2268,6 +2274,7 @@ struct NetworkDiagnosticsTests {
     func unchangedFingerprintDoesNotRestart() async {
         let fingerprint = makeFingerprint(interfaceName: "en0", dnsHash: 1)
         let fingerprintMonitor = ControlledNetworkFingerprintMonitor(initial: fingerprint)
+        let guidance = IsolatedGuidance()
         let probe = RestartableDiagnosticProbe(blockFirstInvocation: true)
         let viewModel = NetworkDiagnosticsViewModel(
             checks: [
@@ -2279,7 +2286,8 @@ struct NetworkDiagnosticsTests {
                 ),
             ],
             minimumStepDuration: .zero,
-            fingerprintMonitor: fingerprintMonitor
+            fingerprintMonitor: fingerprintMonitor,
+            guidance: guidance.coordinator
         )
 
         #expect(viewModel.start())
@@ -2298,10 +2306,12 @@ struct NetworkDiagnosticsTests {
         let initial = makeFingerprint(interfaceName: "en0", dnsHash: 1)
         let fingerprintMonitor = ControlledNetworkFingerprintMonitor(initial: initial)
         let probe = BlockingDiagnosticProbe()
+        let guidance = IsolatedGuidance()
         let viewModel = NetworkDiagnosticsViewModel(
             checks: [BlockingProbeDiagnosticCheck(id: .path, probe: probe)],
             minimumStepDuration: .zero,
-            fingerprintMonitor: fingerprintMonitor
+            fingerprintMonitor: fingerprintMonitor,
+            guidance: guidance.coordinator
         )
 
         #expect(viewModel.start())
@@ -2416,6 +2426,52 @@ struct NetworkDiagnosticsTests {
 
         #expect(viewModel.phase == .idle)
         #expect(viewModel.conclusion == nil)
+    }
+
+    @Test("a successful diagnostics run reports the completion moment exactly once")
+    @MainActor
+    func successfulRunReportsDiagnosticsMomentOnce() async {
+        let recorder = DiagnosticTestRecorder()
+        let guidance = IsolatedGuidance()
+        let viewModel = NetworkDiagnosticsViewModel(
+            checks: makeStubChecks(recorder: recorder),
+            minimumStepDuration: .zero,
+            fingerprintMonitor: DisabledNetworkFingerprintMonitor(),
+            guidance: guidance.coordinator
+        )
+
+        #expect(viewModel.start())
+        await viewModel.waitForCompletion()
+
+        #expect(viewModel.phase == .completed)
+        let loaded = guidance.store.load()
+        #expect(loaded.meaningfulCompletionCount == 1)
+        #expect(loaded.invitationPresentationCount == 0)
+        #expect(loaded.lastInvitationDate == nil)
+        #expect(guidance.events.filter { $0.name == "guidance.value_moment" }.count == 1)
+    }
+
+    @Test("a run that never reaches completion never reports the diagnostics moment")
+    @MainActor
+    func failingRunNeverReportsDiagnosticsMoment() async {
+        let probe = BlockingDiagnosticProbe()
+        let guidance = IsolatedGuidance()
+        let viewModel = NetworkDiagnosticsViewModel(
+            checks: [BlockingProbeDiagnosticCheck(id: .path, probe: probe)],
+            minimumStepDuration: .zero,
+            fingerprintMonitor: DisabledNetworkFingerprintMonitor(),
+            guidance: guidance.coordinator
+        )
+
+        #expect(viewModel.start())
+        await probe.waitForInvocationCount(1)
+        viewModel.cancel()
+        await viewModel.waitForCompletion()
+
+        #expect(viewModel.phase == .idle)
+        #expect(viewModel.conclusion == nil)
+        #expect(guidance.store.load().meaningfulCompletionCount == 0)
+        #expect(guidance.events.isEmpty)
     }
 
     @Test("system fingerprint monitor detects DNS settings changes without a path update")
@@ -3615,6 +3671,53 @@ private actor DiagnosticTestRecorder {
     func record(_ value: NetworkDiagnosticCheckID) {
         values.append(value)
     }
+}
+
+/// Isolated guidance harness: in-memory store, fixed clock, collecting event
+/// sink. Keeps diagnostics view-model tests hermetic (no real UserDefaults,
+/// no Launch Services queries).
+@MainActor
+private final class IsolatedGuidance {
+    let store: InMemoryGuidanceStateStore
+    let coordinator: GuidanceCoordinator
+    private let eventBox: EventBox
+
+    var events: [GuidanceEvent] { eventBox.events }
+
+    init(completionCount: Int = 0) {
+        let calendar = Self.makeCalendar()
+        let now = calendar.date(from: DateComponents(year: 2026, month: 8, day: 5, hour: 12))!
+        let box = EventBox()
+        store = InMemoryGuidanceStateStore(initial: GuidanceState(
+            activeDays: ["2026-07-01", "2026-07-02"],
+            meaningfulCompletionCount: completionCount
+        ))
+        var configuration = GuidanceConfiguration()
+        configuration.invitationEnabled = true
+        coordinator = GuidanceCoordinator(
+            configuration: configuration,
+            stateStore: store,
+            now: { now },
+            calendar: calendar,
+            appVersion: { "2.1.0" },
+            isProAppInstalled: { false },
+            eventSink: { event in
+                box.events.append(event)
+            }
+        )
+        eventBox = box
+    }
+
+    private static func makeCalendar() -> Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        return calendar
+    }
+}
+
+@MainActor
+private final class EventBox {
+    var events: [GuidanceEvent] = []
 }
 
 private struct StubDiagnosticCheck: DiagnosticCheck {

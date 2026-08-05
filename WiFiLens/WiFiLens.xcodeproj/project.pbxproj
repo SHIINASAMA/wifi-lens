@@ -57,8 +57,47 @@
 		MV0000000000000000000015 /* MACVendorCSVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000012 /* MACVendorCSVParser.swift */; };
 		MV0000000000000000000016 /* MACVendorCSVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000012 /* MACVendorCSVParser.swift */; };
 		MV0000000000000000000017 /* MACVendorDatabaseStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000020 /* MACVendorDatabaseStoreTests.swift */; };
+		G900000000000000000000BC /* GuidanceStateStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AC /* GuidanceStateStoreTests.swift */; };
+		G900000000000000000000BF /* GuidancePolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AD /* GuidancePolicyTests.swift */; };
+		G900000000000000000000D5 /* GuidanceCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000D4 /* GuidanceCoordinatorTests.swift */; };
+		G900000000000000000000D7 /* GuidanceEditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000D6 /* GuidanceEditionTests.swift */; };
+		G900000000000000000000D9 /* GuidanceEditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000D8 /* GuidanceEditionTests.swift */; };
+		G900000000000000000000EB /* GuidanceDebugTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000EC /* GuidanceDebugTests.swift */; };
+		G900000000000000000000EF /* GuidanceDebugTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000EE /* GuidanceDebugTests.swift */; };
+		G900000000000000000000A1 /* OnboardingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000A0 /* OnboardingState.swift */; };
+		G900000000000000000000A2 /* OnboardingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000A0 /* OnboardingState.swift */; };
+		G900000000000000000000A4 /* OnboardingStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000A3 /* OnboardingStateStore.swift */; };
+		G900000000000000000000A5 /* OnboardingStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000A3 /* OnboardingStateStore.swift */; };
+		G900000000000000000000A7 /* ExistingInstallationDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000A6 /* ExistingInstallationDetector.swift */; };
+		G900000000000000000000A8 /* ExistingInstallationDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000A6 /* ExistingInstallationDetector.swift */; };
+		G900000000000000000000B0 /* OnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000A9 /* OnboardingCoordinator.swift */; };
+		G900000000000000000000B1 /* OnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000A9 /* OnboardingCoordinator.swift */; };
+		G900000000000000000000B3 /* OnboardingConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000B2 /* OnboardingConfiguration.swift */; };
+		G900000000000000000000B4 /* OnboardingConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000B2 /* OnboardingConfiguration.swift */; };
+		G900000000000000000000B6 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000B5 /* WelcomeView.swift */; };
+		G900000000000000000000B7 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000B5 /* WelcomeView.swift */; };
+		G900000000000000000000B9 /* OnboardingStateStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000B8 /* OnboardingStateStoreTests.swift */; };
+		G900000000000000000000C5 /* OnboardingCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000C0 /* OnboardingCoordinatorTests.swift */; };
+		G900000000000000000000C7 /* OnboardingEditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000C6 /* OnboardingEditionTests.swift */; };
+		G900000000000000000000C9 /* OnboardingEditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000C8 /* OnboardingEditionTests.swift */; };
 		MV0000000000000000000018 /* MACVendorDatabaseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000021 /* MACVendorDatabaseStore.swift */; };
 		MV0000000000000000000019 /* MACVendorDatabaseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000021 /* MACVendorDatabaseStore.swift */; };
+		G900000000000000000000BA /* GuidanceState.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AA /* GuidanceState.swift */; };
+		G900000000000000000000BB /* GuidanceStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AB /* GuidanceStateStore.swift */; };
+		G900000000000000000000BD /* GuidanceState.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AA /* GuidanceState.swift */; };
+		G900000000000000000000BE /* GuidanceStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AB /* GuidanceStateStore.swift */; };
+		G900000000000000000000C1 /* GuidanceConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AE /* GuidanceConfiguration.swift */; };
+		G900000000000000000000C2 /* GuidancePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AF /* GuidancePolicy.swift */; };
+		G900000000000000000000C3 /* GuidanceConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AE /* GuidanceConfiguration.swift */; };
+		G900000000000000000000C4 /* GuidancePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AF /* GuidancePolicy.swift */; };
+		G900000000000000000000D2 /* GuidanceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000D1 /* GuidanceCoordinator.swift */; };
+		G900000000000000000000D3 /* GuidanceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000D1 /* GuidanceCoordinator.swift */; };
+		G900000000000000000000E2 /* ProInvitationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000E1 /* ProInvitationCard.swift */; };
+		G900000000000000000000E3 /* ProInvitationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000E1 /* ProInvitationCard.swift */; };
+		G900000000000000000000E5 /* ExportSuccessBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000E4 /* ExportSuccessBanner.swift */; };
+		G900000000000000000000E6 /* ExportSuccessBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000E4 /* ExportSuccessBanner.swift */; };
+		G900000000000000000000E8 /* GuidanceDebug.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000E7 /* GuidanceDebug.swift */; };
+		G900000000000000000000E9 /* GuidanceDebug.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000E7 /* GuidanceDebug.swift */; };
 		MV0000000000000000000022 /* MACVendorDatabaseDownloaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000023 /* MACVendorDatabaseDownloaderTests.swift */; };
 		MV0000000000000000000024 /* MACVendorDatabaseDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */; };
 		MV0000000000000000000025 /* MACVendorDatabaseDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */; };
@@ -300,6 +339,8 @@
 		EC2000000000000000000001C /* InsightRuleEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2000000000000000000001D /* InsightRuleEngine.swift */; };
 		EC2000000000000000000001E /* InitialInsightRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2000000000000000000001F /* InitialInsightRules.swift */; };
 		EC20000000000000000000020 /* InsightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000021 /* InsightsViewModel.swift */; };
+		EC20000000000000000000024 /* ProReviewRequestBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000023 /* ProReviewRequestBridge.swift */; };
+		EC20000000000000000000026 /* FeedbackContact.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000025 /* FeedbackContact.swift */; };
 		EC20000000000000000000002 /* EditionCompositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000001 /* EditionCompositionTests.swift */; };
 		E30000000000000000000002 /* WiFiObservationEventSQLiteStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000001 /* WiFiObservationEventSQLiteStoreTests.swift */; };
 		EA1000000000000000000002 /* AnalysisScopeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1000000000000000000001 /* AnalysisScopeTests.swift */; };
@@ -510,6 +551,14 @@
 		MV0000000000000000000012 /* MACVendorCSVParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorCSVParser.swift; sourceTree = "<group>"; };
 		MV0000000000000000000020 /* MACVendorDatabaseStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseStoreTests.swift; sourceTree = "<group>"; };
 		MV0000000000000000000021 /* MACVendorDatabaseStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseStore.swift; sourceTree = "<group>"; };
+		G900000000000000000000AA /* GuidanceState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceState.swift; sourceTree = "<group>"; };
+		G900000000000000000000AB /* GuidanceStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceStateStore.swift; sourceTree = "<group>"; };
+		G900000000000000000000AE /* GuidanceConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceConfiguration.swift; sourceTree = "<group>"; };
+		G900000000000000000000AF /* GuidancePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidancePolicy.swift; sourceTree = "<group>"; };
+		G900000000000000000000D1 /* GuidanceCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceCoordinator.swift; sourceTree = "<group>"; };
+		G900000000000000000000E1 /* ProInvitationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProInvitationCard.swift; sourceTree = "<group>"; };
+		G900000000000000000000E4 /* ExportSuccessBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportSuccessBanner.swift; sourceTree = "<group>"; };
+		G900000000000000000000E7 /* GuidanceDebug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceDebug.swift; sourceTree = "<group>"; };
 		MV0000000000000000000023 /* MACVendorDatabaseDownloaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseDownloaderTests.swift; sourceTree = "<group>"; };
 		MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseDownloader.swift; sourceTree = "<group>"; };
 		MV0000000000000000000028 /* MACVendorDatabaseManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseManagerTests.swift; sourceTree = "<group>"; };
@@ -536,6 +585,23 @@
 		A10000000000000000000008 /* SecondaryToolbarCapsule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryToolbarCapsule.swift; sourceTree = "<group>"; };
 		A10000000000000000000009 /* SecondaryToolbarDescriptorExpansionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryToolbarDescriptorExpansionTests.swift; sourceTree = "<group>"; };
 		EC10000000000000000000002 /* EditionCompositionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditionCompositionTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000AC /* GuidanceStateStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceStateStoreTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000AD /* GuidancePolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidancePolicyTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000D4 /* GuidanceCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceCoordinatorTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000D6 /* GuidanceEditionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceEditionTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000D8 /* GuidanceEditionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceEditionTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000EC /* GuidanceDebugTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceDebugTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000EE /* GuidanceDebugTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceDebugTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000A0 /* OnboardingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingState.swift; sourceTree = "<group>"; };
+		G900000000000000000000A3 /* OnboardingStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStateStore.swift; sourceTree = "<group>"; };
+		G900000000000000000000A6 /* ExistingInstallationDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExistingInstallationDetector.swift; sourceTree = "<group>"; };
+		G900000000000000000000A9 /* OnboardingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCoordinator.swift; sourceTree = "<group>"; };
+		G900000000000000000000B2 /* OnboardingConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingConfiguration.swift; sourceTree = "<group>"; };
+		G900000000000000000000B5 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		G900000000000000000000B8 /* OnboardingStateStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStateStoreTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000C0 /* OnboardingCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCoordinatorTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000C6 /* OnboardingEditionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingEditionTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000C8 /* OnboardingEditionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingEditionTests.swift; sourceTree = "<group>"; };
 		EC10000000000000000000005 /* EditionCompositionContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditionCompositionContext.swift; sourceTree = "<group>"; };
 		EC10000000000000000000006 /* OSSEditionComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSSEditionComposition.swift; sourceTree = "<group>"; };
 		A10000000000000000000017 /* App/MenuBarWindowBehaviorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/MenuBarWindowBehaviorTests.swift; sourceTree = "<group>"; };
@@ -634,6 +700,8 @@
 		EC2000000000000000000001D /* InsightRuleEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightRuleEngine.swift; sourceTree = "<group>"; };
 		EC2000000000000000000001F /* InitialInsightRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialInsightRules.swift; sourceTree = "<group>"; };
 		EC20000000000000000000021 /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
+		EC20000000000000000000023 /* ProReviewRequestBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProReviewRequestBridge.swift; sourceTree = "<group>"; };
+		EC20000000000000000000025 /* FeedbackContact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackContact.swift; sourceTree = "<group>"; };
 		EC20000000000000000000001 /* EditionCompositionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditionCompositionTests.swift; sourceTree = "<group>"; };
 		E30000000000000000000001 /* WiFiObservationEventSQLiteStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventSQLiteStoreTests.swift; sourceTree = "<group>"; };
 		EA1000000000000000000001 /* AnalysisScopeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisScopeTests.swift; sourceTree = "<group>"; };
@@ -1007,6 +1075,8 @@
 				D3E6587CCEDEC199C00591B2 /* Channels */,
 				49FEC4F42675BFAD1316DDEC /* Debug */,
 				C1D2E3F4A5B6123456789AC0 /* Filter */,
+				G900000000000000000000CA /* Guidance */,
+				G900000000000000000000D0 /* Onboarding */,
 				8FFEB5302BE8674E56110FAE /* Interfaces */,
 				786696F9D6046171197C0641 /* MCP */,
 				ND0000000000000000000030 /* NetworkDiagnostics */,
@@ -1022,6 +1092,34 @@
 				DD6657406F0FB50F2D9B7FB4 /* Utilities */,
 			);
 			path = WiFiLens;
+			sourceTree = "<group>";
+		};
+		G900000000000000000000D0 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				G900000000000000000000A0 /* OnboardingState.swift */,
+				G900000000000000000000A3 /* OnboardingStateStore.swift */,
+				G900000000000000000000A6 /* ExistingInstallationDetector.swift */,
+				G900000000000000000000A9 /* OnboardingCoordinator.swift */,
+				G900000000000000000000B2 /* OnboardingConfiguration.swift */,
+				G900000000000000000000B5 /* WelcomeView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		G900000000000000000000CA /* Guidance */ = {
+			isa = PBXGroup;
+			children = (
+				G900000000000000000000AA /* GuidanceState.swift */,
+				G900000000000000000000AB /* GuidanceStateStore.swift */,
+				G900000000000000000000AE /* GuidanceConfiguration.swift */,
+				G900000000000000000000AF /* GuidancePolicy.swift */,
+				G900000000000000000000D1 /* GuidanceCoordinator.swift */,
+				G900000000000000000000E1 /* ProInvitationCard.swift */,
+				G900000000000000000000E4 /* ExportSuccessBanner.swift */,
+				G900000000000000000000E7 /* GuidanceDebug.swift */,
+			);
+			path = Guidance;
 			sourceTree = "<group>";
 		};
 		ND0000000000000000000030 /* NetworkDiagnostics */ = {
@@ -1112,6 +1210,9 @@
 				EF2000000000000000000001 /* InsightRuleValidationTests.swift */,
 				EB2000000000000000000005 /* Fixtures */,
 				EC20000000000000000000001 /* EditionCompositionTests.swift */,
+				G900000000000000000000D8 /* GuidanceEditionTests.swift */,
+				G900000000000000000000EE /* GuidanceDebugTests.swift */,
+				G900000000000000000000C8 /* OnboardingEditionTests.swift */,
 				E10000000000000000000001 /* EventJournalTests.swift */,
 				E30000000000000000000001 /* WiFiObservationEventSQLiteStoreTests.swift */,
 				FB8FCB182FF6C4E300BB2929 /* MenuBarMigrationTests.swift */,
@@ -1223,6 +1324,8 @@
 				EC20000000000000000000019 /* StatisticsViewModel.swift */,
 				EC20000000000000000000011 /* InsightsView.swift */,
 				EC20000000000000000000021 /* InsightsViewModel.swift */,
+				EC20000000000000000000023 /* ProReviewRequestBridge.swift */,
+				EC20000000000000000000025 /* FeedbackContact.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -1298,6 +1401,8 @@
 				ADB001000000000000000001 /* DebugMultiAPScenarioTests.swift */,
 				3053495094BB40125310557F /* DeviceCompatibilityFilterTests.swift */,
 				90CF4B22A68C668A58043392 /* ExternalLinksTests.swift */,
+				G900000000000000000000CB /* Guidance */,
+				G900000000000000000000F0 /* Onboarding */,
 				39A94372ADF30D10E0F015CD /* IEParserTests.swift */,
 				A5024CBB8BFCAFF56FEF0756 /* MCPServerTests.swift */,
 				MV0000000000000000000010 /* MACVendorCSVParserTests.swift */,
@@ -1341,6 +1446,28 @@
 				ND0000000000000000000002 /* NetworkDiagnosticsTests.swift */,
 			);
 			path = NetworkDiagnostics;
+			sourceTree = "<group>";
+		};
+		G900000000000000000000F0 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				G900000000000000000000B8 /* OnboardingStateStoreTests.swift */,
+				G900000000000000000000C0 /* OnboardingCoordinatorTests.swift */,
+				G900000000000000000000C6 /* OnboardingEditionTests.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		G900000000000000000000CB /* Guidance */ = {
+			isa = PBXGroup;
+			children = (
+				G900000000000000000000AC /* GuidanceStateStoreTests.swift */,
+				G900000000000000000000AD /* GuidancePolicyTests.swift */,
+				G900000000000000000000D4 /* GuidanceCoordinatorTests.swift */,
+				G900000000000000000000D6 /* GuidanceEditionTests.swift */,
+				G900000000000000000000EC /* GuidanceDebugTests.swift */,
+			);
+			path = Guidance;
 			sourceTree = "<group>";
 		};
 		FBD329492FBF0E2F00D01613 /* Tests */ = {
@@ -1701,6 +1828,20 @@
 				MV0000000000000000000003 /* MACVendorResolver.swift in Sources */,
 				MV0000000000000000000046 /* MACVendorBundledDatabase.swift in Sources */,
 				ND0000000000000000000010 /* NetworkDiagnosticModels.swift in Sources */,
+				G900000000000000000000BA /* GuidanceState.swift in Sources */,
+				G900000000000000000000BB /* GuidanceStateStore.swift in Sources */,
+				G900000000000000000000C1 /* GuidanceConfiguration.swift in Sources */,
+				G900000000000000000000C2 /* GuidancePolicy.swift in Sources */,
+				G900000000000000000000D2 /* GuidanceCoordinator.swift in Sources */,
+				G900000000000000000000E2 /* ProInvitationCard.swift in Sources */,
+				G900000000000000000000E5 /* ExportSuccessBanner.swift in Sources */,
+				G900000000000000000000E8 /* GuidanceDebug.swift in Sources */,
+				G900000000000000000000A1 /* OnboardingState.swift in Sources */,
+				G900000000000000000000A4 /* OnboardingStateStore.swift in Sources */,
+				G900000000000000000000A7 /* ExistingInstallationDetector.swift in Sources */,
+				G900000000000000000000B0 /* OnboardingCoordinator.swift in Sources */,
+				G900000000000000000000B3 /* OnboardingConfiguration.swift in Sources */,
+				G900000000000000000000B6 /* WelcomeView.swift in Sources */,
 				ND0000000000000000000011 /* DiagnosticRunner.swift in Sources */,
 				ND0000000000000000000014 /* NetworkConnectivityCheck.swift in Sources */,
 				ND0000000000000000000015 /* DNSResolutionCheck.swift in Sources */,
@@ -1839,6 +1980,14 @@
 				MV0000000000000000000041 /* MACVendorDatabaseReminderTests.swift in Sources */,
 				MV0000000000000000000017 /* MACVendorDatabaseStoreTests.swift in Sources */,
 				MV0000000000000000000009 /* MACVendorCSVParserTests.swift in Sources */,
+				G900000000000000000000BC /* GuidanceStateStoreTests.swift in Sources */,
+				G900000000000000000000BF /* GuidancePolicyTests.swift in Sources */,
+				G900000000000000000000D5 /* GuidanceCoordinatorTests.swift in Sources */,
+				G900000000000000000000D7 /* GuidanceEditionTests.swift in Sources */,
+				G900000000000000000000EB /* GuidanceDebugTests.swift in Sources */,
+				G900000000000000000000B9 /* OnboardingStateStoreTests.swift in Sources */,
+				G900000000000000000000C5 /* OnboardingCoordinatorTests.swift in Sources */,
+				G900000000000000000000C7 /* OnboardingEditionTests.swift in Sources */,
 				ND0000000000000000000001 /* NetworkDiagnosticsTests.swift in Sources */,
 				67B6475699ADED9C42E8F7CC /* BLEModelTests.swift in Sources */,
 				2A8E470AAD8FCE2CC1D14305 /* BandChartViewModelTests.swift in Sources */,
@@ -1901,6 +2050,20 @@
 				MV0000000000000000000030 /* MACVendorDatabaseService.swift in Sources */,
 				MV0000000000000000000025 /* MACVendorDatabaseDownloader.swift in Sources */,
 				MV0000000000000000000019 /* MACVendorDatabaseStore.swift in Sources */,
+				G900000000000000000000BD /* GuidanceState.swift in Sources */,
+				G900000000000000000000BE /* GuidanceStateStore.swift in Sources */,
+				G900000000000000000000C3 /* GuidanceConfiguration.swift in Sources */,
+				G900000000000000000000C4 /* GuidancePolicy.swift in Sources */,
+				G900000000000000000000D3 /* GuidanceCoordinator.swift in Sources */,
+				G900000000000000000000E3 /* ProInvitationCard.swift in Sources */,
+				G900000000000000000000E6 /* ExportSuccessBanner.swift in Sources */,
+				G900000000000000000000E9 /* GuidanceDebug.swift in Sources */,
+				G900000000000000000000A2 /* OnboardingState.swift in Sources */,
+				G900000000000000000000A5 /* OnboardingStateStore.swift in Sources */,
+				G900000000000000000000A8 /* ExistingInstallationDetector.swift in Sources */,
+				G900000000000000000000B1 /* OnboardingCoordinator.swift in Sources */,
+				G900000000000000000000B4 /* OnboardingConfiguration.swift in Sources */,
+				G900000000000000000000B7 /* WelcomeView.swift in Sources */,
 				MV0000000000000000000016 /* MACVendorCSVParser.swift in Sources */,
 				MV0000000000000000000014 /* MACVendorDatabaseModels.swift in Sources */,
 				MV0000000000000000000004 /* MACVendorResolver.swift in Sources */,
@@ -1932,6 +2095,8 @@
 				EC2000000000000000000001C /* InsightRuleEngine.swift in Sources */,
 				EC2000000000000000000001E /* InitialInsightRules.swift in Sources */,
 				EC20000000000000000000020 /* InsightsViewModel.swift in Sources */,
+				EC20000000000000000000024 /* ProReviewRequestBridge.swift in Sources */,
+				EC20000000000000000000026 /* FeedbackContact.swift in Sources */,
 				FB1E32482FC7316C009D1BDC /* BluetoothPermissionManager.swift in Sources */,
 				FB1E32492FC7316C009D1BDC /* BLEChannel.swift in Sources */,
 				FB1E324A2FC7316C009D1BDC /* BLEAdvertisementEvent.swift in Sources */,
@@ -2080,6 +2245,9 @@
 				EF1000000000000000000002 /* InsightModelTests.swift in Sources */,
 				EF2000000000000000000002 /* InsightRuleValidationTests.swift in Sources */,
 				EC20000000000000000000002 /* EditionCompositionTests.swift in Sources */,
+				G900000000000000000000D9 /* GuidanceEditionTests.swift in Sources */,
+				G900000000000000000000EF /* GuidanceDebugTests.swift in Sources */,
+				G900000000000000000000C9 /* OnboardingEditionTests.swift in Sources */,
 				E10000000000000000000002 /* EventJournalTests.swift in Sources */,
 				E30000000000000000000002 /* WiFiObservationEventSQLiteStoreTests.swift in Sources */,
 				FB8FCB282FF6CAC800BB2929 /* SecondaryToolbarProTests.swift in Sources */,
