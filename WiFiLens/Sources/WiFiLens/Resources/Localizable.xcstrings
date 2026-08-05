@@ -10,6 +10,30 @@
             "state": "translated",
             "value": "Explore WiFi Lens Pro"
           }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WiFi Lens Pro entdecken"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descubre WiFi Lens Pro"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WiFi Lens Pro を試してみる"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "探索 WiFi Lens Pro"
+          }
         }
       }
     },
@@ -20,6 +44,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "This diagnostic reflects the current network state. WiFi Lens Pro can retain changes over time and help identify intermittent problems and long-term trends."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Diagnose spiegelt den aktuellen Netzwerkzustand wider. Mit WiFi Lens Pro kannst du Änderungen über die Zeit nachvollziehen und so intermittierende Probleme und langfristige Trends erkennen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este diagnóstico refleja el estado actual de la red. WiFi Lens Pro puede conservar los cambios a lo largo del tiempo y ayudar a identificar problemas intermitentes y tendencias a largo plazo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この診断は現在のネットワーク状態を反映しています。WiFi Lens Pro は時間の経過に伴う変化を記録し、断続的な問題や長期的な傾向の特定に役立ちます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本次诊断反映了当前的网络状态。WiFi Lens Pro 可以保留随时间发生的变化，帮助识别间歇性问题与长期趋势。"
           }
         }
       }
@@ -32,6 +80,30 @@
             "state": "translated",
             "value": "View WiFi Lens Pro"
           }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WiFi Lens Pro ansehen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ver WiFi Lens Pro"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WiFi Lens Pro を見る"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看 WiFi Lens Pro"
+          }
         }
       }
     },
@@ -43,6 +115,30 @@
             "state": "translated",
             "value": "Later"
           }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Später"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más tarde"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "後で"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "稍后"
+          }
         }
       }
     },
@@ -53,6 +149,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Do not show again"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht mehr anzeigen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No volver a mostrar"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今後表示しない"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不再显示"
           }
         }
       }
@@ -32053,6 +32173,18 @@
             "state": "translated",
             "value": "このMac"
           }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Mac"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este Mac"
+          }
         }
       }
     },
@@ -32072,6 +32204,18 @@
           }
         },
         "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LAN"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LAN"
+          }
+        },
+        "es": {
           "stringUnit": {
             "state": "translated",
             "value": "LAN"
@@ -32099,6 +32243,18 @@
             "state": "translated",
             "value": "インターネット"
           }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Internet"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Internet"
+          }
         }
       }
     },
@@ -32121,6 +32277,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "追加チェック"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zusätzliche Prüfungen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comprobaciones adicionales"
           }
         }
       }
@@ -32145,6 +32313,18 @@
             "state": "translated",
             "value": "ゲートウェイ到達性"
           }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gateway-Erreichbarkeit"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accesibilidad de la puerta de enlace"
+          }
         }
       }
     },
@@ -32167,6 +32347,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "ルーター"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Router"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Router"
           }
         }
       }
@@ -32191,6 +32383,18 @@
             "state": "translated",
             "value": "ゲートウェイに到達"
           }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gateway erreichbar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puerta de enlace accesible"
+          }
         }
       }
     },
@@ -32214,6 +32418,18 @@
             "state": "translated",
             "value": "ゲートウェイに到達できません"
           }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gateway nicht erreichbar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puerta de enlace inaccesible"
+          }
         }
       }
     },
@@ -32236,6 +32452,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "ゲートウェイ到達性不明"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gateway-Erreichbarkeit unbekannt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accesibilidad de la puerta de enlace desconocida"
           }
         }
       }
@@ -32318,6 +32546,30 @@
             "state": "translated",
             "value": "This snapshot captures the current network state. WiFi Lens Pro can retain changes over time and help identify intermittent problems and long-term trends."
           }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Schnappschuss erfasst den aktuellen Netzwerkzustand. Mit WiFi Lens Pro kannst du Änderungen über die Zeit nachvollziehen und so intermittierende Probleme und langfristige Trends erkennen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta instantánea captura el estado actual de la red. WiFi Lens Pro puede conservar los cambios a lo largo del tiempo y ayudar a identificar problemas intermitentes y tendencias a largo plazo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このスナップショットは現在のネットワーク状態を記録しています。WiFi Lens Pro は時間の経過に伴う変化を記録し、断続的な問題や長期的な傾向の特定に役立ちます。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此快照记录了当前的网络状态。WiFi Lens Pro 可以保留随时间发生的变化，帮助识别间歇性问题与长期趋势。"
+          }
         }
       }
     },
@@ -32328,6 +32580,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Snapshot exported successfully"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schnappschuss erfolgreich exportiert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instantánea exportada correctamente"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スナップショットを書き出しました"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "快照已成功导出"
           }
         }
       }
@@ -32340,6 +32616,30 @@
             "state": "translated",
             "value": "Support"
           }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Support"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soporte"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サポート"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支持"
+          }
         }
       }
     },
@@ -32351,6 +32651,30 @@
             "state": "translated",
             "value": "Rate WiFi Lens Pro"
           }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WiFi Lens Pro bewerten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Valorar WiFi Lens Pro"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WiFi Lens Pro を評価"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "评价 WiFi Lens Pro"
+          }
         }
       }
     },
@@ -32361,6 +32685,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Send Feedback"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feedback senden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enviar comentarios"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フィードバックを送信"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送反馈"
           }
         }
       }
