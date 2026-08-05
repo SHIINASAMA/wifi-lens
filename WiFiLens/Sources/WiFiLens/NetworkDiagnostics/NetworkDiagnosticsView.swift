@@ -24,7 +24,8 @@ struct NetworkDiagnosticsView: View {
                     if let invitation = guidance.pendingInvitation,
                        invitation.moment == .diagnosticsCompleted {
                         ProInvitationCard(invitation: invitation, guidance: guidance)
-                            .padding(.horizontal)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 12)
                             .onAppear { renderedInvitationID = invitation.id }
                     }
                 }
