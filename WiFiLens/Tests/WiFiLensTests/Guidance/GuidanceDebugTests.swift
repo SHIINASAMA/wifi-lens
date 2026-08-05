@@ -67,6 +67,39 @@ final class GuidanceDebugTests {
         #expect(coordinator.record(.diagnosticsCompleted) == .showProInvitation)
     }
 
+    @Test func debugPrepareInvitationEligibilityUsesConfiguration() {
+        var config = Self.invitationConfig()
+        config.minimumInvitationActiveDays = 5
+        let coordinator = makeCoordinator(configuration: config, state: GuidanceState())
+
+        coordinator.debugPrepareInvitationEligibility()
+
+        let loaded = store.load()
+        #expect(loaded.activeDays.count == 5)
+        #expect(loaded.meaningfulCompletionCount == config.minimumInvitationCompletions)
+        #expect(coordinator.record(.diagnosticsCompleted) == .showProInvitation)
+    }
+
+    @Test func diagnosticsStagingIsConsumedAtomically() {
+        defer { GuidanceDebugOverrides.clearDiagnosticsStaging() }
+        #expect(GuidanceDebugOverrides.consumeDiagnosticsStaging() == false)
+
+        GuidanceDebugOverrides.requestDiagnosticsStaging()
+
+        #expect(GuidanceDebugOverrides.consumeDiagnosticsStaging() == true)
+        #expect(GuidanceDebugOverrides.consumeDiagnosticsStaging() == false)
+    }
+
+    @Test func debugResetClearsPendingDiagnosticsStaging() {
+        defer { GuidanceDebugOverrides.clearDiagnosticsStaging() }
+        GuidanceDebugOverrides.requestDiagnosticsStaging()
+        let coordinator = makeCoordinator(state: GuidanceState())
+
+        coordinator.debugResetState()
+
+        #expect(GuidanceDebugOverrides.consumeDiagnosticsStaging() == false)
+    }
+
     // MARK: - Invitation scheduling (policy bypass, lifecycle intact)
 
     @Test func debugScheduleInvitationCreatesDiagnosticsToken() throws {
@@ -80,6 +113,11 @@ final class GuidanceDebugTests {
         #expect(store.load().meaningfulCompletionCount == 0)
         #expect(events(named: "guidance.invitation.scheduled").count == 1)
         #expect(events(named: "guidance.debug.invitation_triggered").count == 1)
+        // The injected sink still sees the token for lifecycle tests, but the
+        // production metadata never carries it.
+        let scheduled = try #require(events(named: "guidance.invitation.scheduled").first)
+        #expect(scheduled.tokenID == invitation.id)
+        #expect(scheduled.metadata["token"] == nil)
 
         // The card still confirms presentation through the production API.
         coordinator.invitationPresented(id: invitation.id)

@@ -35,6 +35,16 @@ struct NetworkDiagnosticsView: View {
             }
         }
         .animation(reduceMotion ? nil : .snappy(duration: 0.24), value: viewModel.phase)
+#if DEBUG
+        // Debug-only: the current, real host consumes the one-shot staging
+        // request set by the Debug menu, so a closed old window can never
+        // stage into a stale view model.
+        .onAppear {
+            if GuidanceDebugOverrides.consumeDiagnosticsStaging() {
+                viewModel.debugStageCompletedResult()
+            }
+        }
+#endif
         .onDisappear {
             viewModel.cancel()
             if let id = renderedInvitationID {

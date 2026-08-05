@@ -44,6 +44,7 @@ private struct AppRootView: View {
     var bleViewModel: BLEViewModel?
     @Binding var showCrashLog: Bool
     @Binding var crashLogText: String
+    let onboardingCoordinator: OnboardingCoordinator
     let sparkleUpdater: SparkleUpdater
     let updateMCPServer: @MainActor () -> Void
     let installMainWindowOpenAction: (@escaping () -> Void) -> Void
@@ -321,24 +322,51 @@ private struct AppRootView: View {
             installMainWindowOpenAction {
                 openWindow(id: WiFiLensApp.mainWindowSceneID)
             }
-#if DEBUG
-            // Debug-only: lets the Debug menu render the production
-            // diagnostics result host without running a real diagnostic.
-            GuidanceDebugOverrides.installDiagnosticsStaging {
-                networkDiagnosticsViewModel.debugStageCompletedResult()
-            }
-#endif
             // Under `xcodebuild test` the app process hosts the unit test
             // bundle, so the real scanner must not start: CoreWLAN and
             // NetworkInfoService are synchronous XPC calls that can stall the
             // test process. Unit tests inject their own stores and fakes.
             if !ProcessInfo.processInfo.isRunningUnderTestHost {
+                if !UITestMode.isActive {
+                    _ = onboardingCoordinator.claimWelcome(hostID: sceneState.id)
+                }
                 EditionComposition.startLifecycle(observationRuntime: viewModel.observationRuntime)
                 GuidanceCoordinator.shared.recordAppActive()
                 await viewModel.start()
                 roamingViewModel.handleWiFiPowerStateChange(viewModel.wifiPowerState)
             }
             updateMCPServer()
+        }
+        .sheet(isPresented: Binding(
+            get: { onboardingCoordinator.welcomeHostID == sceneState.id },
+            set: { isPresented in
+                if !isPresented, onboardingCoordinator.welcomeHostID == sceneState.id {
+                    onboardingCoordinator.releaseWelcome(hostID: sceneState.id)
+                }
+            }
+        )) {
+            WelcomeView(
+                configuration: EditionComposition.onboardingConfiguration,
+                coordinator: onboardingCoordinator,
+                hostID: sceneState.id,
+                onStart: { route in
+                    sceneState.route(to: route)
+                }
+            )
+        }
+#if DEBUG
+        .onChange(of: onboardingCoordinator.debugShowRequested) { _, requested in
+            guard requested,
+                  onboardingCoordinator.consumeDebugShowRequest(),
+                  !UITestMode.isActive,
+                  !ProcessInfo.processInfo.isRunningUnderTestHost else {
+                return
+            }
+            _ = onboardingCoordinator.claimWelcome(hostID: sceneState.id)
+        }
+#endif
+        .onDisappear {
+            onboardingCoordinator.releaseWelcome(hostID: sceneState.id)
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active, !ProcessInfo.processInfo.isRunningUnderTestHost {
@@ -944,6 +972,17 @@ struct WiFiLensApp: App {
     private let macVendorDatabaseSummary: MACVendorBundledDatabaseSummary?
     @State private var roamingViewModel = RoamingTestViewModel()
     @State private var bleViewModel: BLEViewModel?
+    /// Declared before `sparkleUpdater` so the existing-install migration
+    /// observes `SUEnableAutomaticChecks` before Sparkle writes it on a
+    /// brand-new install (Swift storage properties initialize in declaration
+    /// order).
+    private let onboardingCoordinator: OnboardingCoordinator = {
+        let coordinator = OnboardingCoordinator.shared
+        if !UITestMode.isActive, ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
+            coordinator.migrateExistingInstallationIfNeeded()
+        }
+        return coordinator
+    }()
     @State private var sparkleUpdater = SparkleUpdater()
     @State private var showCrashLog: Bool = false
     @State private var mainWindowLifecycle = MainWindowLifecycleCoordinator()
@@ -1001,6 +1040,7 @@ struct WiFiLensApp: App {
                     bleViewModel: bleViewModel,
                     showCrashLog: $showCrashLog,
                     crashLogText: $crashLogText,
+                    onboardingCoordinator: onboardingCoordinator,
                     sparkleUpdater: sparkleUpdater,
                     updateMCPServer: updateMCPServer,
                     installMainWindowOpenAction: mainWindowLifecycle.installOpenSceneAction,

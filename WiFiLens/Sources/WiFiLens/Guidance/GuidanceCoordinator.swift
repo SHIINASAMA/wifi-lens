@@ -262,9 +262,6 @@ final class GuidanceCoordinator {
         if let suppressionReason {
             metadata["reason"] = suppressionReason.rawValue
         }
-        if let tokenID {
-            metadata["token"] = String(tokenID.uuidString.prefix(8))
-        }
         eventSink(
             GuidanceEvent(
                 name: name,
@@ -294,6 +291,7 @@ extension GuidanceCoordinator {
         pendingReviewRequest = nil
         confirmedPresentedInvitationIDs.removeAll()
         exportFeedback = nil
+        GuidanceDebugOverrides.clearDiagnosticsStaging()
         stateStore.save(GuidanceState())
         emit("guidance.debug.state_reset")
     }
@@ -326,9 +324,10 @@ extension GuidanceCoordinator {
         }
         var state = GuidanceState()
         let now = now()
-        state.recordActiveDay(at: now, calendar: calendar)
-        if let yesterday = calendar.date(byAdding: .day, value: -1, to: now) {
-            state.recordActiveDay(at: yesterday, calendar: calendar)
+        for daysAgo in 0..<configuration.minimumInvitationActiveDays {
+            if let day = calendar.date(byAdding: .day, value: -daysAgo, to: now) {
+                state.recordActiveDay(at: day, calendar: calendar)
+            }
         }
         state.meaningfulCompletionCount = configuration.minimumInvitationCompletions
         stateStore.save(state)

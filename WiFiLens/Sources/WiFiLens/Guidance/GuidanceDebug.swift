@@ -17,21 +17,33 @@ enum ProInstallationOverride: String, Equatable, Sendable {
 enum GuidanceDebugOverrides {
     private(set) static var proInstallationOverride: ProInstallationOverride = .useRealDetection
 
-    /// Debug-only staging hook installed by the diagnostics host so the Debug
-    /// menu can render the production result host without running a real
-    /// diagnostic. Memory-only; never persisted.
-    private static var diagnosticsStaging: (() -> Void)?
+    /// Debug-only request flag consumed atomically by the real diagnostics
+    /// host. The Debug menu only sets the flag and navigates; the host that
+    /// is actually on screen consumes it and stages its synthetic result.
+    /// Never holds a reference to a view model or window.
+    private static var pendingDiagnosticsStaging = false
 
     static func setProInstallationOverride(_ override: ProInstallationOverride) {
         proInstallationOverride = override
     }
 
-    static func installDiagnosticsStaging(_ staging: @escaping () -> Void) {
-        diagnosticsStaging = staging
+    static func requestDiagnosticsStaging() {
+        pendingDiagnosticsStaging = true
     }
 
-    static func stageDiagnosticsCompletion() {
-        diagnosticsStaging?()
+    /// Consumed by the real `NetworkDiagnosticsView` host. Returns true at
+    /// most once per request; a fresh window can consume a request that an
+    /// older, closed window never did.
+    static func consumeDiagnosticsStaging() -> Bool {
+        guard pendingDiagnosticsStaging else { return false }
+        pendingDiagnosticsStaging = false
+        return true
+    }
+
+    /// Cleared by `debugResetState()` so a stale request cannot stage into a
+    /// future diagnostics host after a reset.
+    static func clearDiagnosticsStaging() {
+        pendingDiagnosticsStaging = false
     }
 }
 #endif

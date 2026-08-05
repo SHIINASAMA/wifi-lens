@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 enum EditionComposition {
@@ -9,6 +10,15 @@ enum EditionComposition {
     }
 
     static var exportSuccessPresentation: ExportSuccessPresentation { .banner }
+
+    static var onboardingConfiguration: OnboardingConfiguration {
+        OnboardingConfiguration(
+            welcomeEnabled: true,
+            showsProLink: true,
+            proURL: ExternalLinks.url(for: .appStoreCampaign),
+            startRoute: .overview
+        )
+    }
 
     @MainActor
     static var markdownExportCommandContribution: MarkdownExportCommandContribution {
@@ -92,6 +102,24 @@ enum EditionComposition {
         showMainWindow: @escaping (SidebarPage) -> Void
     ) -> some Commands {
         CommandMenu("Debug") {
+            Menu("Onboarding") {
+                Button("Reset Welcome State") {
+                    OnboardingCoordinator.shared.debugReset()
+                }
+                Button("Show Welcome Now") {
+                    OnboardingCoordinator.shared.debugRequestShowWelcome()
+                    NSApp.activate(ignoringOtherApps: true)
+                    if let mainWindow = NSApp.windows.first(where: { $0.canBecomeMain }) {
+                        mainWindow.makeKeyAndOrderFront(nil)
+                    } else {
+                        showMainWindow(.overview)
+                    }
+                }
+                Button("Log Onboarding State") {
+                    OnboardingCoordinator.shared.debugLogState(edition: "OSS")
+                }
+            }
+            Divider()
             Menu("Lifecycle Guidance") {
                 Button("Reset Lifecycle Guidance State") {
                     GuidanceCoordinator.shared.debugResetState()
@@ -101,12 +129,18 @@ enum EditionComposition {
                 }
                 Button("Trigger Diagnostics Invitation") {
                     GuidanceCoordinator.shared.debugScheduleInvitation(for: .diagnosticsCompleted)
-                    GuidanceDebugOverrides.stageDiagnosticsCompletion()
+                    GuidanceDebugOverrides.requestDiagnosticsStaging()
                     showMainWindow(.networkDiagnostics)
                 }
                 Button("Trigger Export Invitation Banner") {
                     GuidanceCoordinator.shared.debugScheduleInvitation(for: .exportSucceeded)
                     GuidanceCoordinator.shared.debugPublishExportFeedback()
+                    NSApp.activate(ignoringOtherApps: true)
+                    if let mainWindow = NSApp.windows.first(where: { $0.canBecomeMain }) {
+                        mainWindow.makeKeyAndOrderFront(nil)
+                    } else {
+                        showMainWindow(.overview)
+                    }
                 }
                 Picker("Pro Installation Override", selection: Binding(
                     get: { GuidanceDebugOverrides.proInstallationOverride },
