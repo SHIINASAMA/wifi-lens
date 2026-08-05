@@ -327,7 +327,8 @@ private struct AppRootView: View {
             // NetworkInfoService are synchronous XPC calls that can stall the
             // test process. Unit tests inject their own stores and fakes.
             if !ProcessInfo.processInfo.isRunningUnderTestHost {
-                if !UITestMode.isActive {
+                if !UITestMode.isActive,
+                   EditionComposition.onboardingConfiguration.welcomeEnabled {
                     _ = onboardingCoordinator.claimWelcome(hostID: sceneState.id)
                 }
                 EditionComposition.startLifecycle(observationRuntime: viewModel.observationRuntime)
@@ -361,6 +362,7 @@ private struct AppRootView: View {
         .onChange(of: onboardingCoordinator.debugShowRequested) { _, requested in
             guard requested,
                   onboardingCoordinator.consumeDebugShowRequest(),
+                  EditionComposition.onboardingConfiguration.welcomeEnabled,
                   !UITestMode.isActive,
                   !ProcessInfo.processInfo.isRunningUnderTestHost else {
                 return

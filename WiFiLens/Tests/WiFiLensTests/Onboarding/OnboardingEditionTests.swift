@@ -19,4 +19,17 @@ final class OnboardingEditionTests {
         ])
         #expect(config.proURL?.absoluteString == "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_invite&mt=8")
     }
+
+    @Test func ossMigrationUsesSparkleMarker() {
+        let suiteName = "OSSOnboardingEdition.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let detector = SparkleAutomaticCheckExistingInstallationDetector(defaults: defaults)
+
+        #expect(detector.hasExistingInstallationEvidence() == false)
+
+        defaults.set(true, forKey: SparkleAutomaticCheckExistingInstallationDetector.defaultsKey)
+
+        #expect(detector.hasExistingInstallationEvidence() == true)
+    }
 }

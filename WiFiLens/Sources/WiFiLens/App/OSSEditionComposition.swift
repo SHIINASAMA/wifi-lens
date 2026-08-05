@@ -11,6 +11,10 @@ enum EditionComposition {
 
     static var exportSuccessPresentation: ExportSuccessPresentation { .banner }
 
+    static func makeOnboardingExistingInstallationDetector() -> any ExistingInstallationDetecting {
+        SparkleAutomaticCheckExistingInstallationDetector()
+    }
+
     static var onboardingConfiguration: OnboardingConfiguration {
         OnboardingConfiguration(
             welcomeEnabled: true,
@@ -114,6 +118,7 @@ enum EditionComposition {
                     OnboardingCoordinator.shared.debugReset()
                 }
                 Button("Show Welcome Now") {
+                    guard EditionComposition.onboardingConfiguration.welcomeEnabled else { return }
                     OnboardingCoordinator.shared.debugRequestShowWelcome()
                     NSApp.activate(ignoringOtherApps: true)
                     if let mainWindow = NSApp.windows.first(where: { $0.canBecomeMain }) {

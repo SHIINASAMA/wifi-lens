@@ -11,7 +11,8 @@ import Observation
 final class OnboardingCoordinator {
     static let shared = OnboardingCoordinator(
         store: UserDefaultsOnboardingStateStore(),
-        existingInstallationDetector: SparkleAutomaticCheckExistingInstallationDetector()
+        existingInstallationDetector: EditionComposition.makeOnboardingExistingInstallationDetector(),
+        welcomeEnabled: EditionComposition.onboardingConfiguration.welcomeEnabled
     )
 
     /// The main window currently hosting the welcome, if any. Process-memory
@@ -25,13 +26,16 @@ final class OnboardingCoordinator {
 
     private let store: any OnboardingStateStoring
     private let existingInstallationDetector: any ExistingInstallationDetecting
+    private let welcomeEnabled: Bool
 
     init(
         store: any OnboardingStateStoring,
-        existingInstallationDetector: any ExistingInstallationDetecting
+        existingInstallationDetector: any ExistingInstallationDetecting,
+        welcomeEnabled: Bool = true
     ) {
         self.store = store
         self.existingInstallationDetector = existingInstallationDetector
+        self.welcomeEnabled = welcomeEnabled
     }
 
     var hasCompletedWelcome: Bool {
@@ -40,18 +44,17 @@ final class OnboardingCoordinator {
 
     // MARK: - Existing-install migration
 
-    /// One-time migration: when the onboarding key is absent but a reliable
-    /// pre-onboarding install marker exists, existing users are marked
-    /// completed so they never see the welcome. Must run before
-    /// `SparkleUpdater` initializes (see
-    /// `SparkleAutomaticCheckExistingInstallationDetector`).
+    /// One-time migration that only runs while the onboarding key is absent,
+    /// and always writes a result: `true` for a detected existing install,
+    /// `false` for a clean install. Writing the key on the first launch
+    /// permanently locks the classification, so a marker that appears later
+    /// (e.g. Sparkle writing `SUEnableAutomaticChecks` after first launch)
+    /// can never re-migrate an incomplete clean install into "completed".
     func migrateExistingInstallationIfNeeded() {
-        let state = store.load()
-        guard !state.hasCompletedWelcome else { return }
-        guard existingInstallationDetector.hasExistingInstallationEvidence() else { return }
-        var migrated = state
-        migrated.hasCompletedWelcome = true
-        store.save(migrated)
+        guard !store.hasStoredState() else { return }
+        store.save(OnboardingState(
+            hasCompletedWelcome: existingInstallationDetector.hasExistingInstallationEvidence()
+        ))
     }
 
     // MARK: - Host claim (multi-window exclusivity)
@@ -60,6 +63,7 @@ final class OnboardingCoordinator {
     /// a later host is refused until the current host releases or completes.
     @discardableResult
     func claimWelcome(hostID: UUID) -> Bool {
+        guard welcomeEnabled else { return false }
         guard !hasCompletedWelcome else { return false }
         guard welcomeHostID == nil || welcomeHostID == hostID else { return false }
         welcomeHostID = hostID
@@ -121,6 +125,7 @@ final class OnboardingCoordinator {
     /// The actual sheet still goes through the real host claim and the real
     /// `WelcomeView`; the first visible main window consumes the request.
     func debugRequestShowWelcome() {
+        guard welcomeEnabled else { return }
         store.save(OnboardingState())
         welcomeHostID = nil
         debugShowRequested = true

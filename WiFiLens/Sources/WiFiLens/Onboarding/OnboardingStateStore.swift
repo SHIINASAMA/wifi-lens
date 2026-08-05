@@ -6,6 +6,12 @@ import Foundation
 @MainActor
 protocol OnboardingStateStoring {
     func load() -> OnboardingState
+
+    /// Whether a value for the onboarding key exists. Distinguishes "never
+    /// migrated / key absent" from "key present with `false`", which matters
+    /// for the one-time existing-install migration.
+    func hasStoredState() -> Bool
+
     func save(_ state: OnboardingState)
 }
 
@@ -28,6 +34,10 @@ struct UserDefaultsOnboardingStateStore: OnboardingStateStoring {
         )
     }
 
+    func hasStoredState() -> Bool {
+        defaults.object(forKey: Key.welcomeCompleted) != nil
+    }
+
     func save(_ state: OnboardingState) {
         defaults.set(state.hasCompletedWelcome, forKey: Key.welcomeCompleted)
     }
@@ -37,16 +47,23 @@ struct UserDefaultsOnboardingStateStore: OnboardingStateStoring {
 @MainActor
 final class InMemoryOnboardingStateStore: OnboardingStateStoring {
     private var state: OnboardingState
+    private var stored: Bool
 
-    init(initial: OnboardingState = OnboardingState()) {
+    init(initial: OnboardingState = OnboardingState(), hasStoredState: Bool = false) {
         self.state = initial
+        self.stored = hasStoredState
     }
 
     func load() -> OnboardingState {
         state
     }
 
+    func hasStoredState() -> Bool {
+        stored
+    }
+
     func save(_ state: OnboardingState) {
         self.state = state
+        stored = true
     }
 }

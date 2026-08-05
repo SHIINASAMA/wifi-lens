@@ -4,10 +4,24 @@ import Testing
 
 @MainActor
 final class OnboardingStateStoreTests {
-    @Test func cleanInstallDefaultsToIncomplete() {
+    @Test func cleanInstallDefaultsToIncompleteWithoutStoredKey() {
         let store = UserDefaultsOnboardingStateStore(defaults: suiteDefaults())
         defer { clearSuite() }
 
+        #expect(store.load().hasCompletedWelcome == false)
+        #expect(store.hasStoredState() == false)
+    }
+
+    @Test func absentKeyDistinctFromExplicitFalse() {
+        let defaults = suiteDefaults()
+        defer { clearSuite() }
+        let store = UserDefaultsOnboardingStateStore(defaults: defaults)
+
+        #expect(store.hasStoredState() == false)
+
+        store.save(OnboardingState())
+
+        #expect(store.hasStoredState() == true)
         #expect(store.load().hasCompletedWelcome == false)
     }
 
@@ -18,7 +32,9 @@ final class OnboardingStateStoreTests {
 
         store.save(OnboardingState(hasCompletedWelcome: true))
 
-        #expect(UserDefaultsOnboardingStateStore(defaults: defaults).load().hasCompletedWelcome == true)
+        let reloaded = UserDefaultsOnboardingStateStore(defaults: defaults)
+        #expect(reloaded.load().hasCompletedWelcome == true)
+        #expect(reloaded.hasStoredState() == true)
     }
 
     @Test func resetReturnsToIncomplete() {
@@ -30,6 +46,7 @@ final class OnboardingStateStoreTests {
         store.save(OnboardingState())
 
         #expect(store.load().hasCompletedWelcome == false)
+        #expect(store.hasStoredState() == true)
     }
 
     @Test func corruptDataFallsBackSafely() {
@@ -37,9 +54,11 @@ final class OnboardingStateStoreTests {
         defer { clearSuite() }
         defaults.set("not-a-bool", forKey: "onboarding.welcome.completed.v1")
 
-        let loaded = UserDefaultsOnboardingStateStore(defaults: defaults).load()
+        let store = UserDefaultsOnboardingStateStore(defaults: defaults)
+        let loaded = store.load()
 
         #expect(loaded.hasCompletedWelcome == false)
+        #expect(store.hasStoredState() == true)
     }
 
     @Test func versionedKeyDoesNotAffectOtherDefaults() {

@@ -5,7 +5,7 @@ import Observation
 
 /// One structured guidance event. `tokenID` is a process-memory UUID used by
 /// tests to assert once-per-token behavior; the production log line never
-/// carries the full UUID (only a short prefix in `metadata`).
+/// carries the UUID or any derived prefix.
 struct GuidanceEvent: Equatable, Sendable {
     let name: String                        // "guidance.value_moment", "guidance.invitation.scheduled", ...
     let moment: GuidanceValueMoment?

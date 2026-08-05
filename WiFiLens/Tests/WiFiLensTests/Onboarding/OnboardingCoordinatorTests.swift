@@ -156,13 +156,45 @@ final class OnboardingCoordinatorTests {
         #expect(store.saveCount == 1)
     }
 
-    @Test func migrationLeavesCleanInstallIncomplete() {
+    @Test func migrationWritesFalseForCleanInstall() {
         let coordinator = makeCoordinator(existingInstallation: false)
 
         coordinator.migrateExistingInstallationIfNeeded()
 
         #expect(coordinator.hasCompletedWelcome == false)
+        #expect(store.hasStoredState() == true)
+        #expect(store.saveCount == 1)
+    }
+
+    @Test func migrationDoesNotRunWhenKeyPresentWithExplicitFalse() {
+        let coordinator = makeCoordinator(
+            initial: OnboardingState(hasCompletedWelcome: false),
+            hasStoredState: true,
+            existingInstallation: true
+        )
+
+        coordinator.migrateExistingInstallationIfNeeded()
+
+        #expect(coordinator.hasCompletedWelcome == false)
         #expect(store.saveCount == 0)
+    }
+
+    @Test func cleanInstallWriteFalseThenSparkleMarkerAppearsKeepsWelcome() {
+        let coordinator = makeCoordinator(existingInstallation: false)
+
+        // First launch: clean install writes an explicit false.
+        coordinator.migrateExistingInstallationIfNeeded()
+        #expect(coordinator.hasCompletedWelcome == false)
+        #expect(store.saveCount == 1)
+
+        // Sparkle writes SUEnableAutomaticChecks after first launch. A later
+        // launch must not re-classify this install as an existing user.
+        detector.evidence = true
+        coordinator.migrateExistingInstallationIfNeeded()
+
+        #expect(coordinator.hasCompletedWelcome == false)
+        #expect(store.saveCount == 1)
+        #expect(coordinator.claimWelcome(hostID: UUID()) == true)
     }
 
     @Test func migrationRunsOnlyOnce() {
@@ -189,6 +221,29 @@ final class OnboardingCoordinatorTests {
         let guidance = guidanceStore.load()
         #expect(guidance.meaningfulCompletionCount == 7)
         #expect(guidance.invitationPresentationCount == 2)
+    }
+
+    // MARK: - welcomeEnabled gating
+
+    @Test func welcomeDisabledNeverClaims() {
+        let coordinator = makeCoordinator(
+            existingInstallation: false,
+            welcomeEnabled: false
+        )
+
+        #expect(coordinator.claimWelcome(hostID: UUID()) == false)
+        #expect(coordinator.welcomeHostID == nil)
+    }
+
+    @Test func welcomeDisabledDebugShowDoesNotRequest() {
+        let coordinator = makeCoordinator(
+            existingInstallation: false,
+            welcomeEnabled: false
+        )
+
+        coordinator.debugRequestShowWelcome()
+
+        #expect(coordinator.consumeDebugShowRequest() == false)
     }
 
     // MARK: - Debug-only
@@ -221,20 +276,27 @@ final class OnboardingCoordinatorTests {
 
     private func makeCoordinator(
         initial: OnboardingState = OnboardingState(),
-        existingInstallation: Bool
+        hasStoredState: Bool? = nil,
+        existingInstallation: Bool,
+        welcomeEnabled: Bool = true
     ) -> OnboardingCoordinator {
-        store = CountingOnboardingStateStore(initial: initial)
+        store = CountingOnboardingStateStore(
+            initial: initial,
+            hasStoredState: hasStoredState
+        )
         detector = StubExistingInstallationDetector(evidence: existingInstallation)
         coordinator = OnboardingCoordinator(
             store: store,
-            existingInstallationDetector: detector
+            existingInstallationDetector: detector,
+            welcomeEnabled: welcomeEnabled
         )
         return coordinator
     }
 }
 
 private final class StubExistingInstallationDetector: ExistingInstallationDetecting, @unchecked Sendable {
-    let evidence: Bool
+    var evidence: Bool
+
     init(evidence: Bool) {
         self.evidence = evidence
     }
@@ -247,18 +309,25 @@ private final class StubExistingInstallationDetector: ExistingInstallationDetect
 @MainActor
 private final class CountingOnboardingStateStore: OnboardingStateStoring {
     private var state: OnboardingState
+    private var stored: Bool
     private(set) var saveCount = 0
 
-    init(initial: OnboardingState = OnboardingState()) {
+    init(initial: OnboardingState = OnboardingState(), hasStoredState: Bool? = nil) {
         state = initial
+        stored = hasStoredState ?? initial.hasCompletedWelcome
     }
 
     func load() -> OnboardingState {
         state
     }
 
+    func hasStoredState() -> Bool {
+        stored
+    }
+
     func save(_ state: OnboardingState) {
         saveCount += 1
         self.state = state
+        stored = true
     }
 }
