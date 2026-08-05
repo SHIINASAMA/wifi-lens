@@ -57,8 +57,23 @@
 		MV0000000000000000000015 /* MACVendorCSVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000012 /* MACVendorCSVParser.swift */; };
 		MV0000000000000000000016 /* MACVendorCSVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000012 /* MACVendorCSVParser.swift */; };
 		MV0000000000000000000017 /* MACVendorDatabaseStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000020 /* MACVendorDatabaseStoreTests.swift */; };
+		G900000000000000000000BC /* GuidanceStateStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AC /* GuidanceStateStoreTests.swift */; };
+		G900000000000000000000BF /* GuidancePolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AD /* GuidancePolicyTests.swift */; };
+		G900000000000000000000D5 /* GuidanceCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000D4 /* GuidanceCoordinatorTests.swift */; };
+		G900000000000000000000D7 /* GuidanceEditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000D6 /* GuidanceEditionTests.swift */; };
+		G900000000000000000000D9 /* GuidanceEditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000D8 /* GuidanceEditionTests.swift */; };
 		MV0000000000000000000018 /* MACVendorDatabaseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000021 /* MACVendorDatabaseStore.swift */; };
 		MV0000000000000000000019 /* MACVendorDatabaseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000021 /* MACVendorDatabaseStore.swift */; };
+		G900000000000000000000BA /* GuidanceState.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AA /* GuidanceState.swift */; };
+		G900000000000000000000BB /* GuidanceStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AB /* GuidanceStateStore.swift */; };
+		G900000000000000000000BD /* GuidanceState.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AA /* GuidanceState.swift */; };
+		G900000000000000000000BE /* GuidanceStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AB /* GuidanceStateStore.swift */; };
+		G900000000000000000000C1 /* GuidanceConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AE /* GuidanceConfiguration.swift */; };
+		G900000000000000000000C2 /* GuidancePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AF /* GuidancePolicy.swift */; };
+		G900000000000000000000C3 /* GuidanceConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AE /* GuidanceConfiguration.swift */; };
+		G900000000000000000000C4 /* GuidancePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AF /* GuidancePolicy.swift */; };
+		G900000000000000000000D2 /* GuidanceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000D1 /* GuidanceCoordinator.swift */; };
+		G900000000000000000000D3 /* GuidanceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000D1 /* GuidanceCoordinator.swift */; };
 		MV0000000000000000000022 /* MACVendorDatabaseDownloaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000023 /* MACVendorDatabaseDownloaderTests.swift */; };
 		MV0000000000000000000024 /* MACVendorDatabaseDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */; };
 		MV0000000000000000000025 /* MACVendorDatabaseDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */; };
@@ -510,6 +525,11 @@
 		MV0000000000000000000012 /* MACVendorCSVParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorCSVParser.swift; sourceTree = "<group>"; };
 		MV0000000000000000000020 /* MACVendorDatabaseStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseStoreTests.swift; sourceTree = "<group>"; };
 		MV0000000000000000000021 /* MACVendorDatabaseStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseStore.swift; sourceTree = "<group>"; };
+		G900000000000000000000AA /* GuidanceState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceState.swift; sourceTree = "<group>"; };
+		G900000000000000000000AB /* GuidanceStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceStateStore.swift; sourceTree = "<group>"; };
+		G900000000000000000000AE /* GuidanceConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceConfiguration.swift; sourceTree = "<group>"; };
+		G900000000000000000000AF /* GuidancePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidancePolicy.swift; sourceTree = "<group>"; };
+		G900000000000000000000D1 /* GuidanceCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceCoordinator.swift; sourceTree = "<group>"; };
 		MV0000000000000000000023 /* MACVendorDatabaseDownloaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseDownloaderTests.swift; sourceTree = "<group>"; };
 		MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseDownloader.swift; sourceTree = "<group>"; };
 		MV0000000000000000000028 /* MACVendorDatabaseManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseManagerTests.swift; sourceTree = "<group>"; };
@@ -536,6 +556,11 @@
 		A10000000000000000000008 /* SecondaryToolbarCapsule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryToolbarCapsule.swift; sourceTree = "<group>"; };
 		A10000000000000000000009 /* SecondaryToolbarDescriptorExpansionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryToolbarDescriptorExpansionTests.swift; sourceTree = "<group>"; };
 		EC10000000000000000000002 /* EditionCompositionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditionCompositionTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000AC /* GuidanceStateStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceStateStoreTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000AD /* GuidancePolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidancePolicyTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000D4 /* GuidanceCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceCoordinatorTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000D6 /* GuidanceEditionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceEditionTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000D8 /* GuidanceEditionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceEditionTests.swift; sourceTree = "<group>"; };
 		EC10000000000000000000005 /* EditionCompositionContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditionCompositionContext.swift; sourceTree = "<group>"; };
 		EC10000000000000000000006 /* OSSEditionComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSSEditionComposition.swift; sourceTree = "<group>"; };
 		A10000000000000000000017 /* App/MenuBarWindowBehaviorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/MenuBarWindowBehaviorTests.swift; sourceTree = "<group>"; };
@@ -1007,6 +1032,7 @@
 				D3E6587CCEDEC199C00591B2 /* Channels */,
 				49FEC4F42675BFAD1316DDEC /* Debug */,
 				C1D2E3F4A5B6123456789AC0 /* Filter */,
+				G900000000000000000000CA /* Guidance */,
 				8FFEB5302BE8674E56110FAE /* Interfaces */,
 				786696F9D6046171197C0641 /* MCP */,
 				ND0000000000000000000030 /* NetworkDiagnostics */,
@@ -1022,6 +1048,18 @@
 				DD6657406F0FB50F2D9B7FB4 /* Utilities */,
 			);
 			path = WiFiLens;
+			sourceTree = "<group>";
+		};
+		G900000000000000000000CA /* Guidance */ = {
+			isa = PBXGroup;
+			children = (
+				G900000000000000000000AA /* GuidanceState.swift */,
+				G900000000000000000000AB /* GuidanceStateStore.swift */,
+				G900000000000000000000AE /* GuidanceConfiguration.swift */,
+				G900000000000000000000AF /* GuidancePolicy.swift */,
+				G900000000000000000000D1 /* GuidanceCoordinator.swift */,
+			);
+			path = Guidance;
 			sourceTree = "<group>";
 		};
 		ND0000000000000000000030 /* NetworkDiagnostics */ = {
@@ -1112,6 +1150,7 @@
 				EF2000000000000000000001 /* InsightRuleValidationTests.swift */,
 				EB2000000000000000000005 /* Fixtures */,
 				EC20000000000000000000001 /* EditionCompositionTests.swift */,
+				G900000000000000000000D8 /* GuidanceEditionTests.swift */,
 				E10000000000000000000001 /* EventJournalTests.swift */,
 				E30000000000000000000001 /* WiFiObservationEventSQLiteStoreTests.swift */,
 				FB8FCB182FF6C4E300BB2929 /* MenuBarMigrationTests.swift */,
@@ -1298,6 +1337,7 @@
 				ADB001000000000000000001 /* DebugMultiAPScenarioTests.swift */,
 				3053495094BB40125310557F /* DeviceCompatibilityFilterTests.swift */,
 				90CF4B22A68C668A58043392 /* ExternalLinksTests.swift */,
+				G900000000000000000000CB /* Guidance */,
 				39A94372ADF30D10E0F015CD /* IEParserTests.swift */,
 				A5024CBB8BFCAFF56FEF0756 /* MCPServerTests.swift */,
 				MV0000000000000000000010 /* MACVendorCSVParserTests.swift */,
@@ -1341,6 +1381,17 @@
 				ND0000000000000000000002 /* NetworkDiagnosticsTests.swift */,
 			);
 			path = NetworkDiagnostics;
+			sourceTree = "<group>";
+		};
+		G900000000000000000000CB /* Guidance */ = {
+			isa = PBXGroup;
+			children = (
+				G900000000000000000000AC /* GuidanceStateStoreTests.swift */,
+				G900000000000000000000AD /* GuidancePolicyTests.swift */,
+				G900000000000000000000D4 /* GuidanceCoordinatorTests.swift */,
+				G900000000000000000000D6 /* GuidanceEditionTests.swift */,
+			);
+			path = Guidance;
 			sourceTree = "<group>";
 		};
 		FBD329492FBF0E2F00D01613 /* Tests */ = {
@@ -1701,6 +1752,11 @@
 				MV0000000000000000000003 /* MACVendorResolver.swift in Sources */,
 				MV0000000000000000000046 /* MACVendorBundledDatabase.swift in Sources */,
 				ND0000000000000000000010 /* NetworkDiagnosticModels.swift in Sources */,
+				G900000000000000000000BA /* GuidanceState.swift in Sources */,
+				G900000000000000000000BB /* GuidanceStateStore.swift in Sources */,
+				G900000000000000000000C1 /* GuidanceConfiguration.swift in Sources */,
+				G900000000000000000000C2 /* GuidancePolicy.swift in Sources */,
+				G900000000000000000000D2 /* GuidanceCoordinator.swift in Sources */,
 				ND0000000000000000000011 /* DiagnosticRunner.swift in Sources */,
 				ND0000000000000000000014 /* NetworkConnectivityCheck.swift in Sources */,
 				ND0000000000000000000015 /* DNSResolutionCheck.swift in Sources */,
@@ -1839,6 +1895,10 @@
 				MV0000000000000000000041 /* MACVendorDatabaseReminderTests.swift in Sources */,
 				MV0000000000000000000017 /* MACVendorDatabaseStoreTests.swift in Sources */,
 				MV0000000000000000000009 /* MACVendorCSVParserTests.swift in Sources */,
+				G900000000000000000000BC /* GuidanceStateStoreTests.swift in Sources */,
+				G900000000000000000000BF /* GuidancePolicyTests.swift in Sources */,
+				G900000000000000000000D5 /* GuidanceCoordinatorTests.swift in Sources */,
+				G900000000000000000000D7 /* GuidanceEditionTests.swift in Sources */,
 				ND0000000000000000000001 /* NetworkDiagnosticsTests.swift in Sources */,
 				67B6475699ADED9C42E8F7CC /* BLEModelTests.swift in Sources */,
 				2A8E470AAD8FCE2CC1D14305 /* BandChartViewModelTests.swift in Sources */,
@@ -1901,6 +1961,11 @@
 				MV0000000000000000000030 /* MACVendorDatabaseService.swift in Sources */,
 				MV0000000000000000000025 /* MACVendorDatabaseDownloader.swift in Sources */,
 				MV0000000000000000000019 /* MACVendorDatabaseStore.swift in Sources */,
+				G900000000000000000000BD /* GuidanceState.swift in Sources */,
+				G900000000000000000000BE /* GuidanceStateStore.swift in Sources */,
+				G900000000000000000000C3 /* GuidanceConfiguration.swift in Sources */,
+				G900000000000000000000C4 /* GuidancePolicy.swift in Sources */,
+				G900000000000000000000D3 /* GuidanceCoordinator.swift in Sources */,
 				MV0000000000000000000016 /* MACVendorCSVParser.swift in Sources */,
 				MV0000000000000000000014 /* MACVendorDatabaseModels.swift in Sources */,
 				MV0000000000000000000004 /* MACVendorResolver.swift in Sources */,
@@ -2080,6 +2145,7 @@
 				EF1000000000000000000002 /* InsightModelTests.swift in Sources */,
 				EF2000000000000000000002 /* InsightRuleValidationTests.swift in Sources */,
 				EC20000000000000000000002 /* EditionCompositionTests.swift in Sources */,
+				G900000000000000000000D9 /* GuidanceEditionTests.swift in Sources */,
 				E10000000000000000000002 /* EventJournalTests.swift in Sources */,
 				E30000000000000000000002 /* WiFiObservationEventSQLiteStoreTests.swift in Sources */,
 				FB8FCB282FF6CAC800BB2929 /* SecondaryToolbarProTests.swift in Sources */,

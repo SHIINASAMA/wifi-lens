@@ -1,6 +1,18 @@
 import SwiftUI
 
 enum EditionComposition {
+    static var guidanceConfiguration: GuidanceConfiguration {
+        var config = GuidanceConfiguration()
+        config.invitationEnabled = true
+        // Dev builds use the plain listing. Before release, replace this with
+        // the official App Store Connect "oss_invite" Campaign Link. Never
+        // handcraft campaign parameters.
+        config.appStoreCampaignURL = ExternalLinks.url(for: .appStore)
+        return config
+    }
+
+    static var exportSuccessPresentation: ExportSuccessPresentation { .banner }
+
     @MainActor
     static var markdownExportCommandContribution: MarkdownExportCommandContribution {
         .lockedPreview

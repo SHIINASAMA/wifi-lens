@@ -2,6 +2,13 @@ import SwiftUI
 import AppKit
 import UniformTypeIdentifiers
 
+/// How export success feedback is presented. A presentation concern only —
+/// the guidance policy never reads it.
+enum ExportSuccessPresentation: Equatable, Sendable {
+    case banner            // OSS: non-modal success banner + invitation
+    case preserveExisting  // Pro: keep the existing success alert
+}
+
 /// Snapshot export service for the OSS target.
 /// Composites all visible band charts into a single high-resolution PNG image.
 @MainActor

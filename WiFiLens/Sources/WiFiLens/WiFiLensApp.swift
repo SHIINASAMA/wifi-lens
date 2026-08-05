@@ -321,6 +321,7 @@ private struct AppRootView: View {
             // test process. Unit tests inject their own stores and fakes.
             if !ProcessInfo.processInfo.isRunningUnderTestHost {
                 EditionComposition.startLifecycle(observationRuntime: viewModel.observationRuntime)
+                GuidanceCoordinator.shared.recordAppActive()
                 await viewModel.start()
                 roamingViewModel.handleWiFiPowerStateChange(viewModel.wifiPowerState)
             }
@@ -328,6 +329,7 @@ private struct AppRootView: View {
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active, !ProcessInfo.processInfo.isRunningUnderTestHost {
+                GuidanceCoordinator.shared.recordAppActive()
                 Task { await viewModel.handleSceneDidBecomeActive() }
             }
         }
