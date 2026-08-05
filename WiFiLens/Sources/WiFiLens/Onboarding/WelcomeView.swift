@@ -9,81 +9,150 @@ struct WelcomeView: View {
     let configuration: OnboardingConfiguration
     let coordinator: OnboardingCoordinator
     let hostID: UUID
-    var onStart: (SidebarPage) -> Void = { _ in }
+    var onStart: (SidebarPage, SecondaryToolbarItemID?) -> Void = { _, _ in }
 
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(String(localized: "onboarding.welcome.title", comment: "First-run welcome sheet title"))
-                        .font(.title2.weight(.semibold))
-                        .accessibilityAddTraits(.isHeader)
-
-                    Text(String(localized: "onboarding.welcome.body", comment: "First-run welcome sheet body"))
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                Spacer(minLength: 12)
-
+        VStack(spacing: 0) {
+            HStack {
+                Spacer()
                 Button {
                     coordinator.completeWelcomeWithoutRouting(hostID: hostID)
                     dismiss()
                 } label: {
                     Image(systemName: "xmark")
                         .font(.body.weight(.semibold))
+                        .foregroundStyle(.secondary)
                 }
                 .buttonStyle(.borderless)
                 .accessibilityLabel(String(localized: "onboarding.welcome.close", comment: "Close first-run welcome sheet"))
                 .keyboardShortcut(.cancelAction)
             }
 
-            VStack(alignment: .leading, spacing: 10) {
+            appIcon
+                .padding(.top, 2)
+
+            Text(String(localized: "onboarding.welcome.title", comment: "First-run welcome sheet title"))
+                .font(.title2.weight(.semibold))
+                .multilineTextAlignment(.center)
+                .accessibilityAddTraits(.isHeader)
+                .padding(.top, 16)
+
+            Text(String(localized: "onboarding.welcome.body", comment: "First-run welcome sheet body"))
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: 300)
+                .padding(.top, 6)
+
+            if !configuration.highlights.isEmpty {
+                highlightsList
+                    .padding(.top, 20)
+            }
+
+            Button {
+                startAnalyzing()
+            } label: {
+                Label {
+                    Text(
+                        String(
+                            localized: .init(stringLiteral: configuration.primaryActionKey),
+                            comment: "Primary first-run welcome action"
+                        )
+                    )
+                } icon: {
+                    Image(systemName: "play.fill")
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .keyboardShortcut(.defaultAction)
+            .accessibilityIdentifier("onboarding-start-analyzing")
+            .padding(.top, 20)
+
+            if configuration.showsProLink, let proURL = configuration.proURL {
                 Button {
-                    startAnalyzing()
+                    learnAboutPro(proURL)
                 } label: {
                     Label {
-                        Text(String(localized: "onboarding.welcome.start", comment: "Primary first-run welcome action"))
+                        Text(String(localized: "onboarding.welcome.learn_pro", comment: "OSS secondary first-run welcome action"))
                     } icon: {
-                        Image(systemName: "chart.bar.xaxis")
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption.weight(.semibold))
                     }
                     .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
-                .keyboardShortcut(.defaultAction)
-                .accessibilityIdentifier("onboarding-start-analyzing")
+                .buttonStyle(.borderless)
+                .accessibilityIdentifier("onboarding-learn-pro")
+                .padding(.top, 12)
+            }
 
-                if configuration.showsProLink, let proURL = configuration.proURL {
-                    Button {
-                        learnAboutPro(proURL)
-                    } label: {
-                        Text(String(localized: "onboarding.welcome.learn_pro", comment: "OSS secondary first-run welcome action"))
-                            .frame(maxWidth: .infinity)
-                    }
-                    .accessibilityIdentifier("onboarding-learn-pro")
-                }
+            Button {
+                coordinator.completeWelcomeWithoutRouting(hostID: hostID)
+                dismiss()
+            } label: {
+                Text(String(localized: "onboarding.welcome.skip", comment: "Skip first-run welcome action"))
+                    .font(.callout)
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderless)
+            .foregroundStyle(.secondary)
+            .accessibilityIdentifier("onboarding-skip")
+            .padding(.top, 14)
+        }
+        .padding(22)
+        .frame(width: 400)
+    }
 
-                Button {
-                    coordinator.completeWelcomeWithoutRouting(hostID: hostID)
-                    dismiss()
-                } label: {
-                    Text(String(localized: "onboarding.welcome.skip", comment: "Skip first-run welcome action"))
-                        .frame(maxWidth: .infinity)
-                }
-                .accessibilityIdentifier("onboarding-skip")
+    private var appIcon: some View {
+        Group {
+            if let icon = NSImage(named: "AppIcon") {
+                Image(nsImage: icon)
+                    .resizable()
+                    .frame(width: 76, height: 76)
+            } else {
+                // Fallback only when the asset catalog icon is unavailable.
+                Image(systemName: "wifi")
+                    .font(.system(size: 30, weight: .semibold))
+                    .foregroundStyle(Color.accentColor)
+                    .frame(width: 76, height: 76)
             }
         }
-        .padding(20)
-        .frame(width: 380)
+        .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
+        .accessibilityHidden(true)
+    }
+
+    private var highlightsList: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ForEach(configuration.highlights, id: \.titleKey) { highlight in
+                Label {
+                    Text(
+                        String(
+                            localized: .init(stringLiteral: highlight.titleKey),
+                            comment: "First-run welcome feature highlight"
+                        )
+                    )
+                    .font(.callout)
+                } icon: {
+                    Image(systemName: highlight.icon)
+                        .font(.body)
+                        .foregroundStyle(Color.accentColor)
+                        .frame(width: 22)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(Color.accentColor.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
     }
 
     private func startAnalyzing() {
         let route = configuration.startRoute ?? .overview
         if let resolved = coordinator.completeWelcomeStart(hostID: hostID, startRoute: route) {
-            onStart(resolved)
+            onStart(resolved, configuration.startToolbarSelection)
         }
         dismiss()
     }

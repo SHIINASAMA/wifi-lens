@@ -16,7 +16,14 @@ enum EditionComposition {
             welcomeEnabled: true,
             showsProLink: true,
             proURL: ExternalLinks.url(for: .appStoreCampaign),
-            startRoute: .overview
+            startRoute: .overview,
+            startToolbarSelection: nil,
+            primaryActionKey: "onboarding.welcome.start",
+            highlights: [
+                OnboardingHighlight(icon: "wifi", titleKey: "onboarding.welcome.highlight.live"),
+                OnboardingHighlight(icon: "waveform.path.ecg", titleKey: "onboarding.welcome.highlight.diagnostics"),
+                OnboardingHighlight(icon: "square.and.arrow.up", titleKey: "onboarding.welcome.highlight.export")
+            ]
         )
     }
 

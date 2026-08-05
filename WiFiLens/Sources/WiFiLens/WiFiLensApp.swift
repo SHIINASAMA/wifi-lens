@@ -349,8 +349,11 @@ private struct AppRootView: View {
                 configuration: EditionComposition.onboardingConfiguration,
                 coordinator: onboardingCoordinator,
                 hostID: sceneState.id,
-                onStart: { route in
+                onStart: { route, selection in
                     sceneState.route(to: route)
+                    if let selection {
+                        secondaryToolbarSelections.setSelection(selection, for: route)
+                    }
                 }
             )
         }
