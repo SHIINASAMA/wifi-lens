@@ -55,4 +55,114 @@ import Testing
         // Just verify the VM is in a consistent state
         #expect(vm.state == .idle)
     }
+
+    // MARK: - Guidance Wiring
+
+    @Test func userInitiatedStopOfLiveTestRecordsRoamingMoment() async {
+        let guidance = RoamingGuidanceHarness()
+        let vm = makeConnectedViewModel(guidance: guidance.coordinator)
+
+        await vm.checkReadiness()
+        await waitUntil { vm.state == .ready }
+        vm.startTest()
+        await waitUntil { vm.state == .running }
+        vm.stopTest()
+
+        #expect(vm.state == .stopped)
+        #expect(guidance.store.load().meaningfulCompletionCount == 0)
+        #expect(guidance.events.filter { $0.name == "guidance.value_moment" }.count == 1)
+        #expect(guidance.events.filter { $0.name == "guidance.no_action" }.first?.suppressionReason == .roamingPolicyNotEnabled)
+    }
+
+    @Test func powerOffInterruptionNeverRecordsRoamingMoment() async {
+        let guidance = RoamingGuidanceHarness()
+        let vm = makeConnectedViewModel(guidance: guidance.coordinator)
+
+        await vm.checkReadiness()
+        await waitUntil { vm.state == .ready }
+        vm.startTest()
+        await waitUntil { vm.state == .running }
+
+        vm.handleWiFiPowerStateChange(.poweredOff)
+
+        #expect(vm.state == .idle)
+        #expect(guidance.events.isEmpty)
+        #expect(guidance.store.load().meaningfulCompletionCount == 0)
+    }
+
+    @Test func idleStopNeverRecordsRoamingMoment() {
+        let guidance = RoamingGuidanceHarness()
+        let vm = RoamingTestViewModel(guidance: guidance.coordinator)
+
+        vm.stopTest()
+
+        #expect(vm.state == .stopped)
+        #expect(guidance.events.isEmpty)
+        #expect(guidance.store.load().meaningfulCompletionCount == 0)
+    }
+
+    // MARK: - Helpers
+
+    private func makeConnectedViewModel(guidance: GuidanceCoordinator) -> RoamingTestViewModel {
+        let status = WiFiCurrentStatus(
+            timestamp: Date(),
+            ssid: "TestNet",
+            bssid: "AA:BB:CC:DD:EE:FF",
+            channel: 6,
+            rssi: -45,
+            txRate: 300,
+            isConnected: true,
+            isWiFiPowerOn: true
+        )
+        return RoamingTestViewModel(
+            roamingProvider: MockRoamingProbeProvider(result: status),
+            latencyProvider: MockGatewayLatencyProvider(result: .init(timestamp: Date(), latencyMs: 3)),
+            guidance: guidance
+        )
+    }
+
+    @MainActor
+    private func waitUntil(_ condition: () -> Bool) async {
+        var spins = 0
+        while !condition(), spins < 500 {
+            spins += 1
+            await Task.yield()
+        }
+    }
+}
+
+/// Isolated guidance harness for roaming tests: in-memory store, fixed clock,
+/// collecting event sink — no real UserDefaults or Launch Services queries.
+@MainActor
+private final class RoamingGuidanceHarness {
+    let store: InMemoryGuidanceStateStore
+    let coordinator: GuidanceCoordinator
+    private let eventBox: EventBox
+
+    var events: [GuidanceEvent] { eventBox.events }
+
+    init() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        let now = calendar.date(from: DateComponents(year: 2026, month: 8, day: 5, hour: 12))!
+        let box = EventBox()
+        store = InMemoryGuidanceStateStore()
+        var configuration = GuidanceConfiguration()
+        configuration.invitationEnabled = true
+        coordinator = GuidanceCoordinator(
+            configuration: configuration,
+            stateStore: store,
+            now: { now },
+            calendar: calendar,
+            appVersion: { "2.1.0" },
+            isProAppInstalled: { false },
+            eventSink: { event in box.events.append(event) }
+        )
+        eventBox = box
+    }
+}
+
+@MainActor
+private final class EventBox {
+    var events: [GuidanceEvent] = []
 }

@@ -415,6 +415,17 @@ final class GuidanceCoordinatorTests {
         #expect(coordinator.pendingInvitation == nil)
     }
 
+    @Test func roamingCompletionsDoNotAdvanceInvitationEligibility() {
+        let coordinator = makeCoordinator(state: invitationState(completionCount: 0))
+        _ = coordinator.record(.roamingCompleted)
+        _ = coordinator.record(.roamingCompleted)
+
+        #expect(store.load().meaningfulCompletionCount == 0)
+        #expect(coordinator.record(.diagnosticsCompleted) == .none(.completionThresholdNotMet))
+        #expect(coordinator.record(.diagnosticsCompleted) == .none(.completionThresholdNotMet))
+        #expect(coordinator.record(.diagnosticsCompleted) == .showProInvitation)
+    }
+
     @Test func reviewEventsOncePerToken() {
         let coordinator = makeCoordinator(configuration: reviewConfig(), state: reviewState())
         _ = coordinator.record(.analysisLoaded)

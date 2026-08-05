@@ -21,10 +21,12 @@ final class RoamingTestViewModel {
 
     init(
         roamingProvider: RoamingProbeProviding = RoamingProbeProvider(),
-        latencyProvider: GatewayLatencyProviding = GatewayLatencyProvider()
+        latencyProvider: GatewayLatencyProviding = GatewayLatencyProvider(),
+        guidance: GuidanceCoordinator = .shared
     ) {
         self.roamingProvider = roamingProvider
         self.latencyProvider = latencyProvider
+        self.guidance = guidance
     }
 
     // MARK: - State
@@ -54,6 +56,10 @@ final class RoamingTestViewModel {
 
     let roamingProvider: RoamingProbeProviding
     let latencyProvider: GatewayLatencyProviding
+
+    // MARK: - Guidance
+
+    @ObservationIgnored private let guidance: GuidanceCoordinator
 
     // MARK: - Private
 
@@ -106,7 +112,9 @@ final class RoamingTestViewModel {
             }
 
         case .poweredOff, .interfaceUnavailable:
-            stopTest()
+            // Power-off and interface-loss interruptions are never recorded as
+            // useful roaming completions.
+            stopTest(userInitiated: false)
             self.state = .idle
             errorMessage = nil
         }
@@ -145,7 +153,8 @@ final class RoamingTestViewModel {
         }
     }
 
-    func stopTest() {
+    func stopTest(userInitiated: Bool = true) {
+        let wasRunning = state == .running
         timer?.invalidate()
         timer = nil
 
@@ -156,6 +165,12 @@ final class RoamingTestViewModel {
 
         refreshConnectionInfo()
         state = .stopped
+
+        // A normal user-initiated stop of a live test is a useful roaming
+        // completion; idle stops and power-off interruptions are not.
+        if userInitiated, wasRunning {
+            guidance.record(.roamingCompleted)
+        }
     }
 
     // MARK: - Tick
