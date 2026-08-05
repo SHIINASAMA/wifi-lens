@@ -2,6 +2,61 @@
   "sourceLanguage": "en",
   "version": "1.0",
   "strings": {
+    "guidance.invitation.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explore WiFi Lens Pro"
+          }
+        }
+      }
+    },
+    "guidance.invitation.message.diagnostics": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This diagnostic reflects the current network state. WiFi Lens Pro can retain changes over time and help identify intermittent problems and long-term trends."
+          }
+        }
+      }
+    },
+    "guidance.invitation.view_pro": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View WiFi Lens Pro"
+          }
+        }
+      }
+    },
+    "guidance.invitation.later": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Later"
+          }
+        }
+      }
+    },
+    "guidance.invitation.dont_show_again": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Do not show again"
+          }
+        }
+      }
+    },
     " · %@": {
       "shouldTranslate": false
     },

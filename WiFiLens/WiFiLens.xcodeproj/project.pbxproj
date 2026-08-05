@@ -74,6 +74,8 @@
 		G900000000000000000000C4 /* GuidancePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AF /* GuidancePolicy.swift */; };
 		G900000000000000000000D2 /* GuidanceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000D1 /* GuidanceCoordinator.swift */; };
 		G900000000000000000000D3 /* GuidanceCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000D1 /* GuidanceCoordinator.swift */; };
+		G900000000000000000000E2 /* ProInvitationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000E1 /* ProInvitationCard.swift */; };
+		G900000000000000000000E3 /* ProInvitationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000E1 /* ProInvitationCard.swift */; };
 		MV0000000000000000000022 /* MACVendorDatabaseDownloaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000023 /* MACVendorDatabaseDownloaderTests.swift */; };
 		MV0000000000000000000024 /* MACVendorDatabaseDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */; };
 		MV0000000000000000000025 /* MACVendorDatabaseDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */; };
@@ -530,6 +532,7 @@
 		G900000000000000000000AE /* GuidanceConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceConfiguration.swift; sourceTree = "<group>"; };
 		G900000000000000000000AF /* GuidancePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidancePolicy.swift; sourceTree = "<group>"; };
 		G900000000000000000000D1 /* GuidanceCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceCoordinator.swift; sourceTree = "<group>"; };
+		G900000000000000000000E1 /* ProInvitationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProInvitationCard.swift; sourceTree = "<group>"; };
 		MV0000000000000000000023 /* MACVendorDatabaseDownloaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseDownloaderTests.swift; sourceTree = "<group>"; };
 		MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseDownloader.swift; sourceTree = "<group>"; };
 		MV0000000000000000000028 /* MACVendorDatabaseManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseManagerTests.swift; sourceTree = "<group>"; };
@@ -1058,6 +1061,7 @@
 				G900000000000000000000AE /* GuidanceConfiguration.swift */,
 				G900000000000000000000AF /* GuidancePolicy.swift */,
 				G900000000000000000000D1 /* GuidanceCoordinator.swift */,
+				G900000000000000000000E1 /* ProInvitationCard.swift */,
 			);
 			path = Guidance;
 			sourceTree = "<group>";
@@ -1757,6 +1761,7 @@
 				G900000000000000000000C1 /* GuidanceConfiguration.swift in Sources */,
 				G900000000000000000000C2 /* GuidancePolicy.swift in Sources */,
 				G900000000000000000000D2 /* GuidanceCoordinator.swift in Sources */,
+				G900000000000000000000E2 /* ProInvitationCard.swift in Sources */,
 				ND0000000000000000000011 /* DiagnosticRunner.swift in Sources */,
 				ND0000000000000000000014 /* NetworkConnectivityCheck.swift in Sources */,
 				ND0000000000000000000015 /* DNSResolutionCheck.swift in Sources */,
@@ -1966,6 +1971,7 @@
 				G900000000000000000000C3 /* GuidanceConfiguration.swift in Sources */,
 				G900000000000000000000C4 /* GuidancePolicy.swift in Sources */,
 				G900000000000000000000D3 /* GuidanceCoordinator.swift in Sources */,
+				G900000000000000000000E3 /* ProInvitationCard.swift in Sources */,
 				MV0000000000000000000016 /* MACVendorCSVParser.swift in Sources */,
 				MV0000000000000000000014 /* MACVendorDatabaseModels.swift in Sources */,
 				MV0000000000000000000004 /* MACVendorResolver.swift in Sources */,

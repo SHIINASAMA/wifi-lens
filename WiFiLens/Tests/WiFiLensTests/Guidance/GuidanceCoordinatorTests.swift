@@ -347,6 +347,37 @@ final class GuidanceCoordinatorTests {
         #expect(events(named: "guidance.invitation.disabled").count == 1)
     }
 
+    // MARK: - Invitation card copy
+
+    @Test func invitationCardCopySelectsPerMoment() {
+        #expect(ProInvitationCard.messageKey(for: .diagnosticsCompleted) == "guidance.invitation.message.diagnostics")
+        #expect(ProInvitationCard.messageKey(for: .exportSucceeded) == "guidance.invitation.message.export")
+        #expect(ProInvitationCard.messageKey(for: .analysisLoaded) == "guidance.invitation.message.diagnostics")
+        #expect(ProInvitationCard.messageKey(for: .roamingCompleted) == "guidance.invitation.message.diagnostics")
+    }
+
+    @Test func diagnosticsCompletionsCrossThresholdOnThirdUsefulCompletion() {
+        let coordinator = makeCoordinator(state: GuidanceState(
+            activeDays: ["2026-07-01", "2026-07-02"],
+            meaningfulCompletionCount: 0
+        ))
+
+        #expect(coordinator.record(.diagnosticsCompleted) == .none(.completionThresholdNotMet))
+        #expect(coordinator.record(.diagnosticsCompleted) == .none(.completionThresholdNotMet))
+        #expect(coordinator.record(.diagnosticsCompleted) == .showProInvitation)
+
+        let invitation = coordinator.pendingInvitation
+        #expect(invitation?.moment == .diagnosticsCompleted)
+        let loaded = store.load()
+        #expect(loaded.meaningfulCompletionCount == 3)
+        #expect(loaded.invitationPresentationCount == 0)
+
+        if let id = invitation?.id {
+            coordinator.invitationPresented(id: id)
+        }
+        #expect(store.load().invitationPresentationCount == 1)
+    }
+
     // MARK: - Events
 
     @Test func eventSinkCapturesValueMomentScheduledPresentedDismissed() {
