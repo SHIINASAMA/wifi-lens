@@ -342,3 +342,28 @@ actor NetworkDiagnosticRestartController {
         currentRun = nil
     }
 }
+
+#if DEBUG
+extension NetworkDiagnosticsViewModel {
+    /// Debug-only: publishes a synthetic completed result so the real
+    /// diagnostics host renders its production conclusion strip and the
+    /// production invitation card, without running a real diagnostic. Never
+    /// writes Timeline, diagnostic history, or user data; the production
+    /// `record(.diagnosticsCompleted)` path is not invoked (Debug triggers
+    /// schedule invitations explicitly).
+    func debugStageCompletedResult() {
+        activeTask?.cancel()
+        activeTask = nil
+        let staged = checkIDs.map { id in
+            NetworkDiagnosticResult(id: id, status: .normal, summary: "Debug staged result")
+        }
+        results = Dictionary(uniqueKeysWithValues: staged.map { ($0.id, $0) })
+        executionPhases = Dictionary(uniqueKeysWithValues: staged.map { ($0.id, .completed) })
+        conclusion = NetworkDiagnosticConclusion.evaluate(
+            staged,
+            requiredIDs: Set(checkIDs)
+        )
+        phase = .completed
+    }
+}
+#endif

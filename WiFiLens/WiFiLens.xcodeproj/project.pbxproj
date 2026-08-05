@@ -62,6 +62,8 @@
 		G900000000000000000000D5 /* GuidanceCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000D4 /* GuidanceCoordinatorTests.swift */; };
 		G900000000000000000000D7 /* GuidanceEditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000D6 /* GuidanceEditionTests.swift */; };
 		G900000000000000000000D9 /* GuidanceEditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000D8 /* GuidanceEditionTests.swift */; };
+		G900000000000000000000EB /* GuidanceDebugTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000EC /* GuidanceDebugTests.swift */; };
+		G900000000000000000000EF /* GuidanceDebugTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000EE /* GuidanceDebugTests.swift */; };
 		MV0000000000000000000018 /* MACVendorDatabaseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000021 /* MACVendorDatabaseStore.swift */; };
 		MV0000000000000000000019 /* MACVendorDatabaseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000021 /* MACVendorDatabaseStore.swift */; };
 		G900000000000000000000BA /* GuidanceState.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AA /* GuidanceState.swift */; };
@@ -78,6 +80,8 @@
 		G900000000000000000000E3 /* ProInvitationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000E1 /* ProInvitationCard.swift */; };
 		G900000000000000000000E5 /* ExportSuccessBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000E4 /* ExportSuccessBanner.swift */; };
 		G900000000000000000000E6 /* ExportSuccessBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000E4 /* ExportSuccessBanner.swift */; };
+		G900000000000000000000E8 /* GuidanceDebug.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000E7 /* GuidanceDebug.swift */; };
+		G900000000000000000000E9 /* GuidanceDebug.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000E7 /* GuidanceDebug.swift */; };
 		MV0000000000000000000022 /* MACVendorDatabaseDownloaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000023 /* MACVendorDatabaseDownloaderTests.swift */; };
 		MV0000000000000000000024 /* MACVendorDatabaseDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */; };
 		MV0000000000000000000025 /* MACVendorDatabaseDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */; };
@@ -538,6 +542,7 @@
 		G900000000000000000000D1 /* GuidanceCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceCoordinator.swift; sourceTree = "<group>"; };
 		G900000000000000000000E1 /* ProInvitationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProInvitationCard.swift; sourceTree = "<group>"; };
 		G900000000000000000000E4 /* ExportSuccessBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportSuccessBanner.swift; sourceTree = "<group>"; };
+		G900000000000000000000E7 /* GuidanceDebug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceDebug.swift; sourceTree = "<group>"; };
 		MV0000000000000000000023 /* MACVendorDatabaseDownloaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseDownloaderTests.swift; sourceTree = "<group>"; };
 		MV0000000000000000000026 /* MACVendorDatabaseDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseDownloader.swift; sourceTree = "<group>"; };
 		MV0000000000000000000028 /* MACVendorDatabaseManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MACVendorDatabaseManagerTests.swift; sourceTree = "<group>"; };
@@ -569,6 +574,8 @@
 		G900000000000000000000D4 /* GuidanceCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceCoordinatorTests.swift; sourceTree = "<group>"; };
 		G900000000000000000000D6 /* GuidanceEditionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceEditionTests.swift; sourceTree = "<group>"; };
 		G900000000000000000000D8 /* GuidanceEditionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceEditionTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000EC /* GuidanceDebugTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceDebugTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000EE /* GuidanceDebugTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceDebugTests.swift; sourceTree = "<group>"; };
 		EC10000000000000000000005 /* EditionCompositionContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditionCompositionContext.swift; sourceTree = "<group>"; };
 		EC10000000000000000000006 /* OSSEditionComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSSEditionComposition.swift; sourceTree = "<group>"; };
 		A10000000000000000000017 /* App/MenuBarWindowBehaviorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/MenuBarWindowBehaviorTests.swift; sourceTree = "<group>"; };
@@ -1070,6 +1077,7 @@
 				G900000000000000000000D1 /* GuidanceCoordinator.swift */,
 				G900000000000000000000E1 /* ProInvitationCard.swift */,
 				G900000000000000000000E4 /* ExportSuccessBanner.swift */,
+				G900000000000000000000E7 /* GuidanceDebug.swift */,
 			);
 			path = Guidance;
 			sourceTree = "<group>";
@@ -1163,6 +1171,7 @@
 				EB2000000000000000000005 /* Fixtures */,
 				EC20000000000000000000001 /* EditionCompositionTests.swift */,
 				G900000000000000000000D8 /* GuidanceEditionTests.swift */,
+				G900000000000000000000EE /* GuidanceDebugTests.swift */,
 				E10000000000000000000001 /* EventJournalTests.swift */,
 				E30000000000000000000001 /* WiFiObservationEventSQLiteStoreTests.swift */,
 				FB8FCB182FF6C4E300BB2929 /* MenuBarMigrationTests.swift */,
@@ -1404,6 +1413,7 @@
 				G900000000000000000000AD /* GuidancePolicyTests.swift */,
 				G900000000000000000000D4 /* GuidanceCoordinatorTests.swift */,
 				G900000000000000000000D6 /* GuidanceEditionTests.swift */,
+				G900000000000000000000EC /* GuidanceDebugTests.swift */,
 			);
 			path = Guidance;
 			sourceTree = "<group>";
@@ -1773,6 +1783,7 @@
 				G900000000000000000000D2 /* GuidanceCoordinator.swift in Sources */,
 				G900000000000000000000E2 /* ProInvitationCard.swift in Sources */,
 				G900000000000000000000E5 /* ExportSuccessBanner.swift in Sources */,
+				G900000000000000000000E8 /* GuidanceDebug.swift in Sources */,
 				ND0000000000000000000011 /* DiagnosticRunner.swift in Sources */,
 				ND0000000000000000000014 /* NetworkConnectivityCheck.swift in Sources */,
 				ND0000000000000000000015 /* DNSResolutionCheck.swift in Sources */,
@@ -1915,6 +1926,7 @@
 				G900000000000000000000BF /* GuidancePolicyTests.swift in Sources */,
 				G900000000000000000000D5 /* GuidanceCoordinatorTests.swift in Sources */,
 				G900000000000000000000D7 /* GuidanceEditionTests.swift in Sources */,
+				G900000000000000000000EB /* GuidanceDebugTests.swift in Sources */,
 				ND0000000000000000000001 /* NetworkDiagnosticsTests.swift in Sources */,
 				67B6475699ADED9C42E8F7CC /* BLEModelTests.swift in Sources */,
 				2A8E470AAD8FCE2CC1D14305 /* BandChartViewModelTests.swift in Sources */,
@@ -1984,6 +1996,7 @@
 				G900000000000000000000D3 /* GuidanceCoordinator.swift in Sources */,
 				G900000000000000000000E3 /* ProInvitationCard.swift in Sources */,
 				G900000000000000000000E6 /* ExportSuccessBanner.swift in Sources */,
+				G900000000000000000000E9 /* GuidanceDebug.swift in Sources */,
 				MV0000000000000000000016 /* MACVendorCSVParser.swift in Sources */,
 				MV0000000000000000000014 /* MACVendorDatabaseModels.swift in Sources */,
 				MV0000000000000000000004 /* MACVendorResolver.swift in Sources */,
@@ -2166,6 +2179,7 @@
 				EF2000000000000000000002 /* InsightRuleValidationTests.swift in Sources */,
 				EC20000000000000000000002 /* EditionCompositionTests.swift in Sources */,
 				G900000000000000000000D9 /* GuidanceEditionTests.swift in Sources */,
+				G900000000000000000000EF /* GuidanceDebugTests.swift in Sources */,
 				E10000000000000000000002 /* EventJournalTests.swift in Sources */,
 				E30000000000000000000002 /* WiFiObservationEventSQLiteStoreTests.swift in Sources */,
 				FB8FCB282FF6CAC800BB2929 /* SecondaryToolbarProTests.swift in Sources */,

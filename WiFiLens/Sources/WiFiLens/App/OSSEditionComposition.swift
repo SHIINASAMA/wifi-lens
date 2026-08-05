@@ -84,6 +84,46 @@ enum EditionComposition {
         }
     }
 
+#if DEBUG
+    /// Debug-only manual testing controls for the OSS invitation flow. The
+    /// whole menu is compiled out of Release builds.
+    @MainActor
+    static func debugCommands(
+        showMainWindow: @escaping (SidebarPage) -> Void
+    ) -> some Commands {
+        CommandMenu("Debug") {
+            Menu("Lifecycle Guidance") {
+                Button("Reset Lifecycle Guidance State") {
+                    GuidanceCoordinator.shared.debugResetState()
+                }
+                Button("Prepare OSS Invitation Eligibility") {
+                    GuidanceCoordinator.shared.debugPrepareInvitationEligibility()
+                }
+                Button("Trigger Diagnostics Invitation") {
+                    GuidanceCoordinator.shared.debugScheduleInvitation(for: .diagnosticsCompleted)
+                    GuidanceDebugOverrides.stageDiagnosticsCompletion()
+                    showMainWindow(.networkDiagnostics)
+                }
+                Button("Trigger Export Invitation Banner") {
+                    GuidanceCoordinator.shared.debugScheduleInvitation(for: .exportSucceeded)
+                    GuidanceCoordinator.shared.debugPublishExportFeedback()
+                }
+                Picker("Pro Installation Override", selection: Binding(
+                    get: { GuidanceDebugOverrides.proInstallationOverride },
+                    set: { GuidanceDebugOverrides.setProInstallationOverride($0) }
+                )) {
+                    Text("Use Real Detection").tag(ProInstallationOverride.useRealDetection)
+                    Text("Treat Pro as Not Installed").tag(ProInstallationOverride.treatAsNotInstalled)
+                    Text("Treat Pro as Installed").tag(ProInstallationOverride.treatAsInstalled)
+                }
+                Button("Log Lifecycle Guidance State") {
+                    GuidanceCoordinator.shared.debugLogState(edition: "OSS")
+                }
+            }
+        }
+    }
+#endif
+
     static func startLifecycle(observationRuntime: WiFiObservationRuntime) {}
 
     @MainActor

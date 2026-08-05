@@ -70,7 +70,20 @@ final class GuidanceCoordinator {
             Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.0.0"
         },
         isProAppInstalled: @escaping () -> Bool = {
-            NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.kaoru.wifi-lens-pro") != nil
+            #if DEBUG
+            // Debug-only in-memory override for manual invitation testing;
+            // Release builds compile this block away and always use real
+            // detection.
+            switch GuidanceDebugOverrides.proInstallationOverride {
+            case .useRealDetection:
+                break
+            case .treatAsNotInstalled:
+                return false
+            case .treatAsInstalled:
+                return true
+            }
+            #endif
+            return NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.kaoru.wifi-lens-pro") != nil
         },
         eventSink: @escaping (GuidanceEvent) -> Void = { event in
             var metadata = Logging.Logger.Metadata()
@@ -263,3 +276,170 @@ final class GuidanceCoordinator {
         )
     }
 }
+
+#if DEBUG
+extension GuidanceCoordinator {
+    // MARK: - Debug-only manual test entry points
+    //
+    // These APIs exist only in Debug builds. They may bypass the eligibility
+    // policy for manual testing, but they never bypass the token lifecycle:
+    // every schedule creates a fresh UUID token, respects the pending gate,
+    // and is consumed only through the existing presentation/consume/cancel
+    // APIs. Nothing here is persisted, uploaded, or included in Release.
+
+    /// Clears every persisted guidance field and every pending in-memory
+    /// presentation.
+    func debugResetState() {
+        pendingInvitation = nil
+        pendingReviewRequest = nil
+        confirmedPresentedInvitationIDs.removeAll()
+        exportFeedback = nil
+        stateStore.save(GuidanceState())
+        emit("guidance.debug.state_reset")
+    }
+
+    /// Clears review-eligibility state (persisted review fields, completion
+    /// count, active days, first-launch age) and the pending review request,
+    /// preserving the (inert in Pro) invitation fields.
+    func debugResetReviewState() {
+        pendingReviewRequest = nil
+        let current = stateStore.load()
+        stateStore.save(GuidanceState(
+            firstLaunchDate: nil,
+            activeDays: [],
+            meaningfulCompletionCount: 0,
+            lastInvitationDate: current.lastInvitationDate,
+            invitationPresentationCount: current.invitationPresentationCount,
+            invitationDismissalCount: current.invitationDismissalCount,
+            invitationsDisabled: current.invitationsDisabled
+        ))
+        emit("guidance.debug.review_state_reset")
+    }
+
+    /// Seeds persisted state to exactly meet the invitation policy, so the
+    /// next real value moment schedules an invitation through the production
+    /// policy path. Refuses while an invitation is already pending.
+    func debugPrepareInvitationEligibility() {
+        guard pendingInvitation == nil else {
+            emit("guidance.debug.refused", metadata: ["reason": "pending_invitation"])
+            return
+        }
+        var state = GuidanceState()
+        let now = now()
+        state.recordActiveDay(at: now, calendar: calendar)
+        if let yesterday = calendar.date(byAdding: .day, value: -1, to: now) {
+            state.recordActiveDay(at: yesterday, calendar: calendar)
+        }
+        state.meaningfulCompletionCount = configuration.minimumInvitationCompletions
+        stateStore.save(state)
+        emit("guidance.debug.invitation_eligibility_prepared")
+    }
+
+    /// Seeds persisted state to exactly meet the review policy, so the next
+    /// real value moment schedules a review request through the production
+    /// policy path. Refuses while a review request is already pending.
+    func debugPrepareReviewEligibility() {
+        guard pendingReviewRequest == nil else {
+            emit("guidance.debug.refused", metadata: ["reason": "pending_review"])
+            return
+        }
+        var state = GuidanceState()
+        let now = now()
+        state.firstLaunchDate = calendar.date(
+            byAdding: .day,
+            value: -configuration.minimumReviewAgeDays,
+            to: now
+        )
+        for daysAgo in 0..<configuration.minimumReviewActiveDays {
+            if let day = calendar.date(byAdding: .day, value: -daysAgo, to: now) {
+                state.recordActiveDay(at: day, calendar: calendar)
+            }
+        }
+        state.meaningfulCompletionCount = configuration.minimumReviewCompletions
+        stateStore.save(state)
+        emit("guidance.debug.review_eligibility_prepared")
+    }
+
+    /// Force-schedules an invitation for a supported moment, bypassing the
+    /// policy but keeping the pending gate and token lifecycle intact.
+    func debugScheduleInvitation(for moment: GuidanceValueMoment) {
+        guard moment == .diagnosticsCompleted || moment == .exportSucceeded else {
+            emit("guidance.debug.refused", metadata: ["reason": "unsupported_moment"])
+            return
+        }
+        guard pendingInvitation == nil else {
+            emit("guidance.debug.refused", metadata: ["reason": "pending_invitation"])
+            return
+        }
+        let invitation = InvitationPresentation(id: UUID(), moment: moment, scheduledAt: now())
+        pendingInvitation = invitation
+        emit("guidance.invitation.scheduled", moment: moment, tokenID: invitation.id)
+        emit("guidance.debug.invitation_triggered", moment: moment, tokenID: invitation.id)
+    }
+
+    /// Force-schedules a review request, bypassing the policy but keeping the
+    /// pending gate and token lifecycle intact. Consumed only by the real
+    /// Pro-only bridge; never by direct StoreKit calls.
+    func debugScheduleReview(for moment: GuidanceValueMoment) {
+        guard moment != .roamingCompleted else {
+            emit("guidance.debug.refused", metadata: ["reason": "unsupported_moment"])
+            return
+        }
+        guard pendingReviewRequest == nil else {
+            emit("guidance.debug.refused", metadata: ["reason": "pending_review"])
+            return
+        }
+        let request = ReviewRequestPresentation(id: UUID(), moment: moment, scheduledAt: now())
+        pendingReviewRequest = request
+        emit("guidance.review.scheduled", moment: moment, tokenID: request.id)
+        emit("guidance.debug.review_triggered", moment: moment, tokenID: request.id)
+    }
+
+    /// Publishes export feedback so the real OSS banner host renders, without
+    /// running a real file save.
+    func debugPublishExportFeedback() {
+        exportFeedback = ExportFeedback(occurredAt: now())
+        emit("guidance.debug.export_feedback_published")
+    }
+
+    /// Emits a sanitized state summary for local Debug logs. Contains no
+    /// UUIDs, SSIDs, BSSIDs, IPs, DNS data, or diagnostic results.
+    func debugLogState(edition: String) {
+        let state = stateStore.load()
+        var metadata: [String: String] = [
+            "edition": edition,
+            "completionCount": String(state.meaningfulCompletionCount),
+            "activeDayCount": String(state.activeDays.count),
+            "invitationPresentationCount": String(state.invitationPresentationCount),
+            "invitationDismissalCount": String(state.invitationDismissalCount),
+            "invitationsDisabled": String(state.invitationsDisabled),
+            "hasReviewRequestHistory": String(state.lastReviewRequestDate != nil),
+            "reviewConsumedForCurrentVersion": String(state.lastReviewRequestVersion == appVersion()),
+            "hasPendingInvitation": String(pendingInvitation != nil),
+            "hasPendingReviewRequest": String(pendingReviewRequest != nil),
+            "proInstallationOverride": GuidanceDebugOverrides.proInstallationOverride.rawValue,
+        ]
+        if let lastInvitationDate = state.lastInvitationDate {
+            metadata["invitationCooldownActive"] = String(
+                debugWholeDaysSince(lastInvitationDate) < configuration.invitationCooldownDays
+            )
+        } else {
+            metadata["invitationCooldownActive"] = "false"
+        }
+        if let lastReviewRequestDate = state.lastReviewRequestDate {
+            metadata["reviewCooldownActive"] = String(
+                debugWholeDaysSince(lastReviewRequestDate) < configuration.reviewCooldownDays
+            )
+        } else {
+            metadata["reviewCooldownActive"] = "false"
+        }
+        emit("guidance.debug.state_summary", metadata: metadata)
+    }
+
+    private func debugWholeDaysSince(_ date: Date) -> Int {
+        let start = calendar.startOfDay(for: date)
+        let startNow = calendar.startOfDay(for: now())
+        return calendar.dateComponents([.day], from: start, to: startNow).day ?? 0
+    }
+}
+#endif

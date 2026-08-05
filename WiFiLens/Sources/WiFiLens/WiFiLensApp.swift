@@ -321,6 +321,13 @@ private struct AppRootView: View {
             installMainWindowOpenAction {
                 openWindow(id: WiFiLensApp.mainWindowSceneID)
             }
+#if DEBUG
+            // Debug-only: lets the Debug menu render the production
+            // diagnostics result host without running a real diagnostic.
+            GuidanceDebugOverrides.installDiagnosticsStaging {
+                networkDiagnosticsViewModel.debugStageCompletedResult()
+            }
+#endif
             // Under `xcodebuild test` the app process hosts the unit test
             // bundle, so the real scanner must not start: CoreWLAN and
             // NetworkInfoService are synchronous XPC calls that can stall the
@@ -1146,6 +1153,12 @@ struct WiFiLensApp: App {
                     sparkleUpdater.checkForUpdates()
                 }
             }
+#endif
+
+#if DEBUG
+            EditionComposition.debugCommands(
+                showMainWindow: { showMainWindow(route: $0) }
+            )
 #endif
 
         }
