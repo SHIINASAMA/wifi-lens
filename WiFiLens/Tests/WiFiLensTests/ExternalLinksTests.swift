@@ -13,6 +13,14 @@ struct ExternalLinksTests {
         #expect(ExternalLinks.url(for: .appStore)?.absoluteString == "https://apps.apple.com/app/wifi-lens-pro/id6776590746")
     }
 
+    @Test("app store campaign maps to the official oss_invite campaign link")
+    func appStoreCampaignURL() {
+        #expect(
+            ExternalLinks.url(for: .appStoreCampaign)?.absoluteString
+                == "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_invite&mt=8"
+        )
+    }
+
     @Test("dependency repositories keep their current public locations")
     func dependencyRepositoryURLs() {
         #expect(ExternalLinks.url(for: .chartLensRepository)?.absoluteString == "https://github.com/SHIINASAMA/chart-lens")

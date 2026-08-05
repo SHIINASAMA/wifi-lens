@@ -4,10 +4,7 @@ enum EditionComposition {
     static var guidanceConfiguration: GuidanceConfiguration {
         var config = GuidanceConfiguration()
         config.invitationEnabled = true
-        // Dev builds use the plain listing. Before release, replace this with
-        // the official App Store Connect "oss_invite" Campaign Link. Never
-        // handcraft campaign parameters.
-        config.appStoreCampaignURL = ExternalLinks.url(for: .appStore)
+        config.appStoreCampaignURL = ExternalLinks.url(for: .appStoreCampaign)
         return config
     }
 
