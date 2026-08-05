@@ -1,4 +1,6 @@
+import AppKit
 import Foundation
+import SwiftUI
 import Testing
 @testable import WiFi_Lens
 
@@ -423,6 +425,71 @@ final class GuidanceCoordinatorTests {
         #expect(events(named: "guidance.review.request_invoked").count == 1)
     }
 
+    // MARK: - Export banner view
+
+    @Test func exportBannerHostsInvitationAndConfirmsPresentation() throws {
+        let coordinator = makeCoordinator(state: invitationState(completionCount: 3))
+        coordinator.handleExportSucceeded()
+        let invitation = try #require(coordinator.pendingInvitation)
+        #expect(invitation.moment == .exportSucceeded)
+
+        let host = BannerHost(content: ExportSuccessBanner(guidance: coordinator))
+        host.flushLayout()
+
+        #expect(store.load().invitationPresentationCount == 1)
+        #expect(events(named: "guidance.invitation.presented").count == 1)
+    }
+
+    @Test func exportBannerWithoutInvitationShowsFeedbackOnly() throws {
+        let coordinator = makeCoordinator(state: invitationState(completionCount: 0))
+        coordinator.handleExportSucceeded()
+        #expect(coordinator.pendingInvitation == nil)
+
+        let host = BannerHost(content: ExportSuccessBanner(guidance: coordinator))
+        host.flushLayout()
+
+        #expect(events(named: "guidance.invitation.presented").isEmpty)
+        #expect(store.load().invitationPresentationCount == 0)
+    }
+
+    @Test func exportBannerDisappearAfterPresentationConsumesAsLater() throws {
+        let coordinator = makeCoordinator(state: invitationState())
+        coordinator.handleExportSucceeded()
+        let invitation = try #require(coordinator.pendingInvitation)
+
+        let host = BannerHost(content: ExportSuccessBanner(guidance: coordinator))
+        host.flushLayout()
+        #expect(store.load().invitationPresentationCount == 1)
+        #expect(invitation.id == coordinator.pendingInvitation?.id)
+
+        host.replace(with: EmptyView())
+
+        #expect(coordinator.pendingInvitation == nil)
+        let loaded = store.load()
+        #expect(loaded.invitationPresentationCount == 1)
+        #expect(loaded.invitationDismissalCount == 1)
+        #expect(events(named: "guidance.invitation.dismissed").count == 1)
+        #expect(events(named: "guidance.invitation.cancelled").isEmpty)
+    }
+
+    @Test func exportBannerNeverTouchesNonExportInvitation() throws {
+        let coordinator = makeCoordinator(state: invitationState())
+        _ = coordinator.record(.diagnosticsCompleted)
+        let invitation = try #require(coordinator.pendingInvitation)
+        coordinator.handleExportSucceeded()
+        #expect(coordinator.pendingInvitation?.id == invitation.id)
+
+        let host = BannerHost(content: ExportSuccessBanner(guidance: coordinator))
+        host.flushLayout()
+        #expect(store.load().invitationPresentationCount == 0)
+
+        host.replace(with: EmptyView())
+
+        #expect(coordinator.pendingInvitation?.id == invitation.id)
+        #expect(store.load().invitationDismissalCount == 0)
+        #expect(events(named: "guidance.invitation.presented").isEmpty)
+    }
+
     // MARK: - Helpers
 
     private func makeCoordinator(
@@ -484,5 +551,29 @@ final class GuidanceCoordinatorTests {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "UTC")!
         return calendar
+    }
+}
+
+/// Hosts a SwiftUI view in a real window so `onAppear`/`onDisappear` fire the
+/// way they do in the shipping app.
+@MainActor
+private final class BannerHost {
+    private let window: NSWindow
+    private let controller: NSHostingController<AnyView>
+
+    init<Content: View>(content: Content) {
+        controller = NSHostingController(rootView: AnyView(content))
+        window = NSWindow(contentViewController: controller)
+    }
+
+    func flushLayout() {
+        window.layoutIfNeeded()
+        RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.02))
+    }
+
+    func replace<Content: View>(with content: Content) {
+        controller.rootView = AnyView(content)
+        window.layoutIfNeeded()
+        RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.02))
     }
 }

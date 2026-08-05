@@ -249,6 +249,12 @@ private struct AppRootView: View {
     #endif
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .overlay(alignment: .bottom) {
+                    // OSS `.banner` export strategy only: renders while the
+                    // coordinator publishes export feedback; no-op in Pro
+                    // (`.preserveExisting` never publishes feedback).
+                    ExportSuccessBanner(guidance: GuidanceCoordinator.shared)
+                }
             }
         }
     }

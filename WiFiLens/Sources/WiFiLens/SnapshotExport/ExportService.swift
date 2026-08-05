@@ -82,7 +82,17 @@ enum ExportService {
                 do {
                     try png.write(to: url)
                     await MainActor.run {
-                        showSuccess(String(localized: "export.image_saved_message", comment: "Chart image exported successfully"))
+                        // Presentation is an explicit edition strategy: OSS shows the
+                        // non-modal banner (which records the moment), Pro keeps its
+                        // existing success alert and records the moment for rating
+                        // eligibility only.
+                        switch EditionComposition.exportSuccessPresentation {
+                        case .banner:
+                            GuidanceCoordinator.shared.handleExportSucceeded()
+                        case .preserveExisting:
+                            GuidanceCoordinator.shared.record(.exportSucceeded)
+                            showSuccess(String(localized: "export.image_saved_message", comment: "Chart image exported successfully"))
+                        }
                     }
                 } catch {
                     await MainActor.run {
