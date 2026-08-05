@@ -319,6 +319,7 @@
 		EC2000000000000000000001C /* InsightRuleEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2000000000000000000001D /* InsightRuleEngine.swift */; };
 		EC2000000000000000000001E /* InitialInsightRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2000000000000000000001F /* InitialInsightRules.swift */; };
 		EC20000000000000000000020 /* InsightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000021 /* InsightsViewModel.swift */; };
+		EC20000000000000000000024 /* ProReviewRequestBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000023 /* ProReviewRequestBridge.swift */; };
 		EC20000000000000000000002 /* EditionCompositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000001 /* EditionCompositionTests.swift */; };
 		E30000000000000000000002 /* WiFiObservationEventSQLiteStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30000000000000000000001 /* WiFiObservationEventSQLiteStoreTests.swift */; };
 		EA1000000000000000000002 /* AnalysisScopeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1000000000000000000001 /* AnalysisScopeTests.swift */; };
@@ -665,6 +666,7 @@
 		EC2000000000000000000001D /* InsightRuleEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightRuleEngine.swift; sourceTree = "<group>"; };
 		EC2000000000000000000001F /* InitialInsightRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialInsightRules.swift; sourceTree = "<group>"; };
 		EC20000000000000000000021 /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
+		EC20000000000000000000023 /* ProReviewRequestBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProReviewRequestBridge.swift; sourceTree = "<group>"; };
 		EC20000000000000000000001 /* EditionCompositionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditionCompositionTests.swift; sourceTree = "<group>"; };
 		E30000000000000000000001 /* WiFiObservationEventSQLiteStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventSQLiteStoreTests.swift; sourceTree = "<group>"; };
 		EA1000000000000000000001 /* AnalysisScopeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisScopeTests.swift; sourceTree = "<group>"; };
@@ -1270,6 +1272,7 @@
 				EC20000000000000000000019 /* StatisticsViewModel.swift */,
 				EC20000000000000000000011 /* InsightsView.swift */,
 				EC20000000000000000000021 /* InsightsViewModel.swift */,
+				EC20000000000000000000023 /* ProReviewRequestBridge.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -2009,6 +2012,7 @@
 				EC2000000000000000000001C /* InsightRuleEngine.swift in Sources */,
 				EC2000000000000000000001E /* InitialInsightRules.swift in Sources */,
 				EC20000000000000000000020 /* InsightsViewModel.swift in Sources */,
+				EC20000000000000000000024 /* ProReviewRequestBridge.swift in Sources */,
 				FB1E32482FC7316C009D1BDC /* BluetoothPermissionManager.swift in Sources */,
 				FB1E32492FC7316C009D1BDC /* BLEChannel.swift in Sources */,
 				FB1E324A2FC7316C009D1BDC /* BLEAdvertisementEvent.swift in Sources */,
