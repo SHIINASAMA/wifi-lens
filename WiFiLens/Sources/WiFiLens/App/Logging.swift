@@ -45,6 +45,7 @@ enum AppLogger {
     static let location   = Logging.Logger(label: "location")
     static let ble        = Logging.Logger(label: "ble")
     static let guidance   = Logging.Logger(label: "guidance")
+    static let apRadar    = Logging.Logger(label: "apRadar")
 
     /// Backward-compatible alias for `AppLogger.app` call sites.
     static let app = general

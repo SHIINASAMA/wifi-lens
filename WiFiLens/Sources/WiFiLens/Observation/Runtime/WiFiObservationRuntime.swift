@@ -107,6 +107,13 @@ final class WiFiObservationRuntime {
         workers[identifier] = ObservationConsumerWorker(consumer: consumer)
     }
 
+    /// Stops delivering observations and lifecycle events to a consumer.
+    /// Safe to call for consumers that were never added.
+    func removeConsumer(_ consumer: any WiFiObservationConsuming) {
+        let identifier = ObjectIdentifier(consumer)
+        workers.removeValue(forKey: identifier)
+    }
+
     func accept(_ observation: WiFiObservation) async {
         store.apply(observation)
         for worker in workers.values {

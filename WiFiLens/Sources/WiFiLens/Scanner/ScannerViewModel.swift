@@ -456,6 +456,13 @@ final class ScannerViewModel {
         }
     }
 
+    /// Requests an immediate restart of the shared scan loop. Used by pages
+    /// that offer a manual rescan action; never starts a second scan loop.
+    func requestImmediateRescan() {
+        guard isScanning, !isTerminating else { return }
+        restartScanLoop()
+    }
+
     private static func regionOverride(from rawValue: String) -> RegulatoryDomain? {
         rawValue == "auto" ? nil : RegulatoryDomain(rawValue: rawValue)
     }

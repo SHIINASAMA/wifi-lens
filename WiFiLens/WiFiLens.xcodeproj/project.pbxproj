@@ -460,6 +460,24 @@
 		OB00000000000000000000D3 /* WiFiObservationRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000D0 /* WiFiObservationRuntime.swift */; };
 		OB00000000000000000000D4 /* RuntimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000D1 /* RuntimeTests.swift */; };
 		OB00000000000000000000C2 /* WiFiObservationEventSQLiteStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = OB00000000000000000000C0 /* WiFiObservationEventSQLiteStore.swift */; };
+		AR0000000000000000000011 /* APRadarState.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000001 /* APRadarState.swift */; };
+		AR0000000000000000000021 /* APRadarState.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000001 /* APRadarState.swift */; };
+		AR0000000000000000000012 /* APRadarSignalProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000002 /* APRadarSignalProcessor.swift */; };
+		AR0000000000000000000022 /* APRadarSignalProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000002 /* APRadarSignalProcessor.swift */; };
+		AR0000000000000000000013 /* APRadarAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000003 /* APRadarAudioPlayer.swift */; };
+		AR0000000000000000000023 /* APRadarAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000003 /* APRadarAudioPlayer.swift */; };
+		AR0000000000000000000014 /* APRadarPulseScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000004 /* APRadarPulseScheduler.swift */; };
+		AR0000000000000000000024 /* APRadarPulseScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000004 /* APRadarPulseScheduler.swift */; };
+		AR0000000000000000000015 /* APRadarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000005 /* APRadarViewModel.swift */; };
+		AR0000000000000000000025 /* APRadarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000005 /* APRadarViewModel.swift */; };
+		AR0000000000000000000016 /* APRadarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000006 /* APRadarView.swift */; };
+		AR0000000000000000000026 /* APRadarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000006 /* APRadarView.swift */; };
+		AR0000000000000000000017 /* APSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000007 /* APSelectionView.swift */; };
+		AR0000000000000000000027 /* APSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000007 /* APSelectionView.swift */; };
+		AR0000000000000000000018 /* ap-radar-pulse.wav in Resources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000008 /* ap-radar-pulse.wav */; };
+		AR0000000000000000000028 /* ap-radar-pulse.wav in Resources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000008 /* ap-radar-pulse.wav */; };
+		AR0000000000000000000019 /* APRadarSignalProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000009 /* APRadarSignalProcessorTests.swift */; };
+		AR000000000000000000001A /* APRadarViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR000000000000000000000A /* APRadarViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -798,6 +816,16 @@
 		OB00000000000000000000D0 /* WiFiObservationRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationRuntime.swift; sourceTree = "<group>"; };
 		OB00000000000000000000D1 /* RuntimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeTests.swift; sourceTree = "<group>"; };
 		OB00000000000000000000C0 /* WiFiObservationEventSQLiteStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiObservationEventSQLiteStore.swift; sourceTree = "<group>"; };
+		AR0000000000000000000001 /* APRadarState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarState.swift; sourceTree = "<group>"; };
+		AR0000000000000000000002 /* APRadarSignalProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarSignalProcessor.swift; sourceTree = "<group>"; };
+		AR0000000000000000000003 /* APRadarAudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarAudioPlayer.swift; sourceTree = "<group>"; };
+		AR0000000000000000000004 /* APRadarPulseScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarPulseScheduler.swift; sourceTree = "<group>"; };
+		AR0000000000000000000005 /* APRadarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarViewModel.swift; sourceTree = "<group>"; };
+		AR0000000000000000000006 /* APRadarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarView.swift; sourceTree = "<group>"; };
+		AR0000000000000000000007 /* APSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APSelectionView.swift; sourceTree = "<group>"; };
+		AR0000000000000000000008 /* ap-radar-pulse.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ap-radar-pulse.wav; sourceTree = "<group>"; };
+		AR0000000000000000000009 /* APRadarSignalProcessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarSignalProcessorTests.swift; sourceTree = "<group>"; };
+		AR000000000000000000000A /* APRadarViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1071,6 +1099,7 @@
 				831E90D5B9D07C478A35DD14 /* WiFiLensApp.swift */,
 				FBD0A4442FE5BEAC003658AD /* Pro */,
 				AD735352E4FE8FE0803C143C /* App */,
+				AR000000000000000000000B /* APRadar */,
 				D214ECC1EF82C7552FF49DE8 /* BLE */,
 				D3E6587CCEDEC199C00591B2 /* Channels */,
 				49FEC4F42675BFAD1316DDEC /* Debug */,
@@ -1192,6 +1221,7 @@
 				FBBD169B2FD063630093F940 /* Assets.xcassets */,
 				FBBD16982FD062F60093F940 /* PrivacyInfo.xcprivacy */,
 				FBB1F0AB2FC61E3D00E9D2C6 /* Localizable.xcstrings */,
+				AR0000000000000000000008 /* ap-radar-pulse.wav */,
 				MV0000000000000000000050 /* mac-vendor-database.json */,
 			);
 			path = Resources;
@@ -1430,6 +1460,8 @@
 				786042C29EF01CE698FEBBF8 /* SignalProcessingTests.swift */,
 				5DD34695BFD8D4277DF0BDB0 /* SpectrumModelTests.swift */,
 				C1D2E3F4A5B6123456789ABE /* APFilterServiceTests.swift */,
+				AR0000000000000000000009 /* APRadarSignalProcessorTests.swift */,
+				AR000000000000000000000A /* APRadarViewModelTests.swift */,
 				E4A2B3C4D5E6F708112233AA /* BandPanelSelectionTests.swift */,
 				E4A2B3C4D5E6F708112233B0 /* SpectrumPanelViewTests.swift */,
 				D92298452F334CDAAA9695D3 /* WindowFramePolicyTests.swift */,
@@ -1587,6 +1619,20 @@
 				OB00000000000000000000D0 /* WiFiObservationRuntime.swift */,
 			);
 			path = Runtime;
+			sourceTree = "<group>";
+		};
+		AR000000000000000000000B /* APRadar */ = {
+			isa = PBXGroup;
+			children = (
+				AR0000000000000000000001 /* APRadarState.swift */,
+				AR0000000000000000000002 /* APRadarSignalProcessor.swift */,
+				AR0000000000000000000003 /* APRadarAudioPlayer.swift */,
+				AR0000000000000000000004 /* APRadarPulseScheduler.swift */,
+				AR0000000000000000000005 /* APRadarViewModel.swift */,
+				AR0000000000000000000006 /* APRadarView.swift */,
+				AR0000000000000000000007 /* APSelectionView.swift */,
+			);
+			path = APRadar;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1780,6 +1826,7 @@
 				FBBD169D2FD063630093F940 /* Assets.xcassets in Resources */,
 				FB1E329D2FC7316C009D1BDC /* Localizable.xcstrings in Resources */,
 				MV0000000000000000000051 /* mac-vendor-database.json in Resources */,
+				AR0000000000000000000028 /* ap-radar-pulse.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1791,6 +1838,7 @@
 				FBBD169C2FD063630093F940 /* Assets.xcassets in Resources */,
 				FBB1F0AC2FC61E3D00E9D2C6 /* Localizable.xcstrings in Resources */,
 				MV0000000000000000000049 /* mac-vendor-database.json in Resources */,
+				AR0000000000000000000018 /* ap-radar-pulse.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1968,6 +2016,13 @@
 				OB0000000000000000000095 /* WiFiObservationPipeline.swift in Sources */,
 				OB0000000000000000000096 /* WiFiObservationStore.swift in Sources */,
 				OB00000000000000000000D2 /* WiFiObservationRuntime.swift in Sources */,
+				AR0000000000000000000011 /* APRadarState.swift in Sources */,
+				AR0000000000000000000012 /* APRadarSignalProcessor.swift in Sources */,
+				AR0000000000000000000013 /* APRadarAudioPlayer.swift in Sources */,
+				AR0000000000000000000014 /* APRadarPulseScheduler.swift in Sources */,
+				AR0000000000000000000015 /* APRadarViewModel.swift in Sources */,
+				AR0000000000000000000016 /* APRadarView.swift in Sources */,
+				AR0000000000000000000017 /* APSelectionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2035,6 +2090,8 @@
 				OB00000000000000000000B3 /* RoamingMigrationTests.swift in Sources */,
 				OB00000000000000000000B5 /* DiagnosticMigrationTests.swift in Sources */,
 				OB00000000000000000000D4 /* RuntimeTests.swift in Sources */,
+				AR0000000000000000000019 /* APRadarSignalProcessorTests.swift in Sources */,
+				AR000000000000000000001A /* APRadarViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2229,6 +2286,13 @@
 				OB00000000000000000000A6 /* WiFiObservationStore.swift in Sources */,
 				OB00000000000000000000C2 /* WiFiObservationEventSQLiteStore.swift in Sources */,
 				OB00000000000000000000D3 /* WiFiObservationRuntime.swift in Sources */,
+				AR0000000000000000000021 /* APRadarState.swift in Sources */,
+				AR0000000000000000000022 /* APRadarSignalProcessor.swift in Sources */,
+				AR0000000000000000000023 /* APRadarAudioPlayer.swift in Sources */,
+				AR0000000000000000000024 /* APRadarPulseScheduler.swift in Sources */,
+				AR0000000000000000000025 /* APRadarViewModel.swift in Sources */,
+				AR0000000000000000000026 /* APRadarView.swift in Sources */,
+				AR0000000000000000000027 /* APSelectionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
