@@ -254,7 +254,7 @@ struct HTTPSControlEndpointCheck: DiagnosticCheck {
                 evidence: .init(code: "captive-portal.http-status", value: String(status))
             )
         }
-        guard response.body?.contains(expectedCaptivePortalBody) == true else {
+        guard response.body?.localizedCaseInsensitiveContains(expectedCaptivePortalBody) == true else {
             return EndpointEvaluation(
                 succeeded: false,
                 evidence: .init(code: "captive-portal.suspected", value: nil)

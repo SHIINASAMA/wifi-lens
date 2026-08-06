@@ -710,6 +710,10 @@ private struct EarthGlobeView: NSViewRepresentable {
               let innerGlowNode = coordinator.innerGlowNode,
               let glowNode = coordinator.glowNode else { return }
 
+        // Remove any existing keys first so repeated start transitions can
+        // never stack duplicate CAAnimation instances on the same node.
+        stopAnimations(on: coordinator)
+
         for node in coordinator.hubNodes {
             let pulse = CABasicAnimation(keyPath: "opacity")
             pulse.fromValue = 0.3; pulse.toValue = 1.0; pulse.duration = 1.2

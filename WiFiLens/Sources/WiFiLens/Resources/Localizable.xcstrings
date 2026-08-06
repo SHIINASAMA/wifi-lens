@@ -29120,6 +29120,41 @@
         }
       }
     },
+    "analysis.statistics.severity_none": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No severity data available"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Schweregrad-Daten verfügbar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay datos de gravedad disponibles"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重要度データがありません"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无严重度数据"
+          }
+        }
+      }
+    },
     "analysis.statistics.severity_warning": {
       "extractionState": "manual",
       "localizations": {
