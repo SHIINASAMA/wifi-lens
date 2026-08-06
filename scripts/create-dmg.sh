@@ -5,16 +5,17 @@ set -euo pipefail
 # create-dmg.sh — Create a styled DMG for WiFi Lens
 #
 # Usage:
-#   ./scripts/create-dmg.sh <app-path> [output-dmg-path]
+#   ./scripts/create-dmg.sh <app-path> [output-dmg-path] [volume-name]
 #
 # Dependencies:
 #   brew install create-dmg   (one-time setup)
 #   Background image at assets/dmg-background.png
 # ============================================================
 
-APP_PATH="${1:?Usage: $0 <app-path> [output-dmg-path]}"
+APP_PATH="${1:?Usage: $0 <app-path> [output-dmg-path] [volume-name]}"
 APP_NAME=$(basename "$APP_PATH" .app)
 OUTPUT="${2:-$APP_NAME.dmg}"
+VOLNAME="${3:-$APP_NAME}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACKGROUND="$SCRIPT_DIR/../assets/dmg-background.png"
 
@@ -46,9 +47,10 @@ echo "Creating DMG for $APP_NAME..."
 echo "  App:        $APP_PATH"
 echo "  Background: $BACKGROUND"
 echo "  Output:     $OUTPUT"
+echo "  Volname:    $VOLNAME"
 
 create-dmg \
-    --volname "$APP_NAME" \
+    --volname "$VOLNAME" \
     --background "$BACKGROUND" \
     --window-pos 200 120 \
     --window-size 660 400 \

@@ -27,6 +27,7 @@ jobs:
       ARCHIVE_PATH: ${{ github.workspace }}/build/WiFiLens.xcarchive
       EXPORT_PATH: ${{ github.workspace }}/build/export
       DMG_BASENAME: WiFiLens
+      APP_BUNDLE_NAME: "WiFi Lens"
     steps:
       - uses: actions/checkout@v7
         with:
@@ -220,11 +221,11 @@ jobs:
 
       - name: Prepare App Bundle
         run: |
-          ditto "$APP_PATH" "$DMG_BASENAME.app"
+          ditto "$APP_PATH" "$APP_BUNDLE_NAME.app"
 
       - name: Create DMG
         run: |
-          bash scripts/create-dmg.sh "$DMG_BASENAME.app" "$DMG_BASENAME.dmg"
+          bash scripts/create-dmg.sh "$APP_BUNDLE_NAME.app" "$DMG_BASENAME.dmg" "$DMG_BASENAME"
 
       - name: Sign DMG
         run: |
