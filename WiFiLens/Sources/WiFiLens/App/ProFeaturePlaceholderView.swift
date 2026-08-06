@@ -25,7 +25,7 @@ struct ProBadge: View {
                 )
         }
         .fixedSize()
-        .accessibilityLabel("Pro feature")
+        .accessibilityLabel(String(localized: "pro.accessibility.badge", comment: "Accessibility label for Pro badge"))
     }
 }
 

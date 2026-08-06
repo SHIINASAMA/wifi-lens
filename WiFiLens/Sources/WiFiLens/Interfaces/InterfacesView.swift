@@ -175,7 +175,7 @@ struct InterfacesView: View {
             indicatorPill(
                 title: String(localized: "interfaces.field.stability", comment: "Connection stability field label"),
                 value: stab.label,
-                subtitle: "\(stab.score)/100",
+                subtitle: String(format: String(localized: "format.score_fraction", comment: "Score value out of 100"), stab.score),
                 color: stab.color,
                 bar: scoreBar(stab.score, color: stab.color)
             )
@@ -338,7 +338,7 @@ struct InterfacesView: View {
 
     private var monitorChartHeader: some View {
         Button {
-            withAnimation(reduceMotion ? nil : .default) { isMonitorChartCollapsed.toggle() }
+            withAnimation(reduceMotion ? nil : .snappy(duration: 0.22)) { isMonitorChartCollapsed.toggle() }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: isMonitorChartCollapsed ? "chevron.right" : "chevron.down")
@@ -362,7 +362,7 @@ struct InterfacesView: View {
 
     private var monitorTableHeader: some View {
         Button {
-            withAnimation(reduceMotion ? nil : .default) { isMonitorTableCollapsed.toggle() }
+            withAnimation(reduceMotion ? nil : .snappy(duration: 0.22)) { isMonitorTableCollapsed.toggle() }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: isMonitorTableCollapsed ? "chevron.right" : "chevron.down")
@@ -373,7 +373,7 @@ struct InterfacesView: View {
                 Text(String(localized: "nav.interfaces", comment: "Interfaces sidebar navigation item"))
                     .font(.callout.weight(.semibold))
                 Spacer()
-                Text("\(monitorInterfaces.count) \(String(localized: "interfaces.label.interfaces", comment: "Interfaces plural unit"))")
+                Text(String(format: String(localized: "interfaces.count_format", comment: "Interface count with number"), monitorInterfaces.count))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

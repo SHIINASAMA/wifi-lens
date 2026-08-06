@@ -4,6 +4,7 @@ import SceneKit
 struct OverviewView: View {
     @Bindable var viewModel: ScannerViewModel
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     let store: WiFiObservationStore
 
@@ -57,7 +58,7 @@ struct OverviewView: View {
                     VStack(spacing: 16) {
                         // State icon — rotating 3D Earth
                         let stateColor = wifi != nil ? rssiColor(wifi!.rssi ?? -100) : Color.secondary
-                        EarthGlobeView(color: stateColor)
+                        EarthGlobeView(color: stateColor, reduceMotion: reduceMotion)
                             .frame(width: 240, height: 240)
                             .accessibilityHidden(true)
 
@@ -122,7 +123,7 @@ struct OverviewView: View {
                             .foregroundColor(.secondary)
                             .lineLimit(1)
                         if let ch = wifi.channel {
-                            Text("·  \(bandName(ch))  ·  Ch \(ch)")
+                            Text(String(format: String(localized: "format.band_channel_separator", comment: "Band and channel separator with values"), bandName(ch), ch))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                                 .lineLimit(1)
@@ -132,7 +133,7 @@ struct OverviewView: View {
                 Spacer(minLength: 12)
 
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text("\(wifi.rssi ?? -100) dBm")
+                    Text(String(format: String(localized: "format.rssi_dbm", comment: "RSSI value with dBm unit"), wifi.rssi ?? -100))
                         .font(.caption.monospacedDigit())
                         .foregroundColor(rssiColor(wifi.rssi ?? -100))
                         .accessibilityLabel(String(format: String(localized: "roaming.accessibility.rssi_fmt", comment: "RSSI accessibility label with value and quality"), wifi.rssi ?? -100, signalLabel(wifi.rssi ?? -100)))
@@ -442,6 +443,19 @@ private final class GlobeContainerView: NSView {
     private var globeView: SCNView?
     private var pendingTint: NSColor?
 
+    /// Respects Reduce Motion: when enabled, the globe renders a static frame
+    /// and the SceneKit render loop is stopped instead of playing ambient motion.
+    var reduceMotion: Bool = false {
+        didSet {
+            guard reduceMotion != oldValue else { return }
+            if reduceMotion {
+                globeView?.isPlaying = false
+            } else {
+                updatePlaybackIfVisible()
+            }
+        }
+    }
+
     var scene: SCNScene? {
         didSet { updatePlaybackIfVisible() }
     }
@@ -458,7 +472,7 @@ private final class GlobeContainerView: NSView {
     func updatePlaybackIfVisible() {
         guard let window, window.isVisible, !bounds.isEmpty else { return }
         guard globeView == nil else {
-            globeView?.isPlaying = true
+            globeView?.isPlaying = !reduceMotion
             return
         }
         guard let scene else { return }
@@ -469,7 +483,7 @@ private final class GlobeContainerView: NSView {
         view.antialiasingMode = .multisampling8X
         view.preferredFramesPerSecond = 0
         view.scene = scene
-        view.isPlaying = true
+        view.isPlaying = !reduceMotion
         view.frame = bounds
         view.autoresizingMask = [.width, .height]
         addSubview(view)
@@ -519,6 +533,7 @@ private final class GlobeContainerView: NSView {
 
 private struct EarthGlobeView: NSViewRepresentable {
     let color: Color
+    let reduceMotion: Bool
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
@@ -600,9 +615,11 @@ private struct EarthGlobeView: NSViewRepresentable {
             (1.3, 103.8), (50.1, 8.7), (-33.9, 151.2), (-23.5, -46.6),
         ]
         let hubPairs: [(Int, Int)] = [(0,1),(1,2),(2,5),(3,4),(4,7),(5,3),(0,3),(6,4),(7,0),(2,3)]
+        var tubeNodes: [SCNNode] = []
 
         // Create hub dots + store unit positions for tubes
         var hubUnitPos: [SCNVector3] = []
+        var hubNodes: [SCNNode] = []
         for (lat, lon) in hubs {
             let p = spherePoint(lat: lat, lon: lon)
             hubUnitPos.append(p)
@@ -613,11 +630,7 @@ private struct EarthGlobeView: NSViewRepresentable {
             let node = SCNNode(geometry: dot)
             node.position = SCNVector3(p.x * hubRadius, p.y * hubRadius, p.z * hubRadius)
             earthNode.addChildNode(node)
-
-            let pulse = CABasicAnimation(keyPath: "opacity")
-            pulse.fromValue = 0.3; pulse.toValue = 1.0; pulse.duration = 1.2
-            pulse.autoreverses = true; pulse.repeatCount = .greatestFiniteMagnitude
-            node.addAnimation(pulse, forKey: "pulse")
+            hubNodes.append(node)
         }
 
         // Connection tubes between hub pairs
@@ -635,11 +648,7 @@ private struct EarthGlobeView: NSViewRepresentable {
             tubeNode.position = midP
             tubeNode.look(at: toP, up: SCNVector3(0, 1, 0), localFront: SCNVector3(0, 1, 0))
             earthNode.addChildNode(tubeNode)
-
-            let fade = CABasicAnimation(keyPath: "opacity")
-            fade.fromValue = 0.15; fade.toValue = 0.45; fade.duration = Double.random(in: 2...4)
-            fade.autoreverses = true; fade.repeatCount = .greatestFiniteMagnitude
-            tubeNode.addAnimation(fade, forKey: "flow")
+            tubeNodes.append(tubeNode)
         }
 
         // Camera
@@ -650,7 +659,75 @@ private struct EarthGlobeView: NSViewRepresentable {
         cameraNode.position = SCNVector3(0, 0, 3.5)
         scene.rootNode.addChildNode(cameraNode)
 
-        // Rotation
+        // Keep node references so Reduce Motion can start/stop ambient motion.
+        context.coordinator.scene = scene
+        context.coordinator.earthNode = earthNode
+        context.coordinator.innerGlowNode = innerGlowNode
+        context.coordinator.glowNode = glowNode
+        context.coordinator.hubNodes = hubNodes
+        context.coordinator.tubeNodes = tubeNodes
+        context.coordinator.reduceMotion = reduceMotion
+
+        if !reduceMotion {
+            startAnimations(on: context.coordinator)
+        }
+
+        let container = GlobeContainerView()
+        container.tint = NSColor(color)
+        container.reduceMotion = reduceMotion
+        container.scene = scene
+        DispatchQueue.main.async { container.updatePlaybackIfVisible() }
+        return container
+    }
+
+    func updateNSView(_ nsView: GlobeContainerView, context: Context) {
+        nsView.tint = NSColor(color)
+        nsView.reduceMotion = reduceMotion
+        let coordinator = context.coordinator
+        guard coordinator.reduceMotion != reduceMotion else { return }
+        coordinator.reduceMotion = reduceMotion
+        if reduceMotion {
+            stopAnimations(on: coordinator)
+        } else {
+            startAnimations(on: coordinator)
+        }
+    }
+
+    class Coordinator {
+        var scene: SCNScene?
+        var earthNode: SCNNode?
+        var innerGlowNode: SCNNode?
+        var glowNode: SCNNode?
+        var hubNodes: [SCNNode] = []
+        var tubeNodes: [SCNNode] = []
+        var reduceMotion = false
+    }
+
+    // MARK: - Ambient Motion
+
+    private func startAnimations(on coordinator: Coordinator) {
+        guard let earthNode = coordinator.earthNode,
+              let innerGlowNode = coordinator.innerGlowNode,
+              let glowNode = coordinator.glowNode else { return }
+
+        // Remove any existing keys first so repeated start transitions can
+        // never stack duplicate CAAnimation instances on the same node.
+        stopAnimations(on: coordinator)
+
+        for node in coordinator.hubNodes {
+            let pulse = CABasicAnimation(keyPath: "opacity")
+            pulse.fromValue = 0.3; pulse.toValue = 1.0; pulse.duration = 1.2
+            pulse.autoreverses = true; pulse.repeatCount = .greatestFiniteMagnitude
+            node.addAnimation(pulse, forKey: "pulse")
+        }
+
+        for tube in coordinator.tubeNodes {
+            let fade = CABasicAnimation(keyPath: "opacity")
+            fade.fromValue = 0.15; fade.toValue = 0.45; fade.duration = Double.random(in: 2...4)
+            fade.autoreverses = true; fade.repeatCount = .greatestFiniteMagnitude
+            tube.addAnimation(fade, forKey: "flow")
+        }
+
         let rotate = CABasicAnimation(keyPath: "rotation")
         rotate.fromValue = SCNVector4(0, 1, 0, 0)
         rotate.toValue = SCNVector4(0, 1, 0, Float.pi * 2)
@@ -659,19 +736,13 @@ private struct EarthGlobeView: NSViewRepresentable {
         earthNode.addAnimation(rotate, forKey: "rotate")
         innerGlowNode.addAnimation(rotate, forKey: "rotate")
         glowNode.addAnimation(rotate, forKey: "rotate")
-
-        context.coordinator.scene = scene
-
-        let container = GlobeContainerView()
-        container.tint = NSColor(color)
-        container.scene = scene
-        DispatchQueue.main.async { container.updatePlaybackIfVisible() }
-        return container
     }
 
-    func updateNSView(_ nsView: GlobeContainerView, context: Context) {
-        nsView.tint = NSColor(color)
+    private func stopAnimations(on coordinator: Coordinator) {
+        coordinator.hubNodes.forEach { $0.removeAnimation(forKey: "pulse") }
+        coordinator.tubeNodes.forEach { $0.removeAnimation(forKey: "flow") }
+        coordinator.earthNode?.removeAnimation(forKey: "rotate")
+        coordinator.innerGlowNode?.removeAnimation(forKey: "rotate")
+        coordinator.glowNode?.removeAnimation(forKey: "rotate")
     }
-
-    class Coordinator { var scene: SCNScene? }
 }

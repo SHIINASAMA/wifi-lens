@@ -249,6 +249,7 @@ private struct AppRootView: View {
     #endif
     #endif
                 }
+                .animation(reduceMotion ? nil : .easeOut(duration: 0.12), value: selectedPage)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 .overlay(alignment: .bottom) {
                     // OSS `.banner` export strategy only: renders while the

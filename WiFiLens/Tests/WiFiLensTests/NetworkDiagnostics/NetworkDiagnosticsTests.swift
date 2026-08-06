@@ -782,7 +782,7 @@ struct NetworkDiagnosticsTests {
         #expect(!result.evidence.contains { $0.code.hasPrefix("gateway.") })
     }
 
-    @Test("Microsoft captive-portal probe rejects a rewritten response")
+    @Test("captive-portal probe rejects a rewritten response")
     func captivePortalProbeRejectsRewrittenResponse() async {
         let check = HTTPSControlEndpointCheck(
             loader: StubControlLoader(
@@ -798,13 +798,13 @@ struct NetworkDiagnosticsTests {
         #expect(result.evidence.contains(.init(code: "captive-portal.suspected", value: nil)))
     }
 
-    @Test("control endpoint success verifies HTTPS and the documented Microsoft body")
+    @Test("control endpoint success verifies HTTPS and Apple's captive-portal Success body")
     func controlEndpointSuccess() async {
         let check = HTTPSControlEndpointCheck(
             loader: StubControlLoader(
                 httpsStatus: 200,
                 httpStatus: 200,
-                httpBody: "Microsoft Connect Test"
+                httpBody: "Success"
             )
         )
 
@@ -847,7 +847,7 @@ struct NetworkDiagnosticsTests {
         #expect(!result.evidence.contains { $0.value == "192.0.2.10:443" })
     }
 
-    @Test("Apple HTTPS success and Microsoft HTTP timeout is indeterminate")
+    @Test("control endpoint success and captive-portal timeout is indeterminate")
     func controlEndpointMicrosoftTimeoutIsIndeterminate() async {
         let result = await HTTPSControlEndpointCheck(
             loader: StubControlLoader(
@@ -866,7 +866,7 @@ struct NetworkDiagnosticsTests {
         )))
     }
 
-    @Test("Apple HTTPS success and Microsoft HTTP timeout needs attention")
+    @Test("control endpoint success and captive-portal timeout needs attention")
     func controlEndpointMicrosoftTimeoutConclusion() async {
         let internet = await HTTPSControlEndpointCheck(
             loader: StubControlLoader(
@@ -897,7 +897,7 @@ struct NetworkDiagnosticsTests {
                 httpsStatus: nil,
                 httpsErrorCode: String(URLError.secureConnectionFailed.rawValue),
                 httpStatus: 200,
-                httpBody: "Microsoft Connect Test"
+                httpBody: "Success"
             )
         ).run()
         let certificateTimeFailure = await HTTPSControlEndpointCheck(
@@ -905,7 +905,7 @@ struct NetworkDiagnosticsTests {
                 httpsStatus: nil,
                 httpsErrorCode: String(URLError.serverCertificateNotYetValid.rawValue),
                 httpStatus: 200,
-                httpBody: "Microsoft Connect Test"
+                httpBody: "Success"
             )
         ).run()
         let certificateValidationFailure = await HTTPSControlEndpointCheck(
@@ -913,7 +913,7 @@ struct NetworkDiagnosticsTests {
                 httpsStatus: nil,
                 httpsErrorCode: String(URLError.serverCertificateUntrusted.rawValue),
                 httpStatus: 200,
-                httpBody: "Microsoft Connect Test"
+                httpBody: "Success"
             )
         ).run()
         let connectivityFailure = await HTTPSControlEndpointCheck(
@@ -921,14 +921,14 @@ struct NetworkDiagnosticsTests {
                 httpsStatus: nil,
                 httpsErrorCode: String(URLError.timedOut.rawValue),
                 httpStatus: 200,
-                httpBody: "Microsoft Connect Test"
+                httpBody: "Success"
             )
         ).run()
         let httpsStatusFailure = await HTTPSControlEndpointCheck(
             loader: StubControlLoader(
                 httpsStatus: 503,
                 httpStatus: 200,
-                httpBody: "Microsoft Connect Test"
+                httpBody: "Success"
             )
         ).run()
         let captivePortalRedirect = await HTTPSControlEndpointCheck(
@@ -1001,7 +1001,7 @@ struct NetworkDiagnosticsTests {
             loader: StubControlLoader(
                 httpsStatus: 200,
                 httpStatus: 200,
-                httpBody: "Microsoft Connect Test",
+                httpBody: "Success",
                 recorder: recorder
             )
         )
@@ -1010,7 +1010,7 @@ struct NetworkDiagnosticsTests {
 
         #expect(Set(await recorder.urls) == Set([
             "https://www.apple.com/",
-            "http://www.msftconnecttest.com/connecttest.txt",
+            "https://captive.apple.com/hotspot-detect.html",
         ]))
         #expect(await recorder.timeouts == [.seconds(5), .seconds(5)])
     }
@@ -1034,7 +1034,7 @@ struct NetworkDiagnosticsTests {
         #expect(configuration.proxyConfigurations.isEmpty)
     }
 
-    @Test("app permits temporary HTTP only for the Microsoft captive-portal endpoint")
+    @Test("app scopes the ATS HTTP exception to the Microsoft captive-portal/proxy endpoint")
     func temporaryCaptivePortalATSException() {
         let ats = Bundle.main.object(forInfoDictionaryKey: "NSAppTransportSecurity") as? [String: Any]
         let domains = ats?["NSExceptionDomains"] as? [String: Any]
@@ -1064,7 +1064,7 @@ struct NetworkDiagnosticsTests {
         #expect(result.evidence.contains(.init(code: "dns.indeterminate-count", value: "0/3")))
     }
 
-    @Test("DNS uses the three temporary third-party probe targets")
+    @Test("DNS uses the three authoritative third-party probe targets")
     func dnsProbeTargets() {
         let check = DNSResolutionCheck(resolver: StubDNSResolver(.resolved))
 
@@ -2943,10 +2943,10 @@ private actor ConcurrentControlLoader: ControlEndpointLoading {
         maximumInFlight = max(maximumInFlight, inFlight)
         try? await Task.sleep(for: .milliseconds(20))
         inFlight -= 1
-        if url.scheme == "https" {
-            return .init(status: 200, body: nil, errorCode: nil)
+        if url.host == "captive.apple.com" {
+            return .init(status: 200, body: "Success", errorCode: nil)
         }
-        return .init(status: 200, body: "Microsoft Connect Test", errorCode: nil)
+        return .init(status: 200, body: nil, errorCode: nil)
     }
 }
 
@@ -2954,10 +2954,10 @@ private struct MetricsControlLoader: ControlEndpointLoading {
     let metrics: ControlEndpointMetrics
 
     func load(url: URL, timeout: Duration) async -> ControlEndpointLoadResult {
-        if url.scheme == "https" {
-            return .init(status: 200, body: nil, errorCode: nil, metrics: metrics)
+        if url.host == "captive.apple.com" {
+            return .init(status: 200, body: "Success", errorCode: nil)
         }
-        return .init(status: 200, body: "Microsoft Connect Test", errorCode: nil)
+        return .init(status: 200, body: nil, errorCode: nil, metrics: metrics)
     }
 }
 
@@ -3048,10 +3048,10 @@ private struct StubControlLoader: ControlEndpointLoading {
 
     func load(url: URL, timeout: Duration) async -> ControlEndpointLoadResult {
         await recorder?.record(url: url, timeout: timeout)
-        if url.scheme == "https" {
-            return .init(status: httpsStatus, body: nil, errorCode: httpsErrorCode)
+        if url.host == "captive.apple.com" {
+            return .init(status: httpStatus, body: httpBody, errorCode: httpErrorCode)
         }
-        return .init(status: httpStatus, body: httpBody, errorCode: httpErrorCode)
+        return .init(status: httpsStatus, body: nil, errorCode: httpsErrorCode)
     }
 }
 

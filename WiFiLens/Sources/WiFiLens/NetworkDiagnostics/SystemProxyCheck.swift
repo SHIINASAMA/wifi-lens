@@ -410,6 +410,10 @@ struct ContinuousProxyCheckClock: ProxyCheckClock {
 
 struct SystemProxyCheck: DiagnosticCheck {
     let id = NetworkDiagnosticCheckID.proxy
+    // Authoritative Microsoft NCSI endpoint. Kept as plain HTTP on purpose:
+    // the proxy check exercises the same unencrypted request a captive
+    // portal would intercept. Covered by the scoped ATS exception for
+    // www.msftconnecttest.com only; no personal data is transmitted.
     private static let defaultHTTPTarget = URL(
         string: "http://www.msftconnecttest.com/connecttest.txt"
     )!

@@ -116,7 +116,7 @@ private final class DNSResolutionContext: @unchecked Sendable {
 }
 
 struct DNSResolutionCheck: DiagnosticCheck {
-    // Temporary third-party probe targets pending product-controlled DNS names.
+    // Authoritative third-party DNS probe targets (no self-hosted endpoints).
     private static let defaultProbeTargets = [
         "www.apple.com",
         "www.microsoft.com",

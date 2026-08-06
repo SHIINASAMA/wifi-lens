@@ -108,8 +108,11 @@ struct HTTPSControlEndpointCheck: DiagnosticCheck {
 
     let id = NetworkDiagnosticCheckID.internet
     let httpsEndpoint = Self.stableHTTPSEndpoint
-    let captivePortalEndpoint = URL(string: "http://www.msftconnecttest.com/connecttest.txt")!
-    let expectedCaptivePortalBody = "Microsoft Connect Test"
+    // Authoritative captive-portal probe (Apple). HTTPS keeps the control
+    // check free of the ATS exception still required by the HTTP-only
+    // Microsoft NCSI target used in SystemProxyCheck.
+    let captivePortalEndpoint = URL(string: "https://captive.apple.com/hotspot-detect.html")!
+    let expectedCaptivePortalBody = "Success"
 
     private let loader: any ControlEndpointLoading
     private let timeout: Duration
@@ -251,7 +254,7 @@ struct HTTPSControlEndpointCheck: DiagnosticCheck {
                 evidence: .init(code: "captive-portal.http-status", value: String(status))
             )
         }
-        guard response.body == expectedCaptivePortalBody else {
+        guard response.body?.localizedCaseInsensitiveContains(expectedCaptivePortalBody) == true else {
             return EndpointEvaluation(
                 succeeded: false,
                 evidence: .init(code: "captive-portal.suspected", value: nil)

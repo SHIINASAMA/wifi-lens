@@ -8379,25 +8379,31 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "·  %1$@  ·  Ch %2$@"
+            "value": "·  %1$@  ·  Ch %2$lld"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "·  %1$@  ·  Ch %2$@"
+            "value": "·  %1$@  ·  Ch %2$lld"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "·  %1$@  ·  Ch %2$@"
+            "value": "·  %1$@  ·  Ch %2$lld"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "·  %1$@  ·  Ch %2$@"
+            "value": "·  %1$@  ·  Ch %2$lld"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "·  %1$@  ·  Ch %2$lld"
           }
         }
       },
@@ -8410,25 +8416,31 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "CH %1$@  %2$@ dBm"
+            "value": "CH %1$lld  %2$lld dBm"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "CH %1$@  %2$@ dBm"
+            "value": "CH %1$lld  %2$lld dBm"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "CH %1$@  %2$@ dBm"
+            "value": "CH %1$lld  %2$lld dBm"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "CH %1$@  %2$@ dBm"
+            "value": "CH %1$lld  %2$lld dBm"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CH %1$lld  %2$lld dBm"
           }
         }
       },
@@ -8718,31 +8730,31 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ dBm"
+            "value": "%lld dBm"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ dBm"
+            "value": "%lld dBm"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ dBm"
+            "value": "%lld dBm"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ dBm"
+            "value": "%lld dBm"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ dBm"
+            "value": "%lld dBm"
           }
         }
       },
@@ -29108,6 +29120,41 @@
         }
       }
     },
+    "analysis.statistics.severity_none": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No severity data available"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Schweregrad-Daten verfügbar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay datos de gravedad disponibles"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重要度データがありません"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无严重度数据"
+          }
+        }
+      }
+    },
     "analysis.statistics.severity_warning": {
       "extractionState": "manual",
       "localizations": {
@@ -33164,6 +33211,217 @@
           "stringUnit": {
             "state": "translated",
             "value": "分析趋势与洞察"
+          }
+        }
+      }
+    },
+    "format.score_fraction": {
+      "shouldTranslate": false,
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld/100"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld/100"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld/100"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld/100"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld/100"
+          }
+        }
+      }
+    },
+    "interfaces.count_format": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld interfaces"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Schnittstellen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld interfaces"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 個のインターフェース"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 个接口"
+          }
+        }
+      }
+    },
+    "common.samples_count_fmt": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld samples"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Proben"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld muestras"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld サンプル"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 个样本"
+          }
+        }
+      }
+    },
+    "spectrum.accessibility.chart_label": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wi-Fi spectrum chart"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wi-Fi-Spektrumdiagramm"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gráfico del espectro Wi-Fi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wi-Fi スペクトルチャート"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wi-Fi 频谱图"
+          }
+        }
+      }
+    },
+    "spectrum.accessibility.heatmap_label": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Channel occupancy heatmap"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanalbelegungs-Heatmap"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mapa de calor de ocupación de canales"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "チャンネル占有率のヒートマップ"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "信道占用热力图"
+          }
+        }
+      }
+    },
+    "pro.accessibility.badge": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro feature"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro-Funktion"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Función Pro"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro機能"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro 功能"
           }
         }
       }
