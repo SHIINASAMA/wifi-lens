@@ -252,7 +252,7 @@ private struct ChannelCard: View {
                     }
                 }
                 .frame(height: 6)
-                Text("\(channel.rfScore)/100")
+                Text(String(format: String(localized: "format.score_fraction", comment: "Score value out of 100"), channel.rfScore))
                     .font(.caption.monospacedDigit())
                     .foregroundColor(.secondary)
             }
@@ -268,7 +268,7 @@ private struct ChannelCard: View {
                 }
                 HStack(spacing: 4) {
                     Image(systemName: "wave.3.right").font(.caption2).foregroundColor(.secondary)
-                    Text("\(channel.strongestNeighborRSSI) dBm").font(.caption).foregroundColor(.secondary)
+                    Text(String(format: String(localized: "format.rssi_dbm", comment: "RSSI value with dBm unit"), channel.strongestNeighborRSSI)).font(.caption).foregroundColor(.secondary)
                 }
                 HStack(spacing: 4) {
                     Text(channel.overlapLevel.displayName)

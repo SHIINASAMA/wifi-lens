@@ -111,7 +111,7 @@ private struct BLEScannerContentView: View {
             .width(min: 60, ideal: 70)
 
             TableColumn(String(localized: "ble.table.col.smoothed", comment: "Smoothed RSSI column header")) { device in
-                Text(String(format: "%.0f dBm", device.smoothedRSSI))
+                Text(String(format: String(localized: "format.rssi_dbm", comment: "RSSI value with dBm unit"), Int(device.smoothedRSSI.rounded())))
                     .font(.caption.monospaced())
                     .foregroundColor(.secondary)
             }
@@ -173,7 +173,7 @@ private struct BLEScannerContentView: View {
             HStack(spacing: 16) {
                 if let first = history.first {
                     LabeledContent(String(localized: "common.label.first", comment: "First data point label")) {
-                        Text("\(first.rawRSSI) dBm")
+                        Text(String(format: String(localized: "format.rssi_dbm", comment: "RSSI value with dBm unit"), first.rawRSSI))
                             .font(.caption.monospaced())
                     }
                     .font(.caption2)
@@ -181,7 +181,7 @@ private struct BLEScannerContentView: View {
                 }
                 if let last = history.last {
                     LabeledContent(String(localized: "common.label.latest", comment: "Latest/most recent data point label")) {
-                        Text("\(last.rawRSSI) dBm")
+                        Text(String(format: String(localized: "format.rssi_dbm", comment: "RSSI value with dBm unit"), last.rawRSSI))
                             .font(.caption.monospaced())
                     }
                     .font(.caption2)
@@ -195,7 +195,7 @@ private struct BLEScannerContentView: View {
                     .font(.caption2)
                     .foregroundColor(.secondary)
                     LabeledContent(String(localized: "ble.trend.ema", comment: "EMA (Exponential Moving Average) abbreviation")) {
-                        Text(String(format: "%.0f dBm", device.smoothedRSSI))
+                        Text(String(format: String(localized: "format.rssi_dbm", comment: "RSSI value with dBm unit"), Int(device.smoothedRSSI.rounded())))
                             .font(.caption.monospaced().bold())
                     }
                     .font(.caption2)

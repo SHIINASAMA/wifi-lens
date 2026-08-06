@@ -123,7 +123,7 @@ struct OverviewView: View {
                             .foregroundColor(.secondary)
                             .lineLimit(1)
                         if let ch = wifi.channel {
-                            Text("·  \(bandName(ch))  ·  Ch \(ch)")
+                            Text(String(format: String(localized: "format.band_channel_separator", comment: "Band and channel separator with values"), bandName(ch), ch))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                                 .lineLimit(1)
@@ -133,7 +133,7 @@ struct OverviewView: View {
                 Spacer(minLength: 12)
 
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text("\(wifi.rssi ?? -100) dBm")
+                    Text(String(format: String(localized: "format.rssi_dbm", comment: "RSSI value with dBm unit"), wifi.rssi ?? -100))
                         .font(.caption.monospacedDigit())
                         .foregroundColor(rssiColor(wifi.rssi ?? -100))
                         .accessibilityLabel(String(format: String(localized: "roaming.accessibility.rssi_fmt", comment: "RSSI accessibility label with value and quality"), wifi.rssi ?? -100, signalLabel(wifi.rssi ?? -100)))

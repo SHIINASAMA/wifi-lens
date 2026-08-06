@@ -136,7 +136,7 @@ struct WiFiBandChart: View {
                         heatmapOverlay(geo: chartGeo)
                         dataLabelOverlay(geo: chartGeo)
                     }
-                    .accessibilityLabel("WiFi spectrum chart")
+                    .accessibilityLabel(String(localized: "spectrum.accessibility.chart_label", comment: "Spectrum chart accessibility label"))
                     .onContinuousHover(coordinateSpace: .local) { phase in
                         switch phase {
                         case .active(let location):
@@ -180,7 +180,7 @@ struct WiFiBandChart: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Channel occupancy heatmap")
+        .accessibilityLabel(String(localized: "spectrum.accessibility.heatmap_label", comment: "Channel occupancy heatmap accessibility label"))
     }
 
     private func dataLabelOverlay(geo: ChartGeometry) -> some View {
@@ -271,7 +271,7 @@ struct WiFiBandChart: View {
                         heatmapOverlay(geo: chartGeo)
                         dataLabelOverlay(geo: chartGeo)
                     }
-                    .accessibilityLabel("WiFi spectrum chart")
+                    .accessibilityLabel(String(localized: "spectrum.accessibility.chart_label", comment: "Spectrum chart accessibility label"))
                     .onContinuousHover(coordinateSpace: .local) { phase in
                         switch phase {
                         case .active(let location):
@@ -314,7 +314,7 @@ private struct ChartTooltip: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(ssid).font(.caption.weight(.semibold)).foregroundColor(.primary)
-            Text("CH \(channel)  \(rssi) dBm").font(.caption2).foregroundColor(.secondary)
+            Text(String(format: String(localized: "format.channel_rssi", comment: "Channel and RSSI values"), channel, rssi)).font(.caption2).foregroundColor(.secondary)
             Text(bssid).font(.caption2).foregroundColor(.secondary)
         }
         .padding(.horizontal, 6).padding(.vertical, 4)
