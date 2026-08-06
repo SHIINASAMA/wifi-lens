@@ -9,9 +9,11 @@ private final class FakeAudioPlayer: APRadarAudioPlaying {
     private(set) var prepareCallCount = 0
     private(set) var playCallCount = 0
     private(set) var stopCallCount = 0
+    private(set) var lastPreparedPreset: APRadarSoundPreset?
 
-    func prepare() throws {
+    func prepare(preset: APRadarSoundPreset) throws {
         prepareCallCount += 1
+        lastPreparedPreset = preset
         if prepareShouldThrow {
             throw APRadarAudioError.resourceNotFound
         }
@@ -33,15 +35,18 @@ private final class FakePulseScheduler: APRadarPulseScheduling {
     private(set) var startCount = 0
     private(set) var cancelCount = 0
     private(set) var activeOverride = false
+    private(set) var lastStochastic: Bool?
 
     var isActive: Bool { activeOverride }
 
     func start(
         shouldContinue: @escaping @MainActor () -> Bool,
         intervalProvider: @escaping @MainActor () -> Duration,
-        playPulse: @escaping @MainActor () -> Void
+        playPulse: @escaping @MainActor () -> Void,
+        stochastic: Bool
     ) {
         startCount += 1
+        lastStochastic = stochastic
     }
 
     func cancel() {
@@ -67,15 +72,16 @@ struct APRadarViewModelTests {
         audio: FakeAudioPlayer = FakeAudioPlayer(),
         scheduler: FakePulseScheduler = FakePulseScheduler(),
         defaults: UserDefaults? = nil
-    ) -> (viewModel: APRadarViewModel, runtime: WiFiObservationRuntime, audio: FakeAudioPlayer, scheduler: FakePulseScheduler) {
+    ) -> (viewModel: APRadarViewModel, runtime: WiFiObservationRuntime, audio: FakeAudioPlayer, scheduler: FakePulseScheduler, defaults: UserDefaults) {
         let runtime = WiFiObservationRuntime(store: WiFiObservationStore())
+        let resolvedDefaults = defaults ?? makeDefaults()
         let vm = APRadarViewModel(
             observationRuntime: runtime,
             audioPlayer: audio,
             scheduler: scheduler,
-            userDefaults: defaults ?? makeDefaults()
+            userDefaults: resolvedDefaults
         )
-        return (vm, runtime, audio, scheduler)
+        return (vm, runtime, audio, scheduler, resolvedDefaults)
     }
 
     private func makeNetwork(
@@ -183,6 +189,28 @@ struct APRadarViewModelTests {
         #expect(snapshot?.rawRSSI == -60)
         #expect(snapshot?.smoothedRSSI == -60)
         #expect(snapshot?.lastSeenAt == t0)
+    }
+
+    @Test("reappearing target without SSID keeps identity and refreshes channel/band")
+    func reappearingTargetWithoutSSIDKeepsIdentity() async throws {
+        // Regression: consume() used to read and modify the @Observable
+        // `target` property inside one expression when the fresh sample had no
+        // SSID, trapping with an exclusivity conflict in Debug builds.
+        let harness = makeHarness()
+        activateAndSelect(harness.viewModel, bssid: "AA:BB:CC:DD:EE:FF", ssid: "Home Wi-Fi")
+        let t0 = Date(timeIntervalSince1970: 100)
+
+        try await harness.viewModel.consume(
+            makeObservation(timestamp: t0, networks: [
+                makeNetwork(ssid: nil, bssid: "AA:BB:CC:DD:EE:FF", rssi: -53, channel: 149, band: .band5GHz)
+            ])
+        )
+        let snapshot = trackingSnapshot(harness.viewModel)
+        #expect(snapshot?.rawRSSI == -53)
+        #expect(snapshot?.smoothedRSSI == -53)
+        #expect(snapshot?.target.currentSSID == "Home Wi-Fi")
+        #expect(snapshot?.target.channel == 149)
+        #expect(snapshot?.target.band == .band5GHz)
     }
 
     // MARK: - Signal lost
@@ -472,5 +500,232 @@ struct APRadarViewModelTests {
             makeObservation(timestamp: Date(timeIntervalSince1970: 101), networks: [makeNetwork(bssid: "AA:BB:CC:DD:EE:FF", rssi: -50)])
         )
         #expect(trackingSnapshot(harness.viewModel) != nil)
+    }
+
+    // MARK: - Sound presets
+
+    @Test("changing the preset persists the choice and reloads audio")
+    func changingPresetPersistsAndReloads() async throws {
+        let harness = makeHarness()
+        activateAndSelect(harness.viewModel)
+        try await harness.viewModel.consume(
+            makeObservation(timestamp: Date(timeIntervalSince1970: 100), networks: [makeNetwork(bssid: "AA:BB:CC:DD:EE:FF", rssi: -54)])
+        )
+        // Audio is prepared once the first valid sample arrives.
+        #expect(harness.audio.prepareCallCount >= 1)
+        #expect(harness.audio.lastPreparedPreset == .softPulse)
+
+        harness.viewModel.setSoundPreset(.blip)
+
+        #expect(harness.viewModel.soundPreset == .blip)
+        #expect(harness.defaults.string(forKey: APRadarViewModel.soundPresetKey) == "blip")
+        #expect(harness.audio.lastPreparedPreset == .blip)
+    }
+
+    @Test("preset stored in preferences applies when the session begins")
+    func storedPresetAppliesOnSessionStart() {
+        let defaults = makeDefaults()
+        defaults.set("tick", forKey: APRadarViewModel.soundPresetKey)
+        let harness = makeHarness(defaults: defaults)
+        #expect(harness.viewModel.soundPreset == .tick)
+
+        harness.viewModel.setActive(true)
+        #expect(harness.viewModel.soundPreset == .tick)
+    }
+
+    @Test("unknown stored preset falls back to the default")
+    func unknownStoredPresetFallsBack() {
+        let defaults = makeDefaults()
+        defaults.set("not-a-preset", forKey: APRadarViewModel.soundPresetKey)
+        let harness = makeHarness(defaults: defaults)
+        #expect(harness.viewModel.soundPreset == .softPulse)
+    }
+
+    // MARK: - Geiger easter egg
+
+    @Test("unlocking the Geiger preset persists and reports first unlock")
+    func unlockingGeigerPersists() {
+        let harness = makeHarness()
+        #expect(harness.viewModel.geigerUnlocked == false)
+
+        #expect(harness.viewModel.unlockGeigerPreset() == true)
+        #expect(harness.viewModel.geigerUnlocked == true)
+        #expect(harness.defaults.bool(forKey: APRadarViewModel.geigerUnlockedKey) == true)
+
+        #expect(harness.viewModel.unlockGeigerPreset() == false)
+    }
+
+    @Test("an already unlocked Geiger preset is honored on session start")
+    func unlockedGeigerPersistsAcrossSessions() {
+        let defaults = makeDefaults()
+        defaults.set(true, forKey: APRadarViewModel.geigerUnlockedKey)
+        let harness = makeHarness(defaults: defaults)
+        #expect(harness.viewModel.geigerUnlocked == true)
+    }
+
+    @Test("geiger preset schedules stochastic pulses")
+    func geigerSchedulesStochasticPulses() async throws {
+        let defaults = makeDefaults()
+        defaults.set(APRadarSoundPreset.geiger.rawValue, forKey: APRadarViewModel.soundPresetKey)
+        let harness = makeHarness(defaults: defaults)
+
+        activateAndSelect(harness.viewModel)
+        try await harness.viewModel.consume(
+            makeObservation(timestamp: Date(timeIntervalSince1970: 100), networks: [makeNetwork(bssid: "AA:BB:CC:DD:EE:FF", rssi: -54)])
+        )
+
+        #expect(harness.scheduler.startCount == 1)
+        #expect(harness.scheduler.lastStochastic == true)
+        #expect(harness.audio.lastPreparedPreset == .geiger)
+    }
+
+    @Test("non-geiger presets schedule deterministic pulses")
+    func nonGeigerSchedulesDeterministicPulses() async throws {
+        let defaults = makeDefaults()
+        defaults.set(APRadarSoundPreset.blip.rawValue, forKey: APRadarViewModel.soundPresetKey)
+        let harness = makeHarness(defaults: defaults)
+
+        activateAndSelect(harness.viewModel)
+        try await harness.viewModel.consume(
+            makeObservation(timestamp: Date(timeIntervalSince1970: 100), networks: [makeNetwork(bssid: "AA:BB:CC:DD:EE:FF", rssi: -54)])
+        )
+
+        #expect(harness.scheduler.startCount == 1)
+        #expect(harness.scheduler.lastStochastic == false)
+    }
+
+    @Test("switching to geiger while tracking restarts the scheduler stochastically")
+    func switchingToGeigerRestartsScheduler() async throws {
+        let harness = makeHarness()
+        activateAndSelect(harness.viewModel)
+        try await harness.viewModel.consume(
+            makeObservation(timestamp: Date(timeIntervalSince1970: 100), networks: [makeNetwork(bssid: "AA:BB:CC:DD:EE:FF", rssi: -54)])
+        )
+        #expect(harness.scheduler.startCount == 1)
+        #expect(harness.scheduler.lastStochastic == false)
+
+        let cancelsBefore = harness.scheduler.cancelCount
+        harness.viewModel.setSoundPreset(.geiger)
+
+        #expect(harness.scheduler.startCount == 2)
+        #expect(harness.scheduler.lastStochastic == true)
+        #expect(harness.scheduler.cancelCount > cancelsBefore)
+        #expect(harness.audio.lastPreparedPreset == .geiger)
+    }
+
+    @Test("switching away from geiger restarts the scheduler deterministically")
+    func switchingAwayFromGeigerRestartsScheduler() async throws {
+        let defaults = makeDefaults()
+        defaults.set(APRadarSoundPreset.geiger.rawValue, forKey: APRadarViewModel.soundPresetKey)
+        let harness = makeHarness(defaults: defaults)
+
+        activateAndSelect(harness.viewModel)
+        try await harness.viewModel.consume(
+            makeObservation(timestamp: Date(timeIntervalSince1970: 100), networks: [makeNetwork(bssid: "AA:BB:CC:DD:EE:FF", rssi: -54)])
+        )
+        #expect(harness.scheduler.lastStochastic == true)
+
+        harness.viewModel.setSoundPreset(.softPulse)
+
+        #expect(harness.scheduler.startCount == 2)
+        #expect(harness.scheduler.lastStochastic == false)
+    }
+
+}
+
+@Suite("APRadarSoundPreviewer")
+@MainActor
+struct APRadarSoundPreviewerTests {
+    /// Polls until `condition` becomes true or the timeout elapses, so timing
+    /// assertions stay robust on slow CI machines.
+    private func waitUntil(
+        _ condition: () -> Bool,
+        timeout: Duration = .seconds(3)
+    ) async {
+        let deadline = ContinuousClock.now.advanced(by: timeout)
+        while !condition(), ContinuousClock.now < deadline {
+            try? await Task.sleep(for: .milliseconds(25))
+        }
+    }
+
+    @Test("preview prepares the preset and plays a short burst")
+    func previewPlaysShortBurst() async throws {
+        let audio = FakeAudioPlayer()
+        let previewer = APRadarSoundPreviewer(player: audio)
+
+        let started = previewer.start(preset: .tick)
+        #expect(started)
+        #expect(previewer.isPlaying)
+        #expect(audio.prepareCallCount == 1)
+        #expect(audio.lastPreparedPreset == .tick)
+
+        // The preview is three pulses at 300 ms spacing, but under the
+        // parallel full-suite load the main-actor task can be delayed, so
+        // allow a generous window before asserting the burst completed.
+        await waitUntil({ !previewer.isPlaying }, timeout: .seconds(10))
+        #expect(!previewer.isPlaying)
+        #expect(audio.playCallCount >= 3)
+        #expect(audio.stopCallCount >= 1)
+    }
+
+    @Test("stop cancels the preview task immediately")
+    func stopCancelsPreview() async throws {
+        let audio = FakeAudioPlayer()
+        let previewer = APRadarSoundPreviewer(player: audio)
+
+        previewer.start(preset: .tick)
+        await waitUntil { audio.playCallCount >= 1 }
+        previewer.stop()
+
+        let playCountAfterStop = audio.playCallCount
+        #expect(!previewer.isPlaying)
+        #expect(audio.stopCallCount >= 1)
+
+        // No further pulses may fire after cancellation.
+        try? await Task.sleep(for: .milliseconds(700))
+        #expect(audio.playCallCount == playCountAfterStop)
+    }
+
+    @Test("preview failure is non-fatal and stays silent")
+    func previewFailsGracefully() async throws {
+        let audio = FakeAudioPlayer()
+        audio.prepareShouldThrow = true
+        let previewer = APRadarSoundPreviewer(player: audio)
+
+        let started = previewer.start(preset: .blip)
+        #expect(!started)
+        #expect(!previewer.isPlaying)
+
+        try? await Task.sleep(for: .milliseconds(200))
+        #expect(audio.playCallCount == 0)
+    }
+
+    @Test("geiger preview plays a burst of irregular clicks")
+    func geigerPreviewPlaysBurst() async throws {
+        let audio = FakeAudioPlayer()
+        let previewer = APRadarSoundPreviewer(player: audio)
+
+        previewer.start(preset: .geiger)
+        #expect(audio.lastPreparedPreset == .geiger)
+        #expect(previewer.isPlaying)
+
+        try? await Task.sleep(for: .milliseconds(400))
+        #expect(audio.playCallCount >= 1)
+
+        previewer.stop()
+        #expect(!previewer.isPlaying)
+    }
+
+    @Test("toggling while playing stops the preview")
+    func toggleStopsPreview() async throws {
+        let audio = FakeAudioPlayer()
+        let previewer = APRadarSoundPreviewer(player: audio)
+
+        previewer.toggle(preset: .tick)
+        #expect(previewer.isPlaying)
+
+        previewer.toggle(preset: .tick)
+        #expect(!previewer.isPlaying)
+        #expect(audio.stopCallCount >= 1)
     }
 }

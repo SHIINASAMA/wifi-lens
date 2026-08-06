@@ -478,6 +478,7 @@
 		AR0000000000000000000028 /* ap-radar-pulse.wav in Resources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000008 /* ap-radar-pulse.wav */; };
 		AR0000000000000000000019 /* APRadarSignalProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000009 /* APRadarSignalProcessorTests.swift */; };
 		AR000000000000000000001A /* APRadarViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR000000000000000000000A /* APRadarViewModelTests.swift */; };
+		AR000000000000000000001B /* APRadarSoundSynthesizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR000000000000000000000C /* APRadarSoundSynthesizerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -826,6 +827,7 @@
 		AR0000000000000000000008 /* ap-radar-pulse.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ap-radar-pulse.wav; sourceTree = "<group>"; };
 		AR0000000000000000000009 /* APRadarSignalProcessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarSignalProcessorTests.swift; sourceTree = "<group>"; };
 		AR000000000000000000000A /* APRadarViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarViewModelTests.swift; sourceTree = "<group>"; };
+		AR000000000000000000000C /* APRadarSoundSynthesizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarSoundSynthesizerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1462,6 +1464,7 @@
 				C1D2E3F4A5B6123456789ABE /* APFilterServiceTests.swift */,
 				AR0000000000000000000009 /* APRadarSignalProcessorTests.swift */,
 				AR000000000000000000000A /* APRadarViewModelTests.swift */,
+				AR000000000000000000000C /* APRadarSoundSynthesizerTests.swift */,
 				E4A2B3C4D5E6F708112233AA /* BandPanelSelectionTests.swift */,
 				E4A2B3C4D5E6F708112233B0 /* SpectrumPanelViewTests.swift */,
 				D92298452F334CDAAA9695D3 /* WindowFramePolicyTests.swift */,
@@ -2092,6 +2095,7 @@
 				OB00000000000000000000D4 /* RuntimeTests.swift in Sources */,
 				AR0000000000000000000019 /* APRadarSignalProcessorTests.swift in Sources */,
 				AR000000000000000000001A /* APRadarViewModelTests.swift in Sources */,
+				AR000000000000000000001B /* APRadarSoundSynthesizerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

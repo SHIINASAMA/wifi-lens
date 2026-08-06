@@ -108,7 +108,7 @@ enum SidebarPage: String, CaseIterable {
         case .networkDiagnostics:
             .preview
         case .apRadar:
-            .experimental
+            .preview
         default:
             nil
         }

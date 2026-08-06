@@ -8,9 +8,26 @@ protocol APRadarPulseScheduling: AnyObject {
     func start(
         shouldContinue: @escaping @MainActor () -> Bool,
         intervalProvider: @escaping @MainActor () -> Duration,
-        playPulse: @escaping @MainActor () -> Void
+        playPulse: @escaping @MainActor () -> Void,
+        stochastic: Bool
     )
     func cancel()
+}
+
+extension APRadarPulseScheduling {
+    /// Convenience form for deterministic cadence (non-Geiger presets).
+    func start(
+        shouldContinue: @escaping @MainActor () -> Bool,
+        intervalProvider: @escaping @MainActor () -> Duration,
+        playPulse: @escaping @MainActor () -> Void
+    ) {
+        start(
+            shouldContinue: shouldContinue,
+            intervalProvider: intervalProvider,
+            playPulse: playPulse,
+            stochastic: false
+        )
+    }
 }
 
 /// Owns the single sound-pulse scheduling task. It plays one pulse, waits for
@@ -34,7 +51,8 @@ final class APRadarPulseScheduler: APRadarPulseScheduling {
     func start(
         shouldContinue: @escaping @MainActor () -> Bool,
         intervalProvider: @escaping @MainActor () -> Duration,
-        playPulse: @escaping @MainActor () -> Void
+        playPulse: @escaping @MainActor () -> Void,
+        stochastic: Bool = false
     ) {
         cancel()
         isRunning = true
@@ -42,23 +60,46 @@ final class APRadarPulseScheduler: APRadarPulseScheduling {
             while !Task.isCancelled {
                 guard let self, self.isRunning, shouldContinue() else { break }
                 playPulse()
-                // Wait in small steps. If a fresh RSSI sample shortens the
-                // desired interval, pull the next pulse forward instead of
-                // sleeping out the old, longer interval.
-                var deadline = ContinuousClock.now.advanced(by: intervalProvider())
-                while !Task.isCancelled {
-                    guard self.isRunning, shouldContinue() else { break }
-                    let remaining = deadline - ContinuousClock.now
-                    guard remaining > .zero else { break }
-                    do {
-                        try await Task.sleep(for: min(remaining, Self.recheckStep))
-                    } catch {
-                        break
+                if stochastic {
+                    // Geiger mode: a click that has been scheduled always
+                    // fires. Wait out the full randomly drawn interval; a
+                    // fresh RSSI sample never pulls it forward. Only
+                    // cancellation / mute / stop breaks the wait, and the
+                    // next loop draws a new interval from the current mean.
+                    let mean = intervalProvider()
+                    let drawn = APRadarPulseInterval.nextExponentialInterval(
+                        mean: APRadarPulseInterval.seconds(from: mean)
+                    )
+                    let deadline = ContinuousClock.now.advanced(by: .seconds(drawn))
+                    while !Task.isCancelled {
+                        guard self.isRunning, shouldContinue() else { break }
+                        let remaining = deadline - ContinuousClock.now
+                        guard remaining > .zero else { break }
+                        do {
+                            try await Task.sleep(for: min(remaining, Self.recheckStep))
+                        } catch {
+                            break
+                        }
                     }
-                    let desired = intervalProvider()
-                    let pulledIn = ContinuousClock.now.advanced(by: desired)
-                    if pulledIn < deadline {
-                        deadline = pulledIn
+                } else {
+                    // Wait in small steps. If a fresh RSSI sample shortens the
+                    // desired interval, pull the next pulse forward instead of
+                    // sleeping out the old, longer interval.
+                    var deadline = ContinuousClock.now.advanced(by: intervalProvider())
+                    while !Task.isCancelled {
+                        guard self.isRunning, shouldContinue() else { break }
+                        let remaining = deadline - ContinuousClock.now
+                        guard remaining > .zero else { break }
+                        do {
+                            try await Task.sleep(for: min(remaining, Self.recheckStep))
+                        } catch {
+                            break
+                        }
+                        let desired = intervalProvider()
+                        let pulledIn = ContinuousClock.now.advanced(by: desired)
+                        if pulledIn < deadline {
+                            deadline = pulledIn
+                        }
                     }
                 }
             }

@@ -11,6 +11,8 @@ import Observation
 @Observable
 final class APRadarViewModel: WiFiObservationConsuming {
     static let soundEnabledKey = "apRadarSoundEnabled"
+    static let soundPresetKey = "apRadarSoundPreset"
+    static let geigerUnlockedKey = "apRadarGeigerUnlocked"
     /// Loss duration after which recovery resets the smoother so old samples
     /// cannot pollute the new measurements.
     static let longLossResetThreshold: TimeInterval = 15
@@ -19,6 +21,10 @@ final class APRadarViewModel: WiFiObservationConsuming {
 
     var state: APRadarState = .idle
     var soundEnabled: Bool
+    /// Selected pulse tone preset, persisted in UserDefaults.
+    var soundPreset: APRadarSoundPreset
+    /// Whether the hidden Geiger-counter preset has been unlocked.
+    var geigerUnlocked: Bool
     var latestNetworks: [WiFiNetworkObservation] = []
     var scanFailed = false
     /// Incremented on every audible pulse; the view uses it to drive the
@@ -67,6 +73,10 @@ final class APRadarViewModel: WiFiObservationConsuming {
         } else {
             soundEnabled = true
         }
+        soundPreset = APRadarSoundPreset.fromStoredValue(
+            userDefaults.string(forKey: Self.soundPresetKey)
+        )
+        geigerUnlocked = userDefaults.bool(forKey: Self.geigerUnlockedKey)
     }
 
     // MARK: - Lifecycle (called by the view)
@@ -109,6 +119,7 @@ final class APRadarViewModel: WiFiObservationConsuming {
         guard !hasRegisteredConsumer else { return }
         hasRegisteredConsumer = true
         observationRuntime.addConsumer(self)
+        refreshPreferences()
         resetSession()
         AppLogger.apRadar.info("AP Radar session started")
     }
@@ -191,6 +202,50 @@ final class APRadarViewModel: WiFiObservationConsuming {
         }
     }
 
+    /// Changes the pulse tone and persists the choice. If audio is already
+    /// loaded, the next pulse uses the new tone immediately.
+    func setSoundPreset(_ preset: APRadarSoundPreset) {
+        guard preset != soundPreset else { return }
+        soundPreset = preset
+        userDefaults.set(preset.rawValue, forKey: Self.soundPresetKey)
+        if audioAvailable {
+            prepareAudio()
+        }
+        // The cadence mode changed (Geiger is stochastic, everything else is
+        // deterministic): restart an active loop so the new behavior applies
+        // immediately instead of on the next pulse.
+        if canPulse {
+            scheduler.cancel()
+            startPulseSchedulerIfNeeded()
+        }
+        AppLogger.apRadar.info("AP Radar sound preset changed")
+    }
+
+    /// Unlocks the hidden Geiger-counter preset. Returns true when this is the
+    /// first unlock (used by the view to show the reveal toast once).
+    @discardableResult
+    func unlockGeigerPreset() -> Bool {
+        let firstTime = !geigerUnlocked
+        geigerUnlocked = true
+        userDefaults.set(true, forKey: Self.geigerUnlockedKey)
+        if firstTime {
+            AppLogger.apRadar.info("AP Radar Geiger preset unlocked")
+        }
+        return firstTime
+    }
+
+    /// Re-reads persisted sound preferences. Called when a session begins so
+    /// choices made in Settings apply on the next page visit.
+    private func refreshPreferences() {
+        if let stored = userDefaults.object(forKey: Self.soundEnabledKey) as? Bool {
+            soundEnabled = stored
+        }
+        soundPreset = APRadarSoundPreset.fromStoredValue(
+            userDefaults.string(forKey: Self.soundPresetKey)
+        )
+        geigerUnlocked = userDefaults.bool(forKey: Self.geigerUnlockedKey)
+    }
+
     private func resumeSoundIfNeeded() {
         guard isActive, !isSuspended, state.isTracking,
               signalProcessor.smoothedRSSI != nil else { return }
@@ -203,7 +258,7 @@ final class APRadarViewModel: WiFiObservationConsuming {
 
     private func prepareAudio() {
         do {
-            try audioPlayer.prepare()
+            try audioPlayer.prepare(preset: soundPreset)
             audioAvailable = true
         } catch {
             audioAvailable = false
@@ -245,7 +300,8 @@ final class APRadarViewModel: WiFiObservationConsuming {
                 }
                 return APRadarPulseInterval.pulseInterval(forRSSI: smoothed)
             },
-            playPulse: { [weak self] in self?.playPulse() }
+            playPulse: { [weak self] in self?.playPulse() },
+            stochastic: soundPreset == .geiger
         )
     }
 
@@ -295,21 +351,26 @@ final class APRadarViewModel: WiFiObservationConsuming {
             guard let smoothed = signalProcessor.ingest(rawRSSI: matched.rssi, at: timestamp) else {
                 return // Invalid RSSI sample: ignore entirely.
             }
-            self.target?.currentSSID = matched.ssid ?? self.target?.currentSSID
-            self.target?.channel = matched.channel.channelNumber
-            self.target?.band = matched.channel.band
+            // Copy-on-write the tracked target so we never read and modify the
+            // @Observable `target` property in the same expression (runtime
+            // exclusivity trap in Debug builds).
+            var updatedTarget = target
+            if let currentSSID = matched.ssid {
+                updatedTarget.currentSSID = currentSSID
+            }
+            updatedTarget.channel = matched.channel.channelNumber
+            updatedTarget.band = matched.channel.band
+            self.target = updatedTarget
             lastSeenAt = timestamp
             lostAt = nil
 
-            if let currentTarget = self.target {
-                state = .tracking(APRadarSnapshot(
-                    target: currentTarget,
-                    rawRSSI: matched.rssi,
-                    smoothedRSSI: smoothed,
-                    trend: signalProcessor.trend(at: timestamp),
-                    lastSeenAt: timestamp
-                ))
-            }
+            state = .tracking(APRadarSnapshot(
+                target: updatedTarget,
+                rawRSSI: matched.rssi,
+                smoothedRSSI: smoothed,
+                trend: signalProcessor.trend(at: timestamp),
+                lastSeenAt: timestamp
+            ))
             if wasLost {
                 AppLogger.apRadar.info("AP Radar signal restored")
             }

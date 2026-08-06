@@ -11,9 +11,17 @@ struct SettingsView: View {
     let bluetoothPermission: BluetoothPermissionManager?
     let onScanIntervalChange: (Int) -> Void
     let onRegulatoryRegionChange: (String) -> Void
+    /// True while this is the selected sidebar page. Pages stay mounted in the
+    /// detail ZStack, so page switches must be observed explicitly to stop a
+    /// running sound preview.
+    let isActive: Bool
     @Binding var bleEnabled: Bool
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// One-shot preview player for the selected AP Radar pulse sound. Created
+    /// lazily on first use so opening Settings never touches the audio stack.
+    @State private var soundPreviewer: APRadarSoundPreviewer?
 
     @State private var autoCheck: Bool
     @AppStorage("scanIntervalSeconds") private var scanInterval: Int = 3
@@ -23,6 +31,8 @@ struct SettingsView: View {
     @AppStorage("appearance") private var appearance: String = "system"
     @AppStorage("hideTitleBadge") private var hideTitleBadge = true
     @AppStorage("menuBarEnabled") private var menuBarEnabled = true
+    @AppStorage("apRadarSoundPreset") private var apRadarSoundPresetRaw = APRadarSoundPreset.softPulse.rawValue
+    @AppStorage("apRadarGeigerUnlocked") private var apRadarGeigerUnlocked = false
 
     init(
         macVendorDatabaseSummary: MACVendorBundledDatabaseSummary?,
@@ -31,7 +41,8 @@ struct SettingsView: View {
         bluetoothPermission: BluetoothPermissionManager?,
         bleEnabled: Binding<Bool>,
         onScanIntervalChange: @escaping (Int) -> Void = { _ in },
-        onRegulatoryRegionChange: @escaping (String) -> Void = { _ in }
+        onRegulatoryRegionChange: @escaping (String) -> Void = { _ in },
+        isActive: Bool = true
     ) {
         self.macVendorDatabaseSummary = macVendorDatabaseSummary
         self.updater = updater
@@ -39,6 +50,7 @@ struct SettingsView: View {
         self.bluetoothPermission = bluetoothPermission
         self.onScanIntervalChange = onScanIntervalChange
         self.onRegulatoryRegionChange = onRegulatoryRegionChange
+        self.isActive = isActive
         _bleEnabled = bleEnabled
         _autoCheck = State(initialValue: updater.automaticallyChecksForUpdates)
     }
@@ -113,6 +125,51 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
+                }
+
+                // MARK: - AP Radar
+
+                Section {
+                    Picker(String(localized: "settings.apRadar.preset_label", comment: "AP Radar pulse sound preset picker label"), selection: $apRadarSoundPresetRaw.animation(reduceMotion ? nil : .snappy(duration: 0.2))) {
+                        Text(String(localized: "settings.apRadar.preset.softPulse", comment: "Soft pulse preset name")).tag(APRadarSoundPreset.softPulse.rawValue)
+                        Text(String(localized: "settings.apRadar.preset.tick", comment: "Tick preset name")).tag(APRadarSoundPreset.tick.rawValue)
+                        Text(String(localized: "settings.apRadar.preset.blip", comment: "Radar blip preset name")).tag(APRadarSoundPreset.blip.rawValue)
+                        if apRadarGeigerUnlocked {
+                            Text(String(localized: "settings.apRadar.preset.geiger", comment: "Hidden Geiger counter preset name")).tag(APRadarSoundPreset.geiger.rawValue)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .accessibilityIdentifier("settings-apradar-preset-picker")
+
+                    Text(String(localized: "settings.apRadar.preset_description", comment: "Description of the AP Radar pulse sound presets"))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Button {
+                        toggleSoundPreview()
+                    } label: {
+                        Label(
+                            String(localized: "settings.apRadar.preview", comment: "Button to preview the selected AP Radar pulse sound"),
+                            systemImage: soundPreviewer?.isPlaying == true ? "stop.fill" : "speaker.wave.2.fill"
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundColor(.accentColor)
+                    .accessibilityIdentifier("settings-apradar-preview-button")
+
+                    if apRadarGeigerUnlocked {
+                        Label {
+                            Text(String(localized: "settings.apRadar.preset.geiger_hint", comment: "Hint shown after the Geiger preset is unlocked"))
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        } icon: {
+                            Image(systemName: "gift")
+                                .foregroundColor(.orange)
+                        }
+                    }
+                } header: {
+                    Text(String(localized: "settings.apRadar.header", comment: "AP Radar settings section header"))
                 }
 
                 MACVendorDatabaseSettingsSection(summary: macVendorDatabaseSummary)
@@ -313,6 +370,30 @@ struct SettingsView: View {
                 refreshPermissionStatuses()
             }
         }
+        .onChange(of: isActive) { _, active in
+            if !active {
+                soundPreviewer?.stop()
+            }
+        }
+        .onChange(of: apRadarSoundPresetRaw) { _, _ in
+            // A running preview belongs to the previously selected preset.
+            soundPreviewer?.stop()
+        }
+        .onDisappear {
+            soundPreviewer?.stop()
+        }
+    }
+
+    private func toggleSoundPreview() {
+        let previewer: APRadarSoundPreviewer
+        if let existing = soundPreviewer {
+            previewer = existing
+        } else {
+            previewer = APRadarSoundPreviewer()
+            soundPreviewer = previewer
+        }
+        let preset = APRadarSoundPreset.fromStoredValue(apRadarSoundPresetRaw)
+        previewer.toggle(preset: preset)
     }
 
     private func refreshPermissionStatuses() {

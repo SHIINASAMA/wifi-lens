@@ -79,49 +79,49 @@ struct APRadarPulseIntervalTests {
 
     @Test("all anchor points map to their specified intervals")
     func anchorPoints() {
-        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -42) == 0.18)
-        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -50) == 0.28)
-        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -60) == 0.48)
-        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -70) == 0.80)
-        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -80) == 1.20)
-        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -90) == 1.60)
+        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -42) == 0.35)
+        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -50) == 0.55)
+        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -60) == 0.90)
+        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -70) == 1.40)
+        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -80) == 2.00)
+        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -90) == 2.60)
     }
 
     @Test("midpoints interpolate linearly between anchors")
     func interpolation() {
-        #expect(abs(APRadarPulseInterval.intervalSeconds(forRSSI: -55) - 0.38) < 0.0001)
-        #expect(abs(APRadarPulseInterval.intervalSeconds(forRSSI: -65) - 0.64) < 0.0001)
-        #expect(abs(APRadarPulseInterval.intervalSeconds(forRSSI: -75) - 1.00) < 0.0001)
+        #expect(abs(APRadarPulseInterval.intervalSeconds(forRSSI: -55) - 0.725) < 0.0001)
+        #expect(abs(APRadarPulseInterval.intervalSeconds(forRSSI: -65) - 1.15) < 0.0001)
+        #expect(abs(APRadarPulseInterval.intervalSeconds(forRSSI: -75) - 1.70) < 0.0001)
         // Quarter points.
-        #expect(abs(APRadarPulseInterval.intervalSeconds(forRSSI: -52.5) - 0.33) < 0.0001)
-        #expect(abs(APRadarPulseInterval.intervalSeconds(forRSSI: -87) - 1.48) < 0.0001)
+        #expect(abs(APRadarPulseInterval.intervalSeconds(forRSSI: -52.5) - 0.6375) < 0.0001)
+        #expect(abs(APRadarPulseInterval.intervalSeconds(forRSSI: -87) - 2.42) < 0.0001)
     }
 
     @Test("values beyond the anchors are clamped to the endpoints")
     func clamping() {
-        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -20) == 0.18)
-        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: 10) == 0.18)
-        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -95) == 1.60)
-        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -200) == 1.60)
+        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -20) == 0.35)
+        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: 10) == 0.35)
+        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -95) == 2.60)
+        #expect(APRadarPulseInterval.intervalSeconds(forRSSI: -200) == 2.60)
     }
 
     @Test("non-finite input never produces NaN or infinity")
     func nonFiniteInput() {
         let nanResult = APRadarPulseInterval.intervalSeconds(forRSSI: .nan)
         #expect(nanResult.isFinite)
-        #expect(nanResult == 1.60)
+        #expect(nanResult == 2.60)
 
         let plusInfinity = APRadarPulseInterval.intervalSeconds(forRSSI: .infinity)
-        #expect(plusInfinity == 0.18)
+        #expect(plusInfinity == 0.35)
         let minusInfinity = APRadarPulseInterval.intervalSeconds(forRSSI: -.infinity)
-        #expect(minusInfinity == 1.60)
+        #expect(minusInfinity == 2.60)
     }
 
     @Test("duration form matches seconds form")
     func durationForm() {
         let duration = APRadarPulseInterval.pulseInterval(forRSSI: -55)
         #expect(duration.components.seconds == 0)
-        #expect(abs(Double(duration.components.attoseconds) / 1e18 - 0.38) < 0.0001)
+        #expect(abs(Double(duration.components.attoseconds) / 1e18 - 0.725) < 0.0001)
     }
 }
 
@@ -183,5 +183,89 @@ struct APRadarSignalProcessorTrendTests {
         let smoothed = processor.smoothedRSSI ?? .nan
         #expect(abs(smoothed - (-58.8)) < 0.0001)
         #expect(processor.trend(at: t0.addingTimeInterval(3)) == .stable)
+    }
+}
+
+// MARK: - Stochastic Geiger interval
+
+/// Deterministic RNG so the statistical tests are reproducible.
+private struct SeededRandomNumberGenerator: RandomNumberGenerator {
+    private var state: UInt64
+
+    init(seed: UInt64) {
+        state = seed
+    }
+
+    mutating func next() -> UInt64 {
+        state &+= 0x9E37_79B9_7F4A_7C15
+        var z = state
+        z = (z ^ (z >> 30)) &* 0xBF58_476D_1CE4_E5B9
+        z = (z ^ (z >> 27)) &* 0x94D0_49BB_1331_11EB
+        return z ^ (z >> 31)
+    }
+}
+
+@Suite("APRadarPulseInterval stochastic Geiger")
+struct APRadarPulseIntervalStochasticTests {
+
+    @Test("draws are finite and clamped to safe bounds")
+    func drawsAreFiniteAndClamped() {
+        var rng = SeededRandomNumberGenerator(seed: 42)
+        for mean in [0.35, 1.0, 2.6] {
+            let maximum = max(APRadarPulseInterval.minimumStochasticInterval, mean * 4)
+            for _ in 0..<5_000 {
+                let draw = APRadarPulseInterval.nextExponentialInterval(mean: mean, using: &rng)
+                #expect(draw.isFinite)
+                #expect(draw >= APRadarPulseInterval.minimumStochasticInterval)
+                #expect(draw <= maximum)
+            }
+        }
+    }
+
+    @Test("sample mean tracks the requested mean within 10 percent")
+    func sampleMeanTracksRequestedMean() {
+        var rng = SeededRandomNumberGenerator(seed: 7)
+        let count = 20_000
+        var total = 0.0
+        for _ in 0..<count {
+            total += APRadarPulseInterval.nextExponentialInterval(mean: 1.0, using: &rng)
+        }
+        let sampleMean = total / Double(count)
+        #expect(abs(sampleMean - 1.0) < 0.1)
+    }
+
+    @Test("stronger signals produce a faster average click rate")
+    func strongerSignalIsFasterOnAverage() {
+        var strongRNG = SeededRandomNumberGenerator(seed: 99)
+        var weakRNG = SeededRandomNumberGenerator(seed: 99)
+        let count = 8_000
+
+        var strongTotal = 0.0
+        var weakTotal = 0.0
+        for _ in 0..<count {
+            strongTotal += APRadarPulseInterval.nextExponentialInterval(mean: 0.5, using: &strongRNG)
+            weakTotal += APRadarPulseInterval.nextExponentialInterval(mean: 2.0, using: &weakRNG)
+        }
+        let strongMean = strongTotal / Double(count)
+        let weakMean = weakTotal / Double(count)
+        #expect(strongMean < weakMean)
+        // Sanity: each rate is still close to its own mean.
+        #expect(abs(strongMean - 0.5) < 0.1)
+        #expect(abs(weakMean - 2.0) < 0.25)
+    }
+
+    @Test("invalid or non-finite means fall back to the minimum interval")
+    func invalidMeanFallsBack() {
+        for mean in [Double.nan, Double.infinity, -Double.infinity, 0, -1] {
+            let draw = APRadarPulseInterval.nextExponentialInterval(mean: mean)
+            #expect(draw == APRadarPulseInterval.minimumStochasticInterval)
+        }
+    }
+
+    @Test("duration seconds helper matches the duration components")
+    func durationSecondsHelper() {
+        let duration = Duration.seconds(1) + .nanoseconds(250_000_000) // 1.25 s
+        let seconds = APRadarPulseInterval.seconds(from: duration)
+        #expect(abs(seconds - 1.25) < 0.0001)
     }
 }

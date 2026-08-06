@@ -234,7 +234,8 @@ private struct AppRootView: View {
                         bluetoothPermission: bleViewModel?.bluetoothPermission,
                         bleEnabled: $bleEnabled,
                         onScanIntervalChange: { viewModel.scanIntervalSeconds = $0 },
-                        onRegulatoryRegionChange: viewModel.handleRegulatoryRegionOverrideChange
+                        onRegulatoryRegionChange: viewModel.handleRegulatoryRegionOverrideChange,
+                        isActive: selectedPage == .settings
                     )
                         .opacity(selectedPage == .settings ? 1 : 0)
                         .allowsHitTesting(selectedPage == .settings)

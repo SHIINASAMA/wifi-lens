@@ -120,7 +120,8 @@ struct APRadarSignalProcessor {
 /// Maps smoothed RSSI (dBm) to a pulse interval.
 ///
 /// Piecewise-linear interpolation across the anchors below, clamped to
-/// 0.18...1.60 seconds.
+/// 0.35...2.60 seconds. Anchors are deliberately calmer than the original
+/// design so pulses never feel frantic at typical indoor signal levels.
 enum APRadarPulseInterval {
     struct Anchor: Equatable {
         let rssi: Double
@@ -128,16 +129,16 @@ enum APRadarPulseInterval {
     }
 
     static let anchors: [Anchor] = [
-        Anchor(rssi: -42, interval: 0.18),
-        Anchor(rssi: -50, interval: 0.28),
-        Anchor(rssi: -60, interval: 0.48),
-        Anchor(rssi: -70, interval: 0.80),
-        Anchor(rssi: -80, interval: 1.20),
-        Anchor(rssi: -90, interval: 1.60),
+        Anchor(rssi: -42, interval: 0.35),
+        Anchor(rssi: -50, interval: 0.55),
+        Anchor(rssi: -60, interval: 0.90),
+        Anchor(rssi: -70, interval: 1.40),
+        Anchor(rssi: -80, interval: 2.00),
+        Anchor(rssi: -90, interval: 2.60),
     ]
 
-    static let minimumInterval: Double = 0.18
-    static let maximumInterval: Double = 1.60
+    static let minimumInterval: Double = 0.35
+    static let maximumInterval: Double = 2.60
 
     /// Pure mapping used by the pulse scheduler and by unit tests.
     static func intervalSeconds(forRSSI rssi: Double) -> Double {
@@ -161,4 +162,44 @@ enum APRadarPulseInterval {
     static func pulseInterval(forRSSI rssi: Double) -> Duration {
         .seconds(intervalSeconds(forRSSI: rssi))
     }
+
+    /// Converts a `Duration` to seconds as a `Double`.
+    static func seconds(from duration: Duration) -> Double {
+        Double(duration.components.seconds)
+            + Double(duration.components.attoseconds) / 1_000_000_000_000_000_000
+    }
+
+    /// Geiger-counter click cadence. Real Geiger counters are Poisson
+    /// processes: individual clicks are irregular, but the *average* rate
+    /// follows the signal strength. This draws one exponential-distributed
+    /// interval whose mean is the RSSI-derived interval, so stronger signals
+    /// produce a faster overall click rate with no fixed rhythm.
+    ///
+    /// The draw is clamped so a pathological RNG value can never produce a
+    /// zero (unbounded click burst) or an infinite (dead) pause: minimum
+    /// 50 ms, maximum 4x the mean (keeps the observed average close to the
+    /// requested mean for every signal level).
+    static func nextExponentialInterval(mean: Double) -> Double {
+        var generator = SystemRandomNumberGenerator()
+        return nextExponentialInterval(mean: mean, using: &generator)
+    }
+
+    /// `nextExponentialInterval(mean:)` with an injectable RNG for tests.
+    static func nextExponentialInterval(
+        mean: Double,
+        using rng: inout some RandomNumberGenerator
+    ) -> Double {
+        guard mean.isFinite, mean > 0 else { return minimumStochasticInterval }
+        let minimum = minimumStochasticInterval
+        let maximum = max(minimum, mean * 4)
+        // Uniform in [0, 1); `1 - u` stays strictly positive for u < 1.
+        let u = Double.random(in: 0..<1, using: &rng)
+        let raw = -mean * log(1 - u)
+        guard raw.isFinite else { return maximum }
+        return min(max(raw, minimum), maximum)
+    }
+
+    /// Lower bound for a stochastic Geiger interval (50 ms). Keeps clicks from
+    /// stacking into an uncontrolled burst even when the RNG draws ~0.
+    static let minimumStochasticInterval: Double = 0.05
 }
