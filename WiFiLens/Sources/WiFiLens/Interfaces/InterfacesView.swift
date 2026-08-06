@@ -338,7 +338,7 @@ struct InterfacesView: View {
 
     private var monitorChartHeader: some View {
         Button {
-            withAnimation(reduceMotion ? nil : .default) { isMonitorChartCollapsed.toggle() }
+            withAnimation(reduceMotion ? nil : .snappy(duration: 0.22)) { isMonitorChartCollapsed.toggle() }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: isMonitorChartCollapsed ? "chevron.right" : "chevron.down")
@@ -362,7 +362,7 @@ struct InterfacesView: View {
 
     private var monitorTableHeader: some View {
         Button {
-            withAnimation(reduceMotion ? nil : .default) { isMonitorTableCollapsed.toggle() }
+            withAnimation(reduceMotion ? nil : .snappy(duration: 0.22)) { isMonitorTableCollapsed.toggle() }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: isMonitorTableCollapsed ? "chevron.right" : "chevron.down")

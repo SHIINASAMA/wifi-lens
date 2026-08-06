@@ -8,6 +8,8 @@ import SwiftUI
 struct ExportSuccessBanner: View {
     let guidance: GuidanceCoordinator
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     @State private var renderedInvitationID: UUID?
 
     var body: some View {
@@ -46,6 +48,8 @@ struct ExportSuccessBanner: View {
             )
             .padding(.horizontal, 16)
             .padding(.bottom, 12)
+            .transition(.move(edge: .bottom).combined(with: .opacity))
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.25), value: guidance.exportFeedback != nil)
             .onDisappear {
                 if let id = renderedInvitationID {
                     renderedInvitationID = nil

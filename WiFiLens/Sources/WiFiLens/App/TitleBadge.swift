@@ -4,6 +4,8 @@ import SwiftUI
 struct TitleBadge: View {
     let config: BuildConfig
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     @State private var shimmerOffset: CGFloat = 0
 
     var body: some View {
@@ -60,18 +62,22 @@ struct TitleBadge: View {
         }
         .shadow(color: goldColor.opacity(0.3), radius: 6, y: 2)
         .overlay {
-            Capsule()
-                .fill(
-                    LinearGradient(
-                        colors: [.clear, .white.opacity(0.4), .clear],
-                        startPoint: UnitPoint(x: shimmerOffset - 0.3, y: 0.5),
-                        endPoint: UnitPoint(x: shimmerOffset + 0.3, y: 0.5)
+            // One-shot entrance shimmer; hidden entirely under Reduce Motion.
+            if !reduceMotion {
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            colors: [.clear, .white.opacity(0.4), .clear],
+                            startPoint: UnitPoint(x: shimmerOffset - 0.3, y: 0.5),
+                            endPoint: UnitPoint(x: shimmerOffset + 0.3, y: 0.5)
+                        )
                     )
-                )
-                .mask(Capsule())
+                    .mask(Capsule())
+            }
         }
         .onAppear {
-            withAnimation(.linear(duration: 5).repeatForever(autoreverses: false)) {
+            guard !reduceMotion else { return }
+            withAnimation(.linear(duration: 5)) {
                 shimmerOffset = 1.5
             }
         }
