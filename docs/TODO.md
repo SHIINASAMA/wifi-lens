@@ -11,7 +11,7 @@
 
 - [ ] UI / integration tests
 - [ ] Add a small verification matrix for UI regressions across light/dark mode, localization, and no-permission / no-data states
-- [ ] Before the next Mac App Store submission, update `NSLocalNetworkUsageDescription` for both OSS and Pro targets to disclose that Network Self-Check may connect to a configured local proxy, in addition to the existing MCP server use case
+- [x] Before the next Mac App Store submission, update `NSLocalNetworkUsageDescription` for both OSS and Pro targets to disclose that Network Self-Check may connect to a configured local proxy, in addition to the existing MCP server use case (done: both targets already disclose MCP server + Network Self-Check proxy use)
 
 ## Out of Scope (for now)
 
