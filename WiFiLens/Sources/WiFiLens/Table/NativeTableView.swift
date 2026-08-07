@@ -203,6 +203,11 @@ struct NativeTableView: NSViewRepresentable {
         var onToggleVisibilityLocked: ((String) -> Void)?
         weak var tableView: NSTableView?
         var previousSelectedID: String?
+        /// Whether automatic column sizing has already run once. After the
+        /// first fit, column widths belong to the user: refresh cycles must
+        /// never re-run auto-sizing, or manual width adjustments would be
+        /// reset on every scan update.
+        private var hasAutoSizedColumns = false
 
         init(rows: [NetworkTableRow], selectedID: Binding<String?>, sortOrder: Binding<[NSSortDescriptor]>, hiddenColumns: Binding<Set<String>>, onToggleVisibility: ((String) -> Void)?, onToggleVisibilityLocked: ((String) -> Void)?) {
             self.rows = rows
@@ -403,6 +408,8 @@ struct NativeTableView: NSViewRepresentable {
 
         @MainActor
         func autoSizeColumns() {
+            guard !hasAutoSizedColumns else { return }
+            hasAutoSizedColumns = true
             guard let tableView else { return }
             for column in tableView.tableColumns where !column.isHidden {
                 let headerWidth = (column.headerCell.attributedStringValue.size().width.rounded(.up)) + 20
