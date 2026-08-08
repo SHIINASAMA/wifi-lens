@@ -11,7 +11,13 @@ struct TrackedAccessPoint: Equatable, Sendable {
 
     init(bssid: String, currentSSID: String?, channel: Int?, band: ChannelBand?) {
         self.bssid = Self.normalizedBSSID(bssid)
-        self.currentSSID = currentSSID
+        // Empty SSIDs from hidden networks are normalized to nil so the UI
+        // always shows the "Hidden Network" label instead of a blank name.
+        if let currentSSID, !currentSSID.isEmpty {
+            self.currentSSID = currentSSID
+        } else {
+            self.currentSSID = nil
+        }
         self.channel = channel
         self.band = band
     }
@@ -82,7 +88,11 @@ struct APRadarAPOption: Identifiable, Equatable {
 
     init(observation: WiFiNetworkObservation) {
         id = observation.id
-        ssid = observation.ssid
+        if let ssid = observation.ssid, !ssid.isEmpty {
+            self.ssid = ssid
+        } else {
+            self.ssid = nil
+        }
         bssid = observation.bssid
         rssi = observation.rssi
         channel = observation.channel.channelNumber

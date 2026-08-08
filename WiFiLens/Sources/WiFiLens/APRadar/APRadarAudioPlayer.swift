@@ -1,5 +1,6 @@
 import AVFoundation
 import Foundation
+import Observation
 
 /// Errors surfaced when the bundled pulse sound cannot be prepared.
 enum APRadarAudioError: LocalizedError {
@@ -331,10 +332,17 @@ protocol APRadarAudioPlaying: AnyObject {
 /// page is left or the preset changes. Geiger previews include the continuous
 /// hiss plus a short Poisson burst so the easter egg is audible without
 /// starting a tracking session.
+///
+/// `isPlaying` is observable so the Settings row can refresh its icon when a
+/// preview ends naturally instead of staying on "stop" forever.
 @MainActor
+@Observable
 final class APRadarSoundPreviewer {
     private let player: any APRadarAudioPlaying
     private var task: Task<Void, Never>?
+    /// Incremented on every stop/start so a cancelled preview that wakes after
+    /// a replacement cannot stop the new preview's player or state.
+    private var generation = 0
     private(set) var isPlaying = false
 
     /// Number of pulses for the regular (non-Geiger) preview.
@@ -362,9 +370,11 @@ final class APRadarSoundPreviewer {
         } catch {
             return false
         }
+        generation &+= 1
+        let token = generation
         isPlaying = true
         task = Task { [weak self] in
-            await self?.runPreview(preset: preset)
+            await self?.runPreview(preset: preset, token: token)
         }
         return true
     }
@@ -380,16 +390,18 @@ final class APRadarSoundPreviewer {
 
     /// Cancels the preview task and stops all audio immediately.
     func stop() {
+        generation &+= 1
         task?.cancel()
         task = nil
         player.stop()
         isPlaying = false
     }
 
-    private func runPreview(preset: APRadarSoundPreset) async {
+    private func runPreview(preset: APRadarSoundPreset, token: Int) async {
         if preset == .geiger {
             let end = ContinuousClock.now.advanced(by: Self.geigerPreviewDuration)
             while !Task.isCancelled, ContinuousClock.now < end {
+                guard generation == token else { return }
                 player.playPulse()
                 let interval = APRadarPulseInterval.nextExponentialInterval(
                     mean: Self.geigerPreviewMeanInterval
@@ -398,11 +410,15 @@ final class APRadarSoundPreviewer {
             }
         } else {
             for _ in 0..<Self.regularPulseCount {
-                guard !Task.isCancelled else { break }
+                guard !Task.isCancelled, generation == token else { break }
                 player.playPulse()
                 try? await Task.sleep(for: Self.regularPulseSpacing)
             }
         }
+        // Only the current generation may stop the player and publish the
+        // idle state; a cancelled preview that woke after a replacement must
+        // leave the new preview's audio and state alone.
+        guard generation == token else { return }
         player.stop()
         isPlaying = false
     }

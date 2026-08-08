@@ -40,6 +40,10 @@ extension APRadarPulseScheduling {
 final class APRadarPulseScheduler: APRadarPulseScheduling {
     private var task: Task<Void, Never>?
     private(set) var isRunning = false
+    /// Incremented on every cancel/start. A cancelled loop that wakes up after
+    /// a restart can detect that it is stale and must not tear down the newer
+    /// loop's state (`isRunning` / `task`).
+    private var generation = 0
 
     /// How often the waiting loop re-evaluates the desired interval so a
     /// stronger signal (shorter interval) takes effect within ~100 ms instead
@@ -55,10 +59,12 @@ final class APRadarPulseScheduler: APRadarPulseScheduling {
         stochastic: Bool = false
     ) {
         cancel()
+        generation &+= 1
+        let token = generation
         isRunning = true
         task = Task { [weak self] in
             while !Task.isCancelled {
-                guard let self, self.isRunning, shouldContinue() else { break }
+                guard let self, self.generation == token, self.isRunning, shouldContinue() else { break }
                 playPulse()
                 if stochastic {
                     // Geiger mode: a click that has been scheduled always
@@ -72,7 +78,7 @@ final class APRadarPulseScheduler: APRadarPulseScheduling {
                     )
                     let deadline = ContinuousClock.now.advanced(by: .seconds(drawn))
                     while !Task.isCancelled {
-                        guard self.isRunning, shouldContinue() else { break }
+                        guard self.generation == token, self.isRunning, shouldContinue() else { break }
                         let remaining = deadline - ContinuousClock.now
                         guard remaining > .zero else { break }
                         do {
@@ -87,7 +93,7 @@ final class APRadarPulseScheduler: APRadarPulseScheduling {
                     // sleeping out the old, longer interval.
                     var deadline = ContinuousClock.now.advanced(by: intervalProvider())
                     while !Task.isCancelled {
-                        guard self.isRunning, shouldContinue() else { break }
+                        guard self.generation == token, self.isRunning, shouldContinue() else { break }
                         let remaining = deadline - ContinuousClock.now
                         guard remaining > .zero else { break }
                         do {
@@ -103,13 +109,18 @@ final class APRadarPulseScheduler: APRadarPulseScheduling {
                     }
                 }
             }
-            self?.isRunning = false
-            self?.task = nil
+            // Only the current generation may publish its own shutdown. A
+            // stale loop that woke after `cancel()` + a fresh `start()` must
+            // leave the new loop's state alone.
+            guard let self, self.generation == token else { return }
+            self.isRunning = false
+            self.task = nil
         }
     }
 
     /// Cancels the current loop immediately. Safe to call repeatedly.
     func cancel() {
+        generation &+= 1
         task?.cancel()
         task = nil
         isRunning = false

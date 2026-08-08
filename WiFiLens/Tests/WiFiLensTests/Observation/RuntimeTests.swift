@@ -214,6 +214,33 @@ struct RuntimeTests {
         await runtime.stopScanning()
     }
 
+    @Test("a consumer added after scanning starts receives the active lifecycle")
+    func lateConsumerReceivesActiveLifecycle() async {
+        let source = ScriptedScanSource()
+        let early = LifecycleRecordingConsumer()
+        let late = LifecycleRecordingConsumer()
+        let dates = LockedDateSequence([10, 20])
+        let runtime = WiFiObservationRuntime(
+            store: WiFiObservationStore(), scanSource: source,
+            now: { dates.next() }
+        )
+        runtime.addConsumer(early)
+        await runtime.startScanning(configuration: .init(scanInterval: .seconds(4))) { _ in }
+        #expect(early.events == [.started(date: Date(timeIntervalSince1970: 10), interval: .seconds(4))])
+
+        // AP Radar registers after the scan is already active; it must still
+        // learn the current expected scan interval instead of guessing.
+        runtime.addConsumer(late)
+        await runtime.drainLifecycleReplaysForTesting()
+        #expect(late.events == [.started(date: Date(timeIntervalSince1970: 10), interval: .seconds(4))])
+
+        await runtime.stopScanning()
+        #expect(late.events == [
+            .started(date: Date(timeIntervalSince1970: 10), interval: .seconds(4)),
+            .stopped(date: Date(timeIntervalSince1970: 20)),
+        ])
+    }
+
     @Test("synchronous scan emission cannot overtake lifecycle start")
     func synchronousEmissionFollowsLifecycleStart() async {
         let source = ScriptedScanSource()

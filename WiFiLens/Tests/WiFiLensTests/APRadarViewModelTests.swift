@@ -213,6 +213,26 @@ struct APRadarViewModelTests {
         #expect(snapshot?.target.band == .band5GHz)
     }
 
+    @Test("empty SSID is treated as a hidden network")
+    func emptySSIDIsHiddenNetwork() async throws {
+        let harness = makeHarness()
+        activateAndSelect(harness.viewModel, bssid: "AA:BB:CC:DD:EE:FF", ssid: "")
+        #expect(trackingSnapshot(harness.viewModel)?.target.currentSSID == nil)
+
+        // A later sample with an empty SSID must not blank out a known name.
+        harness.viewModel.stopTracking()
+        activateAndSelect(harness.viewModel, bssid: "AA:BB:CC:DD:EE:FF", ssid: "Home Wi-Fi")
+        let t0 = Date(timeIntervalSince1970: 100)
+        try await harness.viewModel.consume(
+            makeObservation(timestamp: t0, networks: [
+                makeNetwork(ssid: "", bssid: "AA:BB:CC:DD:EE:FF", rssi: -53)
+            ])
+        )
+        let snapshot = trackingSnapshot(harness.viewModel)
+        #expect(snapshot?.target.currentSSID == "Home Wi-Fi")
+        #expect(snapshot?.rawRSSI == -53)
+    }
+
     // MARK: - Signal lost
 
     @Test("missing target past the timeout enters signal lost and stops sound")
@@ -491,15 +511,49 @@ struct APRadarViewModelTests {
             makeObservation(timestamp: Date(timeIntervalSince1970: 100), networks: [makeNetwork(bssid: "AA:BB:CC:DD:EE:FF", rssi: -54)])
         )
 
-        harness.viewModel.handleAppInactive()
+        harness.viewModel.handleAppBackground()
 
         #expect(harness.scheduler.cancelCount >= 1)
         #expect(harness.audio.stopCallCount >= 1)
-        // Target is preserved, so a fresh sample resumes the session.
+        // Target is preserved; once the app returns to active, a fresh sample
+        // resumes the session.
+        harness.viewModel.handleAppActive()
         try await harness.viewModel.consume(
             makeObservation(timestamp: Date(timeIntervalSince1970: 101), networks: [makeNetwork(bssid: "AA:BB:CC:DD:EE:FF", rssi: -50)])
         )
         #expect(trackingSnapshot(harness.viewModel) != nil)
+    }
+
+    @Test("observations while suspended do not restart sound or tracking")
+    func suspendedObservationsStaySuspended() async throws {
+        let harness = makeHarness()
+        activateAndSelect(harness.viewModel)
+        let t0 = Date(timeIntervalSince1970: 100)
+        try await harness.viewModel.consume(
+            makeObservation(timestamp: t0, networks: [makeNetwork(bssid: "AA:BB:CC:DD:EE:FF", rssi: -54)])
+        )
+
+        harness.viewModel.handleAppBackground()
+        let schedulerStarts = harness.scheduler.startCount
+        let playCalls = harness.audio.playCallCount
+
+        // A fresh sample while backgrounded must not clear the suspension or
+        // re-arm the pulse loop (the app could still be in the background).
+        try await harness.viewModel.consume(
+            makeObservation(timestamp: t0.addingTimeInterval(1), networks: [makeNetwork(bssid: "AA:BB:CC:DD:EE:FF", rssi: -50)])
+        )
+        #expect(harness.scheduler.startCount == schedulerStarts)
+        #expect(harness.audio.playCallCount == playCalls)
+        // The sample was ignored, so the smoother still holds the old value.
+        #expect(trackingSnapshot(harness.viewModel)?.smoothedRSSI == -54)
+
+        // Returning to active allows the next sample to resume tracking.
+        harness.viewModel.handleAppActive()
+        try await harness.viewModel.consume(
+            makeObservation(timestamp: t0.addingTimeInterval(2), networks: [makeNetwork(bssid: "AA:BB:CC:DD:EE:FF", rssi: -48)])
+        )
+        #expect(trackingSnapshot(harness.viewModel)?.rawRSSI == -48)
+        #expect(harness.scheduler.startCount > schedulerStarts)
     }
 
     // MARK: - Sound presets
@@ -716,6 +770,32 @@ struct APRadarSoundPreviewerTests {
         #expect(!previewer.isPlaying)
     }
 
+    @Test("replacing a preview immediately does not stop the new one")
+    func replacingPreviewDoesNotStopNewOne() async throws {
+        let audio = FakeAudioPlayer()
+        let previewer = APRadarSoundPreviewer(player: audio)
+
+        // Rapid replacement is the stale-task race: the cancelled tick loop
+        // must not stop the new blip preview or clear its state when it wakes.
+        previewer.start(preset: .tick)
+        previewer.start(preset: .blip)
+
+        #expect(previewer.isPlaying)
+        #expect(audio.lastPreparedPreset == .blip)
+
+        // The cancelled tick preview (3 x 300 ms) would have ended by now; the
+        // blip preview must still be running and unaffected.
+        await waitUntil({ audio.playCallCount >= 2 }, timeout: .seconds(5))
+        try? await Task.sleep(for: .milliseconds(500))
+        #expect(previewer.isPlaying)
+        #expect(audio.lastPreparedPreset == .blip)
+
+        // The blip preview finishes naturally afterwards.
+        await waitUntil({ !previewer.isPlaying }, timeout: .seconds(10))
+        #expect(!previewer.isPlaying)
+        #expect(audio.stopCallCount >= 1)
+    }
+
     @Test("toggling while playing stops the preview")
     func toggleStopsPreview() async throws {
         let audio = FakeAudioPlayer()
@@ -727,5 +807,67 @@ struct APRadarSoundPreviewerTests {
         previewer.toggle(preset: .tick)
         #expect(!previewer.isPlaying)
         #expect(audio.stopCallCount >= 1)
+    }
+}
+
+@Suite("APRadarPulseScheduler")
+@MainActor
+struct APRadarPulseSchedulerTests {
+    /// Polls until `condition` becomes true or the timeout elapses, so timing
+    /// assertions stay robust on slow CI machines.
+    private func waitUntil(
+        _ condition: () -> Bool,
+        timeout: Duration = .seconds(3)
+    ) async {
+        let deadline = ContinuousClock.now.advanced(by: timeout)
+        while !condition(), ContinuousClock.now < deadline {
+            try? await Task.sleep(for: .milliseconds(25))
+        }
+    }
+
+    @Test("immediate restart keeps the new loop active and pulsing")
+    func restartKeepsNewLoopActive() async {
+        let scheduler = APRadarPulseScheduler()
+        let counter = PulseCounter()
+        var shouldContinue = true
+        let interval: Duration = .milliseconds(80)
+
+        // Preset changes / cadence-mode switches call start() twice back to
+        // back; the first loop is cancelled while its first sleep is pending.
+        scheduler.start(
+            shouldContinue: { shouldContinue },
+            intervalProvider: { interval },
+            playPulse: { counter.increment() },
+            stochastic: false
+        )
+        scheduler.start(
+            shouldContinue: { shouldContinue },
+            intervalProvider: { interval },
+            playPulse: { counter.increment() },
+            stochastic: false
+        )
+
+        await waitUntil({ counter.count >= 3 }, timeout: .seconds(5))
+        // The stale loop wakes after ~80-100 ms; give it room to (incorrectly)
+        // publish shutdown, then require the new loop to still be alive.
+        try? await Task.sleep(for: .milliseconds(300))
+        #expect(scheduler.isActive)
+        let countAfterStaleWindow = counter.count
+        try? await Task.sleep(for: .milliseconds(300))
+        #expect(counter.count > countAfterStaleWindow)
+
+        shouldContinue = false
+        scheduler.cancel()
+        #expect(!scheduler.isActive)
+    }
+}
+
+/// Thread-confined pulse counter for scheduler tests.
+@MainActor
+private final class PulseCounter {
+    private(set) var count = 0
+
+    func increment() {
+        count += 1
     }
 }

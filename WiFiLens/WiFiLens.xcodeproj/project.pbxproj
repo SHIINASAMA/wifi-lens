@@ -474,8 +474,6 @@
 		AR0000000000000000000026 /* APRadarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000006 /* APRadarView.swift */; };
 		AR0000000000000000000017 /* APSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000007 /* APSelectionView.swift */; };
 		AR0000000000000000000027 /* APSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000007 /* APSelectionView.swift */; };
-		AR0000000000000000000018 /* ap-radar-pulse.wav in Resources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000008 /* ap-radar-pulse.wav */; };
-		AR0000000000000000000028 /* ap-radar-pulse.wav in Resources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000008 /* ap-radar-pulse.wav */; };
 		AR0000000000000000000019 /* APRadarSignalProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR0000000000000000000009 /* APRadarSignalProcessorTests.swift */; };
 		AR000000000000000000001A /* APRadarViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR000000000000000000000A /* APRadarViewModelTests.swift */; };
 		AR000000000000000000001B /* APRadarSoundSynthesizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AR000000000000000000000C /* APRadarSoundSynthesizerTests.swift */; };
@@ -824,7 +822,6 @@
 		AR0000000000000000000005 /* APRadarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarViewModel.swift; sourceTree = "<group>"; };
 		AR0000000000000000000006 /* APRadarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarView.swift; sourceTree = "<group>"; };
 		AR0000000000000000000007 /* APSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APSelectionView.swift; sourceTree = "<group>"; };
-		AR0000000000000000000008 /* ap-radar-pulse.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ap-radar-pulse.wav; sourceTree = "<group>"; };
 		AR0000000000000000000009 /* APRadarSignalProcessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarSignalProcessorTests.swift; sourceTree = "<group>"; };
 		AR000000000000000000000A /* APRadarViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarViewModelTests.swift; sourceTree = "<group>"; };
 		AR000000000000000000000C /* APRadarSoundSynthesizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APRadarSoundSynthesizerTests.swift; sourceTree = "<group>"; };
@@ -1223,7 +1220,6 @@
 				FBBD169B2FD063630093F940 /* Assets.xcassets */,
 				FBBD16982FD062F60093F940 /* PrivacyInfo.xcprivacy */,
 				FBB1F0AB2FC61E3D00E9D2C6 /* Localizable.xcstrings */,
-				AR0000000000000000000008 /* ap-radar-pulse.wav */,
 				MV0000000000000000000050 /* mac-vendor-database.json */,
 			);
 			path = Resources;
@@ -1829,7 +1825,6 @@
 				FBBD169D2FD063630093F940 /* Assets.xcassets in Resources */,
 				FB1E329D2FC7316C009D1BDC /* Localizable.xcstrings in Resources */,
 				MV0000000000000000000051 /* mac-vendor-database.json in Resources */,
-				AR0000000000000000000028 /* ap-radar-pulse.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1841,7 +1836,6 @@
 				FBBD169C2FD063630093F940 /* Assets.xcassets in Resources */,
 				FBB1F0AC2FC61E3D00E9D2C6 /* Localizable.xcstrings in Resources */,
 				MV0000000000000000000049 /* mac-vendor-database.json in Resources */,
-				AR0000000000000000000018 /* ap-radar-pulse.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

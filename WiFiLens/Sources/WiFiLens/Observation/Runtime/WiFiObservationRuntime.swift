@@ -69,6 +69,13 @@ final class WiFiObservationRuntime {
     private var rawCycleReplacementCount: UInt64 = 0
     private var activeScanGeneration: UUID?
     private var activeLifecycleGeneration: UUID?
+    /// Active lifecycle facts kept after the start broadcast so consumers that
+    /// register later (e.g. AP Radar joining an already-running scan) can be
+    /// replayed the current expected scan interval instead of guessing.
+    private var activeLifecycleStartedAt: Date?
+    private var activeScanInterval: Duration?
+    /// Chains lifecycle replays so tests can drain them deterministically.
+    private var lifecycleReplayTail: Task<Void, Never>?
     private var outputProjection: (@MainActor (WiFiObservationScanOutput) -> Void)?
     private var requestedOutputProjection: (@MainActor (WiFiObservationScanOutput) -> Void)?
     private var publicationEligibility: (@MainActor () -> Bool)?
@@ -82,6 +89,18 @@ final class WiFiObservationRuntime {
 
     func drainRawCyclesForTesting() async {
         while let task = rawCycleTask {
+            await task.value
+        }
+    }
+
+    /// Waits for every pending lifecycle replay scheduled by `addConsumer`.
+    ///
+    /// The tail is cleared before awaiting so a completed replay does not make
+    /// this loop re-await the same finished task forever; a replay added while
+    /// draining is picked up by the next iteration.
+    func drainLifecycleReplaysForTesting() async {
+        while let task = lifecycleReplayTail {
+            lifecycleReplayTail = nil
             await task.value
         }
     }
@@ -104,7 +123,24 @@ final class WiFiObservationRuntime {
     func addConsumer(_ consumer: any WiFiObservationConsuming) {
         let identifier = ObjectIdentifier(consumer)
         guard workers[identifier] == nil else { return }
-        workers[identifier] = ObservationConsumerWorker(consumer: consumer)
+        let worker = ObservationConsumerWorker(consumer: consumer)
+        workers[identifier] = worker
+        // Replay the active lifecycle to consumers that join after the scan
+        // already started so they observe the real expected scan interval
+        // (and therefore the correct signal-loss timeout) without waiting for
+        // the next restart. The generation guard drops the replay if the scan
+        // stops or restarts before it runs.
+        guard let startedAt = activeLifecycleStartedAt,
+              let interval = activeScanInterval,
+              let generation = activeLifecycleGeneration else { return }
+        let previous = lifecycleReplayTail
+        lifecycleReplayTail = Task { @MainActor [weak self] in
+            await previous?.value
+            guard let self,
+                  self.activeLifecycleGeneration == generation,
+                  self.workers[identifier] === worker else { return }
+            await worker.sessionStarted(at: startedAt, expectedInterval: interval)
+        }
     }
 
     /// Stops delivering observations and lifecycle events to a consumer.
@@ -231,6 +267,8 @@ final class WiFiObservationRuntime {
         outputProjection = onOutput
         publicationEligibility = isPublicationEligible
         let startedAt = now()
+        activeLifecycleStartedAt = startedAt
+        activeScanInterval = configuration.scanInterval
         for worker in workers.values {
             await worker.sessionStarted(at: startedAt, expectedInterval: configuration.scanInterval)
         }
@@ -374,6 +412,9 @@ final class WiFiObservationRuntime {
     private func finishLifecycleIfOwned(_ generation: UUID, at date: Date) async {
         guard activeLifecycleGeneration == generation else { return }
         activeLifecycleGeneration = nil
+        activeLifecycleStartedAt = nil
+        activeScanInterval = nil
+        lifecycleReplayTail = nil
         for worker in workers.values { await worker.sessionStopped(at: date) }
     }
 

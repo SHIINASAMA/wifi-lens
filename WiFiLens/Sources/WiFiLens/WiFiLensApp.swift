@@ -389,9 +389,14 @@ private struct AppRootView: View {
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active, !ProcessInfo.processInfo.isRunningUnderTestHost {
                 GuidanceCoordinator.shared.recordAppActive()
+                apRadarViewModel.handleAppActive()
                 Task { await viewModel.handleSceneDidBecomeActive() }
-            } else if newPhase == .inactive || newPhase == .background {
-                apRadarViewModel.handleAppInactive()
+            } else if newPhase == .background {
+                // Ordinary `.inactive` (losing focus) must NOT suspend AP
+                // Radar: the user may carry the Mac while the window is not
+                // focused. Only backgrounding/sleep stops sound, and it stays
+                // suspended until the app returns to `.active`.
+                apRadarViewModel.handleAppBackground()
             }
         }
     }

@@ -101,15 +101,30 @@ final class APRadarViewModel: WiFiObservationConsuming {
         audioPlayer.stop()
     }
 
-    func handleAppInactive() {
+    /// App moved to the background or the system is about to sleep: stop
+    /// sound and scheduling, keep the optional target, wait for a fresh
+    /// sample after the app returns.
+    func handleAppBackground() {
         suspend()
+    }
+
+    /// App became active again after a background suspension. Clears the
+    /// suspension so the next fresh scan sample rebuilds smoothing and resumes
+    /// sound. Sound never starts here: the spec requires a new sample after
+    /// sleep/inactivity, and observations delivered while still suspended stay
+    /// ignored (see `consume`).
+    func handleAppActive() {
+        guard isActive, isSuspended else { return }
+        isSuspended = false
+        signalProcessor.reset()
     }
 
     func handleWiFiPowerStateChange(_ powerState: WiFiPowerState) {
         switch powerState {
         case .poweredOn:
             // Next scan sample re-establishes smoothing state.
-            break
+            isSuspended = false
+            signalProcessor.reset()
         case .poweredOff, .interfaceUnavailable:
             suspend()
         }
@@ -327,17 +342,18 @@ final class APRadarViewModel: WiFiObservationConsuming {
         updateScanFailure(from: observation)
         guard let target else { return }
 
+        if isSuspended {
+            // While the app is backgrounded / Wi-Fi is off, samples must not
+            // re-arm the smoother or restart sound. `handleAppActive` (or a
+            // powered-on transition) clears the suspension; the first sample
+            // after that rebuilds smoothing from scratch.
+            return
+        }
+
         let timestamp = observation.timestamp
         let networks = observation.environmentSnapshot?.networks ?? []
         let matched = networks.first {
             TrackedAccessPoint.normalizedBSSID($0.bssid) == target.bssid
-        }
-
-        if isSuspended {
-            // Fresh sample after sleep/inactivity: rebuild smoothing from
-            // scratch so pre-suspension RSSI cannot pollute the new state.
-            signalProcessor.reset()
-            isSuspended = false
         }
 
         let wasLost = state.isSignalLost
@@ -355,7 +371,7 @@ final class APRadarViewModel: WiFiObservationConsuming {
             // @Observable `target` property in the same expression (runtime
             // exclusivity trap in Debug builds).
             var updatedTarget = target
-            if let currentSSID = matched.ssid {
+            if let currentSSID = matched.ssid, !currentSSID.isEmpty {
                 updatedTarget.currentSSID = currentSSID
             }
             updatedTarget.channel = matched.channel.channelNumber
