@@ -41,6 +41,7 @@ private struct AppRootView: View {
     @Bindable var macVendorDatabaseManager: MACVendorDatabaseManager
     let macVendorDatabaseSummary: MACVendorBundledDatabaseSummary?
     @Bindable var roamingViewModel: RoamingTestViewModel
+    @Bindable var apRadarViewModel: APRadarViewModel
     var bleViewModel: BLEViewModel?
     @Binding var showCrashLog: Bool
     @Binding var crashLogText: String
@@ -211,6 +212,15 @@ private struct AppRootView: View {
                         .accessibilityIdentifier("page-roaming")
                         .accessibilityElement(children: .contain)
 
+                    APRadarView(
+                        viewModel: apRadarViewModel,
+                        isActive: selectedPage == .apRadar,
+                        onRescan: { viewModel.requestImmediateRescan() }
+                    )
+                        .opacity(selectedPage == .apRadar ? 1 : 0)
+                        .allowsHitTesting(selectedPage == .apRadar)
+                        .accessibilityElement(children: .contain)
+
                     BLEScannerView(viewModel: bleViewModel, bleEnabled: bleEnabled)
                         .opacity(selectedPage == .bleScanner ? 1 : 0)
                         .allowsHitTesting(selectedPage == .bleScanner)
@@ -224,7 +234,8 @@ private struct AppRootView: View {
                         bluetoothPermission: bleViewModel?.bluetoothPermission,
                         bleEnabled: $bleEnabled,
                         onScanIntervalChange: { viewModel.scanIntervalSeconds = $0 },
-                        onRegulatoryRegionChange: viewModel.handleRegulatoryRegionOverrideChange
+                        onRegulatoryRegionChange: viewModel.handleRegulatoryRegionOverrideChange,
+                        isActive: selectedPage == .settings
                     )
                         .opacity(selectedPage == .settings ? 1 : 0)
                         .allowsHitTesting(selectedPage == .settings)
@@ -289,6 +300,7 @@ private struct AppRootView: View {
             }
             .onChange(of: viewModel.wifiPowerState) { _, newState in
                 roamingViewModel.handleWiFiPowerStateChange(newState)
+                apRadarViewModel.handleWiFiPowerStateChange(newState)
             }
             .alert(String(localized: "permission.crash_detected_title", comment: "Alert title when previous crash is detected on launch"), isPresented: $showCrashLog) {
                 Button(String(localized: "common.action.dismiss", comment: "Dismiss/close alert button"), role: .cancel) {}
@@ -377,7 +389,14 @@ private struct AppRootView: View {
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active, !ProcessInfo.processInfo.isRunningUnderTestHost {
                 GuidanceCoordinator.shared.recordAppActive()
+                apRadarViewModel.handleAppActive()
                 Task { await viewModel.handleSceneDidBecomeActive() }
+            } else if newPhase == .background {
+                // Ordinary `.inactive` (losing focus) must NOT suspend AP
+                // Radar: the user may carry the Mac while the window is not
+                // focused. Only backgrounding/sleep stops sound, and it stays
+                // suspended until the app returns to `.active`.
+                apRadarViewModel.handleAppBackground()
             }
         }
     }
@@ -977,6 +996,7 @@ struct WiFiLensApp: App {
     @State private var macVendorDatabaseManager: MACVendorDatabaseManager
     private let macVendorDatabaseSummary: MACVendorBundledDatabaseSummary?
     @State private var roamingViewModel = RoamingTestViewModel()
+    @State private var apRadarViewModel: APRadarViewModel
     @State private var bleViewModel: BLEViewModel?
     /// Declared before `sparkleUpdater` so the existing-install migration
     /// observes `SUEnableAutomaticChecks` before Sparkle writes it on a
@@ -1005,7 +1025,14 @@ struct WiFiLensApp: App {
         let vendorResolver = MACVendorResolver(database: database)
         let databaseSummary = database?.summary
         macVendorDatabaseSummary = databaseSummary
-        _viewModel = State(initialValue: ScannerViewModel(vendorResolver: vendorResolver))
+        let observationRuntime = WiFiObservationRuntime(store: WiFiObservationStore.shared)
+        _viewModel = State(initialValue: ScannerViewModel(
+            observationRuntime: observationRuntime,
+            vendorResolver: vendorResolver
+        ))
+        _apRadarViewModel = State(initialValue: APRadarViewModel(
+            observationRuntime: observationRuntime
+        ))
         _macVendorDatabaseManager = State(
             initialValue: MACVendorDatabaseManager(
                 resolver: vendorResolver,
@@ -1043,6 +1070,7 @@ struct WiFiLensApp: App {
                     macVendorDatabaseManager: macVendorDatabaseManager,
                     macVendorDatabaseSummary: macVendorDatabaseSummary,
                     roamingViewModel: roamingViewModel,
+                    apRadarViewModel: apRadarViewModel,
                     bleViewModel: bleViewModel,
                     showCrashLog: $showCrashLog,
                     crashLogText: $crashLogText,

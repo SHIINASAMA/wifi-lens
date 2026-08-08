@@ -8,6 +8,7 @@ enum SidebarPage: String, CaseIterable {
     case networkDiagnostics
     case roaming
     case bleScanner
+    case apRadar
     case timeline
     case statistics
     case insights
@@ -24,7 +25,7 @@ enum SidebarPage: String, CaseIterable {
         switch self {
         case .overview, .settings, .bleScanner, .timeline, .statistics, .insights, .networkDiagnostics:
             false
-        case .spectrum, .channels, .interfaces, .roaming:
+        case .spectrum, .channels, .interfaces, .roaming, .apRadar:
             true
 #if DEBUG
         case .spectrumDebugChart, .debugChart:
@@ -41,7 +42,7 @@ enum SidebarPage: String, CaseIterable {
         switch self {
         case .overview, .settings, .bleScanner, .timeline, .statistics, .insights, .networkDiagnostics:
             false
-        case .spectrum, .channels, .interfaces, .roaming:
+        case .spectrum, .channels, .interfaces, .roaming, .apRadar:
             true
 #if DEBUG
         case .spectrumDebugChart, .debugChart:
@@ -63,6 +64,7 @@ enum SidebarPage: String, CaseIterable {
         case .networkDiagnostics: String(localized: "nav.network_diagnostics", comment: "Network Self-Check sidebar navigation item")
         case .roaming:   String(localized: "nav.roaming_test", comment: "Roaming Test sidebar navigation item")
         case .bleScanner: String(localized: "nav.ble_scanner", comment: "BLE Scanner sidebar navigation item")
+        case .apRadar: String(localized: "nav.apRadar", comment: "AP Radar sidebar navigation item")
         case .timeline: String(localized: "nav.timeline", comment: "Timeline sidebar navigation item")
         case .statistics: String(localized: "nav.statistics", comment: "Statistics sidebar navigation item")
         case .insights: String(localized: "nav.insights", comment: "Insights sidebar navigation item")
@@ -86,6 +88,7 @@ enum SidebarPage: String, CaseIterable {
         case .networkDiagnostics: "stethoscope"
         case .roaming:   "arrow.triangle.swap"
         case .bleScanner: "personalhotspot"
+        case .apRadar: "dot.radiowaves.left.and.right"
         case .timeline: "clock.arrow.circlepath"
         case .statistics: "chart.bar.xaxis"
         case .insights: "lightbulb"
@@ -103,6 +106,8 @@ enum SidebarPage: String, CaseIterable {
     var badgeStyle: SidebarBadge.Style? {
         switch self {
         case .networkDiagnostics:
+            .preview
+        case .apRadar:
             .preview
         default:
             nil
@@ -207,7 +212,7 @@ struct SidebarView: View {
             }
             Section {
                 sidebarGroupTitle(.tools)
-                ForEach([SidebarPage.spectrum, .channels, .interfaces, .networkDiagnostics, .roaming, .bleScanner], id: \.self) { page in
+                ForEach([SidebarPage.spectrum, .channels, .interfaces, .networkDiagnostics, .roaming, .bleScanner, .apRadar], id: \.self) { page in
                     if page == .bleScanner {
                         Label(title: { Text(page.label) }, icon: {
                             BluetoothIconShape()

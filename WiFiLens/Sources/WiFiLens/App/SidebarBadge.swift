@@ -70,11 +70,13 @@ struct SidebarBadge: View {
     enum Style: Equatable {
         case pro
         case preview
+        case experimental
 
         var icon: String {
             switch self {
             case .pro: "crown.fill"
             case .preview: "sparkles"
+            case .experimental: "flask"
             }
         }
 
@@ -82,6 +84,7 @@ struct SidebarBadge: View {
             switch self {
             case .pro: "common.badge.pro"
             case .preview: "common.badge.preview"
+            case .experimental: "common.badge.experimental"
             }
         }
 
@@ -111,6 +114,19 @@ struct SidebarBadge: View {
                         foreground: Swatch(hex: 0xE2DEFF),
                         background: Swatch(hex: 0x403675),
                         border: Swatch(hex: 0x7063C8)
+                    )
+                )
+            case .experimental:
+                Palette(
+                    light: ColorSet(
+                        foreground: Swatch(hex: 0x005F56),
+                        background: Swatch(hex: 0xE0F5F1),
+                        border: Swatch(hex: 0x4FB3A6)
+                    ),
+                    dark: ColorSet(
+                        foreground: Swatch(hex: 0xA7F0E6),
+                        background: Swatch(hex: 0x1F4E49),
+                        border: Swatch(hex: 0x53C6B7)
                     )
                 )
             }
