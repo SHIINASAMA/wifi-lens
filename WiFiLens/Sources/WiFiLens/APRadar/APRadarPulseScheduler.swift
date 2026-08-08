@@ -50,6 +50,21 @@ final class APRadarPulseScheduler: APRadarPulseScheduling {
     /// of only after the previous, longer interval finishes.
     private static let recheckStep: Duration = .milliseconds(100)
 
+    /// Test seam: replaces wall-clock sleeps with a deterministic sleeper.
+    private let sleep: @MainActor (Duration) async throws -> Void
+
+    init(
+        sleep: @escaping @MainActor (Duration) async throws -> Void =
+            APRadarPulseScheduler.realSleep
+    ) {
+        self.sleep = sleep
+    }
+
+    @MainActor
+    private static func realSleep(for duration: Duration) async throws {
+        try await Task.sleep(for: duration)
+    }
+
     /// Starts (or restarts) the pulse loop. Any previous loop is cancelled
     /// first, so multiple starts never overlap.
     func start(
@@ -73,38 +88,39 @@ final class APRadarPulseScheduler: APRadarPulseScheduling {
                     // cancellation / mute / stop breaks the wait, and the
                     // next loop draws a new interval from the current mean.
                     let mean = intervalProvider()
-                    let drawn = APRadarPulseInterval.nextExponentialInterval(
+                    let drawn: Double = APRadarPulseInterval.nextExponentialInterval(
                         mean: APRadarPulseInterval.seconds(from: mean)
                     )
-                    let deadline = ContinuousClock.now.advanced(by: .seconds(drawn))
+                    var remaining: Duration = .seconds(drawn)
                     while !Task.isCancelled {
                         guard self.generation == token, self.isRunning, shouldContinue() else { break }
-                        let remaining = deadline - ContinuousClock.now
                         guard remaining > .zero else { break }
+                        let step = min(remaining, Self.recheckStep)
                         do {
-                            try await Task.sleep(for: min(remaining, Self.recheckStep))
+                            try await self.sleep(step)
                         } catch {
                             break
                         }
+                        remaining -= step
                     }
                 } else {
                     // Wait in small steps. If a fresh RSSI sample shortens the
                     // desired interval, pull the next pulse forward instead of
                     // sleeping out the old, longer interval.
-                    var deadline = ContinuousClock.now.advanced(by: intervalProvider())
+                    var remaining = intervalProvider()
                     while !Task.isCancelled {
                         guard self.generation == token, self.isRunning, shouldContinue() else { break }
-                        let remaining = deadline - ContinuousClock.now
                         guard remaining > .zero else { break }
+                        let step = min(remaining, Self.recheckStep)
                         do {
-                            try await Task.sleep(for: min(remaining, Self.recheckStep))
+                            try await self.sleep(step)
                         } catch {
                             break
                         }
+                        remaining -= step
                         let desired = intervalProvider()
-                        let pulledIn = ContinuousClock.now.advanced(by: desired)
-                        if pulledIn < deadline {
-                            deadline = pulledIn
+                        if desired < remaining {
+                            remaining = desired
                         }
                     }
                 }

@@ -344,6 +344,8 @@ final class APRadarSoundPreviewer {
     /// a replacement cannot stop the new preview's player or state.
     private var generation = 0
     private(set) var isPlaying = false
+    /// Test seam: replaces wall-clock sleeps with a deterministic sleeper.
+    private let sleep: @MainActor (Duration) async throws -> Void
 
     /// Number of pulses for the regular (non-Geiger) preview.
     private static let regularPulseCount = 3
@@ -355,8 +357,18 @@ final class APRadarSoundPreviewer {
     /// the irregular cadence without being mistaken for a steady rhythm).
     private static let geigerPreviewMeanInterval: Double = 0.25
 
-    init(player: any APRadarAudioPlaying = APRadarAudioPlayer()) {
+    init(
+        player: any APRadarAudioPlaying = APRadarAudioPlayer(),
+        sleep: @escaping @MainActor (Duration) async throws -> Void =
+            APRadarSoundPreviewer.realSleep
+    ) {
         self.player = player
+        self.sleep = sleep
+    }
+
+    @MainActor
+    private static func realSleep(for duration: Duration) async throws {
+        try await Task.sleep(for: duration)
     }
 
     /// Starts a short preview of `preset`, replacing any running preview.
@@ -399,20 +411,24 @@ final class APRadarSoundPreviewer {
 
     private func runPreview(preset: APRadarSoundPreset, token: Int) async {
         if preset == .geiger {
-            let end = ContinuousClock.now.advanced(by: Self.geigerPreviewDuration)
-            while !Task.isCancelled, ContinuousClock.now < end {
+            // Track the remaining burst time instead of an absolute deadline so
+            // the loop is fully deterministic under an injected sleeper.
+            var remaining = Self.geigerPreviewDuration
+            while !Task.isCancelled, remaining > .zero {
                 guard generation == token else { return }
                 player.playPulse()
                 let interval = APRadarPulseInterval.nextExponentialInterval(
                     mean: Self.geigerPreviewMeanInterval
                 )
-                try? await Task.sleep(for: .seconds(interval))
+                let step: Duration = .seconds(interval)
+                try? await sleep(step)
+                remaining -= step
             }
         } else {
             for _ in 0..<Self.regularPulseCount {
                 guard !Task.isCancelled, generation == token else { break }
                 player.playPulse()
-                try? await Task.sleep(for: Self.regularPulseSpacing)
+                try? await sleep(Self.regularPulseSpacing)
             }
         }
         // Only the current generation may stop the player and publish the

@@ -687,25 +687,64 @@ struct APRadarViewModelTests {
 
 }
 
+/// Deterministic sleep seam for AP Radar audio and scheduler tests. `sleep(for:)`
+/// suspends until the test calls `advance(by:)`, so every wait is driven
+/// explicitly and no test relies on wall-clock timing.
+@MainActor
+private final class ManualSleeper {
+    private struct Waiter {
+        let deadline: Duration
+        let continuation: CheckedContinuation<Void, Never>
+    }
+
+    private(set) var elapsed: Duration = .zero
+    private(set) var requestedDurations: [Duration] = []
+    private var waiters: [Waiter] = []
+
+    /// Registers a sleep that fires once `elapsed` reaches its deadline.
+    func sleep(for duration: Duration) async {
+        requestedDurations.append(duration)
+        let deadline = elapsed + duration
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            waiters.append(Waiter(deadline: deadline, continuation: continuation))
+        }
+    }
+
+    /// Advances the fake clock and resumes every sleep whose deadline is due.
+    func advance(by duration: Duration) {
+        elapsed += duration
+        let due = waiters.filter { $0.deadline <= elapsed }
+        waiters.removeAll { $0.deadline <= elapsed }
+        for waiter in due {
+            waiter.continuation.resume()
+        }
+    }
+
+    /// Yields until the production task registers its next sleep, letting any
+    /// resumed task run to its next suspension. Bounded so a missing sleep
+    /// fails the test instead of hanging CI.
+    func waitForPendingSleep() async {
+        for _ in 0..<1_000 where waiters.isEmpty {
+            await Task.yield()
+        }
+    }
+}
+
 @Suite("APRadarSoundPreviewer")
 @MainActor
 struct APRadarSoundPreviewerTests {
-    /// Polls until `condition` becomes true or the timeout elapses, so timing
-    /// assertions stay robust on slow CI machines.
-    private func waitUntil(
-        _ condition: () -> Bool,
-        timeout: Duration = .seconds(3)
-    ) async {
-        let deadline = ContinuousClock.now.advanced(by: timeout)
-        while !condition(), ContinuousClock.now < deadline {
-            try? await Task.sleep(for: .milliseconds(25))
-        }
+    private func makePreviewer(
+        _ audio: FakeAudioPlayer,
+        _ sleeper: ManualSleeper
+    ) -> APRadarSoundPreviewer {
+        APRadarSoundPreviewer(player: audio, sleep: sleeper.sleep(for:))
     }
 
     @Test("preview prepares the preset and plays a short burst")
     func previewPlaysShortBurst() async throws {
         let audio = FakeAudioPlayer()
-        let previewer = APRadarSoundPreviewer(player: audio)
+        let sleeper = ManualSleeper()
+        let previewer = makePreviewer(audio, sleeper)
 
         let started = previewer.start(preset: .tick)
         #expect(started)
@@ -713,30 +752,46 @@ struct APRadarSoundPreviewerTests {
         #expect(audio.prepareCallCount == 1)
         #expect(audio.lastPreparedPreset == .tick)
 
-        // The preview is three pulses at 300 ms spacing, but under the
-        // parallel full-suite load the main-actor task can be delayed, so
-        // allow a generous window before asserting the burst completed.
-        await waitUntil({ !previewer.isPlaying }, timeout: .seconds(10))
+        // Three pulses at 300 ms spacing; drive each wait explicitly.
+        await sleeper.waitForPendingSleep()
+        #expect(audio.playCallCount == 1)
+        #expect(previewer.isPlaying)
+
+        sleeper.advance(by: .milliseconds(300))
+        await sleeper.waitForPendingSleep()
+        #expect(audio.playCallCount == 2)
+        #expect(previewer.isPlaying)
+
+        sleeper.advance(by: .milliseconds(300))
+        await sleeper.waitForPendingSleep()
+        #expect(audio.playCallCount == 3)
+        #expect(previewer.isPlaying)
+
+        sleeper.advance(by: .milliseconds(300))
+        await sleeper.waitForPendingSleep()
         #expect(!previewer.isPlaying)
-        #expect(audio.playCallCount >= 3)
         #expect(audio.stopCallCount >= 1)
     }
 
     @Test("stop cancels the preview task immediately")
     func stopCancelsPreview() async throws {
         let audio = FakeAudioPlayer()
-        let previewer = APRadarSoundPreviewer(player: audio)
+        let sleeper = ManualSleeper()
+        let previewer = makePreviewer(audio, sleeper)
 
         previewer.start(preset: .tick)
-        await waitUntil { audio.playCallCount >= 1 }
+        await sleeper.waitForPendingSleep()
+        #expect(audio.playCallCount == 1)
+
         previewer.stop()
 
         let playCountAfterStop = audio.playCallCount
         #expect(!previewer.isPlaying)
         #expect(audio.stopCallCount >= 1)
 
-        // No further pulses may fire after cancellation.
-        try? await Task.sleep(for: .milliseconds(700))
+        // Wake the cancelled task; it must not fire any further pulses.
+        sleeper.advance(by: .milliseconds(300))
+        await sleeper.waitForPendingSleep()
         #expect(audio.playCallCount == playCountAfterStop)
     }
 
@@ -749,22 +804,29 @@ struct APRadarSoundPreviewerTests {
         let started = previewer.start(preset: .blip)
         #expect(!started)
         #expect(!previewer.isPlaying)
-
-        try? await Task.sleep(for: .milliseconds(200))
         #expect(audio.playCallCount == 0)
     }
 
     @Test("geiger preview plays a burst of irregular clicks")
     func geigerPreviewPlaysBurst() async throws {
         let audio = FakeAudioPlayer()
-        let previewer = APRadarSoundPreviewer(player: audio)
+        let sleeper = ManualSleeper()
+        let previewer = makePreviewer(audio, sleeper)
 
         previewer.start(preset: .geiger)
         #expect(audio.lastPreparedPreset == .geiger)
         #expect(previewer.isPlaying)
 
-        try? await Task.sleep(for: .milliseconds(400))
+        // Drive ~1.5 s of burst time in chunks. The exact click count is
+        // random, but several pulses must fire and stop() must silence it.
+        await sleeper.waitForPendingSleep()
         #expect(audio.playCallCount >= 1)
+
+        for _ in 0..<6 {
+            sleeper.advance(by: .milliseconds(250))
+            await sleeper.waitForPendingSleep()
+        }
+        #expect(audio.playCallCount >= 2)
 
         previewer.stop()
         #expect(!previewer.isPlaying)
@@ -773,25 +835,39 @@ struct APRadarSoundPreviewerTests {
     @Test("replacing a preview immediately does not stop the new one")
     func replacingPreviewDoesNotStopNewOne() async throws {
         let audio = FakeAudioPlayer()
-        let previewer = APRadarSoundPreviewer(player: audio)
+        let sleeper = ManualSleeper()
+        let previewer = makePreviewer(audio, sleeper)
 
-        // Rapid replacement is the stale-task race: the cancelled tick loop
-        // must not stop the new blip preview or clear its state when it wakes.
+        // Tick preview starts and reaches its first sleep.
         previewer.start(preset: .tick)
+        await sleeper.waitForPendingSleep()
+        #expect(audio.playCallCount == 1)
+
+        // Replace with blip while the tick loop is mid-sleep (the race).
         previewer.start(preset: .blip)
-
         #expect(previewer.isPlaying)
         #expect(audio.lastPreparedPreset == .blip)
 
-        // The cancelled tick preview (3 x 300 ms) would have ended by now; the
-        // blip preview must still be running and unaffected.
-        await waitUntil({ audio.playCallCount >= 2 }, timeout: .seconds(5))
-        try? await Task.sleep(for: .milliseconds(500))
+        // Wake the stale tick loop first: it must not stop the blip preview.
+        sleeper.advance(by: .milliseconds(300))
+        await sleeper.waitForPendingSleep()
         #expect(previewer.isPlaying)
         #expect(audio.lastPreparedPreset == .blip)
+        #expect(audio.playCallCount == 2)
 
-        // The blip preview finishes naturally afterwards.
-        await waitUntil({ !previewer.isPlaying }, timeout: .seconds(10))
+        // The blip preview continues: pulse 2, pulse 3, then natural stop.
+        sleeper.advance(by: .milliseconds(300))
+        await sleeper.waitForPendingSleep()
+        #expect(previewer.isPlaying)
+        #expect(audio.playCallCount == 3)
+
+        sleeper.advance(by: .milliseconds(300))
+        await sleeper.waitForPendingSleep()
+        #expect(previewer.isPlaying)
+        #expect(audio.playCallCount == 4)
+
+        sleeper.advance(by: .milliseconds(300))
+        await sleeper.waitForPendingSleep()
         #expect(!previewer.isPlaying)
         #expect(audio.stopCallCount >= 1)
     }
@@ -813,33 +889,27 @@ struct APRadarSoundPreviewerTests {
 @Suite("APRadarPulseScheduler")
 @MainActor
 struct APRadarPulseSchedulerTests {
-    /// Polls until `condition` becomes true or the timeout elapses, so timing
-    /// assertions stay robust on slow CI machines.
-    private func waitUntil(
-        _ condition: () -> Bool,
-        timeout: Duration = .seconds(3)
-    ) async {
-        let deadline = ContinuousClock.now.advanced(by: timeout)
-        while !condition(), ContinuousClock.now < deadline {
-            try? await Task.sleep(for: .milliseconds(25))
-        }
-    }
-
     @Test("immediate restart keeps the new loop active and pulsing")
     func restartKeepsNewLoopActive() async {
-        let scheduler = APRadarPulseScheduler()
+        let sleeper = ManualSleeper()
+        let scheduler = APRadarPulseScheduler(sleep: sleeper.sleep(for:))
         let counter = PulseCounter()
         var shouldContinue = true
         let interval: Duration = .milliseconds(80)
 
         // Preset changes / cadence-mode switches call start() twice back to
-        // back; the first loop is cancelled while its first sleep is pending.
+        // back. Loop A starts and reaches its first sleep.
         scheduler.start(
             shouldContinue: { shouldContinue },
             intervalProvider: { interval },
             playPulse: { counter.increment() },
             stochastic: false
         )
+        await sleeper.waitForPendingSleep()
+        #expect(counter.count == 1)
+
+        // Replace the loop while A is mid-sleep; B takes over but cannot run
+        // until A's sleep is driven to completion.
         scheduler.start(
             shouldContinue: { shouldContinue },
             intervalProvider: { interval },
@@ -847,14 +917,22 @@ struct APRadarPulseSchedulerTests {
             stochastic: false
         )
 
-        await waitUntil({ counter.count >= 3 }, timeout: .seconds(5))
-        // The stale loop wakes after ~80-100 ms; give it room to (incorrectly)
-        // publish shutdown, then require the new loop to still be alive.
-        try? await Task.sleep(for: .milliseconds(300))
+        // Wake the stale A first: it must not tear down B.
+        sleeper.advance(by: interval)
+        await sleeper.waitForPendingSleep()
         #expect(scheduler.isActive)
-        let countAfterStaleWindow = counter.count
-        try? await Task.sleep(for: .milliseconds(300))
-        #expect(counter.count > countAfterStaleWindow)
+        #expect(counter.count == 2)
+
+        // B keeps pulsing until told to stop.
+        sleeper.advance(by: interval)
+        await sleeper.waitForPendingSleep()
+        #expect(scheduler.isActive)
+        #expect(counter.count == 3)
+
+        sleeper.advance(by: interval)
+        await sleeper.waitForPendingSleep()
+        #expect(scheduler.isActive)
+        #expect(counter.count == 4)
 
         shouldContinue = false
         scheduler.cancel()
