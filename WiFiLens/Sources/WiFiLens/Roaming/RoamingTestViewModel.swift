@@ -71,6 +71,16 @@ final class RoamingTestViewModel {
     private var currentSegmentIndex: Int = -1
     private var previousProbe: WiFiCurrentStatus?
 
+    /// Generation of the current test run. Incremented whenever a run
+    /// starts or stops so in-flight tick continuations can detect that the
+    /// session they captured no longer matches the current one.
+    private var generation = 0
+
+    /// True while a tick's probe fetch/measure cycle is in flight, so
+    /// overlapping ticks never run concurrently and appended sample
+    /// timestamps stay monotonic.
+    private var isTickInFlight = false
+
     // MARK: - Computed
 
     var canStart: Bool {
@@ -122,6 +132,8 @@ final class RoamingTestViewModel {
 
     func startTest() {
         guard canStart else { return }
+        // Invalidate any tick still in flight from a previous run.
+        generation += 1
 
         Task {
             let status = await roamingProvider.fetchCurrentProbe()
@@ -154,6 +166,9 @@ final class RoamingTestViewModel {
     }
 
     func stopTest(userInitiated: Bool = true) {
+        // Invalidate any tick still awaiting a probe fetch or latency
+        // measurement; its continuation must not append samples after stop.
+        generation += 1
         let wasRunning = state == .running
         timer?.invalidate()
         timer = nil
@@ -177,13 +192,26 @@ final class RoamingTestViewModel {
 
     private func tick() {
         guard state == .running else { return }
+        // Skip this tick when the previous cycle is still awaiting a probe
+        // fetch or latency measurement, so ticks never overlap and samples
+        // are appended in strictly increasing order.
+        guard !isTickInFlight else { return }
+        isTickInFlight = true
+        // Capture the generation of the run this tick belongs to. A
+        // continuation that resumes after the run stopped or restarted must
+        // bail out instead of mutating the (possibly reset) state.
+        let tickGeneration = generation
 
         Task {
+            defer { isTickInFlight = false }
+
             let status = await roamingProvider.fetchCurrentProbe()
+            guard state == .running, generation == tickGeneration else { return }
 
             // Ping gateway asynchronously
             if let router = routerIP {
                 let result = await latencyProvider.measure(routerIP: router)
+                guard state == .running, generation == tickGeneration else { return }
                 gatewayLatency = result.latencyMs
             }
 

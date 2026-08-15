@@ -23,7 +23,7 @@ jobs:
     runs-on: macos-26
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-      SPARKLE_VERSION: "2.9.2"
+      SPARKLE_VERSION: "2.9.5"
       ARCHIVE_PATH: ${{ github.workspace }}/build/WiFiLens.xcarchive
       EXPORT_PATH: ${{ github.workspace }}/build/export
       DMG_BASENAME: WiFiLens
@@ -264,6 +264,23 @@ jobs:
       - name: Get Version
         run: |
           VERSION="${RELEASE_TAG#v}"
+          CONFIG_FILE="WiFiLens/Configs/Base.xcconfig"
+
+          MARKETING_VERSION="$(grep -E '^MARKETING_VERSION[[:space:]]*=' "$CONFIG_FILE" | head -1 | sed 's/^[^=]*=[[:space:]]*//' | tr -d '[:space:]')"
+          CURRENT_PROJECT_VERSION="$(grep -E '^CURRENT_PROJECT_VERSION[[:space:]]*=' "$CONFIG_FILE" | head -1 | sed 's/^[^=]*=[[:space:]]*//' | tr -d '[:space:]')"
+
+          if [ -z "$MARKETING_VERSION" ]; then
+            echo "error: MARKETING_VERSION not found in $CONFIG_FILE" >&2
+            exit 1
+          fi
+
+          echo "App version in $CONFIG_FILE: MARKETING_VERSION=$MARKETING_VERSION (CURRENT_PROJECT_VERSION=$CURRENT_PROJECT_VERSION)"
+
+          if [ "$VERSION" != "$MARKETING_VERSION" ]; then
+            echo "error: release tag '$RELEASE_TAG' resolves to VERSION='$VERSION' but app MARKETING_VERSION is '$MARKETING_VERSION'; aborting to avoid a Sparkle update that would be skipped" >&2
+            exit 1
+          fi
+
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Download Sparkle Tools

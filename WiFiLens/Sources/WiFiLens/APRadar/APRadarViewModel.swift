@@ -277,6 +277,10 @@ final class APRadarViewModel: WiFiObservationConsuming {
         do {
             try audioPlayer.prepare(preset: soundPreset)
             audioAvailable = true
+            // Clear any error state from a previous transient failure so the
+            // banner does not linger for the rest of the session.
+            audioErrorMessage = nil
+            audioFailureReported = false
         } catch {
             audioAvailable = false
             reportAudioFailure(underlying: error)
@@ -367,7 +371,10 @@ final class APRadarViewModel: WiFiObservationConsuming {
 
         if let matched {
             guard let smoothed = signalProcessor.ingest(rawRSSI: matched.rssi, at: timestamp) else {
-                return // Invalid RSSI sample: ignore entirely.
+                // Invalid RSSI sample: do not update the snapshot, but still
+                // evaluate signal loss so the UI does not linger on a stale one.
+                checkSignalLoss(at: timestamp)
+                return
             }
             // Copy-on-write the tracked target so we never read and modify the
             // @Observable `target` property in the same expression (runtime

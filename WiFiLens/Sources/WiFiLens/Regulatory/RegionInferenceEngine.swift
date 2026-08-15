@@ -73,7 +73,7 @@ enum RegionInferenceEngine {
             }
             return RegionInferenceResult(
                 domain: channelCandidate,
-                confidence: apValid ? .medium : .medium,
+                confidence: .medium,
                 contributions: contributions,
                 conflicts: conflicts
             )

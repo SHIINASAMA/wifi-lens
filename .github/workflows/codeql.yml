@@ -4,10 +4,24 @@ on:
   push:
     branches:
       - master
+    paths:
+      - ".github/workflows/codeql.yml"
+      - ".gitmodules"
+      - "WiFiLens/**"
+      - "ChartLens/**"
+      - "wifi-lens.xcworkspace/**"
+      - "web/**"
 
   pull_request:
     branches:
       - master
+    paths:
+      - ".github/workflows/codeql.yml"
+      - ".gitmodules"
+      - "WiFiLens/**"
+      - "ChartLens/**"
+      - "wifi-lens.xcworkspace/**"
+      - "web/**"
 
   schedule:
     - cron: "23 3 * * 1"

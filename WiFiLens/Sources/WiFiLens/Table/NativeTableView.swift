@@ -123,6 +123,13 @@ struct NativeTableView: NSViewRepresentable {
 
         let vendorColumnsChanged = updateVendorColumn(in: tableView)
 
+        if vendorColumnsChanged, !isVendorColumnAvailable {
+            // A removed column may be re-added on a later update; forget its
+            // autosize bookkeeping so it is fitted fresh instead of keeping a
+            // stale default width.
+            context.coordinator.autoSizedColumnIDs.remove("Vendor")
+        }
+
         let rowsChanged = context.coordinator.rows != rows
         let selectionChanged = context.coordinator.previousSelectedID != selectedID
         context.coordinator.rows = rows
@@ -134,15 +141,18 @@ struct NativeTableView: NSViewRepresentable {
 
         if rowsChanged {
             tableView.reloadData()
-            context.coordinator.autoSizeColumns()
-        } else if vendorColumnsChanged {
-            context.coordinator.autoSizeColumns()
         } else if selectionChanged {
             let visibleRange = tableView.rows(in: tableView.visibleRect)
             let rowIndexes = IndexSet(integersIn: visibleRange.lowerBound..<visibleRange.upperBound)
             let colIndexes = IndexSet(integersIn: 0..<tableView.tableColumns.count)
             tableView.reloadData(forRowIndexes: rowIndexes, columnIndexes: colIndexes)
         }
+
+        // Idempotent per column: a column is fitted exactly once, so running
+        // this on every update also covers the first render cycle (rows often
+        // match the coordinator's initial value) and never resets widths the
+        // user has since adjusted.
+        context.coordinator.autoSizeColumns()
 
         if needsRestore {
             if let selID = selectedID,
@@ -203,11 +213,13 @@ struct NativeTableView: NSViewRepresentable {
         var onToggleVisibilityLocked: ((String) -> Void)?
         weak var tableView: NSTableView?
         var previousSelectedID: String?
-        /// Whether automatic column sizing has already run once. After the
-        /// first fit, column widths belong to the user: refresh cycles must
-        /// never re-run auto-sizing, or manual width adjustments would be
-        /// reset on every scan update.
-        private var hasAutoSizedColumns = false
+        /// Column identifiers that have already been auto-sized. Once a column
+        /// has been fitted, its width belongs to the user: refresh cycles must
+        /// never re-run auto-sizing for that column, or manual width
+        /// adjustments would be reset on every scan update. Columns that show
+        /// up later (for example the Vendor column appearing on a later
+        /// update) are fitted the first time they are seen.
+        fileprivate var autoSizedColumnIDs: Set<String> = []
 
         init(rows: [NetworkTableRow], selectedID: Binding<String?>, sortOrder: Binding<[NSSortDescriptor]>, hiddenColumns: Binding<Set<String>>, onToggleVisibility: ((String) -> Void)?, onToggleVisibilityLocked: ((String) -> Void)?) {
             self.rows = rows
@@ -224,12 +236,16 @@ struct NativeTableView: NSViewRepresentable {
         }
 
         func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-            guard row < rows.count, let columnID = tableColumn?.identifier.rawValue else { return nil }
+            guard row < rows.count, let tableColumn else { return nil }
+            let columnID = tableColumn.identifier.rawValue
             let network = rows[row]
             let opacity = rowOpacity(network)
 
-            if columnID == "visibility" {
-                return makeCenteredIconCell(
+            switch columnID {
+            case "visibility":
+                let cell = makeIconCell(tableView: tableView, identifier: tableColumn.identifier)
+                configureIconButton(
+                    in: cell,
                     symbolName: network.isVisible ? "eye.fill" : "eye.slash",
                     tintColor: network.isVisible ? .secondaryLabelColor : .tertiaryLabelColor,
                     opacity: opacity,
@@ -237,10 +253,11 @@ struct NativeTableView: NSViewRepresentable {
                     action: #selector(Coordinator.visibilityToggled(_:)),
                     accessibilityLabel: String(localized: "table.accessibility.toggle_visibility", comment: "Toggle network visibility checkbox")
                 )
-            }
-
-            if columnID == "lock" {
-                return makeCenteredIconCell(
+                return cell
+            case "lock":
+                let cell = makeIconCell(tableView: tableView, identifier: tableColumn.identifier)
+                configureIconButton(
+                    in: cell,
                     symbolName: network.visibilityLocked ? "lock.fill" : "lock.open",
                     tintColor: network.visibilityLocked ? .secondaryLabelColor : .tertiaryLabelColor,
                     opacity: opacity,
@@ -248,36 +265,124 @@ struct NativeTableView: NSViewRepresentable {
                     action: #selector(Coordinator.lockToggled(_:)),
                     accessibilityLabel: String(localized: "table.accessibility.toggle_lock", comment: "Toggle network lock checkbox")
                 )
+                return cell
+            case "dot":
+                let cell = makeDotCell(tableView: tableView, identifier: tableColumn.identifier)
+                configureDot(in: cell, color: network.color, opacity: opacity)
+                return cell
+            default:
+                let cell = makeTextCell(tableView: tableView, identifier: tableColumn.identifier, columnID: columnID)
+                configureTextCell(cell, columnID: columnID, network: network, opacity: opacity)
+                return cell
+            }
+        }
+
+        @MainActor
+        private func makeIconCell(tableView: NSTableView, identifier: NSUserInterfaceItemIdentifier) -> NativeTableCellView {
+            if let cell = tableView.makeView(withIdentifier: identifier, owner: self) as? NativeTableCellView {
+                cell.prepareForReuse()
+                return cell
             }
 
-            if columnID == "dot" {
-                let view = NSView(frame: NSRect(x: 0, y: 0, width: 20, height: 20))
-                view.setAccessibilityElement(false)
-                let dot = NSView(frame: NSRect(x: 8, y: 6, width: 8, height: 8))
-                dot.wantsLayer = true
-                dot.layer?.cornerRadius = 4
-                let nsColor = NSColor(network.color)
-                dot.layer?.backgroundColor = nsColor.withAlphaComponent(opacity).cgColor
-                view.addSubview(dot)
-                return view
+            let cell = NativeTableCellView()
+            cell.identifier = identifier
+
+            let button = NSButton()
+            button.translatesAutoresizingMaskIntoConstraints = false
+            button.setButtonType(.momentaryChange)
+            button.isBordered = false
+            button.imagePosition = .imageOnly
+            button.imageScaling = .scaleProportionallyDown
+            button.target = self
+            cell.addSubview(button)
+            cell.iconButton = button
+
+            NSLayoutConstraint.activate([
+                button.centerXAnchor.constraint(equalTo: cell.centerXAnchor),
+                button.centerYAnchor.constraint(equalTo: cell.centerYAnchor),
+                button.widthAnchor.constraint(equalToConstant: 18),
+                button.heightAnchor.constraint(equalToConstant: 18)
+            ])
+            return cell
+        }
+
+        @MainActor
+        private func configureIconButton(
+            in cell: NativeTableCellView,
+            symbolName: String,
+            tintColor: NSColor,
+            opacity: Double,
+            row: Int,
+            action: Selector,
+            accessibilityLabel: String
+        ) {
+            guard let button = cell.iconButton else { return }
+            button.image = NSImage(systemSymbolName: symbolName, accessibilityDescription: nil)?
+                .withSymbolConfiguration(.init(pointSize: 11, weight: .medium))
+            button.contentTintColor = tintColor
+            button.alphaValue = opacity
+            button.tag = row
+            button.target = self
+            button.action = action
+            button.setAccessibilityLabel(accessibilityLabel)
+        }
+
+        @MainActor
+        private func makeDotCell(tableView: NSTableView, identifier: NSUserInterfaceItemIdentifier) -> NativeTableCellView {
+            if let cell = tableView.makeView(withIdentifier: identifier, owner: self) as? NativeTableCellView {
+                cell.prepareForReuse()
+                return cell
             }
+
+            let cell = NativeTableCellView()
+            cell.identifier = identifier
+            cell.setAccessibilityElement(false)
+
+            let dot = NSView(frame: NSRect(x: 8, y: 6, width: 8, height: 8))
+            dot.wantsLayer = true
+            dot.layer?.cornerRadius = 4
+            cell.addSubview(dot)
+            cell.dotView = dot
+            return cell
+        }
+
+        @MainActor
+        private func configureDot(in cell: NativeTableCellView, color: Color, opacity: Double) {
+            let nsColor = NSColor(color)
+            cell.dotView?.layer?.backgroundColor = nsColor.withAlphaComponent(opacity).cgColor
+        }
+
+        @MainActor
+        private func makeTextCell(tableView: NSTableView, identifier: NSUserInterfaceItemIdentifier, columnID: String) -> NativeTableCellView {
+            if let cell = tableView.makeView(withIdentifier: identifier, owner: self) as? NativeTableCellView {
+                cell.prepareForReuse()
+                return cell
+            }
+
+            let cell = NativeTableCellView()
+            cell.identifier = identifier
 
             let textField = NSTextField(labelWithString: "")
             textField.font = columnID == "BSSID" ? NSFont.systemFont(ofSize: 11) : NSFont.systemFont(ofSize: 12)
             textField.textColor = columnID == "BSSID" ? .secondaryLabelColor : .labelColor
-            textField.alphaValue = opacity
             textField.lineBreakMode = .byTruncatingTail
             textField.maximumNumberOfLines = 1
             textField.translatesAutoresizingMaskIntoConstraints = false
+            cell.addSubview(textField)
+            cell.textField = textField
 
-            let cellView = NSTableCellView()
-            cellView.addSubview(textField)
             NSLayoutConstraint.activate([
-                textField.leadingAnchor.constraint(equalTo: cellView.leadingAnchor),
-                textField.trailingAnchor.constraint(equalTo: cellView.trailingAnchor),
-                textField.centerYAnchor.constraint(equalTo: cellView.centerYAnchor)
+                textField.leadingAnchor.constraint(equalTo: cell.leadingAnchor),
+                textField.trailingAnchor.constraint(equalTo: cell.trailingAnchor),
+                textField.centerYAnchor.constraint(equalTo: cell.centerYAnchor)
             ])
-            cellView.textField = textField
+            return cell
+        }
+
+        @MainActor
+        private func configureTextCell(_ cell: NativeTableCellView, columnID: String, network: NetworkTableRow, opacity: Double) {
+            guard let textField = cell.textField else { return }
+            textField.alphaValue = opacity
 
             switch columnID {
             case "Hidden":
@@ -320,44 +425,6 @@ struct NativeTableView: NSViewRepresentable {
             case "CC": textField.stringValue = network.country
             default: textField.stringValue = ""
             }
-            return cellView
-        }
-
-        @MainActor
-        private func makeCenteredIconCell(
-            symbolName: String,
-            tintColor: NSColor,
-            opacity: Double,
-            row: Int,
-            action: Selector,
-            accessibilityLabel: String
-        ) -> NSView {
-            let container = NSTableCellView()
-
-            let button = NSButton()
-            button.translatesAutoresizingMaskIntoConstraints = false
-            button.setButtonType(.momentaryChange)
-            button.isBordered = false
-            button.imagePosition = .imageOnly
-            button.imageScaling = .scaleProportionallyDown
-            button.image = NSImage(systemSymbolName: symbolName, accessibilityDescription: nil)?
-                .withSymbolConfiguration(.init(pointSize: 11, weight: .medium))
-            button.contentTintColor = tintColor
-            button.alphaValue = opacity
-            button.tag = row
-            button.target = self
-            button.action = action
-            button.setAccessibilityLabel(accessibilityLabel)
-            container.addSubview(button)
-
-            NSLayoutConstraint.activate([
-                button.centerXAnchor.constraint(equalTo: container.centerXAnchor),
-                button.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-                button.widthAnchor.constraint(equalToConstant: 18),
-                button.heightAnchor.constraint(equalToConstant: 18)
-            ])
-
-            return container
         }
 
         func tableView(_ tableView: NSTableView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
@@ -408,10 +475,8 @@ struct NativeTableView: NSViewRepresentable {
 
         @MainActor
         func autoSizeColumns() {
-            guard !hasAutoSizedColumns else { return }
-            hasAutoSizedColumns = true
             guard let tableView else { return }
-            for column in tableView.tableColumns where !column.isHidden {
+            for column in tableView.tableColumns where !column.isHidden && !autoSizedColumnIDs.contains(column.identifier.rawValue) {
                 let headerWidth = (column.headerCell.attributedStringValue.size().width.rounded(.up)) + 20
                 var maxWidth = max(column.minWidth, headerWidth)
 
@@ -422,12 +487,39 @@ struct NativeTableView: NSViewRepresentable {
                 }
 
                 column.width = min(maxWidth, 260)
+                autoSizedColumnIDs.insert(column.identifier.rawValue)
             }
         }
 
         private func rowOpacity(_ row: NetworkTableRow) -> Double {
             row.isVisible ? 1.0 : 0.45
         }
+    }
+}
+
+/// Reusable cell view used by every column of the network table. It keeps
+/// direct references to the per-cell views it configures (text field, icon
+/// button, status dot) so `viewFor` can update them in place. AppKit does not
+/// automatically invoke a "prepare for reuse" hook for table cell views on
+/// macOS, so `viewFor` calls `prepareForReuse()` before reconfiguring a view
+/// returned by `makeView(withIdentifier:owner:)`.
+private final class NativeTableCellView: NSTableCellView {
+    /// Centered icon button backing the icon-style columns (visibility, lock).
+    var iconButton: NSButton?
+    /// Color dot backing the leading status column.
+    var dotView: NSView?
+
+    /// Clears row-specific content so a recycled cell never leaks state from
+    /// its previous row. Call before reconfiguring a reused view.
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        textField?.stringValue = ""
+        textField?.alignment = .natural
+        iconButton?.image = nil
+        iconButton?.contentTintColor = nil
+        iconButton?.alphaValue = 1
+        iconButton?.setAccessibilityLabel(nil)
+        dotView?.layer?.backgroundColor = nil
     }
 }
 

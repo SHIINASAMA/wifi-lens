@@ -14,6 +14,12 @@ enum AppLogger {
         LoggingSystem.bootstrap { label in
             var handlers: [LogHandler] = []
 
+            // Level policy:
+            // - Debug builds: console is .trace, OSLog and file are .debug, so
+            //   .debug diagnostics reach every sink and DebugConsoleLogPolicy
+            //   is not defeated by the more restrictive OSLog/file levels.
+            // - Release builds: OSLog and file stay at .info; the console
+            //   handler is compiled out entirely, so behavior is unchanged.
             #if DEBUG
             var console = ConsoleLogHandler(label: label)
             console.logLevel = .trace
@@ -21,10 +27,19 @@ enum AppLogger {
             #endif
 
             var os = OSLogHandler(label: label)
+            #if DEBUG
+            os.logLevel = .debug
+            #else
             os.logLevel = .info
+            #endif
             handlers.append(os)
 
+            #if DEBUG
+            var file = FileLogHandler(label: label)
+            file.logLevel = .debug
+            #else
             let file = FileLogHandler(label: label)
+            #endif
             handlers.append(file)
 
             return MultiplexLogHandler(handlers)

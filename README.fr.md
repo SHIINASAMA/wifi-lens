@@ -110,7 +110,7 @@ WiFi Lens ne collecte aucune donnée d'utilisation, aucune télémétrie de plan
 
 - **Services de localisation :** macOS exige cette autorisation pour exposer les noms de SSID Wi-Fi. WiFi Lens ne lit pas votre position GPS.
 - **Détection de la région :** WiFi Lens utilise les paramètres régionaux du système, la liste des canaux signalée par le matériel et les codes pays des points d'accès à proximité, sur l'appareil.
-- **Auto-diagnostic réseau :** Lorsque vous l'exécutez, WiFi Lens résout `example.com` et peut tester l'accessibilité de vos points de terminaison proxy configurés.
+- **Auto-diagnostic réseau :** Lorsque vous l'exécutez, WiFi Lens résout des points de terminaison publics (`www.apple.com`, `www.microsoft.com`, `www.msftconnecttest.com`) et peut tester l'accessibilité de vos points de terminaison proxy configurés.
 - **Serveur MCP :** Le serveur facultatif se lie à `127.0.0.1`. Les outils locaux ne peuvent accéder aux données de scan qu'après l'avoir activé.
 - **Vérification des mises à jour :** L'édition GitHub contacte GitHub lorsque vous demandez une vérification des mises à jour ou activez les vérifications automatiques.
 

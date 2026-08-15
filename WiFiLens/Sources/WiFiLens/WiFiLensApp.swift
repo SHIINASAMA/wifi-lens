@@ -1016,10 +1016,13 @@ struct WiFiLensApp: App {
     @State private var pendingResolvedMainWindowFocus = false
     @AppStorage("mcpEnabled") private var mcpEnabled: Bool = false
     @AppStorage("mcpPort") private var mcpPort: Int = 19840
+    @State private var mcpLifecycleTask: Task<Void, Never>? = nil
     @AppStorage("appearance") private var appearance: String = "system"
     @AppStorage("bleEnabled") private var bleEnabled: Bool = false
     @AppStorage("menuBarEnabled") private var menuBarEnabled: Bool = true
 
+    /// UI tests launch the app with `-ApplePersistenceIgnoreState YES` as a
+    /// launch argument to disable window state restoration.
     init() {
         let database = MACVendorBundledDatabase.load()
         let vendorResolver = MACVendorResolver(database: database)
@@ -1042,11 +1045,6 @@ struct WiFiLensApp: App {
                 } ?? .notInstalled
             )
         )
-
-        if UITestMode.isActive {
-            // UI tests pass -ApplePersistenceIgnoreState YES as a launch argument
-            // to disable window state restoration.
-        }
 
         AppLogger.bootstrap()
         CrashReporter.register()
@@ -1386,12 +1384,27 @@ struct WiFiLensApp: App {
 
     @MainActor
     private func updateMCPServer() {
-        viewModel.mcpServer.stop()
-        guard mcpEnabled else { return }
-        viewModel.mcpServer.port = UInt16(mcpPort)
-        Task { @MainActor in
+        // Serialize stop→start on a single lifecycle task so only one start() is
+        // ever in flight: NWListener releases its port asynchronously, so rapid
+        // setting toggles must not race a fresh start against a pending stop.
+        mcpLifecycleTask?.cancel()
+        let previous = mcpLifecycleTask
+        mcpLifecycleTask = Task { @MainActor in
+            if let previous {
+                // Wait for the superseded chain to fully unwind before touching
+                // the server. result never throws, so a cancelled predecessor is
+                // still awaited to completion.
+                _ = await previous.result
+            }
+            guard !Task.isCancelled else { return }
+            viewModel.mcpServer.stop()
+            guard mcpEnabled else { return }
+            guard !Task.isCancelled else { return }
+            viewModel.mcpServer.port = UInt16(mcpPort)
             do {
                 try await viewModel.mcpServer.start()
+            } catch is CancellationError {
+                // Superseded by a newer lifecycle request while starting.
             } catch {
                 AppLogger.mcp.error("MCP server failed to start: \(error)")
             }

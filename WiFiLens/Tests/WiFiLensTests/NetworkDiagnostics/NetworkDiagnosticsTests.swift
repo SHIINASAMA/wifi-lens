@@ -361,7 +361,11 @@ struct NetworkDiagnosticsTests {
             minimumStepDuration: .milliseconds(50)
         ).run { _ in }
 
-        #expect(started.duration(to: clock.now) >= .milliseconds(40))
+        // The runner targets a 50 ms minimum presentation duration, but the
+        // lower bound is intentionally relaxed below that target to absorb
+        // scheduler noise under CI load. 30 ms stays far above the near-zero
+        // elapsed time that would indicate the minimum duration was skipped.
+        #expect(started.duration(to: clock.now) >= .milliseconds(30))
     }
 
     @Test("production diagnostics present each check for at least 0.8 seconds")

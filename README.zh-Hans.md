@@ -110,7 +110,7 @@ WiFi Lens 不收集使用分析、崩溃遥测或 Wi-Fi 扫描数据。
 
 - **定位服务：** macOS 需要此权限才能提供 Wi-Fi SSID 名称。WiFi Lens 不会读取你的 GPS 位置。
 - **区域检测：** WiFi Lens 在设备上使用系统地区、硬件报告的信道列表和附近 AP 的国家代码。
-- **网络自检：** 运行自检时，WiFi Lens 会解析 `example.com`，并可能测试你配置的代理端点是否可达。
+- **网络自检：** 运行自检时，WiFi Lens 会解析公共端点（`www.apple.com`、`www.microsoft.com`、`www.msftconnecttest.com`），并可能测试你配置的代理端点是否可达。
 - **MCP 服务器：** 可选服务器绑定到 `127.0.0.1`。只有在你启用后，本地工具才能访问扫描数据。
 - **更新检查：** 当你手动检查更新或启用自动检查时，GitHub 版本会连接 GitHub。
 

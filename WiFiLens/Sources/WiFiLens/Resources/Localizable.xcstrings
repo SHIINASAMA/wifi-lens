@@ -11526,7 +11526,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "加载中..."
+            "value": "加载中…"
           }
         }
       }
@@ -12583,13 +12583,13 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "スペクトラムチャートを画像で書き出す..."
+            "value": "スペクトラムチャートを画像で書き出す…"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "导出频谱图为图像..."
+            "value": "导出频谱图为图像…"
           }
         }
       }
@@ -12618,13 +12618,13 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Markdownレポートで書き出す..."
+            "value": "Markdownレポートで書き出す…"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "导出为 Markdown 报告..."
+            "value": "导出为 Markdown 报告…"
           }
         }
       }
@@ -15365,13 +15365,13 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "データ収集中..."
+            "value": "データ収集中…"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "收集中..."
+            "value": "收集中…"
           }
         }
       }
@@ -22201,7 +22201,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "等待定位服务授权..."
+            "value": "等待定位服务授权…"
           }
         }
       }
@@ -30778,13 +30778,13 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "フィルター..."
+            "value": "フィルター…"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "筛选..."
+            "value": "筛选…"
           }
         }
       }
@@ -30928,7 +30928,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "正在扫描 Wi-Fi 网络..."
+            "value": "正在扫描 Wi-Fi 网络…"
           }
         }
       }

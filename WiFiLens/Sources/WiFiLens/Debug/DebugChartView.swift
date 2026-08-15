@@ -58,6 +58,8 @@ struct DebugChartView: View {
     @State private var selectedPreset: DebugScenarioPreset = .labelCollision
     @State private var didLoadMultiScenario = false
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     private let debugPalette = [
         "#3B82F6", "#10B981", "#F59E0B", "#EF4444",
         "#8B5CF6", "#0EA5E9", "#22C55E", "#F97316",
@@ -203,7 +205,7 @@ struct DebugChartView: View {
         HStack(spacing: 10) {
             bandPicker
 
-            Picker("Preset", selection: $selectedPreset.animation(.bouncy)) {
+            Picker("Preset", selection: $selectedPreset.animation(reduceMotion ? nil : .bouncy)) {
                 ForEach(DebugScenarioPreset.allCases) { preset in
                     Text(preset.title).tag(preset)
                 }
@@ -239,7 +241,7 @@ struct DebugChartView: View {
     }
 
     private var bandPicker: some View {
-        Picker("Band", selection: bandSelection.animation(.bouncy)) {
+        Picker("Band", selection: bandSelection.animation(reduceMotion ? nil : .bouncy)) {
             Text("2.4 GHz").tag(ChannelBand.band24GHz)
             Text("5 GHz").tag(ChannelBand.band5GHz)
             Text("6 GHz").tag(ChannelBand.band6GHz)
@@ -253,7 +255,7 @@ struct DebugChartView: View {
         VStack(alignment: .leading, spacing: 2) {
             Text("Width: \(selection.wrappedValue) MHz")
                 .foregroundColor(.secondary)
-            Picker("", selection: selection.animation(.bouncy)) {
+            Picker("", selection: selection.animation(reduceMotion ? nil : .bouncy)) {
                 ForEach(DebugScenarioBuilder.allowedWidths(for: selectedBand), id: \.self) { width in
                     Text("\(width)").tag(width)
                 }

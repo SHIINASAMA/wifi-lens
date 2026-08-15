@@ -110,7 +110,7 @@ WiFi Lens no recopila analítica de uso, telemetría de fallos ni datos de escan
 
 - **Servicios de localización:** macOS necesita este permiso para mostrar los nombres SSID Wi-Fi. WiFi Lens no lee tu posición GPS.
 - **Detección de región:** WiFi Lens usa la región del sistema, la lista de canales informada por el hardware y los códigos de país de puntos de acceso cercanos en el dispositivo.
-- **Autodiagnóstico de red:** Cuando lo ejecutas, WiFi Lens resuelve `example.com` y puede comprobar si los endpoints de proxy configurados son accesibles.
+- **Autodiagnóstico de red:** Cuando lo ejecutas, WiFi Lens resuelve endpoints públicos (`www.apple.com`, `www.microsoft.com`, `www.msftconnecttest.com`) y puede comprobar si los endpoints de proxy configurados son accesibles.
 - **Servidor MCP:** El servidor opcional se vincula a `127.0.0.1`. Las herramientas locales acceden a los datos de escaneo después de que lo habilites.
 - **Comprobaciones de actualizaciones:** La edición de GitHub contacta con GitHub cuando solicitas una comprobación o habilitas las comprobaciones automáticas.
 

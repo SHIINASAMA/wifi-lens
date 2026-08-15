@@ -39,7 +39,7 @@ enum ExternalLinks {
         case .chartLensRepository:
             "https://github.com/SHIINASAMA/chart-lens"
         case .mcpSwiftSDKRepository:
-            "https://github.com/nicklama/mcp-swift-sdk"
+            "https://github.com/modelcontextprotocol/swift-sdk"
         case .sparkleRepository:
             "https://github.com/sparkle-project/Sparkle"
         }

@@ -26,6 +26,15 @@
             </BuildableReference>
          </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "4815C3B026D255EF85C56198"
+            BuildableName = "WiFi Lens.app"
+            BlueprintName = "WiFiLens"
+            ReferencedContainer = "container:WiFiLens.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"

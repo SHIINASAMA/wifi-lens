@@ -29,10 +29,11 @@ enum DebugPage: String, CaseIterable {
 struct SpectrumDebugContainerView: View {
     @State private var selectedPage: SpectrumDebugPage = .singleAP
     @State private var visitedTabs: Set<SpectrumDebugPage> = [.singleAP]
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(spacing: 0) {
-            Picker("", selection: $selectedPage.animation(.bouncy)) {
+            Picker("", selection: $selectedPage.animation(reduceMotion ? nil : .bouncy)) {
                 ForEach(SpectrumDebugPage.allCases, id: \.self) { page in
                     Text(page.label).tag(page)
                 }
@@ -69,10 +70,11 @@ struct SpectrumDebugContainerView: View {
 struct DebugContainerView: View {
     @State private var selectedPage: DebugPage = .throughput
     @State private var visitedTabs: Set<DebugPage> = [.throughput]
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(spacing: 0) {
-            Picker("", selection: $selectedPage.animation(.bouncy)) {
+            Picker("", selection: $selectedPage.animation(reduceMotion ? nil : .bouncy)) {
                 ForEach(DebugPage.allCases, id: \.self) { page in
                     Text(page.label).tag(page)
                 }

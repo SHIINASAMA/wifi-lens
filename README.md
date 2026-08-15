@@ -110,7 +110,7 @@ WiFi Lens does not collect usage analytics, crash telemetry, or Wi-Fi scan data.
 
 - **Location Services:** macOS requires this permission to expose Wi-Fi SSID names. WiFi Lens does not read your GPS position.
 - **Region detection:** WiFi Lens uses the system locale, hardware-reported channel list, and nearby AP country codes on-device.
-- **Network Self-Check:** When you run it, WiFi Lens resolves `example.com` and may test reachability of your configured proxy endpoints.
+- **Network Self-Check:** When you run it, WiFi Lens resolves public endpoints (`www.apple.com`, `www.microsoft.com`, `www.msftconnecttest.com`) and may test reachability of your configured proxy endpoints.
 - **MCP server:** The optional server binds to `127.0.0.1`. Local tools can access scan data only after you enable it.
 - **Update checks:** The GitHub edition contacts GitHub when you request an update check or enable automatic checks.
 

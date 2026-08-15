@@ -32,7 +32,7 @@ struct ExternalLinksTests {
     @Test("dependency repositories keep their current public locations")
     func dependencyRepositoryURLs() {
         #expect(ExternalLinks.url(for: .chartLensRepository)?.absoluteString == "https://github.com/SHIINASAMA/chart-lens")
-        #expect(ExternalLinks.url(for: .mcpSwiftSDKRepository)?.absoluteString == "https://github.com/nicklama/mcp-swift-sdk")
+        #expect(ExternalLinks.url(for: .mcpSwiftSDKRepository)?.absoluteString == "https://github.com/modelcontextprotocol/swift-sdk")
         #expect(ExternalLinks.url(for: .sparkleRepository)?.absoluteString == "https://github.com/sparkle-project/Sparkle")
     }
 }
