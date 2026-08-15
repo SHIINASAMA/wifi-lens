@@ -703,11 +703,11 @@ private struct RoamingTimelineChart: View {
         let timeText = timeFormatter.string(from: time) ?? "0:00"
         return HStack(spacing: 8) {
             Text(timeText)
-            Text("RSSI \(sample.rssi) dBm")
-            Text("Ch \(sample.channel)")
-            Text(String(format: "Tx %.0f Mbps", sample.txRate))
+            Text(String(format: String(localized: "roaming.detail.rssi_fmt", comment: "Roaming detail RSSI badge"), sample.rssi))
+            Text(String(format: String(localized: "roaming.detail.channel_fmt", comment: "Roaming detail channel badge"), sample.channel))
+            Text(String(format: String(localized: "roaming.detail.tx_rate_fmt", comment: "Roaming detail Tx rate badge"), sample.txRate))
             if let latency = sample.gatewayLatency {
-                Text(String(format: "RTT %.1f ms", latency))
+                Text(String(format: String(localized: "roaming.detail.rtt_fmt", comment: "Roaming detail RTT badge"), latency))
             }
         }
         .font(.caption.weight(.medium).monospacedDigit())

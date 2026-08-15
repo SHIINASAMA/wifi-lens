@@ -43,8 +43,13 @@ struct ModelsTests {
 
     @Test("WiFiQualityLevel display names")
     func qualityLevelDisplay() {
-        #expect(WiFiQualityLevel.good.displayName == String(localized: "observation.quality.good"))
-        #expect(WiFiQualityLevel.poor.displayName == String(localized: "observation.quality.poor"))
+        // Locale-independent anti-fallback guards: displayName must resolve to a
+        // real catalog value, not the raw key (regression guard for missing
+        // localizations; the test host runs under the developer's locale).
+        #expect(WiFiQualityLevel.good.displayName != "observation.quality.good")
+        #expect(WiFiQualityLevel.poor.displayName != "observation.quality.poor")
+        #expect(!WiFiQualityLevel.good.displayName.isEmpty)
+        #expect(!WiFiQualityLevel.poor.displayName.isEmpty)
     }
 }
 

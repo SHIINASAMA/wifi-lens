@@ -215,10 +215,10 @@ actor WiFiScanner: WiFiScanStreaming {
         ]
         let supportsDFS = !channelNumbers.intersection(dfsChannelSet).isEmpty
         return DevicePHYCapabilities(
-            supportsAX: phy.rawValue >= 5,
-            supportsAC: phy.rawValue >= 4,
-            supportsN: phy.rawValue >= 3,
-            supportsBE: phy.rawValue >= 6,
+            supportsAX: phy.rawValue >= 6,
+            supportsAC: phy.rawValue >= 5,
+            supportsN: phy.rawValue >= 4,
+            supportsBE: phy.rawValue >= 7,
             supports6GHz: is6Ghz,
             supportsDFS: supportsDFS,
             supports160MHz: false

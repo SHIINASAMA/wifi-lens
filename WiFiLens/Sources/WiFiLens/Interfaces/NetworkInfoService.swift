@@ -336,15 +336,17 @@ enum NetworkInfoService {
         }
     }
 
+    /// Maps CWPHYMode raw values to PHY labels (kCWPHYModeNone=0, 11a=1, 11b=2,
+    /// 11g=3, 11n=4, 11ac=5, 11ax=6, 11be=7). Raw 0 (None) returns nil.
     private static func phyModeLabel(_ iface: CWInterface) -> String? {
         switch iface.activePHYMode().rawValue {
-        case 0: return String(localized: "wifi.phy_mode.802_11a", comment: "802.11a PHY mode label")
-        case 1: return String(localized: "wifi.phy_mode.802_11b", comment: "802.11b PHY mode label")
-        case 2: return String(localized: "wifi.phy_mode.802_11g", comment: "802.11g PHY mode label")
-        case 3: return String(localized: "wifi.phy_mode.802_11n", comment: "802.11n PHY mode label")
-        case 4: return String(localized: "wifi.phy_mode.802_11ac", comment: "802.11ac PHY mode label")
-        case 5: return String(localized: "wifi.phy_mode.802_11ax", comment: "802.11ax PHY mode label")
-        case 6: return String(localized: "wifi.phy_mode.802_11be", comment: "802.11be PHY mode label")
+        case 1: return String(localized: "wifi.phy_mode.802_11a", comment: "802.11a PHY mode label")
+        case 2: return String(localized: "wifi.phy_mode.802_11b", comment: "802.11b PHY mode label")
+        case 3: return String(localized: "wifi.phy_mode.802_11g", comment: "802.11g PHY mode label")
+        case 4: return String(localized: "wifi.phy_mode.802_11n", comment: "802.11n PHY mode label")
+        case 5: return String(localized: "wifi.phy_mode.802_11ac", comment: "802.11ac PHY mode label")
+        case 6: return String(localized: "wifi.phy_mode.802_11ax", comment: "802.11ax PHY mode label")
+        case 7: return String(localized: "wifi.phy_mode.802_11be", comment: "802.11be PHY mode label")
         default: return nil
         }
     }

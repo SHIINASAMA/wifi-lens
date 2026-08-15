@@ -124,7 +124,7 @@ struct InterfacesView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     if let latency = gatewayLatency {
-                        Text(String(format: "%.1f ms", latency))
+                        Text(String(format: String(localized: "interfaces.field.gateway_latency_fmt", comment: "Gateway latency value with milliseconds"), latency))
                             .font(.caption.monospacedDigit())
                             .foregroundColor(latencyColor(latency))
                     }
