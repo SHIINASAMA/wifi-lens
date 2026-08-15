@@ -64,8 +64,8 @@ enum DiagnosticEvaluator {
             )
         }
 
-        if phy == "n" || phy == "ac" {
-            let version = phy == "n" ? "4" : "5"
+        if phy == "802.11n" || phy == "802.11ac" {
+            let version = phy == "802.11n" ? "4" : "5"
             return DiagnosticResult(
                 icon: "speedometer",
                 title: String(localized: "observation.diagnosis.old_phy.title", comment: "Older Wi-Fi generation"),

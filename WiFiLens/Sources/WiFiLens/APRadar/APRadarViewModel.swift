@@ -45,7 +45,9 @@ final class APRadarViewModel: WiFiObservationConsuming {
     // MARK: - Private state
 
     private var isActive = false
-    private var isSuspended = false
+    /// True while the app is backgrounded/asleep or Wi-Fi is off; the view's
+    /// visual loop idles on this flag so it stops waking at full cadence.
+    private(set) var isSuspended = false
     private var hasRegisteredConsumer = false
     private var target: TrackedAccessPoint?
     private var lastSeenAt: Date?

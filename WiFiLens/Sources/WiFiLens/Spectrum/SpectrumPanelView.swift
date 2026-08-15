@@ -69,6 +69,8 @@ struct SpectrumPanelView: View {
                         .foregroundColor(.secondary)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(String(localized: "spectrum.filter.clear", comment: "Clear filter button"))
+                .help(String(localized: "spectrum.filter.clear", comment: "Clear filter button"))
             }
 
             Spacer()

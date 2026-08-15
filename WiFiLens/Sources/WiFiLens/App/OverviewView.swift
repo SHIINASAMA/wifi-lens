@@ -36,7 +36,7 @@ struct OverviewView: View {
 
     private var totalNetworks: Int {
         guard viewModel.isWiFiAvailable else { return 0 }
-        return viewModel.bandViewModels.reduce(0) { $0 + $1.allSeriesData.count }
+        return viewModel.cachedTotalNetworks
     }
 
     var body: some View {
@@ -370,10 +370,7 @@ struct OverviewView: View {
     }
 
     private var bandSummary: String {
-        viewModel.bandViewModels.map { vm in
-            let count = vm.allSeriesData.count
-            return "\(vm.band.displayName): \(count)"
-        }.joined(separator: "  ·  ")
+        viewModel.cachedBandSummary
     }
 
     // MARK: - Helpers

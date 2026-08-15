@@ -15,6 +15,7 @@ struct TrendChartView: View {
         } else {
             Chart(series: buildSeries(), axis: axisConfig, style: chartStyle)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .accessibilityLabel(String(format: String(localized: "spectrum.accessibility.chart_label_fmt", comment: "Chart accessibility label with network count"), snapshots.count))
         }
     }
 

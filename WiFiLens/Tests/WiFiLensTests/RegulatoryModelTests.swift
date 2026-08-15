@@ -322,3 +322,256 @@ struct ChannelRecommendationTests {
         #expect(ChannelRecommendationAvailability.from([current]) == .noSignificantImprovement)
     }
 }
+
+// MARK: - RecommendationReasonCalculator
+
+struct RecommendationReasonCalculatorTests {
+
+    /// Builds a ChannelRecommendation whose non-targeted reason families are
+    /// neutral by default (apCount 3 → no congestion reason, adjacentCount 2 →
+    /// no low-overlap reason, interferenceScore 20 → no interference reason,
+    /// not current, no restrictions), so tests can assert exact reason arrays.
+    private func recommendation(
+        channel: Int = 44,
+        band: String = "5",
+        score: Int = 85,
+        apCount: Int = 3,
+        coChannelCount: Int = 3,
+        adjacentCount: Int = 2,
+        interferenceScore: Int = 20,
+        overlapLevel: ChannelQuality.OverlapLevel = .low,
+        isCurrentChannel: Bool = false,
+        scoreSelected: Bool = false,
+        classification: ChannelRecommendation.Classification = .recommended,
+        restrictions: [ChannelRecommendation.RestrictionReason] = []
+    ) -> ChannelRecommendation {
+        var rec = ChannelRecommendation(from: ChannelQuality(
+            channel: channel,
+            band: band,
+            bandDisplay: band == "24" ? "2.4 GHz" : "5 GHz",
+            qualityScore: score,
+            qualityLevel: .from(score: score),
+            apCount: apCount,
+            coChannelCount: coChannelCount,
+            adjacentCount: adjacentCount,
+            interferenceScore: interferenceScore,
+            overlapLevel: overlapLevel,
+            strongestNeighborRSSI: -60,
+            isRecommended: false,
+            isCurrentChannel: isCurrentChannel,
+            showInSimpleView: true
+        ))
+        rec.scoreSelected = scoreSelected
+        rec.classification = classification
+        rec.restrictionReasons = restrictions
+        return rec
+    }
+
+    // MARK: - Congestion family
+
+    @Test("Congestion family: no APs selects clearSpectrum")
+    func congestionClearSpectrum() throws {
+        let out = RecommendationReasonCalculator.compute(for: [recommendation(apCount: 0)])
+        let rec = try #require(out.first)
+        #expect(rec.recommendationReasons == [.clearSpectrum])
+    }
+
+    @Test("Congestion family: 1-2 APs selects lowCongestion")
+    func congestionLow() throws {
+        let out = RecommendationReasonCalculator.compute(for: [recommendation(apCount: 2)])
+        let rec = try #require(out.first)
+        #expect(rec.recommendationReasons == [.lowCongestion])
+    }
+
+    @Test("Congestion family: 6+ APs on a non-recommended channel selects congested")
+    func congestionHigh() throws {
+        let out = RecommendationReasonCalculator.compute(for: [recommendation(apCount: 6)])
+        let rec = try #require(out.first)
+        #expect(rec.recommendationReasons == [.congested])
+    }
+
+    @Test("Congestion family: 6+ APs on a recommended channel emits no congestion reason")
+    func congestionSuppressedWhenRecommended() throws {
+        let out = RecommendationReasonCalculator.compute(
+            for: [recommendation(apCount: 6, scoreSelected: true)]
+        )
+        let rec = try #require(out.first)
+        #expect(rec.recommendationReasons == [])
+    }
+
+    // MARK: - Overlap family
+
+    @Test("Overlap family: low overlap with sparse adjacency selects lowOverlap")
+    func overlapLow() throws {
+        let out = RecommendationReasonCalculator.compute(
+            for: [recommendation(adjacentCount: 1)]
+        )
+        let rec = try #require(out.first)
+        #expect(rec.recommendationReasons == [.lowOverlap])
+    }
+
+    @Test("Overlap family: high overlap on a non-recommended channel selects highOverlap")
+    func overlapHigh() throws {
+        let out = RecommendationReasonCalculator.compute(
+            for: [recommendation(overlapLevel: .high)]
+        )
+        let rec = try #require(out.first)
+        #expect(rec.recommendationReasons == [.highOverlap])
+    }
+
+    @Test("Overlap family: high overlap on a recommended channel emits no overlap reason")
+    func overlapSuppressedWhenRecommended() throws {
+        let out = RecommendationReasonCalculator.compute(
+            for: [recommendation(overlapLevel: .high, scoreSelected: true)]
+        )
+        let rec = try #require(out.first)
+        #expect(rec.recommendationReasons == [])
+    }
+
+    // MARK: - Interference family
+
+    @Test("Interference family: score ≤ 15 selects lowInterference")
+    func interferenceLow() throws {
+        let out = RecommendationReasonCalculator.compute(
+            for: [recommendation(interferenceScore: 15)]
+        )
+        let rec = try #require(out.first)
+        #expect(rec.recommendationReasons == [.lowInterference])
+    }
+
+    @Test("Interference family: score ≥ 40 on a non-recommended channel selects highInterference")
+    func interferenceHigh() throws {
+        let out = RecommendationReasonCalculator.compute(
+            for: [recommendation(interferenceScore: 40)]
+        )
+        let rec = try #require(out.first)
+        #expect(rec.recommendationReasons == [.highInterference])
+    }
+
+    @Test("Interference family: score ≥ 40 on a recommended channel emits no interference reason")
+    func interferenceSuppressedWhenRecommended() throws {
+        let out = RecommendationReasonCalculator.compute(
+            for: [recommendation(interferenceScore: 40, scoreSelected: true)]
+        )
+        let rec = try #require(out.first)
+        #expect(rec.recommendationReasons == [])
+    }
+
+    // MARK: - Status family
+
+    @Test("Status family: current channel selects currentChannel")
+    func statusCurrent() throws {
+        let out = RecommendationReasonCalculator.compute(
+            for: [recommendation(isCurrentChannel: true)]
+        )
+        let rec = try #require(out.first)
+        #expect(rec.recommendationReasons == [.currentChannel])
+    }
+
+    @Test("Status family: current channel with rfScore ≥ 90 also selects currentlyOptimal")
+    func statusCurrentlyOptimal() throws {
+        let out = RecommendationReasonCalculator.compute(
+            for: [recommendation(score: 95, isCurrentChannel: true)]
+        )
+        let rec = try #require(out.first)
+        #expect(rec.recommendationReasons == [.currentChannel, .currentlyOptimal])
+    }
+
+    // MARK: - Band preference
+
+    @Test("Band preference: less crowded band selected when 2.4 GHz has more APs")
+    func bandPreferenceWhen24GHzCrowded() throws {
+        let twoFour = recommendation(channel: 6, band: "24", apCount: 5)
+        let five = recommendation(channel: 36, band: "5", apCount: 3)
+        let out = RecommendationReasonCalculator.compute(for: [twoFour, five])
+
+        let rec24 = try #require(out.first { $0.band == "24" })
+        #expect(rec24.recommendationReasons == [])
+        let rec5 = try #require(out.first { $0.band == "5" })
+        #expect(rec5.recommendationReasons == [.lessCrowdedBand])
+    }
+
+    @Test("Band preference: no reason when 2.4 GHz is not more crowded")
+    func bandPreferenceAbsentWhenNotCrowded() throws {
+        let twoFour = recommendation(channel: 6, band: "24", apCount: 3)
+        let five = recommendation(channel: 36, band: "5", apCount: 3)
+        let out = RecommendationReasonCalculator.compute(for: [twoFour, five])
+
+        let rec5 = try #require(out.first { $0.band == "5" })
+        #expect(rec5.recommendationReasons == [])
+    }
+
+    // MARK: - Regulatory caveats
+
+    @Test("Regulatory: restriction codes map to reasons in input order")
+    func regulatoryCaveats() throws {
+        let rec = recommendation(restrictions: [
+            .init(code: "DFS", description: "DFS channel"),
+            .init(code: "INDOOR_ONLY", description: "Indoor only"),
+            .init(code: "CAC_REQUIRED", description: "CAC required"),
+            .init(code: "RADAR_SENSITIVE", description: "Radar sensitive"),
+        ])
+        let out = RecommendationReasonCalculator.compute(for: [rec])
+        let computed = try #require(out.first)
+        #expect(computed.recommendationReasons == [
+            .dfsRequired, .indoorOnly, .cacRequired, .radarSensitive,
+        ])
+    }
+
+    @Test("Regulatory: unknown restriction codes are ignored")
+    func regulatoryUnknownCodeIgnored() throws {
+        let rec = recommendation(restrictions: [
+            .init(code: "UNKNOWN_CODE", description: "Unknown"),
+        ])
+        let out = RecommendationReasonCalculator.compute(for: [rec])
+        let computed = try #require(out.first)
+        #expect(computed.recommendationReasons == [])
+    }
+
+    // MARK: - Order-preserving deduplication (SF-13)
+
+    @Test("Deduplication preserves first-insertion order and collapses duplicates")
+    func dedupPreservesInsertionOrder() throws {
+        let main = recommendation(
+            channel: 44,
+            band: "5",
+            score: 95,
+            apCount: 0,
+            coChannelCount: 0,
+            adjacentCount: 1,
+            interferenceScore: 10,
+            overlapLevel: .low,
+            isCurrentChannel: true,
+            scoreSelected: true,
+            restrictions: [
+                .init(code: "DFS", description: "DFS channel"),
+                .init(code: "DFS", description: "DFS duplicate"),
+                .init(code: "CAC_REQUIRED", description: "CAC channel"),
+            ]
+        )
+        // 2.4 GHz carries more APs, so the 5 GHz channel gains band preference.
+        let crowdedBand = recommendation(channel: 6, band: "24", apCount: 3)
+
+        let expected: [RecommendationReason] = [
+            .currentChannel,
+            .currentlyOptimal,
+            .clearSpectrum,
+            .lowOverlap,
+            .lowInterference,
+            .lessCrowdedBand,
+            .dfsRequired,
+            .cacRequired,
+        ]
+
+        let out = RecommendationReasonCalculator.compute(for: [main, crowdedBand])
+        let rec = try #require(out.first { $0.band == "5" && $0.channel == 44 })
+        #expect(rec.recommendationReasons == expected)
+        // Duplicate DFS codes collapse to a single reason at its first position.
+        #expect(rec.recommendationReasons.filter { $0 == .dfsRequired }.count == 1)
+
+        // Deterministic across repeated computation.
+        let rerun = RecommendationReasonCalculator.compute(for: [main, crowdedBand])
+        let rerunRec = try #require(rerun.first { $0.band == "5" && $0.channel == 44 })
+        #expect(rerunRec.recommendationReasons == expected)
+    }
+}

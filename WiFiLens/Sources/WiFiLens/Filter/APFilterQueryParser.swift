@@ -203,10 +203,10 @@ struct APFilterQueryParser {
                 advance()
                 if peek() == .gt {
                     advance()
-                    return .gte
+                    return .gt
                 } else if peek() == .lt {
                     advance()
-                    return .lte
+                    return .lt
                 } else if peek() == .gte {
                     advance()
                     return .gte

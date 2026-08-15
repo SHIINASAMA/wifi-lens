@@ -9,7 +9,7 @@
 
 ## Engineering
 
-- [ ] UI / integration tests
+- [ ] UI / integration tests (9 UI test files exist in `WiFiLensUITests`; excluded from the default test plan per AGENTS.md and not yet wired into CI — pending decision: run in a dedicated CI job, or prune)
 - [ ] Add a small verification matrix for UI regressions across light/dark mode, localization, and no-permission / no-data states
 - [x] Before the next Mac App Store submission, update `NSLocalNetworkUsageDescription` for both OSS and Pro targets to disclose that Network Self-Check may connect to a configured local proxy, in addition to the existing MCP server use case (done: both targets already disclose MCP server + Network Self-Check proxy use)
 

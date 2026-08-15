@@ -73,8 +73,9 @@ enum RecommendationReasonCalculator {
                 }
             }
 
-            // ── Deduplicate ──
-            result.recommendationReasons = Array(Set(reasons))
+            // ── Deduplicate, preserving first-insertion order ──
+            var seen = Set<RecommendationReason>()
+            result.recommendationReasons = reasons.filter { seen.insert($0).inserted }
             return result
         }
     }

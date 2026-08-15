@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mattt/eventsource.git",
       "state" : {
-        "revision" : "a3a85a85214caf642abaa96ae664e4c772a59f6e",
-        "version" : "1.4.1"
+        "revision" : "e146002f57ea2abbf4803cb58c22a7b5d20395c6",
+        "version" : "1.4.2"
       }
     },
     {
@@ -69,8 +69,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-system.git",
       "state" : {
-        "revision" : "704705c5c51156ede21172a38654d522ce487074",
-        "version" : "1.8.0"
+        "revision" : "869129b7bf4ecc57b97d0193ad29690ca2134750",
+        "version" : "1.8.1"
       }
     }
   ],

@@ -111,3 +111,147 @@ struct AnalyzerTests {
         #expect(result.message.contains("1 / 11"))
     }
 }
+
+@Suite("ChannelOccupancyAnalyzer")
+struct ChannelOccupancyAnalyzerTests {
+
+    // MARK: - Fixtures
+
+    private func observation(
+        ssid: String = "TestNet",
+        bssid: String,
+        rssi: Int,
+        channel: Int,
+        band: ChannelBand = .band5GHz,
+        widthMHz: Int = 20,
+        spanDirection: SpanDirection? = nil
+    ) -> WiFiNetworkObservation {
+        let ch = WiFiChannel(
+            band: band,
+            channelNumber: channel,
+            channelWidthMHz: widthMHz,
+            spanDirection: spanDirection
+        )
+        return WiFiNetworkObservation(
+            ssid: ssid,
+            bssid: bssid,
+            rssi: rssi,
+            channel: ch,
+            capabilities: WiFiNetworkCapabilities.emptyWithWidth(widthMHz)
+        )
+    }
+
+    private func snapshot(_ networks: [WiFiNetworkObservation]) -> WiFiEnvironmentSnapshot {
+        WiFiEnvironmentSnapshot(
+            timestamp: Date(),
+            interfaceName: nil,
+            networks: networks,
+            scanDurationMs: nil,
+            error: nil
+        )
+    }
+
+    // MARK: - BSSID + band deduplication
+
+    @Test("ChannelOccupancyAnalyzer: duplicate BSSID on the same band keeps the strongest RSSI")
+    func sameBSSIDSameBandKeepsStrongestRSSI() throws {
+        // Weaker scan entry first, stronger second — dedup must keep the stronger one.
+        let aps = [
+            observation(bssid: "AA:BB:CC:DD:EE:01", rssi: -70, channel: 36),
+            observation(bssid: "AA:BB:CC:DD:EE:01", rssi: -45, channel: 36),
+        ]
+        let result = ChannelOccupancyAnalyzer.analyze(
+            snapshot: snapshot(aps),
+            currentChannel: nil,
+            supportedBands: ["5"],
+            targetAP: nil
+        )
+        let ch36 = try #require(result.first { $0.channel == 36 && $0.band == "5" })
+        #expect(ch36.apCount == 1)                    // deduplicated, not double-counted
+        #expect(ch36.coChannelCount == 1)
+        #expect(ch36.strongestNeighborRSSI == -45)    // strongest RSSI survives
+    }
+
+    @Test("ChannelOccupancyAnalyzer: duplicate BSSID order does not change the kept entry")
+    func sameBSSIDSameBandDedupIsOrderIndependent() throws {
+        // Stronger entry first, weaker second — the weaker one must not replace it.
+        let aps = [
+            observation(bssid: "AA:BB:CC:DD:EE:02", rssi: -50, channel: 40),
+            observation(bssid: "AA:BB:CC:DD:EE:02", rssi: -80, channel: 40),
+        ]
+        let result = ChannelOccupancyAnalyzer.analyze(
+            snapshot: snapshot(aps),
+            currentChannel: nil,
+            supportedBands: ["5"],
+            targetAP: nil
+        )
+        let ch40 = try #require(result.first { $0.channel == 40 && $0.band == "5" })
+        #expect(ch40.apCount == 1)
+        #expect(ch40.strongestNeighborRSSI == -50)
+    }
+
+    @Test("ChannelOccupancyAnalyzer: same BSSID on different bands is not deduplicated")
+    func sameBSSIDDifferentBandKeepsBoth() throws {
+        let aps = [
+            observation(bssid: "AA:BB:CC:DD:EE:03", rssi: -60, channel: 6, band: .band24GHz),
+            observation(bssid: "AA:BB:CC:DD:EE:03", rssi: -50, channel: 36, band: .band5GHz),
+        ]
+        let result = ChannelOccupancyAnalyzer.analyze(
+            snapshot: snapshot(aps),
+            currentChannel: nil,
+            supportedBands: ["24", "5"],
+            targetAP: nil
+        )
+        // Each band keeps its own copy of the AP.
+        #expect(result.first { $0.channel == 6 && $0.band == "24" }?.apCount == 1)
+        #expect(result.first { $0.channel == 36 && $0.band == "5" }?.apCount == 1)
+    }
+
+    // MARK: - Wide channel span / apex (40 / 80 MHz)
+
+    @Test("ChannelOccupancyAnalyzer: 40 MHz AP applies the 40 MHz width multiplier")
+    func fortyMHzWidthMultiplier() throws {
+        // rssi -30 → weight 1.0; penalty = 1.0 * 1.0 * 1.2 * 1.0 * 18 = 21.6 → 22 → score 78
+        let result = ChannelOccupancyAnalyzer.analyze(
+            snapshot: snapshot([observation(bssid: "AA:BB:CC:DD:EE:04", rssi: -30, channel: 44, widthMHz: 40)]),
+            currentChannel: nil,
+            supportedBands: ["5"],
+            targetAP: nil
+        )
+        let ch44 = try #require(result.first { $0.channel == 44 && $0.band == "5" })
+        #expect(ch44.qualityScore == 78)
+        #expect(ch44.interferenceScore == 22)
+    }
+
+    @Test("ChannelOccupancyAnalyzer: 80 MHz AP applies the 80 MHz width multiplier")
+    func eightyMHzWidthMultiplier() throws {
+        // rssi -30 → weight 1.0; penalty = 1.0 * 1.0 * 1.5 * 1.0 * 18 = 27 → score 73
+        let result = ChannelOccupancyAnalyzer.analyze(
+            snapshot: snapshot([observation(bssid: "AA:BB:CC:DD:EE:05", rssi: -30, channel: 36, widthMHz: 80)]),
+            currentChannel: nil,
+            supportedBands: ["5"],
+            targetAP: nil
+        )
+        let ch36 = try #require(result.first { $0.channel == 36 && $0.band == "5" })
+        #expect(ch36.qualityScore == 73)
+        #expect(ch36.interferenceScore == 27)
+    }
+
+    @Test("ChannelOccupancyAnalyzer: 40/80 MHz span blocks and apex match ChannelSpanCalculator")
+    func wideChannelSpanApex() {
+        // The analyzer derives each AP's span/apex via ChannelSpanCalculator.
+        // 40 MHz on ch 44 → block (42, 50), apex 46
+        let span40 = ChannelSpanCalculator.channelBlock(
+            primaryChannel: 44, widthMHz: 40, band: .band5GHz, spanDirection: nil)
+        #expect(span40.left == 42)
+        #expect(span40.right == 50)
+        #expect(Double(span40.left + span40.right) / 2.0 == 46)
+
+        // 80 MHz on ch 36 → block (34, 50), apex 42
+        let span80 = ChannelSpanCalculator.channelBlock(
+            primaryChannel: 36, widthMHz: 80, band: .band5GHz, spanDirection: nil)
+        #expect(span80.left == 34)
+        #expect(span80.right == 50)
+        #expect(Double(span80.left + span80.right) / 2.0 == 42)
+    }
+}

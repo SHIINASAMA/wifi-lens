@@ -58,7 +58,7 @@ struct APRadarView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .animation(.easeOut(duration: 0.45), value: stateKey)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.45), value: stateKey)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
@@ -323,7 +323,8 @@ struct APRadarView: View {
                     reduceMotion: reduceMotion,
                     isGeiger: viewModel.soundPreset == .geiger,
                     size: side,
-                    onSecretTap: revealGeigerPreset
+                    onSecretTap: revealGeigerPreset,
+                    isSuspended: viewModel.isSuspended
                 )
                 .frame(width: side, height: side)
 
@@ -764,6 +765,9 @@ private struct RadarPulseVisual: View {
     /// Hidden gesture callback: five quick taps on the center icon unlock the
     /// Geiger-counter preset.
     var onSecretTap: (() -> Void)? = nil
+    /// Whether the app is backgrounded/asleep or Wi-Fi is off; mirrored into
+    /// `suspended` @State so the long-lived visual loop sees updates.
+    var isSuspended: Bool = false
 
     @State private var ripples: [Ripple] = []
     @State private var liveSmoothedRSSI: Double?
@@ -771,6 +775,8 @@ private struct RadarPulseVisual: View {
     /// Sound state mirrored into `@State` so the long-lived visual loop sees
     /// toggles instead of the initial value captured at task creation.
     @State private var soundOn = false
+    /// Runtime mirror of `isSuspended` for the long-lived visual loop.
+    @State private var suspended = false
     /// When the last pulse beat happened (audio beat or visual fallback).
     @State private var lastPulseAt = ContinuousClock.now
     /// Timestamps of recent secret taps used to detect a five-tap sequence.
@@ -847,6 +853,9 @@ private struct RadarPulseVisual: View {
             lastPulseAt = .now
             spawnRipple()
         }
+        .onChange(of: isSuspended) { _, suspendedValue in
+            suspended = suspendedValue
+        }
         .onChange(of: soundEnabled) { _, enabled in
             soundOn = enabled
         }
@@ -895,6 +904,15 @@ private struct RadarPulseVisual: View {
         guard visualLoop == nil else { return }
         visualLoop = Task {
             while !Task.isCancelled {
+                // While the app is backgrounded or asleep the scheduler and
+                // audio are suspended, so keep the loop alive but idle: wait
+                // in one long chunk instead of stepping at full visual rate,
+                // then pick the cadence back up as soon as resume clears the
+                // flag. No ripples are spawned while suspended.
+                if suspended {
+                    try? await Task.sleep(for: .seconds(1))
+                    continue
+                }
                 if soundOn {
                     let interval = APRadarPulseInterval.intervalSeconds(
                         forRSSI: liveSmoothedRSSI ?? -70

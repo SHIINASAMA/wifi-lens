@@ -198,6 +198,46 @@ struct ParserTests {
         }
     }
 
+    @Test func parseGtStrict() throws {
+        let cond = try parser.parse("rssi:>-60")
+        if case .field(let filter) = cond {
+            #expect(filter.comparator == .gt)
+            #expect(filter.value == .integer(-60))
+        } else {
+            Issue.record("Expected .field case")
+        }
+    }
+
+    @Test func parseGteNonStrict() throws {
+        let cond = try parser.parse("rssi:>=-60")
+        if case .field(let filter) = cond {
+            #expect(filter.comparator == .gte)
+            #expect(filter.value == .integer(-60))
+        } else {
+            Issue.record("Expected .field case")
+        }
+    }
+
+    @Test func parseLtStrict() throws {
+        let cond = try parser.parse("rssi:<-60")
+        if case .field(let filter) = cond {
+            #expect(filter.comparator == .lt)
+            #expect(filter.value == .integer(-60))
+        } else {
+            Issue.record("Expected .field case")
+        }
+    }
+
+    @Test func parseLteNonStrict() throws {
+        let cond = try parser.parse("rssi:<=-60")
+        if case .field(let filter) = cond {
+            #expect(filter.comparator == .lte)
+            #expect(filter.value == .integer(-60))
+        } else {
+            Issue.record("Expected .field case")
+        }
+    }
+
     @Test func parseBand24G() throws {
         let cond = try parser.parse("band:2.4G")
         if case .field(let filter) = cond {
@@ -267,6 +307,30 @@ struct EvaluateTests {
         let ap = makeAP(rssi: -70)
         let cond = try APFilterQueryParser().parse("rssi:>-60")
         #expect(service.evaluate(ap, condition: cond) == false)
+    }
+
+    @Test func rssiStrictGtExcludesBoundary() throws {
+        let ap = makeAP(rssi: -60)
+        let cond = try APFilterQueryParser().parse("rssi:>-60")
+        #expect(service.evaluate(ap, condition: cond) == false)
+    }
+
+    @Test func rssiGteIncludesBoundary() throws {
+        let ap = makeAP(rssi: -60)
+        let cond = try APFilterQueryParser().parse("rssi:>=-60")
+        #expect(service.evaluate(ap, condition: cond) == true)
+    }
+
+    @Test func rssiStrictLtExcludesBoundary() throws {
+        let ap = makeAP(rssi: -60)
+        let cond = try APFilterQueryParser().parse("rssi:<-60")
+        #expect(service.evaluate(ap, condition: cond) == false)
+    }
+
+    @Test func rssiLteIncludesBoundary() throws {
+        let ap = makeAP(rssi: -60)
+        let cond = try APFilterQueryParser().parse("rssi:<=-60")
+        #expect(service.evaluate(ap, condition: cond) == true)
     }
 
     @Test func rssiEquals() throws {

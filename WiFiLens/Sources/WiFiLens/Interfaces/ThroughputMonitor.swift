@@ -17,10 +17,21 @@ final class ThroughputMonitor {
     private(set) var isRunning = false
     private var lastCounters: [String: (in: UInt64, out: UInt64, ts: Date)] = [:]
     private var pollTask: Task<Void, Never>?
+    private let now: () -> Date
+    private let pollInterval: Duration
 
     static let maxSamples = 90          // retain 90 s
     private static let cleanupInterval = 60  // purge stale ifaces every 60 polls
     private var pollCount = 0
+
+    /// Creates a throughput monitor.
+    /// - Parameters:
+    ///   - now: Clock used for sample timestamps and staleness checks. Defaults to `Date()`.
+    ///   - pollInterval: Delay between polling loop iterations. Defaults to 1 second.
+    init(now: @escaping () -> Date = { Date() }, pollInterval: Duration = .seconds(1)) {
+        self.now = now
+        self.pollInterval = pollInterval
+    }
 
     func start() {
         guard !isRunning else { return }
@@ -33,7 +44,7 @@ final class ThroughputMonitor {
                 if pollCount % Self.cleanupInterval == 0 {
                     purgeStaleInterfaces()
                 }
-                try? await Task.sleep(for: .seconds(1))
+                try? await Task.sleep(for: pollInterval)
             }
         }
         AppLogger.throughput.info("started")
@@ -52,8 +63,10 @@ final class ThroughputMonitor {
         perInterface[name] ?? []
     }
 
-    private func purgeStaleInterfaces() {
-        let now = Date()
+    /// Drops interfaces whose newest sample is older than 2 minutes.
+    /// Internal so tests can invoke staleness purging deterministically.
+    func purgeStaleInterfaces() {
+        let now = self.now()
         perInterface = perInterface.filter { _, history in
             guard let last = history.last else { return false }
             return now.timeIntervalSince(last.timestamp) < 120  // gone for 2 min → drop
@@ -72,7 +85,7 @@ final class ThroughputMonitor {
         guard getifaddrs(&addrPtr) == 0, let first = addrPtr else { return }
         defer { freeifaddrs(first) }
 
-        let now = Date()
+        let now = self.now()
 
         for ptr in sequence(first: first, next: { $0.pointee.ifa_next }) {
             guard let namePtr = ptr.pointee.ifa_name else { continue }
@@ -98,12 +111,18 @@ final class ThroughputMonitor {
                 rateOut: max(0, deltaOut)
             )
 
-            var history = perInterface[name] ?? []
-            history.append(sample)
-            if history.count > Self.maxSamples {
-                history = Array(history.suffix(Self.maxSamples))
-            }
-            perInterface[name] = history
+            appendSample(sample, for: name)
         }
+    }
+
+    /// Appends a sample to an interface's history, trimming the oldest entries
+    /// once the retained window exceeds `maxSamples`. Internal for tests.
+    func appendSample(_ sample: ThroughputSample, for name: String) {
+        var history = perInterface[name] ?? []
+        history.append(sample)
+        if history.count > Self.maxSamples {
+            history = Array(history.suffix(Self.maxSamples))
+        }
+        perInterface[name] = history
     }
 }

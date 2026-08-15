@@ -60,6 +60,13 @@ final class ScannerViewModel {
     private(set) var deduplicatedNetworks: [WiFiNetwork] = []
     private(set) var displayStatesByID: [String: APDisplayState] = [:]
     private(set) var panelFilterQueries: [SpectrumPanelID: String] = [:]
+    // Cached derived values for stable reads (Overview hero + network table).
+    // Rebuilt only at stable-change boundaries — scan arrival, vendor database
+    // refresh, visibility toggles, and global filter/hidden-network changes —
+    // never on the 60fps animation tick, which only mutates `displayRSSI`.
+    private(set) var cachedTotalNetworks: Int = 0
+    private(set) var cachedBandSummary: String = ""
+    private(set) var cachedCombinedTableRows: [NetworkTableRow] = []
     let wifiPowerMonitor = WiFiPowerMonitor()
     var wifiPowerState: WiFiPowerState = .poweredOn
 
@@ -198,13 +205,30 @@ final class ScannerViewModel {
         .filter { supportedBands.contains($0.band) }
     }
 
+    /// Cached table rows. Every `NetworkTableRow` field derives from stable
+    /// state (true `rssi`, series metadata, display state, vendor database, and
+    /// signal history); the animation tick only mutates `displayRSSI`, which
+    /// the table never reads. The whole array is therefore cached between
+    /// stable-change boundaries and rebuilt only by `rebuildCachedDerivedData`.
     var combinedTableRows: [NetworkTableRow] {
-        _ = vendorDatabaseRevision
+        cachedCombinedTableRows
+    }
+
+    /// Rebuilds all cached derived values from current stable state. Call only
+    /// at stable-change boundaries (scan arrival, vendor database refresh,
+    /// visibility toggles, global filter/hidden-network changes) — never from
+    /// the 60fps animation tick.
+    private func rebuildCachedDerivedData() {
         let qualityScores = Dictionary(uniqueKeysWithValues: bandViewModels.flatMap { vm in
             vm.allSeriesData.map { ($0.id, $0.qualityScore) }
         })
 
-        return deduplicatedNetworks.map { network in
+        cachedTotalNetworks = bandViewModels.reduce(0) { $0 + $1.allSeriesData.count }
+        cachedBandSummary = bandViewModels.map { vm in
+            "\(vm.band.displayName): \(vm.allSeriesData.count)"
+        }.joined(separator: "  ·  ")
+
+        cachedCombinedTableRows = deduplicatedNetworks.map { network in
             let seriesID = network.id
             let ie = network.ieData.map { IEParser.parse(data: $0) }
             let trend = signalHistory.trend(for: network.bssid)
@@ -254,6 +278,7 @@ final class ScannerViewModel {
 
     func vendorDatabaseDidChange() {
         vendorDatabaseRevision &+= 1
+        rebuildCachedDerivedData()
     }
 
     /// Effective scan interval in seconds. Writes update the user's requested
@@ -479,6 +504,9 @@ final class ScannerViewModel {
         if let error = output.cycle.observation.environmentSnapshot?.error {
             AppLogger.scanner.error("scan failure: \(String(describing: error))")
             accessState = .scanning
+            // supportedBands may have changed even though no networks were
+            // applied; refresh the caches so band/count reads stay consistent.
+            rebuildCachedDerivedData()
             return
         }
 
@@ -755,6 +783,8 @@ final class ScannerViewModel {
             count + vm.allSeriesData.filter { $0.ssid != "n/a" }.count
         }
         accessState = ssidCount > 0 ? .scanning : .grantedButSSIDUnavailable
+
+        rebuildCachedDerivedData()
     }
 
     func applyGlobalFilterToBands() {
@@ -764,6 +794,7 @@ final class ScannerViewModel {
         displayStatesByID = recomputeDisplayStates(for: deduplicatedNetworks)
         refreshPanelBandViewModels(.primary)
         refreshPanelBandViewModels(.secondary)
+        rebuildCachedDerivedData()
     }
 
     func toggleVisibility(seriesID: String) {
@@ -774,6 +805,7 @@ final class ScannerViewModel {
         )
         refreshPanelBandViewModels(.primary)
         refreshPanelBandViewModels(.secondary)
+        rebuildCachedDerivedData()
     }
 
     func toggleVisibilityLocked(seriesID: String) {
@@ -784,6 +816,7 @@ final class ScannerViewModel {
         )
         refreshPanelBandViewModels(.primary)
         refreshPanelBandViewModels(.secondary)
+        rebuildCachedDerivedData()
     }
 
     func toggleVisibility(bssid: String) {

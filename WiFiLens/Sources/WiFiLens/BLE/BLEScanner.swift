@@ -88,21 +88,21 @@ actor BLEScanner: BLEScanning {
         let continuation = channel.continuation
         activeSessionID = sessionID
         activeContinuation = continuation
-        del.onStateChange = { [weak self] state in
-            Task { [weak self] in
-                await self?.setState(state)
-                continuation.yield(.bluetoothStateChanged(state))
+        del.setHandlers(
+            onStateChange: { [weak self] state in
+                Task { [weak self] in
+                    await self?.setState(state)
+                    continuation.yield(.bluetoothStateChanged(state))
+                }
+            },
+            onDiscover: { [weak del] event in
+                del?.accumulate(event)
+            },
+            onReady: { [weak del] in
+                del?.startScan()
+                del?.beginActivity()
             }
-        }
-
-        del.onDiscover = { [weak del] event in
-            del?.accumulate(event)
-        }
-
-        del.onReady = { [weak del] in
-            del?.startScan()
-            del?.beginActivity()
-        }
+        )
 
         // Start the central manager (triggers onReady when powered on)
         del.start()
@@ -133,9 +133,7 @@ actor BLEScanner: BLEScanning {
 
         continuation.onTermination = { _ in
             streamTask.cancel()
-            del.onStateChange = nil
-            del.onDiscover = nil
-            del.onReady = nil
+            del.clearHandlers()
             del.stopScan()
             del.endActivity()
             del.stop()
@@ -179,11 +177,17 @@ actor BLEScanner: BLEScanning {
 
 // MARK: - Delegate bridge
 
+// `@unchecked Sendable` is required because CoreBluetooth delivers delegate
+// callbacks on an arbitrary queue while `onTermination` may run on any thread.
+// All mutable closure properties below are guarded by `delegateLock` so that
+// writes (start / onTermination) and reads (delegate callbacks) are
+// synchronized; closures are copied out under the lock and invoked outside it.
 private final class BLEScannerDelegate: NSObject, CBCentralManagerDelegate, @unchecked Sendable {
     private let queue: DispatchQueue
     private var centralManager: CBCentralManager?
     private var accumulator: [UUID: [BLEAdvertisementEvent]] = [:]
     private let accumulatorLock = NSLock()
+    private let delegateLock = NSLock()
     private var started = false
     private var activityToken: NSObjectProtocol?
 
@@ -194,6 +198,28 @@ private final class BLEScannerDelegate: NSObject, CBCentralManagerDelegate, @unc
     init(queue: DispatchQueue) {
         self.queue = queue
         super.init()
+    }
+
+    // MARK: - Handler configuration
+
+    func setHandlers(
+        onStateChange: ((BLEBluetoothState) -> Void)?,
+        onDiscover: ((BLEAdvertisementEvent) -> Void)?,
+        onReady: (() -> Void)?
+    ) {
+        delegateLock.lock()
+        self.onStateChange = onStateChange
+        self.onDiscover = onDiscover
+        self.onReady = onReady
+        delegateLock.unlock()
+    }
+
+    func clearHandlers() {
+        delegateLock.lock()
+        onStateChange = nil
+        onDiscover = nil
+        onReady = nil
+        delegateLock.unlock()
     }
 
     func start() {
@@ -279,10 +305,16 @@ private final class BLEScannerDelegate: NSObject, CBCentralManagerDelegate, @unc
         @unknown default:   .unknown
         }
 
-        onStateChange?(state)
+        delegateLock.lock()
+        let onStateChangeHandler = onStateChange
+        delegateLock.unlock()
+        onStateChangeHandler?(state)
 
         if central.state == .poweredOn, !started {
-            onReady?()
+            delegateLock.lock()
+            let onReadyHandler = onReady
+            delegateLock.unlock()
+            onReadyHandler?()
         }
 
         if central.state != .poweredOn {
@@ -306,6 +338,9 @@ private final class BLEScannerDelegate: NSObject, CBCentralManagerDelegate, @unc
             serviceUUIDs: (advertisementData[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID])?.map(\.uuidString),
             isConnectable: (advertisementData[CBAdvertisementDataIsConnectable] as? NSNumber)?.boolValue ?? false
         )
-        onDiscover?(event)
+        delegateLock.lock()
+        let onDiscoverHandler = onDiscover
+        delegateLock.unlock()
+        onDiscoverHandler?(event)
     }
 }
