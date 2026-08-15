@@ -33,7 +33,7 @@ macOS 14+ · Intel 与 Apple Silicon · 无遥测
 
 > 两版共享相同的核心 Wi-Fi 分析能力。Pro 增加频谱录制、常驻菜单栏与事件时间线，面向专业工作流。
 
-🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
+🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇫🇷 [Français](README.fr.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
 
 ---
 

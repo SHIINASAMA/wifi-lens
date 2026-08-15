@@ -33,7 +33,7 @@ macOS 14+ · Intel y Apple Silicon · Sin telemetría
 
 > Ambas ediciones comparten las mismas capacidades de análisis principal de Wi-Fi. Pro añade grabación de espectro, barra de menús persistente y línea temporal de eventos para flujos de trabajo profesionales.
 
-🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
+🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇫🇷 [Français](README.fr.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
 
 ---
 

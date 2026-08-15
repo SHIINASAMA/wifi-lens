@@ -33,7 +33,7 @@ macOS 14+ · Intel & Apple Silicon · Keine Telemetrie
 
 > Beide Editionen teilen sich dieselben Wi-Fi-Kernanalyse-Fähigkeiten. Pro ergänzt Spektrumsaufzeichnung, dauerhafte Menüleiste und Ereignis-Zeitachse für professionelle Workflows.
 
-🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
+🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇫🇷 [Français](README.fr.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
 
 ---
 

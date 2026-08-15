@@ -33,7 +33,7 @@ macOS 14+ · Intel および Apple Silicon · テレメトリなし
 
 > 両版は同じコア Wi-Fi 分析機能を共有しています。Pro は専門ワークフロー向けにスペクトル録画、常駐メニューバー、イベントタイムラインを追加します。
 
-🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
+🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇫🇷 [Français](README.fr.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
 
 ---
 
