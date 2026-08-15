@@ -379,6 +379,8 @@
 		FBBD169A2FD062F60093F940 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = FBBD16982FD062F60093F940 /* PrivacyInfo.xcprivacy */; };
 		FBBD169C2FD063630093F940 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBBD169B2FD063630093F940 /* Assets.xcassets */; };
 		FBBD169D2FD063630093F940 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBBD169B2FD063630093F940 /* Assets.xcassets */; };
+		A1C0DE0000000000000000F2 /* WiFi Lens.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000F1 /* WiFi Lens.icon */; };
+		A1C0DE0000000000000000F3 /* WiFi Lens.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000F1 /* WiFi Lens.icon */; };
 		FBC557F82FDBC43A0013FD7D /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0573E02FBD0002005F9001 /* ExportService.swift */; };
 		FBD000012FC4000000ABC001 /* WiFiOffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD000002FC4000000ABC001 /* WiFiOffView.swift */; };
 		FBD000022FC4000000ABC001 /* WiFiOffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD000002FC4000000ABC001 /* WiFiOffView.swift */; };
@@ -758,6 +760,7 @@
 		FBBD16932FCF4E560093F940 /* OSS.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = OSS.xctestplan; sourceTree = "<group>"; };
 		FBBD16982FD062F60093F940 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		FBBD169B2FD063630093F940 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1C0DE0000000000000000F1 /* WiFi Lens.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "WiFi Lens.icon"; sourceTree = "<group>"; };
 		FBD000002FC4000000ABC001 /* WiFiOffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiOffView.swift; sourceTree = "<group>"; };
 		FBD0A4342FE5BEAC003658AD /* RecordingTimelineChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingTimelineChart.swift; sourceTree = "<group>"; };
 		FBD0A4352FE5BEAC003658AD /* RecordingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingView.swift; sourceTree = "<group>"; };
@@ -1217,6 +1220,7 @@
 			isa = PBXGroup;
 			children = (
 				FBBD169B2FD063630093F940 /* Assets.xcassets */,
+				A1C0DE0000000000000000F1 /* WiFi Lens.icon */,
 				FBBD16982FD062F60093F940 /* PrivacyInfo.xcprivacy */,
 				FBB1F0AB2FC61E3D00E9D2C6 /* Localizable.xcstrings */,
 				MV0000000000000000000050 /* mac-vendor-database.json */,
@@ -1823,6 +1827,7 @@
 				FBBD169D2FD063630093F940 /* Assets.xcassets in Resources */,
 				FB1E329D2FC7316C009D1BDC /* Localizable.xcstrings in Resources */,
 				MV0000000000000000000051 /* mac-vendor-database.json in Resources */,
+				A1C0DE0000000000000000F3 /* WiFi Lens.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1834,6 +1839,7 @@
 				FBBD169C2FD063630093F940 /* Assets.xcassets in Resources */,
 				FBB1F0AC2FC61E3D00E9D2C6 /* Localizable.xcstrings in Resources */,
 				MV0000000000000000000049 /* mac-vendor-database.json in Resources */,
+				A1C0DE0000000000000000F2 /* WiFi Lens.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2416,7 +2422,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FB80FA2C2FC0AC1900547708 /* OSS.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "WiFi Lens";
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = NO;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = WiFiLens.entitlements;
@@ -2603,7 +2609,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FB80FA2C2FC0AC1900547708 /* OSS.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "WiFi Lens";
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = NO;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = WiFiLens.entitlements;
@@ -2651,7 +2657,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FB80FA2F2FC0AC1900547708 /* PRO.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "WiFi Lens";
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = NO;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -2698,7 +2704,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FB80FA2F2FC0AC1900547708 /* PRO.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "WiFi Lens";
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = NO;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
