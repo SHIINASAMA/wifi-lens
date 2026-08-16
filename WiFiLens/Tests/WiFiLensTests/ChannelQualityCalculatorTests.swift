@@ -479,16 +479,14 @@ struct ChannelQualityCalculatorTests {
     }
 
     @Test func overlap6GHzWideBlock() async throws {
-        // 6 GHz uses IEEE 802.11ax blocks anchored at the lowest primary:
-        // 80 MHz on ch 33 spans (31,45).
-        let aps = [ap(33, -50, width: .mhz80, band: .band6GHz)]
+        // 6 GHz uses IEEE 802.11ax containing blocks: an 80 MHz AP whose
+        // primary is ch 41 (a non-lowest primary) still spans (31,47).
+        let aps = [ap(41, -50, width: .mhz80, band: .band6GHz)]
         let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
         let ch37 = result.first(where: { $0.channel == 37 && $0.band == "6" })!
-        let ch41 = result.first(where: { $0.channel == 41 && $0.band == "6" })!
         let ch45 = result.first(where: { $0.channel == 45 && $0.band == "6" })!
         let ch29 = result.first(where: { $0.channel == 29 && $0.band == "6" })!
         #expect(ch37.qualityScore == 95)  // 4/16 = 0.25
-        #expect(ch41.qualityScore == 95)  // 4/16 = 0.25
         #expect(ch45.qualityScore == 95)  // 4/16 = 0.25
         #expect(ch29.qualityScore == 100) // outside the block
     }
