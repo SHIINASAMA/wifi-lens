@@ -20989,7 +20989,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Starkes Signal, sauberer Kanal und WPA3-Sicherheit. Du bekommst das beste Erlebnis."
+            "value": "Starkes Signal, sauberer Kanal und WPA3-Sicherheit. Du erhältst das beste Erlebnis."
           }
         },
         "en": {
@@ -21013,7 +21013,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "信号强、信道干净、WPA3 加密。你正在享受最佳网络体验。"
+            "value": "信号强、信道干净，并使用 WPA3 安全性。你正在获得最佳体验。"
           }
         }
       }
@@ -21025,7 +21025,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deine Verbindung sieht großartig aus"
+            "value": "Deine Verbindung sieht gut aus"
           }
         },
         "en": {
@@ -21043,13 +21043,13 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "接続状態は非常に良好です"
+            "value": "接続状態は良好です"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "你的连接状态极佳"
+            "value": "你的连接状态很好"
           }
         }
       }
@@ -21133,7 +21133,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Du könntest durch näheres Heranrücken an den Router oder Kanalwechsel verbessern."
+            "value": "Du kannst die Verbindung verbessern, indem du näher zum Router gehst oder den Kanal wechselst."
           }
         },
         "en": {
@@ -21145,19 +21145,19 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Podrías mejorar acercándote al router o cambiando de canal."
+            "value": "Puedes mejorar acercándote al router o cambiando de canal."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ルーターに近づくか、チャンネルを切り替えることで改善できます。"
+            "value": "ルーターに近づくか、チャンネルを切り替えると改善できる可能性があります。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "靠近路由器或切换信道可以改善网络体验。"
+            "value": "靠近路由器或切换信道可能会改善连接。"
           }
         }
       }
@@ -21181,19 +21181,19 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "La conexión es aceptable"
+            "value": "La conexión está bien"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "接続は良好です"
+            "value": "接続は問題ありません"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "连接状态一般"
+            "value": "连接正常"
           }
         }
       }
