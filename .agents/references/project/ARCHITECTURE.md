@@ -95,6 +95,10 @@ explicitly scoped to Pro.
 - `displayRSSI` animates toward `rssi` each tick for smooth Gaussian curve transitions
 - AP roaming transitions share a single timestamp between old and new segments, eliminating gaps on the timeline
 - Signal history (`SignalHistoryStore`) keeps 20 snapshots per BSSID in memory
+- Cross-edition contract (DD-5): `SignalHistoryStore.allSnapshots` is consumed by the
+  Pro recording feature (`RecordingViewModel`) as its per-tick snapshot source — it is
+  not reserved/dead API. Changes to `SignalHistoryStore` must be verified against both
+  the OSS and Pro schemes (`verify.sh` builds both).
 - Private edition behavior must remain behind the shared edition contract and
   inside the `Pro/` submodule. Public navigation or preview surfaces must not
   import private domain code.

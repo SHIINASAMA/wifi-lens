@@ -60,9 +60,15 @@ final class SignalHistoryStore {
         return snaps
     }
 
-    /// All RSSI history (unfiltered) for session persistence.
+    /// All RSSI history (unfiltered). OSS tree: test-only references.
+    /// NOTE (DD-5, 2026-08-16): keep in sync with the allSnapshots contract.
     var allHistory: [String: [Int]] { history }
 
-    /// All snapshots (unfiltered) for session persistence.
+    /// All snapshots (unfiltered) — cross-edition contract.
+    /// NOTE (DD-5, 2026-08-16): consumed by the Pro recording feature
+    /// (RecordingViewModel) as its per-tick snapshot source. This is NOT dead
+    /// or reserved API: changes must be verified against both the OSS and Pro
+    /// schemes (verify.sh). The earlier "for session persistence" comment was
+    /// misleading; re-evaluate naming when the session model is designed.
     var allSnapshots: [String: [NetworkSnapshot]] { snapshots }
 }
