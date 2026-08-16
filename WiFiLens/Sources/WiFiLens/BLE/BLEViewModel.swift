@@ -187,6 +187,22 @@ final class BLEViewModel {
             break
         }
     }
+
+    nonisolated deinit {
+        MainActor.assumeIsolated {
+            // Defensive cleanup (NH-13): cancel in-flight tasks and stop the active
+            // scan session so its idle-sleep activity token is released.
+            scanTask?.cancel()
+            scanTask = nil
+            bluetoothMonitoringTask?.cancel()
+            bluetoothMonitoringTask = nil
+            let session = scanSession
+            scanSession = nil
+            if let session {
+                Task { await session.stop() }
+            }
+        }
+    }
 }
 
 final class BLEPowerMonitor: NSObject, CBCentralManagerDelegate {

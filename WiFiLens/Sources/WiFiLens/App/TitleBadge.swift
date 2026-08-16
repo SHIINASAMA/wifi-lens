@@ -25,14 +25,14 @@ struct TitleBadge: View {
         } label: {
             Text(String(localized: "settings.app.title_badge_oss", comment: "OSS edition title badge text"))
                 .font(.subheadline.weight(.medium))
-                .foregroundColor(Color(red: 130/255, green: 89/255, blue: 221/255))
+                .foregroundColor(Color(red: 91/255, green: 46/255, blue: 166/255))
                 .frame(height: 34)
                 .padding(.horizontal, 14)
         }
         .buttonStyle(.plain)
         .background(Color(red: 245/255, green: 213/255, blue: 250/255), in: Capsule())
         .overlay {
-            Capsule().stroke(Color(red: 130/255, green: 89/255, blue: 221/255), lineWidth: 1)
+            Capsule().stroke(Color(red: 91/255, green: 46/255, blue: 166/255), lineWidth: 1)
         }
         .accessibilityHidden(true)
     }
@@ -51,7 +51,7 @@ struct TitleBadge: View {
                 Text(String(localized: "settings.app.title_badge_pro", comment: "PRO edition title badge text"))
                     .font(.subheadline.weight(.semibold))
             }
-            .foregroundColor(Color(red: 180/255, green: 130/255, blue: 30/255))
+            .foregroundColor(Color(red: 138/255, green: 90/255, blue: 0))
             .frame(height: 34)
             .padding(.horizontal, 14)
         }
