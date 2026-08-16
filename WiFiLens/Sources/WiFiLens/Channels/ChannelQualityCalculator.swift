@@ -176,16 +176,14 @@ enum ChannelQualityCalculator {
         let rssi: Int
         let channelWidth: String  // "20"/"40"/"80"/"160"
         let band: String          // "24"/"5"/"6"
-        let apex: Double          // span midpoint
         let bssid: String?
         let ssid: String?
 
-        init(channel: Int, rssi: Int, channelWidth: String, band: String, apex: Double, bssid: String? = nil, ssid: String? = nil) {
+        init(channel: Int, rssi: Int, channelWidth: String, band: String, bssid: String? = nil, ssid: String? = nil) {
             self.channel = channel
             self.rssi = rssi
             self.channelWidth = channelWidth
             self.band = band
-            self.apex = apex
             self.bssid = bssid?.nilIfBlank
             self.ssid = ssid?.nilIfBlank
         }
@@ -404,6 +402,8 @@ enum ChannelQualityCalculator {
         if other.channel == channel { return 1.0 }
 
         if band == "24" {
+            // 2.4 GHz channels are 5 MHz apart, so adjacent channels overlap in
+            // practice; keep the empirical distance heuristic.
             let dist = abs(channel - other.channel)
             return switch dist {
             case 1: 0.8
@@ -414,14 +414,25 @@ enum ChannelQualityCalculator {
             }
         }
 
-        // 5 / 6 GHz: only wide channels cause adjacency interference
-        let dist = abs(channel - other.channel)
-        let width = Int(other.channelWidth) ?? 20
-        let halfSpan = width / 20 / 2  // how many 5MHz steps
-        if dist == 0 { return 1.0 }
-        if dist <= halfSpan { return 0.4 }
-        if dist <= halfSpan + 1 { return 0.15 }
-        return 0
+        // 5 / 6 GHz: 20 MHz channels sit on standard blocks, so non-overlapping
+        // primary channels do not interfere. Compute the real frequency-band
+        // overlap between the 20 MHz candidate channel and the AP's block, and
+        // normalize by the AP span length: a wide AP contributes at most
+        // 1.0/0.5/0.25/0.125 (20/40/80/160 MHz) to one non-co-channel 20 MHz
+        // candidate (the primary channel carries beacons/control; secondary
+        // channels carry data only). widthMul in computeInterference partially
+        // compensates wider APs.
+        guard let channelBand = ChannelBand(id: band) else { return 0 }
+        let apWidth = Int(other.channelWidth) ?? 20
+        let candidateSpan = ChannelSpanCalculator.channelBlock(
+            primaryChannel: channel, widthMHz: 20, band: channelBand, spanDirection: nil
+        )
+        let apSpan = ChannelSpanCalculator.channelBlock(
+            primaryChannel: other.channel, widthMHz: apWidth, band: channelBand, spanDirection: nil
+        )
+        let overlap = max(0, min(apSpan.right, candidateSpan.right) - max(apSpan.left, candidateSpan.left))
+        let apSpanLength = max(1, apSpan.right - apSpan.left)
+        return min(1.0, Double(overlap) / Double(apSpanLength))
     }
 
     private static func overlaps(channel: Int, other: APInfo, band: String) -> Bool {

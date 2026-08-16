@@ -133,28 +133,47 @@ struct ChannelSpanCalculatorTests {
         #expect(right == 144 + half)
     }
 
-    // MARK: - Fallback (6 GHz)
+    // MARK: - 6 GHz (IEEE 802.11ax containing blocks)
 
-    @Test func channelBlock6GHz80MHzFallback() {
-        let (left, right) = ChannelSpanCalculator.channelBlock(
-            primaryChannel: 50, widthMHz: 80, band: .band6GHz, spanDirection: nil)
-        let half = ChannelSpanCalculator.channelHalfSpan(for: 80)
-        #expect(left == 50 - half)
-        #expect(right == 50 + half)
+    @Test func channelBlock6GHz80MHzBlock() {
+        // The scanned primary may be any 20 MHz primary inside the 80 MHz
+        // block: 33/37/41/45 all resolve to the same block (31, 47).
+        for ch in [33, 37, 41, 45] {
+            let (left, right) = ChannelSpanCalculator.channelBlock(
+                primaryChannel: ch, widthMHz: 80, band: .band6GHz, spanDirection: nil)
+            #expect(left == 31)
+            #expect(right == 47)
+        }
+        let (l49, r49) = ChannelSpanCalculator.channelBlock(
+            primaryChannel: 49, widthMHz: 80, band: .band6GHz, spanDirection: nil)
+        #expect(l49 == 47)
+        #expect(r49 == 63)
     }
 
-    @Test func channelBlock6GHz20MHzFallback() {
-        let (left, right) = ChannelSpanCalculator.channelBlock(
-            primaryChannel: 100, widthMHz: 20, band: .band6GHz, spanDirection: nil)
-        #expect(left == 98)
-        #expect(right == 102)
+    @Test func channelBlock6GHz40MHzNonLowestPrimary() {
+        // 37 and 33 share the 40 MHz block (31, 39).
+        for ch in [33, 37] {
+            let (left, right) = ChannelSpanCalculator.channelBlock(
+                primaryChannel: ch, widthMHz: 40, band: .band6GHz, spanDirection: nil)
+            #expect(left == 31)
+            #expect(right == 39)
+        }
     }
 
-    @Test func channelBlock6GHz160MHzFallback() {
+    @Test func channelBlock6GHz160MHzNonLowestPrimary() {
+        // 37 and 33 share the 160 MHz block (31, 63).
+        for ch in [33, 37] {
+            let (left, right) = ChannelSpanCalculator.channelBlock(
+                primaryChannel: ch, widthMHz: 160, band: .band6GHz, spanDirection: nil)
+            #expect(left == 31)
+            #expect(right == 63)
+        }
+    }
+
+    @Test func channelBlock6GHz20MHzBlock() {
         let (left, right) = ChannelSpanCalculator.channelBlock(
-            primaryChannel: 100, widthMHz: 160, band: .band6GHz, spanDirection: nil)
-        let half = ChannelSpanCalculator.channelHalfSpan(for: 160)
-        #expect(left == 100 - half)
-        #expect(right == 100 + half)
+            primaryChannel: 5, widthMHz: 20, band: .band6GHz, spanDirection: nil)
+        #expect(left == 3)
+        #expect(right == 7)
     }
 }

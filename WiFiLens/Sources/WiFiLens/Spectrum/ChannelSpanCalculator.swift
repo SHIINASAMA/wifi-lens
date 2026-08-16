@@ -81,7 +81,23 @@ enum ChannelSpanCalculator {
             }
         }
 
-        // Fallback for 6 GHz and any unmatched cases
+        if band == .band6GHz {
+            // IEEE 802.11ax 6 GHz channelization: the scanned/control primary
+            // can be any 20 MHz primary inside a 40/80/160 MHz block (e.g. all
+            // of 33/37/41/45 live in the same 80 MHz block). Derive the
+            // containing block from the primary index instead of extending
+            // upward from the primary channel.
+            let channelsPerBlock = widthMHz / 20
+            let primaryIndex = (primaryChannel - 1) / 4
+            let blockStartIndex = (primaryIndex / channelsPerBlock) * channelsPerBlock
+            let lowestPrimary = 1 + blockStartIndex * 4
+            return (
+                lowestPrimary - 2,
+                lowestPrimary + channelsPerBlock * 4 - 2
+            )
+        }
+
+        // Fallback for any unmatched cases
         let half = channelHalfSpan(for: widthMHz)
         return (primaryChannel - half, primaryChannel + half)
     }
