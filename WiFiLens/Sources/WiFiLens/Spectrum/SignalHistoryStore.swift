@@ -65,10 +65,10 @@ final class SignalHistoryStore {
     var allHistory: [String: [Int]] { history }
 
     /// All snapshots (unfiltered) — cross-edition contract.
-    /// NOTE (DD-5, 2026-08-16): consumed by the Pro recording feature
-    /// (RecordingViewModel) as its per-tick snapshot source. This is NOT dead
-    /// or reserved API: changes must be verified against both the OSS and Pro
-    /// schemes (verify.sh). The earlier "for session persistence" comment was
-    /// misleading; re-evaluate naming when the session model is designed.
+    /// NOTE (DD-5, 2026-08-16): consumed by the Pro recording feature as its
+    /// per-tick snapshot source. This is NOT dead or reserved API: changes must
+    /// be verified against both the OSS and Pro schemes (verify.sh). The
+    /// earlier "for session persistence" comment was misleading; re-evaluate
+    /// naming when the session model is designed.
     var allSnapshots: [String: [NetworkSnapshot]] { snapshots }
 }
