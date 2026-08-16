@@ -5,6 +5,7 @@ struct ChannelQualityCalculatorTests {
 
     private enum TestChannelWidth: String {
         case mhz20 = "20"
+        case mhz40 = "40"
         case mhz80 = "80"
         case mhz160 = "160"
     }
@@ -14,7 +15,6 @@ struct ChannelQualityCalculatorTests {
         _ rssi: Int,
         width: TestChannelWidth = .mhz20,
         band: ChannelBand = .band5GHz,
-        apex: Double = 0,
         bssid: String? = nil,
         ssid: String? = nil
     ) -> ChannelQualityCalculator.APInfo {
@@ -23,7 +23,6 @@ struct ChannelQualityCalculatorTests {
             rssi: rssi,
             channelWidth: width.rawValue,
             band: band.id,
-            apex: apex,
             bssid: bssid,
             ssid: ssid
         )
@@ -124,12 +123,10 @@ struct ChannelQualityCalculatorTests {
         let ch44 = result.first(where: { $0.channel == 44 })!
         #expect(ch44.qualityScore < 100)
 
-        // ch 40 (dist 4): beyond halfSpan+1=3 → overlap=0, no penalty
-        // 80 MHz spans channels 42-46 (left=42, right=46), but halfSpan in 5MHz steps = 2
-        // Actually, ch 40 is 4 channels away from 44, halfSpan=2, halfSpan+1=3
-        // dist=4 > 3 → overlap=0
+        // ch 40: the 80 MHz AP on ch 44 really spans (34,50); the 20 MHz
+        // candidate ch 40 (38,42) overlaps 4/16 → factor 0.25 → penalty ≈5
         let ch40 = result.first(where: { $0.channel == 40 })!
-        #expect(ch40.qualityScore == 100)
+        #expect(ch40.qualityScore == 95)
     }
 
     // MARK: - Quality level thresholds
@@ -186,7 +183,8 @@ struct ChannelQualityCalculatorTests {
         let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
         let ch44 = result.first(where: { $0.channel == 44 })!
         #expect(ch44.coChannelCount == 2)
-        #expect(ch44.apCount >= 2)  // total overlapping
+        #expect(ch44.apCount == 3)  // 2 co-channel + the 80 MHz AP on ch 40 (real span overlaps)
+        #expect(ch44.adjacentCount == 1)
     }
 
     // MARK: - Current channel
@@ -239,7 +237,6 @@ struct ChannelQualityCalculatorTests {
                     rssi: -30,
                     channelWidth: "20",
                     band: "5",
-                    apex: 36,
                     bssid: "aa:bb:cc:dd:ee:01",
                     ssid: "Home"
                 )
@@ -267,7 +264,6 @@ struct ChannelQualityCalculatorTests {
                     rssi: -30,
                     channelWidth: "20",
                     band: "5",
-                    apex: 36,
                     bssid: "aa:bb:cc:dd:ee:01",
                     ssid: "Home"
                 ),
@@ -276,7 +272,6 @@ struct ChannelQualityCalculatorTests {
                     rssi: -30,
                     channelWidth: "20",
                     band: "5",
-                    apex: 36,
                     bssid: "aa:bb:cc:dd:ee:02",
                     ssid: "Neighbor"
                 )
@@ -448,5 +443,89 @@ struct ChannelQualityCalculatorTests {
         // Non-overlapping channel gets default -100
         let ch40 = result.first(where: { $0.channel == 40 })!
         #expect(ch40.strongestNeighborRSSI == -100)
+    }
+
+    // MARK: - NH-14: real wide-channel overlap (5/6 GHz)
+
+    @Test func overlap5GHz40MHzDirectional() async throws {
+        // 40 MHz AP on ch 44 spans (42,50): ch 48 overlaps (4/8 = 0.5), ch 40 does not.
+        let aps = [ap(44, -50, width: .mhz40, band: .band5GHz)]
+        let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
+        let ch48 = result.first(where: { $0.channel == 48 })!
+        let ch40 = result.first(where: { $0.channel == 40 })!
+        #expect(ch48.qualityScore == 92)  // 0.5 * 0.714 * 1.2 * 18 ≈ 7.7 → 8
+        #expect(ch40.qualityScore == 100) // block is offset upward, no overlap
+    }
+
+    @Test func overlap5GHz160MHzAdjacent() async throws {
+        // 160 MHz AP on ch 36 spans (34,66): ch 40/44/48 each overlap 4/32 = 0.125.
+        let aps = [ap(36, -50, width: .mhz160, band: .band5GHz)]
+        let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
+        for ch in [40, 44, 48] {
+            let c = result.first(where: { $0.channel == ch })!
+            #expect(c.qualityScore == 97) // 0.125 * 0.714 * 2.0 * 18 ≈ 3.2 → 3
+        }
+    }
+
+    @Test func overlap5GHz80MHzBlockSeam() async throws {
+        // 80 MHz AP on ch 48 spans (34,50); ch 52 is a half-open seam (no overlap),
+        // ch 44 overlaps 4/16 = 0.25.
+        let aps = [ap(48, -50, width: .mhz80, band: .band5GHz)]
+        let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
+        let ch52 = result.first(where: { $0.channel == 52 })!
+        let ch44 = result.first(where: { $0.channel == 44 })!
+        #expect(ch52.qualityScore == 100)
+        #expect(ch44.qualityScore == 95)
+    }
+
+    @Test func overlap6GHzWideFallback() async throws {
+        // 6 GHz uses the symmetric fallback: 80 MHz on ch 33 spans (25,41).
+        let aps = [ap(33, -50, width: .mhz80, band: .band6GHz)]
+        let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
+        let ch29 = result.first(where: { $0.channel == 29 && $0.band == "6" })!
+        let ch41 = result.first(where: { $0.channel == 41 && $0.band == "6" })!
+        let ch25 = result.first(where: { $0.channel == 25 && $0.band == "6" })!
+        #expect(ch29.qualityScore == 95)  // 4/16 = 0.25
+        #expect(ch41.qualityScore == 98)  // 2/16 = 0.125 (8 steps out)
+        #expect(ch25.qualityScore == 98)  // 2/16 = 0.125
+    }
+
+    @Test func overlap6GHzEdgeChannel() async throws {
+        // 80 MHz on ch 5 spans (-3,13); ch 1 still overlaps 4/16 = 0.25.
+        let aps = [ap(5, -50, width: .mhz80, band: .band6GHz)]
+        let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
+        let ch1 = result.first(where: { $0.channel == 1 && $0.band == "6" })!
+        #expect(ch1.qualityScore == 95)
+    }
+
+    @Test func overlap24GHzDistanceTable() async throws {
+        // 2.4 GHz must keep the empirical distance heuristic (5 MHz spacing).
+        let aps = [ap(6, -50, width: .mhz20, band: .band24GHz)]
+        let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
+        let expected: [Int: Int] = [5: 81, 4: 87, 3: 93, 2: 97, 1: 100]
+        for (ch, score) in expected {
+            #expect(result.first(where: { $0.channel == ch && $0.band == "24" })!.qualityScore == score)
+        }
+    }
+
+    @Test func overlap20MHzAdjacentIsZero() async throws {
+        // 20 MHz AP on ch 36: adjacent 20 MHz ch 40 / ch 44 do not overlap.
+        let aps = [ap(36, -50, width: .mhz20, band: .band5GHz)]
+        let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
+        let ch40 = result.first(where: { $0.channel == 40 })!
+        let ch44 = result.first(where: { $0.channel == 44 })!
+        #expect(ch40.qualityScore == 100)
+        #expect(ch44.qualityScore == 100)
+    }
+
+    @Test func wideOverlapConsistency() async throws {
+        // One 80 MHz AP on ch 44: ch 40 must be penalized, counted, and reported
+        // as the strongest neighbor (overlapFactor and overlaps stay in sync).
+        let aps = [ap(44, -50, width: .mhz80, band: .band5GHz)]
+        let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
+        let ch40 = result.first(where: { $0.channel == 40 })!
+        #expect(ch40.qualityScore < 100)
+        #expect(ch40.apCount == 1)
+        #expect(ch40.strongestNeighborRSSI == -50)
     }
 }

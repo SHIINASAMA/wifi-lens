@@ -12,18 +12,11 @@ enum ChannelOccupancyAnalyzer {
         for obs in snapshot.networks {
             let key = "\(obs.bssid)-\(obs.channel.band.rawValue)"
             let widthLabel = channelWidthLabel(obs.capabilities.channelWidth)
-            let span = ChannelSpanCalculator.channelBlock(
-                primaryChannel: obs.channel.channelNumber,
-                widthMHz: obs.channel.channelWidthMHz,
-                band: obs.channel.band,
-                spanDirection: obs.channel.spanDirection
-            )
             let info = ChannelQualityCalculator.APInfo(
                 channel: obs.channel.channelNumber,
                 rssi: obs.rssi,
                 channelWidth: widthLabel,
                 band: obs.channel.band.id,
-                apex: Double(span.left + span.right) / 2.0,
                 bssid: obs.bssid,
                 ssid: obs.ssid
             )
