@@ -1,6 +1,6 @@
 # WiFi Lens
 
-**A native open-source network diagnostics app for macOS with built-in Wi-Fi analysis.**
+**Open-source native Wi-Fi analyzer and network diagnostics app for macOS.**
 
 Diagnose connectivity issues, analyze Wi-Fi channel congestion, and validate roaming behavior — with results processed locally on your Mac.
 
@@ -12,26 +12,14 @@ Diagnose connectivity issues, analyze Wi-Fi channel congestion, and validate roa
 <p align="center">
   <a href="https://github.com/SHIINASAMA/wifi-lens/releases/latest"><strong>Download Open-Source Edition</strong></a>
   ·
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>Get WiFi Lens Pro</strong></a>
+  <a href="#develop"><strong>Build from Source</strong></a>
   ·
   <a href="https://wifi-lens.shiinalabs.com">Official Website</a>
 </p>
 
-macOS 14+ · Intel & Apple Silicon · No telemetry
+macOS 14+ · Intel & Apple Silicon · Apache-2.0 · No telemetry
 
 <img alt="WiFi Lens showing Wi-Fi spectrum analysis on macOS" src="assets/screenshot-swiftui.png" width="800">
-
-## Open Source or Pro?
-
-| Open-Source Edition | WiFi Lens Pro |
-|---|---|
-| Free, open source — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) | One-time paid Mac App Store edition — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) |
-| Tri-band Wi-Fi scanning & spectrum analysis | Professional monitoring workflows built on the same core analysis engine |
-| Channel quality, network details, roaming tests | Spectrum session recording — capture & replay over time |
-| Network Self-Check, BLE scanner, MCP server | Additional professional workflows |
-| Export PNG/CSV · Sparkle updates | Persistent menu bar · Event timeline · Mac App Store updates |
-
-> Both editions share the same core Wi-Fi analysis capabilities. Pro adds spectrum recording, persistent menu bar, and event timeline for professional workflows.
 
 🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇫🇷 [Français](README.fr.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
 
@@ -49,6 +37,22 @@ This repository contains the free, open-source edition. WiFi Lens Pro is a separ
 - 🏢 **Office Wi-Fi audit:** Scan all three bands (2.4, 5, and 6 GHz) to spot dead zones or misconfigured APs.
 - 🚶 **Roaming validation:** Walk through a building and record every AP handoff with a timeline chart to verify seamless transition.
 - 🎧 **BLE device troubleshooting:** Track RSSI trends of Bluetooth peripherals and identify range or interference issues.
+
+---
+
+## Open Source and Pro
+
+The open-source edition is a complete, standalone Wi-Fi analysis and diagnostics app. **WiFi Lens Pro** keeps the same core analysis capabilities and adds persistent monitoring workflows for users who want them.
+
+| Open-Source Edition | WiFi Lens Pro |
+|---|---|
+| Free, open source — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) | One-time paid Mac App Store edition — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) |
+| Tri-band Wi-Fi scanning & spectrum analysis | Professional monitoring workflows built on the same core analysis engine |
+| Channel quality, network details, roaming tests | Spectrum session recording — capture & replay over time |
+| Network Self-Check, BLE scanner, MCP server | Additional professional workflows |
+| Export PNG/CSV · Sparkle updates | Persistent menu bar · Event timeline · Mac App Store updates |
+
+> Both editions share the same core Wi-Fi analysis capabilities. Pro adds spectrum recording, persistent menu bar, and event timeline for professional workflows.
 
 ---
 
