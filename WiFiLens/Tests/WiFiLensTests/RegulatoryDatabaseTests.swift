@@ -159,25 +159,17 @@ import Testing
         #expect(!rules.allowedChannels.contains(165))
     }
 
-    @Test("US 6 GHz excludes passive-only channels 97-117")
-    func us6GHzExcludesPassiveOnly() {
+    @Test("US 6 GHz LPI allows the full 1-233 band")
+    func us6GHzLPIAllowsFullBand() {
         guard let rules = RegulatoryDatabase.rules[.US]?["6"] else {
             #expect(Bool(false))
             return
         }
-        for ch in stride(from: 97, through: 117, by: 4) {
-            #expect(!rules.allowedChannels.contains(ch), "US 6 GHz should exclude passive-only channel \(ch)")
-        }
-    }
-
-    @Test("US 6 GHz capped at 181 for LPI without AFC")
-    func us6GHzMaxChannel() {
-        guard let rules = RegulatoryDatabase.rules[.US]?["6"] else {
-            #expect(Bool(false))
-            return
-        }
-        for ch in rules.allowedChannels {
-            #expect(ch <= 181, "US 6 GHz LPI channel \(ch) exceeds max 181")
+        #expect(rules.allowedChannels == Set(stride(from: 1, through: 233, by: 4)),
+                "US 6 GHz LPI should allow all channels 1-233")
+        // U-NII-6 (97-117) and U-NII-8 (185-233) are LPI-eligible per 47 CFR 15.407(a)(5)
+        for ch in [97, 101, 117, 185, 189, 233] {
+            #expect(rules.allowedChannels.contains(ch), "US 6 GHz should allow LPI channel \(ch)")
         }
     }
 

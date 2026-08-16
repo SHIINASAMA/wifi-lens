@@ -115,7 +115,7 @@ Restricted channels are hidden by default (`showInSimpleView = false`).
 
 | Domain | 2.4 GHz | 5 GHz | 6 GHz |
 |--------|---------|-------|-------|
-| US (FCC) | 1–11 | 36–165 (DFS on 52–144) | 1–181 LPI (no AFC) |
+| US (FCC) | 1–11 | 36–165 (DFS on 52–144) | 1–233 LPI (no AFC) |
 | JP (MIC) | 1–14 (ch14: 802.11b only) | 36–144 (DFS on W53/W56) | 1–93 LPI |
 | CN (SRRC) | 1–13 | 36–48, 149–165 (no DFS) | None |
 | EU (ETSI) | 1–13 | 36–144 (DFS on 52–144) | 1–93 LPI |

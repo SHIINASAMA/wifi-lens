@@ -82,14 +82,11 @@ enum RegulatoryDatabase {
             )
         }
 
-        // US 6 GHz: LPI channels (no AFC). Exclude 97-117 (passive-only),
-        // cap at 181 for LPI. Channel 2 is preferred PSC for 6 GHz.
-        var sixChannels = Set<Int>()
-        for ch in stride(from: 1, through: 233, by: 4) {
-            if (97...117).contains(ch) { continue }
-            if ch > 181 { continue } // Standard-power only above 181 without AFC
-            sixChannels.insert(ch)
-        }
+        // US 6 GHz: LPI (indoor) operation spans the full 5.925-7.125 GHz band
+        // (U-NII-5 through U-NII-8, channels 1-233). Per 47 CFR 15.407(a)(5), LPI has
+        // no sub-band exclusion; standard power is limited to U-NII-5/7 and requires
+        // AFC, which is not modeled here. Channel 2 is the preferred PSC for 6 GHz.
+        let sixChannels = Set(stride(from: 1, through: 233, by: 4))
         let sixMeta = [Int: RegulatoryChannelMeta]()
 
         return [
