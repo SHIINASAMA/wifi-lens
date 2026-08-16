@@ -79,3 +79,4 @@ Standardized terms for `en`, `ja`, `zh-Hans`, `de`, `es` translations in `Locali
 4. **Parameterized strings** — use `%@`, `%lld`, `%1$@` etc. exactly as in English; do not reorder placeholders in translation
 5. **Punctuation** — follow target language conventions (e.g., `…` not `...` in ja/zh-Hans, `«»` in fr)
 6. **Tone** — use informal "你" (zh-Hans), not formal "您"
+7. **AP in prose** — short labels (badges, table headers, menu items) keep the abbreviation `AP`. Longer explanatory prose may expand the full term for readability (zh 接入点, ja アクセスポイント, de Zugangspunkt, es punto de acceso); existing AP Radar long-form usages are sanctioned.

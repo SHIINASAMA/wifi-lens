@@ -21423,42 +21423,6 @@
         }
       }
     },
-    "permission.location.macos_sonoma_full": {
-      "comment": "Full macOS Sonoma Location Services instructions with newline",
-      "extractionState": "manual",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unter macOS 14 Sonoma und neuer ist die Ortungsdienstberechtigung erforderlich, um Wi‑Fi-SSIDs zu erhalten.\nBitte aktiviere Ortungsdienste in Systemeinstellungen > Sicherheit & Datenschutz > Datenschutz > Ortungsdienste."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "On macOS 14 Sonoma and Later, Location Services permission is required to get Wi-Fi SSIDs.\nPlease enable Location Services in System Preferences > Security & Privacy > Privacy > Location Services."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "En macOS 14 Sonoma y posteriores, se requiere permiso de Servicios de Ubicación para obtener SSIDs Wi‑Fi.\nHabilita los Servicios de Ubicación en Preferencias del Sistema > Seguridad y Privacidad > Privacidad > Servicios de Ubicación."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "macOS 14 Sonoma 以降では、Wi-Fi SSID の取得に位置情報サービスの権限が必要です。\n「システム設定」>「プライバシーとセキュリティ」>「位置情報サービス」で有効にしてください。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 macOS 14 Sonoma 及更新版本中，需要使用定位服务权限才能获取 Wi-Fi SSID。\n请在「系统设置」>「隐私与安全性」>「定位服务」中开启。"
-          }
-        }
-      }
-    },
     "permission.location.required_short": {
       "comment": "Short label: Location Services required",
       "extractionState": "manual",

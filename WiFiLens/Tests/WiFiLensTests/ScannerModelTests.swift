@@ -143,3 +143,122 @@ struct WiFiNetworkTests {
         #expect(n1.id != n2.id)
     }
 }
+
+// MARK: - ScannerViewModel behavior
+
+@Suite("ScannerViewModel behavior") @MainActor struct ScannerViewModelBehaviorTests {
+    private func makeNetwork(ssid: String?, bssid: String, band: ChannelBand, channel: Int, rssi: Int = -50) -> WiFiNetwork {
+        WiFiNetwork(
+            ssid: ssid,
+            bssid: bssid,
+            rssi: rssi,
+            channel: WiFiChannel(band: band, channelNumber: channel, channelWidthMHz: 20)
+        )
+    }
+
+    @Test("cached totals and table rows reflect the latest scan")
+    func cachedDerivedDataReflectsScan() {
+        let vm = ScannerViewModel()
+        vm.debugApplyNetworksForTesting(
+            [
+                makeNetwork(ssid: "A", bssid: "00:11:22:33:44:01", band: .band24GHz, channel: 1),
+                makeNetwork(ssid: "B", bssid: "00:11:22:33:44:02", band: .band24GHz, channel: 6),
+                makeNetwork(ssid: "C", bssid: "00:11:22:33:44:03", band: .band5GHz, channel: 36),
+            ],
+            supportedBands: Set([.band24GHz, .band5GHz])
+        )
+
+        #expect(vm.cachedTotalNetworks == 3)
+        #expect(vm.cachedCombinedTableRows.count == 3)
+        #expect(vm.cachedBandSummary.contains(": 2"))
+        #expect(vm.cachedBandSummary.contains(": 1"))
+    }
+
+    @Test("caches update when a new scan arrives")
+    func cachesUpdateOnNewScan() {
+        let vm = ScannerViewModel()
+        let a = makeNetwork(ssid: "A", bssid: "00:11:22:33:44:01", band: .band24GHz, channel: 1)
+        let b = makeNetwork(ssid: "B", bssid: "00:11:22:33:44:02", band: .band24GHz, channel: 6)
+        let c = makeNetwork(ssid: "C", bssid: "00:11:22:33:44:03", band: .band24GHz, channel: 11)
+
+        vm.debugApplyNetworksForTesting([a, b], supportedBands: Set([.band24GHz]))
+        #expect(vm.cachedTotalNetworks == 2)
+
+        vm.debugApplyNetworksForTesting([a, b, c], supportedBands: Set([.band24GHz]))
+        #expect(vm.cachedTotalNetworks == 3)
+        #expect(vm.cachedCombinedTableRows.count == 3)
+    }
+
+    @Test("hiding a band invalidates cached row visibility")
+    func hiddenBandsInvalidateCachedRows() {
+        let vm = ScannerViewModel()
+        let a = makeNetwork(ssid: "A", bssid: "00:11:22:33:44:01", band: .band24GHz, channel: 1)
+        let c = makeNetwork(ssid: "C", bssid: "00:11:22:33:44:03", band: .band5GHz, channel: 36)
+
+        vm.debugApplyNetworksForTesting([a, c], supportedBands: Set([.band24GHz, .band5GHz]))
+        #expect(vm.cachedTotalNetworks == 2)
+        #expect(vm.cachedCombinedTableRows.allSatisfy { $0.isVisible })
+
+        vm.hiddenBands = ["24"]
+        vm.applyGlobalFilterToBands()
+
+        #expect(vm.cachedTotalNetworks == 2) // Counts unchanged; visibility is per-row.
+        let rowsByID = Dictionary(uniqueKeysWithValues: vm.cachedCombinedTableRows.map { ($0.id, $0) })
+        #expect(rowsByID[a.id]?.isVisible == false) // 2.4 GHz band hidden.
+        #expect(rowsByID[c.id]?.isVisible == true)  // 5 GHz band still visible.
+    }
+
+    @Test("visibility and lock toggles invalidate cached rows")
+    func togglesInvalidateCachedRows() {
+        let vm = ScannerViewModel()
+        let a = makeNetwork(ssid: "A", bssid: "00:11:22:33:44:01", band: .band24GHz, channel: 1)
+        vm.debugApplyNetworksForTesting([a], supportedBands: Set([.band24GHz]))
+
+        #expect(vm.cachedCombinedTableRows.first?.isVisible == true)
+
+        vm.toggleVisibility(seriesID: a.id)
+        #expect(vm.cachedCombinedTableRows.first?.isVisible == false)
+        #expect(vm.cachedCombinedTableRows.first?.visibilityLocked == false)
+
+        vm.toggleVisibilityLocked(seriesID: a.id)
+        #expect(vm.cachedCombinedTableRows.first?.visibilityLocked == true)
+    }
+
+    @Test("panel filter does not mutate cached rows")
+    func panelFilterKeepsCachedRowsStable() {
+        let vm = ScannerViewModel()
+        let a = makeNetwork(ssid: "Alpha", bssid: "00:11:22:33:44:01", band: .band24GHz, channel: 1)
+        vm.debugApplyNetworksForTesting([a], supportedBands: Set([.band24GHz]))
+
+        vm.setFilterQuery("Alpha", for: .primary)
+
+        #expect(vm.cachedCombinedTableRows.map(\.id) == [a.id])
+        #expect(vm.cachedCombinedTableRows.first?.isVisible == true)
+        #expect(vm.cachedTotalNetworks == 1)
+    }
+
+    @Test("same BSSID on different bands keeps separate rows")
+    func crossBandSameBSSIDKeepsBothRows() {
+        let vm = ScannerViewModel()
+        let n24 = makeNetwork(ssid: "Home", bssid: "00:11:22:33:44:01", band: .band24GHz, channel: 1)
+        let n5 = makeNetwork(ssid: "Home", bssid: "00:11:22:33:44:01", band: .band5GHz, channel: 36)
+
+        vm.debugApplyNetworksForTesting([n24, n5], supportedBands: Set([.band24GHz, .band5GHz]))
+
+        #expect(vm.cachedCombinedTableRows.count == 2)
+        #expect(vm.cachedTotalNetworks == 2)
+    }
+
+    @Test("duplicate BSSID/channel/band keeps the strongest RSSI")
+    func duplicateKeepsStrongestRSSI() {
+        let vm = ScannerViewModel()
+        let weak = makeNetwork(ssid: "A", bssid: "00:11:22:33:44:01", band: .band24GHz, channel: 1, rssi: -70)
+        let strong = makeNetwork(ssid: "A", bssid: "00:11:22:33:44:01", band: .band24GHz, channel: 1, rssi: -45)
+
+        vm.debugApplyNetworksForTesting([weak, strong], supportedBands: Set([.band24GHz]))
+
+        #expect(vm.cachedCombinedTableRows.count == 1)
+        #expect(vm.cachedCombinedTableRows.first?.rssi == -45)
+        #expect(vm.cachedTotalNetworks == 1)
+    }
+}

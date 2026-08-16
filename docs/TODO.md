@@ -2,7 +2,7 @@
 
 ## Product
 
-- [ ] Integrate SpectrumPanelView filter with `APFilterQueryParser` (support structured queries like `band:5G AND rssi:>-60`) — target v1.5.x
+- [ ] Integrate SpectrumPanelView filter with `APFilterQueryParser` (support structured queries like `band:5G AND rssi:>-60`) — shelved: pending product decision (parser ready, strict comparators fixed)
 - [ ] RSSI threshold alert (notify when a monitored network drops below a configurable threshold)
 - [ ] Unify export into a single reporting flow: multi-band export, richer CSV schema, and session snapshots suitable for sharing/debugging
 - [ ] Turn signal history into a first-class session model: persisted timelines, monitored SSIDs, threshold alerts, and historical comparisons
