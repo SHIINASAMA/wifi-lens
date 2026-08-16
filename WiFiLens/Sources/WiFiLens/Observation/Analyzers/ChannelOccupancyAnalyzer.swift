@@ -11,7 +11,10 @@ enum ChannelOccupancyAnalyzer {
         var seen = [String: ChannelQualityCalculator.APInfo]()
         for obs in snapshot.networks {
             let key = "\(obs.bssid)-\(obs.channel.band.rawValue)"
-            let widthLabel = channelWidthLabel(obs.capabilities.channelWidth)
+            // Use the operating width (CWChannel), not the IE capability width:
+            // capabilities.channelWidth reflects what the AP supports (160/80/40
+            // capability flags), which may exceed the width it is currently using.
+            let widthLabel = channelWidthLabel(obs.channel.channelWidthMHz)
             let info = ChannelQualityCalculator.APInfo(
                 channel: obs.channel.channelNumber,
                 rssi: obs.rssi,

@@ -133,28 +133,26 @@ struct ChannelSpanCalculatorTests {
         #expect(right == 144 + half)
     }
 
-    // MARK: - Fallback (6 GHz)
+    // MARK: - 6 GHz (IEEE 802.11ax blocks anchored at the lowest primary)
 
-    @Test func channelBlock6GHz80MHzFallback() {
+    @Test func channelBlock6GHz80MHzBlock() {
         let (left, right) = ChannelSpanCalculator.channelBlock(
             primaryChannel: 50, widthMHz: 80, band: .band6GHz, spanDirection: nil)
-        let half = ChannelSpanCalculator.channelHalfSpan(for: 80)
-        #expect(left == 50 - half)
-        #expect(right == 50 + half)
+        #expect(left == 48)   // 50 - 2
+        #expect(right == 64)  // 50 + 14 (4 x 20 MHz)
     }
 
-    @Test func channelBlock6GHz20MHzFallback() {
+    @Test func channelBlock6GHz20MHzBlock() {
         let (left, right) = ChannelSpanCalculator.channelBlock(
             primaryChannel: 100, widthMHz: 20, band: .band6GHz, spanDirection: nil)
         #expect(left == 98)
         #expect(right == 102)
     }
 
-    @Test func channelBlock6GHz160MHzFallback() {
+    @Test func channelBlock6GHz160MHzBlock() {
         let (left, right) = ChannelSpanCalculator.channelBlock(
             primaryChannel: 100, widthMHz: 160, band: .band6GHz, spanDirection: nil)
-        let half = ChannelSpanCalculator.channelHalfSpan(for: 160)
-        #expect(left == 100 - half)
-        #expect(right == 100 + half)
+        #expect(left == 98)   // 100 - 2
+        #expect(right == 130) // 100 + 30 (8 x 20 MHz)
     }
 }

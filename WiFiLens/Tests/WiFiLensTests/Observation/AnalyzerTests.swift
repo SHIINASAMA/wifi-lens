@@ -124,7 +124,8 @@ struct ChannelOccupancyAnalyzerTests {
         channel: Int,
         band: ChannelBand = .band5GHz,
         widthMHz: Int = 20,
-        spanDirection: SpanDirection? = nil
+        spanDirection: SpanDirection? = nil,
+        capabilitiesWidth: Int? = nil
     ) -> WiFiNetworkObservation {
         let ch = WiFiChannel(
             band: band,
@@ -137,7 +138,7 @@ struct ChannelOccupancyAnalyzerTests {
             bssid: bssid,
             rssi: rssi,
             channel: ch,
-            capabilities: WiFiNetworkCapabilities.emptyWithWidth(widthMHz)
+            capabilities: WiFiNetworkCapabilities.emptyWithWidth(capabilitiesWidth ?? widthMHz)
         )
     }
 
@@ -235,6 +236,22 @@ struct ChannelOccupancyAnalyzerTests {
         let ch36 = try #require(result.first { $0.channel == 36 && $0.band == "5" })
         #expect(ch36.qualityScore == 73)
         #expect(ch36.interferenceScore == 27)
+    }
+
+    @Test("ChannelOccupancyAnalyzer: uses operating width, not capability width")
+    func operatingWidthNotCapabilityWidth() throws {
+        // AP advertises 160 MHz capability but is operating at 40 MHz on ch 44.
+        // The analyzer must model the 40 MHz block (42,50): ch 48 gets factor
+        // 0.5 (score 92 at -50). Using the 160 MHz capability block (34,66)
+        // would yield 0.125 (score 97), so 92 distinguishes operating width.
+        let result = ChannelOccupancyAnalyzer.analyze(
+            snapshot: snapshot([observation(bssid: "AA:BB:CC:DD:EE:07", rssi: -50, channel: 44, widthMHz: 40, capabilitiesWidth: 160)]),
+            currentChannel: nil,
+            supportedBands: ["5"],
+            targetAP: nil
+        )
+        let ch48 = try #require(result.first { $0.channel == 48 && $0.band == "5" })
+        #expect(ch48.qualityScore == 92)
     }
 
     @Test("ChannelSpanCalculator: 40/80 MHz span blocks (used by real overlap model)")

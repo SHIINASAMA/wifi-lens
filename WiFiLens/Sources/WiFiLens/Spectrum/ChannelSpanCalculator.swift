@@ -81,7 +81,21 @@ enum ChannelSpanCalculator {
             }
         }
 
-        // Fallback for 6 GHz and any unmatched cases
+        if band == .band6GHz {
+            // IEEE 802.11ax 6 GHz channelization: a 40/80/160 MHz block is
+            // anchored at its lowest 20 MHz primary channel and extends upward
+            // (2/4/8 x 20 MHz channels), unlike the 5 GHz table which handles
+            // primary channels anywhere within a block.
+            if widthMHz == 40 {
+                return (primaryChannel - 2, primaryChannel + 6)
+            } else if widthMHz == 80 {
+                return (primaryChannel - 2, primaryChannel + 14)
+            } else if widthMHz == 160 {
+                return (primaryChannel - 2, primaryChannel + 30)
+            }
+        }
+
+        // Fallback for any unmatched cases
         let half = channelHalfSpan(for: widthMHz)
         return (primaryChannel - half, primaryChannel + half)
     }

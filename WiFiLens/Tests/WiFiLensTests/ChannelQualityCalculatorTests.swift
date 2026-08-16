@@ -478,24 +478,28 @@ struct ChannelQualityCalculatorTests {
         #expect(ch44.qualityScore == 95)
     }
 
-    @Test func overlap6GHzWideFallback() async throws {
-        // 6 GHz uses the symmetric fallback: 80 MHz on ch 33 spans (25,41).
+    @Test func overlap6GHzWideBlock() async throws {
+        // 6 GHz uses IEEE 802.11ax blocks anchored at the lowest primary:
+        // 80 MHz on ch 33 spans (31,45).
         let aps = [ap(33, -50, width: .mhz80, band: .band6GHz)]
         let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
-        let ch29 = result.first(where: { $0.channel == 29 && $0.band == "6" })!
+        let ch37 = result.first(where: { $0.channel == 37 && $0.band == "6" })!
         let ch41 = result.first(where: { $0.channel == 41 && $0.band == "6" })!
-        let ch25 = result.first(where: { $0.channel == 25 && $0.band == "6" })!
-        #expect(ch29.qualityScore == 95)  // 4/16 = 0.25
-        #expect(ch41.qualityScore == 98)  // 2/16 = 0.125 (8 steps out)
-        #expect(ch25.qualityScore == 98)  // 2/16 = 0.125
+        let ch45 = result.first(where: { $0.channel == 45 && $0.band == "6" })!
+        let ch29 = result.first(where: { $0.channel == 29 && $0.band == "6" })!
+        #expect(ch37.qualityScore == 95)  // 4/16 = 0.25
+        #expect(ch41.qualityScore == 95)  // 4/16 = 0.25
+        #expect(ch45.qualityScore == 95)  // 4/16 = 0.25
+        #expect(ch29.qualityScore == 100) // outside the block
     }
 
     @Test func overlap6GHzEdgeChannel() async throws {
-        // 80 MHz on ch 5 spans (-3,13); ch 1 still overlaps 4/16 = 0.25.
-        let aps = [ap(5, -50, width: .mhz80, band: .band6GHz)]
+        // 80 MHz on ch 1 spans (-1,15), crossing the band edge; the adjacent
+        // ch 5 still overlaps 4/16 = 0.25. (ch 1 itself is co-channel → 1.0.)
+        let aps = [ap(1, -50, width: .mhz80, band: .band6GHz)]
         let result = ChannelQualityCalculator.compute(aps: aps, currentChannel: nil)
-        let ch1 = result.first(where: { $0.channel == 1 && $0.band == "6" })!
-        #expect(ch1.qualityScore == 95)
+        let ch5 = result.first(where: { $0.channel == 5 && $0.band == "6" })!
+        #expect(ch5.qualityScore == 95)
     }
 
     @Test func overlap24GHzDistanceTable() async throws {
