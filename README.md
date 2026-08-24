@@ -27,7 +27,7 @@ Diagnose connectivity issues, analyze Wi-Fi channel congestion, and validate roa
   🤖 <strong>MCP for AI workflows</strong> — Connect Claude Desktop to live Wi-Fi data
 </p>
 
-English · [Deutsch](README.de.md) · [Español](README.es-ES.md) · [Français](README.fr.md) · [简体中文](README.zh-Hans.md) · [日本語](README.ja.md)
+🇺🇸 English · [🇩🇪 Deutsch](README.de.md) · [🇪🇸 Español](README.es-ES.md) · [🇫🇷 Français](README.fr.md) · [🇨🇳 简体中文](README.zh-Hans.md) · [🇯🇵 日本語](README.ja.md)
 
 [Features](#features) · [Editions](#editions) · [AI / MCP](#ai--mcp-integration) · [Privacy](#privacy) · [Installation](#installation) · [Development](#development) · [Contributing](#contributing) · [License](#license)
 
