@@ -9,7 +9,7 @@ Diagnose connectivity issues, analyze Wi-Fi channel congestion, and validate roa
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Swift CI](https://github.com/SHIINASAMA/wifi-lens/workflows/Swift%20CI/badge.svg)](https://github.com/SHIINASAMA/wifi-lens/actions?query=workflow%3A%22Swift+CI%22)
 
-<img alt="WiFi Lens showing Wi-Fi spectrum analysis on macOS" src="assets/screenshot-swiftui.png" width="800">
+<img alt="WiFi Lens showing Wi-Fi spectrum analysis on macOS" src="assets/screenshot-hero.webp" width="800">
 
 <p align="center">
   <a href="https://github.com/SHIINASAMA/wifi-lens/releases/latest"><strong>Download Open-Source Edition</strong></a>
@@ -99,6 +99,15 @@ WiFi Lens includes an embedded MCP server that lets AI assistants read your loca
 Once connected, ask Claude things like *"What channels are congested near me?"* or *"Is my gateway reachable?"*. The server binds to `127.0.0.1` only — nothing leaves your machine unless you deliberately route it elsewhere.
 
 See the [AI Workflows guide](https://wifi-lens.shiinalabs.com/ai-mcp/) for more examples.
+
+---
+
+<table>
+<tr>
+<td width="50%" align="center"><img alt="Network Self-Check diagnostics view" src="assets/screenshot-selfcheck.webp" width="100%"><sub>Network Self-Check</sub></td>
+<td width="50%" align="center"><img alt="Event Timeline showing connection history" src="assets/screenshot-timeline.webp" width="100%"><sub>Event Timeline (Pro)</sub></td>
+</tr>
+</table>
 
 ---
 
