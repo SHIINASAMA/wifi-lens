@@ -15,7 +15,7 @@ struct TrendChartView: View {
         } else {
             Chart(series: buildSeries(), axis: axisConfig, style: chartStyle)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .accessibilityLabel(String(format: String(localized: "spectrum.accessibility.chart_label_fmt", comment: "Chart accessibility label with network count"), snapshots.count))
+                .accessibilityLabel(accessibilitySummary)
         }
     }
 
@@ -69,5 +69,31 @@ struct TrendChartView: View {
             interpolation: .linear
         )
         return [ChartSeries(id: "trend", points: points, style: style)]
+    }
+
+    /// Meaningful summary for assistive tech: conveys the direction and magnitude
+    /// of the signal change rather than just the sample count.
+    private var accessibilitySummary: String {
+        let first = snapshots[0].rssi
+        let last = snapshots[snapshots.count - 1].rssi
+        let delta = last - first
+        let count = snapshots.count
+        switch delta {
+        case 2...:
+            return String(
+                format: String(localized: "spectrum.accessibility.trend_improving_fmt", comment: "RSSI trend improving: from, to, and sample count"),
+                first, last, delta, count
+            )
+        case ...(-2):
+            return String(
+                format: String(localized: "spectrum.accessibility.trend_declining_fmt", comment: "RSSI trend declining: from, to, change amount, and sample count"),
+                first, last, abs(delta), count
+            )
+        default:
+            return String(
+                format: String(localized: "spectrum.accessibility.trend_stable_fmt", comment: "RSSI trend stable: level and sample count"),
+                last, count
+            )
+        }
     }
 }

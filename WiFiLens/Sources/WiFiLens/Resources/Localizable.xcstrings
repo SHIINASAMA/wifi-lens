@@ -29750,6 +29750,114 @@
         }
       }
     },
+    "spectrum.accessibility.trend_declining_fmt": {
+      "comment": "RSSI trend declining: from, to, change amount, and sample count",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RSSI-Trend: Verschlechterung von %1$d auf %2$d dBm (−%3$d dB, %4$d Messwerte)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RSSI trend: declining from %1$d to %2$d dBm (change %3$d dB, %4$d samples)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tendencia RSSI: empeorando de %1$d a %2$d dBm (cambio de %3$d dB, %4$d muestras)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RSSI トレンド: %1$d から %2$d dBm へ低下（変化 %3$d dB、%4$d サンプル）"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RSSI 趋势：从 %1$d 下降到 %2$d dBm（变化 %3$d dB，%4$d 个采样点）"
+          }
+        }
+      }
+    },
+    "spectrum.accessibility.trend_improving_fmt": {
+      "comment": "RSSI trend improving: from, to, change amount, and sample count",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RSSI-Trend: Verbesserung von %1$d auf %2$d dBm (+%3$d dB, %4$d Messwerte)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RSSI trend: improving from %1$d to %2$d dBm (change +%3$d dB, %4$d samples)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tendencia RSSI: mejorando de %1$d a %2$d dBm (cambio de +%3$d dB, %4$d muestras)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RSSI トレンド: %1$d から %2$d dBm へ改善（変化 +%3$d dB、%4$d サンプル）"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RSSI 趋势：从 %1$d 改善到 %2$d dBm（变化 +%3$d dB，%4$d 个采样点）"
+          }
+        }
+      }
+    },
+    "spectrum.accessibility.trend_stable_fmt": {
+      "comment": "RSSI trend stable: level and sample count",
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RSSI-Trend: stabil bei %1$d dBm (%2$d Messwerte)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RSSI trend: stable around %1$d dBm (%2$d samples)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tendencia RSSI: estable en %1$d dBm (%2$d muestras)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RSSI トレンド: %1$d dBm 付近で安定（%2$d サンプル）"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RSSI 趋势：在 %1$d dBm 附近保持稳定（%2$d 个采样点）"
+          }
+        }
+      }
+    },
     "spectrum.empty.no_channel_data": {
       "comment": "Empty state when no channel data exists",
       "extractionState": "manual",
