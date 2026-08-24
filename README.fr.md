@@ -63,6 +63,8 @@ Ce dépôt contient l'édition gratuite et open source. WiFi Lens Pro est une é
 | 📶 **Informations de connexion** | IP, passerelle, DNS, MAC, canal, débit Tx et résumé de sécurité | OSS & Pro |
 | 🩺 **Auto-diagnostic réseau** | Diagnostic de connexion en un clic — chemin, DNS, HTTPS et accessibilité du proxy, avec des conclusions fondées sur des preuves | OSS & Pro |
 | 📈 **Chronologie des événements** | Historique des événements de connexion — roaming, changements de canal, déconnexions et chutes de signal | Pro uniquement |
+| 📊 **Statistiques** | Analysez votre historique chronologique local avec sélection de période et comparaison | Pro uniquement |
+| 💡 **Perspectives** | Obtenez des conclusions explicables à partir de votre historique chronologique | Pro uniquement |
 | 🔄 **Test de roaming** | Suivi des transitions entre points d'accès avec graphique chronologique, sélecteur de plage et sauvegarde/chargement de session | OSS & Pro |
 | 🗺️ **Carte de chaleur des canaux** | Carte de chaleur d'occupation par bande pour repérer instantanément les schémas de congestion | OSS & Pro |
 | 🎬 **Enregistrement spectral** | Capturez et relisez l'évolution du spectre dans le temps | Pro uniquement |
@@ -75,7 +77,7 @@ Ce dépôt contient l'édition gratuite et open source. WiFi Lens Pro est une é
 | 📤 **Export** | Enregistrez les graphiques par bande en images PNG ou en données CSV | OSS & Pro |
 | 🌍 **Localisé** | Anglais, allemand, espagnol, japonais et chinois simplifié | OSS & Pro |
 
-Toutes les fonctionnalités sont incluses dans l'édition open source, sauf indication **Pro uniquement**. Pro inclut toutes les fonctionnalités open source ainsi que les outils d'enregistrement, de barre de menus et de chronologie des événements.
+Toutes les fonctionnalités sont incluses dans l'édition open source, sauf indication **Pro uniquement**. Pro inclut toutes les fonctionnalités open source ainsi que les outils d'enregistrement, de barre de menus, de chronologie des événements, de statistiques et de perspectives.
 
 ---
 

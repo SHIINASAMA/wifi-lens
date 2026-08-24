@@ -63,6 +63,8 @@ Dieses Repository enthält die kostenlose Open-Source-Edition. WiFi Lens Pro ist
 | 📶 **Verbindungsinformationen** | IP, Gateway, DNS, MAC, Kanal, Tx-Rate und Sicherheitszusammenfassung | OSS & Pro |
 | 🩺 **Netzwerk-Selbsttest** | Ein-Klick-Verbindungsdiagnose — Pfad, DNS, HTTPS und Proxy-Erreichbarkeit mit evidenzbasierten Schlussfolgerungen | OSS & Pro |
 | 📈 **Ereignis-Zeitachse** | Verbindungsereignis-Verlauf — Roaming, Kanalwechsel, Verbindungsabbrüche und Signalabfälle | Nur Pro |
+| 📊 **Statistiken** | Analysiere deinen lokalen Timeline-Verlauf mit Zeitauswahl und Vergleich | Nur Pro |
+| 💡 **Erkenntnisse** | Erhalte nachvollziehbare Erkenntnisse aus deinem Timeline-Verlauf | Nur Pro |
 | 🔄 **Roaming-Test** | Überwachung von AP-Wechseln mit Zeitdiagramm, Bereichsauswahl sowie Speichern und Laden von Sitzungen | OSS & Pro |
 | 🗺️ **Kanal-Heatmap** | Belegungsübersicht pro Band zur schnellen Erkennung von Überlastungsmustern | OSS & Pro |
 | 🎬 **Spektrum-Aufzeichnung** | Spektrumsänderungen über Zeit aufnehmen und wiedergeben | Nur Pro |
@@ -75,7 +77,7 @@ Dieses Repository enthält die kostenlose Open-Source-Edition. WiFi Lens Pro ist
 | 📤 **Exportieren** | Speichere Band-Diagramme als PNG-Bilder oder CSV-Daten | OSS & Pro |
 | 🌍 **Lokalisiert** | Englisch, Deutsch, Spanisch, Japanisch und vereinfachtes Chinesisch | OSS & Pro |
 
-Alle Funktionen sind in der Open-Source-Edition enthalten, sofern nicht **Nur Pro** markiert. Pro umfasst jede Open-Source-Funktion plus Aufzeichnungs-, Menüleisten- und Ereignis-Zeitachsenwerkzeuge.
+Alle Funktionen sind in der Open-Source-Edition enthalten, sofern nicht **Nur Pro** markiert. Pro umfasst jede Open-Source-Funktion plus Aufzeichnungs-, Menüleisten-, Ereignis-Zeitachsen-, Statistik- und Erkenntniswerkzeuge.
 
 ---
 

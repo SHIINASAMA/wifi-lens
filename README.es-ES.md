@@ -63,6 +63,8 @@ Este repositorio contiene la edición gratuita y de código abierto. WiFi Lens P
 | 📶 **Información de Conexión** | IP, gateway, DNS, MAC, canal, tasa Tx y resumen de seguridad | OSS & Pro |
 | 🩺 **Autodiagnóstico de red** | Diagnóstico de conexión con un clic — ruta, DNS, HTTPS y accesibilidad del proxy, con conclusiones basadas en evidencia | OSS & Pro |
 | 📈 **Línea temporal de eventos** | Historial de eventos de conexión — roaming, cambios de canal, desconexiones y caídas de señal | Solo Pro |
+| 📊 **Estadísticas** | Analiza tu historial de línea temporal local con selección de período y comparación | Solo Pro |
+| 💡 **Perspectivas** | Obtén hallazgos explicables de tu historial de línea temporal | Solo Pro |
 | 🔄 **Prueba de Roaming** | Monitoreo de transición AP con gráfico temporal, selector de rango y guardado/carga de sesión | OSS & Pro |
 | 🗺️ **Mapa de Calor del Canal** | Mapa de calor de ocupación por banda para identificar patrones de congestión al instante | OSS & Pro |
 | 🎬 **Grabación de espectro** | Captura y reproduce cambios del espectro a lo largo del tiempo | Solo Pro |
@@ -75,7 +77,7 @@ Este repositorio contiene la edición gratuita y de código abierto. WiFi Lens P
 | 📤 **Exportar** | Guarda gráficos por banda como imágenes PNG o datos CSV | OSS & Pro |
 | 🌍 **Localizado** | Inglés, alemán, español, japonés y chino simplificado | OSS & Pro |
 
-Todas las funciones están incluidas en la edición de código abierto, salvo las marcadas **Solo Pro**. Pro incluye todas las funciones de código abierto más las herramientas de grabación, barra de menús y línea temporal de eventos.
+Todas las funciones están incluidas en la edición de código abierto, salvo las marcadas **Solo Pro**. Pro incluye todas las funciones de código abierto más las herramientas de grabación, barra de menús, línea temporal de eventos, estadísticas y perspectivas.
 
 ---
 

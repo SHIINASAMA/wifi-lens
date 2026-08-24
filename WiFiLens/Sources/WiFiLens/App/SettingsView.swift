@@ -289,10 +289,19 @@ struct SettingsView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
-                        Button(String(localized: "common.action.reveal_logs", comment: "Button to reveal log files in Finder")) {
-                            AppLogger.revealInFinder()
+                        HStack(spacing: 12) {
+                            Button(String(localized: "common.action.reveal_logs", comment: "Button to reveal log files in Finder")) {
+                                AppLogger.revealInFinder()
+                            }
+                            .accessibilityIdentifier("settings-reveal-logs-button")
+
+                            Button(role: .destructive) {
+                                AppLogger.clearLogs()
+                            } label: {
+                                Text(String(localized: "settings.diagnostics.clear_logs", comment: "Button to delete all local log files"))
+                            }
+                            .accessibilityIdentifier("settings-clear-logs-button")
                         }
-                        .accessibilityIdentifier("settings-reveal-logs-button")
                     }
                 } header: {
                     Text(String(localized: "settings.diagnostics.header", comment: "Diagnostics settings section header"))

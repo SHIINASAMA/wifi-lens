@@ -63,6 +63,8 @@ This repository contains the free, open-source edition. WiFi Lens Pro is a separ
 | 📶 **Connection Info** | IP, gateway, DNS, MAC, channel, Tx rate, and security summary | OSS & Pro |
 | 🩺 **Network Self-Check** | One-click connection diagnostics — path, DNS, HTTPS, and proxy reachability, with evidence-based conclusions | OSS & Pro |
 | 📈 **Event Timeline** | Connection event history — roaming, channel changes, disconnections, and signal drops | Pro only |
+| 📊 **Statistics** | Analyze your local Timeline history with period selection and comparison | Pro only |
+| 💡 **Insights** | Get explainable findings from your Timeline history | Pro only |
 | 🔄 **Roaming Test** | AP handoff monitoring with a timeline chart, range selector, and session save/load | OSS & Pro |
 | 🗺️ **Channel Heatmap** | Per-band occupancy heatmap to spot congestion patterns instantly | OSS & Pro |
 | 🎬 **Spectrum Recording** | Capture and replay spectrum changes over time | Pro only |
@@ -75,7 +77,7 @@ This repository contains the free, open-source edition. WiFi Lens Pro is a separ
 | 📤 **Export** | Save per-band charts as PNG images or CSV data | OSS & Pro |
 | 🌍 **Localized** | English, German, Spanish, Japanese, and Simplified Chinese | OSS & Pro |
 
-All features are included in the open-source edition unless marked **Pro only**. Pro includes every open-source feature plus the recording, menu bar, and event timeline tools.
+All features are included in the open-source edition unless marked **Pro only**. Pro includes every open-source feature plus recording, menu bar, event timeline, statistics, and insights tools.
 
 ---
 

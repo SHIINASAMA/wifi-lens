@@ -79,6 +79,17 @@ enum AppLogger {
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         NSWorkspace.shared.open(dir)
     }
+
+    /// Deletes all files in the log directory.
+    static func clearLogs() {
+        let dir = logDirectory
+        guard let contents = try? FileManager.default.contentsOfDirectory(
+            at: dir, includingPropertiesForKeys: nil
+        ) else { return }
+        for item in contents {
+            try? FileManager.default.removeItem(at: item)
+        }
+    }
 }
 
 // MARK: - ConsoleLogHandler
