@@ -106,7 +106,6 @@ struct SettingsView: View {
                     Text(String(localized: "settings.scan.interval_description", comment: "Description clarifying the scan interval only affects the live spectrum view, not recording"))
                         .font(.caption)
                         .foregroundColor(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
 
                     Picker(String(localized: "settings.region.header", comment: "Regulatory region picker label"), selection: $regionOverride.animation(reduceMotion ? nil : .snappy(duration: 0.2))) {
                         Text(String(localized: "settings.region.auto_detect", comment: "Auto-detect regulatory region option")).tag("auto")
@@ -124,7 +123,6 @@ struct SettingsView: View {
                     Text(String(localized: "settings.region.description", comment: "Description of how regional regulation filtering works"))
                         .font(.caption)
                         .foregroundColor(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
                 }
 
                 // MARK: - AP Radar
@@ -144,7 +142,6 @@ struct SettingsView: View {
                     Text(String(localized: "settings.apRadar.preset_description", comment: "Description of the AP Radar pulse sound presets"))
                         .font(.caption)
                         .foregroundColor(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
 
                     Button {
                         toggleSoundPreview()
@@ -235,7 +232,6 @@ struct SettingsView: View {
                     Text(String(localized: "settings.mcp.description", comment: "Description of the MCP server feature"))
                         .font(.caption)
                         .foregroundColor(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
                     HStack {
                         Text(String(localized: "settings.mcp.port_label", comment: "MCP server port field label"))
                         TextField("", value: $mcpPort, format: .number)
@@ -288,7 +284,6 @@ struct SettingsView: View {
                         Text(String(localized: "settings.diagnostics.logs_description", comment: "Explanation that logs are local-only, not collected, and under user control"))
                             .font(.caption)
                             .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
                         HStack(spacing: 12) {
                             Button(String(localized: "common.action.reveal_logs", comment: "Button to reveal log files in Finder")) {
                                 AppLogger.revealInFinder()
@@ -478,7 +473,6 @@ private struct PermissionDescriptionText: View {
         Text(text)
             .font(.callout)
             .foregroundColor(.secondary)
-            .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
@@ -505,7 +499,7 @@ struct BLEFeatureSettingsRow: View {
                 .accessibilityIdentifier("settings-ble-toggle")
             }
             Text(String(localized: "settings.features.ble_description", comment: "Description of Bluetooth analysis feature"))
-                .font(.callout).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
+                .font(.callout).foregroundColor(.secondary)
         }
         .padding(.vertical, 4)
     }

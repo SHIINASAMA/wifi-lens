@@ -226,7 +226,6 @@ struct OverviewView: View {
                 Text(diag.message)
                     .font(.caption)
                     .foregroundColor(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
             }
             Spacer()
         }
@@ -248,7 +247,6 @@ struct OverviewView: View {
                 Text(availability.message)
                     .font(.caption)
                     .foregroundColor(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
             }
             Spacer()
         }
@@ -335,7 +333,6 @@ struct OverviewView: View {
                 Text(String(localized: "permission.location.macos_requires", comment: "Explanation of macOS LS requirement with privacy reassurance"))
                     .font(.caption)
                     .foregroundColor(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
             }
             Spacer()
             Button(String(localized: "common.action.authorize", comment: "Authorize/request permission button")) {
