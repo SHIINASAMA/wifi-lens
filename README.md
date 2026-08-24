@@ -156,6 +156,8 @@ At their discretion, the maintainer may recognize substantial contributions to W
 
 Forked from [tiny-wifi-analyzer](https://github.com/nolze/tiny-wifi-analyzer) by [nolze](https://github.com/nolze), who built the original Python-based Wi-Fi scanner. Since then the app has been fully rewritten in Swift with SwiftUI and CoreWLAN, evolving into the native macOS application it is today.
 
+MAC vendor lookup data is derived from the [IEEE Registration Authority](https://standards.ieee.org/products-programs/regauth/) public registries. See [Third-Party Notices](docs/THIRD-PARTY-NOTICES.md) for details.
+
 ---
 
 ## License

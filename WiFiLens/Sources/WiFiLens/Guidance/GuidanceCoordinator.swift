@@ -45,7 +45,14 @@ final class GuidanceCoordinator {
     private(set) var pendingReviewRequest: ReviewRequestPresentation?
     private(set) var exportFeedback: ExportFeedback?
 
-    var appStoreCampaignURL: URL? { configuration.appStoreCampaignURL }
+    func appStoreCampaignURL(for moment: GuidanceValueMoment) -> URL? {
+        switch moment {
+        case .diagnosticsCompleted, .analysisLoaded, .roamingCompleted:
+            ExternalLinks.url(for: .appStoreCampaignDiagnosis)
+        case .exportSucceeded:
+            ExternalLinks.url(for: .appStoreCampaignExport)
+        }
+    }
 
     private let configuration: GuidanceConfiguration
     private let stateStore: any GuidanceStateStoring

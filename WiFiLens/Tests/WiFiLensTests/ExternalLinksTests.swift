@@ -21,11 +21,23 @@ struct ExternalLinksTests {
         )
     }
 
-    @Test("app store campaign maps to the official oss_invite campaign link")
+    @Test("app store campaign URLs use distinct ct values per entry surface")
     func appStoreCampaignURL() {
         #expect(
-            ExternalLinks.url(for: .appStoreCampaign)?.absoluteString
-                == "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_invite&mt=8"
+            ExternalLinks.url(for: .appStoreCampaignWelcome)?.absoluteString
+                == "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_welcome&mt=8"
+        )
+        #expect(
+            ExternalLinks.url(for: .appStoreCampaignDiagnosis)?.absoluteString
+                == "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_diagnosis&mt=8"
+        )
+        #expect(
+            ExternalLinks.url(for: .appStoreCampaignExport)?.absoluteString
+                == "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_export&mt=8"
+        )
+        #expect(
+            ExternalLinks.url(for: .appStoreCampaignPreviewLock)?.absoluteString
+                == "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_preview_lock&mt=8"
         )
     }
 

@@ -60,7 +60,7 @@ struct ProInvitationCard: View {
     }
 
     private func openAppStore() {
-        guard let url = guidance.appStoreCampaignURL,
+        guard let url = guidance.appStoreCampaignURL(for: invitation.moment),
               NSWorkspace.shared.open(url) else {
             return
         }

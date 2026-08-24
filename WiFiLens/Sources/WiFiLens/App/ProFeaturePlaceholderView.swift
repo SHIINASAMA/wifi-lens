@@ -107,7 +107,7 @@ struct ProFeaturePlaceholderView<CustomSkeleton: View>: View {
     }
     
     private func openAppStore() {
-        guard let url = ExternalLinks.url(for: .appStore) else { return }
+        guard let url = ExternalLinks.url(for: .appStoreCampaignPreviewLock) else { return }
         NSWorkspace.shared.open(url)
     }
 }

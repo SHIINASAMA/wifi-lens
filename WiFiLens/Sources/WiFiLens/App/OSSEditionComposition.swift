@@ -5,7 +5,6 @@ enum EditionComposition {
     static var guidanceConfiguration: GuidanceConfiguration {
         var config = GuidanceConfiguration()
         config.invitationEnabled = true
-        config.appStoreCampaignURL = ExternalLinks.url(for: .appStoreCampaign)
         return config
     }
 
@@ -19,7 +18,7 @@ enum EditionComposition {
         OnboardingConfiguration(
             welcomeEnabled: true,
             showsProLink: true,
-            proURL: ExternalLinks.url(for: .appStoreCampaign),
+            proURL: ExternalLinks.url(for: .appStoreCampaignWelcome),
             startRoute: .overview,
             startToolbarSelection: nil,
             primaryActionKey: "onboarding.welcome.start",
