@@ -56,6 +56,7 @@ final class ScannerViewModel {
     var hiddenBands: Set<String> = []       // band IDs ("24"/"5"/"6") to hide
     var hideHiddenSSIDs: Bool = false       // hide networks with empty SSID
     private(set) var lastNetworks: [WiFiNetwork] = []  // cached for toggle rebuild + MCP
+    private(set) var lastObservationTimestamp = Date.distantPast
     private(set) var vendorDatabaseRevision = 0
     private(set) var deduplicatedNetworks: [WiFiNetwork] = []
     private(set) var displayStatesByID: [String: APDisplayState] = [:]
@@ -514,7 +515,8 @@ final class ScannerViewModel {
         channelRecommendations = output.cycle.observation.channelRecommendation ?? []
         regulatoryPipeline.inferredRegion = output.cycle.inferredRegion
 
-        applyNetworks(output.rawNetworks)
+        lastObservationTimestamp = output.cycle.observation.timestamp
+        applyNetworks(output.rawNetworks, timestamp: lastObservationTimestamp)
     }
 
     private func deduplicateNetworks(_ networks: [WiFiNetwork]) -> [WiFiNetwork] {
@@ -725,15 +727,16 @@ final class ScannerViewModel {
     }
 
 
-    private func applyNetworks(_ networks: [WiFiNetwork]) {
+    private func applyNetworks(_ networks: [WiFiNetwork], timestamp: Date) {
         lastNetworks = networks
         let deduped = deduplicateNetworks(networks)
         deduplicatedNetworks = deduped
 
-        // Record RSSI history + snapshots, build trend/history/snapshot lookups
-        let now = Date()
+        // Record RSSI history + snapshots, build trend/history/snapshot lookups.
+        // Use the observation cycle timestamp so pending-cycle replays carry the
+        // actual capture time, not the wall-clock moment they reached MainActor.
         for nw in deduped {
-            let snap = makeSnapshot(for: nw, timestamp: now)
+            let snap = makeSnapshot(for: nw, timestamp: timestamp)
             signalHistory.record(bssid: nw.bssid, rssi: nw.rssi, snapshot: snap)
         }
         var trends: [String: (direction: TrendDirection, delta: Int)] = [:]
@@ -825,7 +828,7 @@ final class ScannerViewModel {
         } else {
             hiddenBSSIDs.insert(bssid)
         }
-        applyNetworks(lastNetworks)
+        applyNetworks(lastNetworks, timestamp: lastObservationTimestamp)
     }
 
     func stop() {
@@ -924,7 +927,7 @@ final class ScannerViewModel {
 extension ScannerViewModel {
     func debugApplyNetworksForTesting(_ networks: [WiFiNetwork], supportedBands: Set<ChannelBand>) {
         self.supportedBands = supportedBands
-        applyNetworks(networks)
+        applyNetworks(networks, timestamp: Date())
     }
 
     func debugStartScanLoopForTesting() async {

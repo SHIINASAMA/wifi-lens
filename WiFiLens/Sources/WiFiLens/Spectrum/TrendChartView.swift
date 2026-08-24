@@ -32,7 +32,7 @@ struct TrendChartView: View {
         let dataMin = Double(values.min() ?? -90)
         let dataMax = Double(values.max() ?? -30)
         let headroom: Double = 6
-        let now = snapshots.last?.timestamp ?? Date()
+        let baseTime = snapshots[0].timestamp
 
         var axis = ChartAxisConfig()
         axis.yMin = max(Double(Constants.rssiNoiseFloor), dataMin - headroom)
@@ -40,14 +40,15 @@ struct TrendChartView: View {
         axis.yStep = 10
         axis.yTickLabelOffset = 14
 
-        // X-axis time labels
+        // X-axis time labels positioned at real elapsed offsets from the first sample.
+        let latestTime = snapshots[snapshots.count - 1].timestamp
         let tickCount = min(5, max(2, snapshots.count))
         var ticks: [ChartAxisConfig.XTick] = []
         for t in 0..<tickCount {
             let idx = t * (snapshots.count - 1) / max(1, tickCount - 1)
-            let secs = now.timeIntervalSince(snapshots[idx].timestamp)
-            let label = chartDurationLabel(secs, zeroText: String(localized: "common.label.now", comment: "Just now timestamp indicator"))
-            ticks.append(ChartAxisConfig.XTick(position: Double(idx), label: label))
+            let offset = snapshots[idx].timestamp.timeIntervalSince(baseTime)
+            let secsAgo = latestTime.timeIntervalSince(snapshots[idx].timestamp)
+            ticks.append(ChartAxisConfig.XTick(position: offset, label: chartDurationLabel(secsAgo, zeroText: String(localized: "common.label.now", comment: "Just now timestamp indicator"))))
         }
         axis.xTicks = ticks
         axis.xTickLabelOffset = 10
@@ -55,8 +56,9 @@ struct TrendChartView: View {
     }
 
     private func buildSeries() -> [ChartSeries<ChartPoint>] {
-        let points: [ChartPoint] = snapshots.enumerated().map { i, snap in
-            ChartPoint(x: Double(i), y: Double(snap.rssi))
+        let baseTime = snapshots[0].timestamp
+        let points: [ChartPoint] = snapshots.map { snap in
+            ChartPoint(x: snap.timestamp.timeIntervalSince(baseTime), y: Double(snap.rssi))
         }
         let style = ChartSeriesStyle(
             color: color,
