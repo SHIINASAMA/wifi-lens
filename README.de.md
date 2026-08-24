@@ -54,30 +54,36 @@ Dieses Repository enthält die kostenlose Open-Source-Edition. WiFi Lens Pro ist
 
 ## Funktionen
 
-| Kategorie | Fähigkeit | Edition |
-|----------|-----------|---------|
-| 📡 **Wi-Fi-Scanning** | Echtzeit-Scan über die Bänder 2,4, 5 und 6 GHz mit Signalstärke pro Netzwerk | OSS & Pro |
-| 📊 **Spektrum-Ansicht** | Gauß-Glockenkurven-Diagramme zeigen Kanalbelegung auf einen Blick | OSS & Pro |
-| 🎯 **Kanalqualität** | Auslastungsbewertungen mit regulatorisch passenden Empfehlungen für deine Region | OSS & Pro |
-| 🔍 **Netzwerkdetails** | PHY-Generation, Kanalbreite, 802.11k/r/v-Roaming, WPA3, versteckte SSIDs | OSS & Pro |
-| 📶 **Verbindungsinformationen** | IP, Gateway, DNS, MAC, Kanal, Tx-Rate und Sicherheitszusammenfassung | OSS & Pro |
-| 🩺 **Netzwerk-Selbsttest** | Ein-Klick-Verbindungsdiagnose — Pfad, DNS, HTTPS und Proxy-Erreichbarkeit mit evidenzbasierten Schlussfolgerungen | OSS & Pro |
-| 📈 **Ereignis-Zeitachse** | Verbindungsereignis-Verlauf — Roaming, Kanalwechsel, Verbindungsabbrüche und Signalabfälle | Nur Pro |
-| 📊 **Statistiken** | Analysiere deinen lokalen Timeline-Verlauf mit Zeitauswahl und Vergleich | Nur Pro |
-| 💡 **Erkenntnisse** | Erhalte nachvollziehbare Erkenntnisse aus deinem Timeline-Verlauf | Nur Pro |
-| 🔄 **Roaming-Test** | Überwachung von AP-Wechseln mit Zeitdiagramm, Bereichsauswahl sowie Speichern und Laden von Sitzungen | OSS & Pro |
-| 🗺️ **Kanal-Heatmap** | Belegungsübersicht pro Band zur schnellen Erkennung von Überlastungsmustern | OSS & Pro |
-| 🎬 **Spektrum-Aufzeichnung** | Spektrumsänderungen über Zeit aufnehmen und wiedergeben | Nur Pro |
-| 🎧 **BLE-Scanner** | Bluetooth LE-Geräte-Erkennung, RSSI-Analyse, Trend-Diagramme und Gerätetracking | OSS & Pro |
-| 🎨 **Intelligente Farbgebung** | Deterministische Farbzuordnung anhand der SSID; dasselbe Netzwerk behält dieselbe Farbe | OSS & Pro |
-| 📍 **Menüleiste** | Lebt in deiner Menüleiste — klicke das Symbol, um den Analysator jederzeit zu öffnen | Nur Pro |
-| 🔒 **Privatsphäre zuerst** | Keine Telemetrie oder Nutzungsanalyse; Wi-Fi-Scandaten bleiben auf deinem Mac | OSS & Pro |
-| 🌐 **MCP-Server** | Eingebettete HTTP-API auf `127.0.0.1:19840` für externe Tools | OSS & Pro |
-| 🔄 **Auto-Updates** | Sparkle-Updates in der GitHub-Edition; Mac App Store-Updates in Pro | OSS & Pro |
-| 📤 **Exportieren** | Speichere Band-Diagramme als PNG-Bilder oder CSV-Daten | OSS & Pro |
-| 🌍 **Lokalisiert** | Englisch, Deutsch, Spanisch, Japanisch und vereinfachtes Chinesisch | OSS & Pro |
+### Kern · OSS & Pro
 
-Alle Funktionen sind in der Open-Source-Edition enthalten, sofern nicht **Nur Pro** markiert. Pro umfasst jede Open-Source-Funktion plus Aufzeichnungs-, Menüleisten-, Ereignis-Zeitachsen-, Statistik- und Erkenntniswerkzeuge.
+| Funktion | Beschreibung | Status |
+|----------|-------------|--------|
+| Wi-Fi-Scanning | Echtzeit-Scan über 2,4 / 5 / 6 GHz | Stabil |
+| Spektrum-Ansicht | Gauß-Kanalbelegungsdiagramme | Stabil |
+| Kanalqualität | Auslastungsbewertungen mit regionalen Empfehlungen | Stabil |
+| Netzwerkdetails | PHY-Generation, Kanalbreite, 802.11k/r/v, WPA3 | Stabil |
+| Verbindungsinformationen | IP, Gateway, DNS, MAC, Tx-Rate, Sicherheit | Stabil |
+| Roaming-Test | AP-Wechsel-Überwachung mit Sitzungsverwaltung | Stabil |
+| Kanal-Heatmap | Belegungsübersicht pro Band | Stabil |
+| BLE-Scanner | Bluetooth LE-Erkennung, RSSI-Analyse, Tracking | Stabil |
+| Intelligente Farbgebung | Deterministische SSID-Farbzuordnung | Stabil |
+| MCP-Server | Eingebettete HTTP-API für KI-Tools | Stabil |
+| Exportieren | Diagramme als PNG oder CSV speichern | Stabil |
+| Privatsphäre zuerst | Keine Telemetrie; Scandaten bleiben lokal | Stabil |
+| Auto-Updates | Sparkle (GitHub) oder Mac App Store | Stabil |
+| Lokalisiert | Englisch, Deutsch, Spanisch, Japanisch, Chinesisch | Stabil |
+| Netzwerk-Selbsttest | Ein-Klick-Diagnose: Pfad, DNS, HTTPS, Proxy | Vorschau |
+| AP-Radar | Zugangspunkt mit Audio-Puls-Feedback verfolgen | Vorschau |
+
+### Pro exklusiv
+
+| Funktion | Beschreibung | Status |
+|----------|-------------|--------|
+| Ereignis-Zeitachse | Verbindungsereignis-Verlauf — Roaming, Abbrüche, Signalwechsel | Vorschau |
+| Statistiken | Timeline-Verlauf mit Periodenvergleich analysieren | Vorschau |
+| Erkenntnisse | Nachvollziehbare Erkenntnisse mit Evidenz-Links | Vorschau |
+| Spektrum-Aufzeichnung | Spektrumsänderungen über Zeit aufzeichnen | Stabil |
+| Menüleiste | Schnellzugriff über die macOS-Menüleiste | Stabil |
 
 ---
 

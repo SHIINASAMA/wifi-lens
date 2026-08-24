@@ -54,30 +54,36 @@ This repository contains the free, open-source edition. WiFi Lens Pro is a separ
 
 ## Features
 
-| Category | Capability | Edition |
-|----------|-----------|---------|
-| 📡 **Wi-Fi Scanning** | Real-time scan across 2.4, 5, and 6 GHz bands with per-network signal strength | OSS & Pro |
-| 📊 **Spectrum View** | Gaussian bell-curve charts showing channel occupancy at a glance | OSS & Pro |
-| 🎯 **Channel Quality** | Congestion scores with regulatory-aware recommendations tuned to your region | OSS & Pro |
-| 🔍 **Network Details** | PHY generation, channel width, 802.11k/r/v roaming, WPA3, hidden SSID | OSS & Pro |
-| 📶 **Connection Info** | IP, gateway, DNS, MAC, channel, Tx rate, and security summary | OSS & Pro |
-| 🩺 **Network Self-Check** | One-click connection diagnostics — path, DNS, HTTPS, and proxy reachability, with evidence-based conclusions | OSS & Pro |
-| 📈 **Event Timeline** | Connection event history — roaming, channel changes, disconnections, and signal drops | Pro only |
-| 📊 **Statistics** | Analyze your local Timeline history with period selection and comparison | Pro only |
-| 💡 **Insights** | Get explainable findings from your Timeline history | Pro only |
-| 🔄 **Roaming Test** | AP handoff monitoring with a timeline chart, range selector, and session save/load | OSS & Pro |
-| 🗺️ **Channel Heatmap** | Per-band occupancy heatmap to spot congestion patterns instantly | OSS & Pro |
-| 🎬 **Spectrum Recording** | Capture and replay spectrum changes over time | Pro only |
-| 🎧 **BLE Scanner** | Bluetooth LE device discovery, RSSI analysis, trend charts, and device tracking | OSS & Pro |
-| 🎨 **Smart Coloring** | Deterministic SSID-based color assignment; the same network keeps the same color | OSS & Pro |
-| 📍 **Menu Bar** | Lives in your menu bar — click the icon to open the analyzer anytime | Pro only |
-| 🔒 **Privacy First** | No telemetry or analytics; Wi-Fi scan data stays on your Mac | OSS & Pro |
-| 🌐 **MCP Server** | Embedded HTTP API on `127.0.0.1:19840` for external tool integration | OSS & Pro |
-| 🔄 **Auto-Updates** | Sparkle updates in the GitHub edition; Mac App Store updates in Pro | OSS & Pro |
-| 📤 **Export** | Save per-band charts as PNG images or CSV data | OSS & Pro |
-| 🌍 **Localized** | English, German, Spanish, Japanese, and Simplified Chinese | OSS & Pro |
+### Core · OSS & Pro
 
-All features are included in the open-source edition unless marked **Pro only**. Pro includes every open-source feature plus recording, menu bar, event timeline, statistics, and insights tools.
+| Feature | Description | Status |
+|---------|-------------|--------|
+| Wi-Fi Scanning | Real-time scan across 2.4 / 5 / 6 GHz bands | Stable |
+| Spectrum View | Gaussian channel occupancy charts | Stable |
+| Channel Quality | Congestion scores with regional recommendations | Stable |
+| Network Details | PHY generation, channel width, 802.11k/r/v, WPA3 | Stable |
+| Connection Info | IP, gateway, DNS, MAC, Tx rate, security summary | Stable |
+| Roaming Test | AP handoff monitoring with session save/load | Stable |
+| Channel Heatmap | Per-band occupancy heatmap | Stable |
+| BLE Scanner | Bluetooth LE discovery, RSSI analysis, tracking | Stable |
+| Smart Coloring | Deterministic SSID-based color assignment | Stable |
+| MCP Server | Embedded HTTP API for AI tool integration | Stable |
+| Export | Save charts as PNG or CSV | Stable |
+| Privacy First | No telemetry; scan data stays on your Mac | Stable |
+| Auto-Updates | Sparkle (GitHub) or Mac App Store | Stable |
+| Localized | English, German, Spanish, Japanese, Chinese | Stable |
+| Network Self-Check | One-click path, DNS, HTTPS, and proxy diagnostics | Preview |
+| AP Radar | Track a selected AP with audio pulse feedback | Preview |
+
+### Pro Exclusive
+
+| Feature | Description | Status |
+|---------|-------------|--------|
+| Event Timeline | Connection event history — roaming, drops, signal changes | Preview |
+| Statistics | Analyze Timeline history with period comparison | Preview |
+| Insights | Explainable findings linked to evidence | Preview |
+| Spectrum Recording | Capture and replay spectrum changes over time | Stable |
+| Menu Bar | Quick access from the macOS menu bar | Stable |
 
 ---
 

@@ -54,30 +54,36 @@ Ce dépôt contient l'édition gratuite et open source. WiFi Lens Pro est une é
 
 ## Fonctionnalités
 
-| Catégorie | Capacité | Édition |
-|----------|-----------|---------|
-| 📡 **Scan Wi-Fi** | Scan en temps réel des bandes 2,4, 5 et 6 GHz avec l'intensité du signal par réseau | OSS & Pro |
-| 📊 **Vue Spectre** | Courbes en cloche gaussiennes montrant l'occupation des canaux en un coup d'œil | OSS & Pro |
-| 🎯 **Qualité du canal** | Scores de congestion avec recommandations adaptées à votre région, tenant compte de la réglementation | OSS & Pro |
-| 🔍 **Détails du réseau** | Génération PHY, largeur de canal, roaming 802.11k/r/v, WPA3, SSID masqué | OSS & Pro |
-| 📶 **Informations de connexion** | IP, passerelle, DNS, MAC, canal, débit Tx et résumé de sécurité | OSS & Pro |
-| 🩺 **Auto-diagnostic réseau** | Diagnostic de connexion en un clic — chemin, DNS, HTTPS et accessibilité du proxy, avec des conclusions fondées sur des preuves | OSS & Pro |
-| 📈 **Chronologie des événements** | Historique des événements de connexion — roaming, changements de canal, déconnexions et chutes de signal | Pro uniquement |
-| 📊 **Statistiques** | Analysez votre historique chronologique local avec sélection de période et comparaison | Pro uniquement |
-| 💡 **Perspectives** | Obtenez des conclusions explicables à partir de votre historique chronologique | Pro uniquement |
-| 🔄 **Test de roaming** | Suivi des transitions entre points d'accès avec graphique chronologique, sélecteur de plage et sauvegarde/chargement de session | OSS & Pro |
-| 🗺️ **Carte de chaleur des canaux** | Carte de chaleur d'occupation par bande pour repérer instantanément les schémas de congestion | OSS & Pro |
-| 🎬 **Enregistrement spectral** | Capturez et relisez l'évolution du spectre dans le temps | Pro uniquement |
-| 🎧 **Scanner BLE** | Découverte d'appareils Bluetooth LE, analyse RSSI, graphiques de tendance et suivi des appareils | OSS & Pro |
-| 🎨 **Coloration intelligente** | Attribution déterministe des couleurs basée sur le SSID ; le même réseau conserve la même couleur | OSS & Pro |
-| 📍 **Barre de menus** | Vit dans votre barre de menus — cliquez sur l'icône pour ouvrir l'analyseur à tout moment | Pro uniquement |
-| 🔒 **Confidentialité d'abord** | Pas de télémétrie ni d'analytique ; les données de scan Wi-Fi restent sur votre Mac | OSS & Pro |
-| 🌐 **Serveur MCP** | API HTTP intégrée sur `127.0.0.1:19840` pour l'intégration d'outils externes | OSS & Pro |
-| 🔄 **Mises à jour automatiques** | Mises à jour Sparkle dans l'édition GitHub ; mises à jour Mac App Store dans Pro | OSS & Pro |
-| 📤 **Export** | Enregistrez les graphiques par bande en images PNG ou en données CSV | OSS & Pro |
-| 🌍 **Localisé** | Anglais, allemand, espagnol, japonais et chinois simplifié | OSS & Pro |
+### Cœur · OSS & Pro
 
-Toutes les fonctionnalités sont incluses dans l'édition open source, sauf indication **Pro uniquement**. Pro inclut toutes les fonctionnalités open source ainsi que les outils d'enregistrement, de barre de menus, de chronologie des événements, de statistiques et de perspectives.
+| Fonctionnalité | Description | Statut |
+|---------------|-------------|--------|
+| Scan Wi-Fi | Scan en temps réel des bandes 2,4 / 5 / 6 GHz | Stable |
+| Vue Spectre | Courbes gaussiennes d'occupation des canaux | Stable |
+| Qualité du canal | Scores de congestion avec recommandations régionales | Stable |
+| Détails du réseau | Génération PHY, largeur de canal, 802.11k/r/v, WPA3 | Stable |
+| Informations de connexion | IP, passerelle, DNS, MAC, débit Tx, sécurité | Stable |
+| Test de roaming | Suivi des transitions AP avec gestion des sessions | Stable |
+| Carte de chaleur des canaux | Carte de chaleur d'occupation par bande | Stable |
+| Scanner BLE | Découverte Bluetooth LE, analyse RSSI, suivi | Stable |
+| Coloration intelligente | Attribution déterministe basée sur le SSID | Stable |
+| Serveur MCP | API HTTP intégrée pour les outils d'IA | Stable |
+| Export | Enregistrez les graphiques en PNG ou CSV | Stable |
+| Confidentialité d'abord | Pas de télémétrie ; données locales | Stable |
+| Mises à jour automatiques | Sparkle (GitHub) ou Mac App Store | Stable |
+| Localisé | Anglais, allemand, espagnol, japonais, chinois | Stable |
+| Auto-diagnostic réseau | Diagnostic chemin, DNS, HTTPS et proxy en un clic | Aperçu |
+| Radar AP | Suivi d'un point d'accès par impulsions audio | Aperçu |
+
+### Exclusif Pro
+
+| Fonctionnalité | Description | Statut |
+|---------------|-------------|--------|
+| Chronologie des événements | Historique des événements — roaming, déconnexions, changements de signal | Aperçu |
+| Statistiques | Analyse de l'historique chronologique avec comparaison de périodes | Aperçu |
+| Perspectives | Conclusions explicables liées aux preuves | Aperçu |
+| Enregistrement spectral | Capturez et relisez l'évolution du spectre | Stable |
+| Barre de menus | Accès rapide depuis la barre de menus macOS | Stable |
 
 ---
 

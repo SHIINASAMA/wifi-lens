@@ -54,30 +54,36 @@ Este repositorio contiene la edición gratuita y de código abierto. WiFi Lens P
 
 ## Funciones
 
-| Categoría | Capacidad | Edición |
-|----------|-----------|---------|
-| 📡 **Escaneo Wi-Fi** | Escaneo en tiempo real de las bandas de 2,4, 5 y 6 GHz con intensidad de señal por red | OSS & Pro |
-| 📊 **Vista de Espectro** | Gráficos de curva de campana gaussiana que muestran la ocupación del canal al instante | OSS & Pro |
-| 🎯 **Calidad del Canal** | Puntuaciones de congestión con recomendaciones basadas en región adaptadas a tu dominio regulatorio | OSS & Pro |
-| 🔍 **Detalles de Red** | Generación PHY, ancho de canal, roaming 802.11k/r/v, WPA3, SSID oculto | OSS & Pro |
-| 📶 **Información de Conexión** | IP, gateway, DNS, MAC, canal, tasa Tx y resumen de seguridad | OSS & Pro |
-| 🩺 **Autodiagnóstico de red** | Diagnóstico de conexión con un clic — ruta, DNS, HTTPS y accesibilidad del proxy, con conclusiones basadas en evidencia | OSS & Pro |
-| 📈 **Línea temporal de eventos** | Historial de eventos de conexión — roaming, cambios de canal, desconexiones y caídas de señal | Solo Pro |
-| 📊 **Estadísticas** | Analiza tu historial de línea temporal local con selección de período y comparación | Solo Pro |
-| 💡 **Perspectivas** | Obtén hallazgos explicables de tu historial de línea temporal | Solo Pro |
-| 🔄 **Prueba de Roaming** | Monitoreo de transición AP con gráfico temporal, selector de rango y guardado/carga de sesión | OSS & Pro |
-| 🗺️ **Mapa de Calor del Canal** | Mapa de calor de ocupación por banda para identificar patrones de congestión al instante | OSS & Pro |
-| 🎬 **Grabación de espectro** | Captura y reproduce cambios del espectro a lo largo del tiempo | Solo Pro |
-| 🎧 **Escáner BLE** | Descubrimiento de dispositivos Bluetooth LE, análisis RSSI, gráficos de tendencias y seguimiento de dispositivos | OSS & Pro |
-| 🎨 **Colores Inteligentes** | Asignación de color determinista basada en el SSID; la misma red conserva el mismo color | OSS & Pro |
-| 📍 **Barra de menús** | Vive en tu barra de menús — haz clic en el icono para abrir el analizador en cualquier momento | Solo Pro |
-| 🔒 **Privacidad Primero** | Sin telemetría ni analítica; los datos de escaneo Wi-Fi permanecen en tu Mac | OSS & Pro |
-| 🌐 **Servidor MCP** | API HTTP embebida en `127.0.0.1:19840` para integración con herramientas externas | OSS & Pro |
-| 🔄 **Actualizaciones Automáticas** | Actualizaciones Sparkle en la edición de GitHub; actualizaciones de Mac App Store en Pro | OSS & Pro |
-| 📤 **Exportar** | Guarda gráficos por banda como imágenes PNG o datos CSV | OSS & Pro |
-| 🌍 **Localizado** | Inglés, alemán, español, japonés y chino simplificado | OSS & Pro |
+### Núcleo · OSS & Pro
 
-Todas las funciones están incluidas en la edición de código abierto, salvo las marcadas **Solo Pro**. Pro incluye todas las funciones de código abierto más las herramientas de grabación, barra de menús, línea temporal de eventos, estadísticas y perspectivas.
+| Función | Descripción | Estado |
+|---------|-------------|--------|
+| Escaneo Wi-Fi | Escaneo en tiempo real de bandas 2,4 / 5 / 6 GHz | Estable |
+| Vista de Espectro | Gráficos gaussianos de ocupación de canales | Estable |
+| Calidad del Canal | Puntuaciones de congestión con recomendaciones regionales | Estable |
+| Detalles de Red | Generación PHY, ancho de canal, 802.11k/r/v, WPA3 | Estable |
+| Información de Conexión | IP, gateway, DNS, MAC, tasa Tx, seguridad | Estable |
+| Prueba de Roaming | Monitoreo de transición AP con gestión de sesiones | Estable |
+| Mapa de Calor del Canal | Mapa de calor de ocupación por banda | Estable |
+| Escáner BLE | Descubrimiento Bluetooth LE, análisis RSSI, seguimiento | Estable |
+| Colores Inteligentes | Asignación determinista basada en SSID | Estable |
+| Servidor MCP | API HTTP embebida para herramientas de IA | Estable |
+| Exportar | Guarda gráficos como PNG o CSV | Estable |
+| Privacidad Primero | Sin telemetría; datos de escaneo permanecen locales | Estable |
+| Actualizaciones Automáticas | Sparkle (GitHub) o Mac App Store | Estable |
+| Localizado | Inglés, alemán, español, japonés, chino | Estable |
+| Autodiagnóstico de red | Diagnóstico de ruta, DNS, HTTPS y proxy en un clic | Vista previa |
+| Radar AP | Rastrea un AP con retroalimentación de pulso de audio | Vista previa |
+
+### Exclusivo de Pro
+
+| Función | Descripción | Estado |
+|---------|-------------|--------|
+| Línea temporal de eventos | Historial de eventos — roaming, desconexiones, cambios de señal | Vista previa |
+| Estadísticas | Análisis del historial de línea temporal con comparación | Vista previa |
+| Perspectivas | Hallazgos explicables vinculados a evidencia | Vista previa |
+| Grabación de espectro | Captura y reproduce cambios del espectro en el tiempo | Estable |
+| Barra de menús | Acceso rápido desde la barra de menús de macOS | Estable |
 
 ---
 
