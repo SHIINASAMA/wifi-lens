@@ -23,9 +23,9 @@ Diagnose connectivity issues, analyze Wi-Fi channel congestion, and validate roa
 
 <table>
 <tr>
-<td align="center" width="33%" valign="top"><strong>🔒 Local-first privacy</strong><br><sub>No accounts, no cloud, no telemetry.<br>Every scan stays on your Mac.</sub></td>
-<td align="center" width="33%" valign="top"><strong>🩺 Evidence-based diagnostics</strong><br><sub>Path, DNS, HTTPS, and proxy checks<br>with explainable conclusions.</sub></td>
-<td align="center" width="33%" valign="top"><strong>🤖 MCP for AI workflows</strong><br><sub>Connect Claude Desktop or any<br>MCP client to live Wi-Fi data.</sub></td>
+<td width="33%" valign="top"><p align="center"><strong>🔒 Local-first privacy</strong><br><sub>No accounts, no cloud, no telemetry.<br>Every scan stays on your Mac.</sub></p></td>
+<td width="33%" valign="top"><p align="center"><strong>🩺 Evidence-based diagnostics</strong><br><sub>Path, DNS, HTTPS, and proxy checks<br>with explainable conclusions.</sub></p></td>
+<td width="33%" valign="top"><p align="center"><strong>🤖 MCP for AI workflows</strong><br><sub>Connect Claude Desktop or any<br>MCP client to live Wi-Fi data.</sub></p></td>
 </tr>
 </table>
 
