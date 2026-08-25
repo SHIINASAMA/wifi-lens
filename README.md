@@ -4,6 +4,8 @@
 
 Diagnose connectivity issues, analyze Wi-Fi channel congestion, and validate roaming behavior — with results processed locally on your Mac.
 
+**Open source for live analysis. Pro adds monitoring, history, and insights for problems that happen over time.**
+
 [![Latest release](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![macOS](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
@@ -17,6 +19,10 @@ Diagnose connectivity issues, analyze Wi-Fi channel congestion, and validate roa
   <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>Get WiFi Lens Pro</strong></a>
   &nbsp;·&nbsp;
   <a href="https://wifi-lens.shiinalabs.com">Official Website</a>
+</p>
+
+<p align="center">
+  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
 </p>
 
 <p align="center">macOS 14+ &nbsp;·&nbsp; Intel &amp; Apple Silicon &nbsp;·&nbsp; No telemetry</p>
@@ -33,7 +39,7 @@ Diagnose connectivity issues, analyze Wi-Fi channel congestion, and validate roa
   🇺🇸 English · <a href="README.de.md">🇩🇪 Deutsch</a> · <a href="README.es-ES.md">🇪🇸 Español</a> · <a href="README.fr.md">🇫🇷 Français</a> · <a href="README.zh-Hans.md">🇨🇳 简体中文</a> · <a href="README.ja.md">🇯🇵 日本語</a>
 </p>
 <p align="center">
-  <a href="#features">Features</a> · <a href="#editions">Editions</a> · <a href="#ai--mcp-integration">AI / MCP</a> · <a href="#privacy">Privacy</a> · <a href="#installation">Installation</a> · <a href="#development">Development</a> · <a href="#contributing">Contributing</a> · <a href="#license">License</a>
+  <a href="#features">Features</a> · <a href="#when-you-need-pro">When you need Pro</a> · <a href="#editions">Editions</a> · <a href="#ai--mcp-integration">AI / MCP</a> · <a href="#privacy">Privacy</a> · <a href="#get-wifi-lens">Get WiFi Lens</a> · <a href="#development">Development</a> · <a href="#contributing">Contributing</a> · <a href="#license">License</a>
 </p>
 
 ---
@@ -61,29 +67,51 @@ Diagnose connectivity issues, analyze Wi-Fi channel congestion, and validate roa
 | 🩺 Network Self-Check | One-click path, DNS, HTTPS, proxy diagnostics | Preview |
 | 📻 AP Radar | Track a selected AP with audio pulse feedback | Preview |
 
-### Pro Exclusive
+### Available in Pro
 
-| Feature | Description | Status |
-|---------|-------------|--------|
-| 📈 Event Timeline | Connection event history — roaming, drops, signal changes | Preview |
-| 📋 Statistics | Analyze Timeline history with period comparison | Preview |
-| 💡 Insights | Explainable findings linked to evidence | Preview |
-| 🎬 Spectrum Recording | Capture and replay spectrum changes over time | Stable |
-| 📱 Menu Bar | Quick access from the macOS menu bar | Stable |
+| Capability | What it helps you do |
+|------------|----------------------|
+| 📈 Event Timeline *(Preview)* | Reconstruct when connections roamed, dropped, or changed signal |
+| 📋 Statistics *(Preview)* | Compare Wi-Fi behavior across periods instead of relying on memory |
+| 💡 Insights *(Preview)* | Turn recorded evidence into explainable findings |
+| 🎬 Spectrum Recording | Replay spectrum changes after an intermittent problem |
+| 📱 Menu Bar | Keep monitoring reachable without opening the main window |
+
+## When you need Pro
+
+Use Open Source to inspect and diagnose your Wi-Fi right now.
+
+Choose Pro when the problem happens over time:
+
+- Connection drops or slowdowns are intermittent
+- You need to reconstruct when roaming or signal changes happened
+- You want to compare network behavior across periods
+- You want to record spectrum conditions and replay them later
+- You want findings that explain recorded evidence
+
+**Open Source helps you inspect. Pro helps you monitor and investigate.**
 
 ---
 
 ## Editions
 
-| | Open Source | WiFi Lens Pro |
-|--|------------|--------------|
-| Price | Free | One-time purchase |
-| Source | [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) | [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) |
-| Core analysis | ✅ All features above | ✅ Everything in OSS |
-| Exclusive tools | — | Timeline · Statistics · Insights · Recording · Menu Bar |
-| Updates | Sparkle auto-update | Mac App Store |
+Choose based on how you use WiFi Lens:
 
-> Both editions share the same core analysis engine. Pro adds professional monitoring workflows built on top.
+- **Open Source** — free, inspect and diagnose your Wi-Fi now, available from [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
+- **WiFi Lens Pro** — one-time purchase, monitor and investigate over time, available from [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746)
+
+| Capability | Open Source | WiFi Lens Pro |
+|------------|-------------|---------------|
+| Live Wi-Fi analysis | ✅ | ✅ |
+| Network diagnostics | ✅ | ✅ |
+| Channel recommendations | ✅ | ✅ |
+| Event history | — | ✅ |
+| Historical statistics | — | ✅ |
+| Wi-Fi insights | — | ✅ |
+| Spectrum recording | — | ✅ |
+| Menu bar monitoring | — | ✅ |
+
+> Both editions are local-first. Pro extends the workflow from live inspection to monitoring and investigation over time.
 
 ---
 
@@ -113,6 +141,14 @@ See the [AI Workflows guide](https://wifi-lens.shiinalabs.com/ai-mcp/) for more 
 <td width="50%" align="center"><img alt="Event Timeline showing connection history" src="assets/screenshot-timeline.webp" width="100%"><sub>Event Timeline (Pro)</sub></td>
 </tr>
 </table>
+
+### Investigate problems after they happen
+
+Some Wi-Fi problems disappear before you can inspect them. WiFi Lens Pro records connection events and network conditions over time, so you can review what happened after a drop, roam, or signal change.
+
+<p align="center">
+  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>Get WiFi Lens Pro →</strong></a>
+</p>
 
 ---
 

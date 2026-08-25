@@ -4,6 +4,8 @@
 
 诊断连接问题、分析 Wi-Fi 信道拥堵、验证漫游行为——所有结果都在本地处理。
 
+**开源版用于实时分析。Pro 为随时间发生的问题增加监控、历史和洞察。**
+
 [![Latest release](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![macOS](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
@@ -17,6 +19,10 @@
   <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>获取 WiFi Lens Pro</strong></a>
   &nbsp;·&nbsp;
   <a href="https://wifi-lens.shiinalabs.com">官方网站</a>
+</p>
+
+<p align="center">
+  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
 </p>
 
 <p align="center">macOS 14+ &nbsp;·&nbsp; Intel &amp; Apple Silicon &nbsp;·&nbsp; 无遥测</p>
@@ -33,7 +39,7 @@
   <a href="README.md">🇺🇸 English</a> · <a href="README.de.md">🇩🇪 Deutsch</a> · <a href="README.es-ES.md">🇪🇸 Español</a> · <a href="README.fr.md">🇫🇷 Français</a> · 🇨🇳 简体中文 · <a href="README.ja.md">🇯🇵 日本語</a>
 </p>
 <p align="center">
-  <a href="#功能">功能</a> · <a href="#版本">版本</a> · <a href="#ai--mcp-集成">AI / MCP</a> · <a href="#隐私">隐私</a> · <a href="#安装">安装</a> · <a href="#开发">开发</a> · <a href="#贡献">贡献</a> · <a href="#许可">许可</a>
+  <a href="#功能">功能</a> · <a href="#什么时候需要-pro">什么时候需要 Pro</a> · <a href="#版本">版本</a> · <a href="#ai--mcp-集成">AI / MCP</a> · <a href="#隐私">隐私</a> · <a href="#获取-wifi-lens">获取 WiFi Lens</a> · <a href="#开发">开发</a> · <a href="#贡献">贡献</a> · <a href="#许可">许可</a>
 </p>
 
 ---
@@ -61,29 +67,51 @@
 | 🩺 网络自检 | 一键诊断路径、DNS、HTTPS 与代理 | 预览 |
 | 📻 AP 雷达 | 追踪选定接入点并随信号强度发出音频脉冲反馈 | 预览 |
 
-### Pro 独占
+### Pro 提供的能力
 
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| 📈 事件时间线 | 连接事件历史——漫游、断连与信号变化 | 预览 |
-| 📋 统计 | 分析 Timeline 历史数据，支持时段对比 | 预览 |
-| 💡 洞察 | 可解释的发现，链接到证据 | 预览 |
-| 🎬 频谱录制 | 随时间捕获并回放频谱变化 | 稳定 |
-| 📱 菜单栏 | 从 macOS 菜单栏快速访问 | 稳定 |
+| 能力 | 帮你做什么 |
+|------|------------|
+| 📈 事件时间线 *(预览)* | 还原漫游、断连和信号变化发生的时间 |
+| 📋 统计 *(预览)* | 按时段对比 Wi-Fi 行为，而不是靠记忆判断 |
+| 💡 洞察 *(预览)* | 把记录到的证据转化为可解释的发现 |
+| 🎬 频谱录制 | 在间歇性问题发生后回看频谱变化 |
+| 📱 菜单栏 | 不打开主窗口也能继续访问监控 |
+
+## 什么时候需要 Pro
+
+开源版适合立即检查和诊断当前 Wi-Fi。
+
+当问题随时间出现时，选择 Pro：
+
+- 断连或变慢只是偶发出现
+- 需要还原漫游或信号变化发生的时间
+- 需要对比不同时段的网络行为
+- 需要记录频谱状态并稍后回放
+- 需要基于记录证据给出可解释的发现
+
+**开源版帮你检查，Pro 帮你持续观察和调查。**
 
 ---
 
 ## 版本
 
-| | 开源版 | WiFi Lens Pro |
-|--|-------|--------------|
-| 价格 | 免费 | 一次性购买 |
-| 来源 | [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) | [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) |
-| 核心分析 | ✅ 以上全部功能 | ✅ 包含开源版全部功能 |
-| 独有工具 | — | 时间线 · 统计 · 洞察 · 录制 · 菜单栏 |
-| 更新 | Sparkle 自动更新 | Mac App Store |
+按你的使用方式选择：
 
-> 两个版本共享同一分析引擎。Pro 在此基础上增加专业监控工作流。
+- **开源版** — 免费，立即检查和诊断 Wi-Fi；可从 [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) 获取。
+- **WiFi Lens Pro** — 一次性购买，用于长期监控和调查；可从 [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) 获取。
+
+| 能力 | 开源版 | WiFi Lens Pro |
+|------|--------|---------------|
+| 实时 Wi-Fi 分析 | ✅ | ✅ |
+| 网络诊断 | ✅ | ✅ |
+| 信道推荐 | ✅ | ✅ |
+| 事件历史 | — | ✅ |
+| 历史统计 | — | ✅ |
+| Wi-Fi 洞察 | — | ✅ |
+| 频谱录制 | — | ✅ |
+| 菜单栏监控 | — | ✅ |
+
+> 两个版本都在本地处理数据。Pro 将工作流从实时检查扩展到长期监控和调查。
 
 ---
 
@@ -114,6 +142,14 @@ WiFi Lens 内置 MCP 服务器，AI 助手可读取本地 Wi-Fi 数据。在设�
 </tr>
 </table>
 
+### 在问题发生后调查原因
+
+有些 Wi-Fi 问题会在你来得及检查前消失。WiFi Lens Pro 会随时间记录连接事件和网络状态，让你在断连、漫游或信号变化后回看当时发生了什么。
+
+<p align="center">
+  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>获取 WiFi Lens Pro →</strong></a>
+</p>
+
 ---
 
 ## 隐私
@@ -130,12 +166,16 @@ WiFi Lens 不收集使用分析、崩溃遥测或 Wi-Fi 扫描数据。
 
 ---
 
-## 安装
+## 获取 WiFi Lens
 
 需要 **macOS 14 (Sonoma) 或更高版本**。支持 Intel 和 Apple Silicon Mac。6 GHz 扫描需要 Wi-Fi 6E/7 硬件。
 
 - **开源版** — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest)（免费，Sparkle 自动更新）
-- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746)
+- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746)，用于长期监控、录制和调查问题
+
+<p align="center">
+  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
+</p>
 
 > [!IMPORTANT]
 > macOS 14+ 需要**定位服务**才能读取 Wi-Fi SSID 名称。前往 **系统设置 → 隐私与安全性 → 定位服务** 允许 WiFi Lens。

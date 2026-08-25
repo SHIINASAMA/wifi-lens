@@ -4,6 +4,8 @@
 
 接続問題の診断、Wi-Fi チャンネル混雑の分析、ローミング動作の検証——すべてローカルで処理されます。
 
+**オープンソースはライブ分析向け。Pro は、時間とともに起こる問題のためのモニタリング・履歴・インサイトを追加します。**
+
 [![Latest release](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![macOS](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
@@ -17,6 +19,10 @@
   <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>WiFi Lens Pro を入手</strong></a>
   &nbsp;·&nbsp;
   <a href="https://wifi-lens.shiinalabs.com">公式サイト</a>
+</p>
+
+<p align="center">
+  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
 </p>
 
 <p align="center">macOS 14+ &nbsp;·&nbsp; Intel &amp; Apple Silicon &nbsp;·&nbsp; テレメトリなし</p>
@@ -33,7 +39,7 @@
   <a href="README.md">🇺🇸 English</a> · <a href="README.de.md">🇩🇪 Deutsch</a> · <a href="README.es-ES.md">🇪🇸 Español</a> · <a href="README.fr.md">🇫🇷 Français</a> · <a href="README.zh-Hans.md">🇨🇳 简体中文</a> · 🇯🇵 日本語
 </p>
 <p align="center">
-  <a href="#機能">機能</a> · <a href="#エディション">エディション</a> · <a href="#ai--mcp-統合">AI / MCP</a> · <a href="#プライバシー">プライバシー</a> · <a href="#インストール">インストール</a> · <a href="#開発">開発</a> · <a href="#コントリビュート">コントリビュート</a> · <a href="#ライセンス">ライセンス</a>
+  <a href="#機能">機能</a> · <a href="#pro-が向いているケース">Pro が向いているケース</a> · <a href="#エディション">エディション</a> · <a href="#ai--mcp-統合">AI / MCP</a> · <a href="#プライバシー">プライバシー</a> · <a href="#wifi-lens-を入手">WiFi Lens を入手</a> · <a href="#開発">開発</a> · <a href="#コントリビュート">コントリビュート</a> · <a href="#ライセンス">ライセンス</a>
 </p>
 
 ---
@@ -61,29 +67,51 @@
 | 🩺 ネットワーク自己診断 | パス・DNS・HTTPS・プロキシのワンクリック診断 | プレビュー |
 | 📻 APレーダー | 選択した AP を音声パルスで追跡 | プレビュー |
 
-### Pro 専用
+### Pro で利用できる機能
 
-| 機能 | 説明 | ステータス |
-|------|------|----------|
-| 📈 イベントタイムライン | 接続イベント履歴——ローミング・切断・信号変化 | プレビュー |
-| 📋 統計 | タイムライン履歴を期間比較付きで分析 | プレビュー |
-| 💡 インサイト | エビデンスにリンクされた説明可能な発見 | プレビュー |
-| 🎬 スペクトル録画 | 時間経過によるスペクトル変化を記録・再生 | 安定 |
-| 📱 メニューバー | macOS メニューバーからのクイックアクセス | 安定 |
+| 機能 | 活かせる場面 |
+|------|------------|
+| 📈 イベントタイムライン *(プレビュー)* | ローミング・切断・信号変化がいつ起きたかを追跡する |
+| 📋 統計 *(プレビュー)* | 期間ごとの Wi-Fi の挙動を比較する |
+| 💡 インサイト *(プレビュー)* | 記録されたエビデンスを説明可能な発見に変える |
+| 🎬 スペクトル録画 | 断続的な問題の後にスペクトル変化を再生する |
+| 📱 メニューバー | メインウィンドウを開かずにモニタリングにアクセスする |
+
+## Pro が向いているケース
+
+Open Source は、今この瞬間の Wi-Fi を調査・診断するときに使います。
+
+時間とともに問題が現れる場合は Pro が向いています:
+
+- 切断や低速化が断続的に起こる
+- ローミングや信号変化がいつ起きたかを後から把握したい
+- 期間ごとのネットワーク挙動を比較したい
+- スペクトルの状態を記録し、後から再生したい
+- 記録されたエビデンスに基づく説明が欲しい
+
+**Open Source は調査用。Pro は継続観察と原因追究用。**
 
 ---
 
 ## エディション
 
-| | オープンソース | WiFi Lens Pro |
-|--|------------|--------------|
-| 価格 | 無料 | 買い切り |
-| ソース | [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) | [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) |
-| コア分析 | ✅ 上記の全機能 | ✅ OSS の全機能 |
-| 専用ツール | — | イベントタイムライン · 統計 · インサイト · 録画 · メニューバー |
-| アップデート | Sparkle 自動更新 | Mac App Store |
+使い方に合わせて選べます:
 
-> 両エディションは同じ分析エンジンを共有しています。Pro はプロフェッショナルなモニタリングワークフローを追加します。
+- **オープンソース** — 無料。今の Wi-Fi を調査・診断。[GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) から入手
+- **WiFi Lens Pro** — 買い切り。時間軸でのモニタリングと原因追究。[Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) から入手
+
+| 機能 | オープンソース | WiFi Lens Pro |
+|------|--------------|---------------|
+| リアルタイム Wi-Fi 分析 | ✅ | ✅ |
+| ネットワーク診断 | ✅ | ✅ |
+| チャンネル推奨 | ✅ | ✅ |
+| イベント履歴 | — | ✅ |
+| 履歴統計 | — | ✅ |
+| Wi-Fi インサイト | — | ✅ |
+| スペクトル録画 | — | ✅ |
+| メニューバー監視 | — | ✅ |
+
+> どちらのエディションもローカル処理です。Pro はライブ分析から、時間軸でのモニタリングと調査へワークフローを広げます。
 
 ---
 
@@ -114,6 +142,14 @@ WiFi Lens には内蔵 MCP サーバーがあり、AI アシスタントがロ�
 </tr>
 </table>
 
+### 問題のあとで原因を調べる
+
+Wi-Fi の問題には、調査できるようになる前に消えてしまうものがあります。WiFi Lens Pro は接続イベントとネットワーク状態を時間軸で記録するため、切断・ローミング・信号変化のあとに何が起きたかを確認できます。
+
+<p align="center">
+  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>WiFi Lens Pro を入手 →</strong></a>
+</p>
+
 ---
 
 ## プライバシー
@@ -130,12 +166,16 @@ WiFi Lens は利用状況の分析、クラッシュテレメトリ、Wi-Fi ス�
 
 ---
 
-## インストール
+## WiFi Lens を入手
 
 **macOS 14 (Sonoma) 以降**が必要です。Intel Mac と Apple Silicon の両方で動作します。6 GHz スキャンには Wi-Fi 6E/7 ハードウェアが必要です。
 
 - **オープンソース版** — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest)（無料、Sparkle 自動更新）
-- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746)
+- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746)。時間軸でのモニタリング、記録、原因調査に
+
+<p align="center">
+  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
+</p>
 
 > [!IMPORTANT]
 > macOS 14 以降では Wi-Fi SSID 名の読み取りに**位置情報サービス**の有効化が必要です。**システム設定 → プライバシーとセキュリティ → 位置情報サービス**で WiFi Lens を許可してください。

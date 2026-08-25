@@ -4,6 +4,8 @@
 
 Diagnostiquez les problèmes de connectivité, analysez la congestion des canaux Wi-Fi et validez le comportement de roaming — avec des résultats traités localement sur votre Mac.
 
+**Open source pour l'analyse en direct. Pro ajoute surveillance, historique et analyses pour les problèmes qui se manifestent dans la durée.**
+
 [![Latest release](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![macOS](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
@@ -17,6 +19,10 @@ Diagnostiquez les problèmes de connectivité, analysez la congestion des canaux
   <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>Obtenir WiFi Lens Pro</strong></a>
   &nbsp;·&nbsp;
   <a href="https://wifi-lens.shiinalabs.com">Site web officiel</a>
+</p>
+
+<p align="center">
+  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
 </p>
 
 <p align="center">macOS 14+ &nbsp;·&nbsp; Intel &amp; Apple Silicon &nbsp;·&nbsp; Sans télémétrie</p>
@@ -33,7 +39,7 @@ Diagnostiquez les problèmes de connectivité, analysez la congestion des canaux
   <a href="README.md">🇺🇸 English</a> · <a href="README.de.md">🇩🇪 Deutsch</a> · <a href="README.es-ES.md">🇪🇸 Español</a> · 🇫🇷 Français · <a href="README.zh-Hans.md">🇨🇳 简体中文</a> · <a href="README.ja.md">🇯🇵 日本語</a>
 </p>
 <p align="center">
-  <a href="#fonctionnalités">Fonctionnalités</a> · <a href="#éditions">Éditions</a> · <a href="#ia--mcp-intégration">IA / MCP</a> · <a href="#confidentialité">Confidentialité</a> · <a href="#installation">Installation</a> · <a href="#développement">Développement</a> · <a href="#contribuer">Contribuer</a> · <a href="#licence">Licence</a>
+  <a href="#fonctionnalités">Fonctionnalités</a> · <a href="#quand-choisir-pro">Quand choisir Pro</a> · <a href="#éditions">Éditions</a> · <a href="#ia--mcp-intégration">IA / MCP</a> · <a href="#confidentialité">Confidentialité</a> · <a href="#obtenir-wifi-lens">Obtenir WiFi Lens</a> · <a href="#développement">Développement</a> · <a href="#contribuer">Contribuer</a> · <a href="#licence">Licence</a>
 </p>
 
 ---
@@ -61,29 +67,51 @@ Diagnostiquez les problèmes de connectivité, analysez la congestion des canaux
 | 🩺 Auto-diagnostic réseau | Diagnostic chemin, DNS, HTTPS et proxy en un clic | Aperçu |
 | 📻 Radar AP | Suivi d'un point d'accès par impulsions audio | Aperçu |
 
-### Exclusif Pro
+### Disponible dans Pro
 
-| Fonctionnalité | Description | Statut |
-|---------------|-------------|--------|
-| 📈 Chronologie des événements | Historique des événements — roaming, déconnexions, changements de signal | Aperçu |
-| 📋 Statistiques | Analyse de l'historique chronologique avec comparaison de périodes | Aperçu |
-| 💡 Perspectives | Conclusions explicables liées aux preuves | Aperçu |
-| 🎬 Enregistrement spectral | Capturez et relisez l'évolution du spectre | Stable |
-| 📱 Barre de menus | Accès rapide depuis la barre de menus macOS | Stable |
+| Capacité | Ce que cela vous aide à faire |
+|----------|-------------------------------|
+| 📈 Chronologie des événements *(Aperçu)* | Reconstituer quand une connexion a roamé, coupé ou changé de signal |
+| 📋 Statistiques *(Aperçu)* | Comparer le comportement Wi-Fi entre périodes |
+| 💡 Perspectives *(Aperçu)* | Transformer les preuves enregistrées en explications claires |
+| 🎬 Enregistrement spectral | Revoir les changements du spectre après un problème intermittent |
+| 📱 Barre de menus | Garder la surveillance accessible sans ouvrir la fenêtre principale |
+
+## Quand choisir Pro
+
+Utilisez Open Source pour inspecter et diagnostiquer votre réseau maintenant.
+
+Choisissez Pro quand le problème apparaît dans la durée :
+
+- Les coupures ou ralentissements sont intermittents
+- Vous devez reconstituer quand un roaming ou changement de signal est survenu
+- Vous voulez comparer le comportement réseau entre périodes
+- Vous voulez enregistrer les conditions spectrales puis les revoir
+- Vous voulez des explications appuyées par les enregistrements
+
+**Open Source vous aide à inspecter. Pro vous aide à surveiller et investiguer.**
 
 ---
 
 ## Éditions
 
-| | Open Source | WiFi Lens Pro |
-|--|------------|--------------|
-| Prix | Gratuit | Achat unique |
-| Source | [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) | [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) |
-| Analyse principale | ✅ Toutes les fonctionnalités ci-dessus | ✅ Tout le contenu OSS |
-| Outils exclusifs | — | Chronologie · Statistiques · Perspectives · Enregistrement · Menu |
-| Mises à jour | Sparkle auto-update | Mac App Store |
+Choisissez selon votre usage :
 
-> Les deux éditions partagent le même moteur d'analyse. Pro ajoute des workflows de surveillance professionnels.
+- **Open Source** — gratuit, pour inspecter et diagnostiquer votre Wi-Fi maintenant ; disponible via [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
+- **WiFi Lens Pro** — achat unique, pour surveiller et investiguer dans la durée ; disponible sur le [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746)
+
+| Capacité | Open Source | WiFi Lens Pro |
+|----------|-------------|---------------|
+| Analyse Wi-Fi en direct | ✅ | ✅ |
+| Diagnostic réseau | ✅ | ✅ |
+| Recommandations de canaux | ✅ | ✅ |
+| Historique d'événements | — | ✅ |
+| Statistiques historiques | — | ✅ |
+| Analyses Wi-Fi | — | ✅ |
+| Enregistrement spectral | — | ✅ |
+| Surveillance dans la barre des menus | — | ✅ |
+
+> Les deux éditions traitent les données localement. Pro étend le flux d'une inspection en direct vers une surveillance et une investigation dans la durée.
 
 ---
 
@@ -114,6 +142,14 @@ Consultez le [guide des flux IA](https://wifi-lens.shiinalabs.com/ai-mcp/) pour 
 </tr>
 </table>
 
+### Enquêtez après le problème
+
+Certains problèmes Wi-Fi disparaissent avant que vous puissiez les inspecter. WiFi Lens Pro enregistre les événements de connexion et les conditions réseau dans la durée, pour comprendre ce qui s'est passé après une coupure, un roaming ou un changement de signal.
+
+<p align="center">
+  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>Obtenir WiFi Lens Pro →</strong></a>
+</p>
+
 ---
 
 ## Confidentialité
@@ -130,12 +166,16 @@ WiFi Lens ne collecte aucune analytique d'utilisation, télémétrie de plantage
 
 ---
 
-## Installation
+## Obtenir WiFi Lens
 
 Nécessite **macOS 14 (Sonoma) ou ultérieur**. Fonctionne sur Mac Intel et Apple Silicon. Le scan 6 GHz nécessite un matériel Wi-Fi 6E/7.
 
 - **Édition open source** — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) (gratuit, Sparkle auto-updates)
-- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746)
+- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) pour surveiller, enregistrer et investiguer les problèmes dans la durée
+
+<p align="center">
+  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
+</p>
 
 > [!IMPORTANT]
 > Sur macOS 14+, les **Services de localisation** doivent être activés pour lire les noms SSID Wi-Fi. Allez dans **Réglages Système → Confidentialité et sécurité → Localisation**.
