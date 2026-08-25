@@ -47,6 +47,7 @@
 		2A8E470AAD8FCE2CC1D14305 /* BandChartViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC084FA8AE0EE5E703D922DA /* BandChartViewModelTests.swift */; };
 		2B79435DB2D70F8EFE1DFDAA /* RegulatoryFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE17427BAD036F393D712B6F /* RegulatoryFilterTests.swift */; };
 		2B7B4CBC96F724AA4970AC7F /* SpectrumModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DD34695BFD8D4277DF0BDB0 /* SpectrumModelTests.swift */; };
+		B89BCDE0766C4998B46372B /* LoggingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D4F1A65F0142A18B9C161 /* LoggingTests.swift */; };
 		2ED34E17AE03E25A409037BD /* NetworkTableRowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5143599E254B3367AFD37C /* NetworkTableRowTests.swift */; };
 		MV0000000000000000000001 /* MACVendorResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000002 /* MACVendorResolverTests.swift */; };
 		MV0000000000000000000003 /* MACVendorResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000005 /* MACVendorResolver.swift */; };
@@ -554,6 +555,7 @@
 		TH0000000000000000000001 /* ThroughputMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThroughputMonitorTests.swift; sourceTree = "<group>"; };
 		5CE94087AFA3CB5A003A5012 /* RoamingModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoamingModelTests.swift; sourceTree = "<group>"; };
 		5DD34695BFD8D4277DF0BDB0 /* SpectrumModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumModelTests.swift; sourceTree = "<group>"; };
+		08D4F1A65F0142A18B9C161 /* LoggingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggingTests.swift; sourceTree = "<group>"; };
 		6203A2551742DF77D61785FE /* WiFiChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiChannel.swift; sourceTree = "<group>"; };
 		69F66DB715821EBD11B6D1AA /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 		786042C29EF01CE698FEBBF8 /* SignalProcessingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalProcessingTests.swift; sourceTree = "<group>"; };
@@ -1460,6 +1462,7 @@
 				A10000000000000000000003 /* SecondaryToolbarTests.swift */,
 				33A24CA582895A784C2E6014 /* SSIDColorHasherTests.swift */,
 				7E044182AAA5DC5A000A0D69 /* ScannerModelTests.swift */,
+				08D4F1A65F0142A18B9C161 /* LoggingTests.swift */,
 				786042C29EF01CE698FEBBF8 /* SignalProcessingTests.swift */,
 				5DD34695BFD8D4277DF0BDB0 /* SpectrumModelTests.swift */,
 				C1D2E3F4A5B6123456789ABE /* APFilterServiceTests.swift */,
@@ -2076,6 +2079,7 @@
 				A10000000000000000000011 /* SecondaryToolbarTests.swift in Sources */,
 				62A04C6993321BEA64FC8E7D /* SSIDColorHasherTests.swift in Sources */,
 				9E204E0C8B6D8E29583263B0 /* ScannerModelTests.swift in Sources */,
+				B89BCDE0766C4998B46372B /* LoggingTests.swift in Sources */,
 				896F4371837628B3E6454853 /* SignalProcessingTests.swift in Sources */,
 				2B7B4CBC96F724AA4970AC7F /* SpectrumModelTests.swift in Sources */,
 				C1D2E3F4A5B6123456789ABF /* APFilterServiceTests.swift in Sources */,
