@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WiFi Lens 项目审查报告 - 2026 年 8 月 24 日</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --background: #f6f7f4; --surface: #fff; --text: #17212b; --muted: #5d6873; --border: #d7dee4;
+      --accent: #175e54; --accent-soft: #e5f2ef; --p1: #a4260c; --p1-bg: #fdecea;
+      --p2: #8a5b00; --p2-bg: #fff4d6; --p3: #455a70; --p3-bg: #e9eef3; --ok: #20683c; --ok-bg: #e5f3ea;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --background: #12181d; --surface: #1a2228; --text: #ecf1f4; --muted: #a8b4bd; --border: #37444d;
+        --accent: #71c7b8; --accent-soft: #20302d; --p1: #ff9a8c; --p1-bg: #40211c;
+        --p2: #ecc06a; --p2-bg: #3b3018; --p3: #b3c3cf; --p3-bg: #28333b; --ok: #85cf9f; --ok-bg: #1e3527;
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--background); color: var(--text); font-size: 16px; line-height: 1.65;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 48px max(24px, calc((100% - 1120px) / 2)) 36px; }
+    .eyebrow { color: var(--accent); font-size: .82rem; font-weight: 700; letter-spacing: .08em; }
+    h1 { font-size: clamp(1.9rem, 4vw, 3rem); letter-spacing: -.02em; line-height: 1.15; margin: .5rem 0 1rem; max-width: 26ch; }
+    .lede { font-size: 1.12rem; max-width: 74ch; }
+    .layout { display: grid; grid-template-columns: 210px minmax(0,1fr); gap: 42px; padding: 38px max(24px, calc((100% - 1120px) / 2)) 64px; }
+    nav { position: sticky; top: 24px; align-self: start; }
+    nav a { color: var(--muted); display: block; padding: .32rem 0; text-decoration: none; }
+    nav a:hover { color: var(--accent); }
+    main { min-width: 0; }
+    section { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 24px; overflow-wrap: break-word; padding: clamp(20px,3vw,34px); }
+    h2 { font-size: 1.45rem; margin: 0 0 1rem; }
+    h3 { font-size: 1.1rem; margin: 1.6rem 0 .5rem; }
+    p { margin: .65rem 0; }
+    ul, ol { padding-left: 1.4rem; }
+    li + li { margin-top: .35rem; }
+    code { background: var(--accent-soft); border-radius: 4px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .88em; padding: .12em .32em; }
+    .metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; margin-top: 22px; }
+    .metric { background: var(--background); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+    .metric strong { display: block; font-size: 1.65rem; line-height: 1.2; }
+    .metric span { color: var(--muted); display: block; font-size: .86rem; margin-top: .25rem; }
+    .badge { border-radius: 999px; display: inline-block; font-size: .76rem; font-weight: 700; padding: .22rem .58rem; white-space: nowrap; }
+    .p1 { background: var(--p1-bg); color: var(--p1); }
+    .p2 { background: var(--p2-bg); color: var(--p2); }
+    .p3 { background: var(--p3-bg); color: var(--p3); }
+    .pass { background: var(--ok-bg); color: var(--ok); }
+    .finding { border-top: 1px solid var(--border); margin-top: 1.5rem; padding-top: 1.25rem; }
+    .finding-header { align-items: start; display: flex; gap: 12px; justify-content: space-between; }
+    .finding-header h3 { margin: 0; }
+    .finding-meta { color: var(--muted); font-size: .88rem; margin: .35rem 0 .75rem; }
+    .label { color: var(--muted); display: block; font-size: .78rem; font-weight: 700; margin-bottom: .2rem; }
+    table { border-collapse: collapse; table-layout: fixed; width: 100%; }
+    th, td { border-bottom: 1px solid var(--border); padding: .65rem .7rem; text-align: left; vertical-align: top; word-break: break-word; }
+    th { color: var(--muted); font-size: .82rem; }
+    td:first-child { white-space: nowrap; }
+    .callout { background: var(--accent-soft); border-left: 3px solid var(--accent); border-radius: 6px; margin: 1rem 0; padding: .85rem 1rem; }
+    pre { margin: 1rem 0 0; overflow-x: auto; }
+    footer { color: var(--muted); padding: 0 24px 48px; text-align: center; }
+    @media (max-width: 860px) {
+      .layout { display: block; padding-top: 24px; }
+      nav { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 24px; padding: 12px 16px; position: static; }
+      .metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .finding-header { display: block; }
+      .finding-header .badge { margin-top: .6rem; }
+      th:nth-child(3), td:nth-child(3) { display: none; }
+    }
+    @media print { body { font-size: 11pt; } nav { display: none; } section { break-inside: avoid; border: 1px solid #aaa; } a { color: inherit; text-decoration: none; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">工程与产品审查</div>
+    <h1>WiFi Lens 项目健康度与发布就绪</h1>
+    <p class="lede">
+      WiFi Lens 已经具备扎实的本地优先基础，长期分析方向也成立：把本地无线观测转化为可信的时间线、统计、可解释洞察和下一步行动。
+      当前最重要的工作不是继续增加规则，而是保护样本真实性，把不确定性呈现清楚，补齐隐私叙事，并让证据能够自然连接到用户行动。
+    </p>
+    <div class="metrics">
+      <div class="metric"><strong>0</strong><span>P0 阻塞问题</span></div>
+      <div class="metric"><strong>3</strong><span>P1 优先级发现</span></div>
+      <div class="metric"><strong>1,519</strong><span>单元测试通过</span></div>
+      <div class="metric"><strong>5</strong><span>语言本地化完整</span></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav aria-label="报告章节">
+      <a href="#summary">执行摘要</a>
+      <a href="#scope">范围与方法</a>
+      <a href="#findings">优先级发现</a>
+      <a href="#business">分析业务审查</a>
+      <a href="#design">Apple 设计审查</a>
+      <a href="#compliance">法律与合规</a>
+      <a href="#quality">技术质量</a>
+      <a href="#roadmap">建议顺序</a>
+      <a href="#verification">验证结果</a>
+    </nav>
+
+    <main>
+      <section id="summary">
+        <h2>执行摘要</h2>
+        <p><span class="badge pass">无 P0 阻塞</span> 当前代码树可以完成双版本构建，标准 OSS 单元套件通过。应用已经表现出有纪律的生命周期处理、原生 macOS 呈现、本地优先隐私默认值，以及有意义的无障碍覆盖。</p>
+        <p>最重要的工程风险位于长期分析的数据入口。频谱历史可能在一次纯投影操作中写入合成样本，并且使用墙钟时间，而不是来源观测的真实捕获时间。这会削弱付费分析产品必须承诺的核心性质：时间可信。</p>
+        <p>最重要的商业缺口是产品事实不一致。官网已经把 Statistics 和 Insights 描述为付费能力，但仓库 README 的版本矩阵只写了 Event Timeline。公开 OSS 占位路由实际上同时包含这三个入口。下一次推广或 App Store 提交前，应先统一事实源。</p>
+        <p>最重要的合规任务是让已发布隐私政策追上当前网络行为。二进制权限文案已经正确披露 MCP 和 Network Self-Check 的代理探测，但线上隐私页仍主要把本地网络使用绑定到 MCP。公共诊断端点也应出现在用户可读的隐私说明中。</p>
+      </section>
+
+      <section id="scope">
+        <h2>范围与方法</h2>
+        <h3>审查范围</h3>
+        <ul>
+          <li>共享 macOS 应用架构、扫描运行时、频谱历史、图表、漫游、BLE、诊断、MCP、设置、导出、引导和本地化。</li>
+          <li>Edition 边界，以及 Timeline、Statistics、Insights 的公开产品表达。</li>
+          <li>Xcode 工程配置、entitlements、隐私清单、沙盒设置、发布工作流、官网跳转页和已发布隐私政策。</li>
+          <li>App Store 审核风险、Apple 平台设计预期、无障碍、隐私、数据保留、监管声明、许可证和更新完整性。</li>
+        </ul>
+        <h3>知识边界</h3>
+        <p>本次请求明确涉及 Timeline、Statistics 和 Insights，因此付费版实现只在必要范围内检查。公开报告只记录行为级结论，不复制私有路径、符号、schema、算法或架构内部细节。双版本均已构建，付费单元测试结果只汇总为行为级验证。</p>
+        <h3>限制</h3>
+        <ul>
+          <li>这是源码、配置、文档和自动化测试审查，不能替代真实 AP、DFS 事件、代理、强制门户、IPv6、蓝牙适配器、Intel 硬件和 VoiceOver 用户场景测试。</li>
+          <li>按仓库政策，UI 测试包不在默认验证范围内，除非明确要求。</li>
+          <li>合规观察用于降低工程风险，不构成法律意见。</li>
+        </ul>
+      </section>
+
+      <section id="findings">
+        <h2>优先级发现</h2>
+        <table>
+          <thead><tr><th>编号</th><th>发现</th><th>领域</th></tr></thead>
+          <tbody>
+            <tr><td>R-01</td><td>频谱历史可能合成并重放样本</td><td>分析完整性</td></tr>
+            <tr><td>R-02</td><td>趋势图把不相等时间间隔画成等距</td><td>数据可视化</td></tr>
+            <tr><td>R-03</td><td>已发布隐私政策落后于当前网络行为</td><td>隐私与 App Store</td></tr>
+            <tr><td>R-04</td><td>README 缺少 Statistics 和 Insights</td><td>产品事实</td></tr>
+            <tr><td>R-05</td><td>MCP 没有客户端认证或配对模型</td><td>本地信任边界</td></tr>
+            <tr><td>R-06</td><td>诊断产物缺少统一保留与删除故事</td><td>数据最小化</td></tr>
+            <tr><td>R-07</td><td>监管建议需要更清楚来源和边界</td><td>声明与安全</td></tr>
+            <tr><td>R-08</td><td>图表无障碍只表达数量，不表达含义</td><td>无障碍</td></tr>
+            <tr><td>R-09</td><td>更大文本支持仍未完成</td><td>无障碍</td></tr>
+            <tr><td>R-10</td><td>窗口风险布局修饰符仍反复出现</td><td>UI 健壮性</td></tr>
+          </tbody>
+        </table>
+
+        <article class="finding">
+          <div class="finding-header"><h3>R-01：频谱历史可能合成并重放样本</h3><span class="badge p1">P1</span></div>
+          <p class="finding-meta">分析完整性 | 高影响 | 高置信度</p>
+          <span class="label">证据</span>
+          <p><code>ScannerViewModel.applyNetworks(_:)</code> 在第 728-738 行把每个去重后的网络写入 <code>SignalHistoryStore</code>，时间使用当时的 <code>Date()</code>。第 822-829 行的 <code>toggleVisibility(bssid:)</code> 又复用该方法重放 <code>lastNetworks</code>。<code>SignalHistoryStore.swift</code> 第 14-16 行显示每个 BSSID 只保留 20 个点。</p>
+          <span class="label">影响</span>
+          <p>可见性切换是投影关注点，不是一次新的射频观测。重放最新扫描会以新的墙钟时间再插入一个点；处理延迟也会让样本时间晚于真实扫描。在 20 点缓冲中，这可能挤掉真实样本，扭曲趋势差值，把合成点带进导出，并影响下游会话录制。</p>
+          <span class="label">建议</span>
+          <ul>
+            <li>把观测摄取与呈现投影分开。</li>
+            <li>把不可变的周期捕获时间和周期 ID 从 runtime 传递到 view model。</li>
+            <li>按周期 ID 让历史写入幂等；过滤或可见性更新绝不追加样本。</li>
+            <li>增加回归测试，证明切换可见性只改变渲染，不改变样本数量、时间戳或趋势输出。</li>
+          </ul>
+        </article>
+
+        <article class="finding">
+          <div class="finding-header"><h3>R-02：趋势图把不相等时间间隔画成等距</h3><span class="badge p1">P1</span></div>
+          <p class="finding-meta">数据可视化 | 用户可见正确性问题 | 高置信度</p>
+          <span class="label">证据</span>
+          <p><code>TrendChartView.buildSeries()</code> 在第 57-60 行把每个 snapshot 映射为数组索引。第 43-52 行按索引挑选坐标轴标签并格式化为相对时间。snapshot 只在网络出现时追加，因此缺口和延迟样本会被渲染成相等间隔。</p>
+          <span class="label">影响</span>
+          <p>如果一个网络消失两分钟后重新出现，图表会把前后读数画成相邻点。斜率、持续时间和轴标签都会暗示一种并未观测到的连续性。</p>
+          <span class="label">建议</span>
+          <ul>
+            <li>使用相对固定参考点的秒数作为 x 轴域，或把预计算的相对时间传给 ChartLens。</li>
+            <li>明确显示不连续，而不是跨缺失观测插值。</li>
+            <li>为缺失扫描、延迟周期、夏令时切换和网络消失后重现增加测试。</li>
+          </ul>
+        </article>
+
+        <article class="finding">
+          <div class="finding-header"><h3>R-03：已发布隐私政策落后于当前网络行为</h3><span class="badge p1">P1</span></div>
+          <p class="finding-meta">隐私与 App Store | 审核摩擦 | 高置信度</p>
+          <span class="label">证据</span>
+          <p>OSS 和 Pro 目标配置都在 <code>INFOPLIST_KEY_NSLocalNetworkUsageDescription</code> 中披露：本地网络用于 MCP server，也用于 Network Self-Check 探测已配置代理的可达性。相关配置见 <code>project.pbxproj</code> 第 2453-2458 行和第 2687-2692 行。README 第 109-115 行也列出公共诊断端点和代理。但线上隐私页目前主要说明 Local Network 只在启用 MCP 时使用，没有同等突出代理自检流量。</p>
+          <span class="label">影响</span>
+          <p>审核员或关注隐私的用户会合理比较权限文案、应用行为和隐私政策。外部政策比系统权限文案更窄，会制造不必要的拒绝和信任风险。</p>
+          <span class="label">建议</span>
+          <ul>
+            <li>更新线上隐私页，说明 MCP、Network Self-Check、已配置代理探测、公共控制端点、DNS 探测、可选 IEEE registry 下载、GitHub 更新和 App Store 更新差异。</li>
+            <li>说明连接性探测会向目标站点暴露 IP 地址等标准网络元数据，但 Wi-Fi 扫描内容仍保留在本地。</li>
+            <li>区分应用不收集遥测的声明与网站分析、基础设施元数据。</li>
+            <li>增加发布前检查，比较权限文案、README、网站隐私文案和 App Store 隐私问卷。</li>
+          </ul>
+        </article>
+
+        <article class="finding">
+          <div class="finding-header"><h3>R-04：README 缺少 Statistics 和 Insights</h3><span class="badge p2">P2</span></div>
+          <p class="finding-meta">产品事实 | 营销准确性 | 高置信度</p>
+          <span class="label">证据</span>
+          <p>README 第 59-75 行的版本矩阵把 Event Timeline 列为 Pro-only，但没有列 Statistics 和 Insights。公开 OSS composition 在 <code>OSSEditionComposition.swift</code> 第 79-102 行渲染 Timeline、Statistics 和 Insights 的锁定预览。线上 FAQ 则说明 Pro 增加菜单栏、Timeline、Statistics 和 Insights。</p>
+          <span class="label">影响</span><p>功能事实不一致会削弱付费定位，也会让审核者更难判断购买内容。</p>
+          <span class="label">建议</span><p>建立权威产品事实表，让 README、官网、App Store metadata、截图和 release notes 都从这里派生。每个能力都要标明版本归属和成熟度。</p>
+        </article>
+
+        <article class="finding">
+          <div class="finding-header"><h3>R-05：MCP 没有客户端认证或配对模型</h3><span class="badge p2">P2</span></div>
+          <p class="finding-meta">本地信任边界 | 应重新审视既有取舍 | 中高置信度</p>
+          <span class="label">证据</span>
+          <p><code>MCPServer.start()</code> 在第 24-82 行绑定 <code>127.0.0.1</code> 并接受连接，但没有授权 token。第 103-142 行和第 266-310 行的工具定义会返回 SSID、BSSID、RSSI、安全能力、国家码和信道占用。</p>
+          <span class="label">影响</span>
+          <p>loopback 绑定和显式开启是好的默认值，但无法区分用户选择的 AI 客户端和本机其他进程。当 Timeline 和 Analysis 保留更多有价值历史后，本地广泛可读带来的隐私影响比只暴露实时扫描时更大。</p>
+          <span class="label">建议</span>
+          <ul>
+            <li>继续默认关闭 server。</li>
+            <li>增加生成 token 或一次性配对流程，在读取扫描数据前拒绝未认证调用。</li>
+            <li>显示运行状态、端口、已连接或最近授权的客户端类型，并提供撤销控制。</li>
+            <li>如果保留开放模式，应明确标为高级模式，并警告任何本地进程都可能读取附近网络标识。</li>
+          </ul>
+        </article>
+
+        <article class="finding">
+          <div class="finding-header"><h3>R-06：诊断产物缺少统一保留与删除故事</h3><span class="badge p2">P2</span></div>
+          <p class="finding-meta">数据最小化 | 存储卫生 | 高置信度</p>
+          <span class="label">证据</span>
+          <p><code>Logging.swift</code> 第 166-233 行显示应用日志轮转 7 个 5 MB 文件。<code>MetricKitManager.swift</code> 第 17-22 行和第 56-59 行把 MetricKit payload 写入 Application Support，但没有可见清理。<code>CrashReporter.swift</code> 第 12-26 行会在下次启动消费崩溃日志。OSS 设置的诊断区第 285-299 行只提供显示日志入口，没有统一清理控制。</p>
+          <span class="label">影响</span><p>“只保存在本地”不等于“无限期保留”。用户需要可预期的方式检查、选择性导出并删除所有本地诊断产物。</p>
+          <span class="label">建议</span>
+          <ul>
+            <li>建立一个 Data and Diagnostics 界面，覆盖日志、崩溃产物、MetricKit payload、漫游会话、Timeline history 和其他应用生成文件。</li>
+            <li>采用有界保留，例如 30 天或存储上限，以先到达者为准。</li>
+            <li>显示大致磁盘占用，并提供单项删除和批量删除。</li>
+            <li>确保支持包导出必须由用户显式触发，并尽可能默认脱敏标识符。</li>
+          </ul>
+        </article>
+
+        <article class="finding">
+          <div class="finding-header"><h3>R-07：监管建议需要更清楚来源和边界</h3><span class="badge p2">P2</span></div>
+          <p class="finding-meta">声明与安全 | 对用户解释的中等置信度判断</p>
+          <span class="label">证据</span>
+          <p><code>RegulatoryDatabase</code> 第 27-260 行内置 US、JP、CN、EU 规则。区域推断可能是低置信度，未知区域会被限制。用户可见文案说建议已通过区域和设备检查；README 也描述了 regulatory-aware filtering，但没有显示规则快照日期。</p>
+          <span class="label">影响</span><p>模型适合配置指导，但法规会变化，推断本身是概率性的。“passed regulatory checks”可能被理解为合规认证。</p>
+          <span class="label">建议</span>
+          <ul>
+            <li>在专业建议附近显示区域、置信度、规则快照版本和获取日期。</li>
+            <li>把绝对表述改成“已按内置日期规则集过滤”。</li>
+            <li>加入简短说明：这是诊断指导，不是监管或法律建议。</li>
+            <li>保留低置信度降级和未知区域限制，这些保守行为是正确的。</li>
+          </ul>
+        </article>
+
+        <article class="finding">
+          <div class="finding-header"><h3>R-08：图表无障碍只表达数量，不表达含义</h3><span class="badge p2">P2</span></div>
+          <p class="finding-meta">无障碍 | 质量机会 | 高置信度</p>
+          <span class="label">证据</span>
+          <p>主频谱图在 <code>BandChartView.swift</code> 第 139-160 行暴露可见网络数量的 label。关联网络表格是很好的非视觉替代路径，但图表本身没有暴露选中网络详情、主导信道、占用趋势或缩放状态。</p>
+          <span class="label">建议</span>
+          <ul>
+            <li>组合 accessibility value，包含频段、可见数量、选中 SSID 或隐藏状态、信道、RSSI、趋势和是否可重置缩放。</li>
+            <li>增加自定义操作：选择上一个或下一个网络、重置缩放、读取信道摘要。</li>
+            <li>Statistics 图表应提供文本摘要，而不是只有图表数量 label。</li>
+            <li>在不依赖 hover 或指针手势的情况下测试 VoiceOver 路径。</li>
+          </ul>
+        </article>
+
+        <article class="finding">
+          <div class="finding-header"><h3>R-09：更大文本支持仍未完成</h3><span class="badge p2">P2</span></div>
+          <p class="finding-meta">无障碍 | 已知缺口 | 高置信度</p>
+          <span class="label">证据</span><p>项目无障碍追踪文档在 <code>ACCESSIBILITY.md</code> 第 13 行明确把 Larger Text 标记为 incomplete 和 skipped。</p>
+          <span class="label">影响</span><p>密集诊断工具尤其依赖可读标签。原生 macOS 外观本身不能满足依赖更大文本的用户。</p>
+          <span class="label">建议</span>
+          <ul>
+            <li>在多个文本尺寸下审计，找出截断、重叠或低于可用尺寸的布局。</li>
+            <li>正文和标签优先使用语义文本样式和容器驱动换行。</li>
+            <li>密集数值表格可以保持紧凑，但关键值应通过详情弹层或展开行提供。</li>
+            <li>把代表性截图加入计划中的浅色、深色、本地化和无数据回归矩阵。</li>
+          </ul>
+        </article>
+
+        <article class="finding">
+          <div class="finding-header"><h3>R-10：窗口风险布局修饰符仍反复出现</h3><span class="badge p3">P3</span></div>
+          <p class="finding-meta">UI 健壮性 | 回归防护 | 中置信度</p>
+          <span class="label">证据</span>
+          <p>窗口策略警告不要对常驻页面文本使用 <code>.fixedSize(horizontal: false, vertical: true)</code>，因为内容最小尺寸可能传播到窗口。当前根布局已经用 <code>GeometryReader</code> 包裹常驻页面，缓解了原始事故，但该修饰符仍出现在多个 shipping view 中。</p>
+          <span class="label">建议</span>
+          <ul>
+            <li>盘点剩余用法；当父容器可能无界时，改为受限宽度、line limit、可展开详情或滚动容器。</li>
+            <li>增加轻量审查清单或 lint 规则，防止新增高风险用法。</li>
+            <li>继续覆盖长德语字符串、日语文本、病态 SSID 和窄窗口宽度。</li>
+          </ul>
+        </article>
+      </section>
+
+      <section id="business">
+        <h2>分析业务审查</h2>
+        <p>长期价值应该表述得很窄：保留足够的本地证据，帮助用户在下一次 Wi-Fi 问题出现时更快理解情况、判断是否可复现，并采取具体下一步。目标不是保存更多日志。当前方向可信，因为它区分了发生了什么、发生频率，以及证据意味着什么。</p>
+        <h3>已经正确的部分</h3>
+        <ul>
+          <li>共享 observation runtime 把 raw-cycle backlog 限制为一个 in-flight 和一个可替换 pending 周期，保护高负载下的实时性。</li>
+          <li>stop 和 termination barrier 会确定性地 drain consumer 工作，而不是留下模糊的后台任务。</li>
+          <li>公开文案和锁定预览建立了连贯的付费递进：Timeline 提供证据，Statistics 提供分布，Insights 提供解释。</li>
+          <li>当前付费 Analysis 表面已经暴露 scoped networks、unattributed events、历史不足、partial analysis 和返回 Timeline 的 evidence links。</li>
+          <li>规则是确定性的且有证据支撑，不是不透明分数。</li>
+        </ul>
+        <h3>长期壁垒在哪里决定</h3>
+        <ol>
+          <li><strong>样本真实性。</strong>所有统计都继承时间戳和事件身份。在增加规则复杂度前，先修复 R-01 和 R-02。</li>
+          <li><strong>归属。</strong>坚持 event-local identity。不要从相邻事件、当前连接或展示标签推断网络。</li>
+          <li><strong>覆盖度诚实。</strong>没有观测的周期不是健康、正常或零。继续区分无数据、无匹配事件、历史太短、部分覆盖、查询失败和存储失败。</li>
+          <li><strong>证据到行动。</strong>每个 insight 都应导向具体检查：重跑 Network Self-Check、监控某个 SSID、检查路由器、比较周期或导出证据。</li>
+          <li><strong>用户验证。</strong>在扩展规则目录前，加入 opt-in 反馈，询问 insight 是否缩短了排障时间或带来了成功行动。</li>
+        </ol>
+        <h3>路线判断</h3>
+        <p>在 evidence-action loop 被度量之前，不要把 Analysis 宣传成成熟的事件根因诊断。更安全的发布语言是“本地历史证据”和“可解释模式”。更深的根因分析应作为方向，而不是当前能力声明。</p>
+      </section>
+
+      <section id="design">
+        <h2>Apple 设计审查</h2>
+        <h3>优点</h3>
+        <ul>
+          <li>应用使用原生导航、工具栏、表单、sheet、材质、segmented controls、菜单和桌面级工作区，不是移植来的移动端布局。</li>
+          <li>深色模式、Reduce Motion、键盘快捷键、VoiceOver labels、非颜色指示器和窗口恢复都有专门处理。</li>
+          <li>主窗口尺寸有明确策略，并在真实离屏事故后增加了回归测试。</li>
+          <li>核心流程存在错误、加载、空态、权限拒绝、离线和部分数据状态。</li>
+          <li>图表与表格、过滤器配对，让用户可以用多种方式检查同一份数据。</li>
+        </ul>
+        <h3>最有价值的改进</h3>
+        <ol>
+          <li><strong>把不确定性作为一等 UI。</strong>覆盖度、置信度、归属、过期数据和推断区域应在核心页面中使用一致的视觉语法。</li>
+          <li><strong>连续操作反馈。</strong>频谱缩放目前只在拖拽结束后提交。实时选择框会更符合精密工具的直接操作预期。</li>
+          <li><strong>有意义的图表摘要。</strong>每个图表都应配一句结论或 accessible value，说明变化和置信度。</li>
+          <li><strong>更大文本。</strong>这应视为无障碍和工艺缺口，而不是可延后的 nice-to-have。</li>
+          <li><strong>破坏性操作清晰度。</strong>历史删除必须显示范围、预计数量、不可逆性和恢复影响，然后再确认。</li>
+        </ol>
+      </section>
+
+      <section id="compliance">
+        <h2>法律与合规审查</h2>
+        <table>
+          <thead><tr><th>领域</th><th>状态</th><th>行动</th></tr></thead>
+          <tbody>
+            <tr><td>隐私清单</td><td><span class="badge pass">已提供</span></td><td>随着依赖演进，继续同步 UserDefaults 和 file-timestamp API 声明。</td></tr>
+            <tr><td>沙盒与 hardened runtime</td><td><span class="badge pass">已配置</span></td><td>发布前继续验证最终归档签名和 Sparkle XPC entitlement isolation。</td></tr>
+            <tr><td>权限用途文案</td><td><span class="badge pass">具体</span></td><td>未发现模糊文案。新增网络或传感器行为后必须重新检查。</td></tr>
+            <tr><td>外部隐私政策</td><td><span class="badge p1">漂移</span></td><td>补充代理自检、公共端点、IEEE 下载、更新提供方和目标方收到的元数据。</td></tr>
+            <tr><td>数据最小化</td><td><span class="badge p2">待改进</span></td><td>为本地诊断和历史增加有界保留与统一删除入口。</td></tr>
+            <tr><td>支付与版本边界</td><td><span class="badge p2">待澄清</span></td><td>统一 README、官网、App Store metadata 和截图中的 Timeline、Statistics、Insights 归属。</td></tr>
+            <tr><td>监管声明</td><td><span class="badge p2">需收敛</span></td><td>披露快照时间、支持区域、置信度和非法律建议定位。</td></tr>
+            <tr><td>许可证与致谢</td><td><span class="badge p2">需审查</span></td><td>为 bundled 和 linked dependencies 生成完整第三方声明，包括 IEEE 衍生数据的条款。</td></tr>
+          </tbody>
+        </table>
+        <div class="callout">
+          <strong>建议发布门槛：</strong>
+          提交前手动走一遍审核路径：从 Location Services 被拒开始，启用 Bluetooth，开关 MCP，修改 MCP 端口，分别在有代理和无代理时运行 Network Self-Check，
+          清除所有本地数据，重新加载 Timeline，打开隐私政策，检查更新，并把 App Store 隐私问卷与更新后的外部政策逐项比对。
+        </div>
+      </section>
+
+      <section id="quality">
+        <h2>技术质量</h2>
+        <p>对小型产品代码库而言，核心 runtime 相当有纪律。扫描准入有界，发布有序，stop 语义明确，termination 有统一 deadline。单元套件覆盖了很多通常只能靠手动运气处理的并发和迁移边界。</p>
+        <h3>剩余技术债</h3>
+        <ul>
+          <li>历史摄取与呈现投影耦合；这是当前最需要修的架构接缝。</li>
+          <li>趋势渲染使用序数间距，即使时间戳并不均匀。</li>
+          <li>9 个 UI 测试文件仍在默认计划之外，需要 dedicated nightly job 或明确的退役决定。</li>
+          <li>发布工作流在签名和公证之后才校验 tag 与 marketing version。应把该检查提前。</li>
+          <li>本地 master 落后远端 4 个提交，目前只涉及 CodeQL 和 Astro 依赖更新。创建 release branch 前应同步。</li>
+        </ul>
+      </section>
+
+      <section id="roadmap">
+        <h2>建议顺序</h2>
+        <ol>
+          <li><strong>下一次发布门槛。</strong>修复历史重放和时间戳来源，把趋势轴改为真实时间，统一外部隐私政策，并同步 README 与网站功能事实。</li>
+          <li><strong>信任加固。</strong>为 MCP 增加配对或 token 授权、客户端可见性和撤销。为诊断数据建立统一保留与删除界面。</li>
+          <li><strong>Analysis 产品化。</strong>提供受监控 SSID 选择、采集状态引导、阈值提醒、对比摘要和显式 evidence-to-action 按钮。</li>
+          <li><strong>质量矩阵。</strong>在浅色、深色、更大文本、5 种语言、无权限、无 Wi-Fi、空历史、部分历史和查询失败下运行可重复的视觉与无障碍矩阵。</li>
+          <li><strong>验证闭环。</strong>度量 opt-in insight 有用性、行动完成率、误报反馈、支持工单减少、trial-to-paid conversion 和 retention。用这些信号决定继续增加规则，还是先改善解释。</li>
+        </ol>
+        <h3>建议成功指标</h3>
+        <ul>
+          <li>从 Timeline evidence 打开 insight 的比例。</li>
+          <li>insight 被标记为有帮助、已行动、误导或太晚的比例。</li>
+          <li>从反复症状到确认原因或排除假设的中位时间。</li>
+          <li>创建 monitored timeline 的用户的 7 天和 30 天 retention。</li>
+          <li>通过导出的 Timeline 或 Statistics 报告解决的支持会话数量。</li>
+        </ul>
+      </section>
+
+      <section id="verification">
+        <h2>验证结果</h2>
+        <table>
+          <thead><tr><th>检查</th><th>结果</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>标准 verify 脚本</td><td><span class="badge pass">通过</span></td><td>构建 WiFi Lens 和 WiFi Lens Pro Debug scheme，然后运行 WiFiLensTests。</td></tr>
+            <tr><td>OSS 单元测试</td><td><span class="badge pass">1,099 通过</span></td><td>114 个 suite 全部成功。</td></tr>
+            <tr><td>付费版单元测试</td><td><span class="badge pass">420 通过</span></td><td>40 个 suite 全部成功。使用 <code>-only-testing:WiFiLensProTests</code> 单独运行；此处不展开实现细节。</td></tr>
+            <tr><td>本地化完整性</td><td><span class="badge pass">通过</span></td><td>仓库扫描器报告 en、de、es、ja、zh-Hans 全部完整。</td></tr>
+            <tr><td>空白字符 diff 检查</td><td><span class="badge pass">通过</span></td><td>加入本报告前，<code>git diff --check</code> 无问题。</td></tr>
+            <tr><td>知识边界检查</td><td><span class="badge pass">通过</span></td><td>报告加入后，公开知识扫描和 integrity 检查均通过。</td></tr>
+            <tr><td>单文件 HTML 渲染</td><td><span class="badge pass">通过</span></td><td>已验证 markup、锚点、桌面与移动端溢出以及浏览器 console 错误。</td></tr>
+          </tbody>
+        </table>
+        <h3>对应命令</h3>
+        <pre><code>.agents/skills/verify-build/scripts/verify.sh
+xcodebuild ... -scheme "WiFi Lens Pro" test -only-testing:WiFiLensProTests
+python3 .agents/skills/i18n-completer/scripts/scan_i18n.py WiFiLens/Sources/WiFiLens/Resources/Localizable.xcstrings
+python3 .agents/skills/protect-knowledge-boundary/scripts/check_public_knowledge.py
+python3 .agents/skills/protect-knowledge-boundary/scripts/verify_integrity.py</code></pre>
+      </section>
+    </main>
+  </div>
+
+  <footer>报告生成于 2026 年 8 月 24 日，基于当前工作树。内容为工程审查发现，不构成法律意见。</footer>
+</body>
+</html>
