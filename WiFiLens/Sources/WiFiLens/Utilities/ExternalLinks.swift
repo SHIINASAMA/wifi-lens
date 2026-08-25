@@ -4,7 +4,10 @@ enum ExternalDestination {
     case privacyPolicy
     case appStore
     case appStoreWriteReview
-    case appStoreCampaign
+    case appStoreCampaignWelcome
+    case appStoreCampaignDiagnosis
+    case appStoreCampaignExport
+    case appStoreCampaignPreviewLock
     case website
     case github
     case xAccount
@@ -23,11 +26,18 @@ enum ExternalLinks {
             "https://apps.apple.com/app/wifi-lens-pro/id6776590746"
         case .appStoreWriteReview:
             "https://apps.apple.com/app/wifi-lens-pro/id6776590746?action=write-review"
-        case .appStoreCampaign:
-            // Official App Store Connect "oss_invite" Campaign Link. Regenerate
-            // from App Analytics -> Campaigns if the campaign changes; never
-            // handcraft the pt/ct parameters.
-            "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_invite&mt=8"
+        // Each entry point uses a distinct App Store Connect campaign so
+        // conversion attribution can identify the source surface. Regenerate
+        // from App Analytics -> Campaigns when campaigns change; never
+        // handcraft the pt parameter.
+        case .appStoreCampaignWelcome:
+            "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_welcome&mt=8"
+        case .appStoreCampaignDiagnosis:
+            "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_diagnosis&mt=8"
+        case .appStoreCampaignExport:
+            "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_export&mt=8"
+        case .appStoreCampaignPreviewLock:
+            "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_preview_lock&mt=8"
         case .website:
             "https://wifi-lens.shiinalabs.com"
         case .github:

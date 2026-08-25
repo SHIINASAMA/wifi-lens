@@ -261,4 +261,57 @@ struct WiFiNetworkTests {
         #expect(vm.cachedCombinedTableRows.first?.rssi == -45)
         #expect(vm.cachedTotalNetworks == 1)
     }
+
+    @Test("BSSID visibility rebuild does not duplicate signal history")
+    func bssidVisibilityRebuildKeepsSignalHistoryStable() {
+        let vm = ScannerViewModel()
+        let firstScan = Date(timeIntervalSince1970: 100)
+        let secondScan = Date(timeIntervalSince1970: 110)
+        let thirdScan = Date(timeIntervalSince1970: 120)
+        let network = makeNetwork(
+            ssid: "History",
+            bssid: "00:11:22:33:44:01",
+            band: .band24GHz,
+            channel: 1
+        )
+        let weakerNetwork = makeNetwork(
+            ssid: "History",
+            bssid: "00:11:22:33:44:01",
+            band: .band24GHz,
+            channel: 1,
+            rssi: -58
+        )
+
+        vm.debugApplyNetworksForTesting(
+            [network],
+            supportedBands: [.band24GHz],
+            timestamp: firstScan
+        )
+        vm.debugApplyNetworksForTesting(
+            [weakerNetwork],
+            supportedBands: [.band24GHz],
+            timestamp: secondScan
+        )
+
+        vm.toggleVisibility(bssid: network.bssid)
+
+        #expect(vm.hiddenBSSIDs == [network.bssid])
+        #expect(vm.signalHistory.allHistory[network.bssid] == [-50, -58])
+        #expect(
+            vm.signalHistory.allSnapshots[network.bssid]?.map(\.timestamp) == [firstScan, secondScan]
+        )
+        #expect(vm.cachedCombinedTableRows.first?.isVisible == false)
+
+        vm.debugApplyNetworksForTesting(
+            [weakerNetwork],
+            supportedBands: [.band24GHz],
+            timestamp: thirdScan
+        )
+
+        #expect(vm.signalHistory.allHistory[network.bssid] == [-50, -58, -58])
+        #expect(
+            vm.signalHistory.allSnapshots[network.bssid]?.map(\.timestamp)
+                == [firstScan, secondScan, thirdScan]
+        )
+    }
 }

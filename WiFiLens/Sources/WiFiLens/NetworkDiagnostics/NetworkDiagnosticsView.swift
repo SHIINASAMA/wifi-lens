@@ -91,7 +91,6 @@ struct NetworkDiagnosticsView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -179,14 +178,12 @@ struct NetworkDiagnosticsView: View {
                 Text(conclusionMessage(conclusion))
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
                 if conclusion == .needsAttention,
                    let issue = NetworkDiagnosticConclusion.primaryIssue(in: Array(viewModel.results.values)) {
                     let remediation = NetworkDiagnosticRemediation.forResult(issue)
                     Text(String(localized: .init(stringLiteral: remediation.actionKey), comment: "Network self-check primary remediation action"))
                         .font(.caption)
                         .foregroundStyle(.orange)
-                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             Spacer(minLength: 0)
@@ -374,7 +371,6 @@ struct NetworkDiagnosticsView: View {
                     remediationView(for: result)
                 }
             }
-            .fixedSize(horizontal: false, vertical: true)
         }
     }
 

@@ -98,7 +98,6 @@ struct ChannelQualityView: View {
                         Text(recommendationAvailability.message)
                             .font(.caption2)
                             .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
                     }
                     Spacer()
                 }

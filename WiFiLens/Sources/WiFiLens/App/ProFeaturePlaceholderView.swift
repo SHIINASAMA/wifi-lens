@@ -62,7 +62,6 @@ struct ProFeaturePlaceholderView<CustomSkeleton: View>: View {
                             .font(.body)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
-                            .fixedSize(horizontal: false, vertical: true)
                     }
                     
                     HStack(spacing: 6) {
@@ -107,7 +106,7 @@ struct ProFeaturePlaceholderView<CustomSkeleton: View>: View {
     }
     
     private func openAppStore() {
-        guard let url = ExternalLinks.url(for: .appStore) else { return }
+        guard let url = ExternalLinks.url(for: .appStoreCampaignPreviewLock) else { return }
         NSWorkspace.shared.open(url)
     }
 }
@@ -144,7 +143,6 @@ struct MenuBarFeaturePreviewRow: View {
             Text(String(localized: "settings.features.menubar_description", comment: "Description of menu bar icon feature"))
                 .font(.callout)
                 .foregroundColor(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
 
             Button {
                 guard let url = ExternalLinks.url(for: .appStore) else { return }

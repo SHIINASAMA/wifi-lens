@@ -17,7 +17,7 @@ final class OnboardingEditionTests {
             "onboarding.welcome.highlight.diagnostics",
             "onboarding.welcome.highlight.export"
         ])
-        #expect(config.proURL?.absoluteString == "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_invite&mt=8")
+        #expect(config.proURL?.absoluteString == "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_welcome&mt=8")
     }
 
     @Test func ossMigrationUsesSparkleMarker() {

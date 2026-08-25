@@ -79,6 +79,11 @@ enum AppLogger {
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         NSWorkspace.shared.open(dir)
     }
+
+    /// Deletes all files in the log directory.
+    static func clearLogs() {
+        LogFileWriter.shared.clear()
+    }
 }
 
 // MARK: - ConsoleLogHandler
@@ -163,13 +168,10 @@ private struct FileLogHandler: LogHandler {
 
 // MARK: - File Writer
 
-private final class LogFileWriter: @unchecked Sendable {
-    static let shared: LogFileWriter = {
-        let w = LogFileWriter()
-        w.open()
-        return w
-    }()
+final class LogFileWriter: @unchecked Sendable {
+    static let shared = LogFileWriter(logDirectory: AppLogger.logDirectory)
 
+    private let logDirectory: URL
     private let queue = DispatchQueue(label: "com.wifilens.logwriter", qos: .utility)
     private let maxSize: Int64 = 5 * 1024 * 1024
     private let maxFiles = 7
@@ -177,7 +179,9 @@ private final class LogFileWriter: @unchecked Sendable {
     private var handle: FileHandle?
     private var currentSize: Int64 = 0
 
-    private init() {}
+    init(logDirectory: URL) {
+        self.logDirectory = logDirectory
+    }
 
     func enqueue(_ line: String) {
         queue.async { [weak self] in
@@ -185,8 +189,33 @@ private final class LogFileWriter: @unchecked Sendable {
         }
     }
 
+    /// Clears logs on the writer queue so the active file handle is reset
+    /// before any queued write can follow an unlinked inode.
+    func clear() {
+        queue.sync {
+            handle?.closeFile()
+            handle = nil
+            currentSize = 0
+
+            let fileManager = FileManager.default
+            if let contents = try? fileManager.contentsOfDirectory(
+                at: logDirectory, includingPropertiesForKeys: nil
+            ) {
+                for item in contents {
+                    try? fileManager.removeItem(at: item)
+                }
+            }
+
+            open()
+        }
+    }
+
+    func waitForPendingWritesForTesting() {
+        queue.sync {}
+    }
+
     private func open() {
-        let dir = AppLogger.logDirectory
+        let dir = logDirectory
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let path = dir.appendingPathComponent("wifi-lens.log").path
         if !FileManager.default.fileExists(atPath: path) {
@@ -213,7 +242,7 @@ private final class LogFileWriter: @unchecked Sendable {
 
     private func rotate() {
         handle?.closeFile()
-        let dir = AppLogger.logDirectory
+        let dir = logDirectory
         let base = dir.appendingPathComponent("wifi-lens")
 
         for i in stride(from: maxFiles - 1, through: 1, by: -1) {

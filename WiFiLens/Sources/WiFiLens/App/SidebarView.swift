@@ -309,7 +309,7 @@ struct SidebarView: View {
     private func sidebarGroupTitle(_ section: SidebarSection) -> some View {
         HStack(spacing: 6) {
             Text(section.title)
-                .font(.system(size: 10, weight: .semibold))
+                .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
                 .textCase(nil)
 

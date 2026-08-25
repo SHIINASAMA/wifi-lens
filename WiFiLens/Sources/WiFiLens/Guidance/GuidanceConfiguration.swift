@@ -14,7 +14,6 @@ struct GuidanceConfiguration: Equatable, Sendable {
     var minimumReviewActiveDays = 3
     var minimumReviewAgeDays = 7
     var reviewCooldownDays = 120
-    var appStoreCampaignURL: URL?
 }
 
 /// The value moments the guidance system observes.

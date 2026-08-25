@@ -4,119 +4,185 @@
 
 Diagnose connectivity issues, analyze Wi-Fi channel congestion, and validate roaming behavior — with results processed locally on your Mac.
 
+**Open source for live analysis. Pro adds monitoring, history, and insights for problems that happen over time.**
+
 [![Latest release](https://img.shields.io/github/v/release/SHIINASAMA/wifi-lens?label=Latest&color=2563eb)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![macOS](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Swift CI](https://github.com/SHIINASAMA/wifi-lens/workflows/Swift%20CI/badge.svg)](https://github.com/SHIINASAMA/wifi-lens/actions?query=workflow%3A%22Swift+CI%22)
 
+<p align="center"><img alt="WiFi Lens showing Wi-Fi spectrum analysis on macOS" src="assets/screenshot-hero.webp" width="800"></p>
+
 <p align="center">
   <a href="https://github.com/SHIINASAMA/wifi-lens/releases/latest"><strong>Download Open-Source Edition</strong></a>
-  ·
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>Get WiFi Lens Pro</strong></a>
-  ·
+  &nbsp;·&nbsp;
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><strong>Get WiFi Lens Pro</strong></a>
+  &nbsp;·&nbsp;
   <a href="https://wifi-lens.shiinalabs.com">Official Website</a>
 </p>
 
-macOS 14+ · Intel & Apple Silicon · No telemetry
+<p align="center">
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
+</p>
 
-<img alt="WiFi Lens showing Wi-Fi spectrum analysis on macOS" src="assets/screenshot-swiftui.png" width="800">
+<p align="center">macOS 14+ &nbsp;·&nbsp; Intel &amp; Apple Silicon &nbsp;·&nbsp; No telemetry</p>
 
-## Open Source or Pro?
-
-| Open-Source Edition | WiFi Lens Pro |
-|---|---|
-| Free, open source — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) | One-time paid Mac App Store edition — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) |
-| Tri-band Wi-Fi scanning & spectrum analysis | Professional monitoring workflows built on the same core analysis engine |
-| Channel quality, network details, roaming tests | Spectrum session recording — capture & replay over time |
-| Network Self-Check, BLE scanner, MCP server | Additional professional workflows |
-| Export PNG/CSV · Sparkle updates | Persistent menu bar · Event timeline · Mac App Store updates |
-
-> Both editions share the same core Wi-Fi analysis capabilities. Pro adds spectrum recording, persistent menu bar, and event timeline for professional workflows.
-
-🇺🇸 [English](README.md) | 🇩🇪 [Deutsch](README.de.md) | 🇪🇸 [Español](README.es-ES.md) | 🇫🇷 [Français](README.fr.md) | 🇨🇳 [简体中文](README.zh-Hans.md) | 🇯🇵 [日本語](README.ja.md)
+<p align="center">
+  🔒 <strong>Local-first privacy</strong> — No accounts, no cloud, no telemetry<br>
+  🩺 <strong>Evidence-based diagnostics</strong> — Explainable path, DNS, HTTPS, and proxy checks<br>
+  🤖 <strong>MCP for AI workflows</strong> — Connect Claude Desktop to live Wi-Fi data
+</p>
 
 ---
 
-## About WiFi Lens
-
-WiFi Lens is a native macOS network diagnostics app built with SwiftUI, CoreWLAN, and CoreBluetooth. It helps you troubleshoot connectivity issues through network self-checks, Wi-Fi scanning, channel congestion analysis, and roaming validation. Built-in BLE scanning provides additional visibility into nearby wireless devices.
-
-This repository contains the free, open-source edition. WiFi Lens Pro is a separate paid edition that adds spectrum recording, persistent menu bar, and event timeline features.
-
-**Typical use cases:**
-
-- 🏠 **Home network tuning:** Find which channel your neighbors are saturating and move your router to a quieter one.
-- 🏢 **Office Wi-Fi audit:** Scan all three bands (2.4, 5, and 6 GHz) to spot dead zones or misconfigured APs.
-- 🚶 **Roaming validation:** Walk through a building and record every AP handoff with a timeline chart to verify seamless transition.
-- 🎧 **BLE device troubleshooting:** Track RSSI trends of Bluetooth peripherals and identify range or interference issues.
+<p align="center">
+  🇺🇸 English · <a href="README.de.md">🇩🇪 Deutsch</a> · <a href="README.es-ES.md">🇪🇸 Español</a> · <a href="README.fr.md">🇫🇷 Français</a> · <a href="README.zh-Hans.md">🇨🇳 简体中文</a> · <a href="README.ja.md">🇯🇵 日本語</a>
+</p>
+<p align="center">
+  <a href="#features">Features</a> · <a href="#when-you-need-pro">When you need Pro</a> · <a href="#editions">Editions</a> · <a href="#ai--mcp-integration">AI / MCP</a> · <a href="#privacy">Privacy</a> · <a href="#get-wifi-lens">Get WiFi Lens</a> · <a href="#development">Development</a> · <a href="#contributing">Contributing</a> · <a href="#license">License</a>
+</p>
 
 ---
 
 ## Features
 
-| Category | Capability | Edition |
-|----------|-----------|---------|
-| 📡 **Wi-Fi Scanning** | Real-time scan across 2.4, 5, and 6 GHz bands with per-network signal strength | OSS & Pro |
-| 📊 **Spectrum View** | Gaussian bell-curve charts showing channel occupancy at a glance | OSS & Pro |
-| 🎯 **Channel Quality** | Congestion scores with regulatory-aware recommendations tuned to your region | OSS & Pro |
-| 🔍 **Network Details** | PHY generation, channel width, 802.11k/r/v roaming, WPA3, hidden SSID | OSS & Pro |
-| 📶 **Connection Info** | IP, gateway, DNS, MAC, channel, Tx rate, and security summary | OSS & Pro |
-| 🩺 **Network Self-Check** | One-click connection diagnostics — path, DNS, HTTPS, and proxy reachability, with evidence-based conclusions | OSS & Pro |
-| 📈 **Event Timeline** | Connection event history — roaming, channel changes, disconnections, and signal drops | Pro only |
-| 🔄 **Roaming Test** | AP handoff monitoring with a timeline chart, range selector, and session save/load | OSS & Pro |
-| 🗺️ **Channel Heatmap** | Per-band occupancy heatmap to spot congestion patterns instantly | OSS & Pro |
-| 🎬 **Spectrum Recording** | Capture and replay spectrum changes over time | Pro only |
-| 🎧 **BLE Scanner** | Bluetooth LE device discovery, RSSI analysis, trend charts, and device tracking | OSS & Pro |
-| 🎨 **Smart Coloring** | Deterministic SSID-based color assignment; the same network keeps the same color | OSS & Pro |
-| 📍 **Menu Bar** | Lives in your menu bar — click the icon to open the analyzer anytime | Pro only |
-| 🔒 **Privacy First** | No telemetry or analytics; Wi-Fi scan data stays on your Mac | OSS & Pro |
-| 🌐 **MCP Server** | Embedded HTTP API on `127.0.0.1:19840` for external tool integration | OSS & Pro |
-| 🔄 **Auto-Updates** | Sparkle updates in the GitHub edition; Mac App Store updates in Pro | OSS & Pro |
-| 📤 **Export** | Save per-band charts as PNG images or CSV data | OSS & Pro |
-| 🌍 **Localized** | English, German, Spanish, Japanese, and Simplified Chinese | OSS & Pro |
+### Core · OSS & Pro
 
-All features are included in the open-source edition unless marked **Pro only**. Pro includes every open-source feature plus the recording, menu bar, and event timeline tools.
+| Feature | Description | Status |
+|---------|-------------|--------|
+| 📡 Wi-Fi Scanning | Real-time scan across 2.4 / 5 / 6 GHz bands | Stable |
+| 📊 Spectrum View | Gaussian channel occupancy charts | Stable |
+| 🎯 Channel Quality | Congestion scores with regional recommendations | Stable |
+| 🔍 Network Details | PHY generation, channel width, 802.11k/r/v, WPA3 | Stable |
+| 📶 Connection Info | IP, gateway, DNS, MAC, Tx rate, security summary | Stable |
+| 🚶 Roaming Test | AP handoff monitoring with session save/load | Stable |
+| 🗺️ Channel Heatmap | Per-band occupancy heatmap | Stable |
+| 🎧 BLE Scanner | Bluetooth LE discovery, RSSI analysis, tracking | Stable |
+| 🎨 Smart Coloring | Deterministic SSID-based color assignment | Stable |
+| 🌐 MCP Server | Embedded HTTP API for AI tool integration | Stable |
+| 📤 Export | Save charts as PNG or CSV | Stable |
+| 🔒 Privacy First | No telemetry; scan data stays on your Mac | Stable |
+| ⬆️ Auto-Updates | Sparkle (GitHub) or Mac App Store | Stable |
+| 🌍 Localized | English, German, Spanish, Japanese, Chinese | Stable |
+| 🩺 Network Self-Check | One-click path, DNS, HTTPS, proxy diagnostics | Preview |
+| 📻 AP Radar | Track a selected AP with audio pulse feedback | Preview |
+
+### Available in Pro
+
+| Capability | What it helps you do |
+|------------|----------------------|
+| 📈 Event Timeline *(Preview)* | Reconstruct when connections roamed, dropped, or changed signal |
+| 📋 Statistics *(Preview)* | Compare Wi-Fi behavior across periods instead of relying on memory |
+| 💡 Insights *(Preview)* | Turn recorded evidence into explainable findings |
+| 🎬 Spectrum Recording | Replay spectrum changes after an intermittent problem |
+| 📱 Menu Bar | Keep monitoring reachable without opening the main window |
+
+## When you need Pro
+
+Use Open Source to inspect and diagnose your Wi-Fi right now.
+
+Choose Pro when the problem happens over time:
+
+- Connection drops or slowdowns are intermittent
+- You need to reconstruct when roaming or signal changes happened
+- You want to compare network behavior across periods
+- You want to record spectrum conditions and replay them later
+- You want findings that explain recorded evidence
+
+**Open Source helps you inspect. Pro helps you monitor and investigate.**
 
 ---
 
-## Design
+## Editions
 
-**Native macOS UI.** CoreWLAN talks directly to Wi-Fi hardware, and SwiftUI provides Mac-native controls and window behavior.
+Choose based on how you use WiFi Lens:
 
-**Regulatory-aware recommendations.** WiFi Lens infers your regulatory domain from system locale, hardware capability, and nearby AP country codes. It filters recommendations using DFS, indoor-only, and 6 GHz AFC requirements.
+- **Open Source** — free, inspect and diagnose your Wi-Fi now, available from [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
+- **WiFi Lens Pro** — one-time purchase, monitor and investigate over time, available from [Mac App Store](https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8)
 
-**Linked views.** Select a network in the table to highlight it on each chart. Hover over a bell curve to identify its SSID.
+| Capability | Open Source | WiFi Lens Pro |
+|------------|-------------|---------------|
+| Live Wi-Fi analysis | ✅ | ✅ |
+| Network diagnostics | ✅ | ✅ |
+| Channel recommendations | ✅ | ✅ |
+| Event history | — | ✅ |
+| Historical statistics | — | ✅ |
+| Wi-Fi insights | — | ✅ |
+| Spectrum recording | — | ✅ |
+| Menu bar monitoring | — | ✅ |
 
-**Tools in the open-source edition.** Export PNG and CSV files or save and load roaming sessions. The local MCP server connects WiFi Lens to your own tools.
+> Both editions are local-first. Pro extends the workflow from live inspection to monitoring and investigation over time.
 
 ---
 
-## Download
+## AI / MCP Integration
 
-Requires **macOS 14 (Sonoma) or later**. Works on both Intel and Apple Silicon Macs. 6 GHz band scanning requires Wi-Fi 6E/7 hardware.
+WiFi Lens includes an embedded MCP server that lets AI assistants read your local Wi-Fi data. Enable it in Settings, then add to Claude Desktop:
 
-- **Open-source edition** — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) (free, with optional Sparkle auto-updates)
-- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) (supported regions)
+```json
+{
+  "mcpServers": {
+    "wifi-lens": {
+      "url": "http://127.0.0.1:19840"
+    }
+  }
+}
+```
 
-> [!IMPORTANT]
-> On macOS 14+, **Location Services** must be enabled for the app to read Wi-Fi SSID names.
-> Go to **System Settings → Privacy & Security → Location Services** and enable WiFi Lens when prompted.
+Once connected, ask Claude things like *"What channels are congested near me?"* or *"Is my gateway reachable?"*. The server binds to `127.0.0.1` only — nothing leaves your machine unless you deliberately route it elsewhere.
 
-> 🌐 **Official website:** [wifi-lens.shiinalabs.com](https://wifi-lens.shiinalabs.com) provides screenshots, a feature tour, AI/MCP workflows, and an FAQ.
+See the [AI Workflows guide](https://wifi-lens.shiinalabs.com/ai-mcp/) for more examples.
+
+---
+
+<table>
+<tr>
+<td width="50%" align="center"><img alt="Network Self-Check diagnostics view" src="assets/screenshot-selfcheck.webp" width="100%"><sub>Network Self-Check</sub></td>
+<td width="50%" align="center"><img alt="Event Timeline showing connection history" src="assets/screenshot-timeline.webp" width="100%"><sub>Event Timeline (Pro)</sub></td>
+</tr>
+</table>
+
+### Investigate problems after they happen
+
+Some Wi-Fi problems disappear before you can inspect them. WiFi Lens Pro records connection events and network conditions over time, so you can review what happened after a drop, roam, or signal change.
+
+<p align="center">
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><strong>Get WiFi Lens Pro →</strong></a>
+</p>
+
+---
 
 ## Privacy
 
 WiFi Lens does not collect usage analytics, crash telemetry, or Wi-Fi scan data.
 
-- **Location Services:** macOS requires this permission to expose Wi-Fi SSID names. WiFi Lens does not read your GPS position.
-- **Region detection:** WiFi Lens uses the system locale, hardware-reported channel list, and nearby AP country codes on-device.
-- **Network Self-Check:** When you run it, WiFi Lens resolves public endpoints (`www.apple.com`, `www.microsoft.com`, `www.msftconnecttest.com`) and may test reachability of your configured proxy endpoints.
-- **MCP server:** The optional server binds to `127.0.0.1`. Local tools can access scan data only after you enable it.
+- **Location Services:** macOS requires this permission to expose Wi-Fi SSID names. WiFi Lens does not read GPS position.
+- **Region detection:** Uses system locale, hardware-reported channel list, and nearby AP country codes on-device.
+- **Network Self-Check:** Resolves public endpoints (`www.apple.com`, `www.msftconnecttest.com`) and may test reachability of configured proxy endpoints.
+- **MCP server:** Binds to `127.0.0.1` only. Local tools access data only after you enable it.
 - **Update checks:** The GitHub edition contacts GitHub when you request an update check or enable automatic checks.
+
+📋 [Security Policy](SECURITY.md) · 📝 [Changelog](https://github.com/SHIINASAMA/wifi-lens/releases) · ❓ [FAQ](https://wifi-lens.shiinalabs.com/faq/) · 🌐 [Full privacy policy](https://wifi-lens.shiinalabs.com/privacy/)
 
 ---
 
-## Develop
+## Get WiFi Lens
+
+Requires **macOS 14 (Sonoma) or later**. Works on both Intel and Apple Silicon. 6 GHz scanning requires Wi-Fi 6E/7 hardware.
+
+- **Open-source edition** — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) (free, Sparkle auto-updates)
+- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8) for monitoring, recording, and investigating problems over time
+
+<p align="center">
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
+</p>
+
+> [!IMPORTANT]
+> On macOS 14+, **Location Services** must be enabled for the app to read Wi-Fi SSID names. Go to **System Settings → Privacy & Security → Location Services** and enable WiFi Lens when prompted.
+
+---
+
+## Development
 
 ```sh
 git clone https://github.com/SHIINASAMA/wifi-lens
@@ -125,39 +191,27 @@ git submodule update --init ChartLens
 cd WiFiLens
 
 # Build
-xcodebuild -project WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' build
+xcodebuild -project WiFiLens.xcodeproj -scheme "WiFi Lens" \
+  -configuration Debug -destination 'platform=macOS' build
 
-# Run tests
-xcodebuild -project WiFiLens.xcodeproj -scheme "WiFi Lens" -configuration Debug -destination 'platform=macOS' -skipPackageUpdates test -only-testing:WiFiLensTests
-
-# Open in Xcode
-xed WiFiLens.xcodeproj
+# Run unit tests
+xcodebuild -project WiFiLens.xcodeproj -scheme "WiFi Lens" \
+  -configuration Debug -destination 'platform=macOS' \
+  -skipPackageUpdates test -only-testing:WiFiLensTests
 ```
 
-The product name is `WiFi Lens.app` (with space).
-
-Architecture, testing, and roadmap docs live in [docs/](docs/).
+Architecture docs live in [docs/](docs/).
 
 ---
 
 ## Contributing
 
-Bug reports and feature ideas are welcome. Open an [issue](https://github.com/SHIINASAMA/wifi-lens/issues) or start a [discussion](https://github.com/SHIINASAMA/wifi-lens/discussions).
-
-See [Contributing Guidelines](.github/CONTRIBUTING.md) for development setup, pull request conventions, and localization requirements. If you use coding agents, also review [.agents/references/collaboration-rules.md](.agents/references/collaboration-rules.md) for AI assistant guidelines.
-
-At their discretion, the maintainer may recognize substantial contributions to WiFi Lens with an Apple-issued promo code for WiFi Lens Pro. See [Contributor Recognition](.github/CONTRIBUTING.md#contributor-recognition) for details.
+Bug reports and feature ideas are welcome. See [Contributing Guidelines](.github/CONTRIBUTING.md) for setup, PR conventions, and localization requirements. Substantial contributors may receive a Pro promo code — see [Contributor Recognition](.github/CONTRIBUTING.md#contributor-recognition).
 
 **Contact:** [@WiFiLens on X](https://x.com/WiFiLens) · [wifi-lens@shiinalabs.com](mailto:wifi-lens@shiinalabs.com)
 
 ---
 
-## Acknowledgments
+Forked from [tiny-wifi-analyzer](https://github.com/nolze/tiny-wifi-analyzer). MAC vendor data from the [IEEE Registration Authority](https://standards.ieee.org/products-programs/regauth/) — see [Third-Party Notices](docs/THIRD-PARTY-NOTICES.md).
 
-Forked from [tiny-wifi-analyzer](https://github.com/nolze/tiny-wifi-analyzer) by [nolze](https://github.com/nolze), who built the original Python-based Wi-Fi scanner. Since then the app has been fully rewritten in Swift with SwiftUI and CoreWLAN, evolving into the native macOS application it is today.
-
----
-
-## License
-
-Apache License 2.0 © 2020 nolze, 2026 SHIINASAMA. See [LICENSE](LICENSE) for full text.
+Apache License 2.0 © 2020 nolze, 2026 SHIINASAMA — see [LICENSE](LICENSE).

@@ -27,7 +27,6 @@ struct ProInvitationCard: View {
             )
             .font(.callout)
             .foregroundStyle(.secondary)
-            .fixedSize(horizontal: false, vertical: true)
 
             HStack(spacing: 8) {
                 Button {
@@ -60,7 +59,7 @@ struct ProInvitationCard: View {
     }
 
     private func openAppStore() {
-        guard let url = guidance.appStoreCampaignURL,
+        guard let url = guidance.appStoreCampaignURL(for: invitation.moment),
               NSWorkspace.shared.open(url) else {
             return
         }

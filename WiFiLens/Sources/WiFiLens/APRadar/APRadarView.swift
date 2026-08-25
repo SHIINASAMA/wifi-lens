@@ -227,7 +227,6 @@ struct APRadarView: View {
                         .font(.caption)
                         .multilineTextAlignment(.center)
                         .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(maxWidth: 440)
 
@@ -1080,4 +1079,3 @@ private struct RippleRingView: View {
         }
     }
 }
-
