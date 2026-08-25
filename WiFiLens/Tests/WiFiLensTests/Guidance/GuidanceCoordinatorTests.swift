@@ -30,6 +30,28 @@ final class GuidanceCoordinatorTests {
         #expect(loaded.lastInvitationDate == nil)
     }
 
+    @Test("value moments route to their App Store campaigns")
+    func valueMomentsRouteToAppStoreCampaigns() throws {
+        let coordinator = makeCoordinator()
+        let routings: [(moment: GuidanceValueMoment, campaign: String)] = [
+            (.diagnosticsCompleted, "oss_diagnosis"),
+            (.analysisLoaded, "oss_diagnosis"),
+            (.roamingCompleted, "oss_diagnosis"),
+            (.exportSucceeded, "oss_export"),
+        ]
+
+        for routing in routings {
+            let url = try #require(coordinator.appStoreCampaignURL(for: routing.moment))
+            let campaign = try #require(
+                URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                    .queryItems?
+                    .first { $0.name == "ct" }?
+                    .value
+            )
+            #expect(campaign == routing.campaign)
+        }
+    }
+
     @Test func presentationConsumesCountAndDateIdempotently() {
         let coordinator = makeCoordinator(state: invitationState())
         _ = coordinator.record(.diagnosticsCompleted)

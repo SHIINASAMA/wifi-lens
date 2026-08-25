@@ -150,8 +150,14 @@ cd wifi-lens
 git submodule update --init ChartLens
 cd WiFiLens
 
+# Build
 xcodebuild -project WiFiLens.xcodeproj -scheme "WiFi Lens" \
   -configuration Debug -destination 'platform=macOS' build
+
+# Run unit tests
+xcodebuild -project WiFiLens.xcodeproj -scheme "WiFi Lens" \
+  -configuration Debug -destination 'platform=macOS' \
+  -skipPackageUpdates test -only-testing:WiFiLensTests
 ```
 
 架构文档见 [docs/](docs/)。
