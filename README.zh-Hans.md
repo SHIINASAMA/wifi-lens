@@ -16,13 +16,13 @@
 <p align="center">
   <a href="https://github.com/SHIINASAMA/wifi-lens/releases/latest"><strong>下载开源版</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>获取 WiFi Lens Pro</strong></a>
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><strong>获取 WiFi Lens Pro</strong></a>
   &nbsp;·&nbsp;
   <a href="https://wifi-lens.shiinalabs.com">官方网站</a>
 </p>
 
 <p align="center">
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
 </p>
 
 <p align="center">macOS 14+ &nbsp;·&nbsp; Intel &amp; Apple Silicon &nbsp;·&nbsp; 无遥测</p>
@@ -98,7 +98,7 @@
 按你的使用方式选择：
 
 - **开源版** — 免费，立即检查和诊断 Wi-Fi；可从 [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) 获取。
-- **WiFi Lens Pro** — 一次性购买，用于长期监控和调查；可从 [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) 获取。
+- **WiFi Lens Pro** — 一次性购买，用于长期监控和调查；可从 [Mac App Store](https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8) 获取。
 
 | 能力 | 开源版 | WiFi Lens Pro |
 |------|--------|---------------|
@@ -147,7 +147,7 @@ WiFi Lens 内置 MCP 服务器，AI 助手可读取本地 Wi-Fi 数据。在设�
 有些 Wi-Fi 问题会在你来得及检查前消失。WiFi Lens Pro 会随时间记录连接事件和网络状态，让你在断连、漫游或信号变化后回看当时发生了什么。
 
 <p align="center">
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>获取 WiFi Lens Pro →</strong></a>
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><strong>获取 WiFi Lens Pro →</strong></a>
 </p>
 
 ---
@@ -171,10 +171,10 @@ WiFi Lens 不收集使用分析、崩溃遥测或 Wi-Fi 扫描数据。
 需要 **macOS 14 (Sonoma) 或更高版本**。支持 Intel 和 Apple Silicon Mac。6 GHz 扫描需要 Wi-Fi 6E/7 硬件。
 
 - **开源版** — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest)（免费，Sparkle 自动更新）
-- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746)，用于长期监控、录制和调查问题
+- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8)，用于长期监控、录制和调查问题
 
 <p align="center">
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
 </p>
 
 > [!IMPORTANT]

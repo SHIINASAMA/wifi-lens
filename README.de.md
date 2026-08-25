@@ -16,13 +16,13 @@ Diagnostiziere Verbindungsprobleme, analysiere die Kanalauslastung und validiere
 <p align="center">
   <a href="https://github.com/SHIINASAMA/wifi-lens/releases/latest"><strong>Open-Source-Edition herunterladen</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>WiFi Lens Pro holen</strong></a>
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><strong>WiFi Lens Pro holen</strong></a>
   &nbsp;·&nbsp;
   <a href="https://wifi-lens.shiinalabs.com">Offizielle Website</a>
 </p>
 
 <p align="center">
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
 </p>
 
 <p align="center">macOS 14+ &nbsp;·&nbsp; Intel &amp; Apple Silicon &nbsp;·&nbsp; Keine Telemetrie</p>
@@ -98,7 +98,7 @@ Wähle Pro, wenn das Problem sich über die Zeit zeigt:
 Wähle anhand deiner Nutzung:
 
 - **Open Source** — kostenlos, Wi-Fi jetzt untersuchen und diagnostizieren, verfügbar über [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
-- **WiFi Lens Pro** — Einmalkauf, über die Zeit überwachen und untersuchen, verfügbar im [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746)
+- **WiFi Lens Pro** — Einmalkauf, über die Zeit überwachen und untersuchen, verfügbar im [Mac App Store](https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8)
 
 | Funktion | Open Source | WiFi Lens Pro |
 |----------|-------------|---------------|
@@ -147,7 +147,7 @@ Siehe den [KI-Workflows-Leitfaden](https://wifi-lens.shiinalabs.com/ai-mcp/) fü
 Manche Wi-Fi-Probleme verschwinden, bevor du sie untersuchen kannst. WiFi Lens Pro zeichnet Verbindungsereignisse und Netzwerkbedingungen über die Zeit auf, damit du nach einem Abbruch, Roaming oder Signalwechsel rekonstruieren kannst, was passiert ist.
 
 <p align="center">
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>WiFi Lens Pro holen →</strong></a>
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><strong>WiFi Lens Pro holen →</strong></a>
 </p>
 
 ---
@@ -171,10 +171,10 @@ WiFi Lens sammelt keine Nutzungsanalysen, Crash-Telemetrie oder Wi-Fi-Scandaten.
 Erfordert **macOS 14 (Sonoma) oder höher**. Funktioniert auf Intel- und Apple Silicon-Macs. 6-GHz-Scanning erfordert Wi-Fi-6E/7-Hardware.
 
 - **Open-Source-Edition** — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) (kostenlos, Sparkle Auto-Updates)
-- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) für Monitoring, Aufzeichnung und Untersuchung über Zeit
+- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8) für Monitoring, Aufzeichnung und Untersuchung über Zeit
 
 <p align="center">
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
 </p>
 
 > [!IMPORTANT]

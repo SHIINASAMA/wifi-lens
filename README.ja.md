@@ -16,13 +16,13 @@
 <p align="center">
   <a href="https://github.com/SHIINASAMA/wifi-lens/releases/latest"><strong>オープンソース版をダウンロード</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>WiFi Lens Pro を入手</strong></a>
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><strong>WiFi Lens Pro を入手</strong></a>
   &nbsp;·&nbsp;
   <a href="https://wifi-lens.shiinalabs.com">公式サイト</a>
 </p>
 
 <p align="center">
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
 </p>
 
 <p align="center">macOS 14+ &nbsp;·&nbsp; Intel &amp; Apple Silicon &nbsp;·&nbsp; テレメトリなし</p>
@@ -98,7 +98,7 @@ Open Source は、今この瞬間の Wi-Fi を調査・診断するときに使�
 使い方に合わせて選べます:
 
 - **オープンソース** — 無料。今の Wi-Fi を調査・診断。[GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest) から入手
-- **WiFi Lens Pro** — 買い切り。時間軸でのモニタリングと原因追究。[Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746) から入手
+- **WiFi Lens Pro** — 買い切り。時間軸でのモニタリングと原因追究。[Mac App Store](https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8) から入手
 
 | 機能 | オープンソース | WiFi Lens Pro |
 |------|--------------|---------------|
@@ -147,7 +147,7 @@ WiFi Lens には内蔵 MCP サーバーがあり、AI アシスタントがロ�
 Wi-Fi の問題には、調査できるようになる前に消えてしまうものがあります。WiFi Lens Pro は接続イベントとネットワーク状態を時間軸で記録するため、切断・ローミング・信号変化のあとに何が起きたかを確認できます。
 
 <p align="center">
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>WiFi Lens Pro を入手 →</strong></a>
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><strong>WiFi Lens Pro を入手 →</strong></a>
 </p>
 
 ---
@@ -171,10 +171,10 @@ WiFi Lens は利用状況の分析、クラッシュテレメトリ、Wi-Fi ス�
 **macOS 14 (Sonoma) 以降**が必要です。Intel Mac と Apple Silicon の両方で動作します。6 GHz スキャンには Wi-Fi 6E/7 ハードウェアが必要です。
 
 - **オープンソース版** — [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest)（無料、Sparkle 自動更新）
-- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746)。時間軸でのモニタリング、記録、原因調査に
+- **WiFi Lens Pro** — [Mac App Store](https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8)。時間軸でのモニタリング、記録、原因調査に
 
 <p align="center">
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
 </p>
 
 > [!IMPORTANT]

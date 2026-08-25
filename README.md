@@ -16,13 +16,13 @@ Diagnose connectivity issues, analyze Wi-Fi channel congestion, and validate roa
 <p align="center">
   <a href="https://github.com/SHIINASAMA/wifi-lens/releases/latest"><strong>Download Open-Source Edition</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>Get WiFi Lens Pro</strong></a>
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><strong>Get WiFi Lens Pro</strong></a>
   &nbsp;·&nbsp;
   <a href="https://wifi-lens.shiinalabs.com">Official Website</a>
 </p>
 
 <p align="center">
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><img src="assets/appstore-badge-en.svg" alt="Download on the Mac App Store" width="190"></a>
 </p>
 
 <p align="center">macOS 14+ &nbsp;·&nbsp; Intel &amp; Apple Silicon &nbsp;·&nbsp; No telemetry</p>
@@ -98,7 +98,7 @@ Choose Pro when the problem happens over time:
 Choose based on how you use WiFi Lens:
 
 - **Open Source** — free, inspect and diagnose your Wi-Fi now, available from [GitHub Releases](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
-- **WiFi Lens Pro** — one-time purchase, monitor and investigate over time, available from [Mac App Store](https://apps.apple.com/app/wifi-lens-pro/id6776590746)
+- **WiFi Lens Pro** — one-time purchase, monitor and investigate over time, available from [Mac App Store](https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8)
 
 | Capability | Open Source | WiFi Lens Pro |
 |------------|-------------|---------------|
@@ -147,7 +147,7 @@ See the [AI Workflows guide](https://wifi-lens.shiinalabs.com/ai-mcp/) for more 
 Some Wi-Fi problems disappear before you can inspect them. WiFi Lens Pro records connection events and network conditions over time, so you can review what happened after a drop, roam, or signal change.
 
 <p align="center">
-  <a href="https://apps.apple.com/app/wifi-lens-pro/id6776590746"><strong>Get WiFi Lens Pro →</strong></a>
+  <a href="https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=github_readme&mt=8"><strong>Get WiFi Lens Pro →</strong></a>
 </p>
 
 ---
