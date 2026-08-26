@@ -22,7 +22,6 @@ struct SettingsView: View {
     /// One-shot preview player for the selected AP Radar pulse sound. Created
     /// lazily on first use so opening Settings never touches the audio stack.
     @State private var soundPreviewer: APRadarSoundPreviewer?
-    @State private var showsManualMCPConfig = false
 
     @State private var autoCheck: Bool
     @AppStorage("scanIntervalSeconds") private var scanInterval: Int = 3
@@ -242,34 +241,6 @@ struct SettingsView: View {
                         Stepper("", value: $mcpPort, in: 1024...65535)
                             .labelsHidden()
                     }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(String(localized: "settings.mcp.manual_config_label", comment: "Label for manual MCP configuration options"))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        DisclosureGroup(isExpanded: $showsManualMCPConfig) {
-                            Text(String(localized: "settings.mcp.codex_config_label", comment: "Label for Codex TOML config snippet"))
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text(String(format: String(localized: "format.codex_config_toml", comment: "Codex-compatible MCP TOML template"), mcpPort))
-                                .font(.caption.monospaced())
-                                .foregroundColor(.secondary)
-                                .textSelection(.enabled)
-
-                            Text(String(localized: "settings.mcp.claude_config_label", comment: "Label for Claude Desktop config snippet"))
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text(String(format: String(localized: "format.mcp_config_json", comment: "Generic MCP JSON template used by Claude Desktop and compatible clients"), mcpPort))
-                                .font(.caption.monospaced())
-                                .foregroundColor(.secondary)
-                                .textSelection(.enabled)
-                        } label: {
-                            Text(String(localized: "settings.mcp.manual_config_toggle", comment: "Toggle to reveal manual client-specific MCP configurations"))
-                                .font(.caption)
-                        }
-                        .padding(.top, 2)
-                    }
-                    .padding(.top, 4)
 
                     Button {
                         copySetupPrompt()
