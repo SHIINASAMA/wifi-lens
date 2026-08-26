@@ -30,7 +30,7 @@ Diagnostica problemas de conectividad, analiza la congestión del canal Wi-Fi y 
 <p align="center">
   🔒 <strong>Privacidad local</strong> — Sin cuentas, sin nube, sin telemetría<br>
   🩺 <strong>Diagnóstico basado en evidencia</strong> — Comprobaciones de ruta, DNS, HTTPS y proxy<br>
-  🤖 <strong>MCP para flujos de IA</strong> — Conecta Claude Desktop a datos Wi-Fi en vivo
+  🤖 <strong>MCP para flujos de IA</strong> — Conecta Codex Desktop, Claude Desktop y otros clientes compatibles a datos Wi-Fi en vivo
 </p>
 
 ---
@@ -117,7 +117,7 @@ Elige según cómo uses WiFi Lens:
 
 ## IA / MCP Integración
 
-WiFi Lens incluye un servidor MCP integrado que permite a asistentes de IA leer tus datos Wi-Fi locales. Actívalo en Ajustes y agrégalo a Claude Desktop:
+WiFi Lens incluye un servidor MCP integrado que permite a asistentes de IA leer tus datos Wi-Fi locales. Actívalo en Ajustes, elige **Copiar prompt de configuración de IA** y pega el prompt en un cliente de escritorio compatible con MCP como Codex Desktop o Claude Desktop.
 
 ```json
 {
@@ -129,7 +129,26 @@ WiFi Lens incluye un servidor MCP integrado que permite a asistentes de IA leer 
 }
 ```
 
-Una vez conectado, pregúntale a Claude cosas como _"¿Qué canales están congestionados cerca de mí?"_ o _"¿Es alcanzable mi gateway?"_. El servidor se vincula solo a `127.0.0.1` — nada sale de tu máquina a menos que lo enrutes deliberadamente.
+Para la configuración manual, usa el formato que espere tu cliente:
+
+```toml
+# Codex: ~/.codex/config.toml
+[mcp_servers.wifi-lens]
+url = "http://127.0.0.1:19840/"
+```
+
+```json
+// Claude Desktop y otros clientes basados en JSON
+{
+  "mcpServers": {
+    "wifi-lens": {
+      "url": "http://127.0.0.1:19840/"
+    }
+  }
+}
+```
+
+Una vez conectado, pregunta a tu asistente cosas como _"¿Qué canales están congestionados cerca de mí?"_ o _"¿Qué redes cercanas admiten WPA3?"_. El servidor se vincula solo a `127.0.0.1` — nada sale de tu máquina a menos que lo enrutes deliberadamente.
 
 Consulta la [guía de flujos de IA](https://wifi-lens.shiinalabs.com/ai-mcp/) para más ejemplos.
 

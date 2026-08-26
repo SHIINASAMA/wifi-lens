@@ -421,11 +421,42 @@ final class ScannerViewModel {
     }
 
     private func updateMCPDataProvider() {
-        if isWiFiAvailable {
-            mcpServer.dataProvider = { [weak self] in self?.lastNetworks ?? [] }
-        } else {
-            mcpServer.dataProvider = { [] }
+        mcpServer.snapshotProvider = { [weak self] in
+            self?.makeMCPSnapshot() ?? .empty
         }
+    }
+
+    func makeMCPSnapshot() -> MCPSnapshot {
+        let scanContextIsCurrent = isWiFiAvailable
+        let capturedAt = lastObservationTimestamp == .distantPast ? nil : lastObservationTimestamp
+        let powerState: MCPSnapshot.PowerState
+        switch wifiPowerState {
+        case .poweredOn: powerState = .poweredOn
+        case .poweredOff: powerState = .poweredOff
+        case .interfaceUnavailable: powerState = .interfaceUnavailable
+        }
+
+        let accessState: MCPSnapshot.AccessState
+        switch self.accessState {
+        case .waitingForAuthorization: accessState = .waitingForAuthorization
+        case .denied: accessState = .denied
+        case .scanning: accessState = .scanning
+        case .grantedButSSIDUnavailable: accessState = .grantedButSSIDUnavailable
+        case .scanFailed: accessState = .scanFailed
+        }
+
+        return MCPSnapshot(
+            networks: scanContextIsCurrent ? lastNetworks : [],
+            capturedAt: scanContextIsCurrent ? capturedAt : nil,
+            interfaceName: scanContextIsCurrent && !interfaceName.isEmpty ? interfaceName : nil,
+            isScanning: isScanning,
+            powerState: powerState,
+            accessState: accessState,
+            supportedBands: scanContextIsCurrent
+                ? ChannelBand.allCases.filter { supportedBands.contains($0) }.map(\.id)
+                : [],
+            scanIntervalSeconds: effectiveScanIntervalSeconds
+        )
     }
 
     private func restartScanLoop() {
@@ -940,6 +971,7 @@ extension ScannerViewModel {
         timestamp: Date = Date()
     ) {
         self.supportedBands = supportedBands
+        self.lastObservationTimestamp = timestamp
         ingestNetworks(networks, timestamp: timestamp)
     }
 

@@ -30,7 +30,7 @@ Diagnostiquez les problèmes de connectivité, analysez la congestion des canaux
 <p align="center">
   🔒 <strong>Confidentialité locale</strong> — Pas de compte, pas de cloud, pas de télémétrie<br>
   🩺 <strong>Diagnostic fondé sur des preuves</strong> — Vérifications chemin, DNS, HTTPS et proxy<br>
-  🤖 <strong>MCP pour les workflows IA</strong> — Connectez Claude Desktop aux données Wi-Fi en direct
+  🤖 <strong>MCP pour les workflows IA</strong> — Connectez Codex Desktop, Claude Desktop et autres clients compatibles aux données Wi-Fi en direct
 </p>
 
 ---
@@ -117,7 +117,7 @@ Choisissez selon votre usage :
 
 ## IA / MCP Intégration
 
-WiFi Lens inclut un serveur MCP intégré permettant aux assistants IA de lire vos données Wi-Fi locales. Activez-le dans les réglages, puis ajoutez-le à Claude Desktop :
+WiFi Lens inclut un serveur MCP intégré permettant aux assistants IA de lire vos données Wi-Fi locales. Activez-le dans les réglages, choisissez **Copier le prompt de configuration IA**, puis collez-le dans un client de bureau compatible MCP tel que Codex Desktop ou Claude Desktop.
 
 ```json
 {
@@ -129,7 +129,26 @@ WiFi Lens inclut un serveur MCP intégré permettant aux assistants IA de lire v
 }
 ```
 
-Une fois connecté, demandez à Claude : _« Quels canaux sont congestionnés près de moi ? »_ ou _« Ma passerelle est-elle accessible ? »_. Le serveur se lie uniquement à `127.0.0.1` — rien ne quitte votre machine sauf si vous l'acheminez délibérément ailleurs.
+Pour une configuration manuelle, utilisez le format attendu par votre client :
+
+```toml
+# Codex : ~/.codex/config.toml
+[mcp_servers.wifi-lens]
+url = "http://127.0.0.1:19840/"
+```
+
+```json
+// Claude Desktop et autres clients JSON
+{
+  "mcpServers": {
+    "wifi-lens": {
+      "url": "http://127.0.0.1:19840/"
+    }
+  }
+}
+```
+
+Une fois connecté, demandez à votre assistant : _« Quels canaux sont congestionnés près de moi ? »_ ou _« Quels réseaux voisins prennent en charge WPA3 ? »_. Le serveur se lie uniquement à `127.0.0.1` — rien ne quitte votre machine sauf si vous l'acheminez délibérément ailleurs.
 
 Consultez le [guide des flux IA](https://wifi-lens.shiinalabs.com/ai-mcp/) pour plus d'exemples.
 

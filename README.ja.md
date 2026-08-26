@@ -30,7 +30,7 @@
 <p align="center">
   🔒 <strong>ローカルファーストのプライバシー</strong> — アカウント不要、クラウド送信なし<br>
   🩺 <strong>エビデンスに基づく診断</strong> — パス・DNS・HTTPS・プロキシの到達性チェック<br>
-  🤖 <strong>AI ワークフロー向け MCP</strong> — Claude Desktop からライブ Wi-Fi データに接続
+  🤖 <strong>AI ワークフロー向け MCP</strong> — Codex Desktop、Claude Desktop、その他の互換クライアントをライブ Wi-Fi データに接続
 </p>
 
 ---
@@ -117,7 +117,7 @@ Open Source は、今この瞬間の Wi-Fi を調査・診断するときに使�
 
 ## AI / MCP 統合
 
-WiFi Lens には内蔵 MCP サーバーがあり、AI アシスタントがローカルの Wi-Fi データを読み取れます。設定で有効にし、Claude Desktop に追加してください：
+WiFi Lens には内蔵 MCP サーバーがあり、AI アシスタントがローカルの Wi-Fi データを読み取れます。設定で有効にし、「AI セットアッププロンプトをコピー」を選んで、Codex Desktop や Claude Desktop などの MCP 互換デスクトップクライアントにプロンプトを貼り付けてください。
 
 ```json
 {
@@ -129,7 +129,26 @@ WiFi Lens には内蔵 MCP サーバーがあり、AI アシスタントがロ�
 }
 ```
 
-接続後、Claude に _「近くで混雑しているチャンネルは？」_ や _「ゲートウェイは到達可能？」_ と尋ねられます。サーバーは `127.0.0.1` のみにバインドされ、意図的にルーティングしない限りデータは外部に出ません。
+手動で設定する場合は、クライアントが対応する形式を使ってください：
+
+```toml
+# Codex: ~/.codex/config.toml
+[mcp_servers.wifi-lens]
+url = "http://127.0.0.1:19840/"
+```
+
+```json
+// Claude Desktop などの JSON ベースのクライアント
+{
+  "mcpServers": {
+    "wifi-lens": {
+      "url": "http://127.0.0.1:19840/"
+    }
+  }
+}
+```
+
+接続後、AI アシスタントに _「近くで混雑しているチャンネルは？」_ や _「近くにある WPA3 対応ネットワークは？」_ と尋ねられます。サーバーは `127.0.0.1` のみにバインドされ、意図的にルーティングしない限りデータは外部に出ません。
 
 詳しくは [AI ワークフローガイド](https://wifi-lens.shiinalabs.com/ai-mcp/) をご覧ください。
 

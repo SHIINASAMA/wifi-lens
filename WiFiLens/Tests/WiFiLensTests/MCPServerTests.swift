@@ -106,4 +106,180 @@ import MCP
         #expect(result.isError == true)
         #expect(resultText(from: result).contains("Unknown tool"))
     }
+
+    // MARK: - Contract: raw-data-only surface
+
+    @Test func scanNetworksInvalidBandTypeDoesNotFilter() {
+        let n24 = makeNetwork(bssid: "aa:bb:cc:dd:ee:01", channelNumber: 6, band: .band24GHz)
+        let n5 = makeNetwork(bssid: "aa:bb:cc:dd:ee:02", channelNumber: 36, band: .band5GHz)
+        let args: [String: Value] = ["band": .int(5)]
+        let result = MCPServer.handleCallTool(
+            name: "scan_networks",
+            arguments: args,
+            networks: [n24, n5]
+        )
+
+        let json = resultJSON(from: result) as? [[String: Any]]
+        #expect(json?.count == 2)
+        let bssids = json?.compactMap { $0["bssid"] as? String }
+        #expect(bssids?.contains("aa:bb:cc:dd:ee:01") == true)
+        #expect(bssids?.contains("aa:bb:cc:dd:ee:02") == true)
+    }
+
+    @Test func channelOccupancyGroupsAllBands() {
+        let nets = [
+            makeNetwork(bssid: "aa:bb:cc:dd:ee:01", channelNumber: 1, band: .band24GHz),
+            makeNetwork(bssid: "aa:bb:cc:dd:ee:02", channelNumber: 36, band: .band5GHz),
+            makeNetwork(bssid: "aa:bb:cc:dd:ee:03", channelNumber: 6, band: .band6GHz),
+        ]
+        let result = MCPServer.handleCallTool(name: "get_channel_occupancy", arguments: nil, networks: nets)
+
+        let json = resultJSON(from: result) as? [String: [String: Int]]
+        #expect(json?["24"]?["1"] == 1)
+        #expect(json?["5"]?["36"] == 1)
+        #expect(json?["6"]?["6"] == 1)
+    }
+
+    // MARK: - Snapshot dispatch
+
+    @Test func snapshotDispatchPreservesRawNetworkBehavior() {
+        let net = makeNetwork(ssid: "SnapshotNet", bssid: "aa:bb:cc:dd:ee:ff", rssi: -47)
+        let snapshot = MCPSnapshot(networks: [net])
+
+        let scanResult = MCPServer.handleCallTool(
+            name: "scan_networks",
+            arguments: nil,
+            snapshot: snapshot
+        )
+        let missingResult = MCPServer.handleCallTool(
+            name: "get_network_detail",
+            arguments: ["bssid": .string("aa:bb:cc:dd:ee:00")],
+            snapshot: snapshot
+        )
+
+        let json = resultJSON(from: scanResult) as? [[String: Any]]
+        #expect(json?.first?["ssid"] as? String == "SnapshotNet")
+        #expect(missingResult.isError == true)
+        #expect(resultText(from: missingResult).contains("network not found"))
+    }
+
+    // MARK: - get_scan_metadata
+
+    @Test func metadataToolIsAdvertisedAfterRawTools() {
+        #expect(
+            MCPServer.toolNamesForTesting == [
+                "scan_networks",
+                "get_network_detail",
+                "get_channel_occupancy",
+                "get_scan_metadata",
+            ]
+        )
+    }
+
+    @Test func metadataReturnsFactualRuntimeContext() {
+        let capturedAt = Date(timeIntervalSince1970: 100)
+        let snapshot = MCPSnapshot(
+            capturedAt: capturedAt,
+            interfaceName: "en0",
+            isScanning: true,
+            powerState: .poweredOn,
+            accessState: .scanning,
+            supportedBands: ["24", "5"],
+            scanIntervalSeconds: 5
+        )
+
+        let result = MCPServer.handleCallTool(
+            name: "get_scan_metadata",
+            arguments: nil,
+            snapshot: snapshot
+        )
+        let json = resultJSON(from: result) as? [String: Any]
+
+        #expect(result.isError != true)
+        #expect(json?["interfaceName"] as? String == "en0")
+        #expect(json?["isScanning"] as? Bool == true)
+        #expect(json?["powerState"] as? String == "poweredOn")
+        #expect(json?["accessState"] as? String == "scanning")
+        #expect((json?["supportedBands"] as? [String]) == ["24", "5"])
+        #expect(json?["scanIntervalSeconds"] as? Int == 5)
+        #expect(json?["capturedAt"] != nil)
+    }
+
+    @Test func metadataOmitsUnavailableOptionalContext() {
+        let result = MCPServer.handleCallTool(
+            name: "get_scan_metadata",
+            arguments: nil,
+            snapshot: .empty
+        )
+        let json = resultJSON(from: result) as? [String: Any]
+
+        #expect(result.isError != true)
+        #expect(json?.keys.contains("capturedAt") == false)
+        #expect(json?.keys.contains("interfaceName") == false)
+        #expect(json?.keys.contains("supportedBands") == false)
+        #expect(json?.keys.contains("scanIntervalSeconds") == false)
+    }
+
+    // MARK: - Setup prompt
+
+    @Test func setupPromptUsesConfiguredPort() {
+        let prompt = MCPServer.setupPrompt(port: 28461)
+
+        #expect(prompt.contains("wifi-lens"))
+        #expect(prompt.contains("http://127.0.0.1:28461/"))
+        #expect(!prompt.contains("19840"))
+    }
+
+    @Test func setupPromptIncludesClientFormatsAndSafetyBoundaries() {
+        let prompt = MCPServer.setupPrompt(port: 19840)
+
+        #expect(prompt.contains("Streamable HTTP"))
+        #expect(prompt.lowercased().contains("read-only"))
+        #expect(prompt.contains("127.0.0.1"))
+        #expect(prompt.contains("Preserve every other setting"))
+        #expect(prompt.contains("Do not expose this server"))
+        #expect(prompt.contains("verify that the wifi-lens MCP server"))
+        #expect(prompt.contains("Use this client's native configuration format"))
+    }
+}
+
+@Suite("MCP snapshot projection") @MainActor struct MCPScannerViewModelTests {
+    @Test func projectsAuthoritativeRuntimeContextWithoutAnalysis() {
+        let viewModel = ScannerViewModel()
+        let capturedAt = Date(timeIntervalSince1970: 100)
+        let network = WiFiNetwork(
+            ssid: "ProjectionNet",
+            bssid: "aa:bb:cc:dd:ee:ff",
+            rssi: -51,
+            channel: WiFiChannel(band: .band5GHz, channelNumber: 36)
+        )
+
+        viewModel.scanIntervalSeconds = 5
+        viewModel.wifiPowerState = .poweredOn
+        viewModel.accessState = .scanning
+        viewModel.isScanning = true
+        viewModel.interfaceName = "en0"
+        viewModel.debugApplyNetworksForTesting(
+            [network],
+            supportedBands: [.band24GHz, .band5GHz],
+            timestamp: capturedAt
+        )
+
+        let snapshot = viewModel.makeMCPSnapshot()
+        #expect(snapshot.networks.map(\.bssid) == ["aa:bb:cc:dd:ee:ff"])
+        #expect(snapshot.capturedAt == capturedAt)
+        #expect(snapshot.interfaceName == "en0")
+        #expect(snapshot.isScanning == true)
+        #expect(snapshot.powerState == .poweredOn)
+        #expect(snapshot.accessState == .scanning)
+        #expect(snapshot.supportedBands == ["24", "5"])
+        #expect(snapshot.scanIntervalSeconds == 5)
+
+        viewModel.wifiPowerState = .poweredOff
+        let unavailable = viewModel.makeMCPSnapshot()
+        #expect(unavailable.networks.isEmpty)
+        #expect(unavailable.capturedAt == nil)
+        #expect(unavailable.supportedBands.isEmpty)
+        #expect(unavailable.powerState == .poweredOff)
+    }
 }

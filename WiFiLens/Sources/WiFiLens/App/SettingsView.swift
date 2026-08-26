@@ -242,16 +242,16 @@ struct SettingsView: View {
                             .labelsHidden()
                     }
 
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(String(localized: "settings.mcp.claude_config_label", comment: "Label for Claude Desktop config snippet"))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text(String(format: String(localized: "format.claude_config_json", comment: "Claude Desktop MCP config JSON template"), mcpPort))
-                            .font(.caption.monospaced())
-                            .foregroundColor(.secondary)
-                            .textSelection(.enabled)
+                    Button {
+                        copySetupPrompt()
+                    } label: {
+                        Label(
+                            String(localized: "settings.mcp.setup_prompt_button", comment: "Button to copy a universal AI client MCP setup prompt"),
+                            systemImage: "doc.on.doc"
+                        )
                     }
-                    .padding(.top, 4)
+                    .disabled(!mcpEnabled || UInt16(exactly: mcpPort) == nil)
+                    .accessibilityIdentifier("settings-mcp-copy-prompt-button")
                 } header: {
                     Text(String(localized: "settings.mcp.header", comment: "MCP settings section header"))
                 }
@@ -398,6 +398,13 @@ struct SettingsView: View {
         }
         let preset = APRadarSoundPreset.fromStoredValue(apRadarSoundPresetRaw)
         previewer.toggle(preset: preset)
+    }
+
+    private func copySetupPrompt() {
+        guard let port = UInt16(exactly: mcpPort) else { return }
+        let prompt = MCPServer.setupPrompt(port: port)
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(prompt, forType: .string)
     }
 
     private func refreshPermissionStatuses() {

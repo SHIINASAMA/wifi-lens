@@ -30,7 +30,7 @@ Diagnose connectivity issues, analyze Wi-Fi channel congestion, and validate roa
 <p align="center">
   🔒 <strong>Local-first privacy</strong> — No accounts, no cloud, no telemetry<br>
   🩺 <strong>Evidence-based diagnostics</strong> — Explainable path, DNS, HTTPS, and proxy checks<br>
-  🤖 <strong>MCP for AI workflows</strong> — Connect Claude Desktop to live Wi-Fi data
+  🤖 <strong>MCP for AI workflows</strong> — Connect Codex Desktop, Claude Desktop, and other compatible clients to live Wi-Fi data
 </p>
 
 ---
@@ -117,7 +117,7 @@ Choose based on how you use WiFi Lens:
 
 ## AI / MCP Integration
 
-WiFi Lens includes an embedded MCP server that lets AI assistants read your local Wi-Fi data. Enable it in Settings, then add to Claude Desktop:
+WiFi Lens includes an embedded MCP server that lets AI assistants read your local Wi-Fi data. Enable it in Settings, then choose **Copy AI setup prompt** and paste the prompt into an MCP-compatible desktop client such as Codex Desktop or Claude Desktop.
 
 ```json
 {
@@ -129,7 +129,26 @@ WiFi Lens includes an embedded MCP server that lets AI assistants read your loca
 }
 ```
 
-Once connected, ask Claude things like *"What channels are congested near me?"* or *"Is my gateway reachable?"*. The server binds to `127.0.0.1` only — nothing leaves your machine unless you deliberately route it elsewhere.
+For manual setup, use the format your client expects:
+
+```toml
+# Codex: ~/.codex/config.toml
+[mcp_servers.wifi-lens]
+url = "http://127.0.0.1:19840/"
+```
+
+```json
+// Claude Desktop and other JSON-based clients
+{
+  "mcpServers": {
+    "wifi-lens": {
+      "url": "http://127.0.0.1:19840/"
+    }
+  }
+}
+```
+
+Once connected, ask your assistant things like *"What channels are congested near me?"* or *"Which nearby networks support WPA3?"*. The server binds to `127.0.0.1` only — nothing leaves your machine unless you deliberately route it elsewhere.
 
 See the [AI Workflows guide](https://wifi-lens.shiinalabs.com/ai-mcp/) for more examples.
 

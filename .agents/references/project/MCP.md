@@ -2,6 +2,8 @@
 
 The app runs an embedded MCP Streamable HTTP server on `127.0.0.1:19840`, exposing live Wi‑Fi scan data via JSON‑RPC 2.0 tools. No external network access — only processes on the same machine can reach it.
 
+MCP is a minimal read-only data source, not a diagnostic engine. Tools return facts from the latest scan snapshot; the connected AI client performs filtering, ranking, explanation, and recommendations. MCP does not trigger scans or expose historical, BLE, automation, or control functionality.
+
 ## Protocol
 
 - **Transport**: MCP Streamable HTTP (`StatelessHTTPServerTransport` from `swift-mcp-server`)
@@ -80,6 +82,28 @@ Channel occupancy counts grouped by band. No parameters.
 }
 ```
 
+### `get_scan_metadata`
+
+Return factual context for the latest scan snapshot. Takes no parameters and triggers no scan.
+
+Fields are omitted when unavailable:
+
+```json
+{
+  "capturedAt": "2026-08-26T04:00:00Z",
+  "interfaceName": "en0",
+  "isScanning": true,
+  "powerState": "poweredOn",
+  "accessState": "scanning",
+  "supportedBands": ["24", "5", "6"],
+  "scanIntervalSeconds": 3
+}
+```
+
+`capturedAt` is the observation pipeline timestamp, not the time the MCP request arrived. When Wi-Fi power is off or the interface is unavailable, stale network and capture context is suppressed.
+
+Field semantics: `isScanning` indicates whether the scanner is currently executing a scan loop (true while a scan cycle is in flight, false between cycles or when scanning is stopped). `accessState` represents the Wi-Fi authorization and availability stage (`waitingForAuthorization`, `denied`, `scanning`, `grantedButSSIDUnavailable`, or `scanFailed`). Both can be true simultaneously, but they describe different things: `isScanning` is runtime activity, `accessState` is permission/state.
+
 ## Integration
 
 Clients that speak MCP Streamable HTTP can connect directly:
@@ -103,14 +127,50 @@ curl -s -X POST http://127.0.0.1:19840/ \
   -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"scan_networks"}}'
 ```
 
+### Assisted client setup
+
+Settings provides **Copy AI setup prompt**. The prompt is client-neutral: it asks an MCP-compatible coding assistant to add or update only the `wifi-lens` entry, preserve unrelated configuration, use the client's native format, keep the server on `127.0.0.1`, and verify the tool list afterward.
+
+Codex-style clients use Streamable HTTP entries in TOML:
+
+```toml
+[mcp_servers.wifi-lens]
+url = "http://127.0.0.1:19840/"
+```
+
+Claude Desktop and other JSON-based MCP clients merge a Streamable HTTP entry:
+
+```json
+{
+  "mcpServers": {
+    "wifi-lens": {
+      "url": "http://127.0.0.1:19840/"
+    }
+  }
+}
+```
+
+If the user changed the app's MCP port, replace `19840` with the configured port. Do not document command-based stdio launches or remote/tunneled URLs; this server is local-only.
+
 ## Architecture
 
 ```
-ScannerViewModel.lastNetworks
-  └── MCPServer.dataProvider (closure, lock-protected)
-        └── handleCallTool(name:arguments:networks:)
-              └── Tool dispatch (scan_networks / get_network_detail / get_channel_occupancy)
+ScannerViewModel.makeMCPSnapshot()
+  └── MCPServer.snapshotProvider (closure, lock-protected, MainActor-read)
+        └── handleCallTool(name:arguments:snapshot:)
+              └── Tool dispatch (scan_networks / get_network_detail / get_channel_occupancy / get_scan_metadata)
                     └── JSON serialization → CallTool.Result
 ```
 
-`ScannerViewModel.updateMCPDataProvider()` wires the server's `dataProvider` closure to `lastNetworks` so every tool invocation reads the most recent scan without extra copies.
+`ScannerViewModel.makeMCPSnapshot()` returns a `MCPSnapshot` (Sendable) through `MCPServer.snapshotProvider` (lock-protected, MainActor-read) so every tool invocation reads the most recent scan without extra copies.
+
+## Non-goals
+
+- Rescan, connect, forget-network, settings-change, or other control actions
+- Network Self-Check or LAN/Internet probes
+- Signal history, persistence, trend computation, or before/after comparison data
+- Bluetooth discovery or coexistence data
+- Channel scores, recommendations, interference labels, or diagnostic conclusions
+- Automation workflows
+- LAN, tunnel, or public-network exposure
+- New permissions, entitlements, or external network dependencies
