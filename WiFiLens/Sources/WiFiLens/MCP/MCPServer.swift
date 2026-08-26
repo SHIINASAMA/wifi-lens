@@ -258,7 +258,7 @@ final class MCPServer: @unchecked Sendable {
             var headers: [String: String] = [:]
             for line in lines.dropFirst() {
                 let colonIdx = line.firstIndex(of: ":") ?? line.startIndex
-                let key = String(line[..<colonIdx])
+                let key = String(line[..<colonIdx]).lowercased()
                 let valStart = line.index(colonIdx, offsetBy: 1)
                 let value = valStart < line.endIndex
                     ? String(line[line.index(after: valStart)...]).trimmingCharacters(in: .whitespaces)
@@ -266,7 +266,7 @@ final class MCPServer: @unchecked Sendable {
                 headers[key] = value
             }
 
-            let contentLength = Int(headers["Content-Length"] ?? "") ?? 0
+            let contentLength = Int(headers["content-length"] ?? "") ?? 0
             let bodySoFar = Data(afterHeaders)
 
             if bodySoFar.count >= contentLength {
