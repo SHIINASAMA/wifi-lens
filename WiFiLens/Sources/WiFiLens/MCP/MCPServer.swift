@@ -2,6 +2,33 @@ import Foundation
 import Network
 import MCP
 
+struct MCPSnapshot: Sendable {
+    enum PowerState: String, Sendable, Equatable {
+        case poweredOn
+        case poweredOff
+        case interfaceUnavailable
+    }
+
+    enum AccessState: String, Sendable, Equatable {
+        case waitingForAuthorization
+        case denied
+        case scanning
+        case grantedButSSIDUnavailable
+        case scanFailed
+    }
+
+    var networks: [WiFiNetwork] = []
+    var capturedAt: Date?
+    var interfaceName: String?
+    var isScanning = false
+    var powerState: PowerState = .poweredOn
+    var accessState: AccessState = .waitingForAuthorization
+    var supportedBands: [String] = []
+    var scanIntervalSeconds: Int?
+
+    static let empty = MCPSnapshot()
+}
+
 /// MCP Streamable HTTP server on localhost.
 /// Only accessible from this machine — no external network exposure.
 final class MCPServer: @unchecked Sendable {
@@ -10,12 +37,11 @@ final class MCPServer: @unchecked Sendable {
     private(set) var isRunning = false
     var port: UInt16 = 19840
 
-    /// Called on each tool invocation to supply live scan data. Must be set before starting.
-    var dataProvider: (() -> [WiFiNetwork])? {
-        get { lock.withLock { _dataProvider } }
-        set { lock.withLock { _dataProvider = newValue } }
+    var snapshotProvider: (@MainActor @Sendable () -> MCPSnapshot)? {
+        get { lock.withLock { _snapshotProvider } }
+        set { lock.withLock { _snapshotProvider = newValue } }
     }
-    private var _dataProvider: (() -> [WiFiNetwork])?
+    private var _snapshotProvider: (@MainActor @Sendable () -> MCPSnapshot)?
 
     private var transport: StatelessHTTPServerTransport?
     private var mcpServer: Server?
@@ -44,8 +70,11 @@ final class MCPServer: @unchecked Sendable {
                     isError: true
                 )
             }
-            let networks = self.dataProvider?() ?? []
-            return Self.handleCallTool(name: params.name, arguments: params.arguments, networks: networks)
+            let snapshot = await MainActor.run { [weak self] () -> MCPSnapshot in
+                guard let self else { return .empty }
+                return self.snapshotProvider?() ?? .empty
+            }
+            return Self.handleCallTool(name: params.name, arguments: params.arguments, snapshot: snapshot)
         }
 
         // Start the server — this registers the default Initialize/Ping handlers
@@ -100,6 +129,12 @@ final class MCPServer: @unchecked Sendable {
 
     // MARK: - Tool definitions
 
+#if DEBUG
+    static var toolNamesForTesting: [String] {
+        tools.map(\.name)
+    }
+#endif
+
     private static let tools: [Tool] = [
         Tool(
             name: "scan_networks",
@@ -139,7 +174,51 @@ final class MCPServer: @unchecked Sendable {
                 "required": .array([])
             ])
         ),
+        Tool(
+            name: "get_scan_metadata",
+            description: "Return read-only context for the most recent Wi-Fi scan snapshot. It does not trigger a new scan.",
+            inputSchema: .object([
+                "type": .string("object"),
+                "properties": .object([:]),
+                "required": .array([])
+            ])
+        ),
     ]
+
+    // MARK: - Client setup
+
+    static func setupPrompt(port: UInt16) -> String {
+        let url = "http://127.0.0.1:\(port)/"
+
+        return """
+        Set up a local MCP server named "wifi-lens" for this client.
+
+        Transport: Streamable HTTP
+        URL: \(url)
+        Purpose: Read-only access to local Wi-Fi scan data exposed by the WiFi Lens macOS app.
+
+        Requirements:
+        1. Add or update only the MCP server entry named "wifi-lens".
+        2. Preserve every other setting and MCP server.
+        3. Use this client's native configuration format.
+           - For TOML-based clients, create/update:
+             [mcp_servers.wifi-lens]
+             url = "\(url)"
+
+           - For JSON-based clients, merge/update:
+             {
+               "mcpServers": {
+                 "wifi-lens": {
+                   "url": "\(url)"
+                 }
+               }
+             }
+        4. Do not expose this server through LAN, tunneling, or public networking. It must stay bound to 127.0.0.1.
+        5. Do not install dependencies or modify unrelated settings.
+        6. After applying the configuration, verify that the wifi-lens MCP server is available and list its tools.
+        7. If you cannot modify the client configuration directly, return the exact minimal configuration snippet and the manual step required.
+        """
+    }
 
     // MARK: - HTTP adapter (NWListener → StatelessHTTPServerTransport)
 
@@ -266,6 +345,17 @@ final class MCPServer: @unchecked Sendable {
     static func handleCallTool(
         name: String, arguments: [String: Value]?, networks: [WiFiNetwork]
     ) -> CallTool.Result {
+        handleCallTool(
+            name: name,
+            arguments: arguments,
+            snapshot: MCPSnapshot(networks: networks)
+        )
+    }
+
+    static func handleCallTool(
+        name: String, arguments: [String: Value]?, snapshot: MCPSnapshot
+    ) -> CallTool.Result {
+        let networks = snapshot.networks
         switch name {
         case "scan_networks":
             var nets = networks
@@ -302,6 +392,9 @@ final class MCPServer: @unchecked Sendable {
                 return .init(content: [.text(text: json, annotations: nil, _meta: nil)])
             }
             return .init(content: [.text(text: "{}", annotations: nil, _meta: nil)], isError: true)
+
+        case "get_scan_metadata":
+            return serializeMetadata(snapshot)
 
         default:
             return .init(
@@ -373,5 +466,38 @@ final class MCPServer: @unchecked Sendable {
         if ie.supports80MHz { return "80" }
         if ie.supports40MHz { return "40" }
         return ""
+    }
+
+    private static func serializeMetadata(_ snapshot: MCPSnapshot) -> CallTool.Result {
+        var dict: [String: Any] = [
+            "isScanning": snapshot.isScanning,
+            "powerState": snapshot.powerState.rawValue,
+            "accessState": snapshot.accessState.rawValue,
+        ]
+
+        if let capturedAt = snapshot.capturedAt {
+            let formatter = ISO8601DateFormatter()
+            formatter.formatOptions = [.withInternetDateTime]
+            dict["capturedAt"] = formatter.string(from: capturedAt)
+        }
+        if let interfaceName = snapshot.interfaceName {
+            dict["interfaceName"] = interfaceName
+        }
+        if !snapshot.supportedBands.isEmpty {
+            dict["supportedBands"] = snapshot.supportedBands
+        }
+        if let scanIntervalSeconds = snapshot.scanIntervalSeconds {
+            dict["scanIntervalSeconds"] = scanIntervalSeconds
+        }
+
+        guard JSONSerialization.isValidJSONObject(dict),
+              let data = try? JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted),
+              let json = String(data: data, encoding: .utf8) else {
+            return .init(
+                content: [.text(text: #"{"error":"metadata serialization failed"}"#, annotations: nil, _meta: nil)],
+                isError: true
+            )
+        }
+        return .init(content: [.text(text: json, annotations: nil, _meta: nil)])
     }
 }

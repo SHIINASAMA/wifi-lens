@@ -30,7 +30,7 @@
 <p align="center">
   🔒 <strong>本地优先隐私</strong> — 无账号、无云端、无遥测<br>
   🩺 <strong>基于证据的诊断</strong> — 路径、DNS、HTTPS 与代理可达性检查<br>
-  🤖 <strong>AI 工作流 MCP 集成</strong> — 连接 Claude Desktop 读取实时 Wi-Fi 数据
+  🤖 <strong>AI 工作流 MCP 集成</strong> — 连接 Codex Desktop、Claude Desktop 及其他兼容客户端读取实时 Wi-Fi 数据
 </p>
 
 ---
@@ -117,7 +117,7 @@
 
 ## AI / MCP 集成
 
-WiFi Lens 内置 MCP 服务器，AI 助手可读取本地 Wi-Fi 数据。在设置中启用后，添加到 Claude Desktop：
+WiFi Lens 内置 MCP 服务器，AI 助手可读取本地 Wi-Fi 数据。在设置中启用后，选择“复制 AI 设置提示词”，并粘贴到 Codex Desktop、Claude Desktop 等 MCP 兼容桌面客户端。
 
 ```json
 {
@@ -129,7 +129,26 @@ WiFi Lens 内置 MCP 服务器，AI 助手可读取本地 Wi-Fi 数据。在设�
 }
 ```
 
-连接后可以问 Claude：*"附近哪些信道比较拥堵？"* 或 *"我的网关可达吗？"*。服务器仅绑定 `127.0.0.1`——除非主动路由，数据不会离开你的电脑。
+手动配置时，请使用客户端要求的格式：
+
+```toml
+# Codex：~/.codex/config.toml
+[mcp_servers.wifi-lens]
+url = "http://127.0.0.1:19840/"
+```
+
+```json
+// Claude Desktop 及其他基于 JSON 的客户端
+{
+  "mcpServers": {
+    "wifi-lens": {
+      "url": "http://127.0.0.1:19840/"
+    }
+  }
+}
+```
+
+连接后可以问 AI 助手：*"附近哪些信道比较拥堵？"* 或 *"附近有哪些网络支持 WPA3？"*。服务器仅绑定 `127.0.0.1`——除非主动路由，数据不会离开你的电脑。
 
 更多示例请参考 [AI 工作流指南](https://wifi-lens.shiinalabs.com/ai-mcp/)。
 

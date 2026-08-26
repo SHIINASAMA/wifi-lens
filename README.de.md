@@ -30,7 +30,7 @@ Diagnostiziere Verbindungsprobleme, analysiere die Kanalauslastung und validiere
 <p align="center">
   🔒 <strong>Local-first privacy</strong> — Keine Konten, keine Cloud, keine Telemetrie<br>
   🩺 <strong>Evidenzbasierte Diagnose</strong> — Pfad-, DNS-, HTTPS- und Proxy-Prüfungen<br>
-  🤖 <strong>MCP für KI-Workflows</strong> — Claude Desktop mit Live-Wi-Fi-Daten verbinden
+  🤖 <strong>MCP für KI-Workflows</strong> — Codex Desktop, Claude Desktop und andere kompatible Clients mit Live-Wi-Fi-Daten verbinden
 </p>
 
 ---
@@ -117,7 +117,7 @@ Wähle anhand deiner Nutzung:
 
 ## KI / MCP Integration
 
-WiFi Lens enthält einen eingebetteten MCP-Server, der KI-Assistenten den Zugriff auf lokale Wi-Fi-Daten ermöglicht. Aktiviere ihn in den Einstellungen und füge ihn zu Claude Desktop hinzu:
+WiFi Lens enthält einen eingebetteten MCP-Server, der KI-Assistenten den Zugriff auf lokale Wi-Fi-Daten ermöglicht. Aktiviere ihn in den Einstellungen, wähle **KI-Setup-Prompt kopieren** und füge den Prompt in einen MCP-kompatiblen Desktop-Client wie Codex Desktop oder Claude Desktop ein.
 
 ```json
 {
@@ -129,7 +129,26 @@ WiFi Lens enthält einen eingebetteten MCP-Server, der KI-Assistenten den Zugrif
 }
 ```
 
-Nach der Verbindung kannst du Claude Fragen stellen wie _„Welche Kanäle sind bei mir überlastet?"_ oder _„Ist mein Gateway erreichbar?"_. Der Server bindet nur an `127.0.0.1` — nichts verlässt deine Maschine, außer du leitest es bewusst woandershin.
+Für die manuelle Einrichtung verwende das Format deines Clients:
+
+```toml
+# Codex: ~/.codex/config.toml
+[mcp_servers.wifi-lens]
+url = "http://127.0.0.1:19840/"
+```
+
+```json
+// Claude Desktop und andere JSON-basierte Clients
+{
+  "mcpServers": {
+    "wifi-lens": {
+      "url": "http://127.0.0.1:19840/"
+    }
+  }
+}
+```
+
+Nach der Verbindung kannst du dein KI-Tool Fragen stellen wie _„Welche Kanäle sind bei mir überlastet?“_ oder _„Welche Netzwerke in der Nähe unterstützen WPA3?“_. Der Server bindet nur an `127.0.0.1` — nichts verlässt deine Maschine, außer du leitest es bewusst woandershin.
 
 Siehe den [KI-Workflows-Leitfaden](https://wifi-lens.shiinalabs.com/ai-mcp/) für weitere Beispiele.
 

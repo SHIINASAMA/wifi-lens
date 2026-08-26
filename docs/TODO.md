@@ -2,6 +2,7 @@
 
 ## Product
 
+- [x] Keep MCP positioned as a minimal read-only local-data source: preserve the existing three-tool compatibility surface, document that AI clients perform the analysis, and consider `get_scan_metadata` only if it can expose authoritative scan context that cannot be inferred from the latest network array (done: kept three compatible raw-data tools, added factual get_scan_metadata, documented AI-side analysis boundary)
 - [ ] Integrate SpectrumPanelView filter with `APFilterQueryParser` (support structured queries like `band:5G AND rssi:>-60`) — shelved: pending product decision (parser ready, strict comparators fixed)
 - [ ] RSSI threshold alert (notify when a monitored network drops below a configurable threshold)
 - [ ] Unify export into a single reporting flow: multi-band export, richer CSV schema, and session snapshots suitable for sharing/debugging
