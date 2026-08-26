@@ -102,6 +102,8 @@ Fields are omitted when unavailable:
 
 `capturedAt` is the observation pipeline timestamp, not the time the MCP request arrived. When Wi-Fi power is off or the interface is unavailable, stale network and capture context is suppressed.
 
+Field semantics: `isScanning` indicates whether the scanner is currently executing a scan loop (true while a scan cycle is in flight, false between cycles or when scanning is stopped). `accessState` represents the Wi-Fi authorization and availability stage (`waitingForAuthorization`, `denied`, `scanning`, `grantedButSSIDUnavailable`, or `scanFailed`). Both can be true simultaneously, but they describe different things: `isScanning` is runtime activity, `accessState` is permission/state.
+
 ## Integration
 
 Clients that speak MCP Streamable HTTP can connect directly:

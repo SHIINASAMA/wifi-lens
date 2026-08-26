@@ -225,7 +225,7 @@ import MCP
     @Test func setupPromptUsesConfiguredPort() {
         let prompt = MCPServer.setupPrompt(port: 28461)
 
-        #expect(prompt.contains("server named \"wifi-lens\""))
+        #expect(prompt.contains("wifi-lens"))
         #expect(prompt.contains("http://127.0.0.1:28461/"))
         #expect(!prompt.contains("19840"))
     }
@@ -235,12 +235,11 @@ import MCP
 
         #expect(prompt.contains("Streamable HTTP"))
         #expect(prompt.lowercased().contains("read-only"))
-        #expect(prompt.contains("[mcp_servers.wifi-lens]"))
-        #expect(prompt.contains("\"mcpServers\""))
         #expect(prompt.contains("127.0.0.1"))
         #expect(prompt.contains("Preserve every other setting"))
         #expect(prompt.contains("Do not expose this server"))
         #expect(prompt.contains("verify that the wifi-lens MCP server"))
+        #expect(prompt.contains("Use this client's native configuration format"))
     }
 }
 

@@ -191,32 +191,16 @@ final class MCPServer: @unchecked Sendable {
         let url = "http://127.0.0.1:\(port)/"
 
         return """
-        Set up a local MCP server named "wifi-lens" for this client.
+        Add or update an MCP server entry named "wifi-lens" with these properties:
+        - Transport: Streamable HTTP
+        - URL: \(url)
+        - Purpose: Read-only access to local Wi-Fi scan data exposed by the WiFi Lens macOS app.
 
-        Transport: Streamable HTTP
-        URL: \(url)
-        Purpose: Read-only access to local Wi-Fi scan data exposed by the WiFi Lens macOS app.
-
-        Requirements:
-        1. Add or update only the MCP server entry named "wifi-lens".
-        2. Preserve every other setting and MCP server.
-        3. Use this client's native configuration format.
-           - For TOML-based clients, create/update:
-             [mcp_servers.wifi-lens]
-             url = "\(url)"
-
-           - For JSON-based clients, merge/update:
-             {
-               "mcpServers": {
-                 "wifi-lens": {
-                   "url": "\(url)"
-                 }
-               }
-             }
-        4. Do not expose this server through LAN, tunneling, or public networking. It must stay bound to 127.0.0.1.
-        5. Do not install dependencies or modify unrelated settings.
-        6. After applying the configuration, verify that the wifi-lens MCP server is available and list its tools.
-        7. If you cannot modify the client configuration directly, return the exact minimal configuration snippet and the manual step required.
+        Use this client's native configuration format. Preserve every other setting and MCP server.
+        Do not expose this server through LAN, tunneling, or public networking. It must stay bound to 127.0.0.1.
+        Do not install dependencies or modify unrelated settings.
+        After applying the configuration, verify that the wifi-lens MCP server is available and list its tools.
+        If you cannot modify the client configuration directly, return the exact minimal configuration snippet and the manual step required.
         """
     }
 
