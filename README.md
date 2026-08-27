@@ -10,6 +10,7 @@ Diagnose connectivity issues, analyze Wi-Fi channel congestion, and validate roa
 [![macOS](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Swift CI](https://github.com/SHIINASAMA/wifi-lens/workflows/Swift%20CI/badge.svg)](https://github.com/SHIINASAMA/wifi-lens/actions?query=workflow%3A%22Swift+CI%22)
+[![Discord](https://img.shields.io/badge/Discord-Rabbit%20Hole-5865F2)](https://discord.gg/gH6sTCYaJ7)
 
 <p align="center"><img alt="WiFi Lens showing Wi-Fi spectrum analysis on macOS" src="assets/screenshot-hero.webp" width="800"></p>
 
@@ -224,6 +225,12 @@ Architecture docs live in [docs/](docs/).
 ---
 
 ## Contributing
+
+### Community
+
+Have a question, found a bug, or want to share an idea?
+
+Join **[Rabbit Hole](https://discord.gg/gH6sTCYaJ7)**, a small community for WiFiLens and other projects.
 
 Bug reports and feature ideas are welcome. See [Contributing Guidelines](.github/CONTRIBUTING.md) for setup, PR conventions, and localization requirements. Substantial contributors may receive a Pro promo code — see [Contributor Recognition](.github/CONTRIBUTING.md#contributor-recognition).
 

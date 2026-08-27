@@ -10,6 +10,7 @@ Diagnostica problemas de conectividad, analiza la congestión del canal Wi-Fi y 
 [![macOS](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Swift CI](https://github.com/SHIINASAMA/wifi-lens/workflows/Swift%20CI/badge.svg)](https://github.com/SHIINASAMA/wifi-lens/actions?query=workflow%3A%22Swift+CI%22)
+[![Discord](https://img.shields.io/badge/Discord-Rabbit%20Hole-5865F2)](https://discord.gg/gH6sTCYaJ7)
 
 <p align="center"><img alt="WiFi Lens análisis de espectro en macOS" src="assets/screenshot-hero.webp" width="800"></p>
 
@@ -225,9 +226,13 @@ Documentación de arquitectura en [docs/](docs/).
 
 ## Contribuir
 
-Reportes de errores e ideas de funciones son bienvenidos. Consulta las [Directrices de contribución](.github/CONTRIBUTING.md) para configuración y convenciones. Los contribuyentes destacados pueden recibir un código promocional de Pro — ver [Reconocimiento de colaboradores](.github/CONTRIBUTING.md#contributor-recognition).
 
-**Contacto:** [@WiFiLens en X](https://x.com/WiFiLens) · [wifi-lens@shiinalabs.com](mailto:wifi-lens@shiinalabs.com)
+### Comunidad
+
+¿Tienes una pregunta, encontraste un error o quieres compartir una idea?
+
+Únete a **[Rabbit Hole](https://discord.gg/gH6sTCYaJ7)**, una pequeña comunidad para WiFiLens y otros proyectos.
+
 
 ---
 

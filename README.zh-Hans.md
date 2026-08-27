@@ -10,6 +10,7 @@
 [![macOS](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Swift CI](https://github.com/SHIINASAMA/wifi-lens/workflows/Swift%20CI/badge.svg)](https://github.com/SHIINASAMA/wifi-lens/actions?query=workflow%3A%22Swift+CI%22)
+[![Discord](https://img.shields.io/badge/Discord-Rabbit%20Hole-5865F2)](https://discord.gg/gH6sTCYaJ7)
 
 <p align="center"><img alt="WiFi Lens 频谱分析" src="assets/screenshot-hero.webp" width="800"></p>
 
@@ -225,9 +226,13 @@ xcodebuild -project WiFiLens.xcodeproj -scheme "WiFi Lens" \
 
 ## 贡献
 
-欢迎提交 Bug 报告和功能建议。请参阅[贡献指南](.github/CONTRIBUTING.md)了解环境和规范。重大贡献者可能获得 Pro 兑换码——参见[贡献者认可](.github/CONTRIBUTING.md#contributor-recognition)。
 
-**联系方式：** [@WiFiLens on X](https://x.com/WiFiLens) · [wifi-lens@shiinalabs.com](mailto:wifi-lens@shiinalabs.com)
+### 社区
+
+有问题、发现了 Bug，还是想分享想法？
+
+加入 **[Rabbit Hole](https://discord.gg/gH6sTCYaJ7)**，一个关于 WiFiLens 和其他项目的小社区。
+
 
 ---
 

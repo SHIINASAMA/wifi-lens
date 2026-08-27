@@ -10,6 +10,7 @@
 [![macOS](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](https://github.com/SHIINASAMA/wifi-lens/releases/latest)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Swift CI](https://github.com/SHIINASAMA/wifi-lens/workflows/Swift%20CI/badge.svg)](https://github.com/SHIINASAMA/wifi-lens/actions?query=workflow%3A%22Swift+CI%22)
+[![Discord](https://img.shields.io/badge/Discord-Rabbit%20Hole-5865F2)](https://discord.gg/gH6sTCYaJ7)
 
 <p align="center"><img alt="WiFi Lens スペクトル分析" src="assets/screenshot-hero.webp" width="800"></p>
 
@@ -225,9 +226,13 @@ xcodebuild -project WiFiLens.xcodeproj -scheme "WiFi Lens" \
 
 ## コントリビュート
 
-バグレポートや機能のアイデアを歓迎します。[コントリビューションガイドライン](.github/CONTRIBUTING.md)をご覧ください。大きな貢献をされた方には Pro プロモコードを贈呈する場合があります——[コントリビューター認定](.github/CONTRIBUTING.md#contributor-recognition)をご参照ください。
 
-**連絡先：** [X の @WiFiLens](https://x.com/WiFiLens) · [wifi-lens@shiinalabs.com](mailto:wifi-lens@shiinalabs.com)
+### コミュニティ
+
+質問、バグの発見、またはアイデアの共有はありますか？
+
+WiFiLens やその他のプロジェクトに関する小さなコミュニティ **[Rabbit Hole](https://discord.gg/gH6sTCYaJ7)** に参加しましょう。
+
 
 ---
 
