@@ -20993,31 +20993,31 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tritt unserer Discord-Community bei"
+            "value": "Feedback & Community · Discord"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Join our Discord community"
+            "value": "Feedback & community · Discord"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Únete a nuestra comunidad de Discord"
+            "value": "Feedback y comunidad · Discord"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Discord コミュニティに参加"
+            "value": "フィードバックとコミュニティ · Discord"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "加入我们的 Discord 社区"
+            "value": "反馈与社区 · Discord"
           }
         }
       }
