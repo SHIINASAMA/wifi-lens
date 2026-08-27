@@ -20987,6 +20987,41 @@
         }
       }
     },
+    "onboarding.welcome.discord": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tritt unserer Discord-Community bei"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join our Discord community"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Únete a nuestra comunidad de Discord"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord コミュニティに参加"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入我们的 Discord 社区"
+          }
+        }
+      }
+    },
     "onboarding.welcome.highlight.analysis": {
       "extractionState": "manual",
       "localizations": {
