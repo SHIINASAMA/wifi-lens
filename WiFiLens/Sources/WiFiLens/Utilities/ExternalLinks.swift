@@ -15,6 +15,7 @@ enum ExternalDestination {
     case chartLensRepository
     case mcpSwiftSDKRepository
     case sparkleRepository
+    case discord
 }
 
 enum ExternalLinks {
@@ -52,6 +53,8 @@ enum ExternalLinks {
             "https://github.com/modelcontextprotocol/swift-sdk"
         case .sparkleRepository:
             "https://github.com/sparkle-project/Sparkle"
+        case .discord:
+            "https://discord.gg/gH6sTCYaJ7"
         }
 
         return URL(string: value)
