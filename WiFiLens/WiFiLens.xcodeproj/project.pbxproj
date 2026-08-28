@@ -81,6 +81,7 @@
 		G900000000000000000000C5 /* OnboardingCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000C0 /* OnboardingCoordinatorTests.swift */; };
 		G900000000000000000000C7 /* OnboardingEditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000C6 /* OnboardingEditionTests.swift */; };
 		G900000000000000000000C9 /* OnboardingEditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000C8 /* OnboardingEditionTests.swift */; };
+		G900000000000000000000F2 /* WhatsNewCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000F1 /* WhatsNewCoordinatorTests.swift */; };
 		MV0000000000000000000018 /* MACVendorDatabaseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000021 /* MACVendorDatabaseStore.swift */; };
 		MV0000000000000000000019 /* MACVendorDatabaseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = MV0000000000000000000021 /* MACVendorDatabaseStore.swift */; };
 		G900000000000000000000BA /* GuidanceState.swift in Sources */ = {isa = PBXBuildFile; fileRef = G900000000000000000000AA /* GuidanceState.swift */; };
@@ -624,6 +625,7 @@
 		G900000000000000000000C0 /* OnboardingCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCoordinatorTests.swift; sourceTree = "<group>"; };
 		G900000000000000000000C6 /* OnboardingEditionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingEditionTests.swift; sourceTree = "<group>"; };
 		G900000000000000000000C8 /* OnboardingEditionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingEditionTests.swift; sourceTree = "<group>"; };
+		G900000000000000000000F1 /* WhatsNewCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsNewCoordinatorTests.swift; sourceTree = "<group>"; };
 		EC10000000000000000000005 /* EditionCompositionContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditionCompositionContext.swift; sourceTree = "<group>"; };
 		EC10000000000000000000006 /* OSSEditionComposition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSSEditionComposition.swift; sourceTree = "<group>"; };
 		A10000000000000000000017 /* App/MenuBarWindowBehaviorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/MenuBarWindowBehaviorTests.swift; sourceTree = "<group>"; };
@@ -1248,6 +1250,7 @@
 				G900000000000000000000D8 /* GuidanceEditionTests.swift */,
 				G900000000000000000000EE /* GuidanceDebugTests.swift */,
 				G900000000000000000000C8 /* OnboardingEditionTests.swift */,
+				G900000000000000000000F1 /* WhatsNewCoordinatorTests.swift */,
 				E10000000000000000000001 /* EventJournalTests.swift */,
 				E30000000000000000000001 /* WiFiObservationEventSQLiteStoreTests.swift */,
 				FB8FCB182FF6C4E300BB2929 /* MenuBarMigrationTests.swift */,
@@ -2322,6 +2325,7 @@
 				G900000000000000000000D9 /* GuidanceEditionTests.swift in Sources */,
 				G900000000000000000000EF /* GuidanceDebugTests.swift in Sources */,
 				G900000000000000000000C9 /* OnboardingEditionTests.swift in Sources */,
+				G900000000000000000000F2 /* WhatsNewCoordinatorTests.swift in Sources */,
 				E10000000000000000000002 /* EventJournalTests.swift in Sources */,
 				E30000000000000000000002 /* WiFiObservationEventSQLiteStoreTests.swift in Sources */,
 				FB8FCB282FF6CAC800BB2929 /* SecondaryToolbarProTests.swift in Sources */,
