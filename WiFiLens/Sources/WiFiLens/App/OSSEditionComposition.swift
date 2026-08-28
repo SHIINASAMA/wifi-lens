@@ -130,6 +130,14 @@ enum EditionComposition {
                     OnboardingCoordinator.shared.debugLogState(edition: "OSS")
                 }
             }
+            Menu("What's New") {
+                Button("Reset What's New State") {
+                    WhatsNewCoordinator.shared.debugReset()
+                }
+                Button("Show What's New Now") {
+                    WhatsNewCoordinator.shared.debugRequestShow()
+                }
+            }
             Divider()
             Menu("Lifecycle Guidance") {
                 Button("Reset Lifecycle Guidance State") {
