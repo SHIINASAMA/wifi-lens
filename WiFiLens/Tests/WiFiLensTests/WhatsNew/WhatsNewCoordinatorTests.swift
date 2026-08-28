@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import Testing
 @testable import WiFi_Lens
@@ -75,6 +76,55 @@ final class WhatsNewCoordinatorTests {
     @Test func versionStringContainsCurrentVersion() {
         let coordinator = makeCoordinator(storedVersion: nil, appVersion: "1.6.0")
         #expect(coordinator.versionString == "WiFi Lens 1.6.0")
+    }
+
+
+    // MARK: - Markdown renderer
+
+    @Test func renderHeadingIsLargerAndBold() {
+        let ns = MarkdownRenderer.render("# Heading", pointSize: 13)
+        let attrs = ns.attributes(at: 0, effectiveRange: nil)
+        let font = attrs[.font] as? NSFont
+        #expect(font != nil)
+        #expect(font!.pointSize > 13)
+        #expect(font!.fontDescriptor.symbolicTraits.contains(.bold))
+    }
+
+    @Test func renderListAddsBullet() {
+        let ns = MarkdownRenderer.render("- Item", pointSize: 13)
+        #expect(ns.string.hasPrefix("\u{2022}"))
+    }
+
+    @Test func renderCodeBlockUsesFixedPitchFont() {
+        let ns = MarkdownRenderer.render("```swift\nprint(1)\n```", pointSize: 13)
+        // The code block begins with an indentation tab, so scan for the first
+        // run that actually carries the monospaced code font.
+        var foundFixedPitch = false
+        for i in 0..<ns.length {
+            let font = ns.attributes(at: i, effectiveRange: nil)[.font] as? NSFont
+            if font?.isFixedPitch == true {
+                foundFixedPitch = true
+                break
+            }
+        }
+        #expect(foundFixedPitch)
+    }
+
+    @Test func renderSeparatesBlocksWithNewlines() {
+        let ns = MarkdownRenderer.render("# A\n\nB", pointSize: 13)
+        #expect(ns.string.contains("\n"))
+    }
+
+    @Test func renderPreservesLinks() {
+        let ns = MarkdownRenderer.render("[link](https://example.com)", pointSize: 13)
+        var foundLink = false
+        for i in 0..<ns.length {
+            if ns.attributes(at: i, effectiveRange: nil)[.link] != nil {
+                foundLink = true
+                break
+            }
+        }
+        #expect(foundLink)
     }
 
     // MARK: - Helpers

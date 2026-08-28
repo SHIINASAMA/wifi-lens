@@ -72,6 +72,26 @@ struct SettingsView: View {
                     .padding(.vertical, 4)
                 }
 
+                // MARK: - What's New
+                Section {
+                    Button {
+                        WhatsNewCoordinator.shared.showSheetFromBadge = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "sparkles")
+                            Text(String(localized: "settings.whatsnew.review", comment: "Review What's New in Settings"))
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                        }
+                    }
+                    .buttonStyle(.borderless)
+                    .accessibilityIdentifier("settings-whatsnew-review")
+                } header: {
+                    Text(String(localized: "settings.whatsnew.header", comment: "What's New settings section header"))
+                }
+
                 // MARK: - Appearance
                 Section {
                     Picker(String(localized: "settings.appearance.theme_label", comment: "Theme picker label"), selection: $appearance.animation(reduceMotion ? nil : .snappy(duration: 0.2))) {

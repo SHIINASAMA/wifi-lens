@@ -35792,6 +35792,88 @@
           }
         }
       }
+    },
+    "settings.whatsnew.header": {
+      "comment": "What's New settings section header",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's New"
+          }
+        },
+        "de": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neuigkeiten"
+          }
+        },
+        "es": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novedades"
+          }
+        },
+        "ja": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新内容"
+          }
+        },
+        "zh-Hans": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新内容"
+          }
+        }
+      }
+    },
+    "settings.whatsnew.review": {
+      "comment": "Review What's New in Settings",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review What's New"
+          }
+        },
+        "de": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neuerungen erneut lesen"
+          }
+        },
+        "es": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisar novedades"
+          }
+        },
+        "ja": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新内容を再度読む"
+          }
+        },
+        "zh-Hans": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新阅读更新内容"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -1,7 +1,11 @@
 import SwiftUI
 
-/// What's New sheet displayed after a version update. Loads the appropriate
-/// Markdown file based on the current locale and renders it via AttributedString.
+/// What's New sheet displayed after a version update.
+///
+/// The sheet uses a landscape layout because release notes are text-heavy: a
+/// horizontal header carries the app identity and the version, while a wide
+/// reading column scrolls the Markdown body. The Markdown body is produced by
+/// `MarkdownRenderer` and displayed via `MarkdownTextView`.
 struct WhatsNewSheetView: View {
     let coordinator: WhatsNewCoordinator
     var onDismiss: () -> Void
@@ -10,53 +14,66 @@ struct WhatsNewSheetView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Spacer()
-                Button {
-                    coordinator.markSeen()
-                    dismiss()
-                    onDismiss()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.borderless)
-                .accessibilityLabel(String(localized: "whatsnew.close", comment: "Close What's New sheet"))
-                .keyboardShortcut(.cancelAction)
-            }
+            header
+            Divider()
+            markdownContent
+                .frame(width: contentWidth, height: contentHeight)
+            Divider()
+            doneButton
+        }
+        // The width is fixed for a readable landscape column; the height hugs
+        // the Markdown content so short release notes don't leave a large void.
+        .frame(width: 640)
+    }
 
+    // MARK: - Adaptive sizing
+
+    private var contentWidth: CGFloat {
+        640 - 24 * 2
+    }
+
+    private var contentHeight: CGFloat {
+        guard let markdown = loadMarkdown() else { return 180 }
+        let measured = MarkdownTextView.measureHeight(
+            markdown: markdown,
+            width: contentWidth
+        )
+        // Clamp to a comfortable min/max so the sheet stays compact for short
+        // notes and scrolls (rather than growing unbounded) for long ones.
+        return min(max(measured + 24, 110), 340)
+    }
+
+    // MARK: - Header
+
+    private var header: some View {
+        HStack(spacing: 14) {
             appIcon
-                .padding(.top, 2)
 
-            Text(coordinator.versionString)
-                .font(.title2.weight(.semibold))
-                .multilineTextAlignment(.center)
-                .accessibilityAddTraits(.isHeader)
-                .padding(.top, 16)
-
-            ScrollView {
-                markdownContent
-                    .padding(.horizontal, 20)
-                    .padding(.top, 16)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(String(localized: "whatsnew.review", comment: "What's New sheet title"))
+                    .font(.title2.weight(.semibold))
+                Text(coordinator.versionString)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
             }
+
+            Spacer()
 
             Button {
                 coordinator.markSeen()
                 dismiss()
                 onDismiss()
             } label: {
-                Text(String(localized: "whatsnew.done", comment: "Done button in What's New sheet"))
-                    .frame(maxWidth: .infinity)
+                Image(systemName: "xmark")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(.secondary)
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            .keyboardShortcut(.defaultAction)
-            .accessibilityIdentifier("whatsnew-done")
-            .padding(.top, 16)
+            .buttonStyle(.borderless)
+            .accessibilityLabel(String(localized: "whatsnew.close", comment: "Close What's New sheet"))
+            .keyboardShortcut(.cancelAction)
         }
-        .padding(22)
-        .frame(width: 420, height: 480)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
     }
 
     private var appIcon: some View {
@@ -64,41 +81,85 @@ struct WhatsNewSheetView: View {
             if let icon = NSImage(named: "AppIcon") {
                 Image(nsImage: icon)
                     .resizable()
-                    .frame(width: 76, height: 76)
+                    .frame(width: 56, height: 56)
             } else {
                 Image(systemName: "sparkles")
-                    .font(.system(size: 30, weight: .semibold))
+                    .font(.system(size: 26, weight: .semibold))
                     .foregroundStyle(Color.accentColor)
-                    .frame(width: 76, height: 76)
+                    .frame(width: 56, height: 56)
             }
         }
-        .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
+        .shadow(color: .black.opacity(0.12), radius: 4, y: 2)
         .accessibilityHidden(true)
     }
 
+    // MARK: - Content
+
     private var markdownContent: some View {
         Group {
-            if let attributed = loadMarkdown() {
-                Text(attributed)
-                    .textSelection(.enabled)
+            if let markdown = loadMarkdown() {
+                MarkdownTextView(markdown: markdown)
             } else {
                 Text(String(localized: "whatsnew.unavailable", comment: "Fallback when release notes file is missing"))
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 16)
     }
 
-    private func loadMarkdown() -> AttributedString? {
-        guard let url = Bundle.main.url(forReleaseNotesLanguage: Locale.current.language.languageCode?.identifier) else {
+    /// Resolves which localized release-notes file to load for the current
+    /// language. Foundation reports Chinese simply as `zh`, but the app ships
+    /// a `zh-Hans` file, so map it explicitly; otherwise use the language code.
+    private func resolvedMarkdownLanguage() -> String? {
+        guard let code = Locale.current.language.languageCode?.identifier else { return nil }
+        if code == "zh" {
+            return "zh-Hans"
+        }
+        return code
+    }
+
+    private func loadMarkdown() -> String? {
+        guard let url = Bundle.main.url(forReleaseNotesLanguage: resolvedMarkdownLanguage()) else {
             return nil
         }
         guard let data = try? Data(contentsOf: url),
               let markdown = String(data: data, encoding: .utf8) else {
             return nil
         }
-        return try? AttributedString(markdown: markdown)
+        // The sheet header supplies the title and version, so drop a leading
+        // `# Heading` to avoid repeating it inside the reading pane.
+        return dropLeadingTitle(from: markdown)
+    }
+
+    private func dropLeadingTitle(from markdown: String) -> String {
+        let lines = markdown.components(separatedBy: "\n")
+        if let first = lines.first, first.trimmingCharacters(in: .whitespaces).hasPrefix("#") {
+            return lines.dropFirst().joined(separator: "\n")
+        }
+        return markdown
+    }
+
+    // MARK: - Footer
+
+    private var doneButton: some View {
+        HStack {
+            Spacer()
+            Button {
+                coordinator.markSeen()
+                dismiss()
+                onDismiss()
+            } label: {
+                Text(String(localized: "whatsnew.done", comment: "Done button in What's New sheet"))
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.regular)
+            .keyboardShortcut(.defaultAction)
+            .accessibilityIdentifier("whatsnew-done")
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 14)
     }
 }
 
