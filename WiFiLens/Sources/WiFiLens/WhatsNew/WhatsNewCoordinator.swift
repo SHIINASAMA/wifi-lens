@@ -50,6 +50,7 @@ final class WhatsNewCoordinator {
         var state = store.load()
         state.lastSeenVersion = currentVersion
         store.save(state)
+        shouldShowSheet = false
     }
 
     /// Called when the user dismisses the What's New sheet (either auto or manual).
