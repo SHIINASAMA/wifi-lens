@@ -114,7 +114,7 @@ private extension Bundle {
             languages = ["en"]
         }
         for lang in languages {
-            if let url = url(forResource: lang, withExtension: "md", subdirectory: "ReleaseNotes") {
+            if let url = url(forResource: lang, withExtension: "md", subdirectory: "WhatsNew") {
                 return url
             }
         }

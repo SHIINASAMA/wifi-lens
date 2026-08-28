@@ -35628,6 +35628,170 @@
           }
         }
       }
+    },
+    "whatsnew.close": {
+      "comment": "Close What's New sheet",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
+        "de": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schließen"
+          }
+        },
+        "es": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerrar"
+          }
+        },
+        "ja": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "閉じる"
+          }
+        },
+        "zh-Hans": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        }
+      }
+    },
+    "whatsnew.done": {
+      "comment": "Done button in What's New sheet",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        },
+        "de": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fertig"
+          }
+        },
+        "es": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listo"
+          }
+        },
+        "ja": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "完了"
+          }
+        },
+        "zh-Hans": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        }
+      }
+    },
+    "whatsnew.unavailable": {
+      "comment": "Fallback when release notes file is missing",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Release notes unavailable."
+          }
+        },
+        "de": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Release-Notes nicht verfügbar."
+          }
+        },
+        "es": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notas de la versión no disponibles."
+          }
+        },
+        "ja": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "リリースノートを読み込めません。"
+          }
+        },
+        "zh-Hans": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新说明不可用。"
+          }
+        }
+      }
+    },
+    "whatsnew.review": {
+      "comment": "Re-view What's New",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's New"
+          }
+        },
+        "de": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neuigkeiten"
+          }
+        },
+        "es": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novedades"
+          }
+        },
+        "ja": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新内容"
+          }
+        },
+        "zh-Hans": {
+          "localizationUnit": "swift",
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新内容"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
