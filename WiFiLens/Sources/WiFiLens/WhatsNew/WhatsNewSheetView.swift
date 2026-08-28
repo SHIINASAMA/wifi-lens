@@ -80,7 +80,6 @@ struct WhatsNewSheetView: View {
         Group {
             if let attributed = loadMarkdown() {
                 Text(attributed)
-                    .font(.callout)
                     .textSelection(.enabled)
             } else {
                 Text(String(localized: "whatsnew.unavailable", comment: "Fallback when release notes file is missing"))
