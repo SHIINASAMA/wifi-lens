@@ -105,8 +105,14 @@ struct WelcomeView: View {
 
             if let discordURL = ExternalLinks.url(for: .discord) {
                 Link(destination: discordURL) {
-                    Text(String(localized: "onboarding.welcome.discord", comment: "Discord community link in first-run welcome sheet"))
-                        .font(.caption)
+                    Label {
+                        Text(String(localized: "onboarding.welcome.discord", comment: "Discord community link in first-run welcome sheet"))
+                    } icon: {
+                        Image("Discord")
+                            .resizable()
+                            .frame(width: 12, height: 12)
+                    }
+                    .font(.caption)
                 }
                 .buttonStyle(.borderless)
                 .foregroundStyle(.tertiary)

@@ -339,6 +339,7 @@ struct SettingsView: View {
                         aboutLinkRow(icon: "safari", title: String(localized: "settings.about.website", comment: "Product website link"), destination: .website)
                         aboutLinkRow(icon: "chevron.left.forwardslash.chevron.right", title: String(localized: "settings.about.github", comment: "GitHub repository link"), destination: .github)
                         aboutLinkRow(icon: "bubble.left.and.bubble.right.fill", title: String(localized: "settings.about.x", comment: "X (formerly Twitter) account link"), destination: .xAccount)
+                        aboutLinkRow(customIcon: "Discord", title: String(localized: "settings.about.discord", comment: "Discord community link"), destination: .discord)
                         aboutLinkRow(icon: "person.fill.checkmark", title: String(localized: "settings.about.developer", comment: "Developer profile link"), destination: .developerProfile)
 
                         Divider()
@@ -413,11 +414,19 @@ struct SettingsView: View {
     }
 
     private func aboutLinkRow(icon: String, title: String, destination: ExternalDestination) -> some View {
+        aboutLinkRow(iconView: Image(systemName: icon), title: title, destination: destination)
+    }
+
+    private func aboutLinkRow(customIcon name: String, title: String, destination: ExternalDestination) -> some View {
+        aboutLinkRow(iconView: Image(name), title: title, destination: destination)
+    }
+
+    private func aboutLinkRow(iconView: Image, title: String, destination: ExternalDestination) -> some View {
         Button {
             open(destination)
         } label: {
             HStack(spacing: 8) {
-                Image(systemName: icon)
+                iconView
                     .foregroundColor(.accentColor)
                     .frame(width: 20)
                 Text(title)
