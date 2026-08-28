@@ -20987,6 +20987,41 @@
         }
       }
     },
+    "onboarding.welcome.discord": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feedback & Community · Discord"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feedback & community · Discord"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feedback y comunidad · Discord"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フィードバックとコミュニティ · Discord"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "反馈与社区 · Discord"
+          }
+        }
+      }
+    },
     "onboarding.welcome.highlight.analysis": {
       "extractionState": "manual",
       "localizations": {
@@ -35555,6 +35590,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "{\n  \"mcpServers\": {\n    \"wifi-lens\": {\n      \"url\": \"http://127.0.0.1:%ld/\"\n    }\n  }\n}"
+          }
+        }
+      }
+    },
+    "settings.about.discord": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord-Community"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discord"
           }
         }
       }

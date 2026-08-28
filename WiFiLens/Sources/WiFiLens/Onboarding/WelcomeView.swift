@@ -102,6 +102,23 @@ struct WelcomeView: View {
             .foregroundStyle(.secondary)
             .accessibilityIdentifier("onboarding-skip")
             .padding(.top, 14)
+
+            if let discordURL = ExternalLinks.url(for: .discord) {
+                Link(destination: discordURL) {
+                    Label {
+                        Text(String(localized: "onboarding.welcome.discord", comment: "Discord community link in first-run welcome sheet"))
+                    } icon: {
+                        Image("Discord")
+                            .resizable()
+                            .frame(width: 12, height: 12)
+                    }
+                    .font(.caption)
+                }
+                .buttonStyle(.borderless)
+                .foregroundStyle(.tertiary)
+                .accessibilityIdentifier("onboarding-discord")
+                .padding(.top, 10)
+            }
         }
         .padding(22)
         .frame(width: 400)
