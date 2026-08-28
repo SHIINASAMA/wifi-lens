@@ -46,6 +46,7 @@ private struct AppRootView: View {
     @Binding var showCrashLog: Bool
     @Binding var crashLogText: String
     let onboardingCoordinator: OnboardingCoordinator
+    let whatsNewCoordinator: WhatsNewCoordinator
     let sparkleUpdater: SparkleUpdater
     let updateMCPServer: @MainActor () -> Void
     let installMainWindowOpenAction: (@escaping () -> Void) -> Void
@@ -116,6 +117,16 @@ private struct AppRootView: View {
             if selectedPage == .overview, (BuildConfig.current == .oss || !hideTitleBadge) {
                 TitleBadge(config: .current)
                     .fixedSize()
+            }
+            if selectedPage == .overview {
+                Button {
+                    whatsNewCoordinator.showSheetFromBadge = true
+                } label: {
+                    Image(systemName: "sparkles")
+                        .font(.caption)
+                }
+                .buttonStyle(.borderless)
+                .accessibilityLabel(String(localized: "whatsnew.review", comment: "Re-view What's New"))
             }
         }
         ToolbarItem(placement: .principal) {
@@ -340,9 +351,13 @@ private struct AppRootView: View {
             // NetworkInfoService are synchronous XPC calls that can stall the
             // test process. Unit tests inject their own stores and fakes.
             if !ProcessInfo.processInfo.isRunningUnderTestHost {
+                var welcomedOnThisLaunch = false
                 if !UITestMode.isActive,
                    EditionComposition.onboardingConfiguration.welcomeEnabled {
-                    _ = onboardingCoordinator.claimWelcome(hostID: sceneState.id)
+                    welcomedOnThisLaunch = onboardingCoordinator.claimWelcome(hostID: sceneState.id)
+                }
+                if !welcomedOnThisLaunch {
+                    whatsNewCoordinator.checkForUpdate()
                 }
                 EditionComposition.startLifecycle(observationRuntime: viewModel.observationRuntime)
                 GuidanceCoordinator.shared.recordAppActive()
@@ -385,6 +400,15 @@ private struct AppRootView: View {
 #endif
         .onDisappear {
             onboardingCoordinator.releaseWelcome(hostID: sceneState.id)
+        }
+        .sheet(isPresented: Binding(
+            get: { whatsNewCoordinator.shouldShowSheet || whatsNewCoordinator.showSheetFromBadge },
+            set: { if !$0 { whatsNewCoordinator.dismiss() } }
+        )) {
+            WhatsNewSheetView(
+                coordinator: whatsNewCoordinator,
+                onDismiss: { }
+            )
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active, !ProcessInfo.processInfo.isRunningUnderTestHost {
@@ -1009,6 +1033,7 @@ struct WiFiLensApp: App {
         }
         return coordinator
     }()
+    private let whatsNewCoordinator: WhatsNewCoordinator = WhatsNewCoordinator.shared
     @State private var sparkleUpdater = SparkleUpdater()
     @State private var showCrashLog: Bool = false
     @State private var mainWindowLifecycle = MainWindowLifecycleCoordinator()
@@ -1073,6 +1098,7 @@ struct WiFiLensApp: App {
                     showCrashLog: $showCrashLog,
                     crashLogText: $crashLogText,
                     onboardingCoordinator: onboardingCoordinator,
+                    whatsNewCoordinator: whatsNewCoordinator,
                     sparkleUpdater: sparkleUpdater,
                     updateMCPServer: updateMCPServer,
                     installMainWindowOpenAction: mainWindowLifecycle.installOpenSceneAction,
