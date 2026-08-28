@@ -80,3 +80,34 @@ Standardized terms for `en`, `ja`, `zh-Hans`, `de`, `es` translations in `Locali
 5. **Punctuation** — follow target language conventions (e.g., `…` not `...` in ja/zh-Hans, `«»` in fr)
 6. **Tone** — use informal "你" (zh-Hans), not formal "您"
 7. **AP in prose** — short labels (badges, table headers, menu items) keep the abbreviation `AP`. Longer explanatory prose may expand the full term for readability (zh 接入点, ja アクセスポイント, de Zugangspunkt, es punto de acceso); existing AP Radar long-form usages are sanctioned.
+
+## fr (Français)
+
+| English | Use | Do NOT use | Notes |
+|---------|-----|------------|-------|
+| channel | canal | ~~fréquence~~ | "fréquence" reserved for frequency (e.g. frequency band = bande de fréquence) |
+| Wi-Fi | Wi-Fi | — | |
+| WiFi Lens | WiFi Lens | — | Product name, never hyphenated |
+| AP | AP | ~~point d'accès~~ | Abbreviation kept as-is in short labels/badges; prose may expand to "point d'accès" |
+| scan / scanning | scan / analyse | ~~balayage~~ | "analyse" for analysis; "scan" for the scan action/feature |
+| System Settings | Réglages Système | ~~Préférences Système~~ | macOS 13+ French uses "Réglages Système" |
+| recommendation | recommandation | ~~suggestion~~ | For channel recommendations |
+| permission (noun) | autorisation | — | "autoriser" for the verb allow/grant |
+| network | réseau | — | |
+| device | appareil | ~~dispositif~~ | |
+| signal | signal | — | |
+| hide / hidden (network) | masquer / réseau masqué | ~~caché~~ | |
+| enable (verb) | activer | — | For toggling features on |
+| disabled | désactivé | — | For feature states/toggles |
+| granted | accordée / accordé | — | Permission states |
+| denied | refusée / refusé | — | Permission states |
+| overlap | chevauchement | ~~recouvrement~~ | Channel overlap |
+| open (verb) | ouvrir | — | Opening settings/apps |
+| interface (network) | interface | — | Network interface |
+| you (informal) | tu | ~~vous~~ | App uses informal tone throughout |
+
+## General Rules (fr addition)
+
+1. **Guillemets** — use `« »` for quoted text in French
+2. **Feminine/plural agreement** — match the noun gender/number for quality tiers, permission states, and "X est/est désactivé" forms
+3. **Product name & abbreviations** — never translate `WiFi Lens`, `AP`, `RSSI`, `MCS`, `NSS`, `BSSID`, `SSID`, `DFS`, `EMA` in short labels; keep them as-is
