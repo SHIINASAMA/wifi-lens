@@ -2,8 +2,10 @@
 //  MarkdownRenderer.swift
 //  WiFi Lens
 //
-//  Renders Markdown text into a styled NSAttributedString that supports
-//  block-level Markdown (headings, lists, block quotes, code blocks).
+//  Renders a Markdown subset into a styled NSAttributedString for the What's
+//  New sheet: headings, lists, block quotes, code blocks, inline emphasis and
+//  links. Tables, thematic breaks, and other block constructs are intentionally
+//  not rendered; they are dropped rather than styled.
 //
 //  This mirrors the technique used by Sparkle's `SUTextViewReleaseNotesView`:
 //  Foundation's Markdown parser strips structural newlines and only records
@@ -73,7 +75,12 @@ enum MarkdownRenderer {
         intent?.value(forKey: "parentIntent") as AnyObject?
     }
 
-    // Raw `NSPresentationIntentKind` enum values; mirrors the Foundation header.
+    // Raw `NSPresentationIntentKind` values. `NSPresentationIntent` is
+    // `NS_REFINED_FOR_SWIFT`, so its kind cannot be named from Swift and the
+    // properties must be read via Key-Value Coding. The numeric cases below
+    // mirror Foundation's `NSPresentationIntentKind` order in NSAttributedString.h
+    // and are SDK-coupled: if that enum changes ordering, this mapping must be
+    // updated.
     private enum Kind: Int {
         case paragraph = 0
         case header = 1

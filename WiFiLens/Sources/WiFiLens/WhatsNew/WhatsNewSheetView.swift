@@ -109,15 +109,27 @@ struct WhatsNewSheetView: View {
         .padding(.vertical, 16)
     }
 
-    /// Resolves which localized release-notes file to load for the current
-    /// language. Foundation reports Chinese simply as `zh`, but the app ships
-    /// a `zh-Hans` file, so map it explicitly; otherwise use the language code.
+    /// Resolves which localized release-notes file to load.
+    ///
+    /// Uses the bundle's preferred localizations rather than the global
+    /// `Locale.current`, so the Markdown matches the app's own language even
+    /// when the user has set a per-app language override in System Settings.
+    /// Only simplified Chinese (`zh-Hans`) notes are shipped, so any Chinese
+    /// script resolves to that file; otherwise the localization tag is used
+    /// verbatim and falls back to `en`.
     private func resolvedMarkdownLanguage() -> String? {
-        guard let code = Locale.current.language.languageCode?.identifier else { return nil }
-        if code == "zh" {
-            return "zh-Hans"
+        for preferred in Bundle.main.preferredLocalizations {
+            let candidate: String
+            if preferred.hasPrefix("zh") {
+                candidate = "zh-Hans"
+            } else {
+                candidate = preferred
+            }
+            if Bundle.main.url(forResource: candidate, withExtension: "md", subdirectory: nil) != nil {
+                return candidate
+            }
         }
-        return code
+        return "en"
     }
 
     private func loadMarkdown() -> String? {

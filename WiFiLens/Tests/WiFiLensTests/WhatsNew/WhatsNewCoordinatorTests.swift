@@ -127,6 +127,22 @@ final class WhatsNewCoordinatorTests {
         #expect(foundLink)
     }
 
+
+    @Test func renderBlockQuoteIndentsText() {
+        let ns = MarkdownRenderer.render("> a quote", pointSize: 13)
+        let attrs = ns.attributes(at: 0, effectiveRange: nil)
+        let style = attrs[.paragraphStyle] as? NSParagraphStyle
+        #expect(style != nil)
+        #expect((style?.headIndent ?? 0) > 0)
+    }
+
+    @Test func renderTableIsDroppedGracefully() {
+        // Tables are outside the What's New Markdown subset; cell content is
+        // intentionally dropped rather than rendered.
+        let ns = MarkdownRenderer.render("| a | b |\n|---|---|\n| 1 | 2 |", pointSize: 13)
+        #expect(ns.string.isEmpty)
+    }
+
     // MARK: - Helpers
 
     private func makeCoordinator(
