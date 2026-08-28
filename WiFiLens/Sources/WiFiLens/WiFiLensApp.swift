@@ -118,16 +118,6 @@ private struct AppRootView: View {
                 TitleBadge(config: .current)
                     .fixedSize()
             }
-            if selectedPage == .overview {
-                Button {
-                    whatsNewCoordinator.showSheetFromBadge = true
-                } label: {
-                    Image(systemName: "sparkles")
-                        .font(.caption)
-                }
-                .buttonStyle(.borderless)
-                .accessibilityLabel(String(localized: "whatsnew.review", comment: "Re-view What's New"))
-            }
         }
         ToolbarItem(placement: .principal) {
             switch selectedPage {
