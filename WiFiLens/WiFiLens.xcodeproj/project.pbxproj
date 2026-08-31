@@ -160,6 +160,8 @@
 		E8A1B534D16CB1175560A807 /* TimelineReportExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0724F9D8C687C53E378D13E2 /* TimelineReportExporter.swift */; };
 		78D748E699F0BD72E8076BBA /* TimelineReportExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D2B21285BDCF1A6FD3E42C8 /* TimelineReportExporterTests.swift */; };
 		721C59AB6DD7BE47D87FAE98 /* InsightFeedbackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C187307EE359A3BC6E25D44 /* InsightFeedbackTests.swift */; };
+		DBDF66D03BD11B7D5986B87F /* SeverityValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB8408E6A12E8F18E4C2CF7 /* SeverityValidationTests.swift */; };
+		63BB596DECFDBA8763C84656 /* TimelineLocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B05D236E635B93825959AC92 /* TimelineLocalizationTests.swift */; };
 		ECCBBEBFAF59A2E2035CE1FF /* BLEViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7BA76DD3B1E6198BDAEEA7 /* BLEViewModel.swift */; };
 		ED1000000000000000000002 /* AnalysisSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED1000000000000000000001 /* AnalysisSnapshotTests.swift */; };
 		ED1000000000000000000004 /* AnalysisSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED1000000000000000000003 /* AnalysisSnapshot.swift */; };
@@ -667,6 +669,8 @@
 		0724F9D8C687C53E378D13E2 /* TimelineReportExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineReportExporter.swift; sourceTree = "<group>"; };
 		1D2B21285BDCF1A6FD3E42C8 /* TimelineReportExporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineReportExporterTests.swift; sourceTree = "<group>"; };
 		5C187307EE359A3BC6E25D44 /* InsightFeedbackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightFeedbackTests.swift; sourceTree = "<group>"; };
+		FAB8408E6A12E8F18E4C2CF7 /* SeverityValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeverityValidationTests.swift; sourceTree = "<group>"; };
+		B05D236E635B93825959AC92 /* TimelineLocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineLocalizationTests.swift; sourceTree = "<group>"; };
 		ED1000000000000000000001 /* AnalysisSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisSnapshotTests.swift; sourceTree = "<group>"; };
 		ED1000000000000000000003 /* AnalysisSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisSnapshot.swift; sourceTree = "<group>"; };
 		ED2000000000000000000001 /* AnalysisNetworkScopeIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisNetworkScopeIntegrationTests.swift; sourceTree = "<group>"; };
@@ -1311,6 +1315,8 @@
 				ED5000000000000000000001 /* DemoAnalysisDataTests.swift */,
 				1D2B21285BDCF1A6FD3E42C8 /* TimelineReportExporterTests.swift */,
 				5C187307EE359A3BC6E25D44 /* InsightFeedbackTests.swift */,
+				FAB8408E6A12E8F18E4C2CF7 /* SeverityValidationTests.swift */,
+				B05D236E635B93825959AC92 /* TimelineLocalizationTests.swift */,
 				EF1000000000000000000001 /* InsightModelTests.swift */,
 				EF2000000000000000000001 /* InsightRuleValidationTests.swift */,
 				EB2000000000000000000005 /* Fixtures */,
@@ -2403,6 +2409,8 @@
 				ED5000000000000000000002 /* DemoAnalysisDataTests.swift in Sources */,
 				78D748E699F0BD72E8076BBA /* TimelineReportExporterTests.swift in Sources */,
 				721C59AB6DD7BE47D87FAE98 /* InsightFeedbackTests.swift in Sources */,
+				DBDF66D03BD11B7D5986B87F /* SeverityValidationTests.swift in Sources */,
+				63BB596DECFDBA8763C84656 /* TimelineLocalizationTests.swift in Sources */,
 				EF1000000000000000000002 /* InsightModelTests.swift in Sources */,
 				EF2000000000000000000002 /* InsightRuleValidationTests.swift in Sources */,
 				EC20000000000000000000002 /* EditionCompositionTests.swift in Sources */,
