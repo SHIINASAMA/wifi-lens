@@ -156,11 +156,14 @@
 		EC20000000000000000000020 /* InsightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000021 /* InsightsViewModel.swift */; };
 		EC20000000000000000000024 /* ProReviewRequestBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000023 /* ProReviewRequestBridge.swift */; };
 		EC20000000000000000000026 /* FeedbackContact.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000025 /* FeedbackContact.swift */; };
+		EC20000000000000000000028 /* DemoAnalysisData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC20000000000000000000027 /* DemoAnalysisData.swift */; };
 		ECCBBEBFAF59A2E2035CE1FF /* BLEViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB7BA76DD3B1E6198BDAEEA7 /* BLEViewModel.swift */; };
 		ED1000000000000000000002 /* AnalysisSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED1000000000000000000001 /* AnalysisSnapshotTests.swift */; };
 		ED1000000000000000000004 /* AnalysisSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED1000000000000000000003 /* AnalysisSnapshot.swift */; };
 		ED2000000000000000000002 /* AnalysisNetworkScopeIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED2000000000000000000001 /* AnalysisNetworkScopeIntegrationTests.swift */; };
 		ED3000000000000000000002 /* AnalysisWorkspaceScenarioValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED3000000000000000000001 /* AnalysisWorkspaceScenarioValidationTests.swift */; };
+		ED4000000000000000000002 /* AnalysisReadinessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED4000000000000000000001 /* AnalysisReadinessTests.swift */; };
+		ED5000000000000000000002 /* DemoAnalysisDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED5000000000000000000001 /* DemoAnalysisDataTests.swift */; };
 		EEF6495F8D90DE97D0C86ADF /* ChartViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A7A45AB88716DC3AC18610B /* ChartViewTests.swift */; };
 		EF1000000000000000000002 /* InsightModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF1000000000000000000001 /* InsightModelTests.swift */; };
 		EF2000000000000000000002 /* InsightRuleValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF2000000000000000000001 /* InsightRuleValidationTests.swift */; };
@@ -657,10 +660,13 @@
 		EC20000000000000000000021 /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
 		EC20000000000000000000023 /* ProReviewRequestBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProReviewRequestBridge.swift; sourceTree = "<group>"; };
 		EC20000000000000000000025 /* FeedbackContact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackContact.swift; sourceTree = "<group>"; };
+		EC20000000000000000000027 /* DemoAnalysisData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoAnalysisData.swift; sourceTree = "<group>"; };
 		ED1000000000000000000001 /* AnalysisSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisSnapshotTests.swift; sourceTree = "<group>"; };
 		ED1000000000000000000003 /* AnalysisSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisSnapshot.swift; sourceTree = "<group>"; };
 		ED2000000000000000000001 /* AnalysisNetworkScopeIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisNetworkScopeIntegrationTests.swift; sourceTree = "<group>"; };
 		ED3000000000000000000001 /* AnalysisWorkspaceScenarioValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisWorkspaceScenarioValidationTests.swift; sourceTree = "<group>"; };
+		ED4000000000000000000001 /* AnalysisReadinessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisReadinessTests.swift; sourceTree = "<group>"; };
+		ED5000000000000000000001 /* DemoAnalysisDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoAnalysisDataTests.swift; sourceTree = "<group>"; };
 		EDF4EDF838BA0ABB1DAFDBBB /* BLEDeviceSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEDeviceSnapshot.swift; sourceTree = "<group>"; };
 		EF1000000000000000000001 /* InsightModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightModelTests.swift; sourceTree = "<group>"; };
 		EF2000000000000000000001 /* InsightRuleValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightRuleValidationTests.swift; sourceTree = "<group>"; };
@@ -1222,6 +1228,7 @@
 				EB4000000000000000000001 /* AnalysisObservationCoverage.swift */,
 				EC20000000000000000000013 /* AnalysisDataReadiness.swift */,
 				EC20000000000000000000017 /* TimelineStatistics.swift */,
+				EC20000000000000000000027 /* DemoAnalysisData.swift */,
 				ED1000000000000000000003 /* AnalysisSnapshot.swift */,
 				EC2000000000000000000001B /* Insight.swift */,
 				EC2000000000000000000001D /* InsightRuleEngine.swift */,
@@ -1294,6 +1301,8 @@
 				ED1000000000000000000001 /* AnalysisSnapshotTests.swift */,
 				ED2000000000000000000001 /* AnalysisNetworkScopeIntegrationTests.swift */,
 				ED3000000000000000000001 /* AnalysisWorkspaceScenarioValidationTests.swift */,
+				ED4000000000000000000001 /* AnalysisReadinessTests.swift */,
+				ED5000000000000000000001 /* DemoAnalysisDataTests.swift */,
 				EF1000000000000000000001 /* InsightModelTests.swift */,
 				EF2000000000000000000001 /* InsightRuleValidationTests.swift */,
 				EB2000000000000000000005 /* Fixtures */,
@@ -2215,6 +2224,7 @@
 				EC20000000000000000000014 /* AnalysisDataReadiness.swift in Sources */,
 				EC20000000000000000000016 /* TimelineStatistics.swift in Sources */,
 				ED1000000000000000000004 /* AnalysisSnapshot.swift in Sources */,
+				EC20000000000000000000028 /* DemoAnalysisData.swift in Sources */,
 				EC20000000000000000000018 /* StatisticsViewModel.swift in Sources */,
 				EC2000000000000000000001A /* Insight.swift in Sources */,
 				EC2000000000000000000001C /* InsightRuleEngine.swift in Sources */,
@@ -2379,6 +2389,8 @@
 				ED1000000000000000000002 /* AnalysisSnapshotTests.swift in Sources */,
 				ED2000000000000000000002 /* AnalysisNetworkScopeIntegrationTests.swift in Sources */,
 				ED3000000000000000000002 /* AnalysisWorkspaceScenarioValidationTests.swift in Sources */,
+				ED4000000000000000000002 /* AnalysisReadinessTests.swift in Sources */,
+				ED5000000000000000000002 /* DemoAnalysisDataTests.swift in Sources */,
 				EF1000000000000000000002 /* InsightModelTests.swift in Sources */,
 				EF2000000000000000000002 /* InsightRuleValidationTests.swift in Sources */,
 				EC20000000000000000000002 /* EditionCompositionTests.swift in Sources */,

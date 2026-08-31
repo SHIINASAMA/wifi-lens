@@ -3633,6 +3633,47 @@
         }
       }
     },
+    "analysis.readiness.remaining_time_format" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufzeichnung läuft. Noch etwa %@, bis die Analyse bereit ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording... about %@ until analysis is ready."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grabando... queda aproximadamente %@ para que el análisis esté listo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrement... environ %@ avant que l'analyse soit prête."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "記録中...分析が準備できるまで約%@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在记录…约%@后分析即可就绪。"
+          }
+        }
+      }
+    },
     "analysis.readiness.rule_unavailable_format" : {
       "extractionState" : "manual",
       "localizations" : {
