@@ -8,6 +8,10 @@ enum ExternalDestination {
     case appStoreCampaignDiagnosis
     case appStoreCampaignExport
     case appStoreCampaignPreviewLock
+    case appStoreCampaignPreviewTimeline
+    case appStoreCampaignPreviewStatistics
+    case appStoreCampaignPreviewInsights
+    case appStoreCampaignSettingsAbout
     case website
     case github
     case xAccount
@@ -39,6 +43,14 @@ enum ExternalLinks {
             "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_export&mt=8"
         case .appStoreCampaignPreviewLock:
             "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_preview_lock&mt=8"
+        case .appStoreCampaignPreviewTimeline:
+            "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_preview_timeline&mt=8"
+        case .appStoreCampaignPreviewStatistics:
+            "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_preview_statistics&mt=8"
+        case .appStoreCampaignPreviewInsights:
+            "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_preview_insights&mt=8"
+        case .appStoreCampaignSettingsAbout:
+            "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_settings_about&mt=8"
         case .website:
             "https://wifi-lens.shiinalabs.com"
         case .github:

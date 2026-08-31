@@ -80,6 +80,7 @@ enum EditionComposition {
                 featureName: String(localized: "pro.timeline.title", comment: "Pro timeline feature title"),
                 featureDescription: String(localized: "pro.timeline.description", comment: "Pro timeline feature description"),
                 featureIcon: SidebarPage.timeline.icon,
+                campaign: .appStoreCampaignPreviewTimeline,
                 customSkeleton: { TimelineSkeletonView() }
             )
             .accessibilityIdentifier("page-timeline")
@@ -88,6 +89,7 @@ enum EditionComposition {
                 featureName: String(localized: "pro.statistics.title", comment: "Pro Statistics feature title"),
                 featureDescription: String(localized: "pro.statistics.description", comment: "Pro Statistics feature description"),
                 featureIcon: SidebarPage.statistics.icon,
+                campaign: .appStoreCampaignPreviewStatistics,
                 customSkeleton: { StatisticsSkeletonView() }
             )
             .accessibilityIdentifier("page-statistics")
@@ -96,6 +98,7 @@ enum EditionComposition {
                 featureName: String(localized: "pro.insights.title", comment: "Pro Insights feature title"),
                 featureDescription: String(localized: "pro.insights.description", comment: "Pro Insights feature description"),
                 featureIcon: SidebarPage.insights.icon,
+                campaign: .appStoreCampaignPreviewInsights,
                 customSkeleton: { InsightsSkeletonView() }
             )
             .accessibilityIdentifier("page-insights")

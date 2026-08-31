@@ -355,7 +355,7 @@ struct SettingsView: View {
 
                         Divider()
 
-                        aboutLinkRow(icon: "bag.fill", title: String(localized: "settings.about.app_store", comment: "App Store link"), destination: .appStore)
+                        aboutLinkRow(icon: "bag.fill", title: String(localized: "settings.about.app_store", comment: "App Store link"), destination: .appStoreCampaignSettingsAbout)
                         aboutLinkRow(icon: "safari", title: String(localized: "settings.about.website", comment: "Product website link"), destination: .website)
                         aboutLinkRow(icon: "chevron.left.forwardslash.chevron.right", title: String(localized: "settings.about.github", comment: "GitHub repository link"), destination: .github)
                         aboutLinkRow(icon: "bubble.left.and.bubble.right.fill", title: String(localized: "settings.about.x", comment: "X (formerly Twitter) account link"), destination: .xAccount)

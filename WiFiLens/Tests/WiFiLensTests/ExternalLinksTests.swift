@@ -39,6 +39,34 @@ struct ExternalLinksTests {
             ExternalLinks.url(for: .appStoreCampaignPreviewLock)?.absoluteString
                 == "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_preview_lock&mt=8"
         )
+        #expect(
+            ExternalLinks.url(for: .appStoreCampaignPreviewTimeline)?.absoluteString
+                == "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_preview_timeline&mt=8"
+        )
+        #expect(
+            ExternalLinks.url(for: .appStoreCampaignPreviewStatistics)?.absoluteString
+                == "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_preview_statistics&mt=8"
+        )
+        #expect(
+            ExternalLinks.url(for: .appStoreCampaignPreviewInsights)?.absoluteString
+                == "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_preview_insights&mt=8"
+        )
+        #expect(
+            ExternalLinks.url(for: .appStoreCampaignSettingsAbout)?.absoluteString
+                == "https://apps.apple.com/app/apple-store/id6776590746?pt=128979395&ct=oss_settings_about&mt=8"
+        )
+    }
+
+    @Test("each preview surface has a unique campaign value")
+    func previewSurfaceCampaignsAreDistinct() {
+        let timeline = ExternalLinks.url(for: .appStoreCampaignPreviewTimeline)?.absoluteString
+        let statistics = ExternalLinks.url(for: .appStoreCampaignPreviewStatistics)?.absoluteString
+        let insights = ExternalLinks.url(for: .appStoreCampaignPreviewInsights)?.absoluteString
+        let settings = ExternalLinks.url(for: .appStoreCampaignSettingsAbout)?.absoluteString
+
+        #expect(timeline != statistics)
+        #expect(statistics != insights)
+        #expect(insights != settings)
     }
 
     @Test("dependency repositories keep their current public locations")

@@ -33,8 +33,23 @@ struct ProFeaturePlaceholderView<CustomSkeleton: View>: View {
     let featureName: String
     let featureDescription: String
     let featureIcon: String
+    let campaign: ExternalDestination
     @ViewBuilder var customSkeleton: () -> CustomSkeleton
     @Environment(\.colorScheme) private var colorScheme
+
+    init(
+        featureName: String,
+        featureDescription: String,
+        featureIcon: String,
+        campaign: ExternalDestination = .appStoreCampaignPreviewLock,
+        @ViewBuilder customSkeleton: @escaping () -> CustomSkeleton
+    ) {
+        self.featureName = featureName
+        self.featureDescription = featureDescription
+        self.featureIcon = featureIcon
+        self.campaign = campaign
+        self.customSkeleton = customSkeleton
+    }
     
     var body: some View {
         GeometryReader { geometry in
@@ -106,16 +121,22 @@ struct ProFeaturePlaceholderView<CustomSkeleton: View>: View {
     }
     
     private func openAppStore() {
-        guard let url = ExternalLinks.url(for: .appStoreCampaignPreviewLock) else { return }
+        guard let url = ExternalLinks.url(for: campaign) else { return }
         NSWorkspace.shared.open(url)
     }
 }
 
 extension ProFeaturePlaceholderView where CustomSkeleton == ProFeatureScreenshotPlaceholder {
-    init(featureName: String, featureDescription: String, featureIcon: String) {
+    init(
+        featureName: String,
+        featureDescription: String,
+        featureIcon: String,
+        campaign: ExternalDestination = .appStoreCampaignPreviewLock
+    ) {
         self.featureName = featureName
         self.featureDescription = featureDescription
         self.featureIcon = featureIcon
+        self.campaign = campaign
         self.customSkeleton = { ProFeatureScreenshotPlaceholder(systemImage: featureIcon) }
     }
 }

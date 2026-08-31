@@ -164,6 +164,19 @@ final class GuidanceCoordinator {
         return decision
     }
 
+    /// Records a lightweight, privacy-safe Insight feedback signal through the
+    /// same local event sink as other guidance events. Metadata carries only
+    /// the rating and rule identifier; never network identity or device data.
+    func recordInsightFeedback(rating: String, ruleID: String) {
+        emit(
+            "analysis.insight_feedback",
+            metadata: [
+                "rating": rating,
+                "rule": ruleID,
+            ]
+        )
+    }
+
     func recordAppActive() {
         var state = stateStore.load()
         if state.firstLaunchDate == nil {
