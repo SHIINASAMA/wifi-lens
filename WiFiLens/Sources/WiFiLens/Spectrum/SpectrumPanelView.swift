@@ -90,7 +90,7 @@ struct SpectrumPanelView: View {
             .controlSize(.regular)
 
             if !viewModel.combinedTableRows.isEmpty {
-                Text("\(viewModel.combinedTableRows.count)")
+                Text(String(format: String(localized: "spectrum.panel.table_count_fmt", comment: "Network count in table toolbar"), viewModel.combinedTableRows.count))
                     .font(.body)
                     .foregroundColor(.secondary)
             }
