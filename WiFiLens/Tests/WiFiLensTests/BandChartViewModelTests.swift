@@ -689,11 +689,15 @@ import ChartLens
     @Test func sharedTrendAPIsUseSignalHistoryForSelectedNetwork() {
         let vm = ScannerViewModel()
         let network = makeNetwork(ssid: "Office", bssid: "00:11:22:33:44:55", band: .band5GHz, channel: 36)
-        vm.debugApplyNetworksForTesting([network], supportedBands: [.band5GHz])
+        let t0 = Date(timeIntervalSince1970: 1_752_001_200)
+        let t1 = t0.addingTimeInterval(3)
+        vm.debugApplyNetworksForTesting([network], supportedBands: [.band5GHz], timestamp: t0)
+        vm.debugApplyNetworksForTesting([network], supportedBands: [.band5GHz], timestamp: t1)
 
         // A panel that never opened a band must still resolve shared history
         // for the globally selected network.
         let snaps = vm.snapshots(for: network.id)
         #expect(snaps != nil)
+        #expect(snaps?.count == 2)
     }
 }
