@@ -7,32 +7,7 @@ struct SpectrumTablePanel: View {
     @Binding var hiddenColumns: Set<String>
 
     var body: some View {
-        VStack(spacing: 0) {
-            tableToolbar
-            tableContent
-        }
-        .padding(.trailing, 8)
-    }
-
-    private var tableToolbar: some View {
-        HStack(spacing: 12) {
-            Toggle(isOn: $viewModel.hideHiddenSSIDs) {
-                Text(String(localized: "spectrum.filter.hide_hidden", comment: "Toggle to hide networks with hidden SSIDs"))
-                    .font(.caption)
-            }
-            .toggleStyle(.checkbox)
-
-            if !viewModel.combinedTableRows.isEmpty {
-                Text("\(viewModel.combinedTableRows.count)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-
-            Spacer()
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 4)
-        .background(.bar)
+        tableContent
     }
 
     private var tableContent: some View {

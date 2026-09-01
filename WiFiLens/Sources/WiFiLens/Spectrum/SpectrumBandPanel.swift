@@ -6,65 +6,31 @@ struct SpectrumBandPanel: View {
     let chartType: SpectrumPanelViewType
     @Binding var selectedNetworkID: String?
 
-    private var bandVM: BandChartViewModel {
+    var bandVM: BandChartViewModel {
         viewModel.bandViewModel(for: panelID, selection: chartType)
     }
 
-    private var filterQueryBinding: Binding<String> {
+    var filterQueryBinding: Binding<String> {
         Binding(
             get: { viewModel.filterQuery(for: panelID) },
             set: { viewModel.setFilterQuery($0, for: panelID) }
         )
     }
 
-    private var totalCount: Int {
+    var totalCount: Int {
         bandVM.networkCount
     }
 
-    private var displayedCount: Int {
+    var displayedCount: Int {
         bandVM.visibleSeriesData().count
     }
 
-    private var hiddenCount: Int {
+    var hiddenCount: Int {
         totalCount - displayedCount
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            toolbar
-            chart
-        }
-    }
-
-    private var toolbar: some View {
-        HStack(spacing: 8) {
-            TextField(String(localized: "spectrum.panel.filter_placeholder", comment: "Filter input placeholder"), text: filterQueryBinding)
-                .textFieldStyle(.roundedBorder)
-                .frame(maxWidth: 300)
-
-            if hiddenCount > 0 {
-                Text("\(displayedCount)/\(totalCount)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-
-            if !filterQueryBinding.wrappedValue.isEmpty {
-                Button {
-                    filterQueryBinding.wrappedValue = ""
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.secondary)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(String(localized: "spectrum.filter.clear", comment: "Clear filter button"))
-                .help(String(localized: "spectrum.filter.clear", comment: "Clear filter button"))
-            }
-
-            Spacer()
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(.bar)
+        chart
     }
 
     private var chart: some View {
