@@ -96,11 +96,11 @@ struct ContentView: View {
 
                     Divider()
 
-                    SpectrumPanelView(
+                    SpectrumTablePanel(
                         viewModel: viewModel,
-                        panelID: .tertiary,
-                        chartType: $panel3ChartType,
-                        selectedNetworkID: $viewModel.selectedNetworkID
+                        isVendorColumnAvailable: isVendorColumnAvailable,
+                        sortOrder: $sortOrder,
+                        hiddenColumns: hiddenColumns
                     )
                     .frame(height: layout.tableHeight)
                 }
@@ -109,72 +109,6 @@ struct ContentView: View {
         }
         .accessibilityIdentifier("spectrum-dashboard")
         .accessibilityElement(children: .contain)
-    }
-
-    private var tableFilterBar: some View {
-        HStack(spacing: 12) {
-            Toggle(isOn: $viewModel.hideHiddenSSIDs) {
-                Text(String(localized: "spectrum.filter.hide_hidden", comment: "Toggle to hide networks with hidden SSIDs")).font(.caption)
-            }
-            .toggleStyle(.checkbox)
-            Spacer()
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 4)
-        .background(.bar)
-    }
-
-    private var tableRows: [NetworkTableRow] {
-        viewModel.combinedTableRows
-    }
-
-    private var sortedRows: [NetworkTableRow] {
-        guard !sortOrder.isEmpty else { return tableRows }
-        return tableRows.sorted { a, b in
-            for desc in sortOrder {
-                let result = compareRow(a, b, key: desc.key ?? "", ascending: desc.ascending)
-                if result != .orderedSame { return result == .orderedAscending }
-            }
-            return false
-        }
-    }
-
-    private func compareRow(_ a: NetworkTableRow, _ b: NetworkTableRow, key: String, ascending: Bool) -> ComparisonResult {
-        let cmp: ComparisonResult
-        switch key {
-        case "ssid": cmp = a.ssid.localizedCaseInsensitiveCompare(b.ssid)
-        case "vendor": cmp = a.vendor.localizedCaseInsensitiveCompare(b.vendor)
-        case "bandLabel": cmp = a.bandLabel.localizedCaseInsensitiveCompare(b.bandLabel)
-        case "channel": cmp = a.channel < b.channel ? .orderedAscending : a.channel > b.channel ? .orderedDescending : .orderedSame
-        case "rssi": cmp = a.rssi > b.rssi ? .orderedAscending : a.rssi < b.rssi ? .orderedDescending : .orderedSame
-        case "bssid": cmp = a.bssid.localizedCaseInsensitiveCompare(b.bssid)
-        case "phyMode": cmp = a.phyMode.localizedCaseInsensitiveCompare(b.phyMode)
-        case "channelWidth": cmp = Int(a.channelWidth) ?? 0 < Int(b.channelWidth) ?? 0 ? .orderedAscending : Int(a.channelWidth) ?? 0 > Int(b.channelWidth) ?? 0 ? .orderedDescending : .orderedSame
-        case "supportsK": cmp = a.supportsK == b.supportsK ? .orderedSame : a.supportsK ? .orderedDescending : .orderedAscending
-        case "supportsR": cmp = a.supportsR == b.supportsR ? .orderedSame : a.supportsR ? .orderedDescending : .orderedAscending
-        case "supportsV": cmp = a.supportsV == b.supportsV ? .orderedSame : a.supportsV ? .orderedDescending : .orderedAscending
-        case "isHiddenSSID": cmp = a.isHiddenSSID == b.isHiddenSSID ? .orderedSame : a.isHiddenSSID ? .orderedDescending : .orderedAscending
-        case "qualityScore": cmp = a.qualityScore > b.qualityScore ? .orderedAscending : a.qualityScore < b.qualityScore ? .orderedDescending : .orderedSame
-        case "security": cmp = a.security.localizedCaseInsensitiveCompare(b.security)
-        case "mcs": cmp = (Int(a.mcs) ?? 0) < (Int(b.mcs) ?? 0) ? .orderedAscending : (Int(a.mcs) ?? 0) > (Int(b.mcs) ?? 0) ? .orderedDescending : .orderedSame
-        case "nss": cmp = (Int(a.nss) ?? 0) < (Int(b.nss) ?? 0) ? .orderedAscending : (Int(a.nss) ?? 0) > (Int(b.nss) ?? 0) ? .orderedDescending : .orderedSame
-        case "country": cmp = a.country.localizedCaseInsensitiveCompare(b.country)
-        case "lastSeen": cmp = a.lastSeen.localizedCaseInsensitiveCompare(b.lastSeen)
-        default: cmp = .orderedSame
-        }
-        return ascending ? cmp : (cmp == .orderedAscending ? .orderedDescending : cmp == .orderedDescending ? .orderedAscending : .orderedSame)
-    }
-
-    private var bottomTable: some View {
-        NativeTableView(
-            rows: sortedRows,
-            selectedID: $viewModel.selectedNetworkID,
-            sortOrder: $sortOrder,
-            hiddenColumns: hiddenColumns,
-            isVendorColumnAvailable: isVendorColumnAvailable,
-            onToggleVisibility: { seriesID in viewModel.toggleVisibility(seriesID: seriesID) },
-            onToggleVisibilityLocked: { seriesID in viewModel.toggleVisibilityLocked(seriesID: seriesID) }
-        )
     }
 
     private var shouldShowEmptyState: Bool {
