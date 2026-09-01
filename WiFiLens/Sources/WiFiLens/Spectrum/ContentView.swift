@@ -27,6 +27,7 @@ struct ContentView: View {
     @State private var sortOrder: [NSSortDescriptor] = [NSSortDescriptor(key: "ssid", ascending: true)]
     @State private var panel1ChartType: SpectrumPanelViewType = .band24
     @State private var panel2ChartType: SpectrumPanelViewType = .band5
+    @State private var panel3ChartType: SpectrumPanelViewType = .table
     @AppStorage("hiddenTableColumns") private var hiddenColumnsData: String = ""
 
     private var hiddenColumns: Binding<Set<String>> {
@@ -95,10 +96,12 @@ struct ContentView: View {
 
                     Divider()
 
-                    VStack(spacing: 0) {
-                        tableFilterBar
-                        bottomTable
-                    }
+                    SpectrumPanelView(
+                        viewModel: viewModel,
+                        panelID: .tertiary,
+                        chartType: $panel3ChartType,
+                        selectedNetworkID: $viewModel.selectedNetworkID
+                    )
                     .frame(height: layout.tableHeight)
                 }
             }

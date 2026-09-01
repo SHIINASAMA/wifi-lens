@@ -23,4 +23,8 @@ import Testing
         #expect(SpectrumPanelViewType.trend.icon == "chart.line.uptrend.xyaxis")
         #expect(SpectrumPanelViewType.table.icon == "tablecells")
     }
+
+    @Test func spectrumPanelIDHasTertiary() {
+        #expect(SpectrumPanelID.tertiary.rawValue == "tertiary")
+    }
 }

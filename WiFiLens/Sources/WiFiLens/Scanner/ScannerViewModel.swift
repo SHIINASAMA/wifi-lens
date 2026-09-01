@@ -80,6 +80,9 @@ final class ScannerViewModel {
     private let secondaryBand24 = BandChartViewModel(band: .band24GHz)
     private let secondaryBand5 = BandChartViewModel(band: .band5GHz)
     private let secondaryBand6 = BandChartViewModel(band: .band6GHz)
+    private let tertiaryBand24 = BandChartViewModel(band: .band24GHz)
+    private let tertiaryBand5 = BandChartViewModel(band: .band5GHz)
+    private let tertiaryBand6 = BandChartViewModel(band: .band6GHz)
 
     var supportedBands: Set<ChannelBand> = []
     var isScanning = false
@@ -172,7 +175,7 @@ final class ScannerViewModel {
     }
 
     var allBandViewModels: [BandChartViewModel] {
-        [band24, band5, band6, primaryBand24, primaryBand5, primaryBand6, secondaryBand24, secondaryBand5, secondaryBand6]
+        [band24, band5, band6, primaryBand24, primaryBand5, primaryBand6, secondaryBand24, secondaryBand5, secondaryBand6, tertiaryBand24, tertiaryBand5, tertiaryBand6]
     }
 
     func bandViewModel(for panelID: SpectrumPanelID, selection: SpectrumPanelViewType) -> BandChartViewModel {
@@ -183,10 +186,15 @@ final class ScannerViewModel {
         case (.secondary, .band24): return secondaryBand24
         case (.secondary, .band5): return secondaryBand5
         case (.secondary, .band6): return secondaryBand6
+        case (.tertiary, .band24): return tertiaryBand24
+        case (.tertiary, .band5): return tertiaryBand5
+        case (.tertiary, .band6): return tertiaryBand6
         case (.primary, .trend): return primaryBand24
         case (.secondary, .trend): return secondaryBand24
+        case (.tertiary, .trend): return tertiaryBand24
         case (.primary, .table): return primaryBand24
         case (.secondary, .table): return secondaryBand24
+        case (.tertiary, .table): return tertiaryBand24
         }
     }
 
@@ -815,6 +823,7 @@ final class ScannerViewModel {
         }
         refreshBandViewModels(for: .primary, with: deduped, trends: trends, snapshots: snapshotDict)
         refreshBandViewModels(for: .secondary, with: deduped, trends: trends, snapshots: snapshotDict)
+        refreshBandViewModels(for: .tertiary, with: deduped, trends: trends, snapshots: snapshotDict)
 
         // Validate selected network still exists in the new scan
         if let selectedID = selectedNetworkID {
@@ -839,6 +848,7 @@ final class ScannerViewModel {
         displayStatesByID = recomputeDisplayStates(for: deduplicatedNetworks)
         refreshPanelBandViewModels(.primary)
         refreshPanelBandViewModels(.secondary)
+        refreshPanelBandViewModels(.tertiary)
         rebuildCachedDerivedData()
     }
 
@@ -850,6 +860,7 @@ final class ScannerViewModel {
         )
         refreshPanelBandViewModels(.primary)
         refreshPanelBandViewModels(.secondary)
+        refreshPanelBandViewModels(.tertiary)
         rebuildCachedDerivedData()
     }
 
@@ -861,6 +872,7 @@ final class ScannerViewModel {
         )
         refreshPanelBandViewModels(.primary)
         refreshPanelBandViewModels(.secondary)
+        refreshPanelBandViewModels(.tertiary)
         rebuildCachedDerivedData()
     }
 

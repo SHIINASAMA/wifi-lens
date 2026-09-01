@@ -3,6 +3,7 @@ import Foundation
 enum SpectrumPanelID: String, CaseIterable, Hashable {
     case primary
     case secondary
+    case tertiary
 }
 
 enum SpectrumPanelViewType: String, CaseIterable, Identifiable {
