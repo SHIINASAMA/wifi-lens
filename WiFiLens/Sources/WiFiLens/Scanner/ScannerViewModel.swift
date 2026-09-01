@@ -185,7 +185,7 @@ final class ScannerViewModel {
         case .band24: band = .band24GHz
         case .band5: band = .band5GHz
         case .band6: band = .band6GHz
-        case .trend, .table:
+        case .trend, .table, .heatmap:
             preconditionFailure("bandViewModel(for:) only supports band selections")
         }
 
@@ -233,6 +233,56 @@ final class ScannerViewModel {
     func snapshots(for networkID: String) -> [NetworkSnapshot]? {
         guard let bssid = deduplicatedNetworks.first(where: { $0.id == networkID })?.bssid else { return nil }
         return signalHistory.snapshotHistory(for: bssid)
+    }
+
+    /// Shared-history-derived heatmap for a single band. Owns only aggregation:
+    /// buckets the store's per-BSSID snapshots by scan timestamp, then for each
+    /// bucket counts how many AP spans cover each channel, reusing
+    /// ChannelSpanCalculator so the heatmap and the spectrum chart never
+    /// disagree about channel width. Does not compute colors or geometry, and
+    /// does not re-implement history trimming (SignalHistoryStore owns the
+    /// window). Environment-level: ignores per-panel filters and hidden toggles.
+    func heatmapModel(for band: ChannelBand) -> SpectrumHeatmapModel {
+        let channels: [Int] = band == .band24GHz ? Array(1...14) : Array(1...band.maxChannel)
+
+        // Bucket the band's snapshots by their exact scan timestamp. In
+        // production, ingestNetworks records every network of one scan with the
+        // same observation-cycle timestamp, so a bucket == one scan moment.
+        var buckets: [Date: [NetworkSnapshot]] = [:]
+        for snaps in signalHistory.allSnapshots.values {
+            for snap in snaps {
+                guard let snapBand = ChannelBand(id: snap.band), snapBand == band else { continue }
+                buckets[snap.timestamp, default: []].append(snap)
+            }
+        }
+
+        let sortedTimestamps = buckets.keys.sorted()
+        let rows = sortedTimestamps.map { timestamp -> SpectrumHeatmapRow in
+            var activity = [Int](repeating: 0, count: channels.count)
+            for snap in buckets[timestamp] ?? [] {
+                let widthMHz = SnapshotToChartAdapter.channelWidthMHz(from: snap.channelWidth)
+                let (left, right) = ChannelSpanCalculator.channelBlock(
+                    primaryChannel: snap.channel,
+                    widthMHz: widthMHz,
+                    band: band,
+                    spanDirection: nil
+                )
+                for (index, channel) in channels.enumerated() where (left...right).contains(channel) {
+                    activity[index] += 1
+                }
+            }
+            let cells = channels.enumerated().map { index, channel in
+                SpectrumHeatmapCell(
+                    id: "\(timestamp.timeIntervalSinceReferenceDate)-\(channel)",
+                    timestamp: timestamp,
+                    channel: channel,
+                    activity: activity[index]
+                )
+            }
+            return SpectrumHeatmapRow(id: timestamp, timestamp: timestamp, cells: cells)
+        }
+
+        return SpectrumHeatmapModel(band: band, channels: channels, rows: rows)
     }
 
     /// Cached table rows. Every `NetworkTableRow` field derives from stable

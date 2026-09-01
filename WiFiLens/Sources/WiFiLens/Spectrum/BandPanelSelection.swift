@@ -12,6 +12,7 @@ enum SpectrumPanelViewType: String, CaseIterable, Identifiable {
     case band6 = "6"
     case trend = "trend"
     case table = "table"
+    case heatmap = "heatmap"
 
     var id: String { rawValue }
 
@@ -22,6 +23,7 @@ enum SpectrumPanelViewType: String, CaseIterable, Identifiable {
         case .band6: return String(localized: "spectrum.panel.band.6ghz", comment: "6 GHz band label in spectrum panel")
         case .trend: return String(localized: "spectrum.panel.trend", comment: "Trend chart label in spectrum panel")
         case .table: return String(localized: "spectrum.panel.table", comment: "Table view label in spectrum panel")
+        case .heatmap: return String(localized: "spectrum.panel.heatmap", comment: "Heatmap label in spectrum panel")
         }
     }
 
@@ -32,6 +34,7 @@ enum SpectrumPanelViewType: String, CaseIterable, Identifiable {
         case .band6: return "wave.3.right.circle"
         case .trend: return "chart.line.uptrend.xyaxis"
         case .table: return "tablecells"
+        case .heatmap: return "square.grid.3x3.fill"
         }
     }
 }

@@ -8,6 +8,7 @@ import Testing
         #expect(SpectrumPanelViewType.band6.rawValue == "6")
         #expect(SpectrumPanelViewType.trend.rawValue == "trend")
         #expect(SpectrumPanelViewType.table.rawValue == "table")
+        #expect(SpectrumPanelViewType.heatmap.rawValue == "heatmap")
     }
 
     @Test func displayNames() {
@@ -18,7 +19,7 @@ import Testing
     }
 
     @Test func allCasesCount() {
-        #expect(SpectrumPanelViewType.allCases.count == 5)
+        #expect(SpectrumPanelViewType.allCases.count == 6)
     }
 
     @Test func icons() {
@@ -27,5 +28,6 @@ import Testing
         #expect(SpectrumPanelViewType.band6.icon == "wave.3.right.circle")
         #expect(SpectrumPanelViewType.trend.icon == "chart.line.uptrend.xyaxis")
         #expect(SpectrumPanelViewType.table.icon == "tablecells")
+        #expect(SpectrumPanelViewType.heatmap.icon == "square.grid.3x3.fill")
     }
 }

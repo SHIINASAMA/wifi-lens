@@ -4,6 +4,7 @@ struct SpectrumPanelView: View {
     @Bindable var viewModel: ScannerViewModel
     let panelID: SpectrumPanelID
     let isVendorColumnAvailable: Bool
+    let band: ChannelBand
     @Binding var chartType: SpectrumPanelViewType
     @Binding var selectedNetworkID: String?
     @Binding var sortOrder: [NSSortDescriptor]
@@ -34,7 +35,7 @@ struct SpectrumPanelView: View {
             switch chartType {
             case .band24, .band5, .band6:
                 bandPanel.toolbarContent
-            case .trend:
+            case .trend, .heatmap:
                 EmptyView()
             case .table:
                 tablePanel.toolbarContent
@@ -71,6 +72,8 @@ struct SpectrumPanelView: View {
             )
         case .table:
             tablePanel
+        case .heatmap:
+            SpectrumHeatmapPanel(viewModel: viewModel, band: band)
         }
     }
 
@@ -92,6 +95,7 @@ struct SpectrumPanelView: View {
         if viewModel.supportedBands.contains(.band6GHz) { types.append(.band6) }
         types.append(.trend)
         types.append(.table)
+        types.append(.heatmap)
         return types
     }
 

@@ -24,6 +24,14 @@ import AppKit
         #expect(SpectrumPanelViewType.band6.icon == "wave.3.right.circle")
         #expect(SpectrumPanelViewType.trend.icon == "chart.line.uptrend.xyaxis")
         #expect(SpectrumPanelViewType.table.icon == "tablecells")
+        #expect(SpectrumPanelViewType.heatmap.icon == "square.grid.3x3.fill")
+    }
+
+    @Test func bandPanelSelectionHeatmap() {
+        let selection = SpectrumPanelViewType.heatmap
+        #expect(selection.rawValue == "heatmap")
+        #expect(!selection.displayName.isEmpty)
+        #expect(selection.displayName != selection.rawValue)
     }
 
     @Test func spectrumPanelIDHasTertiary() {
@@ -37,6 +45,7 @@ import AppKit
             viewModel: vm,
             panelID: .tertiary,
             isVendorColumnAvailable: true,
+            band: .band24GHz,
             chartType: .constant(.table),
             selectedNetworkID: .constant(nil),
             sortOrder: .constant([]),
@@ -44,5 +53,6 @@ import AppKit
         )
         #expect(panel.supportedViewTypes.contains(.table))
         #expect(panel.supportedViewTypes.contains(.trend))
+        #expect(panel.supportedViewTypes.contains(.heatmap))
     }
 }
