@@ -668,4 +668,21 @@ import ChartLens
         #expect(vm.combinedTableRows.first?.visibilityLocked == true)
         #expect(vm.bandViewModel(for: .primary, selection: .band5).visibleSeriesData().isEmpty)
     }
+
+    @Test func bandViewModelsAreCreatedLazilyPerPanel() {
+        let vm = ScannerViewModel()
+        let office = makeNetwork(ssid: "Office", bssid: "00:11:22:33:44:55", band: .band5GHz, channel: 36)
+
+        vm.debugApplyNetworksForTesting([office], supportedBands: Set([ChannelBand.band5GHz]))
+
+        // The tertiary panel defaults to Table and never requested a band VM,
+        // so no band ViewModels should have been allocated for it.
+        #expect(vm.panelBandViewModels(for: .tertiary).isEmpty)
+
+        // Requesting a band VM lazily creates it and immediately syncs the
+        // current scan data so the panel is usable right away.
+        let bandVM = vm.bandViewModel(for: .tertiary, selection: .band5)
+        #expect(bandVM.visibleSeriesData().map(\.id) == [office.id])
+        #expect(vm.panelBandViewModels(for: .tertiary).map(\.band) == [.band5GHz])
+    }
 }
