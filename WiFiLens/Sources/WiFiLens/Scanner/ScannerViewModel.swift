@@ -227,6 +227,14 @@ final class ScannerViewModel {
             .filter { supportedBands.contains($0.band) }
     }
 
+    /// Shared history for a selected network, independent of any panel's band
+    /// ViewModels. Maps the stable network ID to its BSSID and reads the
+    /// shared SignalHistoryStore.
+    func snapshots(for networkID: String) -> [NetworkSnapshot]? {
+        guard let bssid = deduplicatedNetworks.first(where: { $0.id == networkID })?.bssid else { return nil }
+        return signalHistory.snapshotHistory(for: bssid)
+    }
+
     /// Cached table rows. Every `NetworkTableRow` field derives from stable
     /// state (true `rssi`, series metadata, display state, vendor database, and
     /// signal history); the animation tick only mutates `displayRSSI`, which

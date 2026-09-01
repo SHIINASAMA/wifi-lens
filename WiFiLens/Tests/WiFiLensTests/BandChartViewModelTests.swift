@@ -685,4 +685,15 @@ import ChartLens
         #expect(bandVM.visibleSeriesData().map(\.id) == [office.id])
         #expect(vm.panelBandViewModels(for: .tertiary).map(\.band) == [.band5GHz])
     }
+
+    @Test func sharedTrendAPIsUseSignalHistoryForSelectedNetwork() {
+        let vm = ScannerViewModel()
+        let network = makeNetwork(ssid: "Office", bssid: "00:11:22:33:44:55", band: .band5GHz, channel: 36)
+        vm.debugApplyNetworksForTesting([network], supportedBands: [.band5GHz])
+
+        // A panel that never opened a band must still resolve shared history
+        // for the globally selected network.
+        let snaps = vm.snapshots(for: network.id)
+        #expect(snaps != nil)
+    }
 }
