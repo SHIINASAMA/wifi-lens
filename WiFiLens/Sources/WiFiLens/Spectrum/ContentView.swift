@@ -1,22 +1,20 @@
 import SwiftUI
 
 struct SpectrumDashboardLayout {
-    static let primaryRatio: CGFloat = 0.35
-    static let secondaryRatio: CGFloat = 0.35
-    static let tableRatio: CGFloat = 0.30
+    static let panelRatio: CGFloat = 1.0 / 3.0
 
     let viewportHeight: CGFloat
 
     var primaryHeight: CGFloat {
-        viewportHeight * Self.primaryRatio
+        viewportHeight * Self.panelRatio
     }
 
     var secondaryHeight: CGFloat {
-        viewportHeight * Self.secondaryRatio
+        viewportHeight * Self.panelRatio
     }
 
-    var tableHeight: CGFloat {
-        viewportHeight * Self.tableRatio
+    var tertiaryHeight: CGFloat {
+        viewportHeight * Self.panelRatio
     }
 }
 
@@ -25,8 +23,6 @@ struct ContentView: View {
     let isVendorColumnAvailable: Bool
 
     @State private var sortOrder: [NSSortDescriptor] = [NSSortDescriptor(key: "ssid", ascending: true)]
-    @State private var panel1ChartType: BandPanelSelection = .band24
-    @State private var panel2ChartType: BandPanelSelection = .band5
     @AppStorage("hiddenTableColumns") private var hiddenColumnsData: String = ""
 
     private var hiddenColumns: Binding<Set<String>> {
@@ -75,103 +71,48 @@ struct ContentView: View {
                     emptyState
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    SpectrumPanelView(
+                    SpectrumPanelContainer(
                         viewModel: viewModel,
                         panelID: .primary,
-                        chartType: $panel1ChartType,
-                        selectedNetworkID: $viewModel.selectedNetworkID
+                        isVendorColumnAvailable: isVendorColumnAvailable,
+                        defaultViewType: .band24,
+                        selectedNetworkID: $viewModel.selectedNetworkID,
+                        sortOrder: $sortOrder,
+                        hiddenColumns: hiddenColumns
                     )
                     .frame(height: layout.primaryHeight)
 
                     Divider()
 
-                    SpectrumPanelView(
+                    SpectrumPanelContainer(
                         viewModel: viewModel,
                         panelID: .secondary,
-                        chartType: $panel2ChartType,
-                        selectedNetworkID: $viewModel.selectedNetworkID
+                        isVendorColumnAvailable: isVendorColumnAvailable,
+                        defaultViewType: .band5,
+                        selectedNetworkID: $viewModel.selectedNetworkID,
+                        sortOrder: $sortOrder,
+                        hiddenColumns: hiddenColumns
                     )
                     .frame(height: layout.secondaryHeight)
 
                     Divider()
 
-                    VStack(spacing: 0) {
-                        tableFilterBar
-                        bottomTable
-                    }
-                    .frame(height: layout.tableHeight)
+                    SpectrumPanelContainer(
+                        viewModel: viewModel,
+                        panelID: .tertiary,
+                        isVendorColumnAvailable: isVendorColumnAvailable,
+                        defaultViewType: .table,
+                        selectedNetworkID: $viewModel.selectedNetworkID,
+                        sortOrder: $sortOrder,
+                        hiddenColumns: hiddenColumns
+                    )
+                    .frame(height: layout.tertiaryHeight)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .accessibilityIdentifier("spectrum-dashboard")
         .accessibilityElement(children: .contain)
-    }
-
-    private var tableFilterBar: some View {
-        HStack(spacing: 12) {
-            Toggle(isOn: $viewModel.hideHiddenSSIDs) {
-                Text(String(localized: "spectrum.filter.hide_hidden", comment: "Toggle to hide networks with hidden SSIDs")).font(.caption)
-            }
-            .toggleStyle(.checkbox)
-            Spacer()
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 4)
-        .background(.bar)
-    }
-
-    private var tableRows: [NetworkTableRow] {
-        viewModel.combinedTableRows
-    }
-
-    private var sortedRows: [NetworkTableRow] {
-        guard !sortOrder.isEmpty else { return tableRows }
-        return tableRows.sorted { a, b in
-            for desc in sortOrder {
-                let result = compareRow(a, b, key: desc.key ?? "", ascending: desc.ascending)
-                if result != .orderedSame { return result == .orderedAscending }
-            }
-            return false
-        }
-    }
-
-    private func compareRow(_ a: NetworkTableRow, _ b: NetworkTableRow, key: String, ascending: Bool) -> ComparisonResult {
-        let cmp: ComparisonResult
-        switch key {
-        case "ssid": cmp = a.ssid.localizedCaseInsensitiveCompare(b.ssid)
-        case "vendor": cmp = a.vendor.localizedCaseInsensitiveCompare(b.vendor)
-        case "bandLabel": cmp = a.bandLabel.localizedCaseInsensitiveCompare(b.bandLabel)
-        case "channel": cmp = a.channel < b.channel ? .orderedAscending : a.channel > b.channel ? .orderedDescending : .orderedSame
-        case "rssi": cmp = a.rssi > b.rssi ? .orderedAscending : a.rssi < b.rssi ? .orderedDescending : .orderedSame
-        case "bssid": cmp = a.bssid.localizedCaseInsensitiveCompare(b.bssid)
-        case "phyMode": cmp = a.phyMode.localizedCaseInsensitiveCompare(b.phyMode)
-        case "channelWidth": cmp = Int(a.channelWidth) ?? 0 < Int(b.channelWidth) ?? 0 ? .orderedAscending : Int(a.channelWidth) ?? 0 > Int(b.channelWidth) ?? 0 ? .orderedDescending : .orderedSame
-        case "supportsK": cmp = a.supportsK == b.supportsK ? .orderedSame : a.supportsK ? .orderedDescending : .orderedAscending
-        case "supportsR": cmp = a.supportsR == b.supportsR ? .orderedSame : a.supportsR ? .orderedDescending : .orderedAscending
-        case "supportsV": cmp = a.supportsV == b.supportsV ? .orderedSame : a.supportsV ? .orderedDescending : .orderedAscending
-        case "isHiddenSSID": cmp = a.isHiddenSSID == b.isHiddenSSID ? .orderedSame : a.isHiddenSSID ? .orderedDescending : .orderedAscending
-        case "qualityScore": cmp = a.qualityScore > b.qualityScore ? .orderedAscending : a.qualityScore < b.qualityScore ? .orderedDescending : .orderedSame
-        case "security": cmp = a.security.localizedCaseInsensitiveCompare(b.security)
-        case "mcs": cmp = (Int(a.mcs) ?? 0) < (Int(b.mcs) ?? 0) ? .orderedAscending : (Int(a.mcs) ?? 0) > (Int(b.mcs) ?? 0) ? .orderedDescending : .orderedSame
-        case "nss": cmp = (Int(a.nss) ?? 0) < (Int(b.nss) ?? 0) ? .orderedAscending : (Int(a.nss) ?? 0) > (Int(b.nss) ?? 0) ? .orderedDescending : .orderedSame
-        case "country": cmp = a.country.localizedCaseInsensitiveCompare(b.country)
-        case "lastSeen": cmp = a.lastSeen.localizedCaseInsensitiveCompare(b.lastSeen)
-        default: cmp = .orderedSame
-        }
-        return ascending ? cmp : (cmp == .orderedAscending ? .orderedDescending : cmp == .orderedDescending ? .orderedAscending : .orderedSame)
-    }
-
-    private var bottomTable: some View {
-        NativeTableView(
-            rows: sortedRows,
-            selectedID: $viewModel.selectedNetworkID,
-            sortOrder: $sortOrder,
-            hiddenColumns: hiddenColumns,
-            isVendorColumnAvailable: isVendorColumnAvailable,
-            onToggleVisibility: { seriesID in viewModel.toggleVisibility(seriesID: seriesID) },
-            onToggleVisibilityLocked: { seriesID in viewModel.toggleVisibilityLocked(seriesID: seriesID) }
-        )
     }
 
     private var shouldShowEmptyState: Bool {

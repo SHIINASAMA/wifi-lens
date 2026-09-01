@@ -20,7 +20,11 @@ WiFi — CoreWLAN scan source → WiFiObservationRuntime
 Runtime output → ScannerViewModel presentation projection
                   ├── WiFiNetwork → ChannelSpanCalculator → ChartSeriesData (Gaussian curves)
                   │                 → BandChartViewModel (per-band state → BandChartRenderModel)
-                                       ├── combinedTableRows → NativeTableView (AppKit NSTableView)
+                                       ├── combinedTableRows → SpectrumTablePanel → NativeTableView (AppKit NSTableView)
+                                       ├── SpectrumPanelView (primary/secondary/tertiary, 1:1:1)
+                                       │     ├── SpectrumBandPanel → WiFiBandChart
+                                       │     ├── SpectrumTrendPanel → TrendChartView
+                                       │     └── SpectrumTablePanel → NativeTableView
                                        ├── channelQualities → ChannelQualityCalculator → ChannelQualityView
                                        ├── bandViewModels → WiFiBandChart → Chart (universal renderer)
                                        ├── networkInfo → InterfacesView (throughput, gateway, DNS)
@@ -53,7 +57,7 @@ Chart Engine (ChartLens package):
 |------|---------------|
 | `WiFiLensApp.swift` | Root `@main` App struct, Scene, menu commands, window group |
 | `Scanner/` | Presentation-facing scanner ViewModel, CoreWLAN scan source, network/channel models, Wi-Fi power monitoring, and CWChannel extensions |
-| `Spectrum/` | WiFiBandChart, BandChartViewModel, BandChartRenderModel, BandChartLayout, ContentView (dashboard), ChartSeriesData, ChannelSpanCalculator, SignalHistoryStore, NetworkSnapshot, TrendChartView, SnapshotToChartAdapter, SSIDColorHasher |
+| `Spectrum/` | ContentView (dashboard), SpectrumPanelView (reusable panel shell), SpectrumBandPanel, SpectrumTrendPanel, SpectrumTablePanel, NetworkTableRowSorter, WiFiBandChart, BandChartViewModel, BandChartRenderModel, BandChartLayout, ChartSeriesData, ChannelSpanCalculator, SignalHistoryStore, NetworkSnapshot, TrendChartView, SnapshotToChartAdapter, SSIDColorHasher |
 | `Channels/` | ChannelQualityCalculator, ChannelQualityView, RecommendationReason, RecommendationReasonCalculator, ReasonPopover |
 | `Charts/` | Universal Chart engine: ChartView, ChartTypes, DetailOverviewChart, RangeSelectorView, ChartGeometry, SplineInterpolation, ChartTimeFormatting, ChartRendering (legacy) |
 | `Interfaces/` | InterfacesView, ThroughputMonitor, ThroughputChartView, NetworkInfoService |
@@ -89,6 +93,7 @@ explicitly scoped to Pro.
 - **Shared route-resource leases**: each main window registers its current route under a stable scene ID. A process-scoped coordinator aggregates those leases for the process-shared Spectrum charts and BLE scanner; resources start on the first matching route and stop only after the final lease is released by a route change or real window close. BLE starts return generation-bound sessions whose stop operation cannot terminate a newer session, and stopping always finishes that session's event stream.
 - Selection flows bidirectionally: table row → `selectedNetworkID` → chart highlight; chart curve click → `selectedNetworkID` → table row highlight
 - `NativeTableView` uses `Coordinator` as `NSTableViewDelegate` + `NSTableViewDataSource`
+- **Spectrum panel composition**: `ContentView` lays out three `SpectrumPanelView` instances at equal height (`primary` / `secondary` / `tertiary`). Each panel owns a View-type switcher (`SpectrumPanelViewType`: `2.4G / 5G / 6G / Trend / Table`) and renders the matching content object: `SpectrumBandPanel`, `SpectrumTrendPanel`, or `SpectrumTablePanel`. The panel toolbar shows the View switcher and the active content's own controls on the same row; filtering belongs to the band views, the hidden-SSID toggle belongs to the table view, and Trend has no dedicated controls. `SpectrumTablePanel` sorts rows through `NetworkTableRowSorter` and preserves the shared `sortOrder` / `hiddenColumns` bindings.
 - **Chart Engine** — All chart views build `[ChartSeries]` arrays and delegate rendering to the universal `Chart<Overlay>` component. Domain-specific overlays (tooltips, heatmaps, data labels, transition markers) are injected via a `ViewBuilder` closure. See [CHARTS.md](CHARTS.md).
 - `WiFiBandChart` is decoupled from `BandChartViewModel` via `BandChartRenderModel` — a value-type snapshot created each render pass, so the view never holds a reference to the ViewModel
 - **ChartSeriesData split**: `ChartSeriesDomainData` (immutable network identity) + `ChartSeriesRenderState` (mutable visual state: animated `displayRSSI`, `color`, filter/visibility flags, trend indicators). `ChartSeriesData` wraps both with computed passthrough properties

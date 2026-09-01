@@ -74,12 +74,10 @@ final class ScannerViewModel {
     var band24 = BandChartViewModel(band: .band24GHz)
     var band5 = BandChartViewModel(band: .band5GHz)
     var band6 = BandChartViewModel(band: .band6GHz)
-    private let primaryBand24 = BandChartViewModel(band: .band24GHz)
-    private let primaryBand5 = BandChartViewModel(band: .band5GHz)
-    private let primaryBand6 = BandChartViewModel(band: .band6GHz)
-    private let secondaryBand24 = BandChartViewModel(band: .band24GHz)
-    private let secondaryBand5 = BandChartViewModel(band: .band5GHz)
-    private let secondaryBand6 = BandChartViewModel(band: .band6GHz)
+    /// Panel band ViewModels are created lazily when a panel actually requests
+    /// a band view. Panels that never open a band (for example a Table-only
+    /// panel) do not allocate or refresh these stateful objects.
+    private var panelBandViewModelsByID: [SpectrumPanelID: [ChannelBand: BandChartViewModel]] = [:]
 
     var supportedBands: Set<ChannelBand> = []
     var isScanning = false
@@ -172,20 +170,46 @@ final class ScannerViewModel {
     }
 
     var allBandViewModels: [BandChartViewModel] {
-        [band24, band5, band6, primaryBand24, primaryBand5, primaryBand6, secondaryBand24, secondaryBand5, secondaryBand6]
+        var result = bandViewModels
+        for panel in SpectrumPanelID.allCases {
+            if let byBand = panelBandViewModelsByID[panel] {
+                result.append(contentsOf: Array(byBand.values))
+            }
+        }
+        return result
     }
 
-    func bandViewModel(for panelID: SpectrumPanelID, selection: BandPanelSelection) -> BandChartViewModel {
-        switch (panelID, selection) {
-        case (.primary, .band24): return primaryBand24
-        case (.primary, .band5): return primaryBand5
-        case (.primary, .band6): return primaryBand6
-        case (.secondary, .band24): return secondaryBand24
-        case (.secondary, .band5): return secondaryBand5
-        case (.secondary, .band6): return secondaryBand6
-        case (.primary, .trend): return primaryBand24
-        case (.secondary, .trend): return secondaryBand24
+    func bandViewModel(for panelID: SpectrumPanelID, selection: SpectrumPanelViewType) -> BandChartViewModel {
+        let band: ChannelBand
+        switch selection {
+        case .band24: band = .band24GHz
+        case .band5: band = .band5GHz
+        case .band6: band = .band6GHz
+        case .trend, .table:
+            preconditionFailure("bandViewModel(for:) only supports band selections")
         }
+
+        var byBand = panelBandViewModelsByID[panelID] ?? [:]
+        if let existing = byBand[band] {
+            return existing
+        }
+        let created = BandChartViewModel(band: band)
+        if !interfaceName.isEmpty {
+            created.updateInterfaceName(interfaceName)
+        }
+        byBand[band] = created
+        panelBandViewModelsByID[panelID] = byBand
+        if !deduplicatedNetworks.isEmpty {
+            syncBandViewModel(
+                created,
+                for: panelID,
+                band: band,
+                networks: deduplicatedNetworks,
+                trends: makeTrends(for: deduplicatedNetworks),
+                snapshots: makeSnapshots(for: deduplicatedNetworks)
+            )
+        }
+        return created
     }
 
     func filterQuery(for panelID: SpectrumPanelID) -> String {
@@ -198,12 +222,17 @@ final class ScannerViewModel {
     }
 
     func panelBandViewModels(for panelID: SpectrumPanelID) -> [BandChartViewModel] {
-        [
-            bandViewModel(for: panelID, selection: .band24),
-            bandViewModel(for: panelID, selection: .band5),
-            bandViewModel(for: panelID, selection: .band6),
-        ]
-        .filter { supportedBands.contains($0.band) }
+        guard let byBand = panelBandViewModelsByID[panelID] else { return [] }
+        return Array(byBand.values)
+            .filter { supportedBands.contains($0.band) }
+    }
+
+    /// Shared history for a selected network, independent of any panel's band
+    /// ViewModels. Maps the stable network ID to its BSSID and reads the
+    /// shared SignalHistoryStore.
+    func snapshots(for networkID: String) -> [NetworkSnapshot]? {
+        guard let bssid = deduplicatedNetworks.first(where: { $0.id == networkID })?.bssid else { return nil }
+        return signalHistory.snapshotHistory(for: bssid)
     }
 
     /// Cached table rows. Every `NetworkTableRow` field derives from stable
@@ -683,46 +712,62 @@ final class ScannerViewModel {
         trends: [String: (direction: TrendDirection, delta: Int)],
         snapshots: [String: [NetworkSnapshot]]
     ) {
+        if supportedBands.contains(.band24GHz),
+           let vm = panelBandViewModelsByID[panelID]?[.band24GHz] {
+            syncBandViewModel(
+                vm,
+                for: panelID,
+                band: .band24GHz,
+                networks: networks,
+                trends: trends,
+                snapshots: snapshots
+            )
+        }
+
+        if supportedBands.contains(.band5GHz),
+           let vm = panelBandViewModelsByID[panelID]?[.band5GHz] {
+            syncBandViewModel(
+                vm,
+                for: panelID,
+                band: .band5GHz,
+                networks: networks,
+                trends: trends,
+                snapshots: snapshots
+            )
+        }
+
+        if supportedBands.contains(.band6GHz),
+           let vm = panelBandViewModelsByID[panelID]?[.band6GHz] {
+            syncBandViewModel(
+                vm,
+                for: panelID,
+                band: .band6GHz,
+                networks: networks,
+                trends: trends,
+                snapshots: snapshots
+            )
+        }
+    }
+
+    private func syncBandViewModel(
+        _ vm: BandChartViewModel,
+        for panelID: SpectrumPanelID,
+        band: ChannelBand,
+        networks: [WiFiNetwork],
+        trends: [String: (direction: TrendDirection, delta: Int)],
+        snapshots: [String: [NetworkSnapshot]]
+    ) {
         let panelDisplayStates = recomputePanelDisplayStates(for: networks, panelID: panelID)
-
-        let sorted24 = networks
-            .filter { $0.channel.band == .band24GHz }
+        let sorted = networks
+            .filter { $0.channel.band == band }
             .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
-        if supportedBands.contains(.band24GHz) {
-            bandViewModel(for: panelID, selection: .band24).updateNetworks(
-                sorted24,
-                colorHasher: colorHasher,
-                displayStatesByID: panelDisplayStates,
-                trends: trends,
-                snapshots: snapshots
-            )
-        }
-
-        let sorted5 = networks
-            .filter { $0.channel.band == .band5GHz }
-            .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
-        if supportedBands.contains(.band5GHz) {
-            bandViewModel(for: panelID, selection: .band5).updateNetworks(
-                sorted5,
-                colorHasher: colorHasher,
-                displayStatesByID: panelDisplayStates,
-                trends: trends,
-                snapshots: snapshots
-            )
-        }
-
-        let sorted6 = networks
-            .filter { $0.channel.band == .band6GHz }
-            .sorted { $0.channel.channelNumber < $1.channel.channelNumber }
-        if supportedBands.contains(.band6GHz) {
-            bandViewModel(for: panelID, selection: .band6).updateNetworks(
-                sorted6,
-                colorHasher: colorHasher,
-                displayStatesByID: panelDisplayStates,
-                trends: trends,
-                snapshots: snapshots
-            )
-        }
+        vm.updateNetworks(
+            sorted,
+            colorHasher: colorHasher,
+            displayStatesByID: panelDisplayStates,
+            trends: trends,
+            snapshots: snapshots
+        )
     }
 
     private func refreshPanelBandViewModels(_ panelID: SpectrumPanelID) {
@@ -813,6 +858,7 @@ final class ScannerViewModel {
         }
         refreshBandViewModels(for: .primary, with: deduped, trends: trends, snapshots: snapshotDict)
         refreshBandViewModels(for: .secondary, with: deduped, trends: trends, snapshots: snapshotDict)
+        refreshBandViewModels(for: .tertiary, with: deduped, trends: trends, snapshots: snapshotDict)
 
         // Validate selected network still exists in the new scan
         if let selectedID = selectedNetworkID {
@@ -837,6 +883,7 @@ final class ScannerViewModel {
         displayStatesByID = recomputeDisplayStates(for: deduplicatedNetworks)
         refreshPanelBandViewModels(.primary)
         refreshPanelBandViewModels(.secondary)
+        refreshPanelBandViewModels(.tertiary)
         rebuildCachedDerivedData()
     }
 
@@ -848,6 +895,7 @@ final class ScannerViewModel {
         )
         refreshPanelBandViewModels(.primary)
         refreshPanelBandViewModels(.secondary)
+        refreshPanelBandViewModels(.tertiary)
         rebuildCachedDerivedData()
     }
 
@@ -859,6 +907,7 @@ final class ScannerViewModel {
         )
         refreshPanelBandViewModels(.primary)
         refreshPanelBandViewModels(.secondary)
+        refreshPanelBandViewModels(.tertiary)
         rebuildCachedDerivedData()
     }
 
