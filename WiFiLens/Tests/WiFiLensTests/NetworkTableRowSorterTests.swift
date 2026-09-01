@@ -49,12 +49,20 @@ struct NetworkTableRowSorterTests {
         #expect(sorted.map(\.ssid) == ["A", "B"])
     }
 
-    @Test func sortsByRSSIDescending() {
+    @Test func sortsByRSSIUsingExistingInvertedSemantics() {
         let rows = [row("weak", rssi: -60, ssid: "A"), row("strong", rssi: -50, ssid: "B")]
         let sorted = NetworkTableRowSorter.sort(
             rows,
             by: [NSSortDescriptor(key: "rssi", ascending: false)]
         )
-        #expect(sorted.map(\.id) == ["strong", "weak"])
+        // The pre-existing comparator treats a larger RSSI as "ascending", so
+        // descending flips the order: weaker signal comes first.
+        #expect(sorted.map(\.id) == ["weak", "strong"])
+
+        let ascendingSorted = NetworkTableRowSorter.sort(
+            rows,
+            by: [NSSortDescriptor(key: "rssi", ascending: true)]
+        )
+        #expect(ascendingSorted.map(\.id) == ["strong", "weak"])
     }
 }

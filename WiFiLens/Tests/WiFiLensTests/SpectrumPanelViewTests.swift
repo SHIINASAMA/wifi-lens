@@ -36,9 +36,9 @@ import AppKit
         let panel = SpectrumPanelView(
             viewModel: vm,
             panelID: .tertiary,
+            isVendorColumnAvailable: true,
             chartType: .constant(.table),
             selectedNetworkID: .constant(nil),
-            isVendorColumnAvailable: true,
             sortOrder: .constant([]),
             hiddenColumns: .constant([])
         )

@@ -79,9 +79,9 @@ struct ContentView: View {
                     SpectrumPanelView(
                         viewModel: viewModel,
                         panelID: .primary,
+                        isVendorColumnAvailable: isVendorColumnAvailable,
                         chartType: $panel1ChartType,
                         selectedNetworkID: $viewModel.selectedNetworkID,
-                        isVendorColumnAvailable: isVendorColumnAvailable,
                         sortOrder: $sortOrder,
                         hiddenColumns: hiddenColumns
                     )
@@ -92,9 +92,9 @@ struct ContentView: View {
                     SpectrumPanelView(
                         viewModel: viewModel,
                         panelID: .secondary,
+                        isVendorColumnAvailable: isVendorColumnAvailable,
                         chartType: $panel2ChartType,
                         selectedNetworkID: $viewModel.selectedNetworkID,
-                        isVendorColumnAvailable: isVendorColumnAvailable,
                         sortOrder: $sortOrder,
                         hiddenColumns: hiddenColumns
                     )
@@ -105,9 +105,9 @@ struct ContentView: View {
                     SpectrumPanelView(
                         viewModel: viewModel,
                         panelID: .tertiary,
+                        isVendorColumnAvailable: isVendorColumnAvailable,
                         chartType: $panel3ChartType,
                         selectedNetworkID: $viewModel.selectedNetworkID,
-                        isVendorColumnAvailable: isVendorColumnAvailable,
                         sortOrder: $sortOrder,
                         hiddenColumns: hiddenColumns
                     )

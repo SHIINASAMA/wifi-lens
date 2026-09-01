@@ -9,24 +9,6 @@ struct SpectrumPanelView: View {
     @Binding var sortOrder: [NSSortDescriptor]
     @Binding var hiddenColumns: Set<String>
 
-    init(
-        viewModel: ScannerViewModel,
-        panelID: SpectrumPanelID,
-        chartType: Binding<SpectrumPanelViewType>,
-        selectedNetworkID: Binding<String?>,
-        isVendorColumnAvailable: Bool,
-        sortOrder: Binding<[NSSortDescriptor]>,
-        hiddenColumns: Binding<Set<String>>
-    ) {
-        self.viewModel = viewModel
-        self.panelID = panelID
-        self.chartType = chartType
-        self.selectedNetworkID = selectedNetworkID
-        self.isVendorColumnAvailable = isVendorColumnAvailable
-        self.sortOrder = sortOrder
-        self.hiddenColumns = hiddenColumns
-    }
-
     private var currentBandVM: BandChartViewModel {
         bandViewModel(for: chartType)
     }
@@ -63,7 +45,7 @@ struct SpectrumPanelView: View {
     private var toolbar: some View {
         HStack(spacing: 8) {
             Picker(String(localized: "spectrum.panel.chart_type", comment: "Chart type picker label"), selection: $chartType) {
-                ForEach(supportedChartTypes) { type in
+                ForEach(supportedViewTypes) { type in
                     Text(type.displayName)
                         .lineLimit(1)
                         .tag(type)
