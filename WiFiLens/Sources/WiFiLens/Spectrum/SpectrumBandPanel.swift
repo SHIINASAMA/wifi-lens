@@ -30,13 +30,10 @@ struct SpectrumBandPanel: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            toolbar
-            chart
-        }
+        chart
     }
 
-    private var toolbar: some View {
+    var toolbarContent: some View {
         HStack(spacing: 8) {
             TextField(String(localized: "spectrum.panel.filter_placeholder", comment: "Filter input placeholder"), text: filterQueryBinding)
                 .textFieldStyle(.roundedBorder)
@@ -62,10 +59,6 @@ struct SpectrumBandPanel: View {
 
             Spacer()
         }
-        .frame(minHeight: 24)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(.bar)
     }
 
     private var chart: some View {

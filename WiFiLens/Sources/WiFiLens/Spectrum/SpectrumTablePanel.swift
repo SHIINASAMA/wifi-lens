@@ -7,13 +7,10 @@ struct SpectrumTablePanel: View {
     @Binding var hiddenColumns: Set<String>
 
     var body: some View {
-        VStack(spacing: 0) {
-            tableToolbar
-            tableContent
-        }
+        tableContent
     }
 
-    private var tableToolbar: some View {
+    var toolbarContent: some View {
         HStack(spacing: 12) {
             Toggle(isOn: $viewModel.hideHiddenSSIDs) {
                 Text(String(localized: "spectrum.filter.hide_hidden", comment: "Toggle to hide networks with hidden SSIDs"))
@@ -30,10 +27,6 @@ struct SpectrumTablePanel: View {
 
             Spacer()
         }
-        .frame(minHeight: 24)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 4)
-        .background(.bar)
     }
 
     private var tableContent: some View {

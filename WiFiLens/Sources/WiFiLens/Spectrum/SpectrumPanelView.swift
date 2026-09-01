@@ -31,6 +31,15 @@ struct SpectrumPanelView: View {
             .pickerStyle(.menu)
             .frame(width: 180)
 
+            switch chartType {
+            case .band24, .band5, .band6:
+                bandPanel.toolbarContent
+            case .trend:
+                EmptyView()
+            case .table:
+                tablePanel.toolbarContent
+            }
+
             Spacer()
         }
         .frame(minHeight: 24)
@@ -39,18 +48,22 @@ struct SpectrumPanelView: View {
         .background(.bar)
     }
 
+    private var bandPanel: SpectrumBandPanel {
+        SpectrumBandPanel(
+            viewModel: viewModel,
+            panelID: panelID,
+            chartType: chartType,
+            selectedNetworkID: $selectedNetworkID
+        )
+    }
+
     // MARK: - Chart Content
 
     @ViewBuilder
     private var chartContent: some View {
         switch chartType {
         case .band24, .band5, .band6:
-            SpectrumBandPanel(
-                viewModel: viewModel,
-                panelID: panelID,
-                chartType: chartType,
-                selectedNetworkID: $selectedNetworkID
-            )
+            bandPanel
         case .trend:
             SpectrumTrendPanel(
                 viewModel: viewModel,
@@ -61,7 +74,7 @@ struct SpectrumPanelView: View {
         }
     }
 
-    private var tablePanel: some View {
+    private var tablePanel: SpectrumTablePanel {
         SpectrumTablePanel(
             viewModel: viewModel,
             isVendorColumnAvailable: isVendorColumnAvailable,
