@@ -97,7 +97,43 @@ import SwiftUI
         let vm = ScannerViewModel()
         let model = vm.heatmapModel(for: .band24GHz)
         #expect(model.rows.isEmpty)
-        #expect(model.channels == Array(1...14))
+        // Unknown region in a fresh view model → US 2.4 GHz fallback (channels 1...11).
+        #expect(model.channels == Array(1...11))
+    }
+
+    @Test func fiveGHzChannelsUseLegalSet() {
+        let vm = ScannerViewModel()
+        let model = vm.heatmapModel(for: .band5GHz)
+        // Unknown region → US fallback: the legal 5 GHz plan (36/40/44/…), not 1...170.
+        let expected = RegulatoryDatabase.rules[.US]?["5"]?.allowedChannels.sorted() ?? []
+        #expect(!expected.isEmpty)
+        #expect(model.channels == expected)
+        // Regression guards against the old continuous 1...maxChannel range:
+        #expect(!model.channels.contains(1))
+        #expect(!model.channels.contains(170))
+    }
+
+    @Test func sixGHzChannelsUseLegalSet() {
+        let vm = ScannerViewModel()
+        let model = vm.heatmapModel(for: .band6GHz)
+        let expected = RegulatoryDatabase.rules[.US]?["6"]?.allowedChannels.sorted() ?? []
+        #expect(!expected.isEmpty)
+        #expect(model.channels == expected)
+        // 6 GHz is a 20 MHz PSC grid (1, 5, 9, …, 233), not every integer:
+        #expect(model.channels.first == 1)
+        #expect(model.channels.contains(5))
+        #expect(!model.channels.contains(2))
+    }
+
+    @Test func heatmapChannelsRespectRegionOverride() {
+        let vm = ScannerViewModel()
+        vm.userRegionOverride = .JP
+        let model = vm.heatmapModel(for: .band5GHz)
+        let expected = RegulatoryDatabase.rules[.JP]?["5"]?.allowedChannels.sorted() ?? []
+        #expect(!expected.isEmpty)
+        #expect(model.channels == expected)
+        #expect(model.channels.last == 144)      // JP 5 GHz caps at 144
+        #expect(!model.channels.contains(149))   // U-NII-3 not available in JP
     }
 
     @Test func bandFilteringExcludesOtherBands() {

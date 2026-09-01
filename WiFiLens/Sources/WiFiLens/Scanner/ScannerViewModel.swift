@@ -243,7 +243,7 @@ final class ScannerViewModel {
     /// does not re-implement history trimming (SignalHistoryStore owns the
     /// window). Environment-level: ignores per-panel filters and hidden toggles.
     func heatmapModel(for band: ChannelBand) -> SpectrumHeatmapModel {
-        let channels: [Int] = band == .band24GHz ? Array(1...14) : Array(1...band.maxChannel)
+        let channels = heatmapChannels(for: band)
 
         // Bucket the band's snapshots by their exact scan timestamp. In
         // production, ingestNetworks records every network of one scan with the
@@ -283,6 +283,20 @@ final class ScannerViewModel {
         }
 
         return SpectrumHeatmapModel(band: band, channels: channels, rows: rows)
+    }
+
+    /// The heatmap's X-axis channels for a band: the legal channel set from the
+    /// regulatory database for the current region (user override first, else the
+    /// inferred region), falling back to the US standard plan when the region is
+    /// unknown or has no entry. Reuses RegulatoryDatabase so the heatmap and the
+    /// rest of the app agree on which channels exist (5 GHz is 36/40/44/…, not
+    /// 1...170; 6 GHz is the 1/5/9/… PSC grid).
+    private func heatmapChannels(for band: ChannelBand) -> [Int] {
+        let region = userRegionOverride ?? inferredRegion?.domain ?? .US
+        let allowed = RegulatoryDatabase.rules[region]?[band.id]?.allowedChannels
+            ?? RegulatoryDatabase.rules[.US]?[band.id]?.allowedChannels
+            ?? Set(band == .band24GHz ? Array(1...14) : Array(1...band.maxChannel))
+        return allowed.sorted()
     }
 
     /// Cached table rows. Every `NetworkTableRow` field derives from stable
