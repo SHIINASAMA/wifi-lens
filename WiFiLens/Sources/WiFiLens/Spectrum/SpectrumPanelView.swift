@@ -31,71 +31,12 @@ struct SpectrumPanelView: View {
             .pickerStyle(.menu)
             .frame(width: 180)
 
-            switch chartType {
-            case .band24, .band5, .band6:
-                bandToolbar
-            case .trend:
-                EmptyView()
-            case .table:
-                tableToolbar
-            }
-
             Spacer()
         }
         .frame(minHeight: 24)
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
         .background(.bar)
-    }
-
-    private var bandToolbar: some View {
-        let bandPanel = SpectrumBandPanel(
-            viewModel: viewModel,
-            panelID: panelID,
-            chartType: chartType,
-            selectedNetworkID: $selectedNetworkID
-        )
-        return HStack(spacing: 8) {
-            TextField(String(localized: "spectrum.panel.filter_placeholder", comment: "Filter input placeholder"), text: bandPanel.filterQueryBinding)
-                .textFieldStyle(.roundedBorder)
-                .frame(maxWidth: 300)
-
-            if bandPanel.hiddenCount > 0 {
-                Text("\(bandPanel.displayedCount)/\(bandPanel.totalCount)")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-            }
-
-            if !bandPanel.filterQueryBinding.wrappedValue.isEmpty {
-                Button {
-                    bandPanel.filterQueryBinding.wrappedValue = ""
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.secondary)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(String(localized: "spectrum.filter.clear", comment: "Clear filter button"))
-                .help(String(localized: "spectrum.filter.clear", comment: "Clear filter button"))
-            }
-        }
-    }
-
-    private var tableToolbar: some View {
-        HStack(spacing: 12) {
-            Toggle(isOn: $viewModel.hideHiddenSSIDs) {
-                Text(String(localized: "spectrum.filter.hide_hidden", comment: "Toggle to hide networks with hidden SSIDs"))
-                    .font(.body)
-            }
-            .toggleStyle(.checkbox)
-            .controlSize(.regular)
-
-            if !viewModel.combinedTableRows.isEmpty {
-                Text(String(format: String(localized: "spectrum.panel.table_count_fmt", comment: "Network count in table toolbar"), viewModel.combinedTableRows.count))
-                    .font(.body)
-                    .foregroundColor(.secondary)
-            }
-        }
-        .frame(minHeight: 24)
     }
 
     // MARK: - Chart Content
