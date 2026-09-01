@@ -1,22 +1,20 @@
 import SwiftUI
 
 struct SpectrumDashboardLayout {
-    static let primaryRatio: CGFloat = 0.35
-    static let secondaryRatio: CGFloat = 0.35
-    static let tableRatio: CGFloat = 0.30
+    static let panelRatio: CGFloat = 1.0 / 3.0
 
     let viewportHeight: CGFloat
 
     var primaryHeight: CGFloat {
-        viewportHeight * Self.primaryRatio
+        viewportHeight * Self.panelRatio
     }
 
     var secondaryHeight: CGFloat {
-        viewportHeight * Self.secondaryRatio
+        viewportHeight * Self.panelRatio
     }
 
-    var tableHeight: CGFloat {
-        viewportHeight * Self.tableRatio
+    var tertiaryHeight: CGFloat {
+        viewportHeight * Self.panelRatio
     }
 }
 
@@ -111,7 +109,7 @@ struct ContentView: View {
                         sortOrder: $sortOrder,
                         hiddenColumns: hiddenColumns
                     )
-                    .frame(height: layout.tableHeight)
+                    .frame(height: layout.tertiaryHeight)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

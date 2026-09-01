@@ -9,29 +9,6 @@ struct SpectrumPanelView: View {
     @Binding var sortOrder: [NSSortDescriptor]
     @Binding var hiddenColumns: Set<String>
 
-    private var currentBandVM: BandChartViewModel {
-        bandViewModel(for: chartType)
-    }
-
-    private var filterQueryBinding: Binding<String> {
-        Binding(
-            get: { viewModel.filterQuery(for: panelID) },
-            set: { viewModel.setFilterQuery($0, for: panelID) }
-        )
-    }
-
-    private var totalCount: Int {
-        currentBandVM.networkCount
-    }
-
-    private var displayedCount: Int {
-        currentBandVM.visibleSeriesData().count
-    }
-
-    private var hiddenCount: Int {
-        totalCount - displayedCount
-    }
-
     var body: some View {
         VStack(spacing: 0) {
             toolbar
@@ -54,28 +31,6 @@ struct SpectrumPanelView: View {
             .pickerStyle(.menu)
             .frame(width: 180)
 
-            TextField(String(localized: "spectrum.panel.filter_placeholder", comment: "Filter input placeholder"), text: filterQueryBinding)
-                .textFieldStyle(.roundedBorder)
-                .frame(maxWidth: 300)
-
-            if hiddenCount > 0 {
-                Text("\(displayedCount)/\(totalCount)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-
-            if !filterQueryBinding.wrappedValue.isEmpty {
-                Button {
-                    filterQueryBinding.wrappedValue = ""
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.secondary)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(String(localized: "spectrum.filter.clear", comment: "Clear filter button"))
-                .help(String(localized: "spectrum.filter.clear", comment: "Clear filter button"))
-            }
-
             Spacer()
         }
         .padding(.horizontal, 8)
@@ -89,52 +44,20 @@ struct SpectrumPanelView: View {
     private var chartContent: some View {
         switch chartType {
         case .band24, .band5, .band6:
-            spectrumChart
+            SpectrumBandPanel(
+                viewModel: viewModel,
+                panelID: panelID,
+                chartType: chartType,
+                selectedNetworkID: $selectedNetworkID
+            )
         case .trend:
-            trendChart
+            SpectrumTrendPanel(
+                viewModel: viewModel,
+                panelID: panelID,
+                selectedNetworkID: $selectedNetworkID
+            )
         case .table:
             tablePanel
-        }
-    }
-
-    private var spectrumChart: some View {
-        let bandVM = bandViewModel(for: chartType)
-        return WiFiBandChart(
-            model: bandVM.renderModel,
-            selectedNetworkID: $selectedNetworkID,
-            onResetZoom: { bandVM.resetZoom() },
-            onToggleExpand: { bandVM.toggleExpand() },
-            onApplyZoom: { lo, hi in bandVM.applyZoom(lo: lo, hi: hi) }
-        )
-        .background {
-            GeometryReader { geometry in
-                Color.clear
-                    .onAppear {
-                        bandVM.chartSize = geometry.size
-                    }
-                    .onChange(of: geometry.size) { _, newSize in
-                        bandVM.chartSize = newSize
-                    }
-            }
-        }
-    }
-
-    private var trendChart: some View {
-        Group {
-            if let selID = selectedNetworkID,
-               let snaps = selectedNetworkSnapshots(for: selID),
-               let series = selectedNetworkSeries(for: selID),
-               snaps.count >= 2 {
-                TrendChartView(snapshots: snaps, color: series.color)
-            } else {
-                VStack {
-                    Spacer()
-                    Text(String(localized: "spectrum.panel.select_network_for_trend", comment: "Placeholder when no network is selected for trend chart"))
-                        .foregroundColor(.secondary)
-                        .font(.caption)
-                    Spacer()
-                }
-            }
         }
     }
 
@@ -159,25 +82,4 @@ struct SpectrumPanelView: View {
         return types
     }
 
-    private func bandViewModel(for selection: SpectrumPanelViewType) -> BandChartViewModel {
-        viewModel.bandViewModel(for: panelID, selection: selection)
-    }
-
-    private func selectedNetworkSnapshots(for networkID: String) -> [NetworkSnapshot]? {
-        for vm in viewModel.panelBandViewModels(for: panelID) {
-            if let snaps = vm.snapshots(for: networkID) {
-                return snaps
-            }
-        }
-        return nil
-    }
-
-    private func selectedNetworkSeries(for networkID: String) -> ChartSeriesData? {
-        for vm in viewModel.panelBandViewModels(for: panelID) {
-            if let series = vm.series(for: networkID) {
-                return series
-            }
-        }
-        return nil
-    }
 }

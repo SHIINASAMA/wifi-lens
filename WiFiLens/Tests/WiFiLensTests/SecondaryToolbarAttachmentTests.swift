@@ -31,18 +31,17 @@ struct SecondaryToolbarAttachmentTests {
     @Test func spectrumDashboardLayout_usesPureRatiosWhenViewportIsComfortable() {
         let layout = SpectrumDashboardLayout(viewportHeight: 1000)
 
-        #expect(layout.primaryHeight == 350)
-        #expect(layout.secondaryHeight == 350)
-        #expect(layout.tableHeight == 300)
+        #expect(layout.primaryHeight == layout.secondaryHeight)
+        #expect(layout.secondaryHeight == layout.tertiaryHeight)
+        #expect(layout.primaryHeight + layout.secondaryHeight + layout.tertiaryHeight == 1000)
     }
 
     @Test func spectrumDashboardLayout_usesSameRatiosForSmallerViewports() {
         let layout = SpectrumDashboardLayout(viewportHeight: 640)
 
-        #expect(layout.primaryHeight == 224)
-        #expect(layout.secondaryHeight == 224)
-        #expect(layout.tableHeight == 192)
-        #expect(layout.primaryHeight + layout.secondaryHeight + layout.tableHeight == 640)
+        #expect(layout.primaryHeight == layout.secondaryHeight)
+        #expect(layout.secondaryHeight == layout.tertiaryHeight)
+        #expect(layout.primaryHeight + layout.secondaryHeight + layout.tertiaryHeight == 640)
     }
 }
 
