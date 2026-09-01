@@ -42,6 +42,7 @@ struct SpectrumPanelView: View {
 
             Spacer()
         }
+        .frame(minHeight: 24)
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
         .background(.bar)
@@ -61,7 +62,7 @@ struct SpectrumPanelView: View {
 
             if bandPanel.hiddenCount > 0 {
                 Text("\(bandPanel.displayedCount)/\(bandPanel.totalCount)")
-                    .font(.caption)
+                    .font(.body)
                     .foregroundColor(.secondary)
             }
 
@@ -83,16 +84,18 @@ struct SpectrumPanelView: View {
         HStack(spacing: 12) {
             Toggle(isOn: $viewModel.hideHiddenSSIDs) {
                 Text(String(localized: "spectrum.filter.hide_hidden", comment: "Toggle to hide networks with hidden SSIDs"))
-                    .font(.caption)
+                    .font(.body)
             }
             .toggleStyle(.checkbox)
+            .controlSize(.regular)
 
             if !viewModel.combinedTableRows.isEmpty {
                 Text("\(viewModel.combinedTableRows.count)")
-                    .font(.caption)
+                    .font(.body)
                     .foregroundColor(.secondary)
             }
         }
+        .frame(minHeight: 24)
     }
 
     // MARK: - Chart Content
