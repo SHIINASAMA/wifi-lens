@@ -2,16 +2,15 @@ import SwiftUI
 
 struct SpectrumTrendPanel: View {
     let viewModel: ScannerViewModel
-    let panelID: SpectrumPanelID
     @Binding var selectedNetworkID: String?
 
     var body: some View {
         Group {
             if let selID = selectedNetworkID,
-               let snaps = selectedNetworkSnapshots(for: selID),
-               let series = selectedNetworkSeries(for: selID),
+               let snaps = viewModel.snapshots(for: selID),
+               let color = selectedNetworkColor(for: selID),
                snaps.count >= 2 {
-                TrendChartView(snapshots: snaps, color: series.color)
+                TrendChartView(snapshots: snaps, color: color)
             } else {
                 VStack {
                     Spacer()
@@ -24,21 +23,8 @@ struct SpectrumTrendPanel: View {
         }
     }
 
-    private func selectedNetworkSnapshots(for networkID: String) -> [NetworkSnapshot]? {
-        for vm in viewModel.panelBandViewModels(for: panelID) {
-            if let snaps = vm.snapshots(for: networkID) {
-                return snaps
-            }
-        }
-        return nil
-    }
-
-    private func selectedNetworkSeries(for networkID: String) -> ChartSeriesData? {
-        for vm in viewModel.panelBandViewModels(for: panelID) {
-            if let series = vm.series(for: networkID) {
-                return series
-            }
-        }
-        return nil
+    private func selectedNetworkColor(for networkID: String) -> Color? {
+        guard let network = viewModel.deduplicatedNetworks.first(where: { $0.id == networkID }) else { return nil }
+        return viewModel.colorHasher.color(for: network.ssid, bssid: network.bssid)
     }
 }

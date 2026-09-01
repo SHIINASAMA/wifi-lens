@@ -113,7 +113,6 @@ struct SpectrumPanelView: View {
         case .trend:
             SpectrumTrendPanel(
                 viewModel: viewModel,
-                panelID: panelID,
                 selectedNetworkID: $selectedNetworkID
             )
         case .table:
