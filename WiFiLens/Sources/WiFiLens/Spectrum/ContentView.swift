@@ -23,9 +23,6 @@ struct ContentView: View {
     let isVendorColumnAvailable: Bool
 
     @State private var sortOrder: [NSSortDescriptor] = [NSSortDescriptor(key: "ssid", ascending: true)]
-    @State private var panel1ChartType: SpectrumPanelViewType = .band24
-    @State private var panel2ChartType: SpectrumPanelViewType = .band5
-    @State private var panel3ChartType: SpectrumPanelViewType = .table
     @AppStorage("hiddenTableColumns") private var hiddenColumnsData: String = ""
 
     private var hiddenColumns: Binding<Set<String>> {
@@ -74,11 +71,11 @@ struct ContentView: View {
                     emptyState
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    SpectrumPanelView(
+                    SpectrumPanelContainer(
                         viewModel: viewModel,
                         panelID: .primary,
                         isVendorColumnAvailable: isVendorColumnAvailable,
-                        chartType: $panel1ChartType,
+                        defaultViewType: .band24,
                         selectedNetworkID: $viewModel.selectedNetworkID,
                         sortOrder: $sortOrder,
                         hiddenColumns: hiddenColumns
@@ -87,11 +84,11 @@ struct ContentView: View {
 
                     Divider()
 
-                    SpectrumPanelView(
+                    SpectrumPanelContainer(
                         viewModel: viewModel,
                         panelID: .secondary,
                         isVendorColumnAvailable: isVendorColumnAvailable,
-                        chartType: $panel2ChartType,
+                        defaultViewType: .band5,
                         selectedNetworkID: $viewModel.selectedNetworkID,
                         sortOrder: $sortOrder,
                         hiddenColumns: hiddenColumns
@@ -100,11 +97,11 @@ struct ContentView: View {
 
                     Divider()
 
-                    SpectrumPanelView(
+                    SpectrumPanelContainer(
                         viewModel: viewModel,
                         panelID: .tertiary,
                         isVendorColumnAvailable: isVendorColumnAvailable,
-                        chartType: $panel3ChartType,
+                        defaultViewType: .table,
                         selectedNetworkID: $viewModel.selectedNetworkID,
                         sortOrder: $sortOrder,
                         hiddenColumns: hiddenColumns
