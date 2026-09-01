@@ -25,8 +25,8 @@ struct ContentView: View {
     let isVendorColumnAvailable: Bool
 
     @State private var sortOrder: [NSSortDescriptor] = [NSSortDescriptor(key: "ssid", ascending: true)]
-    @State private var panel1ChartType: BandPanelSelection = .band24
-    @State private var panel2ChartType: BandPanelSelection = .band5
+    @State private var panel1ChartType: SpectrumPanelViewType = .band24
+    @State private var panel2ChartType: SpectrumPanelViewType = .band5
     @AppStorage("hiddenTableColumns") private var hiddenColumnsData: String = ""
 
     private var hiddenColumns: Binding<Set<String>> {

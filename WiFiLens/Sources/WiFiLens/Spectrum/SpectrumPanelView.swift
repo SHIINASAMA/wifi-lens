@@ -3,7 +3,7 @@ import SwiftUI
 struct SpectrumPanelView: View {
     let viewModel: ScannerViewModel
     let panelID: SpectrumPanelID
-    @Binding var chartType: BandPanelSelection
+    @Binding var chartType: SpectrumPanelViewType
     @Binding var selectedNetworkID: String?
 
     private var currentBandVM: BandChartViewModel {
@@ -89,6 +89,8 @@ struct SpectrumPanelView: View {
             spectrumChart
         case .trend:
             trendChart
+        case .table:
+            trendChart // temporary compile-safe fallback; replaced in Task 4
         }
     }
 
@@ -135,8 +137,8 @@ struct SpectrumPanelView: View {
 
     // MARK: - Helpers
 
-    private var supportedChartTypes: [BandPanelSelection] {
-        var types: [BandPanelSelection] = []
+    private var supportedChartTypes: [SpectrumPanelViewType] {
+        var types: [SpectrumPanelViewType] = []
         if viewModel.supportedBands.contains(.band24GHz) { types.append(.band24) }
         if viewModel.supportedBands.contains(.band5GHz) { types.append(.band5) }
         if viewModel.supportedBands.contains(.band6GHz) { types.append(.band6) }
@@ -144,7 +146,7 @@ struct SpectrumPanelView: View {
         return types
     }
 
-    private func bandViewModel(for selection: BandPanelSelection) -> BandChartViewModel {
+    private func bandViewModel(for selection: SpectrumPanelViewType) -> BandChartViewModel {
         viewModel.bandViewModel(for: panelID, selection: selection)
     }
 

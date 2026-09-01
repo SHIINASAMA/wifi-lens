@@ -175,7 +175,7 @@ final class ScannerViewModel {
         [band24, band5, band6, primaryBand24, primaryBand5, primaryBand6, secondaryBand24, secondaryBand5, secondaryBand6]
     }
 
-    func bandViewModel(for panelID: SpectrumPanelID, selection: BandPanelSelection) -> BandChartViewModel {
+    func bandViewModel(for panelID: SpectrumPanelID, selection: SpectrumPanelViewType) -> BandChartViewModel {
         switch (panelID, selection) {
         case (.primary, .band24): return primaryBand24
         case (.primary, .band5): return primaryBand5
@@ -185,6 +185,8 @@ final class ScannerViewModel {
         case (.secondary, .band6): return secondaryBand6
         case (.primary, .trend): return primaryBand24
         case (.secondary, .trend): return secondaryBand24
+        case (.primary, .table): return primaryBand24
+        case (.secondary, .table): return secondaryBand24
         }
     }
 
