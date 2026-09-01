@@ -30,7 +30,42 @@ struct SpectrumBandPanel: View {
     }
 
     var body: some View {
-        chart
+        VStack(spacing: 0) {
+            toolbar
+            chart
+        }
+    }
+
+    private var toolbar: some View {
+        HStack(spacing: 8) {
+            TextField(String(localized: "spectrum.panel.filter_placeholder", comment: "Filter input placeholder"), text: filterQueryBinding)
+                .textFieldStyle(.roundedBorder)
+                .frame(maxWidth: 300)
+
+            if hiddenCount > 0 {
+                Text("\(displayedCount)/\(totalCount)")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+            }
+
+            if !filterQueryBinding.wrappedValue.isEmpty {
+                Button {
+                    filterQueryBinding.wrappedValue = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(String(localized: "spectrum.filter.clear", comment: "Clear filter button"))
+                .help(String(localized: "spectrum.filter.clear", comment: "Clear filter button"))
+            }
+
+            Spacer()
+        }
+        .frame(minHeight: 24)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(.bar)
     }
 
     private var chart: some View {
