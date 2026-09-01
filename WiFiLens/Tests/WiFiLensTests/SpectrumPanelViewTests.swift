@@ -1,4 +1,6 @@
 import Testing
+import SwiftUI
+import AppKit
 @testable import WiFi_Lens
 
 @Suite struct SpectrumPanelViewTests {
@@ -26,5 +28,21 @@ import Testing
 
     @Test func spectrumPanelIDHasTertiary() {
         #expect(SpectrumPanelID.tertiary.rawValue == "tertiary")
+    }
+
+    @MainActor
+    @Test func supportedViewTypesIncludeTable() {
+        let vm = ScannerViewModel()
+        let panel = SpectrumPanelView(
+            viewModel: vm,
+            panelID: .tertiary,
+            chartType: .constant(.table),
+            selectedNetworkID: .constant(nil),
+            isVendorColumnAvailable: true,
+            sortOrder: .constant([]),
+            hiddenColumns: .constant([])
+        )
+        #expect(panel.supportedViewTypes.contains(.table))
+        #expect(panel.supportedViewTypes.contains(.trend))
     }
 }

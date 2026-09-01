@@ -80,7 +80,10 @@ struct ContentView: View {
                         viewModel: viewModel,
                         panelID: .primary,
                         chartType: $panel1ChartType,
-                        selectedNetworkID: $viewModel.selectedNetworkID
+                        selectedNetworkID: $viewModel.selectedNetworkID,
+                        isVendorColumnAvailable: isVendorColumnAvailable,
+                        sortOrder: $sortOrder,
+                        hiddenColumns: hiddenColumns
                     )
                     .frame(height: layout.primaryHeight)
 
@@ -90,14 +93,20 @@ struct ContentView: View {
                         viewModel: viewModel,
                         panelID: .secondary,
                         chartType: $panel2ChartType,
-                        selectedNetworkID: $viewModel.selectedNetworkID
+                        selectedNetworkID: $viewModel.selectedNetworkID,
+                        isVendorColumnAvailable: isVendorColumnAvailable,
+                        sortOrder: $sortOrder,
+                        hiddenColumns: hiddenColumns
                     )
                     .frame(height: layout.secondaryHeight)
 
                     Divider()
 
-                    SpectrumTablePanel(
+                    SpectrumPanelView(
                         viewModel: viewModel,
+                        panelID: .tertiary,
+                        chartType: $panel3ChartType,
+                        selectedNetworkID: $viewModel.selectedNetworkID,
                         isVendorColumnAvailable: isVendorColumnAvailable,
                         sortOrder: $sortOrder,
                         hiddenColumns: hiddenColumns

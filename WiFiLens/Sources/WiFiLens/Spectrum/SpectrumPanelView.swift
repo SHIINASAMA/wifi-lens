@@ -3,8 +3,29 @@ import SwiftUI
 struct SpectrumPanelView: View {
     let viewModel: ScannerViewModel
     let panelID: SpectrumPanelID
+    let isVendorColumnAvailable: Bool
     @Binding var chartType: SpectrumPanelViewType
     @Binding var selectedNetworkID: String?
+    @Binding var sortOrder: [NSSortDescriptor]
+    @Binding var hiddenColumns: Set<String>
+
+    init(
+        viewModel: ScannerViewModel,
+        panelID: SpectrumPanelID,
+        chartType: Binding<SpectrumPanelViewType>,
+        selectedNetworkID: Binding<String?>,
+        isVendorColumnAvailable: Bool,
+        sortOrder: Binding<[NSSortDescriptor]>,
+        hiddenColumns: Binding<Set<String>>
+    ) {
+        self.viewModel = viewModel
+        self.panelID = panelID
+        self.chartType = chartType
+        self.selectedNetworkID = selectedNetworkID
+        self.isVendorColumnAvailable = isVendorColumnAvailable
+        self.sortOrder = sortOrder
+        self.hiddenColumns = hiddenColumns
+    }
 
     private var currentBandVM: BandChartViewModel {
         bandViewModel(for: chartType)
@@ -90,7 +111,7 @@ struct SpectrumPanelView: View {
         case .trend:
             trendChart
         case .table:
-            trendChart // temporary compile-safe fallback; replaced in Task 4
+            tablePanel
         }
     }
 
@@ -135,14 +156,24 @@ struct SpectrumPanelView: View {
         }
     }
 
+    private var tablePanel: some View {
+        SpectrumTablePanel(
+            viewModel: viewModel,
+            isVendorColumnAvailable: isVendorColumnAvailable,
+            sortOrder: $sortOrder,
+            hiddenColumns: $hiddenColumns
+        )
+    }
+
     // MARK: - Helpers
 
-    private var supportedChartTypes: [SpectrumPanelViewType] {
+    var supportedViewTypes: [SpectrumPanelViewType] {
         var types: [SpectrumPanelViewType] = []
         if viewModel.supportedBands.contains(.band24GHz) { types.append(.band24) }
         if viewModel.supportedBands.contains(.band5GHz) { types.append(.band5) }
         if viewModel.supportedBands.contains(.band6GHz) { types.append(.band6) }
         types.append(.trend)
+        types.append(.table)
         return types
     }
 
