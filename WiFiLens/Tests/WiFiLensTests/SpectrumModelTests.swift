@@ -194,7 +194,7 @@ struct ChartSeriesDataTests {
 
 // MARK: - SignalHistoryStore
 
-@Suite @MainActor struct SignalHistoryStoreTests {
+@Suite @MainActor struct SignalHistoryStoreBehaviorTests {
 
     @Test func recordAndTrend() {
         let store = SignalHistoryStore(maxCount: 10)

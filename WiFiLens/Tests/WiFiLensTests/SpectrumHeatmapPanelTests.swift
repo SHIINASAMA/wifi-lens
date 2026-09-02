@@ -193,6 +193,61 @@ import SwiftUI
         #expect(model.rows[1].cells.allSatisfy { $0.activity == 0 })
     }
 
+    @Test func selectedBandDisappearanceProducesZeroRow() {
+        let vm = ScannerViewModel()
+        let first = Date(timeIntervalSince1970: 100)
+        let second = Date(timeIntervalSince1970: 130)
+        vm.signalHistory.recordScan(timestamp: first)
+        vm.signalHistory.recordScan(timestamp: second)
+        vm.signalHistory.record(
+            bssid: "aa:bb:cc:dd:ee:01", rssi: -50,
+            snapshot: makeSnapshot(timestamp: first, bssid: "aa:bb:cc:dd:ee:01", channel: 6, band: "24")
+        )
+
+        let model = vm.heatmapModel(for: .band24GHz)
+        #expect(model.rows.map(\.timestamp) == [first, second])
+        #expect(model.rows[1].cells.allSatisfy { $0.activity == 0 })
+    }
+
+    @Test func recordedScanTimelineIsRenderedOldestFirst() {
+        let vm = ScannerViewModel()
+        let first = Date(timeIntervalSince1970: 100)
+        let second = Date(timeIntervalSince1970: 130)
+        vm.signalHistory.recordScan(timestamp: second)
+        vm.signalHistory.recordScan(timestamp: first)
+        vm.signalHistory.record(
+            bssid: "aa:bb:cc:dd:ee:01", rssi: -50,
+            snapshot: makeSnapshot(timestamp: first, bssid: "aa:bb:cc:dd:ee:01", channel: 6, band: "24")
+        )
+
+        let model = vm.heatmapModel(for: .band24GHz)
+
+        #expect(model.rows.map(\.timestamp) == [first, second])
+    }
+
+    @Test func staleSnapshotOutsideSuccessfulScanTimelineDoesNotCreateRow() {
+        let vm = ScannerViewModel()
+        let stale = Date(timeIntervalSince1970: 100)
+        vm.signalHistory.record(
+            bssid: "aa:bb:cc:dd:ee:ff", rssi: -80,
+            snapshot: makeSnapshot(timestamp: stale, bssid: "aa:bb:cc:dd:ee:ff", channel: 1, band: "24")
+        )
+        let retainedTimeline = (1...20).map { Date(timeIntervalSince1970: Double(100 + $0)) }
+        for (offset, timestamp) in retainedTimeline.enumerated() {
+            vm.signalHistory.record(
+                bssid: "aa:bb:cc:dd:ee:01", rssi: -50 - offset,
+                snapshot: makeSnapshot(timestamp: timestamp, bssid: "aa:bb:cc:dd:ee:01", channel: 6, band: "24")
+            )
+        }
+
+        let model = vm.heatmapModel(for: .band24GHz)
+
+        #expect(vm.signalHistory.allSnapshots["aa:bb:cc:dd:ee:ff"]?.map(\.timestamp) == [stale])
+        #expect(vm.signalHistory.allScanTimestamps == retainedTimeline)
+        #expect(model.rows.map(\.timestamp) == retainedTimeline)
+        #expect(model.rows.allSatisfy { $0.timestamp != stale })
+    }
+
     @Test func emptyScanKeepsCurrentTimestampAsZeroActivityRow() {
         let vm = ScannerViewModel()
         let t1 = Date(timeIntervalSince1970: 100)
@@ -207,6 +262,29 @@ import SwiftUI
 
         #expect(model.rows.map(\.timestamp) == [t1, t2])
         #expect(model.rows[1].cells.allSatisfy { $0.activity == 0 })
+    }
+
+    @Test func explicitScanRecordingAndSnapshotRecordingShareOneRow() {
+        let vm = ScannerViewModel()
+        let timestamp = Date(timeIntervalSince1970: 100)
+
+        vm.debugApplyNetworksForTesting(
+            [
+                WiFiNetwork(
+                    ssid: "TestNet",
+                    bssid: "aa:bb:cc:dd:ee:01",
+                    rssi: -50,
+                    channel: WiFiChannel(band: .band24GHz, channelNumber: 6, channelWidthMHz: 20)
+                )
+            ],
+            supportedBands: [.band24GHz],
+            timestamp: timestamp
+        )
+
+        let model = vm.heatmapModel(for: .band24GHz)
+
+        #expect(model.rows.map(\.timestamp) == [timestamp])
+        #expect(model.rows.count == 1)
     }
 
     @Test func cellIDIsDeterministic() {
@@ -227,16 +305,6 @@ import SwiftUI
         #expect(SpectrumHeatmapColor.intensity(forActivity: 5) == 1.0)
         #expect(SpectrumHeatmapColor.intensity(forActivity: 9) == 1.0)   // clamped high
         #expect(SpectrumHeatmapColor.intensity(forActivity: -3) == 0.0)  // clamped low
-    }
-
-    @Test func bilinearFieldPreservesFractionalActivity() {
-        let intensity = SpectrumHeatmapField.sampledIntensity(
-            atCol: 0.5,
-            atRow: 0.5,
-            grid: [[0, 5], [0, 5]]
-        )
-
-        #expect(abs(intensity - 0.5) < 0.0001)
     }
 
     @Test func panelConstructsWithBand() {

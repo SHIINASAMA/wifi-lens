@@ -49,6 +49,7 @@
 		85C7DEE09D3045078A2ADFF5 /* ExponentialMovingAverage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E1D69278614400AA3B660C /* ExponentialMovingAverage.swift */; };
 		869A4E799B9BF9BB3D1FBCF9 /* RoamingTestViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70E4041B5972D72DD79BF56 /* RoamingTestViewModelTests.swift */; };
 		896F4371837628B3E6454853 /* SignalProcessingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786042C29EF01CE698FEBBF8 /* SignalProcessingTests.swift */; };
+		A2B300000000000000000002 /* SignalHistoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B300000000000000000001 /* SignalHistoryStoreTests.swift */; };
 		8C78C6A4ACEDAD6EA5CCD90E /* BLETrendChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38EAECBD60DDB96A1E8D5835 /* BLETrendChartView.swift */; };
 		90CF4B22A68C668A58043390 /* RegulatoryDatabaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07A4C1B8DFCDFBA81A6DFFA /* RegulatoryDatabaseTests.swift */; };
 		90CF4B22A68C668A58043391 /* ExternalLinksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90CF4B22A68C668A58043392 /* ExternalLinksTests.swift */; };
@@ -131,6 +132,9 @@
 		A3C7A1B2C3D4E5F678900015 /* SpectrumTablePanelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900003 /* SpectrumTablePanelTests.swift */; };
 		A3C7A1B2C3D4E5F678900016 /* NetworkTableRowSorterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900004 /* NetworkTableRowSorterTests.swift */; };
 		A3C7A1B2C3D4E5F678900021 /* SpectrumHeatmapPanelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F67890000A /* SpectrumHeatmapPanelTests.swift */; };
+		A3C7A1B2C3D4E5F678900022 /* SpectrumHeatmapLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F67890000B /* SpectrumHeatmapLayout.swift */; };
+		A3C7A1B2C3D4E5F678900023 /* SpectrumHeatmapLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F67890000B /* SpectrumHeatmapLayout.swift */; };
+		A3C7A1B2C3D4E5F678900024 /* SpectrumHeatmapLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F67890000C /* SpectrumHeatmapLayoutTests.swift */; };
 		A3C7A1B2C3D4E5F678900012 /* SpectrumTablePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900001 /* SpectrumTablePanel.swift */; };
 		A3C7A1B2C3D4E5F678900014 /* NetworkTableRowSorter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900002 /* NetworkTableRowSorter.swift */; };
 		A3C7A1B2C3D4E5F678900017 /* SpectrumBandPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900005 /* SpectrumBandPanel.swift */; };
@@ -659,6 +663,9 @@
 		A3C7A1B2C3D4E5F678900003 /* SpectrumTablePanelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumTablePanelTests.swift; sourceTree = "<group>"; };
 		A3C7A1B2C3D4E5F678900004 /* NetworkTableRowSorterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTableRowSorterTests.swift; sourceTree = "<group>"; };
 		A3C7A1B2C3D4E5F67890000A /* SpectrumHeatmapPanelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapPanelTests.swift; sourceTree = "<group>"; };
+		A3C7A1B2C3D4E5F67890000B /* SpectrumHeatmapLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapLayout.swift; sourceTree = "<group>"; };
+		A3C7A1B2C3D4E5F67890000C /* SpectrumHeatmapLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapLayoutTests.swift; sourceTree = "<group>"; };
+		A2B300000000000000000001 /* SignalHistoryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalHistoryStoreTests.swift; sourceTree = "<group>"; };
 		A3C7A1B2C3D4E5F678900005 /* SpectrumBandPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumBandPanel.swift; sourceTree = "<group>"; };
 		A3C7A1B2C3D4E5F678900006 /* SpectrumTrendPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumTrendPanel.swift; sourceTree = "<group>"; };
 		A3C7A1B2C3D4E5F678900007 /* SpectrumPanelContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumPanelContainer.swift; sourceTree = "<group>"; };
@@ -1022,6 +1029,7 @@
 				A3C7A1B2C3D4E5F678900006 /* SpectrumTrendPanel.swift */,
 				A3C7A1B2C3D4E5F678900007 /* SpectrumPanelContainer.swift */,
 				A3C7A1B2C3D4E5F678900008 /* SpectrumHeatmapModel.swift */,
+				A3C7A1B2C3D4E5F67890000B /* SpectrumHeatmapLayout.swift */,
 				A3C7A1B2C3D4E5F678900009 /* SpectrumHeatmapPanel.swift */,
 			);
 			path = Spectrum;
@@ -1524,6 +1532,7 @@
 				A10000000000000000000003 /* SecondaryToolbarTests.swift */,
 				33A24CA582895A784C2E6014 /* SSIDColorHasherTests.swift */,
 				7E044182AAA5DC5A000A0D69 /* ScannerModelTests.swift */,
+				A2B300000000000000000001 /* SignalHistoryStoreTests.swift */,
 				08D4F1A65F0142A18B9C161 /* LoggingTests.swift */,
 				786042C29EF01CE698FEBBF8 /* SignalProcessingTests.swift */,
 				5DD34695BFD8D4277DF0BDB0 /* SpectrumModelTests.swift */,
@@ -1536,6 +1545,7 @@
 				A3C7A1B2C3D4E5F678900003 /* SpectrumTablePanelTests.swift */,
 				A3C7A1B2C3D4E5F678900004 /* NetworkTableRowSorterTests.swift */,
 				A3C7A1B2C3D4E5F67890000A /* SpectrumHeatmapPanelTests.swift */,
+				A3C7A1B2C3D4E5F67890000C /* SpectrumHeatmapLayoutTests.swift */,
 				TH0000000000000000000001 /* ThroughputMonitorTests.swift */,
 				D92298452F334CDAAA9695D3 /* WindowFramePolicyTests.swift */,
 				A1C4E7B92F0148D3B6E90A21 /* DetailPageMinimumHeightTests.swift */,
@@ -2039,6 +2049,7 @@
 				A3C7A1B2C3D4E5F678900019 /* SpectrumTrendPanel.swift in Sources */,
 				A3C7A1B2C3D4E5F67890001B /* SpectrumPanelContainer.swift in Sources */,
 				A3C7A1B2C3D4E5F67890001D /* SpectrumHeatmapModel.swift in Sources */,
+				A3C7A1B2C3D4E5F678900022 /* SpectrumHeatmapLayout.swift in Sources */,
 				A3C7A1B2C3D4E5F67890001E /* SpectrumHeatmapPanel.swift in Sources */,
 				23F1AB88A28C6E035AA916AA /* BandChartViewModel.swift in Sources */,
 				FB0573C62FBC741D005F8214 /* ChannelQualityView.swift in Sources */,
@@ -2205,6 +2216,7 @@
 				A10000000000000000000011 /* SecondaryToolbarTests.swift in Sources */,
 				62A04C6993321BEA64FC8E7D /* SSIDColorHasherTests.swift in Sources */,
 				9E204E0C8B6D8E29583263B0 /* ScannerModelTests.swift in Sources */,
+				A2B300000000000000000002 /* SignalHistoryStoreTests.swift in Sources */,
 				B89BCDE0766C4998B46372B /* LoggingTests.swift in Sources */,
 				896F4371837628B3E6454853 /* SignalProcessingTests.swift in Sources */,
 				2B7B4CBC96F724AA4970AC7F /* SpectrumModelTests.swift in Sources */,
@@ -2214,6 +2226,7 @@
 				A3C7A1B2C3D4E5F678900015 /* SpectrumTablePanelTests.swift in Sources */,
 				A3C7A1B2C3D4E5F678900016 /* NetworkTableRowSorterTests.swift in Sources */,
 				A3C7A1B2C3D4E5F678900021 /* SpectrumHeatmapPanelTests.swift in Sources */,
+				A3C7A1B2C3D4E5F678900024 /* SpectrumHeatmapLayoutTests.swift in Sources */,
 				TH0000000000000000000002 /* ThroughputMonitorTests.swift in Sources */,
 				1B8B239E2A11401AB0C0D51B /* WindowFramePolicyTests.swift in Sources */,
 				A1C4E7BA2F0148D3B6E90A22 /* DetailPageMinimumHeightTests.swift in Sources */,
@@ -2357,6 +2370,7 @@
 				A3C7A1B2C3D4E5F67890001A /* SpectrumTrendPanel.swift in Sources */,
 				A3C7A1B2C3D4E5F67890001C /* SpectrumPanelContainer.swift in Sources */,
 				A3C7A1B2C3D4E5F67890001F /* SpectrumHeatmapModel.swift in Sources */,
+				A3C7A1B2C3D4E5F678900023 /* SpectrumHeatmapLayout.swift in Sources */,
 				A3C7A1B2C3D4E5F678900020 /* SpectrumHeatmapPanel.swift in Sources */,
 				FB1E32752FC7316C009D1BDC /* OverviewView.swift in Sources */,
 				FB1E32762FC7316C009D1BDC /* SpanDirection.swift in Sources */,

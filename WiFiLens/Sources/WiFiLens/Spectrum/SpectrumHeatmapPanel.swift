@@ -30,8 +30,7 @@ enum SpectrumHeatmapColor {
         color(forIntensity: intensity(forActivity: activity))
     }
 
-    /// Interpolate the thermal ramp at an arbitrary intensity in [0, 1]. Used
-    /// by the heatmap's per-subcell field sampling so sparse grids stay smooth.
+    /// Interpolate the thermal ramp at an arbitrary intensity in [0, 1].
     static func color(forIntensity t: Double) -> Color {
         let clamped = min(1, max(0, t))
         // Find the surrounding stops spanning `clamped`.
@@ -54,53 +53,13 @@ enum SpectrumHeatmapColor {
     }
 }
 
-/// Samples the heatmap activity field at a fractional grid coordinate.
-/// Keeping this calculation independent from Canvas makes the interpolation
-/// contract testable and ensures fractional activity reaches the color ramp.
-enum SpectrumHeatmapField {
-    static func sampledIntensity(atCol col: Double, atRow row: Double, grid: [[Int]]) -> Double {
-        let rows = grid.count
-        let cols = grid.first?.count ?? 0
-        guard rows > 0, cols > 0 else { return 0 }
-        guard rows >= 2, cols >= 2 else {
-            // Degenerate grid: fall back to the nearest cell's intensity.
-            let r = min(max(Int(row), 0), rows - 1)
-            let c = min(max(Int(col), 0), cols - 1)
-            return SpectrumHeatmapColor.intensity(forActivity: grid[r][c])
-        }
-        let c = min(max(col, 0), Double(cols - 1))
-        let r = min(max(row, 0), Double(rows - 1))
-        let cl = min(Int(c), cols - 2)
-        let ct = min(Int(r), rows - 2)
-        let cr = cl + 1
-        let cb = ct + 1
-        let dx = c - Double(cl)
-        let dy = r - Double(ct)
-        let v11 = Double(grid[ct][cl])
-        let v21 = Double(grid[ct][cr])
-        let v12 = Double(grid[cb][cl])
-        let v22 = Double(grid[cb][cr])
-        let top = v11 + (v21 - v11) * dx
-        let bottom = v12 + (v22 - v12) * dx
-        let value = top + (bottom - top) * dy
-        return SpectrumHeatmapColor.intensity(forActivity: value)
-    }
-}
-
 /// Waterfall grid of channel activity over the recent past for one band.
 /// X = channel, Y = time (newest at the bottom), cell color = activity
-/// intensity. Each channel cell is subdivided into an n×n grid of subcells
-/// whose color is sampled from a bilinear-interpolated activity field, so the
-/// image reads as a continuous thermal scan rather than a mosaic of flat
-/// rectangles. Environment-level: no AP selection, no per-panel store.
+/// intensity. Every model cell is rendered as one discrete rectangle.
+/// Environment-level: no AP selection, no per-panel store.
 struct SpectrumHeatmapPanel: View {
     let viewModel: ScannerViewModel
     let band: ChannelBand
-
-    /// Subdivision per cell edge. Higher n → smoother gradient within a cell,
-    /// so even a sparse grid (few channels/timestamps) doesn't collapse into
-    /// flat color blocks. Kept modest to bound the fill count (cells × n²).
-    private let subdivision: Int = 6
 
     var body: some View {
         let model = viewModel.heatmapModel(for: band)
@@ -147,78 +106,50 @@ struct SpectrumHeatmapPanel: View {
             let gridRect = CGRect(x: 0, y: 0, width: size.width, height: size.height - bottomInset)
             let channels = model.channels
             guard !channels.isEmpty, !model.rows.isEmpty else { return }
-            let activityByCell = buildActivityGrid(model, channels: channels)
-            drawThermalGrid(context: context, gridRect: gridRect, model: model, activityByCell: activityByCell)
+            let columnRects = SpectrumHeatmapLayout.columnRects(channels: channels, band: band, in: gridRect)
+            drawCells(context: context, gridRect: gridRect, model: model, columnRects: columnRects)
             drawChannelAxis(
                 context: context,
                 gridRect: gridRect,
-                model: model,
                 channels: channels,
-                columnW: gridRect.width / CGFloat(channels.count)
+                columnRects: columnRects
             )
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(localized: "spectrum.accessibility.heatmap_label", comment: "Channel occupancy heatmap accessibility label"))
     }
 
-    /// Flatten the rows' cells into a (row, col) → activity lookup keyed by row
-    /// index. Rows may carry a sparse cell set; unlisted channels default to 0.
-    private func buildActivityGrid(_ model: SpectrumHeatmapModel, channels: [Int]) -> [[Int]] {
-        model.rows.map { row in
-            let byChannel = Dictionary(uniqueKeysWithValues: row.cells.map { ($0.channel, $0.activity) })
-            return channels.map { byChannel[$0] ?? 0 }
-        }
-    }
-
-    /// Draw the grid, subdividing each cell into `subdivision × subdivision`
-    /// subcells whose color is sampled from the bilinear field, then lay a
-    /// faint line at each original cell boundary for orientation.
-    private func drawThermalGrid(
+    private func drawCells(
         context: GraphicsContext,
         gridRect: CGRect,
         model: SpectrumHeatmapModel,
-        activityByCell: [[Int]]
+        columnRects: [(channel: Int, rect: CGRect)]
     ) {
-        let rows = activityByCell.count
-        let cols = model.channels.count
-        guard rows > 0, cols > 0 else { return }
-        let cellW = gridRect.width / CGFloat(cols)
-        let cellH = gridRect.height / CGFloat(rows)
-        let subW = cellW / CGFloat(subdivision)
-        let subH = cellH / CGFloat(subdivision)
-        let n = CGFloat(subdivision)
+        guard !model.rows.isEmpty, !columnRects.isEmpty else { return }
+        let cellH = gridRect.height / CGFloat(model.rows.count)
+        let rectByChannel = Dictionary(uniqueKeysWithValues: columnRects.map { ($0.channel, $0.rect) })
 
-        // 0.5pt overlap per subcell avoids antialiasing hairlines between them.
-        for rowIndex in 0..<rows {
-            let cellY = gridRect.minY + CGFloat(rowIndex) * cellH
-            for colIndex in 0..<cols {
-                let cellX = gridRect.minX + CGFloat(colIndex) * cellW
-                for sy in 0..<subdivision {
-                    for sx in 0..<subdivision {
-                        let intensity = SpectrumHeatmapField.sampledIntensity(
-                            atCol: Double(colIndex) + Double(sx + 1) / n,
-                            atRow: Double(rowIndex) + Double(sy + 1) / n,
-                            grid: activityByCell
-                        )
-                        let x = cellX + CGFloat(sx) * subW
-                        let y = cellY + CGFloat(sy) * subH
-                        let rect = CGRect(x: x, y: y, width: subW + 0.5, height: subH + 0.5)
-                        context.fill(Path(rect), with: .color(SpectrumHeatmapColor.color(forIntensity: intensity)))
-                    }
-                }
+        for (rowIndex, row) in model.rows.enumerated() {
+            let y = gridRect.minY + CGFloat(rowIndex) * cellH
+            for cell in row.cells {
+                guard let columnRect = rectByChannel[cell.channel] else { continue }
+                let cellRect = CGRect(x: columnRect.minX, y: y, width: columnRect.width, height: cellH)
+                context.fill(
+                    Path(cellRect),
+                    with: .color(SpectrumHeatmapColor.color(forActivity: cell.activity))
+                )
             }
         }
 
-        // Faint cell-boundary lines so individual channel/timestamp cells stay
-        // locatable, without reverting to a mosaic.
         context.stroke(
             Path { path in
-                for col in 0...cols {
-                    let x = gridRect.minX + CGFloat(col) * cellW
-                    path.move(to: CGPoint(x: x, y: gridRect.minY))
-                    path.addLine(to: CGPoint(x: x, y: gridRect.maxY))
+                for column in columnRects {
+                    for x in [column.rect.minX, column.rect.maxX] {
+                        path.move(to: CGPoint(x: x, y: gridRect.minY))
+                        path.addLine(to: CGPoint(x: x, y: gridRect.maxY))
+                    }
                 }
-                for row in 0...rows {
+                for row in 0...model.rows.count {
                     let y = gridRect.minY + CGFloat(row) * cellH
                     path.move(to: CGPoint(x: gridRect.minX, y: y))
                     path.addLine(to: CGPoint(x: gridRect.maxX, y: y))
@@ -232,9 +163,8 @@ struct SpectrumHeatmapPanel: View {
     private func drawChannelAxis(
         context: GraphicsContext,
         gridRect: CGRect,
-        model: SpectrumHeatmapModel,
         channels: [Int],
-        columnW: CGFloat
+        columnRects: [(channel: Int, rect: CGRect)]
     ) {
         guard !channels.isEmpty else { return }
         // Choose representative channels from the legal set itself — never
@@ -259,13 +189,12 @@ struct SpectrumHeatmapPanel: View {
         // Position each label at its column's center so labels sit under their
         // data, aligned with the cell grid — not at a fabricated channel offset.
         for ch in ticks {
-            guard let colIndex = channels.firstIndex(of: ch) else { continue }
-            let x = gridRect.minX + (CGFloat(colIndex) + 0.5) * columnW
+            guard let columnRect = columnRects.first(where: { $0.channel == ch })?.rect else { continue }
             let label = Text("\(ch)")
                 .font(.caption2)
                 .foregroundColor(.secondary)
             let resolved = context.resolve(label)
-            context.draw(resolved, at: CGPoint(x: x, y: gridRect.maxY + 10))
+            context.draw(resolved, at: CGPoint(x: columnRect.midX, y: gridRect.maxY + 10))
         }
     }
 }

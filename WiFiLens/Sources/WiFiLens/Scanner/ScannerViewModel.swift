@@ -249,20 +249,14 @@ final class ScannerViewModel {
         // ingestNetworks records every network of one scan with the same
         // observation-cycle timestamp, so a bucket == one scan moment.
         var buckets: [Date: [NetworkSnapshot]] = [:]
-        var timestamps: Set<Date> = []
-        if lastObservationTimestamp != .distantPast {
-            timestamps.insert(lastObservationTimestamp)
-        }
         for snaps in signalHistory.allSnapshots.values {
             for snap in snaps {
-                timestamps.insert(snap.timestamp)
                 guard let snapBand = ChannelBand(id: snap.band), snapBand == band else { continue }
                 buckets[snap.timestamp, default: []].append(snap)
             }
         }
 
-        let sortedTimestamps = timestamps.sorted()
-        let rows = sortedTimestamps.map { timestamp -> SpectrumHeatmapRow in
+        let rows = signalHistory.allScanTimestamps.sorted().map { timestamp -> SpectrumHeatmapRow in
             var activity = [Int](repeating: 0, count: channels.count)
             for snap in buckets[timestamp] ?? [] {
                 let widthMHz = SnapshotToChartAdapter.channelWidthMHz(from: snap.channelWidth)
@@ -645,6 +639,7 @@ final class ScannerViewModel {
         regulatoryPipeline.inferredRegion = output.cycle.inferredRegion
 
         lastObservationTimestamp = output.cycle.observation.timestamp
+        signalHistory.recordScan(timestamp: lastObservationTimestamp)
         ingestNetworks(output.rawNetworks, timestamp: lastObservationTimestamp)
     }
 
@@ -1090,6 +1085,7 @@ extension ScannerViewModel {
     ) {
         self.supportedBands = supportedBands
         self.lastObservationTimestamp = timestamp
+        signalHistory.recordScan(timestamp: timestamp)
         ingestNetworks(networks, timestamp: timestamp)
     }
 

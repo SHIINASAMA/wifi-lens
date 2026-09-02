@@ -9,6 +9,7 @@ enum TrendDirection { case up, down, stable }
 final class SignalHistoryStore {
     private var history: [String: [Int]] = [:]
     private var snapshots: [String: [NetworkSnapshot]] = [:]
+    private var scanTimestamps: [Date] = []
     private let maxCount: Int
 
     init(maxCount: Int = 20) {
@@ -26,12 +27,21 @@ final class SignalHistoryStore {
 
         // Snapshot
         if let snap = snapshot {
+            recordScan(timestamp: snap.timestamp)
             var snaps = snapshots[bssid] ?? []
             snaps.append(snap)
             if snaps.count > maxCount {
                 snaps.removeFirst(snaps.count - maxCount)
             }
             snapshots[bssid] = snaps
+        }
+    }
+
+    func recordScan(timestamp: Date) {
+        guard !scanTimestamps.contains(timestamp) else { return }
+        scanTimestamps.append(timestamp)
+        if scanTimestamps.count > maxCount {
+            scanTimestamps.removeFirst(scanTimestamps.count - maxCount)
         }
     }
 
@@ -71,4 +81,9 @@ final class SignalHistoryStore {
     /// earlier "for session persistence" comment was misleading; re-evaluate
     /// naming when the session model is designed.
     var allSnapshots: [String: [NetworkSnapshot]] { snapshots }
+
+    /// Successful scan-cycle timestamps (oldest first), bounded independently
+    /// from per-BSSID snapshot retention so empty successful scans can still
+    /// participate in shared-history consumers such as the heatmap.
+    var allScanTimestamps: [Date] { scanTimestamps }
 }
