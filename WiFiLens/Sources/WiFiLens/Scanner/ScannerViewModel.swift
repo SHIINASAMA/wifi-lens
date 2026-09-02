@@ -236,12 +236,11 @@ final class ScannerViewModel {
     }
 
     /// Shared-history-derived heatmap for a single band. Owns only aggregation:
-    /// buckets the store's per-BSSID snapshots by scan timestamp, then for each
-    /// bucket counts how many AP spans cover each channel, reusing
-    /// ChannelSpanCalculator so the heatmap and the spectrum chart never
-    /// disagree about channel width. Does not compute colors or geometry, and
-    /// does not re-implement history trimming (SignalHistoryStore owns the
-    /// window). Environment-level: ignores per-panel filters and hidden toggles.
+    /// it converts the per-BSSID snapshots belonging to each successful scan
+    /// into anonymous weighted frequency spans. The scan timeline is the source
+    /// of frame ownership, so an empty scan remains a zero-activity frame and a
+    /// stale snapshot cannot create one. Environment-level: ignores per-panel
+    /// filters and hidden toggles.
     func heatmapModel(for band: ChannelBand) -> SpectrumHeatmapModel {
         let channels = heatmapChannels(for: band)
 
@@ -256,32 +255,14 @@ final class ScannerViewModel {
             }
         }
 
-        let rows = signalHistory.allScanTimestamps.sorted().map { timestamp -> SpectrumHeatmapRow in
-            var activity = [Int](repeating: 0, count: channels.count)
-            for snap in buckets[timestamp] ?? [] {
-                let widthMHz = SnapshotToChartAdapter.channelWidthMHz(from: snap.channelWidth)
-                let (left, right) = ChannelSpanCalculator.channelBlock(
-                    primaryChannel: snap.channel,
-                    widthMHz: widthMHz,
-                    band: band,
-                    spanDirection: nil
-                )
-                for (index, channel) in channels.enumerated() where (left...right).contains(channel) {
-                    activity[index] += 1
-                }
+        let frames = signalHistory.allScanTimestamps.sorted().map { timestamp in
+            let spans = (buckets[timestamp] ?? []).compactMap {
+                SpectrumHeatmapActivity.span(for: $0, band: band)
             }
-            let cells = channels.enumerated().map { index, channel in
-                SpectrumHeatmapCell(
-                    id: "\(timestamp.timeIntervalSinceReferenceDate)-\(channel)",
-                    timestamp: timestamp,
-                    channel: channel,
-                    activity: activity[index]
-                )
-            }
-            return SpectrumHeatmapRow(id: timestamp, timestamp: timestamp, cells: cells)
+            return SpectrumHeatmapFrame(id: timestamp, timestamp: timestamp, spans: spans)
         }
 
-        return SpectrumHeatmapModel(band: band, channels: channels, rows: rows)
+        return SpectrumHeatmapModel(band: band, channels: channels, frames: frames)
     }
 
     /// The heatmap's X-axis channels for a band: the legal channel set from the

@@ -1,85 +1,64 @@
-import Foundation
+import CoreGraphics
 import Testing
 @testable import WiFi_Lens
 
-private func makeModel(channels: [Int], rows: Int) -> SpectrumHeatmapModel {
-    let timestamps = (0..<rows).map { Date(timeIntervalSince1970: Double($0)) }
-    let heatmapRows = timestamps.map { timestamp in
-        SpectrumHeatmapRow(
-            id: timestamp,
-            timestamp: timestamp,
-            cells: channels.map { channel in
-                SpectrumHeatmapCell(
-                    id: "\(timestamp.timeIntervalSinceReferenceDate)-\(channel)",
-                    timestamp: timestamp,
-                    channel: channel,
-                    activity: 0
-                )
-            }
-        )
-    }
-    return SpectrumHeatmapModel(band: .band5GHz, channels: channels, rows: heatmapRows)
-}
-
 @Suite struct SpectrumHeatmapLayoutTests {
-    @Test func channelRectsPreserveNumericGaps() {
-        let rects = SpectrumHeatmapLayout.columnRects(
-            channels: [36, 40, 44, 48, 149],
-            in: CGRect(x: 0, y: 0, width: 500, height: 200)
+    private let rect = CGRect(x: 0, y: 0, width: 500, height: 200)
+
+    @Test func frequencyDomainPreservesDiscontinuousFiveGHzGap() {
+        let domain = SpectrumHeatmapLayout.frequencyDomain(
+            channels: [36, 40, 44, 48, 149, 153, 157, 161, 165],
+            band: .band5GHz
         )
-        #expect(rects[0].channel == 36)
-        #expect(rects[3].rect.maxX < rects[4].rect.minX)
+        let ch48 = SpectrumHeatmapLayout.xPosition(
+            forFrequencyMHz: 5000 + 48 * 5,
+            domain: domain,
+            in: rect
+        )!
+        let ch149 = SpectrumHeatmapLayout.xPosition(
+            forFrequencyMHz: 5000 + 149 * 5,
+            domain: domain,
+            in: rect
+        )!
+        let ch153 = SpectrumHeatmapLayout.xPosition(
+            forFrequencyMHz: 5000 + 153 * 5,
+            domain: domain,
+            in: rect
+        )!
+
+        #expect(ch48 < ch149)
+        #expect(ch149 - ch48 > ch153 - ch149)
+        #expect(domain.regions.count == 2)
     }
 
-    @Test func sparseOnlyChannelRectsPreserveNumericGaps() {
-        let rects = SpectrumHeatmapLayout.columnRects(
-            channels: [36, 44, 149],
-            in: CGRect(x: 0, y: 0, width: 500, height: 200)
+    @Test func frequencyMappingHasAnInverse() {
+        let domain = SpectrumHeatmapLayout.frequencyDomain(
+            channels: [1, 6, 11],
+            band: .band24GHz
         )
+        let frequency = 2437.0
+        let x = SpectrumHeatmapLayout.xPosition(forFrequencyMHz: frequency, domain: domain, in: rect)!
+        let roundTrip = SpectrumHeatmapLayout.frequencyMHz(forX: x, domain: domain, in: rect)!
 
-        #expect(rects[0].rect.maxX < rects[1].rect.minX)
-        #expect(rects[1].rect.maxX < rects[2].rect.minX)
+        #expect(abs(roundTrip - frequency) < 0.0001)
     }
 
-    @Test func bandAwareRectsUseNominalFiveGHzSpacing() {
-        let rects = SpectrumHeatmapLayout.columnRects(
-            channels: [36, 40, 44, 48, 149],
+    @Test func channelTicksUseOnlyProvidedLegalChannels() {
+        let ticks = SpectrumHeatmapLayout.channelTicks(
+            channels: [36, 40, 44, 48, 149, 153, 157, 161, 165],
             band: .band5GHz,
-            in: CGRect(x: 0, y: 0, width: 500, height: 200)
+            in: rect,
+            maximumCount: 4
         )
 
-        #expect(abs(rects[0].rect.maxX - rects[1].rect.minX) < 0.001)
-        #expect(rects[3].rect.maxX < rects[4].rect.minX)
+        #expect(!ticks.isEmpty)
+        #expect(ticks.allSatisfy { [36, 40, 44, 48, 149, 153, 157, 161, 165].contains($0.channel) })
+        #expect(ticks.last?.channel == 165)
     }
 
-    @Test func cellHitTestingDoesNotInterpolateAcrossGap() {
-        let result = SpectrumHeatmapLayout.cell(
-            at: CGPoint(x: 250, y: 40),
-            in: CGRect(x: 0, y: 0, width: 500, height: 200),
-            model: makeModel(channels: [36, 40, 149], rows: 2)
-        )
-        #expect(result == nil)
-    }
-
-    @Test func emptyAndSingletonInputsAreHandled() {
-        let rect = CGRect(x: 0, y: 0, width: 500, height: 200)
-        #expect(SpectrumHeatmapLayout.columnRects(channels: [], in: rect).isEmpty)
-
-        let singleton = SpectrumHeatmapLayout.columnRects(channels: [36], in: rect)
-        #expect(singleton.count == 1)
-        #expect(singleton[0].channel == 36)
-        #expect(singleton[0].rect == rect)
-    }
-
-    @Test func rowBoundaryHitTestingUsesTheLowerRow() {
-        let model = makeModel(channels: [36], rows: 2)
-        let result = SpectrumHeatmapLayout.cell(
-            at: CGPoint(x: 250, y: 100),
-            in: CGRect(x: 0, y: 0, width: 500, height: 200),
-            model: model
-        )
-
-        #expect(result?.row == 1)
-        #expect(result?.channel == 36)
+    @Test func invalidGeometryReturnsNoMapping() {
+        let domain = SpectrumHeatmapLayout.frequencyDomain(channels: [], band: .band5GHz)
+        #expect(SpectrumHeatmapLayout.xPosition(forFrequencyMHz: 5000, domain: domain, in: rect) == nil)
+        #expect(SpectrumHeatmapLayout.frequencyMHz(forX: -1, domain: domain, in: rect) == nil)
     }
 }

@@ -11,9 +11,11 @@ final class SignalHistoryStore {
     private var snapshots: [String: [NetworkSnapshot]] = [:]
     private var scanTimestamps: [Date] = []
     private let maxCount: Int
+    private let scanWindow: TimeInterval
 
-    init(maxCount: Int = 20) {
+    init(maxCount: Int = 20, scanWindow: TimeInterval = 60) {
         self.maxCount = maxCount
+        self.scanWindow = max(0, scanWindow)
     }
 
     func record(bssid: String, rssi: Int, snapshot: NetworkSnapshot? = nil) {
@@ -27,7 +29,6 @@ final class SignalHistoryStore {
 
         // Snapshot
         if let snap = snapshot {
-            recordScan(timestamp: snap.timestamp)
             var snaps = snapshots[bssid] ?? []
             snaps.append(snap)
             if snaps.count > maxCount {
@@ -40,8 +41,13 @@ final class SignalHistoryStore {
     func recordScan(timestamp: Date) {
         guard !scanTimestamps.contains(timestamp) else { return }
         scanTimestamps.append(timestamp)
+        let latest = scanTimestamps.max() ?? timestamp
+        let cutoff = latest.addingTimeInterval(-scanWindow)
+        scanTimestamps = scanTimestamps
+            .filter { $0 >= cutoff }
+            .sorted()
         if scanTimestamps.count > maxCount {
-            scanTimestamps.removeFirst(scanTimestamps.count - maxCount)
+            scanTimestamps = Array(scanTimestamps.suffix(maxCount))
         }
     }
 

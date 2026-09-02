@@ -135,6 +135,10 @@
 		A3C7A1B2C3D4E5F678900022 /* SpectrumHeatmapLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F67890000B /* SpectrumHeatmapLayout.swift */; };
 		A3C7A1B2C3D4E5F678900023 /* SpectrumHeatmapLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F67890000B /* SpectrumHeatmapLayout.swift */; };
 		A3C7A1B2C3D4E5F678900024 /* SpectrumHeatmapLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F67890000C /* SpectrumHeatmapLayoutTests.swift */; };
+		A3C7A1B2C3D4E5F678900025 /* SpectrumHeatmapActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F67890000D /* SpectrumHeatmapActivity.swift */; };
+		A3C7A1B2C3D4E5F678900026 /* SpectrumHeatmapActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F67890000D /* SpectrumHeatmapActivity.swift */; };
+		A3C7A1B2C3D4E5F678900027 /* SpectrumHeatmapRasterizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F67890000E /* SpectrumHeatmapRasterizer.swift */; };
+		A3C7A1B2C3D4E5F678900028 /* SpectrumHeatmapRasterizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F67890000E /* SpectrumHeatmapRasterizer.swift */; };
 		A3C7A1B2C3D4E5F678900012 /* SpectrumTablePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900001 /* SpectrumTablePanel.swift */; };
 		A3C7A1B2C3D4E5F678900014 /* NetworkTableRowSorter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900002 /* NetworkTableRowSorter.swift */; };
 		A3C7A1B2C3D4E5F678900017 /* SpectrumBandPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900005 /* SpectrumBandPanel.swift */; };
@@ -665,6 +669,8 @@
 		A3C7A1B2C3D4E5F67890000A /* SpectrumHeatmapPanelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapPanelTests.swift; sourceTree = "<group>"; };
 		A3C7A1B2C3D4E5F67890000B /* SpectrumHeatmapLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapLayout.swift; sourceTree = "<group>"; };
 		A3C7A1B2C3D4E5F67890000C /* SpectrumHeatmapLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapLayoutTests.swift; sourceTree = "<group>"; };
+		A3C7A1B2C3D4E5F67890000D /* SpectrumHeatmapActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapActivity.swift; sourceTree = "<group>"; };
+		A3C7A1B2C3D4E5F67890000E /* SpectrumHeatmapRasterizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapRasterizer.swift; sourceTree = "<group>"; };
 		A2B300000000000000000001 /* SignalHistoryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalHistoryStoreTests.swift; sourceTree = "<group>"; };
 		A3C7A1B2C3D4E5F678900005 /* SpectrumBandPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumBandPanel.swift; sourceTree = "<group>"; };
 		A3C7A1B2C3D4E5F678900006 /* SpectrumTrendPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumTrendPanel.swift; sourceTree = "<group>"; };
@@ -1029,6 +1035,8 @@
 				A3C7A1B2C3D4E5F678900006 /* SpectrumTrendPanel.swift */,
 				A3C7A1B2C3D4E5F678900007 /* SpectrumPanelContainer.swift */,
 				A3C7A1B2C3D4E5F678900008 /* SpectrumHeatmapModel.swift */,
+				A3C7A1B2C3D4E5F67890000D /* SpectrumHeatmapActivity.swift */,
+				A3C7A1B2C3D4E5F67890000E /* SpectrumHeatmapRasterizer.swift */,
 				A3C7A1B2C3D4E5F67890000B /* SpectrumHeatmapLayout.swift */,
 				A3C7A1B2C3D4E5F678900009 /* SpectrumHeatmapPanel.swift */,
 			);
@@ -2049,6 +2057,8 @@
 				A3C7A1B2C3D4E5F678900019 /* SpectrumTrendPanel.swift in Sources */,
 				A3C7A1B2C3D4E5F67890001B /* SpectrumPanelContainer.swift in Sources */,
 				A3C7A1B2C3D4E5F67890001D /* SpectrumHeatmapModel.swift in Sources */,
+				A3C7A1B2C3D4E5F678900025 /* SpectrumHeatmapActivity.swift in Sources */,
+				A3C7A1B2C3D4E5F678900027 /* SpectrumHeatmapRasterizer.swift in Sources */,
 				A3C7A1B2C3D4E5F678900022 /* SpectrumHeatmapLayout.swift in Sources */,
 				A3C7A1B2C3D4E5F67890001E /* SpectrumHeatmapPanel.swift in Sources */,
 				23F1AB88A28C6E035AA916AA /* BandChartViewModel.swift in Sources */,
@@ -2370,6 +2380,8 @@
 				A3C7A1B2C3D4E5F67890001A /* SpectrumTrendPanel.swift in Sources */,
 				A3C7A1B2C3D4E5F67890001C /* SpectrumPanelContainer.swift in Sources */,
 				A3C7A1B2C3D4E5F67890001F /* SpectrumHeatmapModel.swift in Sources */,
+				A3C7A1B2C3D4E5F678900026 /* SpectrumHeatmapActivity.swift in Sources */,
+				A3C7A1B2C3D4E5F678900028 /* SpectrumHeatmapRasterizer.swift in Sources */,
 				A3C7A1B2C3D4E5F678900023 /* SpectrumHeatmapLayout.swift in Sources */,
 				A3C7A1B2C3D4E5F678900020 /* SpectrumHeatmapPanel.swift in Sources */,
 				FB1E32752FC7316C009D1BDC /* OverviewView.swift in Sources */,
