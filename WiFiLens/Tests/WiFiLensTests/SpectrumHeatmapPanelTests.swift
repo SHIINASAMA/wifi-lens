@@ -136,14 +136,16 @@ import SwiftUI
         #expect(!model.channels.contains(149))   // U-NII-3 not available in JP
     }
 
-    @Test func bandFilteringExcludesOtherBands() {
+    @Test func bandFilteringExcludesOtherBandsButKeepsScanTimestamp() {
         let vm = ScannerViewModel()
         vm.signalHistory.record(
             bssid: "aa:bb:cc:dd:ee:01", rssi: -50,
             snapshot: makeSnapshot(timestamp: Date(timeIntervalSince1970: 100), bssid: "aa:bb:cc:dd:ee:01", channel: 36, band: "5")
         )
 
-        #expect(vm.heatmapModel(for: .band24GHz).rows.isEmpty)
+        let band24Model = vm.heatmapModel(for: .band24GHz)
+        #expect(band24Model.rows.count == 1)
+        #expect(band24Model.rows[0].cells.allSatisfy { $0.activity == 0 })
         #expect(vm.heatmapModel(for: .band5GHz).rows.count == 1)
     }
 
@@ -171,6 +173,42 @@ import SwiftUI
         #expect(model.rows[0].cells.first { $0.channel == 11 }?.activity == 0)  // B absent at t1
     }
 
+    @Test func selectedBandDisappearingMidWindowKeepsZeroActivityRow() {
+        let vm = ScannerViewModel()
+        let t1 = Date(timeIntervalSince1970: 100)
+        let t2 = Date(timeIntervalSince1970: 130)
+        // Scan 1 contains the selected band; scan 2 contains only another band.
+        vm.signalHistory.record(
+            bssid: "aa:bb:cc:dd:ee:01", rssi: -50,
+            snapshot: makeSnapshot(timestamp: t1, bssid: "aa:bb:cc:dd:ee:01", channel: 6, band: "24")
+        )
+        vm.signalHistory.record(
+            bssid: "aa:bb:cc:dd:ee:02", rssi: -60,
+            snapshot: makeSnapshot(timestamp: t2, bssid: "aa:bb:cc:dd:ee:02", channel: 36, band: "5")
+        )
+
+        let model = vm.heatmapModel(for: .band24GHz)
+
+        #expect(model.rows.map(\.timestamp) == [t1, t2])
+        #expect(model.rows[1].cells.allSatisfy { $0.activity == 0 })
+    }
+
+    @Test func emptyScanKeepsCurrentTimestampAsZeroActivityRow() {
+        let vm = ScannerViewModel()
+        let t1 = Date(timeIntervalSince1970: 100)
+        let t2 = Date(timeIntervalSince1970: 130)
+        vm.signalHistory.record(
+            bssid: "aa:bb:cc:dd:ee:01", rssi: -50,
+            snapshot: makeSnapshot(timestamp: t1, bssid: "aa:bb:cc:dd:ee:01", channel: 6, band: "24")
+        )
+        vm.debugApplyNetworksForTesting([], supportedBands: [.band24GHz], timestamp: t2)
+
+        let model = vm.heatmapModel(for: .band24GHz)
+
+        #expect(model.rows.map(\.timestamp) == [t1, t2])
+        #expect(model.rows[1].cells.allSatisfy { $0.activity == 0 })
+    }
+
     @Test func cellIDIsDeterministic() {
         let vm = ScannerViewModel()
         let t1 = Date(timeIntervalSince1970: 100)
@@ -189,6 +227,16 @@ import SwiftUI
         #expect(SpectrumHeatmapColor.intensity(forActivity: 5) == 1.0)
         #expect(SpectrumHeatmapColor.intensity(forActivity: 9) == 1.0)   // clamped high
         #expect(SpectrumHeatmapColor.intensity(forActivity: -3) == 0.0)  // clamped low
+    }
+
+    @Test func bilinearFieldPreservesFractionalActivity() {
+        let intensity = SpectrumHeatmapField.sampledIntensity(
+            atCol: 0.5,
+            atRow: 0.5,
+            grid: [[0, 5], [0, 5]]
+        )
+
+        #expect(abs(intensity - 0.5) < 0.0001)
     }
 
     @Test func panelConstructsWithBand() {

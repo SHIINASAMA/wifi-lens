@@ -36484,6 +36484,48 @@
         }
       }
     },
+    "spectrum.heatmap.legend.gradient" : {
+      "comment" : "Thermal color gradient legend",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thermisches Farbspektrum"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thermal color gradient"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gradiente térmico"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dégradé thermique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "熱カラーグラデーション"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "热成像颜色渐变"
+          }
+        }
+      }
+    },
     "spectrum.heatmap.legend.high" : {
       "comment" : "High end of the heatmap intensity legend",
       "extractionState" : "manual",

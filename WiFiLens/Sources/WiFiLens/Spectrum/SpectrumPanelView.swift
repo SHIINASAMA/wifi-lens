@@ -35,8 +35,10 @@ struct SpectrumPanelView: View {
             switch chartType {
             case .band24, .band5, .band6:
                 bandPanel.toolbarContent
-            case .trend, .heatmap:
+            case .trend:
                 EmptyView()
+            case .heatmap:
+                heatmapPanel.heatmapToolbarContent
             case .table:
                 tablePanel.toolbarContent
             }
@@ -58,6 +60,10 @@ struct SpectrumPanelView: View {
         )
     }
 
+    private var heatmapPanel: SpectrumHeatmapPanel {
+        SpectrumHeatmapPanel(viewModel: viewModel, band: band)
+    }
+
     // MARK: - Chart Content
 
     @ViewBuilder
@@ -73,7 +79,7 @@ struct SpectrumPanelView: View {
         case .table:
             tablePanel
         case .heatmap:
-            SpectrumHeatmapPanel(viewModel: viewModel, band: band)
+            heatmapPanel
         }
     }
 
