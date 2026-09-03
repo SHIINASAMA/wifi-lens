@@ -1,30 +1,7 @@
 import Foundation
-import SwiftUI
 import ChartLens
 
 struct BandChartLayout {
-    struct HeatmapBar {
-        let offset: CGFloat
-        let color: Color
-    }
-
-    struct HeatmapBin {
-        let apex: Int
-        let colors: [Color]
-
-        func bars(barWidth: CGFloat, barGap: CGFloat) -> [HeatmapBar] {
-            colors.enumerated().map { index, color in
-                let offset = CGFloat(index) * (barWidth + barGap) - CGFloat(colors.count - 1) * (barWidth + barGap) / 2
-                return HeatmapBar(offset: offset, color: color)
-            }
-        }
-    }
-
-    struct Heatmap {
-        let bins: [HeatmapBin]
-        let maxCount: Int
-    }
-
     struct LabelPlacement {
         enum Kind {
             case regular
@@ -45,14 +22,6 @@ struct BandChartLayout {
         let rawStep = max(1, Int((xMax - xMin) / Double(desiredTicks)))
         let step = max(1, rawStep)
         return stride(from: Int(xMin), through: Int(xMax), by: step).filter { $0 >= axisTickStartChannel }
-    }
-
-    static func heatmapBins(series: [ChartSeriesData]) -> Heatmap {
-        let grouped = Dictionary(grouping: series) { Int($0.apex.rounded()) }
-        let bins = grouped.keys.sorted().map { apex in
-            HeatmapBin(apex: apex, colors: grouped[apex]?.map(\.color) ?? [])
-        }
-        return Heatmap(bins: bins, maxCount: max(1, bins.map(\.colors.count).max() ?? 1))
     }
 
     static func placeLabels(

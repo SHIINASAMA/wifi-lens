@@ -1109,7 +1109,7 @@ struct ScannerRuntimeMigrationTests {
         #expect(scanner.filterQuery(for: .primary) == "Guest")
         #expect(scanner.combinedTableRows.first(where: { $0.id == office.id })?.isVisible == false)
         #expect(scanner.combinedTableRows.first(where: { $0.id == office.id })?.visibilityLocked == true)
-        #expect(scanner.bandViewModel(for: .primary, selection: .band5).visibleSeriesData().map { $0.id } == [guest.id])
+        #expect(scanner.bandViewModel(for: .primary, band: .band5GHz).visibleSeriesData().map { $0.id } == [guest.id])
         scanner.stop()
     }
 

@@ -1,4 +1,4 @@
-enum ChannelBand: Int, Sendable, CaseIterable {
+enum ChannelBand: Int, Sendable, CaseIterable, Hashable {
     case band24GHz = 1
     case band5GHz = 2
     case band6GHz = 3

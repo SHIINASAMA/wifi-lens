@@ -75,7 +75,8 @@ struct ContentView: View {
                         viewModel: viewModel,
                         panelID: .primary,
                         isVendorColumnAvailable: isVendorColumnAvailable,
-                        defaultViewType: .band24,
+                        defaultViewType: .spectrum,
+                        defaultBand: .band24GHz,
                         selectedNetworkID: $viewModel.selectedNetworkID,
                         sortOrder: $sortOrder,
                         hiddenColumns: hiddenColumns
@@ -88,7 +89,8 @@ struct ContentView: View {
                         viewModel: viewModel,
                         panelID: .secondary,
                         isVendorColumnAvailable: isVendorColumnAvailable,
-                        defaultViewType: .band5,
+                        defaultViewType: .spectrum,
+                        defaultBand: .band5GHz,
                         selectedNetworkID: $viewModel.selectedNetworkID,
                         sortOrder: $sortOrder,
                         hiddenColumns: hiddenColumns

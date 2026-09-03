@@ -1,6 +1,7 @@
 import Testing
 import Foundation
 import SwiftUI
+import ChartLens
 @testable import WiFi_Lens
 
 // MARK: - NetworkSnapshot
@@ -159,6 +160,42 @@ struct ChartSeriesDataTests {
         #expect(d.curvePoints.count == 81)
     }
 
+    @Test func curvePointsAgreeWithSharedGaussianEnvelope() {
+        let data = ChartSeriesData(id: "1", ssid: "Net", bssid: "aa:bb:cc", channel: 6, left: 0, apex: 2, right: 4, rssi: -50)
+        let envelope = GaussianEnvelope(
+            leftX: Double(data.left),
+            rightX: Double(data.right),
+            peakY: Double(data.rssi),
+            baselineY: Double(Constants.rssiNoiseFloor),
+            sigma: Double(data.right - data.left) / 8.0
+        )
+        let points = data.curvePoints
+
+        #expect(points.first?.x == envelope.leftX)
+        #expect(points.first?.y == envelope.value(atX: envelope.leftX))
+        #expect(points[points.count / 2].y == envelope.value(atX: (envelope.leftX + envelope.rightX) / 2.0))
+        #expect(points.last?.x == envelope.rightX)
+        #expect(points.last?.y == envelope.value(atX: envelope.rightX))
+    }
+
+    @Test func spectrumEnvelopeGeometryUsesTheSameGaussianDescriptorForAllViews() {
+        let geometry = SpectrumEnvelopeGeometry(
+            leftX: 5170,
+            rightX: 5250,
+            peakRSSI: -50,
+            baselineRSSI: Double(Constants.rssiNoiseFloor)
+        )
+        let chartEnvelope = GaussianEnvelope(
+            leftX: 5170,
+            rightX: 5250,
+            peakY: -50,
+            baselineY: Double(Constants.rssiNoiseFloor),
+            sigma: 10
+        )
+
+        #expect(geometry.gaussian == chartEnvelope)
+    }
+
     @Test func curvePointsCentered() {
         let d = ChartSeriesData(id: "1", ssid: "Net", bssid: "aa:bb:cc", channel: 6, left: 0, apex: 1.5, right: 4, rssi: -50)
         let points = d.curvePoints
@@ -194,7 +231,7 @@ struct ChartSeriesDataTests {
 
 // MARK: - SignalHistoryStore
 
-@Suite @MainActor struct SignalHistoryStoreTests {
+@Suite @MainActor struct SignalHistoryStoreBehaviorTests {
 
     @Test func recordAndTrend() {
         let store = SignalHistoryStore(maxCount: 10)

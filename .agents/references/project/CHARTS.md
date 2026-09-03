@@ -135,7 +135,7 @@ Created fresh on each render pass via `BandChartViewModel.renderModel` — the v
 
 Thin wrapper around `Chart` for WiFi spectrum visualization:
 - Builds `[ChartSeries]` with `.gaussian` interpolation from `visibleSeriesData`
-- Heatmap overlay: color-coded channel occupancy bars below the chart
+- Spectrum chart: Gaussian curves with data labels and selection/zoom overlays
 - Data label overlay: SSID + trend arrows positioned above curves
 - Tooltip overlay: SSID, RSSI, channel, BSSID on hover
 - Tap-to-select, drag-to-zoom, expand to fullscreen
@@ -145,7 +145,6 @@ Thin wrapper around `Chart` for WiFi spectrum visualization:
 
 Static layout utilities extracted from the old `DataLabelOverlay`:
 - `axisTickValues()` — channel-number tick placement
-- `heatmapBins()` — group series by apex channel, compute max bar count
 - `placeLabels()` — collision-aware label placement with occupancy tracking
 - `nearestSeries()` — hit-testing for hover/selection within curves
 

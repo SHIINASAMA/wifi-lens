@@ -70,7 +70,7 @@ import ChartLens
         vm.setFilterQuery("Beta", for: .primary)
 
         #expect(vm.combinedTableRows.count == 3)
-        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().map(\.ssid) == ["Beta"])
+        #expect(vm.bandViewModel(for: .primary, band: .band24GHz).visibleSeriesData().map(\.ssid) == ["Beta"])
     }
 
     @Test func filterByHiddenBandsRemovesBand() {
@@ -83,7 +83,7 @@ import ChartLens
         vm.applyGlobalFilterToBands()
 
         #expect(vm.combinedTableRows.count == 2)
-        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().isEmpty)
+        #expect(vm.bandViewModel(for: .primary, band: .band24GHz).visibleSeriesData().isEmpty)
         #expect(vm.combinedTableRows.allSatisfy { $0.isVisible == false })
     }
 
@@ -97,8 +97,8 @@ import ChartLens
         vm.applyGlobalFilterToBands()
 
         #expect(vm.combinedTableRows.count == 2)
-        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().count == 1)
-        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().first?.ssid == "Visible")
+        #expect(vm.bandViewModel(for: .primary, band: .band24GHz).visibleSeriesData().count == 1)
+        #expect(vm.bandViewModel(for: .primary, band: .band24GHz).visibleSeriesData().first?.ssid == "Visible")
     }
 
     @Test func debugInjectPreservesInjectedFilteredState() {
@@ -122,10 +122,10 @@ import ChartLens
 
         vm.debugApplyNetworksForTesting([alpha, beta], supportedBands: Set([ChannelBand.band24GHz]))
         vm.setFilterQuery("Alpha", for: .primary)
-        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().count == 1)
+        #expect(vm.bandViewModel(for: .primary, band: .band24GHz).visibleSeriesData().count == 1)
 
         vm.setFilterQuery("", for: .primary)
-        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().count == 2)
+        #expect(vm.bandViewModel(for: .primary, band: .band24GHz).visibleSeriesData().count == 2)
     }
 
     @Test func panelFilterOnlyChangesPanelRenderStateNotTableRowPresence() {
@@ -138,7 +138,7 @@ import ChartLens
 
         #expect(vm.combinedTableRows.map(\.id) == [alpha.id, beta.id])
         #expect(vm.combinedTableRows.first(where: { $0.id == beta.id })?.isVisible == true)
-        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().map(\.id) == [alpha.id])
+        #expect(vm.bandViewModel(for: .primary, band: .band24GHz).visibleSeriesData().map(\.id) == [alpha.id])
     }
 
     @Test func panelFiltersAreIndependentPerView() {
@@ -150,8 +150,8 @@ import ChartLens
         vm.setFilterQuery("Alpha", for: .primary)
         vm.setFilterQuery("Beta", for: .secondary)
 
-        #expect(vm.bandViewModel(for: .primary, selection: .band24).visibleSeriesData().map(\.id) == [alpha.id])
-        #expect(vm.bandViewModel(for: .secondary, selection: .band24).visibleSeriesData().map(\.id) == [beta.id])
+        #expect(vm.bandViewModel(for: .primary, band: .band24GHz).visibleSeriesData().map(\.id) == [alpha.id])
+        #expect(vm.bandViewModel(for: .secondary, band: .band24GHz).visibleSeriesData().map(\.id) == [beta.id])
     }
 
     // MARK: - Validation
@@ -213,19 +213,6 @@ import ChartLens
         #expect(!ticks.isEmpty)
         #expect(ticks.allSatisfy { $0 >= 1 })
         #expect(ticks.first == 1)
-    }
-
-    @Test func heatmapBinsGroupByApex() {
-        let series = [
-            makeSeries(id: "1", ssid: "A", channel: 6),
-            makeSeries(id: "2", ssid: "B", channel: 6),
-            makeSeries(id: "3", ssid: "C", channel: 11),
-        ]
-        let heatmap = BandChartLayout.heatmapBins(series: series)
-        #expect(heatmap.bins.count == 2)
-        #expect(heatmap.maxCount == 2)
-        #expect(heatmap.bins.first?.colors.count == 2)
-        #expect(heatmap.bins.last?.colors.count == 1)
     }
 
     @Test func placeLabelsKeepsSelectedSeries() {
@@ -542,7 +529,7 @@ import ChartLens
         vm.toggleVisibilityLocked(seriesID: office.id)
         vm.setFilterQuery("Home", for: .primary)
 
-        #expect(vm.bandViewModel(for: .primary, selection: .band5).visibleSeriesData().first?.id == office.id)
+        #expect(vm.bandViewModel(for: .primary, band: .band5GHz).visibleSeriesData().first?.id == office.id)
     }
 
     @Test func unlockedAPModifiedByFilter() {
@@ -552,7 +539,7 @@ import ChartLens
         vm.debugApplyNetworksForTesting([office], supportedBands: Set([ChannelBand.band5GHz]))
         vm.setFilterQuery("Home", for: .primary)
 
-        #expect(vm.bandViewModel(for: .primary, selection: .band5).visibleSeriesData().isEmpty)
+        #expect(vm.bandViewModel(for: .primary, band: .band5GHz).visibleSeriesData().isEmpty)
     }
 
     @Test func lockedAPPreservedWhileOtherAPsUpdateForFilter() {
@@ -564,7 +551,7 @@ import ChartLens
         vm.toggleVisibilityLocked(seriesID: locked.id)
         vm.setFilterQuery("Home", for: .primary)
 
-        #expect(vm.bandViewModel(for: .primary, selection: .band5).visibleSeriesData().map(\.id) == [locked.id, unlocked.id])
+        #expect(vm.bandViewModel(for: .primary, band: .band5GHz).visibleSeriesData().map(\.id) == [locked.id, unlocked.id])
     }
 
     @Test func toggleVisibility() {
@@ -636,7 +623,7 @@ import ChartLens
         #expect(vm.combinedTableRows.map(\.id) == [office.id, guest.id])
         #expect(vm.combinedTableRows.first(where: { $0.id == office.id })?.isVisible == true)
         #expect(vm.combinedTableRows.first(where: { $0.id == guest.id })?.isVisible == true)
-        #expect(vm.bandViewModel(for: .primary, selection: .band5).visibleSeriesData().map(\.id) == [office.id])
+        #expect(vm.bandViewModel(for: .primary, band: .band5GHz).visibleSeriesData().map(\.id) == [office.id])
     }
 
     @Test func lockedHiddenAPIsPreservedWhileOtherAPsRecomputeVisibility() {
@@ -653,7 +640,7 @@ import ChartLens
         #expect(vm.combinedTableRows.first(where: { $0.id == office.id })?.isVisible == false)
         #expect(vm.combinedTableRows.first(where: { $0.id == office.id })?.visibilityLocked == true)
         #expect(vm.combinedTableRows.first(where: { $0.id == guest.id })?.isVisible == true)
-        #expect(vm.bandViewModel(for: .primary, selection: .band5).visibleSeriesData().map(\.id) == [guest.id])
+        #expect(vm.bandViewModel(for: .primary, band: .band5GHz).visibleSeriesData().map(\.id) == [guest.id])
     }
 
     @Test func userVisibilityChangeOverridesLockProtection() {
@@ -666,7 +653,7 @@ import ChartLens
 
         #expect(vm.combinedTableRows.first?.isVisible == false)
         #expect(vm.combinedTableRows.first?.visibilityLocked == true)
-        #expect(vm.bandViewModel(for: .primary, selection: .band5).visibleSeriesData().isEmpty)
+        #expect(vm.bandViewModel(for: .primary, band: .band5GHz).visibleSeriesData().isEmpty)
     }
 
     @Test func bandViewModelsAreCreatedLazilyPerPanel() {
@@ -681,7 +668,7 @@ import ChartLens
 
         // Requesting a band VM lazily creates it and immediately syncs the
         // current scan data so the panel is usable right away.
-        let bandVM = vm.bandViewModel(for: .tertiary, selection: .band5)
+        let bandVM = vm.bandViewModel(for: .tertiary, band: .band5GHz)
         #expect(bandVM.visibleSeriesData().map(\.id) == [office.id])
         #expect(vm.panelBandViewModels(for: .tertiary).map(\.band) == [.band5GHz])
     }

@@ -179,15 +179,7 @@ final class ScannerViewModel {
         return result
     }
 
-    func bandViewModel(for panelID: SpectrumPanelID, selection: SpectrumPanelViewType) -> BandChartViewModel {
-        let band: ChannelBand
-        switch selection {
-        case .band24: band = .band24GHz
-        case .band5: band = .band5GHz
-        case .band6: band = .band6GHz
-        case .trend, .table:
-            preconditionFailure("bandViewModel(for:) only supports band selections")
-        }
+    func bandViewModel(for panelID: SpectrumPanelID, band: ChannelBand) -> BandChartViewModel {
 
         var byBand = panelBandViewModelsByID[panelID] ?? [:]
         if let existing = byBand[band] {
@@ -233,6 +225,30 @@ final class ScannerViewModel {
     func snapshots(for networkID: String) -> [NetworkSnapshot]? {
         guard let bssid = deduplicatedNetworks.first(where: { $0.id == networkID })?.bssid else { return nil }
         return signalHistory.snapshotHistory(for: bssid)
+    }
+
+    /// Current-scan heatmap for a single band. It deliberately reads the full
+    /// deduplicated scan result and ignores presentation state.
+    func heatmapModel(for band: ChannelBand) -> SpectrumHeatmapModel {
+        let channels = heatmapChannels(for: band)
+        let envelopes = deduplicatedNetworks.compactMap {
+            SpectrumHeatmapActivity.envelope(for: $0, band: band)
+        }
+        return SpectrumHeatmapModel(band: band, channels: channels, envelopes: envelopes)
+    }
+
+    /// The heatmap's X-axis channels for a band: the legal channel set from the
+    /// regulatory database for the current region (user override first, else the
+    /// inferred region), falling back to the US standard plan when the region is
+    /// unknown or has no entry. Reuses RegulatoryDatabase so the heatmap and the
+    /// rest of the app agree on which channels exist (5 GHz is 36/40/44/…, not
+    /// 1...170; 6 GHz is the 1/5/9/… PSC grid).
+    private func heatmapChannels(for band: ChannelBand) -> [Int] {
+        let region = userRegionOverride ?? inferredRegion?.domain ?? .US
+        let allowed = RegulatoryDatabase.rules[region]?[band.id]?.allowedChannels
+            ?? RegulatoryDatabase.rules[.US]?[band.id]?.allowedChannels
+            ?? Set(band == .band24GHz ? Array(1...14) : Array(1...band.maxChannel))
+        return allowed.sorted()
     }
 
     /// Cached table rows. Every `NetworkTableRow` field derives from stable

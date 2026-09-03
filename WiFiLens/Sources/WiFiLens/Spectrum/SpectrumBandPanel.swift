@@ -3,11 +3,11 @@ import SwiftUI
 struct SpectrumBandPanel: View {
     let viewModel: ScannerViewModel
     let panelID: SpectrumPanelID
-    let chartType: SpectrumPanelViewType
+    let band: ChannelBand
     @Binding var selectedNetworkID: String?
 
     var bandVM: BandChartViewModel {
-        viewModel.bandViewModel(for: panelID, selection: chartType)
+        viewModel.bandViewModel(for: panelID, band: band)
     }
 
     var filterQueryBinding: Binding<String> {

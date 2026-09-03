@@ -71,4 +71,5 @@ final class SignalHistoryStore {
     /// earlier "for session persistence" comment was misleading; re-evaluate
     /// naming when the session model is designed.
     var allSnapshots: [String: [NetworkSnapshot]] { snapshots }
+
 }

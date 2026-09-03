@@ -1,5 +1,27 @@
 import SwiftUI
 import Foundation
+import ChartLens
+
+/// Shared, identity-free description of the Gaussian envelope used by every
+/// spectrum presentation. Callers provide their canonical X coordinate space.
+struct SpectrumEnvelopeGeometry: Equatable, Sendable {
+    let leftX: Double
+    let rightX: Double
+    let peakRSSI: Double
+    let baselineRSSI: Double
+
+    var sigma: Double { (rightX - leftX) / 8.0 }
+
+    var gaussian: GaussianEnvelope {
+        GaussianEnvelope(
+            leftX: leftX,
+            rightX: rightX,
+            peakY: peakRSSI,
+            baselineY: baselineRSSI,
+            sigma: sigma
+        )
+    }
+}
 
 struct ChartSeriesDomainData: Identifiable {
     let id: String
@@ -168,40 +190,19 @@ struct ChartSeriesData: Identifiable {
     var displaySSID: String { ssid.isEmpty ? "n/a" : ssid }
 
     var curvePoints: [(x: Double, y: Double)] {
-        let center = Double(left + right) / 2.0
-        let halfWidth = Double(right - left) / 2.0
-        let sigma = halfWidth / 4.0
-        let amplitude = Double(rssi - Constants.rssiNoiseFloor)
-        let floor = Double(Constants.rssiNoiseFloor)
-        let steps = 80
-        var points: [(x: Double, y: Double)] = []
-
-        for i in 0...steps {
-            let x = Double(left) + (Double(right - left) * Double(i) / Double(steps))
-            let d = x - center
-            let g = exp(-(d * d) / (2 * sigma * sigma))
-            let y = floor + amplitude * g
-            points.append((x, y))
-        }
-        return points
+        gaussianEnvelope(peakY: Double(rssi)).sampledPoints(count: 81)
     }
 
     var displayCurvePoints: [(x: Double, y: Double)] {
-        let center = Double(left + right) / 2.0
-        let halfWidth = Double(right - left) / 2.0
-        let sigma = halfWidth / 4.0
-        let amplitude = displayRSSI - Double(Constants.rssiNoiseFloor)
-        let floor = Double(Constants.rssiNoiseFloor)
-        let steps = 80
-        var points: [(x: Double, y: Double)] = []
+        gaussianEnvelope(peakY: displayRSSI).sampledPoints(count: 81)
+    }
 
-        for i in 0...steps {
-            let x = Double(left) + (Double(right - left) * Double(i) / Double(steps))
-            let d = x - center
-            let g = exp(-(d * d) / (2 * sigma * sigma))
-            let y = floor + amplitude * g
-            points.append((x, y))
-        }
-        return points
+    private func gaussianEnvelope(peakY: Double) -> GaussianEnvelope {
+        SpectrumEnvelopeGeometry(
+            leftX: Double(left),
+            rightX: Double(right),
+            peakRSSI: peakY,
+            baselineRSSI: Double(Constants.rssiNoiseFloor)
+        ).gaussian
     }
 }

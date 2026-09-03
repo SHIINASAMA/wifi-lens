@@ -4,6 +4,7 @@ struct SpectrumPanelView: View {
     @Bindable var viewModel: ScannerViewModel
     let panelID: SpectrumPanelID
     let isVendorColumnAvailable: Bool
+    @Binding var band: ChannelBand
     @Binding var chartType: SpectrumPanelViewType
     @Binding var selectedNetworkID: String?
     @Binding var sortOrder: [NSSortDescriptor]
@@ -32,10 +33,14 @@ struct SpectrumPanelView: View {
             .frame(width: 180)
 
             switch chartType {
-            case .band24, .band5, .band6:
+            case .spectrum:
+                spectrumBandPicker
                 bandPanel.toolbarContent
             case .trend:
                 EmptyView()
+            case .heatmap:
+                bandPicker(label: String(localized: "spectrum.heatmap.band", comment: "Band picker label for the heatmap"))
+                heatmapPanel.heatmapToolbarContent
             case .table:
                 tablePanel.toolbarContent
             }
@@ -52,9 +57,41 @@ struct SpectrumPanelView: View {
         SpectrumBandPanel(
             viewModel: viewModel,
             panelID: panelID,
-            chartType: chartType,
+            band: band,
             selectedNetworkID: $selectedNetworkID
         )
+    }
+
+    private var heatmapPanel: SpectrumHeatmapPanel {
+        SpectrumHeatmapPanel(viewModel: viewModel, band: band)
+    }
+
+    private var spectrumBandPicker: some View {
+        bandPicker(label: String(localized: "spectrum.heatmap.band", comment: "Band picker label for the spectrum"))
+    }
+
+    private func bandPicker(label: String) -> some View {
+        let bands = Self.bandOptions(supportedBands: viewModel.supportedBands)
+
+        return Group {
+            if bands.isEmpty {
+                Text(band.displayName)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            } else {
+                Picker(
+                    label,
+                    selection: $band
+                ) {
+                    ForEach(bands, id: \.self) { option in
+                        Text(option.displayName)
+                            .tag(option)
+                    }
+                }
+                .pickerStyle(.menu)
+                .frame(width: 140)
+            }
+        }
     }
 
     // MARK: - Chart Content
@@ -62,7 +99,7 @@ struct SpectrumPanelView: View {
     @ViewBuilder
     private var chartContent: some View {
         switch chartType {
-        case .band24, .band5, .band6:
+        case .spectrum:
             bandPanel
         case .trend:
             SpectrumTrendPanel(
@@ -71,6 +108,8 @@ struct SpectrumPanelView: View {
             )
         case .table:
             tablePanel
+        case .heatmap:
+            heatmapPanel
         }
     }
 
@@ -86,13 +125,15 @@ struct SpectrumPanelView: View {
     // MARK: - Helpers
 
     var supportedViewTypes: [SpectrumPanelViewType] {
-        var types: [SpectrumPanelViewType] = []
-        if viewModel.supportedBands.contains(.band24GHz) { types.append(.band24) }
-        if viewModel.supportedBands.contains(.band5GHz) { types.append(.band5) }
-        if viewModel.supportedBands.contains(.band6GHz) { types.append(.band6) }
+        var types: [SpectrumPanelViewType] = viewModel.supportedBands.isEmpty ? [] : [.spectrum]
         types.append(.trend)
         types.append(.table)
+        types.append(.heatmap)
         return types
+    }
+
+    static func bandOptions(supportedBands: Set<ChannelBand>) -> [ChannelBand] {
+        ChannelBand.allCases.filter { supportedBands.contains($0) }
     }
 
 }
