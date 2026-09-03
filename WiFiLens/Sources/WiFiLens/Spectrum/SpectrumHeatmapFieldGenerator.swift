@@ -12,6 +12,7 @@ protocol SpectrumHeatmapFieldGenerating: Sendable {
 
 struct CPUHeatmapFieldGenerator: SpectrumHeatmapFieldGenerating, Sendable {
     private static let verticalDecayTauDB = 10.0
+    private static let verticalBodyFloor = 0.12
     private static let edgeFadeDB = 3.0
 
     init() {}
@@ -57,12 +58,27 @@ struct CPUHeatmapFieldGenerator: SpectrumHeatmapFieldGenerating, Sendable {
                     guard channel >= envelope.leftX, channel <= envelope.rightX else { continue }
                     let gaussian = envelope.gaussian
                     let curve = gaussian.value(atX: channel)
+                    let amplitude = max(0, gaussian.peakY - gaussian.baselineY)
+                    guard amplitude > 0 else { continue }
+
+                    // Keep the body tied to the same Gaussian support as the
+                    // spectrum curve. This makes the filled field taper at
+                    // both frequency edges instead of creating a rectangle.
+                    let horizontalSupport = min(
+                        1,
+                        max(0, (curve - gaussian.baselineY) / amplitude)
+                    )
+                    guard horizontalSupport > 0 else { continue }
+
                     let depthDB = curve - rssi
                     if depthDB >= 0 {
-                        density += exp(-depthDB / Self.verticalDecayTauDB)
+                        let decay = exp(-depthDB / Self.verticalDecayTauDB)
+                        let profile = Self.verticalBodyFloor
+                            + (1 - Self.verticalBodyFloor) * decay
+                        density += horizontalSupport * profile
                     } else if depthDB >= -Self.edgeFadeDB {
                         let edge = (depthDB + Self.edgeFadeDB) / Self.edgeFadeDB
-                        density += smoothstep(edge)
+                        density += horizontalSupport * smoothstep(edge)
                     }
                 }
 

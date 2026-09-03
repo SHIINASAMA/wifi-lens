@@ -52,7 +52,8 @@ struct SpectrumHeatmapPanel: View {
 
     static let timeAxisLabels: [String] = []
 
-    private static let plotLeadingInset: CGFloat = 44
+    // Leave enough room for the unit-bearing upper RSSI tick label.
+    private static let plotLeadingInset: CGFloat = 56
     private static let plotTopInset: CGFloat = 12
     private static let plotTrailingInset: CGFloat = 8
     private static let plotBottomInset: CGFloat = 28

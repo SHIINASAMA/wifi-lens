@@ -125,6 +125,20 @@ import Testing
         #expect(raster.value(x: center.x, y: deepBelowCurve.y) > 0)
     }
 
+    @Test func filledEnvelopeRetainsVisibleBodyWellBelowItsCurve() {
+        let raster = generator.generate(
+            envelopes: [envelope()],
+            domain: singleRegionDomain,
+            rssiRange: rssiRange,
+            resolution: resolution
+        )
+        let nearCurve = pixel(forChannel: 5, rssi: -55)
+        let body = pixel(forChannel: 5, rssi: -75)
+
+        #expect(raster.value(x: body.x, y: body.y) > 0.15)
+        #expect(raster.value(x: nearCurve.x, y: nearCurve.y) > raster.value(x: body.x, y: body.y))
+    }
+
     @Test func sampledPixelsFarAboveTheGaussianCurveRemainZero() {
         let testEnvelope = envelope()
         let raster = generator.generate(
