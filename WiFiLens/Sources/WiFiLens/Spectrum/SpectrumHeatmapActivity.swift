@@ -1,51 +1,72 @@
+import ChartLens
 import Foundation
 
-/// Converts observed networks into anonymous, frequency-based heatmap spans.
-/// The heatmap intentionally carries no SSID or BSSID identity.
+/// Converts current-scan networks into anonymous frequency envelopes.
 enum SpectrumHeatmapActivity {
-    /// Keep weak but real observations visible while giving nearby APs more
-    /// influence. This is a fixed scale so colors remain comparable over time.
-    static func signalWeight(forRSSI rssi: Int) -> Double {
-        let clamped = min(-45, max(-90, rssi))
-        return 0.15 + Double(clamped + 90) / 45.0 * 0.85
+    static func envelope(
+        for network: WiFiNetwork,
+        band: ChannelBand
+    ) -> SpectrumHeatmapEnvelope? {
+        envelope(for: network, rssi: Double(network.rssi), band: band)
     }
 
-    static func span(
-        for snapshot: NetworkSnapshot,
+    static func envelope(
+        for network: WiFiNetwork,
+        rssi: Double,
         band: ChannelBand
-    ) -> SpectrumHeatmapSpan? {
-        guard ChannelBand(id: snapshot.band) == band else { return nil }
+    ) -> SpectrumHeatmapEnvelope? {
+        guard network.channel.band == band,
+              rssi.isFinite,
+              SpectrumHeatmapLayout.fixedRSSIRange.contains(rssi),
+              network.channel.channelWidthMHz > 0 else { return nil }
 
-        let widthMHz = SnapshotToChartAdapter.channelWidthMHz(from: snapshot.channelWidth)
         let block = ChannelSpanCalculator.channelBlock(
-            primaryChannel: snapshot.channel,
-            widthMHz: widthMHz,
+            primaryChannel: network.channel.channelNumber,
+            widthMHz: network.channel.channelWidthMHz,
             band: band,
-            spanDirection: nil
+            spanDirection: network.channel.spanDirection
         )
+        guard let bounds = SpectrumHeatmapLayout.channelBlockFrequencyBounds(
+            leftChannel: block.left,
+            rightChannel: block.right,
+            band: band
+        ) else { return nil }
+
+        let lowerFrequencyMHz = bounds.lowerBound
+        let upperFrequencyMHz = bounds.upperBound
+        let halfWidthMHz = (upperFrequencyMHz - lowerFrequencyMHz) / 2.0
         guard
-            let lower = SpectrumHeatmapLayout.channelEdgeFrequencyMHz(
-                channel: block.left,
-                band: band
-            ),
-            let upper = SpectrumHeatmapLayout.channelEdgeFrequencyMHz(
-                channel: block.right,
-                band: band
-            )
+            lowerFrequencyMHz.isFinite,
+            upperFrequencyMHz.isFinite,
+            upperFrequencyMHz > lowerFrequencyMHz,
+            halfWidthMHz.isFinite,
+            halfWidthMHz > 0
         else { return nil }
 
-        return SpectrumHeatmapSpan(
-            lowerFrequencyMHz: min(lower, upper),
-            upperFrequencyMHz: max(lower, upper),
-            weight: signalWeight(forRSSI: snapshot.rssi)
+        return SpectrumHeatmapEnvelope(
+            lowerFrequencyMHz: lowerFrequencyMHz,
+            upperFrequencyMHz: upperFrequencyMHz,
+            peakRSSI: rssi,
+            sigmaMHz: halfWidthMHz / 4.0,
+            weight: Float(signalWeight(forRSSI: rssi))
         )
     }
 
-    /// Compress activity into the fixed [0, 1] display range. Square-root
-    /// compression makes a single weak AP visible without allowing crowded
-    /// areas to wash out the whole field.
-    static func normalizedIntensity(forActivity activity: Double) -> Double {
-        let clamped = min(1, max(0, activity / 3.0))
-        return sqrt(clamped)
+    /// Returns the shared ChartLens sampler for a current-scan envelope.
+    /// This preserves the same Gaussian mathematics as the Spectrum chart.
+    static func gaussianEnvelope(for envelope: SpectrumHeatmapEnvelope) -> GaussianEnvelope {
+        GaussianEnvelope(
+            leftX: envelope.lowerFrequencyMHz,
+            rightX: envelope.upperFrequencyMHz,
+            peakY: envelope.peakRSSI,
+            baselineY: Double(Constants.rssiNoiseFloor),
+            sigma: envelope.sigmaMHz
+        )
+    }
+
+    private static func signalWeight(forRSSI rssi: Double) -> Double {
+        if rssi <= -90 { return 0.15 }
+        if rssi >= -45 { return 1.0 }
+        return 0.15 + Double(rssi + 90) / 45.0 * 0.85
     }
 }

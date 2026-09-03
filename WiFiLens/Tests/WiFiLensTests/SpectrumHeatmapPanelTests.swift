@@ -4,235 +4,243 @@ import SwiftUI
 @testable import WiFi_Lens
 
 @Suite @MainActor struct SpectrumHeatmapPanelTests {
-
-    private func makeSnapshot(
-        timestamp: Date,
+    private func makeNetwork(
         bssid: String,
         rssi: Int = -50,
+        band: ChannelBand = .band24GHz,
         channel: Int = 6,
-        band: String = "24",
-        channelWidth: String = "20"
-    ) -> NetworkSnapshot {
-        NetworkSnapshot(
-            timestamp: timestamp,
+        widthMHz: Int = 20,
+        ssid: String? = "TestNet"
+    ) -> WiFiNetwork {
+        WiFiNetwork(
+            ssid: ssid,
             bssid: bssid,
-            ssid: "TestNet",
             rssi: rssi,
-            channel: channel,
-            band: band,
-            phyMode: "ax",
-            channelWidth: channelWidth,
-            mcs: "",
-            nss: "",
-            security: "",
-            country: "",
-            supportsK: false,
-            supportsR: false,
-            supportsV: false,
-            supportsWPA3: false,
-            isHiddenSSID: false
+            channel: WiFiChannel(
+                band: band,
+                channelNumber: channel,
+                channelWidthMHz: widthMHz
+            )
         )
     }
 
-    private func recordCycle(
-        _ vm: ScannerViewModel,
-        timestamp: Date,
-        snapshots: [NetworkSnapshot]
-    ) {
-        vm.signalHistory.recordScan(timestamp: timestamp)
-        for snapshot in snapshots {
-            vm.signalHistory.record(
-                bssid: snapshot.bssid,
-                rssi: snapshot.rssi,
-                snapshot: snapshot
-            )
-        }
-    }
-
-    @Test func modelHasOneAnonymousFramePerSuccessfulScan() {
-        let vm = ScannerViewModel()
-        let t1 = Date(timeIntervalSince1970: 100)
-        let t2 = Date(timeIntervalSince1970: 130)
-        recordCycle(vm, timestamp: t1, snapshots: [
-            makeSnapshot(timestamp: t1, bssid: "aa:bb:cc:dd:ee:01", rssi: -45, channel: 6)
-        ])
-        recordCycle(vm, timestamp: t2, snapshots: [
-            makeSnapshot(timestamp: t2, bssid: "aa:bb:cc:dd:ee:01", rssi: -60, channel: 6),
-            makeSnapshot(timestamp: t2, bssid: "aa:bb:cc:dd:ee:02", rssi: -75, channel: 11)
-        ])
-
-        let model = vm.heatmapModel(for: .band24GHz)
-
-        #expect(model.frames.map(\.timestamp) == [t1, t2])
-        #expect(model.frames[0].spans.count == 1)
-        #expect(model.frames[1].spans.count == 2)
-        #expect(model.frames[0].spans.allSatisfy { $0.lowerFrequencyMHz < $0.upperFrequencyMHz })
-    }
-
-    @Test func emptySuccessfulScanProducesZeroActivityFrame() {
-        let vm = ScannerViewModel()
-        let t1 = Date(timeIntervalSince1970: 100)
-        let t2 = Date(timeIntervalSince1970: 130)
-        recordCycle(vm, timestamp: t1, snapshots: [
-            makeSnapshot(timestamp: t1, bssid: "aa:bb:cc:dd:ee:01")
-        ])
-        vm.debugApplyNetworksForTesting([], supportedBands: [.band24GHz], timestamp: t2)
-
-        let model = vm.heatmapModel(for: .band24GHz)
-
-        #expect(model.frames.map(\.timestamp) == [t1, t2])
-        #expect(model.frames[1].spans.isEmpty)
-    }
-
-    @Test func bandFilteringKeepsFrameOwnershipButRemovesOtherBandSpans() {
-        let vm = ScannerViewModel()
-        let timestamp = Date(timeIntervalSince1970: 100)
-        recordCycle(vm, timestamp: timestamp, snapshots: [
-            makeSnapshot(timestamp: timestamp, bssid: "aa:bb:cc:dd:ee:01", channel: 36, band: "5")
-        ])
-
-        let model = vm.heatmapModel(for: .band24GHz)
-
-        #expect(model.frames.count == 1)
-        #expect(model.frames[0].spans.isEmpty)
-    }
-
-    @Test func strongerRSSIProducesGreaterSpanWeight() {
-        let timestamp = Date(timeIntervalSince1970: 100)
-        let weak = makeSnapshot(timestamp: timestamp, bssid: "aa:bb:cc:dd:ee:01", rssi: -85)
-        let strong = makeSnapshot(timestamp: timestamp, bssid: "aa:bb:cc:dd:ee:02", rssi: -55)
-
-        #expect(SpectrumHeatmapActivity.span(for: strong, band: .band24GHz)!.weight
-            > SpectrumHeatmapActivity.span(for: weak, band: .band24GHz)!.weight)
-    }
-
-    @Test func staleSnapshotOutsideSuccessfulTimelineDoesNotCreateFrame() {
-        let vm = ScannerViewModel()
-        let stale = Date(timeIntervalSince1970: 100)
-        vm.signalHistory.record(
-            bssid: "aa:bb:cc:dd:ee:ff",
-            rssi: -80,
-            snapshot: makeSnapshot(timestamp: stale, bssid: "aa:bb:cc:dd:ee:ff")
+    private func applyCurrentScan(_ networks: [WiFiNetwork], to viewModel: ScannerViewModel) {
+        viewModel.debugApplyNetworksForTesting(
+            networks,
+            supportedBands: Set(ChannelBand.allCases),
+            timestamp: Date(timeIntervalSince1970: 100)
         )
-        let retainedTimeline = (1...3).map { Date(timeIntervalSince1970: Double(100 + $0)) }
-        for timestamp in retainedTimeline {
-            recordCycle(vm, timestamp: timestamp, snapshots: [
-                makeSnapshot(timestamp: timestamp, bssid: "aa:bb:cc:dd:ee:01")
-            ])
+    }
+
+    @Test func panelConstructsForEveryBandAndKeepsToolbarLegend() {
+        let viewModel = ScannerViewModel()
+
+        for band in ChannelBand.allCases {
+            let panel = SpectrumHeatmapPanel(viewModel: viewModel, band: band)
+            _ = panel.body
+            _ = panel.heatmapToolbarContent
         }
-
-        let model = vm.heatmapModel(for: .band24GHz)
-
-        #expect(model.frames.map(\.timestamp) == retainedTimeline)
-        #expect(model.frames.allSatisfy { $0.timestamp != stale })
     }
 
-    @Test func debugIngestRecordsExactlyOneTimestampForOneCycle() {
-        let vm = ScannerViewModel()
-        let timestamp = Date(timeIntervalSince1970: 100)
-        let networks = (1...3).map { channel in
-            WiFiNetwork(
-                ssid: "TestNet\(channel)",
-                bssid: "aa:bb:cc:dd:ee:0\(channel)",
-                rssi: -50,
-                channel: WiFiChannel(band: .band24GHz, channelNumber: channel, channelWidthMHz: 20)
-            )
-        }
+    @Test func emptyCurrentScanUsesTheNormalEmptyState() {
+        let model = SpectrumHeatmapModel(band: .band5GHz, channels: [36], envelopes: [])
 
-        vm.debugApplyNetworksForTesting(networks, supportedBands: [.band24GHz], timestamp: timestamp)
-
-        #expect(vm.signalHistory.allScanTimestamps == [timestamp])
-        #expect(vm.heatmapModel(for: .band24GHz).frames.count == 1)
+        #expect(SpectrumHeatmapPanel.shouldShowEmptyState(for: model))
+        #expect(!SpectrumHeatmapPanel.shouldShowEmptyState(for: SpectrumHeatmapModel(
+            band: .band5GHz,
+            channels: [36],
+            envelopes: [SpectrumHeatmapEnvelope(
+                lowerFrequencyMHz: 5170,
+                upperFrequencyMHz: 5190,
+                peakRSSI: -50,
+                sigmaMHz: 2.5,
+                weight: 1
+            )]
+        )))
     }
 
-    @Test func emptyHistoryProducesNoFramesAndUsesLegalChannels() {
-        let vm = ScannerViewModel()
-        let model = vm.heatmapModel(for: .band5GHz)
-        let expected = RegulatoryDatabase.rules[.US]?["5"]?.allowedChannels.sorted() ?? []
+    @Test func currentBandAggregateAccessibilityLabelUsesFixedRSSIRange() {
+        let label = SpectrumHeatmapPanel.aggregateAccessibilityLabel(for: .band5GHz)
 
-        #expect(model.frames.isEmpty)
-        #expect(model.channels == expected)
-        #expect(!model.channels.contains(1))
-        #expect(!model.channels.contains(170))
+        #expect(label.contains("5 GHz"))
+        #expect(label.contains("RSSI"))
+        #expect(label.contains("-100"))
+        #expect(label.contains("-30 dBm"))
     }
 
-    @Test func fixedThermalIntensityScaleClampsAndCompresses() {
-        #expect(SpectrumHeatmapActivity.normalizedIntensity(forActivity: 0) == 0)
-        #expect(abs(SpectrumHeatmapActivity.normalizedIntensity(forActivity: 0.75) - 0.5) < 0.0001)
-        #expect(SpectrumHeatmapActivity.normalizedIntensity(forActivity: 30) == 1)
+    @Test func axesUseSparseRSSILabelsAndNoTimeLabels() {
+        #expect(SpectrumHeatmapPanel.rssiAxisLabels == ["-100", "-70", "-30 dBm"])
+        #expect(SpectrumHeatmapPanel.timeAxisLabels.isEmpty)
     }
 
-    @Test func thermalRampKeepsMaximumWarmRatherThanPureWhite() {
-        let rgb = SpectrumHeatmapColor.components(forIntensity: 1)
-        #expect(rgb.red == 1)
-        #expect(rgb.green < 1)
-        #expect(rgb.blue < 1)
+    @Test func panelUsesStandardRasterStorageIndependentOfDisplaySize() {
+        #expect(SpectrumHeatmapPanel.rasterResolution(for: CGSize(width: 80, height: 40)) == .standard)
+        #expect(SpectrumHeatmapPanel.rasterResolution(for: CGSize(width: 2_000, height: 1_000)) == .standard)
     }
 
-    @Test func panelConstructsWithBand() {
-        let panel = SpectrumHeatmapPanel(viewModel: ScannerViewModel(), band: .band24GHz)
-        #expect(panel.band == .band24GHz)
-    }
-}
-
-@Suite struct SpectrumHeatmapRasterizerTests {
-    private let domain = SpectrumHeatmapLayout.frequencyDomain(channels: [6], band: .band24GHz)
-
-    @Test func rasterResolutionIsBoundedByDisplaySizeAndCap() {
-        let large = SpectrumHeatmapRasterizer.resolution(for: CGSize(width: 1_000, height: 400))
-        let small = SpectrumHeatmapRasterizer.resolution(for: CGSize(width: 80, height: 40))
-
-        #expect(large.width == 320)
-        #expect(large.height == 96)
-        #expect(small.width == 80)
-        #expect(small.height == 40)
-    }
-
-    @Test func rasterUsesWallClockTimeInsteadOfFrameOrdinal() {
-        let start = Date(timeIntervalSince1970: 0)
-        let frames = [
-            SpectrumHeatmapFrame(
-                id: start,
-                timestamp: start,
-                spans: [SpectrumHeatmapSpan(lowerFrequencyMHz: 2427, upperFrequencyMHz: 2447, weight: 1)]
-            ),
-            SpectrumHeatmapFrame(
-                id: start.addingTimeInterval(30),
-                timestamp: start.addingTimeInterval(30),
-                spans: []
-            ),
-            SpectrumHeatmapFrame(
-                id: start.addingTimeInterval(60),
-                timestamp: start.addingTimeInterval(60),
-                spans: [SpectrumHeatmapSpan(lowerFrequencyMHz: 2427, upperFrequencyMHz: 2447, weight: 1)]
-            )
-        ]
-
-        let raster = SpectrumHeatmapRasterizer.rasterize(
-            frames: frames,
+    @Test func renderCacheReusesEquivalentModelDomainAndResolution() {
+        let model = SpectrumHeatmapModel(
+            band: .band5GHz,
+            channels: [36, 40],
+            envelopes: [SpectrumHeatmapEnvelope(
+                lowerFrequencyMHz: 5170,
+                upperFrequencyMHz: 5190,
+                peakRSSI: -50,
+                sigmaMHz: 2.5,
+                weight: 1
+            )]
+        )
+        let domain = SpectrumHeatmapLayout.frequencyDomain(channels: model.channels, band: model.band)
+        let rssiRange = -100.0...(-30.0)
+        let key = SpectrumHeatmapRenderKey(
+            model: model,
             domain: domain,
-            timeDomain: SpectrumHeatmapTimeDomain(start: start, end: start.addingTimeInterval(60)),
-            size: CGSize(width: 1, height: 5)
+            rssiRange: rssiRange,
+            resolution: .standard
         )
+        let equivalentKey = SpectrumHeatmapRenderKey(
+            model: SpectrumHeatmapModel(
+                band: .band5GHz,
+                channels: [36, 40],
+                envelopes: model.envelopes
+            ),
+            domain: domain,
+            rssiRange: rssiRange,
+            resolution: .standard
+        )
+        let cache = SpectrumHeatmapRenderCache()
+        var generationCount = 0
+        var smoothingCount = 0
+        let generate = {
+            generationCount += 1
+            return SpectrumHeatmapRaster(width: 1, height: 1, values: [1])
+        }
+        let smooth: (SpectrumHeatmapRaster) -> SpectrumHeatmapRaster = { raster in
+            smoothingCount += 1
+            return raster
+        }
 
-        #expect(raster.value(x: 0, y: 0) > 0.5)
-        #expect(raster.value(x: 0, y: 1) > 0.4)
-        #expect(raster.value(x: 0, y: 2) == 0)
-        #expect(raster.value(x: 0, y: 3) > 0.4)
-        #expect(raster.value(x: 0, y: 4) > 0.5)
+        let first = cache.smoothedRaster(for: key, generate: generate, smooth: smooth)
+        let second = cache.smoothedRaster(for: equivalentKey, generate: generate, smooth: smooth)
+
+        #expect(first == second)
+        #expect(generationCount == 1)
+        #expect(smoothingCount == 1)
     }
 
-    @Test func smoothingDoesNotBridgeDiscontinuousRegions() {
-        let domain = SpectrumHeatmapFrequencyDomain(
-            minFrequencyMHz: 0,
-            maxFrequencyMHz: 100,
-            regions: [0...20, 80...100]
-        )
-        let raster = SpectrumHeatmapRaster(width: 5, height: 1, values: [1, 0, 0, 0, 0])
+    @Test func maximumHeatmapColorIsWarmAndNotWhite() {
+        let maximum = SpectrumHeatmapColor.components(forIntensity: 1)
 
-        let smoothed = SpectrumHeatmapRasterizer.smooth(raster, domain: domain)
+        #expect(maximum.red == 1)
+        #expect(maximum.green < 1)
+        #expect(maximum.blue < 0.5)
+    }
 
-        #expect(smoothed.value(x: 0, y: 0) > 0)
-        #expect(smoothed.value(x: 4, y: 0) == 0)
+    @Test func currentScanProducesOneAnonymousEnvelopePerValidNetwork() {
+        let viewModel = ScannerViewModel()
+        applyCurrentScan([
+            makeNetwork(bssid: "aa:bb:cc:dd:ee:01", rssi: -45, channel: 1),
+            makeNetwork(bssid: "aa:bb:cc:dd:ee:02", rssi: -90, channel: 11)
+        ], to: viewModel)
+
+        let model = viewModel.heatmapModel(for: .band24GHz)
+
+        #expect(model.envelopes.count == 2)
+        #expect(model.envelopes.allSatisfy { $0.lowerFrequencyMHz < $0.upperFrequencyMHz })
+        #expect(model.envelopes.map(\.weight).sorted() == [0.15, 1.0])
+    }
+
+    @Test func currentScanEnvelopesRemainIsolatedByRequestedBand() {
+        let viewModel = ScannerViewModel()
+        applyCurrentScan([
+            makeNetwork(bssid: "aa:bb:cc:dd:ee:01", band: .band24GHz, channel: 6),
+            makeNetwork(bssid: "aa:bb:cc:dd:ee:02", band: .band5GHz, channel: 36),
+            makeNetwork(bssid: "aa:bb:cc:dd:ee:03", band: .band6GHz, channel: 5)
+        ], to: viewModel)
+
+        #expect(viewModel.heatmapModel(for: .band24GHz).envelopes.map(\.lowerFrequencyMHz) == [2427])
+        #expect(viewModel.heatmapModel(for: .band5GHz).envelopes.map(\.lowerFrequencyMHz) == [5170])
+        #expect(viewModel.heatmapModel(for: .band6GHz).envelopes.map(\.lowerFrequencyMHz) == [5965])
+    }
+
+    @Test func emptyCurrentScanProducesNoEnvelopes() {
+        let viewModel = ScannerViewModel()
+        applyCurrentScan([], to: viewModel)
+
+        #expect(viewModel.heatmapModel(for: .band5GHz).envelopes.isEmpty)
+    }
+
+    @Test func filtersVisibilityAndSelectionDoNotChangeCurrentScanHeatmapInput() {
+        let viewModel = ScannerViewModel()
+        let network = makeNetwork(bssid: "aa:bb:cc:dd:ee:01", ssid: nil)
+        applyCurrentScan([network], to: viewModel)
+        let expected = viewModel.heatmapModel(for: .band24GHz)
+
+        viewModel.globalFilterQuery = "does-not-match"
+        viewModel.setFilterQuery("also-does-not-match", for: .primary)
+        viewModel.hiddenBSSIDs.insert(network.bssid)
+        viewModel.hiddenBands.insert(network.channel.band.id)
+        viewModel.hideHiddenSSIDs = true
+        viewModel.selectedNetworkID = network.id
+
+        #expect(viewModel.heatmapModel(for: .band24GHz) == expected)
+    }
+
+    @Test func malformedAndOtherBandNetworksAreSkipped() {
+        let viewModel = ScannerViewModel()
+        applyCurrentScan([
+            makeNetwork(bssid: "aa:bb:cc:dd:ee:01", channel: 6, widthMHz: 0),
+            makeNetwork(bssid: "aa:bb:cc:dd:ee:02", channel: 999),
+            makeNetwork(bssid: "aa:bb:cc:dd:ee:03", band: .band5GHz, channel: 36),
+            makeNetwork(bssid: "aa:bb:cc:dd:ee:04", channel: 11)
+        ], to: viewModel)
+
+        let envelopes = viewModel.heatmapModel(for: .band24GHz).envelopes
+
+        #expect(envelopes.count == 1)
+        #expect(envelopes[0].lowerFrequencyMHz == 2452)
+        #expect(envelopes[0].upperFrequencyMHz == 2472)
+    }
+
+    @Test func rejectsRSSIOutsideFixedRangeBeforeEnvelopeCreation() {
+        let belowRange = makeNetwork(bssid: "aa:bb:cc:dd:ee:05", rssi: -101)
+        let aboveRange = makeNetwork(bssid: "aa:bb:cc:dd:ee:06", rssi: -29)
+
+        #expect(SpectrumHeatmapActivity.envelope(for: belowRange, band: .band24GHz) == nil)
+        #expect(SpectrumHeatmapActivity.envelope(for: aboveRange, band: .band24GHz) == nil)
+    }
+
+    @Test func rejectsNonFiniteRSSIBeforeEnvelopeCreation() {
+        let network = makeNetwork(bssid: "aa:bb:cc:dd:ee:07")
+
+        #expect(SpectrumHeatmapActivity.envelope(for: network, rssi: Double.nan, band: .band24GHz) == nil)
+        #expect(SpectrumHeatmapActivity.envelope(for: network, rssi: Double.infinity, band: .band24GHz) == nil)
+        #expect(SpectrumHeatmapActivity.envelope(for: network, rssi: -Double.infinity, band: .band24GHz) == nil)
+    }
+
+    @Test func acceptsRSSIBoundariesForEnvelopeCreation() {
+        let lowerBoundary = makeNetwork(bssid: "aa:bb:cc:dd:ee:08", rssi: -100)
+        let upperBoundary = makeNetwork(bssid: "aa:bb:cc:dd:ee:09", rssi: -30)
+
+        #expect(SpectrumHeatmapActivity.envelope(for: lowerBoundary, band: .band24GHz) != nil)
+        #expect(SpectrumHeatmapActivity.envelope(for: upperBoundary, band: .band24GHz) != nil)
+    }
+
+    @Test func heatmapModelAndEnvelopesExposeNoAccessPointIdentityOrTimeline() {
+        let modelFields = Set(Mirror(reflecting: SpectrumHeatmapModel(
+            band: .band24GHz,
+            channels: [1],
+            envelopes: []
+        )).children.compactMap(\.label))
+        let envelopeFields = Set(Mirror(reflecting: SpectrumHeatmapEnvelope(
+            lowerFrequencyMHz: 2412,
+            upperFrequencyMHz: 2422,
+            peakRSSI: -50,
+            sigmaMHz: 1.25,
+            weight: 0.5
+        )).children.compactMap(\.label))
+
+        #expect(modelFields == ["band", "channels", "envelopes"])
+        #expect(envelopeFields == ["lowerFrequencyMHz", "upperFrequencyMHz", "peakRSSI", "sigmaMHz", "weight"])
     }
 }

@@ -1,94 +1,116 @@
 import CoreGraphics
-import Foundation
 
-struct SpectrumHeatmapTimeDomain: Equatable, Sendable {
-    let start: Date
-    let end: Date
+struct SpectrumHeatmapResolution: Equatable, Sendable {
+    static let standard = SpectrumHeatmapResolution(width: 640, height: 256)
 
-    var duration: TimeInterval {
-        max(0, end.timeIntervalSince(start))
+    let width: Int
+    let height: Int
+
+    init(width: Int, height: Int) {
+        let sanitizedWidth = max(0, width)
+        let sanitizedHeight = max(0, height)
+
+        guard sanitizedWidth > 0, sanitizedHeight > 0 else {
+            self.width = sanitizedWidth
+            self.height = sanitizedHeight
+            return
+        }
+
+        let product = sanitizedWidth.multipliedReportingOverflow(by: sanitizedHeight)
+        guard !product.overflow else {
+            self.width = 0
+            self.height = 0
+            return
+        }
+
+        self.width = sanitizedWidth
+        self.height = sanitizedHeight
+    }
+
+    var storageCount: Int {
+        guard width > 0, height > 0 else { return 0 }
+        let count = width.multipliedReportingOverflow(by: height)
+        guard !count.overflow else {
+            return 0
+        }
+        return count.partialValue
     }
 }
 
 struct SpectrumHeatmapRaster: Equatable, Sendable {
     let width: Int
     let height: Int
-    let values: [Double]
+    let values: [Float]
 
-    init(width: Int, height: Int, values: [Double]) {
-        self.width = max(0, width)
-        self.height = max(0, height)
-        self.values = values.count == self.width * self.height
-            ? values
-            : Array(values.prefix(self.width * self.height))
-                + Array(repeating: 0, count: max(0, self.width * self.height - values.count))
+    init(width: Int, height: Int, values: [Float]) {
+        let resolution = SpectrumHeatmapResolution(width: width, height: height)
+        self.width = resolution.width
+        self.height = resolution.height
+
+        let expectedCount = resolution.storageCount
+        if values.count == expectedCount {
+            self.values = values
+        } else if values.count > expectedCount {
+            self.values = Array(values.prefix(expectedCount))
+        } else {
+            self.values = values + Array(repeating: 0, count: expectedCount - values.count)
+        }
     }
 
-    func value(x: Int, y: Int) -> Double {
+    func value(x: Int, y: Int) -> Float {
         guard (0..<width).contains(x), (0..<height).contains(y) else { return 0 }
         return values[y * width + x]
     }
 }
 
-enum SpectrumHeatmapRasterizer {
-    static let maxResolution = (width: 320, height: 96)
+struct SpectrumHeatmapRenderKey: Equatable, Sendable {
+    let model: SpectrumHeatmapModel
+    let domain: SpectrumHeatmapFrequencyDomain
+    let rssiRange: ClosedRange<Double>
+    let resolution: SpectrumHeatmapResolution
+}
 
-    static func resolution(for displaySize: CGSize) -> (width: Int, height: Int) {
-        let width = min(maxResolution.width, max(1, Int(displaySize.width.rounded(.up))))
-        let height = min(maxResolution.height, max(1, Int(displaySize.height.rounded(.up))))
-        return (width, height)
+/// Retains the last field result for a panel. The key includes every input to
+/// field generation and smoothing, so SwiftUI body reevaluation cannot repeat
+/// identical CPU work.
+final class SpectrumHeatmapRenderCache {
+    private struct Entry {
+        let key: SpectrumHeatmapRenderKey
+        let raster: SpectrumHeatmapRaster
     }
 
-    static func rasterize(
-        frames: [SpectrumHeatmapFrame],
-        domain: SpectrumHeatmapFrequencyDomain,
-        timeDomain: SpectrumHeatmapTimeDomain,
-        size: CGSize
+    private var entry: Entry?
+
+    func smoothedRaster(
+        for key: SpectrumHeatmapRenderKey,
+        generate: () -> SpectrumHeatmapRaster,
+        smooth: (SpectrumHeatmapRaster) -> SpectrumHeatmapRaster
     ) -> SpectrumHeatmapRaster {
-        let outputSize = resolution(for: size)
-        guard !frames.isEmpty, timeDomain.duration > 0 else {
-            return SpectrumHeatmapRaster(
-                width: outputSize.width,
-                height: outputSize.height,
-                values: Array(repeating: 0, count: outputSize.width * outputSize.height)
-            )
+        if let entry, entry.key == key {
+            return entry.raster
         }
 
-        let sortedFrames = frames.sorted { $0.timestamp < $1.timestamp }
-        let rasterRect = CGRect(x: 0, y: 0, width: outputSize.width, height: outputSize.height)
-        var values = Array(repeating: 0.0, count: outputSize.width * outputSize.height)
-
-        for y in 0..<outputSize.height {
-            let yFraction = outputSize.height == 1 ? 1.0 : Double(y) / Double(outputSize.height - 1)
-            let timestamp = timeDomain.start.addingTimeInterval(yFraction * timeDomain.duration)
-            for x in 0..<outputSize.width {
-                guard let frequency = SpectrumHeatmapLayout.frequencyMHz(
-                    forX: CGFloat(x) + 0.5,
-                    domain: domain,
-                    in: rasterRect
-                ) else { continue }
-                let activity = interpolatedActivity(
-                    at: timestamp,
-                    frequencyMHz: frequency,
-                    frames: sortedFrames
-                )
-                values[y * outputSize.width + x] = SpectrumHeatmapActivity.normalizedIntensity(forActivity: activity)
-            }
-        }
-
-        return SpectrumHeatmapRaster(width: outputSize.width, height: outputSize.height, values: values)
+        let raster = generate()
+        let smoothed = smooth(raster)
+        entry = Entry(key: key, raster: smoothed)
+        return smoothed
     }
+}
 
-    /// Applies a small spatial/temporal blur while refusing to sample across
-    /// discontinuous frequency regions. The renderer can use this for its glow
-    /// pass without inventing activity in the large 5 GHz gap.
+enum SpectrumHeatmapRasterizer {
+    static let resolution = SpectrumHeatmapResolution.standard
+
+    /// Applies a small spatial blur without sampling across a discontinuous
+    /// frequency region. The temporal axis was removed from the heatmap, so
+    /// this operation only considers nearby raster pixels.
     static func smooth(
         _ raster: SpectrumHeatmapRaster,
         domain: SpectrumHeatmapFrequencyDomain
     ) -> SpectrumHeatmapRaster {
         guard raster.width > 0, raster.height > 0 else { return raster }
+
         let rect = CGRect(x: 0, y: 0, width: raster.width, height: raster.height)
-        var output = Array(repeating: 0.0, count: raster.width * raster.height)
+        var output = Array(repeating: Float(0), count: raster.values.count)
 
         for y in 0..<raster.height {
             for x in 0..<raster.width {
@@ -96,7 +118,9 @@ enum SpectrumHeatmapRasterizer {
                     forX: CGFloat(x) + 0.5,
                     domain: domain,
                     in: rect
-                ), domain.regions.contains(where: { $0.contains(frequency) }) else { continue }
+                ), let region = regionIndex(for: frequency, in: domain.regions) else {
+                    continue
+                }
 
                 var sum = 0.0
                 var count = 0.0
@@ -106,47 +130,26 @@ enum SpectrumHeatmapRasterizer {
                             forX: CGFloat(sampleX) + 0.5,
                             domain: domain,
                             in: rect
-                        ), domain.regions.contains(where: { $0.contains(sampleFrequency) }) else { continue }
-                        sum += raster.value(x: sampleX, y: sampleY)
+                        ), regionIndex(for: sampleFrequency, in: domain.regions) == region else {
+                            continue
+                        }
+                        sum += Double(raster.value(x: sampleX, y: sampleY))
                         count += 1
                     }
                 }
-                output[y * raster.width + x] = count > 0 ? sum / count : 0
+
+                let average = count > 0 ? sum / count : 0
+                output[y * raster.width + x] = Float(min(1, max(0, average)))
             }
         }
 
         return SpectrumHeatmapRaster(width: raster.width, height: raster.height, values: output)
     }
 
-    private static func interpolatedActivity(
-        at timestamp: Date,
-        frequencyMHz: Double,
-        frames: [SpectrumHeatmapFrame]
-    ) -> Double {
-        guard let first = frames.first, let last = frames.last,
-              timestamp >= first.timestamp, timestamp <= last.timestamp else { return 0 }
-        if timestamp == first.timestamp { return activity(at: frequencyMHz, in: first) }
-        if timestamp == last.timestamp { return activity(at: frequencyMHz, in: last) }
-
-        guard let upperIndex = frames.firstIndex(where: { $0.timestamp >= timestamp }) else { return 0 }
-        let upper = frames[upperIndex]
-        let lower = frames[upperIndex - 1]
-        let duration = upper.timestamp.timeIntervalSince(lower.timestamp)
-        guard duration > 0 else { return activity(at: frequencyMHz, in: upper) }
-        let fraction = timestamp.timeIntervalSince(lower.timestamp) / duration
-        let lowerActivity = activity(at: frequencyMHz, in: lower)
-        let upperActivity = activity(at: frequencyMHz, in: upper)
-        return lowerActivity + (upperActivity - lowerActivity) * fraction
-    }
-
-    private static func activity(
-        at frequencyMHz: Double,
-        in frame: SpectrumHeatmapFrame
-    ) -> Double {
-        frame.spans.reduce(into: 0) { total, span in
-            if span.lowerFrequencyMHz...span.upperFrequencyMHz ~= frequencyMHz {
-                total += span.weight
-            }
-        }
+    private static func regionIndex(
+        for frequency: Double,
+        in regions: [ClosedRange<Double>]
+    ) -> Int? {
+        regions.firstIndex { $0.contains(frequency) }
     }
 }

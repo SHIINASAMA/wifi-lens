@@ -3,13 +3,12 @@ import Testing
 @testable import WiFi_Lens
 
 @Suite @MainActor struct SignalHistoryStoreTests {
-
-    private func makeSnapshot(timestamp: Date) -> NetworkSnapshot {
+    private func makeSnapshot(timestamp: Date, rssi: Int) -> NetworkSnapshot {
         NetworkSnapshot(
             timestamp: timestamp,
             bssid: "aa:bb:cc:dd:ee:01",
             ssid: "TestNet",
-            rssi: -50,
+            rssi: rssi,
             channel: 6,
             band: "24",
             phyMode: "ax",
@@ -26,46 +25,23 @@ import Testing
         )
     }
 
-    @Test func scanTimelineDeduplicatesSnapshotsFromOneCycle() {
-        let store = SignalHistoryStore(maxCount: 20)
-        let timestamp = Date(timeIntervalSince1970: 100)
-        store.recordScan(timestamp: timestamp)
-        store.recordScan(timestamp: timestamp)
-        #expect(store.allScanTimestamps == [timestamp])
+    @Test func perBSSIDRSSIHistoryRemainsBounded() {
+        let store = SignalHistoryStore(maxCount: 2)
+        store.record(bssid: "aa:bb:cc:dd:ee:01", rssi: -80)
+        store.record(bssid: "aa:bb:cc:dd:ee:01", rssi: -70)
+        store.record(bssid: "aa:bb:cc:dd:ee:01", rssi: -60)
+
+        #expect(store.rssiHistory(for: "aa:bb:cc:dd:ee:01") == [-70, -60])
     }
 
-    @Test func scanTimelineKeepsNewestTwentyCycles() {
-        let store = SignalHistoryStore(maxCount: 20)
-        for offset in 0..<21 {
-            store.recordScan(timestamp: Date(timeIntervalSince1970: Double(offset)))
-        }
-        #expect(store.allScanTimestamps.count == 20)
-        #expect(store.allScanTimestamps.first == Date(timeIntervalSince1970: 1))
-    }
+    @Test func perBSSIDSnapshotsRemainAvailableForTrendHistory() {
+        let store = SignalHistoryStore(maxCount: 2)
+        let first = Date(timeIntervalSince1970: 100)
+        let second = Date(timeIntervalSince1970: 101)
+        store.record(bssid: "aa:bb:cc:dd:ee:01", rssi: -70, snapshot: makeSnapshot(timestamp: first, rssi: -70))
+        store.record(bssid: "aa:bb:cc:dd:ee:01", rssi: -60, snapshot: makeSnapshot(timestamp: second, rssi: -60))
 
-    @Test func scanTimelineRemovesFramesOutsideWallClockWindow() {
-        let store = SignalHistoryStore(maxCount: 20, scanWindow: 60)
-        let t100 = Date(timeIntervalSince1970: 100)
-        let t140 = Date(timeIntervalSince1970: 140)
-        let t161 = Date(timeIntervalSince1970: 161)
-
-        store.recordScan(timestamp: t100)
-        store.recordScan(timestamp: t140)
-        store.recordScan(timestamp: t161)
-
-        #expect(store.allScanTimestamps == [t140, t161])
-    }
-
-    @Test func recordingSnapshotDoesNotCreateAnotherScanCycle() {
-        let store = SignalHistoryStore(maxCount: 20)
-        let timestamp = Date(timeIntervalSince1970: 100)
-
-        store.record(
-            bssid: "aa:bb:cc:dd:ee:01",
-            rssi: -50,
-            snapshot: makeSnapshot(timestamp: timestamp)
-        )
-
-        #expect(store.allScanTimestamps.isEmpty)
+        #expect(store.snapshotHistory(for: "aa:bb:cc:dd:ee:01")?.map(\.timestamp) == [first, second])
+        #expect(store.allSnapshots["aa:bb:cc:dd:ee:01"]?.map(\.rssi) == [-70, -60])
     }
 }

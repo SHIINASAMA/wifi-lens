@@ -36023,6 +36023,47 @@
         }
       }
     },
+    "spectrum.accessibility.aggregate_heatmap_label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ aggregate Wi-Fi activity heatmap, RSSI from -100 to -30 dBm"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@-Heatmap der aggregierten Wi-Fi-Aktivität, RSSI von -100 bis -30 dBm"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapa de calor de actividad Wi-Fi agregada de %1$@, RSSI de -100 a -30 dBm"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carte de chaleur de l’activité Wi-Fi agrégée de %1$@, RSSI de -100 à -30 dBm"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ Wi-Fi アクティビティの集約ヒートマップ、RSSI は -100 ～ -30 dBm"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ Wi-Fi 活动聚合热力图，RSSI 范围为 -100 至 -30 dBm"
+          }
+        }
+      }
+    },
     "spectrum.accessibility.trend_declining_fmt" : {
       "comment" : "RSSI trend declining: from, to, change amount, and sample count",
       "extractionState" : "manual",
@@ -36443,7 +36484,7 @@
       }
     },
     "spectrum.heatmap.empty" : {
-      "comment" : "Placeholder when not enough snapshots are collected for the heatmap",
+      "comment" : "Placeholder when the current scan has no heatmap envelopes",
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
@@ -43217,88 +43258,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "有误导性"
-          }
-        }
-      }
-    },
-    "spectrum.heatmap.time.ago" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vor 60 s"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "60s ago"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hace 60 s"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il y a 60 s"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "60秒前"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "60 秒前"
-          }
-        }
-      }
-    },
-    "spectrum.heatmap.time.now" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jetzt"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Now"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ahora"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maintenant"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "現在"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "现在"
           }
         }
       }

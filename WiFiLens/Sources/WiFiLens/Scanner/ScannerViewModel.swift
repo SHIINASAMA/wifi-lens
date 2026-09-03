@@ -235,34 +235,14 @@ final class ScannerViewModel {
         return signalHistory.snapshotHistory(for: bssid)
     }
 
-    /// Shared-history-derived heatmap for a single band. Owns only aggregation:
-    /// it converts the per-BSSID snapshots belonging to each successful scan
-    /// into anonymous weighted frequency spans. The scan timeline is the source
-    /// of frame ownership, so an empty scan remains a zero-activity frame and a
-    /// stale snapshot cannot create one. Environment-level: ignores per-panel
-    /// filters and hidden toggles.
+    /// Current-scan heatmap for a single band. It deliberately reads the full
+    /// deduplicated scan result and ignores presentation state.
     func heatmapModel(for band: ChannelBand) -> SpectrumHeatmapModel {
         let channels = heatmapChannels(for: band)
-
-        // Bucket snapshots by their exact scan timestamp. In production,
-        // ingestNetworks records every network of one scan with the same
-        // observation-cycle timestamp, so a bucket == one scan moment.
-        var buckets: [Date: [NetworkSnapshot]] = [:]
-        for snaps in signalHistory.allSnapshots.values {
-            for snap in snaps {
-                guard let snapBand = ChannelBand(id: snap.band), snapBand == band else { continue }
-                buckets[snap.timestamp, default: []].append(snap)
-            }
+        let envelopes = deduplicatedNetworks.compactMap {
+            SpectrumHeatmapActivity.envelope(for: $0, band: band)
         }
-
-        let frames = signalHistory.allScanTimestamps.sorted().map { timestamp in
-            let spans = (buckets[timestamp] ?? []).compactMap {
-                SpectrumHeatmapActivity.span(for: $0, band: band)
-            }
-            return SpectrumHeatmapFrame(id: timestamp, timestamp: timestamp, spans: spans)
-        }
-
-        return SpectrumHeatmapModel(band: band, channels: channels, frames: frames)
+        return SpectrumHeatmapModel(band: band, channels: channels, envelopes: envelopes)
     }
 
     /// The heatmap's X-axis channels for a band: the legal channel set from the
@@ -620,7 +600,6 @@ final class ScannerViewModel {
         regulatoryPipeline.inferredRegion = output.cycle.inferredRegion
 
         lastObservationTimestamp = output.cycle.observation.timestamp
-        signalHistory.recordScan(timestamp: lastObservationTimestamp)
         ingestNetworks(output.rawNetworks, timestamp: lastObservationTimestamp)
     }
 
@@ -1066,7 +1045,6 @@ extension ScannerViewModel {
     ) {
         self.supportedBands = supportedBands
         self.lastObservationTimestamp = timestamp
-        signalHistory.recordScan(timestamp: timestamp)
         ingestNetworks(networks, timestamp: timestamp)
     }
 

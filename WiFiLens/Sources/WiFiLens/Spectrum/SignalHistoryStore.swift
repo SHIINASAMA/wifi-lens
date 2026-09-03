@@ -9,13 +9,10 @@ enum TrendDirection { case up, down, stable }
 final class SignalHistoryStore {
     private var history: [String: [Int]] = [:]
     private var snapshots: [String: [NetworkSnapshot]] = [:]
-    private var scanTimestamps: [Date] = []
     private let maxCount: Int
-    private let scanWindow: TimeInterval
 
-    init(maxCount: Int = 20, scanWindow: TimeInterval = 60) {
+    init(maxCount: Int = 20) {
         self.maxCount = maxCount
-        self.scanWindow = max(0, scanWindow)
     }
 
     func record(bssid: String, rssi: Int, snapshot: NetworkSnapshot? = nil) {
@@ -35,19 +32,6 @@ final class SignalHistoryStore {
                 snaps.removeFirst(snaps.count - maxCount)
             }
             snapshots[bssid] = snaps
-        }
-    }
-
-    func recordScan(timestamp: Date) {
-        guard !scanTimestamps.contains(timestamp) else { return }
-        scanTimestamps.append(timestamp)
-        let latest = scanTimestamps.max() ?? timestamp
-        let cutoff = latest.addingTimeInterval(-scanWindow)
-        scanTimestamps = scanTimestamps
-            .filter { $0 >= cutoff }
-            .sorted()
-        if scanTimestamps.count > maxCount {
-            scanTimestamps = Array(scanTimestamps.suffix(maxCount))
         }
     }
 
@@ -88,8 +72,4 @@ final class SignalHistoryStore {
     /// naming when the session model is designed.
     var allSnapshots: [String: [NetworkSnapshot]] { snapshots }
 
-    /// Successful scan-cycle timestamps (oldest first), bounded independently
-    /// from per-BSSID snapshot retention so empty successful scans can still
-    /// participate in shared-history consumers such as the heatmap.
-    var allScanTimestamps: [Date] { scanTimestamps }
 }
