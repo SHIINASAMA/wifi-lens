@@ -88,6 +88,39 @@ import Testing
         #expect(selectedKind == .cpu)
         #expect(failingBackend.computeCount == 1)
     }
+
+    @Test func concurrentFailedMetalRendersEachFallBackToCPU() async throws {
+        let failingBackend = TestHeatmapBackend(kind: .metal, failure: TestHeatmapBackendError.failed)
+        let worker = SpectrumHeatmapRenderWorker(
+            factory: SpectrumHeatmapComputeBackendFactory { failingBackend }
+        )
+        let firstKey = makeRenderKey(channel: 1)
+        let secondKey = makeRenderKey(channel: 6)
+
+        async let first = worker.render(firstKey)
+        async let second = worker.render(secondKey)
+        let (firstResult, secondResult) = try await (first, second)
+
+        #expect(firstResult.raster.values.allSatisfy { $0.isFinite && (0...1).contains($0) })
+        #expect(secondResult.raster.values.allSatisfy { $0.isFinite && (0...1).contains($0) })
+        #expect(failingBackend.computeCount == 2)
+
+        let selectedKind = await worker.selectedBackendKind()
+        #expect(selectedKind == .cpu)
+    }
+
+    private func makeRenderKey(channel: Int) -> SpectrumHeatmapRenderKey {
+        SpectrumHeatmapRenderKey(
+            model: SpectrumHeatmapModel(
+                band: .band24GHz,
+                channels: [channel],
+                envelopes: input.envelopes
+            ),
+            domain: input.domain,
+            rssiRange: input.rssiRange,
+            resolution: input.resolution
+        )
+    }
 }
 
 private enum TestHeatmapBackendError: Error {

@@ -44,14 +44,18 @@ actor SpectrumHeatmapRenderWorker {
         } catch is CancellationError {
             throw CancellationError()
         } catch {
-            guard backend.kind == .metal, !metalDisabled else {
+            guard backend.kind == .metal else {
                 throw error
             }
 
             // A failed Metal submission disables it for this worker lifetime;
             // later renders go directly to the CPU reference implementation.
-            metalDisabled = true
-            selectedBackend = cpuBackend
+            // The request that already selected Metal must still fall back,
+            // even if another concurrent request disabled Metal first.
+            if !metalDisabled {
+                metalDisabled = true
+                selectedBackend = cpuBackend
+            }
             raster = try await Self.computeOffMainActor(using: cpuBackend, input: input)
         }
 

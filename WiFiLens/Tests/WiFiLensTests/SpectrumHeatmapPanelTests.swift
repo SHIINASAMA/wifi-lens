@@ -78,55 +78,6 @@ import SwiftUI
         #expect(SpectrumHeatmapPanel.rasterResolution(for: CGSize(width: 2_000, height: 1_000)) == .standard)
     }
 
-    @Test func renderCacheReusesEquivalentModelDomainAndResolution() {
-        let model = SpectrumHeatmapModel(
-            band: .band5GHz,
-            channels: [36, 40],
-            envelopes: [SpectrumHeatmapEnvelope(
-                leftX: 34,
-                rightX: 38,
-                peakRSSI: -50,
-                baselineRSSI: -100
-            )]
-        )
-        let domain = SpectrumHeatmapLayout.channelDomain(channels: model.channels, band: model.band)!
-        let rssiRange = -100.0...(-30.0)
-        let key = SpectrumHeatmapRenderKey(
-            model: model,
-            domain: domain,
-            rssiRange: rssiRange,
-            resolution: .standard
-        )
-        let equivalentKey = SpectrumHeatmapRenderKey(
-            model: SpectrumHeatmapModel(
-                band: .band5GHz,
-                channels: [36, 40],
-                envelopes: model.envelopes
-            ),
-            domain: domain,
-            rssiRange: rssiRange,
-            resolution: .standard
-        )
-        let cache = SpectrumHeatmapRenderCache()
-        var generationCount = 0
-        var smoothingCount = 0
-        let generate = {
-            generationCount += 1
-            return SpectrumHeatmapRaster(width: 1, height: 1, values: [1])
-        }
-        let smooth: (SpectrumHeatmapRaster) -> SpectrumHeatmapRaster = { raster in
-            smoothingCount += 1
-            return raster
-        }
-
-        let first = cache.smoothedRaster(for: key, generate: generate, smooth: smooth)
-        let second = cache.smoothedRaster(for: equivalentKey, generate: generate, smooth: smooth)
-
-        #expect(first == second)
-        #expect(generationCount == 1)
-        #expect(smoothingCount == 1)
-    }
-
     @Test func maximumHeatmapColorIsWarmAndNotWhite() {
         let maximum = SpectrumHeatmapColor.components(forIntensity: 1)
 

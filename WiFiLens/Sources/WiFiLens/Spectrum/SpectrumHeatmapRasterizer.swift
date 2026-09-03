@@ -77,33 +77,6 @@ struct SpectrumHeatmapRenderKey: Hashable, Sendable {
     let resolution: SpectrumHeatmapResolution
 }
 
-/// Retains the last field result for a panel. The key includes every input to
-/// field generation and smoothing, so SwiftUI body reevaluation cannot repeat
-/// identical CPU work.
-final class SpectrumHeatmapRenderCache {
-    private struct Entry {
-        let key: SpectrumHeatmapRenderKey
-        let raster: SpectrumHeatmapRaster
-    }
-
-    private var entry: Entry?
-
-    func smoothedRaster(
-        for key: SpectrumHeatmapRenderKey,
-        generate: () -> SpectrumHeatmapRaster,
-        smooth: (SpectrumHeatmapRaster) -> SpectrumHeatmapRaster
-    ) -> SpectrumHeatmapRaster {
-        if let entry, entry.key == key {
-            return entry.raster
-        }
-
-        let raster = generate()
-        let smoothed = smooth(raster)
-        entry = Entry(key: key, raster: smoothed)
-        return smoothed
-    }
-}
-
 enum SpectrumHeatmapRasterizer {
     static let resolution = SpectrumHeatmapResolution.standard
 
