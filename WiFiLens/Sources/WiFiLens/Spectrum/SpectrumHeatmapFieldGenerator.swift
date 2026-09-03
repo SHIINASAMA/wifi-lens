@@ -11,10 +11,6 @@ protocol SpectrumHeatmapFieldGenerating: Sendable {
 }
 
 struct CPUHeatmapFieldGenerator: SpectrumHeatmapFieldGenerating, Sendable {
-    private static let verticalDecayTauDB = 10.0
-    private static let verticalBodyFloor = 0.12
-    private static let edgeFadeDB = 3.0
-
     init() {}
 
     func generate(
@@ -38,6 +34,7 @@ struct CPUHeatmapFieldGenerator: SpectrumHeatmapFieldGenerating, Sendable {
 
         let rect = CGRect(x: 0, y: 0, width: resolution.width, height: resolution.height)
         var values = Array(repeating: Float(0), count: storageCount)
+        let parameters = SpectrumHeatmapFieldParameters.current
 
         for y in 0..<resolution.height {
             guard let rssi = SpectrumHeatmapLayout.rssi(
@@ -72,17 +69,17 @@ struct CPUHeatmapFieldGenerator: SpectrumHeatmapFieldGenerating, Sendable {
 
                     let depthDB = curve - rssi
                     if depthDB >= 0 {
-                        let decay = exp(-depthDB / Self.verticalDecayTauDB)
-                        let profile = Self.verticalBodyFloor
-                            + (1 - Self.verticalBodyFloor) * decay
+                        let decay = exp(-depthDB / parameters.verticalDecayTauDB)
+                        let profile = parameters.verticalBodyFloor
+                            + (1 - parameters.verticalBodyFloor) * decay
                         density += horizontalSupport * profile
-                    } else if depthDB >= -Self.edgeFadeDB {
-                        let edge = (depthDB + Self.edgeFadeDB) / Self.edgeFadeDB
+                    } else if depthDB >= -parameters.edgeFadeDB {
+                        let edge = (depthDB + parameters.edgeFadeDB) / parameters.edgeFadeDB
                         density += horizontalSupport * smoothstep(edge)
                     }
                 }
 
-                let normalized = sqrt(max(0, min(density / 4.0, 1.0)))
+                let normalized = sqrt(max(0, min(density / parameters.normalizationDivisor, 1.0)))
                 values[y * resolution.width + x] = Float(min(1, max(0, normalized)))
             }
         }

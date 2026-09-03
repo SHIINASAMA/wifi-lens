@@ -1,3 +1,4 @@
+import CoreGraphics
 import SwiftUI
 
 /// Fixed thermal-imaging colormap for the heatmap field.
@@ -48,7 +49,7 @@ enum SpectrumHeatmapColor {
 struct SpectrumHeatmapPanel: View {
     let viewModel: ScannerViewModel
     let band: ChannelBand
-    @State private var renderCache = SpectrumHeatmapRenderCache()
+    @State private var renderCoordinator: SpectrumHeatmapRenderCoordinator
 
     static let timeAxisLabels: [String] = []
 
@@ -57,6 +58,12 @@ struct SpectrumHeatmapPanel: View {
     private static let plotTopInset: CGFloat = 12
     private static let plotTrailingInset: CGFloat = 8
     private static let plotBottomInset: CGFloat = 28
+
+    init(viewModel: ScannerViewModel, band: ChannelBand) {
+        self.viewModel = viewModel
+        self.band = band
+        _renderCoordinator = State(initialValue: SpectrumHeatmapRenderCoordinator())
+    }
 
     var body: some View {
         let model = viewModel.heatmapModel(for: band)
@@ -142,49 +149,37 @@ struct SpectrumHeatmapPanel: View {
                 rssiRange: rssiRange,
                 resolution: resolution
             )
-            let smoothed = renderCache.smoothedRaster(
-                for: key,
-                generate: {
-                    CPUHeatmapFieldGenerator().generate(
-                        envelopes: model.envelopes,
-                        domain: domain,
-                        rssiRange: rssiRange,
-                        resolution: resolution
-                    )
-                },
-                smooth: { raster in
-                    SpectrumHeatmapRasterizer.smooth(raster, domain: domain)
-                }
-            )
 
             ZStack {
                 RoundedRectangle(cornerRadius: 9, style: .continuous)
                     .fill(Color(red: 0.008, green: 0.014, blue: 0.038))
-                rasterLayer(smoothed, in: plotRect, opacity: 0.42)
-                    .blur(radius: 8)
-                rasterLayer(smoothed, in: plotRect, opacity: 0.96)
+                if let result = renderCoordinator.result {
+                    rasterLayer(result.image, in: plotRect, opacity: 0.42)
+                        .blur(radius: 8)
+                    rasterLayer(result.image, in: plotRect, opacity: 0.96)
+                }
                 axisLayer(model: model, domain: domain, rssiRange: rssiRange, plotRect: plotRect)
             }
             .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+            .task(id: key) {
+                renderCoordinator.request(key)
+            }
+            .onDisappear {
+                renderCoordinator.cancel()
+            }
         }
         .frame(minHeight: 160, idealHeight: 190, maxHeight: 240)
     }
 
     private func rasterLayer(
-        _ raster: SpectrumHeatmapRaster,
+        _ image: CGImage,
         in plotRect: CGRect,
         opacity: Double
     ) -> some View {
-        Group {
-            if let image = SpectrumHeatmapRasterizer.cgImage(for: raster, color: {
-                SpectrumHeatmapColor.components(forIntensity: Double($0))
-            }) {
-                Image(decorative: image, scale: 1, orientation: .up)
-                    .resizable()
-                    .interpolation(.high)
-                    .opacity(opacity)
-            }
-        }
+        Image(decorative: image, scale: 1, orientation: .up)
+            .resizable()
+            .interpolation(.high)
+            .opacity(opacity)
         .frame(width: plotRect.width, height: plotRect.height)
         .position(x: plotRect.midX, y: plotRect.midY)
     }

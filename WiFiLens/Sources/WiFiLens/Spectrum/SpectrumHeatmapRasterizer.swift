@@ -7,7 +7,7 @@ struct SpectrumHeatmapRGB: Equatable, Sendable {
     let blue: Double
 }
 
-struct SpectrumHeatmapResolution: Equatable, Sendable {
+struct SpectrumHeatmapResolution: Hashable, Sendable {
     static let standard = SpectrumHeatmapResolution(width: 640, height: 256)
 
     let width: Int
@@ -70,7 +70,7 @@ struct SpectrumHeatmapRaster: Equatable, Sendable {
     }
 }
 
-struct SpectrumHeatmapRenderKey: Equatable, Sendable {
+struct SpectrumHeatmapRenderKey: Hashable, Sendable {
     let model: SpectrumHeatmapModel
     let domain: SpectrumHeatmapChannelDomain
     let rssiRange: ClosedRange<Double>

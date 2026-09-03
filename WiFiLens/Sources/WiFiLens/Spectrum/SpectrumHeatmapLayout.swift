@@ -3,7 +3,7 @@ import CoreGraphics
 /// The same channel-coordinate domain used by `WiFiBandChart` and ChartLens.
 /// Regulatory channel lists are used for labels and scanner input, but never
 /// to compress or clip the numeric chart coordinate space.
-struct SpectrumHeatmapChannelDomain: Equatable, Sendable {
+struct SpectrumHeatmapChannelDomain: Hashable, Sendable {
     let minChannelCoordinate: Double
     let maxChannelCoordinate: Double
 

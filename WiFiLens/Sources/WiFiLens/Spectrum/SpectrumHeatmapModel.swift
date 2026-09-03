@@ -2,7 +2,7 @@ import ChartLens
 
 /// An anonymous spectrum envelope contributed by one network in the current
 /// scan. It intentionally contains no access-point identity or time data.
-struct SpectrumHeatmapEnvelope: Equatable, Sendable {
+struct SpectrumHeatmapEnvelope: Hashable, Sendable {
     let leftX: Double
     let rightX: Double
     let peakRSSI: Double
@@ -20,7 +20,7 @@ struct SpectrumHeatmapEnvelope: Equatable, Sendable {
 
 /// The current-scan aggregate view for one band. It deliberately contains no
 /// scan history, timestamps, frames, or access-point identity.
-struct SpectrumHeatmapModel: Equatable, Sendable {
+struct SpectrumHeatmapModel: Hashable, Sendable {
     let band: ChannelBand
     let channels: [Int]
     let envelopes: [SpectrumHeatmapEnvelope]

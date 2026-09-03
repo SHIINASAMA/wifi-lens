@@ -154,6 +154,19 @@
 		A3C7A1B2C3D4E5F678900031 /* SpectrumHeatmapFieldGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900030 /* SpectrumHeatmapFieldGenerator.swift */; };
 		A3C7A1B2C3D4E5F678900032 /* SpectrumHeatmapFieldGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900030 /* SpectrumHeatmapFieldGenerator.swift */; };
 		A3C7A1B2C3D4E5F678900033 /* SpectrumHeatmapFieldGeneratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900034 /* SpectrumHeatmapFieldGeneratorTests.swift */; };
+		A3C7A1B2C3D4E5F678900036 /* SpectrumHeatmapComputeBackendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900035 /* SpectrumHeatmapComputeBackendTests.swift */; };
+		A3C7A1B2C3D4E5F67890003C /* SpectrumHeatmapMetalBackendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F67890003B /* SpectrumHeatmapMetalBackendTests.swift */; };
+		A3C7A1B2C3D4E5F678900039 /* SpectrumHeatmapComputeBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900038 /* SpectrumHeatmapComputeBackend.swift */; };
+		A3C7A1B2C3D4E5F67890003A /* SpectrumHeatmapComputeBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900038 /* SpectrumHeatmapComputeBackend.swift */; };
+		A3C7A1B2C3D4E5F678900042 /* SpectrumHeatmapMetalBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900041 /* SpectrumHeatmapMetalBackend.swift */; };
+		A3C7A1B2C3D4E5F678900043 /* SpectrumHeatmapMetalBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900041 /* SpectrumHeatmapMetalBackend.swift */; };
+		A3C7A1B2C3D4E5F678900045 /* SpectrumHeatmap.metal in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900044 /* SpectrumHeatmap.metal */; };
+		A3C7A1B2C3D4E5F678900046 /* SpectrumHeatmap.metal in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900044 /* SpectrumHeatmap.metal */; };
+		A3C7A1B2C3D4E5F678900049 /* SpectrumHeatmapRenderWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900047 /* SpectrumHeatmapRenderWorker.swift */; };
+		A3C7A1B2C3D4E5F67890004A /* SpectrumHeatmapRenderWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900047 /* SpectrumHeatmapRenderWorker.swift */; };
+		A3C7A1B2C3D4E5F67890004B /* SpectrumHeatmapRenderCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900048 /* SpectrumHeatmapRenderCoordinator.swift */; };
+		A3C7A1B2C3D4E5F67890004C /* SpectrumHeatmapRenderCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F678900048 /* SpectrumHeatmapRenderCoordinator.swift */; };
+		A3C7A1B2C3D4E5F67890004E /* SpectrumHeatmapRenderCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3C7A1B2C3D4E5F67890004D /* SpectrumHeatmapRenderCoordinatorTests.swift */; };
 		E4A2B3C4D5E6F708112233B1 /* SpectrumPanelViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A2B3C4D5E6F708112233B0 /* SpectrumPanelViewTests.swift */; };
 		EA1000000000000000000002 /* AnalysisScopeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1000000000000000000001 /* AnalysisScopeTests.swift */; };
 		EA1000000000000000000004 /* AnalysisScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1000000000000000000003 /* AnalysisScope.swift */; };
@@ -676,6 +689,14 @@
 		A3C7A1B2C3D4E5F67890000E /* SpectrumHeatmapRasterizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapRasterizer.swift; sourceTree = "<group>"; };
 		A3C7A1B2C3D4E5F678900030 /* SpectrumHeatmapFieldGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapFieldGenerator.swift; sourceTree = "<group>"; };
 		A3C7A1B2C3D4E5F678900034 /* SpectrumHeatmapFieldGeneratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapFieldGeneratorTests.swift; sourceTree = "<group>"; };
+		A3C7A1B2C3D4E5F678900035 /* SpectrumHeatmapComputeBackendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapComputeBackendTests.swift; sourceTree = "<group>"; };
+		A3C7A1B2C3D4E5F67890003B /* SpectrumHeatmapMetalBackendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapMetalBackendTests.swift; sourceTree = "<group>"; };
+		A3C7A1B2C3D4E5F678900038 /* SpectrumHeatmapComputeBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapComputeBackend.swift; sourceTree = "<group>"; };
+		A3C7A1B2C3D4E5F678900041 /* SpectrumHeatmapMetalBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapMetalBackend.swift; sourceTree = "<group>"; };
+		A3C7A1B2C3D4E5F678900044 /* SpectrumHeatmap.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = SpectrumHeatmap.metal; sourceTree = "<group>"; };
+		A3C7A1B2C3D4E5F678900047 /* SpectrumHeatmapRenderWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapRenderWorker.swift; sourceTree = "<group>"; };
+		A3C7A1B2C3D4E5F678900048 /* SpectrumHeatmapRenderCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapRenderCoordinator.swift; sourceTree = "<group>"; };
+		A3C7A1B2C3D4E5F67890004D /* SpectrumHeatmapRenderCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumHeatmapRenderCoordinatorTests.swift; sourceTree = "<group>"; };
 		A2B300000000000000000001 /* SignalHistoryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalHistoryStoreTests.swift; sourceTree = "<group>"; };
 		A3C7A1B2C3D4E5F678900005 /* SpectrumBandPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumBandPanel.swift; sourceTree = "<group>"; };
 		A3C7A1B2C3D4E5F678900006 /* SpectrumTrendPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumTrendPanel.swift; sourceTree = "<group>"; };
@@ -1043,6 +1064,11 @@
 				A3C7A1B2C3D4E5F67890000D /* SpectrumHeatmapActivity.swift */,
 				A3C7A1B2C3D4E5F67890000E /* SpectrumHeatmapRasterizer.swift */,
 				A3C7A1B2C3D4E5F678900030 /* SpectrumHeatmapFieldGenerator.swift */,
+				A3C7A1B2C3D4E5F678900038 /* SpectrumHeatmapComputeBackend.swift */,
+				A3C7A1B2C3D4E5F678900041 /* SpectrumHeatmapMetalBackend.swift */,
+				A3C7A1B2C3D4E5F678900044 /* SpectrumHeatmap.metal */,
+				A3C7A1B2C3D4E5F678900047 /* SpectrumHeatmapRenderWorker.swift */,
+				A3C7A1B2C3D4E5F678900048 /* SpectrumHeatmapRenderCoordinator.swift */,
 				A3C7A1B2C3D4E5F67890000B /* SpectrumHeatmapLayout.swift */,
 				A3C7A1B2C3D4E5F678900009 /* SpectrumHeatmapPanel.swift */,
 			);
@@ -1561,6 +1587,9 @@
 				A3C7A1B2C3D4E5F67890000A /* SpectrumHeatmapPanelTests.swift */,
 				A3C7A1B2C3D4E5F67890000C /* SpectrumHeatmapLayoutTests.swift */,
 				A3C7A1B2C3D4E5F678900034 /* SpectrumHeatmapFieldGeneratorTests.swift */,
+				A3C7A1B2C3D4E5F678900035 /* SpectrumHeatmapComputeBackendTests.swift */,
+				A3C7A1B2C3D4E5F67890003B /* SpectrumHeatmapMetalBackendTests.swift */,
+				A3C7A1B2C3D4E5F67890004D /* SpectrumHeatmapRenderCoordinatorTests.swift */,
 				TH0000000000000000000001 /* ThroughputMonitorTests.swift */,
 				D92298452F334CDAAA9695D3 /* WindowFramePolicyTests.swift */,
 				A1C4E7B92F0148D3B6E90A21 /* DetailPageMinimumHeightTests.swift */,
@@ -2067,6 +2096,11 @@
 				A3C7A1B2C3D4E5F678900025 /* SpectrumHeatmapActivity.swift in Sources */,
 				A3C7A1B2C3D4E5F678900027 /* SpectrumHeatmapRasterizer.swift in Sources */,
 				A3C7A1B2C3D4E5F678900031 /* SpectrumHeatmapFieldGenerator.swift in Sources */,
+				A3C7A1B2C3D4E5F678900039 /* SpectrumHeatmapComputeBackend.swift in Sources */,
+				A3C7A1B2C3D4E5F678900042 /* SpectrumHeatmapMetalBackend.swift in Sources */,
+				A3C7A1B2C3D4E5F678900045 /* SpectrumHeatmap.metal in Sources */,
+				A3C7A1B2C3D4E5F678900049 /* SpectrumHeatmapRenderWorker.swift in Sources */,
+				A3C7A1B2C3D4E5F67890004B /* SpectrumHeatmapRenderCoordinator.swift in Sources */,
 				A3C7A1B2C3D4E5F678900022 /* SpectrumHeatmapLayout.swift in Sources */,
 				A3C7A1B2C3D4E5F67890001E /* SpectrumHeatmapPanel.swift in Sources */,
 				23F1AB88A28C6E035AA916AA /* BandChartViewModel.swift in Sources */,
@@ -2246,6 +2280,9 @@
 				A3C7A1B2C3D4E5F678900021 /* SpectrumHeatmapPanelTests.swift in Sources */,
 				A3C7A1B2C3D4E5F678900024 /* SpectrumHeatmapLayoutTests.swift in Sources */,
 				A3C7A1B2C3D4E5F678900033 /* SpectrumHeatmapFieldGeneratorTests.swift in Sources */,
+				A3C7A1B2C3D4E5F678900036 /* SpectrumHeatmapComputeBackendTests.swift in Sources */,
+				A3C7A1B2C3D4E5F67890003C /* SpectrumHeatmapMetalBackendTests.swift in Sources */,
+				A3C7A1B2C3D4E5F67890004E /* SpectrumHeatmapRenderCoordinatorTests.swift in Sources */,
 				TH0000000000000000000002 /* ThroughputMonitorTests.swift in Sources */,
 				1B8B239E2A11401AB0C0D51B /* WindowFramePolicyTests.swift in Sources */,
 				A1C4E7BA2F0148D3B6E90A22 /* DetailPageMinimumHeightTests.swift in Sources */,
@@ -2392,6 +2429,11 @@
 				A3C7A1B2C3D4E5F678900026 /* SpectrumHeatmapActivity.swift in Sources */,
 				A3C7A1B2C3D4E5F678900028 /* SpectrumHeatmapRasterizer.swift in Sources */,
 				A3C7A1B2C3D4E5F678900032 /* SpectrumHeatmapFieldGenerator.swift in Sources */,
+				A3C7A1B2C3D4E5F67890003A /* SpectrumHeatmapComputeBackend.swift in Sources */,
+				A3C7A1B2C3D4E5F678900043 /* SpectrumHeatmapMetalBackend.swift in Sources */,
+				A3C7A1B2C3D4E5F678900046 /* SpectrumHeatmap.metal in Sources */,
+				A3C7A1B2C3D4E5F67890004A /* SpectrumHeatmapRenderWorker.swift in Sources */,
+				A3C7A1B2C3D4E5F67890004C /* SpectrumHeatmapRenderCoordinator.swift in Sources */,
 				A3C7A1B2C3D4E5F678900023 /* SpectrumHeatmapLayout.swift in Sources */,
 				A3C7A1B2C3D4E5F678900020 /* SpectrumHeatmapPanel.swift in Sources */,
 				FB1E32752FC7316C009D1BDC /* OverviewView.swift in Sources */,

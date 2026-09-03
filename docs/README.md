@@ -9,6 +9,7 @@ This directory contains project documentation for human maintainers and agents.
 | [TODO.md](TODO.md) | Planned features, engineering work, and product directions |
 | [ISSUES.md](ISSUES.md) | Current known defects, regressions, and deferred items |
 | [2026-09-02-aggregate-spectrum-heatmap.md](superpowers/plans/2026-09-02-aggregate-spectrum-heatmap.md) | Implementation plan for the aggregate Spectrum Heatmap |
+| [2026-09-03-gpu-heatmap-computation.md](superpowers/plans/2026-09-03-gpu-heatmap-computation.md) | Implementation plan for Metal-backed Heatmap field computation |
 
 `TODO.md` records work that has not been done yet. Completed items are removed
 rather than archived. `ISSUES.md` records active problems and explicitly
