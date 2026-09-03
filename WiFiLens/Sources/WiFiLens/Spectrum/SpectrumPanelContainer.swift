@@ -36,7 +36,7 @@ struct SpectrumPanelContainer: View {
             viewModel: viewModel,
             panelID: panelID,
             isVendorColumnAvailable: isVendorColumnAvailable,
-            band: band,
+            band: $band,
             chartType: $viewType,
             selectedNetworkID: $selectedNetworkID,
             sortOrder: $sortOrder,

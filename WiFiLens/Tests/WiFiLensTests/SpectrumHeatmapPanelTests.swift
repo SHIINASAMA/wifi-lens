@@ -50,16 +50,15 @@ import SwiftUI
             band: .band5GHz,
             channels: [36],
             envelopes: [SpectrumHeatmapEnvelope(
-                lowerFrequencyMHz: 5170,
-                upperFrequencyMHz: 5190,
+                leftX: 34,
+                rightX: 38,
                 peakRSSI: -50,
-                sigmaMHz: 2.5,
-                weight: 1
+                baselineRSSI: -100
             )]
         )))
     }
 
-    @Test func currentBandAggregateAccessibilityLabelUsesFixedRSSIRange() {
+    @Test func currentBandAggregateAccessibilityLabelUsesRSSIContext() {
         let label = SpectrumHeatmapPanel.aggregateAccessibilityLabel(for: .band5GHz)
 
         #expect(label.contains("5 GHz"))
@@ -68,8 +67,9 @@ import SwiftUI
         #expect(label.contains("-30 dBm"))
     }
 
-    @Test func axesUseSparseRSSILabelsAndNoTimeLabels() {
-        #expect(SpectrumHeatmapPanel.rssiAxisLabels == ["-100", "-70", "-30 dBm"])
+    @Test func axesUseSpectrumRSSIRangeAndNoTimeLabels() {
+        let range = SpectrumHeatmapLayout.rssiRange(for: [-45])
+        #expect(SpectrumHeatmapPanel.rssiAxisLabels(for: range) == ["-100", "-90", "-80", "-70", "-60", "-50", "-40 dBm"])
         #expect(SpectrumHeatmapPanel.timeAxisLabels.isEmpty)
     }
 
@@ -83,14 +83,13 @@ import SwiftUI
             band: .band5GHz,
             channels: [36, 40],
             envelopes: [SpectrumHeatmapEnvelope(
-                lowerFrequencyMHz: 5170,
-                upperFrequencyMHz: 5190,
+                leftX: 34,
+                rightX: 38,
                 peakRSSI: -50,
-                sigmaMHz: 2.5,
-                weight: 1
+                baselineRSSI: -100
             )]
         )
-        let domain = SpectrumHeatmapLayout.frequencyDomain(channels: model.channels, band: model.band)
+        let domain = SpectrumHeatmapLayout.channelDomain(channels: model.channels, band: model.band)!
         let rssiRange = -100.0...(-30.0)
         let key = SpectrumHeatmapRenderKey(
             model: model,
@@ -146,8 +145,8 @@ import SwiftUI
         let model = viewModel.heatmapModel(for: .band24GHz)
 
         #expect(model.envelopes.count == 2)
-        #expect(model.envelopes.allSatisfy { $0.lowerFrequencyMHz < $0.upperFrequencyMHz })
-        #expect(model.envelopes.map(\.weight).sorted() == [0.15, 1.0])
+        #expect(model.envelopes.allSatisfy { $0.leftX < $0.rightX })
+        #expect(model.envelopes.allSatisfy { $0.peakRSSI == -45 || $0.peakRSSI == -90 })
     }
 
     @Test func currentScanEnvelopesRemainIsolatedByRequestedBand() {
@@ -158,9 +157,9 @@ import SwiftUI
             makeNetwork(bssid: "aa:bb:cc:dd:ee:03", band: .band6GHz, channel: 5)
         ], to: viewModel)
 
-        #expect(viewModel.heatmapModel(for: .band24GHz).envelopes.map(\.lowerFrequencyMHz) == [2427])
-        #expect(viewModel.heatmapModel(for: .band5GHz).envelopes.map(\.lowerFrequencyMHz) == [5170])
-        #expect(viewModel.heatmapModel(for: .band6GHz).envelopes.map(\.lowerFrequencyMHz) == [5965])
+        #expect(viewModel.heatmapModel(for: .band24GHz).envelopes.map(\.leftX) == [4])
+        #expect(viewModel.heatmapModel(for: .band5GHz).envelopes.map(\.leftX) == [34])
+        #expect(viewModel.heatmapModel(for: .band6GHz).envelopes.map(\.leftX) == [3])
     }
 
     @Test func emptyCurrentScanProducesNoEnvelopes() {
@@ -198,8 +197,8 @@ import SwiftUI
         let envelopes = viewModel.heatmapModel(for: .band24GHz).envelopes
 
         #expect(envelopes.count == 1)
-        #expect(envelopes[0].lowerFrequencyMHz == 2452)
-        #expect(envelopes[0].upperFrequencyMHz == 2472)
+        #expect(envelopes[0].leftX == 9)
+        #expect(envelopes[0].rightX == 13)
     }
 
     @Test func rejectsRSSIOutsideFixedRangeBeforeEnvelopeCreation() {
@@ -233,14 +232,13 @@ import SwiftUI
             envelopes: []
         )).children.compactMap(\.label))
         let envelopeFields = Set(Mirror(reflecting: SpectrumHeatmapEnvelope(
-            lowerFrequencyMHz: 2412,
-            upperFrequencyMHz: 2422,
+            leftX: 4,
+            rightX: 8,
             peakRSSI: -50,
-            sigmaMHz: 1.25,
-            weight: 0.5
+            baselineRSSI: -100
         )).children.compactMap(\.label))
 
         #expect(modelFields == ["band", "channels", "envelopes"])
-        #expect(envelopeFields == ["lowerFrequencyMHz", "upperFrequencyMHz", "peakRSSI", "sigmaMHz", "weight"])
+        #expect(envelopeFields == ["leftX", "rightX", "peakRSSI", "baselineRSSI"])
     }
 }

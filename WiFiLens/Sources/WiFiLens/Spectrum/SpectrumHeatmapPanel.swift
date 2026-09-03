@@ -1,11 +1,5 @@
 import SwiftUI
 
-struct SpectrumHeatmapRGB: Equatable, Sendable {
-    let red: Double
-    let green: Double
-    let blue: Double
-}
-
 /// Fixed thermal-imaging colormap for the heatmap field.
 /// The ramp stays in purple → magenta → red → orange → yellow; it avoids a
 /// broad white region so the hottest core remains visually localized.
@@ -49,18 +43,15 @@ enum SpectrumHeatmapColor {
     }
 }
 
-/// Aggregate thermal field for one band. X is physical frequency and Y is the
-/// fixed RSSI range shared by the field generator and the axis.
+/// Aggregate thermal field for one band. X and Y use the same channel and RSSI
+/// coordinate spaces as the normal Spectrum chart.
 struct SpectrumHeatmapPanel: View {
     let viewModel: ScannerViewModel
     let band: ChannelBand
     @State private var renderCache = SpectrumHeatmapRenderCache()
 
-    static let rssiReferenceValues = [-100.0, -70.0, -30.0]
-    static let rssiAxisLabels = ["-100", "-70", "-30 dBm"]
     static let timeAxisLabels: [String] = []
 
-    private static let rssiRange = (-100.0)...(-30.0)
     private static let plotLeadingInset: CGFloat = 44
     private static let plotTopInset: CGFloat = 12
     private static let plotTrailingInset: CGFloat = 8
@@ -95,6 +86,16 @@ struct SpectrumHeatmapPanel: View {
         )
     }
 
+    static func rssiReferenceValues(for range: ClosedRange<Double>) -> [Double] {
+        Array(stride(from: range.lowerBound, through: range.upperBound, by: 10))
+    }
+
+    static func rssiAxisLabels(for range: ClosedRange<Double>) -> [String] {
+        rssiReferenceValues(for: range).enumerated().map { index, value in
+            index == rssiReferenceValues(for: range).count - 1 ? "\(Int(value)) dBm" : "\(Int(value))"
+        }
+    }
+
     private var emptyState: some View {
         VStack {
             Spacer()
@@ -122,13 +123,22 @@ struct SpectrumHeatmapPanel: View {
     private func heatmapCanvas(_ model: SpectrumHeatmapModel) -> some View {
         GeometryReader { proxy in
             let size = proxy.size
-            let domain = SpectrumHeatmapLayout.frequencyDomain(channels: model.channels, band: band)
+            let domain = SpectrumHeatmapLayout.channelDomain(
+                channels: model.channels,
+                band: band
+            ) ?? SpectrumHeatmapChannelDomain(
+                minChannelCoordinate: band == .band24GHz ? -1 : 1,
+                maxChannelCoordinate: Double(band.maxChannel)
+            )
+            let rssiRange = SpectrumHeatmapLayout.rssiRange(
+                for: model.envelopes.map(\.peakRSSI)
+            )
             let plotRect = Self.plotRect(in: size)
             let resolution = Self.rasterResolution(for: plotRect.size)
             let key = SpectrumHeatmapRenderKey(
                 model: model,
                 domain: domain,
-                rssiRange: Self.rssiRange,
+                rssiRange: rssiRange,
                 resolution: resolution
             )
             let smoothed = renderCache.smoothedRaster(
@@ -137,7 +147,7 @@ struct SpectrumHeatmapPanel: View {
                     CPUHeatmapFieldGenerator().generate(
                         envelopes: model.envelopes,
                         domain: domain,
-                        rssiRange: Self.rssiRange,
+                        rssiRange: rssiRange,
                         resolution: resolution
                     )
                 },
@@ -152,7 +162,7 @@ struct SpectrumHeatmapPanel: View {
                 rasterLayer(smoothed, in: plotRect, opacity: 0.42)
                     .blur(radius: 8)
                 rasterLayer(smoothed, in: plotRect, opacity: 0.96)
-                axisLayer(model: model, domain: domain, plotRect: plotRect)
+                axisLayer(model: model, domain: domain, rssiRange: rssiRange, plotRect: plotRect)
             }
             .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
         }
@@ -164,43 +174,37 @@ struct SpectrumHeatmapPanel: View {
         in plotRect: CGRect,
         opacity: Double
     ) -> some View {
-        Canvas { context, _ in
-            guard raster.width > 0, raster.height > 0 else { return }
-            let cellWidth = plotRect.width / CGFloat(raster.width)
-            let cellHeight = plotRect.height / CGFloat(raster.height)
-            for y in 0..<raster.height {
-                for x in 0..<raster.width {
-                    let intensity = raster.value(x: x, y: y)
-                    guard intensity > 0.005 else { continue }
-                    let cell = CGRect(
-                        x: plotRect.minX + CGFloat(x) * cellWidth,
-                        y: plotRect.minY + CGFloat(y) * cellHeight,
-                        width: cellWidth + 0.5,
-                        height: cellHeight + 0.5
-                    )
-                    context.fill(
-                        Path(cell),
-                        with: .color(SpectrumHeatmapColor.color(forIntensity: intensity).opacity(opacity))
-                    )
-                }
+        Group {
+            if let image = SpectrumHeatmapRasterizer.cgImage(for: raster, color: {
+                SpectrumHeatmapColor.components(forIntensity: Double($0))
+            }) {
+                Image(decorative: image, scale: 1, orientation: .up)
+                    .resizable()
+                    .interpolation(.high)
+                    .opacity(opacity)
             }
         }
+        .frame(width: plotRect.width, height: plotRect.height)
+        .position(x: plotRect.midX, y: plotRect.midY)
     }
 
     private func axisLayer(
         model: SpectrumHeatmapModel,
-        domain: SpectrumHeatmapFrequencyDomain,
+        domain: SpectrumHeatmapChannelDomain,
+        rssiRange: ClosedRange<Double>,
         plotRect: CGRect
     ) -> some View {
         Canvas { context, _ in
             let labelColor = Color.white.opacity(0.58)
-            for (index, rssi) in Self.rssiReferenceValues.enumerated() {
+            let rssiValues = Self.rssiReferenceValues(for: rssiRange)
+            let labels = Self.rssiAxisLabels(for: rssiRange)
+            for (index, rssi) in rssiValues.enumerated() {
                 guard let y = SpectrumHeatmapLayout.yPosition(
                     forRSSI: rssi,
                     in: plotRect,
-                    rssiRange: Self.rssiRange
+                    rssiRange: rssiRange
                 ) else { continue }
-                let label = Text(Self.rssiAxisLabels[index])
+                let label = Text(labels[index])
                     .font(.caption2)
                     .foregroundColor(labelColor)
                 context.draw(

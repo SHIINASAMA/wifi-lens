@@ -1,28 +1,30 @@
 import CoreGraphics
 import Foundation
-import ChartLens
 
 protocol SpectrumHeatmapFieldGenerating: Sendable {
     func generate(
         envelopes: [SpectrumHeatmapEnvelope],
-        domain: SpectrumHeatmapFrequencyDomain,
+        domain: SpectrumHeatmapChannelDomain,
         rssiRange: ClosedRange<Double>,
         resolution: SpectrumHeatmapResolution
     ) -> SpectrumHeatmapRaster
 }
 
 struct CPUHeatmapFieldGenerator: SpectrumHeatmapFieldGenerating, Sendable {
+    private static let verticalDecayTauDB = 10.0
+    private static let edgeFadeDB = 3.0
+
     init() {}
 
     func generate(
         envelopes: [SpectrumHeatmapEnvelope],
-        domain: SpectrumHeatmapFrequencyDomain,
+        domain: SpectrumHeatmapChannelDomain,
         rssiRange: ClosedRange<Double>,
         resolution: SpectrumHeatmapResolution
     ) -> SpectrumHeatmapRaster {
         let storageCount = resolution.storageCount
         guard storageCount > 0,
-              !domain.regions.isEmpty,
+              domain.span > 0,
               rssiRange.lowerBound.isFinite,
               rssiRange.upperBound.isFinite,
               rssiRange.lowerBound <= rssiRange.upperBound else {
@@ -34,15 +36,6 @@ struct CPUHeatmapFieldGenerator: SpectrumHeatmapFieldGenerating, Sendable {
         }
 
         let rect = CGRect(x: 0, y: 0, width: resolution.width, height: resolution.height)
-        let gaussians = envelopes.map { envelope in
-            GaussianEnvelope(
-                leftX: envelope.lowerFrequencyMHz,
-                rightX: envelope.upperFrequencyMHz,
-                peakY: envelope.peakRSSI,
-                baselineY: Double(Constants.rssiNoiseFloor),
-                sigma: envelope.sigmaMHz
-            )
-        }
         var values = Array(repeating: Float(0), count: storageCount)
 
         for y in 0..<resolution.height {
@@ -53,27 +46,27 @@ struct CPUHeatmapFieldGenerator: SpectrumHeatmapFieldGenerating, Sendable {
             ) else { continue }
 
             for x in 0..<resolution.width {
-                guard let frequency = SpectrumHeatmapLayout.frequencyMHz(
+                guard let channel = SpectrumHeatmapLayout.channelCoordinate(
                     forX: CGFloat(x) + 0.5,
                     domain: domain,
                     in: rect
                 ) else { continue }
 
                 var density = 0.0
-                for (index, gaussian) in gaussians.enumerated() {
-                    let curve = gaussian.value(atX: frequency)
-                    let coverage: Double
-                    if rssi <= curve - 3 {
-                        coverage = 1
-                    } else if rssi <= curve {
-                        coverage = smoothstep((curve - rssi) / 3)
-                    } else {
-                        coverage = 0
+                for envelope in envelopes {
+                    guard channel >= envelope.leftX, channel <= envelope.rightX else { continue }
+                    let gaussian = envelope.gaussian
+                    let curve = gaussian.value(atX: channel)
+                    let depthDB = curve - rssi
+                    if depthDB >= 0 {
+                        density += exp(-depthDB / Self.verticalDecayTauDB)
+                    } else if depthDB >= -Self.edgeFadeDB {
+                        let edge = (depthDB + Self.edgeFadeDB) / Self.edgeFadeDB
+                        density += smoothstep(edge)
                     }
-                    density += coverage * Double(envelopes[index].weight)
                 }
 
-                let normalized = sqrt(max(0, min(density / 3.0, 1.0)))
+                let normalized = sqrt(max(0, min(density / 4.0, 1.0)))
                 values[y * resolution.width + x] = Float(min(1, max(0, normalized)))
             }
         }
@@ -89,4 +82,5 @@ struct CPUHeatmapFieldGenerator: SpectrumHeatmapFieldGenerating, Sendable {
         let clamped = min(1, max(0, value))
         return clamped * clamped * (3 - 2 * clamped)
     }
+
 }

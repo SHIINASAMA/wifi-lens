@@ -2,6 +2,27 @@ import SwiftUI
 import Foundation
 import ChartLens
 
+/// Shared, identity-free description of the Gaussian envelope used by every
+/// spectrum presentation. Callers provide their canonical X coordinate space.
+struct SpectrumEnvelopeGeometry: Equatable, Sendable {
+    let leftX: Double
+    let rightX: Double
+    let peakRSSI: Double
+    let baselineRSSI: Double
+
+    var sigma: Double { (rightX - leftX) / 8.0 }
+
+    var gaussian: GaussianEnvelope {
+        GaussianEnvelope(
+            leftX: leftX,
+            rightX: rightX,
+            peakY: peakRSSI,
+            baselineY: baselineRSSI,
+            sigma: sigma
+        )
+    }
+}
+
 struct ChartSeriesDomainData: Identifiable {
     let id: String
     let ssid: String
@@ -177,12 +198,11 @@ struct ChartSeriesData: Identifiable {
     }
 
     private func gaussianEnvelope(peakY: Double) -> GaussianEnvelope {
-        GaussianEnvelope(
+        SpectrumEnvelopeGeometry(
             leftX: Double(left),
             rightX: Double(right),
-            peakY: peakY,
-            baselineY: Double(Constants.rssiNoiseFloor),
-            sigma: Double(right - left) / 8.0
-        )
+            peakRSSI: peakY,
+            baselineRSSI: Double(Constants.rssiNoiseFloor)
+        ).gaussian
     }
 }

@@ -178,6 +178,24 @@ struct ChartSeriesDataTests {
         #expect(points.last?.y == envelope.value(atX: envelope.rightX))
     }
 
+    @Test func spectrumEnvelopeGeometryUsesTheSameGaussianDescriptorForAllViews() {
+        let geometry = SpectrumEnvelopeGeometry(
+            leftX: 5170,
+            rightX: 5250,
+            peakRSSI: -50,
+            baselineRSSI: Double(Constants.rssiNoiseFloor)
+        )
+        let chartEnvelope = GaussianEnvelope(
+            leftX: 5170,
+            rightX: 5250,
+            peakY: -50,
+            baselineY: Double(Constants.rssiNoiseFloor),
+            sigma: 10
+        )
+
+        #expect(geometry.gaussian == chartEnvelope)
+    }
+
     @Test func curvePointsCentered() {
         let d = ChartSeriesData(id: "1", ssid: "Net", bssid: "aa:bb:cc", channel: 6, left: 0, apex: 1.5, right: 4, rssi: -50)
         let points = d.curvePoints

@@ -5,108 +5,64 @@ import Testing
 @Suite struct SpectrumHeatmapLayoutTests {
     private let rect = CGRect(x: 0, y: 0, width: 500, height: 200)
 
-    @Test func frequencyDomainPreservesDiscontinuousFiveGHzGap() {
-        let domain = SpectrumHeatmapLayout.frequencyDomain(
+    @Test func channelDomainMatchesSpectrumChartCoordinateSpace() {
+        let domain = SpectrumHeatmapLayout.channelDomain(
             channels: [36, 40, 44, 48, 149, 153, 157, 161, 165],
             band: .band5GHz
-        )
+        )!
+        #expect(domain.minChannelCoordinate == 1)
+        #expect(domain.maxChannelCoordinate == 170)
+
+        let ch36 = SpectrumHeatmapLayout.xPosition(
+            forChannelCoordinate: 36,
+            domain: domain,
+            in: rect
+        )!
         let ch48 = SpectrumHeatmapLayout.xPosition(
-            forFrequencyMHz: 5000 + 48 * 5,
+            forChannelCoordinate: 48,
             domain: domain,
             in: rect
         )!
         let ch149 = SpectrumHeatmapLayout.xPosition(
-            forFrequencyMHz: 5000 + 149 * 5,
-            domain: domain,
-            in: rect
-        )!
-        let ch153 = SpectrumHeatmapLayout.xPosition(
-            forFrequencyMHz: 5000 + 153 * 5,
+            forChannelCoordinate: 149,
             domain: domain,
             in: rect
         )!
 
         #expect(ch48 < ch149)
-        #expect(ch149 - ch48 > ch153 - ch149)
-        #expect(domain.regions.count == 2)
-
-        let ch36 = SpectrumHeatmapLayout.xPosition(
-            forFrequencyMHz: 5180,
-            domain: domain,
-            in: rect
-        )!
-        let ch40 = SpectrumHeatmapLayout.xPosition(
-            forFrequencyMHz: 5200,
-            domain: domain,
-            in: rect
-        )!
-        let firstRegionDelta = ch40 - ch36
-        let firstFrequencyDelta = 5200.0 - 5180.0
-        let ch157 = SpectrumHeatmapLayout.xPosition(
-            forFrequencyMHz: 5000 + 157 * 5,
-            domain: domain,
-            in: rect
-        )!
-        let secondRegionDelta = ch157 - ch153
-        let secondFrequencyDelta = 5785.0 - 5765.0
-        #expect(abs(Double(firstRegionDelta) / firstFrequencyDelta - Double(secondRegionDelta) / secondFrequencyDelta) < 0.01)
-
-        let gapStart = SpectrumHeatmapLayout.xPosition(
-            forFrequencyMHz: domain.regions[0].upperBound,
-            domain: domain,
-            in: rect
-        )!
-        let gapEnd = SpectrumHeatmapLayout.xPosition(
-            forFrequencyMHz: domain.regions[1].lowerBound,
-            domain: domain,
-            in: rect
-        )!
-        #expect(gapEnd - gapStart > rect.width * 0.1)
-        #expect(SpectrumHeatmapLayout.frequencyMHz(
-            forX: (gapStart + gapEnd) / 2,
-            domain: domain,
-            in: rect
-        ) == nil)
-
-        for frequency in [5180.0, 5200.0, 5745.0, 5805.0] {
-            let x = SpectrumHeatmapLayout.xPosition(forFrequencyMHz: frequency, domain: domain, in: rect)!
-            let roundTrip = SpectrumHeatmapLayout.frequencyMHz(forX: x, domain: domain, in: rect)!
-            #expect(abs(roundTrip - frequency) < 0.0001)
-        }
-
-        let rightmostX = SpectrumHeatmapLayout.xPosition(
-            forFrequencyMHz: domain.regions[1].upperBound,
-            domain: domain,
-            in: rect
-        )!
-        #expect(rightmostX == rect.maxX)
-        #expect(SpectrumHeatmapLayout.frequencyMHz(forX: rightmostX, domain: domain, in: rect) == domain.regions[1].upperBound)
+        #expect(abs(Double(ch48 - ch36) / 12.0 - Double(ch149 - ch48) / 101.0) < 0.01)
+        #expect(SpectrumHeatmapLayout.channelCoordinate(forX: ch149, domain: domain, in: rect) == 149)
     }
 
-    @Test func frequencyDomainHandlesSingletonAndEmptyInput() {
-        let singleton = SpectrumHeatmapLayout.frequencyDomain(channels: [36], band: .band5GHz)
-        #expect(singleton.regions.count == 1)
-        #expect(SpectrumHeatmapLayout.xPosition(forFrequencyMHz: 5180, domain: singleton, in: rect) == rect.midX)
+    @Test func channelDomainHandlesSingletonAndEmptyInput() {
+        let singleton = SpectrumHeatmapLayout.channelDomain(channels: [36], band: .band5GHz)!
+        #expect(singleton.minChannelCoordinate == 1)
+        #expect(singleton.maxChannelCoordinate == 170)
+        #expect(SpectrumHeatmapLayout.xPosition(forChannelCoordinate: 36, domain: singleton, in: rect) != nil)
 
-        let empty = SpectrumHeatmapLayout.frequencyDomain(channels: [], band: .band5GHz)
-        #expect(empty.regions.isEmpty)
-        #expect(SpectrumHeatmapLayout.xPosition(forFrequencyMHz: 0, domain: empty, in: rect) == nil)
+        let empty = SpectrumHeatmapLayout.channelDomain(channels: [], band: .band5GHz)
+        #expect(empty == nil)
     }
 
-    @Test func frequencyDomainUsesBandSpecificPhysicalSpacing() {
-        let band24 = SpectrumHeatmapLayout.frequencyDomain(channels: [1, 2, 3], band: .band24GHz)
-        let band6 = SpectrumHeatmapLayout.frequencyDomain(channels: [1, 5, 9], band: .band6GHz)
-        #expect(band24.regions[0].upperBound - band24.regions[0].lowerBound == 15)
-        #expect(band6.regions[0].upperBound - band6.regions[0].lowerBound == 60)
-
-        let fiveGHzBreak = SpectrumHeatmapLayout.frequencyDomain(
-            channels: [140, 144, 149],
+    @Test func channelDomainContainsWideEnvelopeSupportWithoutRegulatoryClipping() {
+        let domain = SpectrumHeatmapLayout.channelDomain(channels: [36, 40, 44, 48], band: .band5GHz)!
+        let envelope = SpectrumHeatmapActivity.envelope(
+            for: WiFiNetwork(
+                ssid: "wide",
+                bssid: "aa:bb:cc:dd:ee:01",
+                rssi: -50,
+                channel: WiFiChannel(band: .band5GHz, channelNumber: 36, channelWidthMHz: 160)
+            ),
             band: .band5GHz
-        )
-        #expect(fiveGHzBreak.regions.count == 2)
+        )!
+
+        #expect(envelope.leftX == 34)
+        #expect(envelope.rightX == 66)
+        #expect(SpectrumHeatmapLayout.xPosition(forChannelCoordinate: envelope.leftX, domain: domain, in: rect) != nil)
+        #expect(SpectrumHeatmapLayout.xPosition(forChannelCoordinate: envelope.rightX, domain: domain, in: rect) != nil)
     }
 
-    @Test func legalJapaneseChannel14EnvelopeStaysCenteredOn2484MHz() {
+    @Test func legalJapaneseChannel14EnvelopeUsesCanonicalChannelCoordinates() {
         let legalJapaneseChannels = RegulatoryDatabase.rules[.JP]?["24"]?.allowedChannels ?? []
         #expect(legalJapaneseChannels.contains(14))
 
@@ -118,21 +74,18 @@ import Testing
         )
         let envelope = SpectrumHeatmapActivity.envelope(for: network, band: .band24GHz)
 
-        #expect(envelope?.lowerFrequencyMHz == 2474)
-        #expect(envelope?.upperFrequencyMHz == 2494)
-        #expect(envelope.map { ($0.lowerFrequencyMHz + $0.upperFrequencyMHz) / 2 } == 2484)
+        #expect(envelope?.leftX == 12)
+        #expect(envelope?.rightX == 16)
+        #expect(envelope.map { ($0.leftX + $0.rightX) / 2 } == 14)
     }
 
     @Test func frequencyMappingHasAnInverse() {
-        let domain = SpectrumHeatmapLayout.frequencyDomain(
-            channels: [1, 6, 11],
-            band: .band24GHz
-        )
-        let frequency = 2437.0
-        let x = SpectrumHeatmapLayout.xPosition(forFrequencyMHz: frequency, domain: domain, in: rect)!
-        let roundTrip = SpectrumHeatmapLayout.frequencyMHz(forX: x, domain: domain, in: rect)!
+        let domain = SpectrumHeatmapLayout.channelDomain(channels: [1, 6, 11], band: .band24GHz)!
+        let channel = 6.0
+        let x = SpectrumHeatmapLayout.xPosition(forChannelCoordinate: channel, domain: domain, in: rect)!
+        let roundTrip = SpectrumHeatmapLayout.channelCoordinate(forX: x, domain: domain, in: rect)!
 
-        #expect(abs(roundTrip - frequency) < 0.0001)
+        #expect(abs(roundTrip - channel) < 0.0001)
     }
 
     @Test func channelTicksUseOnlyProvidedLegalChannels() {
@@ -144,11 +97,10 @@ import Testing
         )
 
         #expect(!ticks.isEmpty)
-        #expect(ticks.allSatisfy { [36, 40, 44, 48, 149, 153, 157, 161, 165].contains($0.channel) })
-        #expect(ticks.last?.channel == 165)
+        #expect(ticks.map(\.channel) == [1, 56, 111, 166])
     }
 
-    @Test func channelTicksAreCappedAndUseBrokenProjection() {
+    @Test func channelTicksAreCappedAndUseSpectrumAxisValues() {
         let channels = [36, 40, 44, 48, 149, 153, 157, 161, 165, 169, 173, 177]
         let ticks = SpectrumHeatmapLayout.channelTicks(
             channels: channels,
@@ -157,8 +109,8 @@ import Testing
             maximumCount: 20
         )
         #expect(ticks.count <= 10)
-        #expect(ticks.first?.channel == 36)
-        #expect(ticks.last?.channel == 177)
+        #expect(ticks.first?.channel == 1)
+        #expect(ticks.last?.channel == 166)
     }
 
     @Test func fixedRSSIProjectionHasExactRoundTrips() {
@@ -182,8 +134,8 @@ import Testing
     }
 
     @Test func invalidGeometryReturnsNoMapping() {
-        let domain = SpectrumHeatmapLayout.frequencyDomain(channels: [], band: .band5GHz)
-        #expect(SpectrumHeatmapLayout.xPosition(forFrequencyMHz: 5000, domain: domain, in: rect) == nil)
-        #expect(SpectrumHeatmapLayout.frequencyMHz(forX: -1, domain: domain, in: rect) == nil)
+        let domain = SpectrumHeatmapLayout.channelDomain(channels: [], band: .band5GHz)
+        #expect(domain == nil)
+        #expect(SpectrumHeatmapLayout.channelCoordinate(forX: -1, domain: SpectrumHeatmapChannelDomain(minChannelCoordinate: 1, maxChannelCoordinate: 170), in: rect) == nil)
     }
 }

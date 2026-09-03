@@ -7,41 +7,34 @@ import Testing
     private let resolution = SpectrumHeatmapResolution(width: 640, height: 256)
     private let rssiRange = (-100.0)...(-30.0)
 
-    private var singleRegionDomain: SpectrumHeatmapFrequencyDomain {
-        SpectrumHeatmapFrequencyDomain(
-            minFrequencyMHz: 2400,
-            maxFrequencyMHz: 2440,
-            regions: [2400...2440]
-        )
+    private var singleRegionDomain: SpectrumHeatmapChannelDomain {
+        SpectrumHeatmapChannelDomain(minChannelCoordinate: 1, maxChannelCoordinate: 9)
     }
 
     private func envelope(
-        lower: Double = 2408,
-        upper: Double = 2432,
+        lower: Double = 3,
+        upper: Double = 7,
         peakRSSI: Double = -50,
-        sigma: Double = 3,
-        weight: Float = 1
+        baselineRSSI: Double = -100
     ) -> SpectrumHeatmapEnvelope {
         SpectrumHeatmapEnvelope(
-            lowerFrequencyMHz: lower,
-            upperFrequencyMHz: upper,
+            leftX: lower,
+            rightX: upper,
             peakRSSI: peakRSSI,
-            sigmaMHz: sigma,
-            weight: weight
+            baselineRSSI: baselineRSSI
         )
     }
 
     private func pixel(
-        forFrequency frequency: Double,
+        forChannel channel: Double,
         rssi: Double,
-        domain: SpectrumHeatmapFrequencyDomain = SpectrumHeatmapFrequencyDomain(
-            minFrequencyMHz: 2400,
-            maxFrequencyMHz: 2440,
-            regions: [2400...2440]
+        domain: SpectrumHeatmapChannelDomain = SpectrumHeatmapChannelDomain(
+            minChannelCoordinate: 1,
+            maxChannelCoordinate: 9
         )
     ) -> (x: Int, y: Int) {
         let rect = CGRect(x: 0, y: 0, width: resolution.width, height: resolution.height)
-        let x = Int((SpectrumHeatmapLayout.xPosition(forFrequencyMHz: frequency, domain: domain, in: rect)! - 0.5).rounded())
+        let x = Int((SpectrumHeatmapLayout.xPosition(forChannelCoordinate: channel, domain: domain, in: rect)! - 0.5).rounded())
         let y = Int((SpectrumHeatmapLayout.yPosition(forRSSI: rssi, in: rect, rssiRange: rssiRange)! - 0.5).rounded())
         return (
             min(max(0, x), resolution.width - 1),
@@ -66,6 +59,16 @@ import Testing
         #expect(raster.value(x: 0, y: 256) == 0)
     }
 
+    @Test func rasterConvertsToOneRGBAImageAtItsNativeResolution() {
+        let raster = SpectrumHeatmapRaster(width: 2, height: 3, values: [0, 0.25, 0.5, 0.75, 1, 0])
+        let image = SpectrumHeatmapRasterizer.cgImage(for: raster) { intensity in
+            SpectrumHeatmapRGB(red: Double(intensity), green: 0, blue: 0)
+        }
+
+        #expect(image?.width == 2)
+        #expect(image?.height == 3)
+    }
+
     @Test func overflowedDimensionsAreSanitizedBeforeBoundsChecks() {
         let raster = SpectrumHeatmapRaster(width: Int.max, height: 2, values: [])
 
@@ -76,7 +79,7 @@ import Testing
     }
 
     @Test func repeatedGenerationIsDeterministic() {
-        let envelopes = [envelope(), envelope(lower: 2418, upper: 2442, peakRSSI: -65, weight: 0.5)]
+        let envelopes = [envelope(), envelope(lower: 2418, upper: 2442, peakRSSI: -65)]
 
         let first = generator.generate(
             envelopes: envelopes,
@@ -105,22 +108,24 @@ import Testing
         #expect(raster.values.allSatisfy { $0 == 0 })
     }
 
-    @Test func singleGaussianOnlyCoversRSSIAtOrBelowItsCurve() {
+    @Test func singleGaussianContributionDecaysContinuouslyBelowItsCurve() {
         let raster = generator.generate(
             envelopes: [envelope()],
             domain: singleRegionDomain,
             rssiRange: rssiRange,
             resolution: resolution
         )
-        let center = pixel(forFrequency: 2420, rssi: -50)
-        let aboveCurve = pixel(forFrequency: 2420, rssi: -45)
-        let belowCurve = pixel(forFrequency: 2420, rssi: -90)
+        let center = pixel(forChannel: 5, rssi: -50)
+        let aboveCurve = pixel(forChannel: 5, rssi: -45)
+        let nearCurve = pixel(forChannel: 5, rssi: -55)
+        let deepBelowCurve = pixel(forChannel: 5, rssi: -75)
 
         #expect(raster.value(x: center.x, y: aboveCurve.y) == 0)
-        #expect(raster.value(x: center.x, y: belowCurve.y) > 0)
+        #expect(raster.value(x: center.x, y: nearCurve.y) > raster.value(x: center.x, y: deepBelowCurve.y))
+        #expect(raster.value(x: center.x, y: deepBelowCurve.y) > 0)
     }
 
-    @Test func sampledPixelsAboveTheGaussianCurveRemainZero() {
+    @Test func sampledPixelsFarAboveTheGaussianCurveRemainZero() {
         let testEnvelope = envelope()
         let raster = generator.generate(
             envelopes: [testEnvelope],
@@ -132,41 +137,55 @@ import Testing
         let gaussian = SpectrumHeatmapActivity.gaussianEnvelope(for: testEnvelope)
 
         for x in stride(from: 0, to: resolution.width, by: 37) {
-            guard let frequency = SpectrumHeatmapLayout.frequencyMHz(
+            guard let channel = SpectrumHeatmapLayout.channelCoordinate(
                 forX: CGFloat(x) + 0.5,
                 domain: singleRegionDomain,
                 in: rect
             ) else { continue }
-            let curve = gaussian.value(atX: frequency)
+            let curve = gaussian.value(atX: channel)
             for y in stride(from: 0, to: resolution.height, by: 11) {
                 guard let rssi = SpectrumHeatmapLayout.rssi(
                     forY: CGFloat(y) + 0.5,
                     in: rect,
                     rssiRange: rssiRange
                 ) else { continue }
-                if rssi > curve {
+                if rssi > curve + 3 {
                     #expect(raster.value(x: x, y: y) == 0)
                 }
             }
         }
     }
 
-    @Test func strongerEnvelopeIsBrighterThanWeakerEnvelope() {
+    @Test func RSSIOnlyChangesEnvelopeHeightNotItsPerAPColorWeight() {
+        let strongRow = 64
+        let weakRow = 192
+        let rect = CGRect(x: 0, y: 0, width: resolution.width, height: resolution.height)
+        let strongRSSI = SpectrumHeatmapLayout.rssi(
+            forY: CGFloat(strongRow) + 0.5,
+            in: rect,
+            rssiRange: rssiRange
+        )!
+        let weakRSSI = SpectrumHeatmapLayout.rssi(
+            forY: CGFloat(weakRow) + 0.5,
+            in: rect,
+            rssiRange: rssiRange
+        )!
         let strong = generator.generate(
-            envelopes: [envelope(peakRSSI: -45, weight: 1)],
+            envelopes: [envelope(peakRSSI: strongRSSI)],
             domain: singleRegionDomain,
             rssiRange: rssiRange,
             resolution: resolution
         )
         let weak = generator.generate(
-            envelopes: [envelope(peakRSSI: -90, weight: 0.15)],
+            envelopes: [envelope(peakRSSI: weakRSSI)],
             domain: singleRegionDomain,
             rssiRange: rssiRange,
             resolution: resolution
         )
-        let sample = pixel(forFrequency: 2420, rssi: -95)
+        let centerX = pixel(forChannel: 5, rssi: strongRSSI).x
 
-        #expect(strong.value(x: sample.x, y: sample.y) > weak.value(x: sample.x, y: sample.y))
+        #expect(abs(Double(strong.value(x: centerX, y: strongRow)) - 0.5) < 0.01)
+        #expect(abs(Double(weak.value(x: centerX, y: weakRow)) - 0.5) < 0.01)
     }
 
     @Test func overlappingEnvelopesAccumulateAtTheSamePixel() {
@@ -182,50 +201,59 @@ import Testing
             rssiRange: rssiRange,
             resolution: resolution
         )
-        let sample = pixel(forFrequency: 2420, rssi: -95)
+        let sample = pixel(forChannel: 5, rssi: -50)
 
         #expect(two.value(x: sample.x, y: sample.y) > one.value(x: sample.x, y: sample.y))
-        #expect(abs(Double(one.value(x: sample.x, y: sample.y)) - sqrt(1.0 / 3.0)) < 0.01)
-        #expect(abs(Double(two.value(x: sample.x, y: sample.y)) - sqrt(2.0 / 3.0)) < 0.01)
+        #expect(abs(Double(one.value(x: sample.x, y: sample.y)) - 0.5) < 0.01)
+        #expect(abs(Double(two.value(x: sample.x, y: sample.y)) - sqrt(2.0 / 4.0)) < 0.01)
     }
 
     @Test func aggregateDensityAtLeastThreeSaturatesNormalization() {
+        let row = 128
+        let rect = CGRect(x: 0, y: 0, width: resolution.width, height: resolution.height)
+        let peakRSSI = SpectrumHeatmapLayout.rssi(
+            forY: CGFloat(row) + 0.5,
+            in: rect,
+            rssiRange: rssiRange
+        )!
         let raster = generator.generate(
-            envelopes: [envelope(), envelope(), envelope()],
+            envelopes: [
+                envelope(peakRSSI: peakRSSI),
+                envelope(peakRSSI: peakRSSI),
+                envelope(peakRSSI: peakRSSI),
+                envelope(peakRSSI: peakRSSI),
+                envelope(peakRSSI: peakRSSI)
+            ],
             domain: singleRegionDomain,
             rssiRange: rssiRange,
             resolution: resolution
         )
-        let sample = pixel(forFrequency: 2420, rssi: -95)
+        let sample = pixel(forChannel: 5, rssi: peakRSSI)
 
-        #expect(raster.value(x: sample.x, y: sample.y) == 1)
+        #expect(raster.value(x: sample.x, y: sample.y) > 0.99)
     }
 
     @Test func disjointEnvelopesProduceUnionCoverage() {
-        let domain = SpectrumHeatmapFrequencyDomain(
-            minFrequencyMHz: 2390,
-            maxFrequencyMHz: 2470,
-            regions: [2390...2470]
-        )
+        let domain = SpectrumHeatmapChannelDomain(minChannelCoordinate: 1, maxChannelCoordinate: 9)
         let raster = generator.generate(
             envelopes: [
-                envelope(lower: 2400, upper: 2410, sigma: 0.5),
-                envelope(lower: 2450, upper: 2460, sigma: 0.5)
+                envelope(lower: 2, upper: 3),
+                envelope(lower: 7, upper: 8)
             ],
             domain: domain,
             rssiRange: rssiRange,
             resolution: resolution
         )
-        let left = pixel(forFrequency: 2405, rssi: -95, domain: domain)
-        let right = pixel(forFrequency: 2455, rssi: -95, domain: domain)
-        let middle = pixel(forFrequency: 2430, rssi: -95, domain: domain)
+        let left = pixel(forChannel: 2.5, rssi: -95, domain: domain)
+        let right = pixel(forChannel: 7.5, rssi: -95, domain: domain)
+        let middle = pixel(forChannel: 5, rssi: -95, domain: domain)
 
         #expect(raster.value(x: left.x, y: left.y) > 0)
         #expect(raster.value(x: right.x, y: right.y) > 0)
         #expect(raster.value(x: middle.x, y: middle.y) == 0)
     }
 
-    @Test func threeDecibelCoverageEdgeIsZeroAndTransitionIsMonotonic() {
+    @Test func contributionAtTheEnvelopeEdgeIsMaximumAndTransitionIsMonotonic() {
         let domain = singleRegionDomain
         let rect = CGRect(x: 0, y: 0, width: resolution.width, height: resolution.height)
         let curveRSSI = SpectrumHeatmapLayout.rssi(
@@ -239,29 +267,31 @@ import Testing
             rssiRange: rssiRange,
             resolution: resolution
         )
-        let x = pixel(forFrequency: 2420, rssi: curveRSSI, domain: domain).x
+        let x = pixel(forChannel: 5, rssi: curveRSSI, domain: domain).x
 
-        #expect(raster.value(x: x, y: 100) == 0)
+        #expect(raster.value(x: x, y: 101) > 0)
         #expect(raster.value(x: x, y: 130) > 0)
-        for y in 100..<130 {
-            #expect(raster.value(x: x, y: y) <= raster.value(x: x, y: y + 1) + 0.0001)
+        for y in 101..<130 {
+            #expect(raster.value(x: x, y: y) >= raster.value(x: x, y: y + 1) - 0.0001)
         }
     }
 
-    @Test func gapPixelsRemainZeroForBrokenFrequencyDomain() {
-        let domain = SpectrumHeatmapLayout.frequencyDomain(
-            channels: [36, 40, 44, 48, 149, 153, 157, 161, 165],
-            band: .band5GHz
-        )
+    @Test func sparseChannelGapPixelsRemainDark() {
+        let domain = SpectrumHeatmapChannelDomain(minChannelCoordinate: 1, maxChannelCoordinate: 170)
         let raster = generator.generate(
-            envelopes: [envelope(lower: 5170, upper: 5240, peakRSSI: -45, sigma: 4)],
+            envelopes: [envelope(lower: 34, upper: 50, peakRSSI: -45)],
             domain: domain,
             rssiRange: rssiRange,
             resolution: resolution
         )
         let rect = CGRect(x: 0, y: 0, width: resolution.width, height: resolution.height)
         let gapColumns = (0..<resolution.width).filter { x in
-            SpectrumHeatmapLayout.frequencyMHz(forX: CGFloat(x) + 0.5, domain: domain, in: rect) == nil
+            guard let channel = SpectrumHeatmapLayout.channelCoordinate(
+                forX: CGFloat(x) + 0.5,
+                domain: domain,
+                in: rect
+            ) else { return false }
+            return channel > 50 && channel < 149
         }
 
         #expect(!gapColumns.isEmpty)
@@ -270,28 +300,22 @@ import Testing
         })
     }
 
-    @Test func smoothingStaysWithinContiguousRegionsAndClampsOutput() {
-        let domain = SpectrumHeatmapFrequencyDomain(
-            minFrequencyMHz: 0,
-            maxFrequencyMHz: 100,
-            regions: [0...20, 80...100]
-        )
+    @Test func smoothingRemainsLocalAndClampsOutput() {
+        let domain = SpectrumHeatmapChannelDomain(minChannelCoordinate: 1, maxChannelCoordinate: 9)
         let raw = SpectrumHeatmapRaster(
             width: 100,
             height: 5,
             values: {
                 var values = Array(repeating: Float(0), count: 500)
-                values[2 * 100 + 20] = 1
+                values[2 * 100 + 50] = 1
                 return values
             }()
         )
 
         let smoothed = SpectrumHeatmapRasterizer.smooth(raw, domain: domain)
 
-        #expect(smoothed.value(x: 19, y: 2) > 0)
-        #expect((45...55).allSatisfy { x in
-            (0..<5).allSatisfy { y in smoothed.value(x: x, y: y) == 0 }
-        })
+        #expect(smoothed.value(x: 49, y: 2) > 0)
+        #expect(smoothed.value(x: 51, y: 2) > 0)
         #expect(smoothed.values.allSatisfy { (0...1).contains($0) })
     }
 }

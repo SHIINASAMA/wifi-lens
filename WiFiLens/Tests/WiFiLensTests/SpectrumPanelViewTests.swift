@@ -3,7 +3,7 @@ import SwiftUI
 import AppKit
 @testable import WiFi_Lens
 
-@Suite struct SpectrumPanelViewTests {
+@Suite @MainActor struct SpectrumPanelViewTests {
     @Test func bandPanelSelectionFromBand() {
         let selection = SpectrumPanelViewType.band5
         #expect(selection.rawValue == "5")
@@ -38,14 +38,13 @@ import AppKit
         #expect(SpectrumPanelID.tertiary.rawValue == "tertiary")
     }
 
-    @MainActor
     @Test func supportedViewTypesIncludeTable() {
         let vm = ScannerViewModel()
         let panel = SpectrumPanelView(
             viewModel: vm,
             panelID: .tertiary,
             isVendorColumnAvailable: true,
-            band: .band24GHz,
+            band: .constant(.band24GHz),
             chartType: .constant(.table),
             selectedNetworkID: .constant(nil),
             sortOrder: .constant([]),
@@ -54,5 +53,13 @@ import AppKit
         #expect(panel.supportedViewTypes.contains(.table))
         #expect(panel.supportedViewTypes.contains(.trend))
         #expect(panel.supportedViewTypes.contains(.heatmap))
+    }
+
+    @Test func heatmapBandOptionsFollowSupportedBandsInDisplayOrder() {
+        let options = SpectrumPanelView.heatmapBandOptions(
+            supportedBands: [.band6GHz, .band24GHz]
+        )
+
+        #expect(options == [.band24GHz, .band6GHz])
     }
 }

@@ -1,4 +1,11 @@
 import CoreGraphics
+import Foundation
+
+struct SpectrumHeatmapRGB: Equatable, Sendable {
+    let red: Double
+    let green: Double
+    let blue: Double
+}
 
 struct SpectrumHeatmapResolution: Equatable, Sendable {
     static let standard = SpectrumHeatmapResolution(width: 640, height: 256)
@@ -65,7 +72,7 @@ struct SpectrumHeatmapRaster: Equatable, Sendable {
 
 struct SpectrumHeatmapRenderKey: Equatable, Sendable {
     let model: SpectrumHeatmapModel
-    let domain: SpectrumHeatmapFrequencyDomain
+    let domain: SpectrumHeatmapChannelDomain
     let rssiRange: ClosedRange<Double>
     let resolution: SpectrumHeatmapResolution
 }
@@ -100,39 +107,23 @@ final class SpectrumHeatmapRenderCache {
 enum SpectrumHeatmapRasterizer {
     static let resolution = SpectrumHeatmapResolution.standard
 
-    /// Applies a small spatial blur without sampling across a discontinuous
-    /// frequency region. The temporal axis was removed from the heatmap, so
-    /// this operation only considers nearby raster pixels.
+    /// Applies a small deterministic blur in the shared channel-coordinate
+    /// raster. A small kernel cannot fabricate a meaningful hotspot across
+    /// the large numeric gaps present in sparse channel plans.
     static func smooth(
         _ raster: SpectrumHeatmapRaster,
-        domain: SpectrumHeatmapFrequencyDomain
+        domain _: SpectrumHeatmapChannelDomain
     ) -> SpectrumHeatmapRaster {
         guard raster.width > 0, raster.height > 0 else { return raster }
 
-        let rect = CGRect(x: 0, y: 0, width: raster.width, height: raster.height)
         var output = Array(repeating: Float(0), count: raster.values.count)
 
         for y in 0..<raster.height {
             for x in 0..<raster.width {
-                guard let frequency = SpectrumHeatmapLayout.frequencyMHz(
-                    forX: CGFloat(x) + 0.5,
-                    domain: domain,
-                    in: rect
-                ), let region = regionIndex(for: frequency, in: domain.regions) else {
-                    continue
-                }
-
                 var sum = 0.0
                 var count = 0.0
                 for sampleY in max(0, y - 1)...min(raster.height - 1, y + 1) {
                     for sampleX in max(0, x - 2)...min(raster.width - 1, x + 2) {
-                        guard let sampleFrequency = SpectrumHeatmapLayout.frequencyMHz(
-                            forX: CGFloat(sampleX) + 0.5,
-                            domain: domain,
-                            in: rect
-                        ), regionIndex(for: sampleFrequency, in: domain.regions) == region else {
-                            continue
-                        }
                         sum += Double(raster.value(x: sampleX, y: sampleY))
                         count += 1
                     }
@@ -146,10 +137,42 @@ enum SpectrumHeatmapRasterizer {
         return SpectrumHeatmapRaster(width: raster.width, height: raster.height, values: output)
     }
 
-    private static func regionIndex(
-        for frequency: Double,
-        in regions: [ClosedRange<Double>]
-    ) -> Int? {
-        regions.firstIndex { $0.contains(frequency) }
+    static func cgImage(
+        for raster: SpectrumHeatmapRaster,
+        color: (Float) -> SpectrumHeatmapRGB
+    ) -> CGImage? {
+        guard raster.width > 0, raster.height > 0 else { return nil }
+
+        var bytes = Array(repeating: UInt8(0), count: raster.width * raster.height * 4)
+        for y in 0..<raster.height {
+            for x in 0..<raster.width {
+                let rgb = color(raster.value(x: x, y: y))
+                let offset = (y * raster.width + x) * 4
+                bytes[offset] = byte(rgb.red)
+                bytes[offset + 1] = byte(rgb.green)
+                bytes[offset + 2] = byte(rgb.blue)
+                bytes[offset + 3] = 255
+            }
+        }
+
+        guard let provider = CGDataProvider(data: Data(bytes) as CFData) else { return nil }
+        return CGImage(
+            width: raster.width,
+            height: raster.height,
+            bitsPerComponent: 8,
+            bitsPerPixel: 32,
+            bytesPerRow: raster.width * 4,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue),
+            provider: provider,
+            decode: nil,
+            shouldInterpolate: true,
+            intent: .defaultIntent
+        )
     }
+
+    private static func byte(_ value: Double) -> UInt8 {
+        UInt8((min(1, max(0, value)) * 255).rounded())
+    }
+
 }
