@@ -73,11 +73,11 @@ struct SpectrumLegacyCompatibilityTests {
         viewModel.setFilterQuery("Alpha", for: .primary)
 
         let primaryVisible = viewModel
-            .bandViewModel(for: .primary, selection: .band24)
+            .bandViewModel(for: .primary, band: .band24GHz)
             .visibleSeriesData()
             .map(\.displaySSID)
         let secondaryVisible = viewModel
-            .bandViewModel(for: .secondary, selection: .band24)
+            .bandViewModel(for: .secondary, band: .band24GHz)
             .visibleSeriesData()
             .map(\.displaySSID)
 

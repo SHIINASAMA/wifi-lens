@@ -179,15 +179,7 @@ final class ScannerViewModel {
         return result
     }
 
-    func bandViewModel(for panelID: SpectrumPanelID, selection: SpectrumPanelViewType) -> BandChartViewModel {
-        let band: ChannelBand
-        switch selection {
-        case .band24: band = .band24GHz
-        case .band5: band = .band5GHz
-        case .band6: band = .band6GHz
-        case .trend, .table, .heatmap:
-            preconditionFailure("bandViewModel(for:) only supports band selections")
-        }
+    func bandViewModel(for panelID: SpectrumPanelID, band: ChannelBand) -> BandChartViewModel {
 
         var byBand = panelBandViewModelsByID[panelID] ?? [:]
         if let existing = byBand[band] {

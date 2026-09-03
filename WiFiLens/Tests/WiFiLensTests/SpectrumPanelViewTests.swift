@@ -4,9 +4,9 @@ import AppKit
 @testable import WiFi_Lens
 
 @Suite @MainActor struct SpectrumPanelViewTests {
-    @Test func bandPanelSelectionFromBand() {
-        let selection = SpectrumPanelViewType.band5
-        #expect(selection.rawValue == "5")
+    @Test func spectrumPanelSelection() {
+        let selection = SpectrumPanelViewType.spectrum
+        #expect(selection.rawValue == "spectrum")
         #expect(!selection.displayName.isEmpty)
         #expect(selection.displayName != selection.rawValue)
     }
@@ -19,9 +19,7 @@ import AppKit
     }
 
     @Test func bandPanelSelectionIconNames() {
-        #expect(SpectrumPanelViewType.band24.icon == "wave.3.left")
-        #expect(SpectrumPanelViewType.band5.icon == "wave.3.right")
-        #expect(SpectrumPanelViewType.band6.icon == "wave.3.right.circle")
+        #expect(SpectrumPanelViewType.spectrum.icon == "wave.3.left")
         #expect(SpectrumPanelViewType.trend.icon == "chart.line.uptrend.xyaxis")
         #expect(SpectrumPanelViewType.table.icon == "tablecells")
         #expect(SpectrumPanelViewType.heatmap.icon == "square.grid.3x3.fill")
@@ -40,6 +38,7 @@ import AppKit
 
     @Test func supportedViewTypesIncludeTable() {
         let vm = ScannerViewModel()
+        vm.debugApplyNetworksForTesting([], supportedBands: [.band24GHz, .band5GHz, .band6GHz])
         let panel = SpectrumPanelView(
             viewModel: vm,
             panelID: .tertiary,
@@ -53,10 +52,11 @@ import AppKit
         #expect(panel.supportedViewTypes.contains(.table))
         #expect(panel.supportedViewTypes.contains(.trend))
         #expect(panel.supportedViewTypes.contains(.heatmap))
+        #expect(panel.supportedViewTypes.contains(.spectrum))
     }
 
-    @Test func heatmapBandOptionsFollowSupportedBandsInDisplayOrder() {
-        let options = SpectrumPanelView.heatmapBandOptions(
+    @Test func bandPickerOptionsFollowSupportedBandsInDisplayOrder() {
+        let options = SpectrumPanelView.bandOptions(
             supportedBands: [.band6GHz, .band24GHz]
         )
 

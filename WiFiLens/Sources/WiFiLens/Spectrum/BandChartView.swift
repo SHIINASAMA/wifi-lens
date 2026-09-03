@@ -109,12 +109,12 @@ struct WiFiBandChart: View {
         a.xMin = xMin; a.xMax = xMax
         a.yMin = model.yMin; a.yStep = 10; a.gridColor = .gray.opacity(0.15)
         a.xTicks = tickValues.map { ChartAxisConfig.XTick(position: Double($0), label: "\($0)") }
-        a.xTickLabelOffset = 28; a.yTickLabelOffset = 14
+        a.xTickLabelOffset = 10; a.yTickLabelOffset = 14
         return a
     }
 
     private let chartStyle = ChartStyle(
-        leftAxisWidth: 38, bottomAxisHeight: 42,
+        leftAxisWidth: 38, bottomAxisHeight: 24,
         marginTop: 6, marginRight: 8, marginBottom: 4
     )
 
@@ -133,7 +133,6 @@ struct WiFiBandChart: View {
                 GeometryReader { geometry in
                     let geo = computeGeo(size: geometry.size)
                     Chart(series: buildSeries(), axis: axisConfig, style: chartStyle) { chartGeo, _ in
-                        heatmapOverlay(geo: chartGeo)
                         dataLabelOverlay(geo: chartGeo)
                     }
                     .accessibilityLabel(String(localized: "spectrum.accessibility.chart_label", comment: "Spectrum chart accessibility label"))
@@ -163,25 +162,6 @@ struct WiFiBandChart: View {
     }
 
     // MARK: - Overlays
-
-    private func heatmapOverlay(geo: ChartGeometry) -> some View {
-        Canvas { context, _ in
-            let heatHeight: CGFloat = 14; let barWidth: CGFloat = 5; let barGap: CGFloat = 1
-            let heatY = geo.chartRect.maxY + 3
-            let heatmap = BandChartLayout.heatmapBins(series: visibleSeries)
-            for bin in heatmap.bins {
-                let x = geo.chartRect.minX + (Double(bin.apex) - geo.xMin) * geo.scaleX
-                let op = 0.18 + (CGFloat(bin.colors.count) / CGFloat(heatmap.maxCount)) * 0.45
-                for bar in bin.bars(barWidth: barWidth, barGap: barGap) {
-                    var p = Path()
-                    p.addRect(CGRect(x: x - barWidth / 2 + bar.offset, y: heatY, width: barWidth, height: heatHeight))
-                    context.fill(p, with: .color(bar.color.opacity(op)))
-                }
-            }
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(String(localized: "spectrum.accessibility.heatmap_label", comment: "Channel occupancy heatmap accessibility label"))
-    }
 
     private func dataLabelOverlay(geo: ChartGeometry) -> some View {
         let seriesList = model.displayedSeriesData
@@ -268,7 +248,6 @@ struct WiFiBandChart: View {
                 GeometryReader { geometry in
                     let geo = computeGeo(size: geometry.size)
                     Chart(series: buildSeries(), axis: axisConfig, style: chartStyle) { chartGeo, _ in
-                        heatmapOverlay(geo: chartGeo)
                         dataLabelOverlay(geo: chartGeo)
                     }
                     .accessibilityLabel(String(localized: "spectrum.accessibility.chart_label", comment: "Spectrum chart accessibility label"))
