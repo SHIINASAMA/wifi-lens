@@ -1,5 +1,19 @@
 name: Release
 
+# Builds, signs, notarizes and publishes the WiFi Lens OSS DMG. Release
+# credentials are shared at the ShiinaLabs organization level, while the
+# Sparkle appcast key remains specific to this repository.
+#
+# Required organization secrets / variables:
+#   APPLE_DEVELOPER_ID_CERTIFICATE_BASE64     base64 of the Developer ID Application .p12
+#   APPLE_DEVELOPER_ID_CERTIFICATE_PASSWORD   password for that .p12
+#   APPLE_TEAM_ID                             Developer Team ID (organization variable)
+#   APPLE_ID                                  Apple ID used for notarization
+#   APPLE_APP_SPECIFIC_PASSWORD               app-specific password for that Apple ID
+#
+# Required repository secret:
+#   SPARKLE_ED25519_PRIVATE_KEY               Sparkle appcast signing key
+
 on:
   push:
     tags:
@@ -16,13 +30,13 @@ permissions:
 
 env:
   RELEASE_CONFIG: Release
-  KEYCHAIN_PW: "ci-temporary-keychain-password"
 
 jobs:
   release:
     runs-on: macos-26
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
       SPARKLE_VERSION: "2.9.5"
       ARCHIVE_PATH: ${{ github.workspace }}/build/WiFiLens.xcarchive
       EXPORT_PATH: ${{ github.workspace }}/build/export
@@ -71,17 +85,30 @@ jobs:
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Import Developer ID Certificate
+        env:
+          CERTIFICATE_P12: ${{ secrets.APPLE_DEVELOPER_ID_CERTIFICATE_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.APPLE_DEVELOPER_ID_CERTIFICATE_PASSWORD }}
         run: |
-          CERT_PATH="$RUNNER_TEMP/developer-id.p12"
-          echo "${{ secrets.DEVELOPER_ID_CERTIFICATE_BASE64 }}" | base64 -d > "$CERT_PATH"
+          KEYCHAIN_PASSWORD="$(uuidgen)"
+          KEYCHAIN="$RUNNER_TEMP/wifi-lens.keychain-db"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          echo "$CERTIFICATE_P12" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN" \
+            -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security \
+            -T /usr/bin/productbuild -T /usr/bin/xcodebuild
+          security set-key-partition-list -S apple-tool:,apple:,codesign: \
+            -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security default-keychain -s "$KEYCHAIN"
+          security list-keychains -d user -s "$KEYCHAIN" login.keychain-db
+          rm -f "$RUNNER_TEMP/cert.p12"
 
-          security create-keychain -p "$KEYCHAIN_PW" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "$KEYCHAIN_PW" build.keychain
-          security import "$CERT_PATH" -k build.keychain -P "${{ secrets.P12_PASSWORD }}" -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/xcodebuild
-          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PW" build.keychain
-
-          IDENTITY=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application" | head -1 | sed 's/.*"\(.*\)"/\1/')
+          IDENTITY=$(security find-identity -v -p codesigning "$KEYCHAIN" | grep "Developer ID Application" | head -1 | sed 's/.*"\(.*\)"/\1/')
+          if [ -z "$IDENTITY" ]; then
+            echo "Developer ID Application signing identity not found" >&2
+            exit 1
+          fi
           echo "SIGNING_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
 
       - name: Create Export Options
@@ -101,7 +128,7 @@ jobs:
             <key>signingCertificate</key>
             <string>Developer ID Application</string>
             <key>teamID</key>
-            <string>${{ secrets.APPLE_TEAM_ID }}</string>
+            <string>$TEAM_ID</string>
           </dict>
           </plist>
           EOF
@@ -118,7 +145,7 @@ jobs:
             -archivePath "$ARCHIVE_PATH" \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
-            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
             CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
             ENABLE_HARDENED_RUNTIME=YES \
             OTHER_CODE_SIGN_FLAGS="--timestamp"
@@ -251,23 +278,24 @@ jobs:
           codesign --sign "$SIGNING_IDENTITY" --timestamp --options=runtime "$DMG_BASENAME.dmg"
 
       - name: Notarize DMG
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
         run: |
-          echo "${{ secrets.APPLE_API_KEY_BASE64 }}" | base64 -d > "$RUNNER_TEMP/api-key.p8"
-
           NOTARY_EXIT=0
           xcrun notarytool submit "$DMG_BASENAME.dmg" \
-            --key "$RUNNER_TEMP/api-key.p8" \
-            --key-id "${{ secrets.APPLE_API_KEY_ID }}" \
-            --issuer "${{ secrets.APPLE_API_ISSUER_ID }}" \
+            --apple-id "$APPLE_ID" \
+            --team-id "$TEAM_ID" \
+            --password "$APPLE_APP_PASSWORD" \
             --wait | tee "$RUNNER_TEMP/notary-output.txt" || NOTARY_EXIT=$?
 
           SUBMISSION_ID=$(grep -o 'id: [a-f0-9-]*' "$RUNNER_TEMP/notary-output.txt" | head -1 | cut -d' ' -f2)
           if [ -n "$SUBMISSION_ID" ]; then
             echo "--- Notarization Log ---"
             xcrun notarytool log "$SUBMISSION_ID" \
-              --key "$RUNNER_TEMP/api-key.p8" \
-              --key-id "${{ secrets.APPLE_API_KEY_ID }}" \
-              --issuer "${{ secrets.APPLE_API_ISSUER_ID }}"
+              --apple-id "$APPLE_ID" \
+              --team-id "$TEAM_ID" \
+              --password "$APPLE_APP_PASSWORD"
           fi
           exit $NOTARY_EXIT
 
